@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\C_Afluencia.cpp" />
+    <ClCompile Include="..\src\C_AgrupamentoIntercambio.cpp" />
+    <ClCompile Include="..\src\C_BaciaHidrografica.cpp" />
+    <ClCompile Include="..\src\C_ConjuntoHidraulico.cpp" />
+    <ClCompile Include="..\src\C_Contrato.cpp" />
+    <ClCompile Include="..\src\C_CorteBenders.cpp" />
+    <ClCompile Include="..\src\C_Dados.cpp" />
+    <ClCompile Include="..\src\C_Dados_CP.cpp" />
+    <ClCompile Include="..\src\C_Dados_MP.cpp" />
+    <ClCompile Include="..\src\C_Defluencia.cpp" />
+    <ClCompile Include="..\src\C_DemandaEspecial.cpp" />
+    <ClCompile Include="..\src\C_DiscretizacaoTemporal.cpp" />
+    <ClCompile Include="..\src\C_ElementoSistema.cpp" />
+    <ClCompile Include="..\src\C_EntradaSaidaDados.cpp" />
+    <ClCompile Include="..\src\C_Eolica.cpp" />
+    <ClCompile Include="..\src\C_EstagioOtimizacao.cpp" />
+    <ClCompile Include="..\src\C_FuncaoProducaoHidreletrica.cpp" />
+    <ClCompile Include="..\src\C_Hidreletrica.cpp" />
+    <ClCompile Include="..\src\C_Intercambio.cpp" />
+    <ClCompile Include="..\src\C_IntercambioHidraulico.cpp" />
+    <ClCompile Include="..\src\C_Iteracao.cpp" />
+    <ClCompile Include="..\src\C_LeituraCEPEL.cpp" />
+    <ClCompile Include="..\src\C_LeituraCEPEL_DECOMP.cpp" />
+    <ClCompile Include="..\src\C_LeituraCEPEL_DESSEM.cpp" />
+    <ClCompile Include="..\src\C_LeituraCEPEL_NEWAVE.cpp" />
+    <ClCompile Include="..\src\C_MetodoSolucao.cpp" />
+    <ClCompile Include="..\src\C_MetodoSolucao_PDDE.cpp" />
+    <ClCompile Include="..\src\C_MetodoSolucao_PSD.cpp" />
+    <ClCompile Include="..\src\C_ModeloOtimizacao.cpp" />
+    <ClCompile Include="..\src\C_ModeloOtimizacao_multiestagio_estocastico.cpp" />
+    <ClCompile Include="..\src\C_PatamarDeficit.cpp" />
+    <ClCompile Include="..\src\C_Periodo.cpp" />
+    <ClCompile Include="..\src\C_PolinomioJusante.cpp" />
+    <ClCompile Include="..\src\C_Processo.cpp" />
+    <ClCompile Include="..\src\C_ProcessoEstocastico.cpp" />
+    <ClCompile Include="..\src\C_Regua11.cpp" />
+    <ClCompile Include="..\src\C_ReservaPotencia.cpp" />
+    <ClCompile Include="..\src\C_Reservatorio.cpp" />
+    <ClCompile Include="..\src\C_RestricaoEletrica.cpp" />
+    <ClCompile Include="..\src\C_RestricaoOperativaUHE.cpp" />
+    <ClCompile Include="..\src\C_Submercado.cpp" />
+    <ClCompile Include="..\src\C_Termeletrica.cpp" />
+    <ClCompile Include="..\src\C_UnidadeUHE.cpp" />
+    <ClCompile Include="..\src\C_UnidadeUTE.cpp" />
+    <ClCompile Include="..\src\C_UsinaElevatoria.cpp" />
+    <ClCompile Include="..\src\C_UsinaNaoSimulada.cpp" />
+    <ClCompile Include="..\src\C_VariavelAleatoria.cpp" />
+    <ClCompile Include="..\src\C_VariavelAleatoriaInterna.cpp" />
+    <ClCompile Include="..\src\C_VariavelEstado.cpp" />
+    <ClCompile Include="..\src\C_VariavelRealizacao.cpp" />
+    <ClCompile Include="..\src\C_VariavelRealizacaoInterna.cpp" />
+    <ClCompile Include="..\src\SPT_main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\C_Afluencia.h" />
+    <ClInclude Include="..\src\C_AgrupamentoIntercambio.h" />
+    <ClInclude Include="..\src\C_Auxiliar.h" />
+    <ClInclude Include="..\src\C_BaciaHidrografica.h" />
+    <ClInclude Include="..\src\C_ConjuntoHidraulico.h" />
+    <ClInclude Include="..\src\C_Contrato.h" />
+    <ClInclude Include="..\src\C_CorteBenders.h" />
+    <ClInclude Include="..\src\C_Dados.h" />
+    <ClInclude Include="..\src\C_Defluencia.h" />
+    <ClInclude Include="..\src\C_DemandaEspecial.h" />
+    <ClInclude Include="..\src\C_DiscretizacaoTemporal.h" />
+    <ClInclude Include="..\src\C_ElementoSistema.h" />
+    <ClInclude Include="..\src\C_EntradaSaidaDados.h" />
+    <ClInclude Include="..\src\C_Eolica.h" />
+    <ClInclude Include="..\src\C_EstagioOtimizacao.h" />
+    <ClInclude Include="..\src\C_FuncaoProducaoHidreletrica.h" />
+    <ClInclude Include="..\src\C_Hidreletrica.h" />
+    <ClInclude Include="..\src\C_Intercambio.h" />
+    <ClInclude Include="..\src\C_IntercambioHidraulico.h" />
+    <ClInclude Include="..\src\C_Iteracao.h" />
+    <ClInclude Include="..\src\C_LeituraCEPEL.h" />
+    <ClInclude Include="..\src\C_MetodoSolucao.h" />
+    <ClInclude Include="..\src\C_ModeloOtimizacao.h" />
+    <ClInclude Include="..\src\C_OperacoesMatematicas.h" />
+    <ClInclude Include="..\src\C_OperacoesVetoriais.h" />
+    <ClInclude Include="..\src\C_PatamarDeficit.h" />
+    <ClInclude Include="..\src\C_Periodo.h" />
+    <ClInclude Include="..\src\C_PolinomioJusante.h" />
+    <ClInclude Include="..\src\C_Processo.h" />
+    <ClInclude Include="..\src\C_ProcessoEstocastico.h" />
+    <ClInclude Include="..\src\C_Regua11.h" />
+    <ClInclude Include="..\src\C_ReservaPotencia.h" />
+    <ClInclude Include="..\src\C_Reservatorio.h" />
+    <ClInclude Include="..\src\C_RestricaoEletrica.h" />
+    <ClInclude Include="..\src\C_RestricaoEquacaoLinear.h" />
+    <ClInclude Include="..\src\C_RestricaoInequacaoLinear.h" />
+    <ClInclude Include="..\src\C_RestricaoOperativaUHE.h" />
+    <ClInclude Include="..\src\C_SmartAttComum.h" />
+    <ClInclude Include="..\src\C_SmartAttMatriz.h" />
+    <ClInclude Include="..\src\C_SmartAttVetor.h" />
+    <ClInclude Include="..\src\C_SmartElemento.h" />
+    <ClInclude Include="..\src\C_SmartEnum.h" />
+    <ClInclude Include="..\src\C_SmartEnupla.h" />
+    <ClInclude Include="..\src\C_SmartMembro.h" />
+    <ClInclude Include="..\src\C_Solver.h" />
+    <ClInclude Include="..\src\C_Submercado.h" />
+    <ClInclude Include="..\src\C_Termeletrica.h" />
+    <ClInclude Include="..\src\C_UnidadeUHE.h" />
+    <ClInclude Include="..\src\C_UnidadeUTE.h" />
+    <ClInclude Include="..\src\C_UsinaElevatoria.h" />
+    <ClInclude Include="..\src\C_UsinaNaoSimulada.h" />
+    <ClInclude Include="..\src\C_VariavelAleatoria.h" />
+    <ClInclude Include="..\src\C_VariavelAleatoriaInterna.h" />
+    <ClInclude Include="..\src\C_VariavelDecisao.h" />
+    <ClInclude Include="..\src\C_VariavelEstado.h" />
+    <ClInclude Include="..\src\C_VariavelRealizacao.h" />
+    <ClInclude Include="..\src\C_VariavelRealizacaoInterna.h" />
+    <ClInclude Include="..\src\C_EstruturaResultados.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{5c3c71d3-e400-42b7-8c4f-3ffcacefde79}</ProjectGuid>
+    <RootNamespace>SPTWINapp</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>GRB;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;SPTWIN</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(MSMPI_INC);$(GUROBI_INC64);$(SolutionDir)ThirdParty\lsZollen;$(SolutionDir)ThirdParty\libseq_beta_04.21.01\src;$(SolutionDir)ThirdParty\COIN\Clp\src;$(SolutionDir)ThirdParty\COIN\CoinUtils\src;$(SolutionDir)ThirdParty\COIN\Cbc\src;$(SolutionDir)ThirdParty\COIN\Osi\src\Osi;$(SolutionDir)ThirdParty\COIN\Clp\src\OsiClp;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglAllDifferent;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglBKClique;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglClique;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglCliqueStrengthening;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglCommon;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglDuplicateRow;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglFlowCover;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglGMI;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglGomory;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglKnapsackCover;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglLandP;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglLiftAndProject;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglMixedIntegerRounding;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglMixedIntegerRounding2;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglOddHole;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglOddWheel;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglPreProcess;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglProbing;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglRedSplit;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglRedSplit2;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglResidualCapacity;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglSimpleRounding;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglTwomir;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglZeroHalf</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(MSMPI_LIB64);$(GUROBI_LIB64);$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>msmpi.lib;gurobi91.lib;gurobi_c++mdd2019.lib;libSeq.lib;libCoinUtils.lib;libClp.lib;libCbc.lib;libCbcSolver.lib;libOsi.lib;libOsiCbc.lib;libOsiClp.lib;libCgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>GRB;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;SPTWIN</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(MSMPI_INC);$(GUROBI_INC64);$(SolutionDir)ThirdParty\lsZollen;$(SolutionDir)ThirdParty\libseq_beta_04.21.01\src;$(SolutionDir)ThirdParty\COIN\Clp\src;$(SolutionDir)ThirdParty\COIN\CoinUtils\src;$(SolutionDir)ThirdParty\COIN\Cbc\src;$(SolutionDir)ThirdParty\COIN\Osi\src\Osi;$(SolutionDir)ThirdParty\COIN\Clp\src\OsiClp;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglAllDifferent;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglBKClique;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglClique;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglCliqueStrengthening;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglCommon;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglDuplicateRow;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglFlowCover;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglGMI;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglGomory;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglKnapsackCover;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglLandP;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglLiftAndProject;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglMixedIntegerRounding;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglMixedIntegerRounding2;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglOddHole;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglOddWheel;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglPreProcess;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglProbing;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglRedSplit;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglRedSplit2;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglResidualCapacity;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglSimpleRounding;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglTwomir;$(SolutionDir)ThirdParty\COIN\Cgl\src\CglZeroHalf</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/Bv /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(MSMPI_LIB64);$(GUROBI_LIB64);$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>msmpi.lib;gurobi91.lib;gurobi_c++md2019.lib;libSeq.lib;libCoinUtils.lib;libClp.lib;libCbc.lib;libCbcSolver.lib;libOsi.lib;libOsiCbc.lib;libOsiClp.lib;libCgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

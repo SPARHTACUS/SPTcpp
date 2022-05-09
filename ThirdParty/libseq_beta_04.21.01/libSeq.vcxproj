@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Counter.CPP" />
+    <ClCompile Include="src\C_matrix.CPP" />
+    <ClCompile Include="src\DigitalSequence.CPP" />
+    <ClCompile Include="src\DigitalSequence_advanced.CPP" />
+    <ClCompile Include="src\DigitalSequence_base_2.CPP" />
+    <ClCompile Include="src\DigitalSequence_classic.CPP" />
+    <ClCompile Include="src\DigitalSequence_medium_base.CPP" />
+    <ClCompile Include="src\digit_gen.CPP" />
+    <ClCompile Include="src\HaltonSequence.CPP" />
+    <ClCompile Include="src\LatinHypercube.CPP" />
+    <ClCompile Include="src\LatinSupercube.CPP" />
+    <ClCompile Include="src\own_types.CPP" />
+    <ClCompile Include="src\Permutation.CPP" />
+    <ClCompile Include="src\Polynomial.CPP" />
+    <ClCompile Include="src\RandomizedTSSequence.CPP" />
+    <ClCompile Include="src\RandomizedTSSequence_base_2.CPP" />
+    <ClCompile Include="src\Ring.CPP" />
+    <ClCompile Include="src\Sequence.CPP" />
+    <ClCompile Include="src\VectorMatrix.CPP" />
+    <ClCompile Include="src\VectorRing.CPP" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Counter.h" />
+    <ClInclude Include="src\C_matrix.h" />
+    <ClInclude Include="src\DigitalSequence.h" />
+    <ClInclude Include="src\digit_gen.h" />
+    <ClInclude Include="src\FileSequence.h" />
+    <ClInclude Include="src\HaltonSequence.h" />
+    <ClInclude Include="src\includeQMC.h" />
+    <ClInclude Include="src\LatinHypercube.h" />
+    <ClInclude Include="src\LatinSupercube.h" />
+    <ClInclude Include="src\options.h" />
+    <ClInclude Include="src\own_types.h" />
+    <ClInclude Include="src\Permutation.h" />
+    <ClInclude Include="src\Polynomial.h" />
+    <ClInclude Include="src\RandomizedTSSequence.h" />
+    <ClInclude Include="src\RandomSequence.h" />
+    <ClInclude Include="src\Ring.h" />
+    <ClInclude Include="src\Sequence.h" />
+    <ClInclude Include="src\VectorMatrix.h" />
+    <ClInclude Include="src\VectorRing.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\COPYRIGHT" />
+    <None Include="src\implementation.pdf" />
+    <None Include="src\implementation.ps" />
+    <None Include="src\README" />
+    <None Include="src\VERSIONS" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{71381624-d5b5-47b1-b316-3c90a319fcec}</ProjectGuid>
+    <RootNamespace>libSeq</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>libSeq</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

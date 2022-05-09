@@ -1,0 +1,53 @@
+libseq - low discrepancy sequence library (version beta 04/021/01)
+=========================================
+
+This C++ library is an implementation of several low discrepancy sequences
+accompanying the new techniques presented in the article Fast Generation
+of Randomized Low Discrepancy Points Sets by Ilja Friedel and Alexander
+Keller. In its curent version the library implements Latin Hypercube
+sampling, the Halton sequence, digital sequences, randomized
+(t,s)-sequences, and Latin supercube sampling.
+
+Download 
+--------
+
+The central code of libseq was tested carefully (DigitalSequence*,
+RandomizedTSSequence). Still the software is in its beta-release. Please
+report any bugs and fixes to the authors.
+
+libseq_beta_04.21.01.tar.gz   The complete C++ source code including the
+                              reference manual.
+
+For using this library you need a C++ compiler that knows 64 bit integers
+(long long int). They are only used in very few places in the library,
+however at key positions. Most of the code is 32 bits.
+
+Storing Latin Hypercube point sets or Owen's randomized sequences is
+memory intensive. We recommend at least 128 megabytes of main memory.
+                        
+Contact
+-------
+
+Ilja Friedel       ilja@cs.caltech.edu
+Alexander Keller   keller@informatik.uni-kl.de
+Website            http://www.multires.caltech.edu/software/libseq/
+
+License 
+-------
+                   
+Copyright © 1992-2001 by Alexander Keller, and Ilja Friedel. All rights
+reserved. This software may be freely copied, modified, and redistributed
+provided that this copyright notice is preserved on all copies. You may
+not distribute this software, in whole or in part, as part of any
+commercial product without the express consent of the authors. There is no
+warranty or other guarantee of fitness of this software for any purpose.
+It is provided solely "as is".
+
+Acknowledgments 
+---------------
+
+The authors are especially thankful to Fred Hickernell and Harald
+Niederreiter for their comments on the draft version of the article.
+
+
+Copyright © 2001 Ilja Friedel and Alexander Keller 
