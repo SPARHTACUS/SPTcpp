@@ -2,7 +2,7 @@
 
 Modelo computacional open-source para programação hidrotérmica em C++, mais detalhes no [WIKI](https://github.com/SPARHTACUS/SPTcpp/wiki). 
 
-Versão distribuída sob [licença MIT](https://github.com/SPARHTACUS/SPTcpp/blob/main/LICENSE.md). 
+[SPTv2.0.](https://github.com/SPARHTACUS/SPTcpp/releases/tag/alpha) Versão distribuída sob [licença MIT](https://github.com/SPARHTACUS/SPTcpp/blob/main/LICENSE.md). 
 
 
 # Instalação e execução
