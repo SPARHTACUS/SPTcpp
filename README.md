@@ -13,7 +13,7 @@ Requisitos:
   
   * [Microsoft MPI](https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi)
   * [Gurobi](https://www.gurobi.com/) (Opcional)
-  * SPTWIN 
+  * [SPTWIN](https://github.com/SPARHTACUS/SPTcpp/releases/tag/alpha)
 
 ## Ubuntu 20.04 (x64):
 
