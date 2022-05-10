@@ -11,7 +11,7 @@
 *.userprefs
 
 # SPT_app Output
-SPT_app/out/
+SPTLNX/out/
 ThirdParty/COIN/
 *.la
 *.so

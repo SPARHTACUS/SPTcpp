@@ -19,32 +19,32 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "COIN", "COIN", "{6EA42ED3-5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libseq_beta_04.21.01", "libseq_beta_04.21.01", "{8F55B65A-8A57-4B8C-843A-86D0BF973ADA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libSeq", "ThirdParty\libseq_beta_04.21.01\libseq.vcxproj", "{71381624-D5B5-47B1-B316-3C90A319FCEC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libSeq", "..\ThirdParty\libseq_beta_04.21.01\libseq.vcxproj", "{71381624-D5B5-47B1-B316-3C90A319FCEC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lsZollen", "lsZollen", "{61D58094-DF70-4F0F-8EB0-C34E7D37513F}"
 	ProjectSection(SolutionItems) = preProject
-		ThirdParty\lsZollen\convert.h = ThirdParty\lsZollen\convert.h
-		ThirdParty\lsZollen\ls_zollen.h = ThirdParty\lsZollen\ls_zollen.h
-		ThirdParty\lsZollen\sparsematrix.h = ThirdParty\lsZollen\sparsematrix.h
+		..\ThirdParty\lsZollen\convert.h = ..\ThirdParty\lsZollen\convert.h
+		..\ThirdParty\lsZollen\ls_zollen.h = ..\ThirdParty\lsZollen\ls_zollen.h
+		..\ThirdParty\lsZollen\sparsematrix.h = ..\ThirdParty\lsZollen\sparsematrix.h
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPTWIN", "SPTWIN\SPTWIN.vcxproj", "{5C3C71D3-E400-42B7-8C4F-3FFCACEFDE79}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPTWIN", "SPTWIN.vcxproj", "{5C3C71D3-E400-42B7-8C4F-3FFCACEFDE79}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCbc", "ThirdParty\COIN\Cbc\MSVisualStudio\v16\libCbc\libCbc.vcxproj", "{0B054D74-6082-452F-9744-5FBE12C7D476}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCbc", "..\ThirdParty\COIN\Cbc\MSVisualStudio\v16\libCbc\libCbc.vcxproj", "{0B054D74-6082-452F-9744-5FBE12C7D476}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCbcSolver", "ThirdParty\COIN\Cbc\MSVisualStudio\v16\libCbcSolver\libCbcSolver.vcxproj", "{5A9043A5-CB87-4E2B-807C-74830BFFAE39}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCbcSolver", "..\ThirdParty\COIN\Cbc\MSVisualStudio\v16\libCbcSolver\libCbcSolver.vcxproj", "{5A9043A5-CB87-4E2B-807C-74830BFFAE39}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiCbc", "ThirdParty\COIN\Cbc\MSVisualStudio\v16\libOsiCbc\libOsiCbc.vcxproj", "{22911998-FEDD-44AC-902F-CFEFA060C36A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiCbc", "..\ThirdParty\COIN\Cbc\MSVisualStudio\v16\libOsiCbc\libOsiCbc.vcxproj", "{22911998-FEDD-44AC-902F-CFEFA060C36A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCgl", "ThirdParty\COIN\Cgl\MSVisualStudio\v16\libCgl\libCgl.vcxproj", "{1E645A44-00EF-4093-9F6A-1D082BD43BDB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCgl", "..\ThirdParty\COIN\Cgl\MSVisualStudio\v16\libCgl\libCgl.vcxproj", "{1E645A44-00EF-4093-9F6A-1D082BD43BDB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCoinUtils", "ThirdParty\COIN\CoinUtils\MSVisualStudio\v16\libCoinUtils\libCoinUtils.vcxproj", "{6D2EF92A-D693-47E3-A325-A686E78C5FFD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCoinUtils", "..\ThirdParty\COIN\CoinUtils\MSVisualStudio\v16\libCoinUtils\libCoinUtils.vcxproj", "{6D2EF92A-D693-47E3-A325-A686E78C5FFD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsi", "ThirdParty\COIN\Osi\MSVisualStudio\v16\libOsi\libOsi.vcxproj", "{BF5C7532-EE0A-479B-9993-72134087D530}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsi", "..\ThirdParty\COIN\Osi\MSVisualStudio\v16\libOsi\libOsi.vcxproj", "{BF5C7532-EE0A-479B-9993-72134087D530}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libClp", "ThirdParty\COIN\Clp\MSVisualStudio\v16\libClp\libClp.vcxproj", "{768B67D6-E6D3-4A8F-AA61-511FDBCE7937}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libClp", "..\ThirdParty\COIN\Clp\MSVisualStudio\v16\libClp\libClp.vcxproj", "{768B67D6-E6D3-4A8F-AA61-511FDBCE7937}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiClp", "ThirdParty\COIN\Clp\MSVisualStudio\v16\libOsiClp\libOsiClp.vcxproj", "{79433425-EC16-410F-9B91-8D31D2109C90}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libOsiClp", "..\ThirdParty\COIN\Clp\MSVisualStudio\v16\libOsiClp\libOsiClp.vcxproj", "{79433425-EC16-410F-9B91-8D31D2109C90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

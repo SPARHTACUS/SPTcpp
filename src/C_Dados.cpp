@@ -10859,12 +10859,12 @@ void Dados::validacao_mapeamento_aberturas(EntradaSaidaDados a_entradaSaidaDados
 												validado = true;
 											}
 
-											else if ((abertura_inicial < abertura_inicial_cenarios) && (abertura_final == IdCenario(abertura_inicial_cenarios - 1))) {
+											else if ((abertura_inicial < abertura_inicial_cenarios) && (abertura_final == IdAbertura(abertura_inicial_cenarios - 1))) {
 												abertura_inicial_cenarios = abertura_inicial;
 												validado = true;
 											}
 
-											else if ((abertura_final > abertura_final_cenarios) && (abertura_inicial == IdCenario(abertura_final_cenarios + 1))) {
+											else if ((abertura_final > abertura_final_cenarios) && (abertura_inicial == IdAbertura(abertura_final_cenarios + 1))) {
 												abertura_final_cenarios = abertura_final;
 												validado = true;
 											}
