@@ -15,7 +15,7 @@ Requisitos:
   * [Gurobi](https://www.gurobi.com/) (Opcional)
   * SPTWIN 
 
-## Ubuntu (x64):
+## Ubuntu 20.04 (x64):
 
 Requisitos:
   
