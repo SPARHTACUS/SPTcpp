@@ -1,3 +1,9 @@
+SPARHTACUS Model - sparhtacus.com
+R&D ANEEL/BRAZIL: PD-07427-0318/2018 
+Funding:     Norte Energia S.A.
+Development: LabPlan UFSC
+             Norus
+
 MIT License
 
 Copyright (c) 2022 Norte Energia S.A.
