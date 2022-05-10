@@ -19,5 +19,8 @@ Versão distribuída sob [licença MIT](https://github.com/SPARHTACUS/SPTcpp/blo
 
 * Requisitos:
   * OpenMPI
+  ```
+    $ apt-get install openmpi-bin
+  ```  
   * [Gurobi](https://www.gurobi.com/) (Opcional)
-  * SPTLNX 
+  * [SPTLNX](https://github.com/SPARHTACUS/SPTcpp/releases/tag/alpha) 
