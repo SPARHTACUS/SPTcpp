@@ -9,16 +9,14 @@ Versão distribuída sob [licença MIT](https://github.com/SPARHTACUS/SPTcpp/blo
 
 ## Windows 10 e 11 (x64):
 
-Requisitos:
-  
+* Requisitos:
   * [Microsoft MPI](https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi)
   * [Gurobi](https://www.gurobi.com/) (Opcional)
   * [SPTWIN](https://github.com/SPARHTACUS/SPTcpp/releases/tag/alpha)
 
 ## Ubuntu 20.04 (x64):
 
-Requisitos:
-  
+* Requisitos:
   * OpenMPI
   * [Gurobi](https://www.gurobi.com/) (Opcional)
   * SPTLNX 
