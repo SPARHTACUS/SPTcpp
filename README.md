@@ -6,7 +6,11 @@ Modelo computacional open-source para programação hidrotérmica em C++, mais d
 Versão distribuída sob [licença MIT](https://github.com/SPARHTACUS/SPTcpp/blob/main/LICENSE.md). 
 
 
-# Instalação e execução
+# Baixar e executar
+
+Instruções básicas para execução do modelo podem ser encontradas AQUI.
+
+Decks disponibilizados em [sparhtacus.com](https://sparhtacus.com).
 
 ## Windows 10 e 11 (x64):
 
@@ -23,4 +27,6 @@ Versão distribuída sob [licença MIT](https://github.com/SPARHTACUS/SPTcpp/blo
     $ apt-get install openmpi-bin
   ```  
   * [Gurobi](https://www.gurobi.com/) (Opcional)
-  * [SPTLNX](https://github.com/SPARHTACUS/SPTcpp/releases) 
+  * [SPTLNX](https://github.com/SPARHTACUS/SPTcpp/releases)
+
+# Programar e compilar
