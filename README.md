@@ -10,7 +10,7 @@ Versão mais recente [SPTv2.0.](https://github.com/SPARHTACUS/SPTcpp/releases/ta
 
 Instruções básicas para execução do modelo podem ser encontradas AQUI.
 
-Decks disponibilizados em [sparhtacus.com](https://sparhtacus.com).
+Decks disponibilizados em [sparhtacus.com/decks](https://sparhtacus.com/decks).
 
 ## Windows 10 e 11 (x64):
 
