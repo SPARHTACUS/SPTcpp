@@ -8,7 +8,7 @@ Versão mais recente [SPTv2.0.](https://github.com/SPARHTACUS/SPTcpp/releases/ta
 
 # Baixar e executar
 
-Instruções básicas para execução do modelo podem ser encontradas AQUI.
+Instruções básicas para execução do modelo podem ser encontradas [AQUI](https://github.com/SPARHTACUS/SPTcpp/wiki/Execucao-Basica).
 
 Decks disponibilizados em [sparhtacus.com/decks](https://sparhtacus.com/decks).
 
