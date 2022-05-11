@@ -38,7 +38,7 @@ O repositório foi automatizado para utilização do *Microsoft Visual Studio Co
   * *ls_zollen* (Incluso no diretório */ThirdParty/*).
   * Resolvedores [COIN-OR](https://github.com/coin-or). Scripts instaladores `winCoinInstaller` e `lnxCoinInstaller` disponibilizados no diretório */ThirdParty/*. Ambos os scrips promovem as seguintes alterações do código original *COIN-OR* para compatibilização com biblioteca *<windows.h>*:
    ```
-   "&small," -> "&small_," (ClpSimplexOther.hpp - l244)
+   "&small," -> "&small_," (ClpSimplexOther.hpp, l244)
    "std::max" -> "(std::max)" (CglGMI.hpp - l87, l101)
    ```
    Em caso de compilação *Windows* e *Linux* no mesmo diretório utilizando *WSL*, apenas o instalador `lnxCoinInstaller` é necessário.
