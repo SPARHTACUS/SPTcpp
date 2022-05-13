@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(SPT_app)
+project(SPTLNX)
 
 set(CMAKE_CXX_STANDARD 20)
    
@@ -69,7 +69,7 @@ set(SPT_SOURCES ../src/SPT_main.cpp
                 ../src/C_VariavelRealizacao.cpp 
                 ../src/C_VariavelRealizacaoInterna.cpp)
 
-add_executable(SPT_app ${SPT_SOURCES})
+add_executable(SPTLNX ${SPT_SOURCES})
   
-target_link_libraries(SPT_app ${MPI_CXX_LIBRARIES} ${MPI_CXX_LINK_FLAGS} ${LINK_FLAGS})
+target_link_libraries(SPTLNX ${MPI_CXX_LIBRARIES} ${MPI_CXX_LINK_FLAGS} ${LINK_FLAGS})
  
