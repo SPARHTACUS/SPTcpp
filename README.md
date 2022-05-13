@@ -15,9 +15,9 @@ Decks disponibilizados em [sparhtacus.com/decks](https://sparhtacus.com/decks).
 ## Windows 10 e 11 (x64):
 
 * Requisitos:
-  * [Microsoft MPI](https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi)
-  * [Gurobi](https://www.gurobi.com/) (Opcional)
-  * [SPTWIN](https://github.com/SPARHTACUS/SPTcpp/releases)
+  * [Microsoft MPI (bin)](https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi)
+  * Resolvedor [Gurobi](https://www.gurobi.com/) (Opcional)
+  * Executável [SPTWIN](https://github.com/SPARHTACUS/SPTcpp/releases)
 
 ## Ubuntu 20.04 (x64):
 
@@ -26,19 +26,42 @@ Decks disponibilizados em [sparhtacus.com/decks](https://sparhtacus.com/decks).
   ```
     $ apt-get install openmpi-bin
   ```  
-  * [Gurobi](https://www.gurobi.com/) (Opcional)
-  * [SPTLNX](https://github.com/SPARHTACUS/SPTcpp/releases)
+  * Resolvedor [Gurobi](https://www.gurobi.com/) (Opcional)
+  * Executável [SPTLNX](https://github.com/SPARHTACUS/SPTcpp/releases)
 
 # Programar e compilar
 
 O repositório foi automatizado para utilização do *Microsoft Visual Studio Community 2019 (v16)* em ambiente *Windows* com *Windows Subsistem for Linux (WSL)*.
 
+## SPTWIN (x64)
+
+* Requisitos:
+  * [Microsoft MPI (sdk)](https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi).
+    * Criar variável ambiente `MSMPI_INC` apontando o diretório `/Microsoft SDKs/MPI/Include`.
+    * Criar variável ambiente `MSMPI_LIB64` apontando o diretório `/Microsoft SDKs/MPI/Lib/x64`.
+  * [libseq_beta_04.21.01](http://www.multires.caltech.edu/software/libseq/) (Incluso no diretório */ThirdParty/* com ajustes para compiladores recentes).
+  * *ls_zollen* (Incluso no diretório */ThirdParty/*).
+  * Resolvedores [COIN-OR](https://github.com/coin-or).
+    * Executar script instalador `winCoinInstaller` ou `lnxCoinInstaller` disponibilizados no diretório */ThirdParty/* (em caso de compilação *Windows* e *Linux* no mesmo diretório utilizando *WSL*, apenas o instalador `lnxCoinInstaller` é necessário).
+    * Ambos os scrips promovem as seguintes alterações do código original *COIN-OR* para compatibilização com biblioteca *<windows.h>*:
+        ```
+        "&small," -> "&small_," (ClpSimplexOther.hpp, l244)
+        "std::max" -> "(std::max)" (CglGMI.hpp - l87, l101)
+        ```
+  * Resolvedor [Gurobi](https://www.gurobi.com/) (Opcional)
+    *  Criar variável ambiente `GUROBI_INC64` apontando o diretório `/gurobiXXX/win64/include`
+    *  Criar variável ambiente `GUROBI_LIB64` apontando o diretório `/gurobiXXX/win64/lib`
+
+## SPTLNX (x64)
+
 * Requisitos:
   * [libseq_beta_04.21.01](http://www.multires.caltech.edu/software/libseq/) (Incluso no diretório */ThirdParty/* com ajustes para compiladores recentes).
   * *ls_zollen* (Incluso no diretório */ThirdParty/*).
-  * Resolvedores [COIN-OR](https://github.com/coin-or). Scripts instaladores `winCoinInstaller` e `lnxCoinInstaller` disponibilizados no diretório */ThirdParty/*. Ambos os scrips promovem as seguintes alterações do código original *COIN-OR* para compatibilização com biblioteca *<windows.h>*:
-   ```
-   "&small," -> "&small_," (ClpSimplexOther.hpp, l244)
-   "std::max" -> "(std::max)" (CglGMI.hpp - l87, l101)
-   ```
-   Em caso de compilação *Windows* e *Linux* no mesmo diretório utilizando *WSL*, apenas o instalador `lnxCoinInstaller` é necessário.
+  * Resolvedores [COIN-OR](https://github.com/coin-or).
+    * Executar script instalador `lnxCoinInstaller` disponibilizado no diretório */ThirdParty/* (em caso de compilação *Windows* e *Linux* no mesmo diretório utilizando *WSL*, apenas o instalador `lnxCoinInstaller` é necessário).
+    * Ambos os scrips promovem as seguintes alterações do código original *COIN-OR* para compatibilização com biblioteca *<windows.h>*:
+        ```
+        "&small," -> "&small_," (ClpSimplexOther.hpp, l244)
+        "std::max" -> "(std::max)" (CglGMI.hpp - l87, l101)
+        ```
+  * Resolvedor [Gurobi](https://www.gurobi.com/) (Opcional)
