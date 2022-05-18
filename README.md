@@ -49,8 +49,9 @@ O repositório foi automatizado para utilização do *Microsoft Visual Studio Co
         "std::max" -> "(std::max)" (CglGMI.hpp - l87, l101)
         ```
   * Resolvedor [Gurobi](https://www.gurobi.com/) (Opcional)
-    *  Criar variável ambiente `GUROBI_INC64` apontando o diretório `/gurobiXXX/win64/include`
-    *  Criar variável ambiente `GUROBI_LIB64` apontando o diretório `/gurobiXXX/win64/lib`
+    * Incluir `GRB` nas instruções de precompilação *preprocessor definitions*
+    * Criar variável ambiente `GUROBI_INC64` apontando o diretório `/gurobiXXX/win64/include`
+    * Criar variável ambiente `GUROBI_LIB64` apontando o diretório `/gurobiXXX/win64/lib`
 
 ## SPTLNX (x64)
 
@@ -65,3 +66,4 @@ O repositório foi automatizado para utilização do *Microsoft Visual Studio Co
         "std::max" -> "(std::max)" (CglGMI.hpp - l87, l101)
         ```
   * Resolvedor [Gurobi](https://www.gurobi.com/) (Opcional)
+    * Descomentar com as linhas 11 e 15 e comentar as linhas 13 e 17 do arquivo CMakeLists.txt
