@@ -180,10 +180,12 @@ double Hidreletrica::getCotaJusante(const double a_vazao_defluente, const Period
 
 			}//for (IdPolinomioJusante idPolinomio; idPolinomio <= maiorIdPolinomio; maiorIdPolinomio++) {
 
-			if ((cotaJusante_1 == 0.0) && (cotaJusante_2 == 0.0))
-				throw std::invalid_argument("Cota jusante igual a 0.");
+			if ((cotaJusante_1 == 0.0) && (cotaJusante_2 == 0.0)) {
+				cota = 0.1;
+			}
+				//throw std::invalid_argument("Cota jusante igual a 0.");
 
-			if (cotaJusante_1 == 0.0) { cota = cotaJusante_2; }
+			else if (cotaJusante_1 == 0.0) { cota = cotaJusante_2; }
 			else if (cotaJusante_2 == 0.0) { cota = cotaJusante_1; }
 			else if (cotaJusante_2 == cotaJusante_1) { cota = cotaJusante_1; }
 			else if ((cotaJusante_1 != 0.0) && (cotaJusante_2 != 0.0)) {
@@ -205,8 +207,10 @@ double Hidreletrica::getCotaJusante(const double a_vazao_defluente, const Period
 			throw std::invalid_argument("Valor NaN.");
 		else if (cota < 0.0)
 			throw std::invalid_argument("Valor Negativo.");
-		else if (cota == 0.0)
-			throw std::invalid_argument("Cota jusante igual a 0.");
+		else if (cota == 0.0) {
+			cota = 0.1;
+			//throw std::invalid_argument("Cota jusante igual a 0.");
+		}
 
 		return cota;
 

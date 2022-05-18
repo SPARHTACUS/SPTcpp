@@ -5088,7 +5088,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 							atributo = line.substr(0, 4);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-							if (atributo == "9999")
+							if ((atributo == "9999") || (leituraArquivo.eof()))
 								break;
 
 							//////////////////////////////////////////////////////////////////////////////////////
