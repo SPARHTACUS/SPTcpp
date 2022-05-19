@@ -23,7 +23,7 @@ Decks disponibilizados em [sparhtacus.com/decks](https://sparhtacus.com/decks).
 * Requisitos:
   * OpenMPI
   ```
-    $ apt-get install openmpi-bin
+    $ sudo apt-get install openmpi-bin
   ```  
   * Executável [SPTLNX](https://github.com/SPARHTACUS/SPTcpp/releases)
 
