@@ -6,6 +6,8 @@ Programa open-source distribuído sob [licença MIT](https://github.com/SPARHTAC
 
 Versão mais recente [SPTv2.0.](https://github.com/SPARHTACUS/SPTcpp/releases/tag/SPTv2.0).
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
 # Baixar e executar
 
 Instruções básicas para execução do modelo podem ser encontradas [AQUI](https://github.com/SPARHTACUS/SPTcpp/wiki/Execucao-Basica).
@@ -26,6 +28,8 @@ Decks disponibilizados em [sparhtacus.com/decks](https://sparhtacus.com/decks).
     $ sudo apt-get install openmpi-bin
   ```  
   * Executável [SPTLNX](https://github.com/SPARHTACUS/SPTcpp/releases)
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Programar e compilar
 
