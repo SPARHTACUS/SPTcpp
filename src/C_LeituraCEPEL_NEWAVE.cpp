@@ -453,8 +453,7 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 			strNormalizada(line);
 
 			if (!dadosPreConfig_instanciados) {
-				//const int numero_maximo_iteracoes = std::stoi(line.substr(21, 4));
-				const int numero_maximo_iteracoes = 5;
+				const int numero_maximo_iteracoes = std::stoi(line.substr(21, 4));
 
 				a_dados.setAtributo(AttComumDados_numero_maximo_iteracoes, numero_maximo_iteracoes);
 
@@ -478,8 +477,7 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 
 			if (!dadosPreConfig_instanciados) {
 
-				//const int numero_cenarios_por_iteracao_otimizacao = std::stoi(line.substr(21, 4));
-				int numero_cenarios_por_iteracao_otimizacao = 1;
+				const int numero_cenarios_por_iteracao_otimizacao = std::stoi(line.substr(21, 4));
 
 				a_dados.setAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, false);
 
@@ -591,6 +589,8 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 				const double taxa_desconto_anual = atof(atributo.c_str()) / 100;
 				a_dados.setAtributo(AttComumDados_taxa_desconto_anual, taxa_desconto_anual);
 			}
+
+			a_dados.setAtributo(AttComumDados_multiplicador_tempo_limite_resolucao, 3.0);
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//Registro 26 -  Simulação final após convergência PDDE

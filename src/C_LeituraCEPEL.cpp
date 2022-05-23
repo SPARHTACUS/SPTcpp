@@ -2821,17 +2821,12 @@ void LeituraCEPEL::aplicarModificacoesUTE(Dados& a_dados) {
 								a_dados.vetorTermeletrica.att(idTermeletrica).setElemento(AttVetorTermeletrica_indisponibilidade_forcada, periodo, valor_novo);
 							}
 
-							if (lista_FCMAX.size() > 0) {
-								const double valor_anterior = a_dados.vetorTermeletrica.att(idTermeletrica).getElementoVetor(AttVetorTermeletrica_fator_de_capacidade, periodo, double());
-								const double valor_novo = valor_anterior + sobreposicao * lista_FCMAX.at(periodo_DECK);
-								a_dados.vetorTermeletrica.att(idTermeletrica).setElemento(AttVetorTermeletrica_fator_de_capacidade, periodo, valor_novo);
-							}
-
 							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
 
 								if (lista_GTMIN.size() > 0) {
 									const double valor_anterior = a_dados.vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(IdUnidadeUTE_1).getElementoMatriz(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, double());
 									const double valor_novo = valor_anterior + sobreposicao * lista_GTMIN.at(periodo_DECK);
+
 									a_dados.vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(IdUnidadeUTE_1).setElemento(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, valor_novo);
 								}
 								if (lista_POTEF.size() > 0) {
@@ -2847,6 +2842,52 @@ void LeituraCEPEL::aplicarModificacoesUTE(Dados& a_dados) {
 					} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 				} // for (Periodo periodo_DECK = horizonte_estudo_DECK.getIteradorInicial(); periodo_DECK <= horizonte_estudo_DECK.getIteradorFinal(); periodo_DECK++) {
+
+				// (Específico para FCMAX, quando FCMAX = 0, GTMIN = 0)
+				// Atualiza atributos do horizonte de estudo com listas em base de periodo do DECK
+				//
+
+				for (Periodo periodo_DECK = horizonte_estudo_DECK.getIteradorInicial(); periodo_DECK <= horizonte_estudo_DECK.getIteradorFinal(); periodo_DECK++) {
+
+					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+						double sobreposicao = periodo.sobreposicao(periodo_DECK);
+
+						if ((periodo == horizonte_estudo.getIteradorInicial()) && (periodo_DECK == horizonte_estudo_DECK.getIteradorInicial()))
+							sobreposicao += sobreposicao_atraso_periodo_inicial;
+
+						if (sobreposicao > 0.0) {
+
+							if (lista_FCMAX.size() > 0) {
+								const double valor_anterior = a_dados.vetorTermeletrica.att(idTermeletrica).getElementoVetor(AttVetorTermeletrica_fator_de_capacidade, periodo, double());
+								const double valor_novo = valor_anterior + sobreposicao * lista_FCMAX.at(periodo_DECK);
+								a_dados.vetorTermeletrica.att(idTermeletrica).setElemento(AttVetorTermeletrica_fator_de_capacidade, periodo, valor_novo);
+
+								if (valor_novo == 0.0) {
+									if (a_dados.vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(IdUnidadeUTE_1).getSizeMatriz(AttMatrizUnidadeUTE_potencia_minima) > 0) {
+										if (a_dados.vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(IdUnidadeUTE_1).getSizeMatriz(AttMatrizUnidadeUTE_potencia_minima, periodo) > 0) {
+											for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
+												a_dados.vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(IdUnidadeUTE_1).setElemento(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, 0.0);
+											}
+										}
+									}
+									if (a_dados.vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(IdUnidadeUTE_1).getSizeMatriz(AttMatrizUnidadeUTE_potencia_util) > 0) {
+										if (a_dados.vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(IdUnidadeUTE_1).getSizeMatriz(AttMatrizUnidadeUTE_potencia_util, periodo) > 0) {
+											for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
+												a_dados.vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(IdUnidadeUTE_1).setElemento(AttMatrizUnidadeUTE_potencia_util, periodo, idPatamarCarga, 0.0);
+											}
+										}
+									}
+								}
+
+							}
+
+						} // if (sobreposicao > 0.0) {
+
+					} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+				} // for (Periodo periodo_DECK = horizonte_estudo_DECK.getIteradorInicial(); periodo_DECK <= horizonte_estudo_DECK.getIteradorFinal(); periodo_DECK++) {
+
 
 			} // if (lista_modificacaoUTE.at(idTermeletrica).size() > 0){
 

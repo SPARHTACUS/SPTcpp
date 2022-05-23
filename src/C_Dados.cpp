@@ -1295,7 +1295,7 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 
 			for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
-				if ((idEstagio < estagio_acoplamento_pre_estudo) || (idEstagio == IdEstagio_1))
+				if (idEstagio < estagio_acoplamento_pre_estudo)
 					addElemento(AttVetorDados_numero_aberturas, idEstagio, 1);
 				else
 					addElemento(AttVetorDados_numero_aberturas, idEstagio, getAtributo(AttComumDados_numero_aberturas, int()));
