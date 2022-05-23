@@ -6,6 +6,8 @@ Programa open-source distribuído sob [licença MIT](https://github.com/SPARHTAC
 
 Versão mais recente [SPTv2.0.](https://github.com/SPARHTACUS/SPTcpp/releases/tag/SPTv2.0).
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
 # Baixar e executar
 
 Instruções básicas para execução do modelo podem ser encontradas [AQUI](https://github.com/SPARHTACUS/SPTcpp/wiki/Execucao-Basica).
@@ -16,7 +18,6 @@ Decks disponibilizados em [sparhtacus.com/decks](https://sparhtacus.com/decks).
 
 * Requisitos:
   * [Microsoft MPI (bin)](https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi)
-  * Resolvedor [Gurobi](https://www.gurobi.com/) (Opcional)
   * Executável [SPTWIN](https://github.com/SPARHTACUS/SPTcpp/releases)
 
 ## Ubuntu 20.04 (x64):
@@ -24,10 +25,11 @@ Decks disponibilizados em [sparhtacus.com/decks](https://sparhtacus.com/decks).
 * Requisitos:
   * OpenMPI
   ```
-    $ apt-get install openmpi-bin
+    $ sudo apt-get install openmpi-bin
   ```  
-  * Resolvedor [Gurobi](https://www.gurobi.com/) (Opcional)
   * Executável [SPTLNX](https://github.com/SPARHTACUS/SPTcpp/releases)
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Programar e compilar
 
@@ -42,7 +44,8 @@ O repositório foi automatizado para utilização do *Microsoft Visual Studio Co
   * [libseq_beta_04.21.01](http://www.multires.caltech.edu/software/libseq/) (Incluso no diretório */ThirdParty/* com ajustes para compiladores recentes).
   * *ls_zollen* (Incluso no diretório */ThirdParty/*).
   * Resolvedores [COIN-OR](https://github.com/coin-or).
-    * Executar script instalador `winCoinInstaller` ou `lnxCoinInstaller` disponibilizados no diretório */ThirdParty/* (em caso de compilação *Windows* e *Linux* no mesmo diretório utilizando *WSL*, apenas o instalador `lnxCoinInstaller` é necessário).
+    * Executar script instalador `winCoinInstaller` ou `lnxCoinInstaller` disponibilizados no diretório */ThirdParty/*.
+      *  Apenas o instalador `lnxCoinInstaller` é necessário para compilação *Windows* e *Linux* no mesmo diretório utilizando *WSL*. Nesse caso também é necessário instalar via `$ sudo apt-install` as bibliotecas: `libopenmpi-dev`, `gfortran`, `pkgconf`, `libbz2-dev` e `zlib1g-dev`.
     * Ambos os scrips promovem as seguintes alterações do código original *COIN-OR* para compatibilização com biblioteca *<windows.h>*:
         ```
         "&small," -> "&small_," (ClpSimplexOther.hpp, l244)
@@ -59,6 +62,7 @@ O repositório foi automatizado para utilização do *Microsoft Visual Studio Co
   * [libseq_beta_04.21.01](http://www.multires.caltech.edu/software/libseq/) (Incluso no diretório */ThirdParty/* com ajustes para compiladores recentes).
   * *ls_zollen* (Incluso no diretório */ThirdParty/*).
   * Resolvedores [COIN-OR](https://github.com/coin-or).
+    * Instalar via `$ sudo apt-install` as bibliotecas: `libopenmpi-dev`, `gfortran`, `pkgconf`, `libbz2-dev` e `zlib1g-dev`.
     * Executar script instalador `lnxCoinInstaller` disponibilizado no diretório */ThirdParty/* (em caso de compilação *Windows* e *Linux* no mesmo diretório utilizando *WSL*, apenas o instalador `lnxCoinInstaller` é necessário).
     * Ambos os scrips promovem as seguintes alterações do código original *COIN-OR* para compatibilização com biblioteca *<windows.h>*:
         ```
