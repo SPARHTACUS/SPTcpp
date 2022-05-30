@@ -17,6 +17,7 @@ Decks disponibilizados em [sparhtacus.com/decks](https://sparhtacus.com/decks).
 ## Windows 10 e 11 (x64):
 
 * Requisitos:
+  * [Microsoft Visual C++ Redistributable](https://docs.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170) (Caso necessário) 
   * [Microsoft MPI (bin)](https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi)
   * Executável [SPTWIN](https://github.com/SPARHTACUS/SPTcpp/releases)
 
