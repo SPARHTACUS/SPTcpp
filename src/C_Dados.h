@@ -109,8 +109,8 @@
       m(Dados,  AttComum,  representar_turbinamento_disponivel_em_restricoes_hidraulicas,               bool,         min,         max,           sim,      nao) \
       m(Dados,  AttComum,  representar_potencia_hidro_disponivel_em_restricoes_hidraulicas,             bool,         min,         max,           sim,      nao) \
       m(Dados,  AttComum,  representar_potencia_termo_disponivel_em_restricoes_hidraulicas,             bool,         min,         max,           sim,      nao) \
-      m(Dados,  AttComum,           nao_utilizar_restricoes_simples_em_restricoes_eletricas,            bool,         min,         max,           sim,      nao) \
-      m(Dados,  AttComum,           nao_utilizar_restricoes_simples_em_restricoes_hidraulicas,          bool,         min,         max,         sim,      nao) \
+      m(Dados,  AttComum,           nao_utilizar_restricoes_simples_em_restricoes_eletricas,            bool,         min,         max,           nao,      nao) \
+      m(Dados,  AttComum,           nao_utilizar_restricoes_simples_em_restricoes_hidraulicas,          bool,         min,         max,         nao,      nao) \
       m(Dados,  AttComum,               maior_estagio_impressao_versao_alternativa_cortes,         IdEstagio,      min,         max,            12,      nao) \
       m(Dados,  AttComum,                              mes_penalizacao_volume_util_minimo,             IdMes,      nenhum,         max,            11,      nao) \
       m(Dados,  AttComum,                  custo_acumulado_penalizacao_volume_util_minimo,            double,           0,         max,             0,      nao) \
