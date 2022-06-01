@@ -7466,8 +7466,35 @@ int ModeloOtimizacao::criarVariaveis_Decisao_e_Estado_YP_ACUMULADO(const TipoSub
 
 			int pos_YP_ACUMULADO = getVarDecisao_YP_ACUMULADOseExistir(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria);
 
-			if (pos_YP_ACUMULADO == -1)
-				pos_YP_ACUMULADO = addVarDecisao_YP_ACUMULADO(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria, -infinito, infinito, 0.0);
+			try {
+
+				if (pos_YP_ACUMULADO == -1) {
+					if (idx_var_YP_ACUMULADO_3.at(a_TSS).size() > 0) {
+						if (idx_var_YP_ACUMULADO_3.at(a_TSS).getIteradorFinal() >= a_idEstagio) {
+							if (idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).size() > 0) {
+								if (idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).getIteradorFinal() >= a_periodo_processo_estocastico_PAR) {
+									if (idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).size() > 0) {
+										IdVariavelAleatoria menorIdVariavelAleatoria = idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorInicial();
+										IdVariavelAleatoria maiorIdVariavelAleatoria = idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorFinal();
+										if (menorIdVariavelAleatoria > a_idVariavelAleatoria) {
+											SmartEnupla <IdVariavelAleatoria, std::vector<int>> idx_var_YP_ACUMULADO_3_novo(a_idVariavelAleatoria, std::vector<std::vector<int>>(int(maiorIdVariavelAleatoria - a_idVariavelAleatoria) + 1, std::vector<int>()));
+											for (IdVariavelAleatoria idVariavelAleatoria = menorIdVariavelAleatoria; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++)
+												idx_var_YP_ACUMULADO_3_novo.at(idVariavelAleatoria) = idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).at(idVariavelAleatoria);
+											idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR) = idx_var_YP_ACUMULADO_3_novo;
+										}
+									}
+								}
+							}
+						}
+					}
+
+					pos_YP_ACUMULADO = addVarDecisao_YP_ACUMULADO(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria, -infinito, infinito, 0.0);
+				}
+
+			}
+			catch (const std::exception& erro) {
+				throw std::invalid_argument("Erro na 1a chamada. \n" + std::string(erro.what()));
+			}
 
 			//Cria restriçao YP_ACUMULADO = afluencias_sobrepostas
 			
@@ -7522,8 +7549,29 @@ int ModeloOtimizacao::criarVariaveis_Decisao_e_Estado_YP_ACUMULADO(const TipoSub
 
 			int posEqu_YP_ACUMULADO = getEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADAseExistir(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria);
 				
-			if (posEqu_YP_ACUMULADO == -1)
+			if (posEqu_YP_ACUMULADO == -1) {
+
+				if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).size() > 0) {
+					if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).getIteradorFinal() >= a_idEstagio) {
+						if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).size() > 0) {
+							if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).getIteradorFinal() >= a_periodo_processo_estocastico_PAR) {
+								if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).size() > 0) {
+									IdVariavelAleatoria menorIdVariavelAleatoria = idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorInicial();
+									IdVariavelAleatoria maiorIdVariavelAleatoria = idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorFinal();
+									if (menorIdVariavelAleatoria > a_idVariavelAleatoria) {
+										SmartEnupla <IdVariavelAleatoria, std::vector<int>> idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3_novo(a_idVariavelAleatoria, std::vector<std::vector<int>>(int(maiorIdVariavelAleatoria - a_idVariavelAleatoria) + 1, std::vector<int>()));
+										for (IdVariavelAleatoria idVariavelAleatoria = menorIdVariavelAleatoria; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++)
+											idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3_novo.at(idVariavelAleatoria) = idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).at(idVariavelAleatoria);
+										idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR) = idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3_novo;
+									}
+								}
+							}
+						}
+					}
+				}
+
 				posEqu_YP_ACUMULADO = addEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria);
+			}
 
 			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEqu_YP_ACUMULADO, 0.0);
 
@@ -7595,6 +7643,26 @@ int ModeloOtimizacao::criarVariaveis_Decisao_e_Estado_YP_ACUMULADO(const TipoSub
 			int pos_YP_ACUMULANDO = getVarDecisao_YP_ACUMULANDOseExistir(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria);
 
 			if (pos_YP_ACUMULANDO == -1) {
+
+				if (idx_var_YP_ACUMULANDO_3.at(a_TSS).size() > 0) {
+					if (idx_var_YP_ACUMULANDO_3.at(a_TSS).getIteradorFinal() >= a_idEstagio) {
+						if (idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).size() > 0) {
+							if (idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).getIteradorFinal() >= a_periodo_processo_estocastico_PAR) {
+								if (idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).size() > 0) {
+									IdVariavelAleatoria menorIdVariavelAleatoria = idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorInicial();
+									IdVariavelAleatoria maiorIdVariavelAleatoria = idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorFinal();
+									if (menorIdVariavelAleatoria > a_idVariavelAleatoria) {
+										SmartEnupla <IdVariavelAleatoria, std::vector<int>> idx_var_YP_ACUMULANDO_3_novo(a_idVariavelAleatoria, std::vector<std::vector<int>>(int(maiorIdVariavelAleatoria - a_idVariavelAleatoria) + 1, std::vector<int>()));
+										for (IdVariavelAleatoria idVariavelAleatoria = menorIdVariavelAleatoria; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++)
+											idx_var_YP_ACUMULANDO_3_novo.at(idVariavelAleatoria) = idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).at(idVariavelAleatoria);
+										idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR) = idx_var_YP_ACUMULANDO_3_novo;
+									}
+								}
+							}
+						}
+					}
+				}
+
 				pos_YP_ACUMULANDO = addVarDecisao_YP_ACUMULANDO(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria, -infinito, infinito, 0.0);
 
 				a_idVariavelEstado_criada = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_YP_ACUMULANDO(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria), pos_YP_ACUMULANDO, pos_YP_ACUMULADO_anterior);
@@ -7659,8 +7727,34 @@ int ModeloOtimizacao::criarVariaveis_Decisao_e_Estado_YP_ACUMULADO(const TipoSub
 
 			int pos_YP_ACUMULADO = getVarDecisao_YP_ACUMULADOseExistir(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria);
 			
-			if (pos_YP_ACUMULADO == -1)
-				pos_YP_ACUMULADO = addVarDecisao_YP_ACUMULADO(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria, -infinito, infinito, 0.0);
+			try {
+
+				if (pos_YP_ACUMULADO == -1) {
+					if (idx_var_YP_ACUMULADO_3.at(a_TSS).size() > 0) {
+						if (idx_var_YP_ACUMULADO_3.at(a_TSS).getIteradorFinal() >= a_idEstagio) {
+							if (idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).size() > 0) {
+								if (idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).getIteradorFinal() >= a_periodo_processo_estocastico_PAR) {
+									if (idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).size() > 0) {
+										IdVariavelAleatoria menorIdVariavelAleatoria = idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorInicial();
+										IdVariavelAleatoria maiorIdVariavelAleatoria = idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorFinal();
+										if (menorIdVariavelAleatoria > a_idVariavelAleatoria) {
+											SmartEnupla <IdVariavelAleatoria, std::vector<int>> idx_var_YP_ACUMULADO_3_novo(a_idVariavelAleatoria, std::vector<std::vector<int>>(int(maiorIdVariavelAleatoria - a_idVariavelAleatoria) + 1, std::vector<int>()));
+											for (IdVariavelAleatoria idVariavelAleatoria = menorIdVariavelAleatoria; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++)
+												idx_var_YP_ACUMULADO_3_novo.at(idVariavelAleatoria) = idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).at(idVariavelAleatoria);
+											idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR) = idx_var_YP_ACUMULADO_3_novo;
+										}
+									}
+								}
+							}
+						}
+					}
+
+					pos_YP_ACUMULADO = addVarDecisao_YP_ACUMULADO(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria, -infinito, infinito, 0.0);
+				}
+			}
+			catch (const std::exception& erro) {
+				throw std::invalid_argument("Erro na 2a chamada. \n" + std::string(erro.what()));
+			}
 
 			if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).size() > 0) {
 
@@ -7713,8 +7807,29 @@ int ModeloOtimizacao::criarVariaveis_Decisao_e_Estado_YP_ACUMULADO(const TipoSub
 					
 			int posEqu_YP_ACUMULADO = getEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADAseExistir(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria);
 			
-			if (posEqu_YP_ACUMULADO == -1)
+			if (posEqu_YP_ACUMULADO == -1) {
+
+				if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).size() > 0) {
+					if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).getIteradorFinal() >= a_idEstagio) {
+						if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).size() > 0) {
+							if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).getIteradorFinal() >= a_periodo_processo_estocastico_PAR) {
+								if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).size() > 0) {
+									IdVariavelAleatoria menorIdVariavelAleatoria = idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorInicial();
+									IdVariavelAleatoria maiorIdVariavelAleatoria = idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorFinal();
+									if (menorIdVariavelAleatoria > a_idVariavelAleatoria) {
+										SmartEnupla <IdVariavelAleatoria, std::vector<int>> idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3_novo(a_idVariavelAleatoria, std::vector<std::vector<int>>(int(maiorIdVariavelAleatoria - a_idVariavelAleatoria) + 1, std::vector<int>()));
+										for (IdVariavelAleatoria idVariavelAleatoria = menorIdVariavelAleatoria; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++)
+											idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3_novo.at(idVariavelAleatoria) = idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).at(idVariavelAleatoria);
+										idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR) = idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3_novo;
+									}
+								}
+							}
+						}
+					}
+				}
+
 				posEqu_YP_ACUMULADO = addEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria);
+			}
 
 			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEqu_YP_ACUMULADO, 0.0);
 
@@ -7786,6 +7901,26 @@ int ModeloOtimizacao::criarVariaveis_Decisao_e_Estado_YP_ACUMULADO(const TipoSub
 		int pos_YP_ACUMULANDO = getVarDecisao_YP_ACUMULANDOseExistir(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria);
 
 		if (pos_YP_ACUMULANDO == -1) {
+
+			if (idx_var_YP_ACUMULANDO_3.at(a_TSS).size() > 0) {
+				if (idx_var_YP_ACUMULANDO_3.at(a_TSS).getIteradorFinal() >= a_idEstagio) {
+					if (idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).size() > 0) {
+						if (idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).getIteradorFinal() >= a_periodo_processo_estocastico_PAR) {
+							if (idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).size() > 0) {
+								IdVariavelAleatoria menorIdVariavelAleatoria = idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorInicial();
+								IdVariavelAleatoria maiorIdVariavelAleatoria = idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorFinal();
+								if (menorIdVariavelAleatoria > a_idVariavelAleatoria) {
+									SmartEnupla <IdVariavelAleatoria, std::vector<int>> idx_var_YP_ACUMULANDO_3_novo(a_idVariavelAleatoria, std::vector<std::vector<int>>(int(maiorIdVariavelAleatoria - a_idVariavelAleatoria) + 1, std::vector<int>()));
+									for (IdVariavelAleatoria idVariavelAleatoria = menorIdVariavelAleatoria; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++)
+										idx_var_YP_ACUMULANDO_3_novo.at(idVariavelAleatoria) = idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).at(idVariavelAleatoria);
+									idx_var_YP_ACUMULANDO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR) = idx_var_YP_ACUMULANDO_3_novo;
+								}
+							}
+						}
+					}
+				}
+			}
+
 			pos_YP_ACUMULANDO = addVarDecisao_YP_ACUMULANDO(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria, -infinito, infinito, 0.0);
 
 			a_idVariavelEstado_criada = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_YP_ACUMULANDO(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria), pos_YP_ACUMULANDO, pos_YP_ACUMULADO_anterior);
@@ -7849,8 +7984,37 @@ int ModeloOtimizacao::criarVariaveis_Decisao_e_Estado_YP_ACUMULADO(const TipoSub
 
 		int pos_YP_ACUMULADO = getVarDecisao_YP_ACUMULADOseExistir(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria);
 			
-		if (pos_YP_ACUMULADO == -1)
-			pos_YP_ACUMULADO = addVarDecisao_YP_ACUMULADO(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria, -infinito, infinito, 0.0);
+		try {
+
+			if (pos_YP_ACUMULADO == -1) {
+
+				if (idx_var_YP_ACUMULADO_3.at(a_TSS).size() > 0) {
+					if (idx_var_YP_ACUMULADO_3.at(a_TSS).getIteradorFinal() >= a_idEstagio) {
+						if (idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).size() > 0) {
+							if (idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).getIteradorFinal() >= a_periodo_processo_estocastico_PAR) {
+								if (idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).size() > 0) {
+									IdVariavelAleatoria menorIdVariavelAleatoria = idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorInicial();
+									IdVariavelAleatoria maiorIdVariavelAleatoria = idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorFinal();
+									if (menorIdVariavelAleatoria > a_idVariavelAleatoria) {
+										SmartEnupla <IdVariavelAleatoria, std::vector<int>> idx_var_YP_ACUMULADO_3_novo(a_idVariavelAleatoria, std::vector<std::vector<int>>(int(maiorIdVariavelAleatoria - a_idVariavelAleatoria) + 1, std::vector<int>()));
+										for (IdVariavelAleatoria idVariavelAleatoria = menorIdVariavelAleatoria; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++)
+											idx_var_YP_ACUMULADO_3_novo.at(idVariavelAleatoria) = idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).at(idVariavelAleatoria);
+										idx_var_YP_ACUMULADO_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR) = idx_var_YP_ACUMULADO_3_novo;
+									}
+								}
+							}
+						}
+					}
+				}
+
+				pos_YP_ACUMULADO = addVarDecisao_YP_ACUMULADO(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria, -infinito, infinito, 0.0);
+
+			}
+
+		}
+		catch (const std::exception& erro) {
+			throw std::invalid_argument("Erro na 3a chamada. \n" + std::string(erro.what()));
+		}
 
 		if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).size() > 0) {
 
@@ -7903,8 +8067,30 @@ int ModeloOtimizacao::criarVariaveis_Decisao_e_Estado_YP_ACUMULADO(const TipoSub
 		
 		int posEqu_YP_ACUMULADO = getEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADAseExistir(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria);
 
-		if (posEqu_YP_ACUMULADO == -1)
+		if (posEqu_YP_ACUMULADO == -1) {
+
+			if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).size() > 0) {
+				if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).getIteradorFinal() >= a_idEstagio) {
+					if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).size() > 0) {
+						if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).getIteradorFinal() >= a_periodo_processo_estocastico_PAR) {
+							if (idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).size() > 0) {
+								IdVariavelAleatoria menorIdVariavelAleatoria = idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorInicial();
+								IdVariavelAleatoria maiorIdVariavelAleatoria = idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).getIteradorFinal();
+								if (menorIdVariavelAleatoria > a_idVariavelAleatoria) {
+									SmartEnupla <IdVariavelAleatoria, std::vector<int>> idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3_novo(a_idVariavelAleatoria, std::vector<std::vector<int>>(int(maiorIdVariavelAleatoria - a_idVariavelAleatoria) + 1, std::vector<int>()));
+									for (IdVariavelAleatoria idVariavelAleatoria = menorIdVariavelAleatoria; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++)
+										idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3_novo.at(idVariavelAleatoria) = idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR).at(idVariavelAleatoria);
+									idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3.at(a_TSS).at(a_idEstagio).at(a_periodo_processo_estocastico_PAR) = idx_equ_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA_3_novo;
+								}
+							}
+						}
+					}
+				}
+			}
+
 			posEqu_YP_ACUMULADO = addEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA(a_TSS, a_idEstagio, a_periodo_processo_estocastico_PAR, a_idVariavelAleatoria);
+
+		}
 
 		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEqu_YP_ACUMULADO, 0.0);
 
