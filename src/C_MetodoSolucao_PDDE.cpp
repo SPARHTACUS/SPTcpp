@@ -1897,12 +1897,14 @@ void MetodoSolucao::executarPDDE_distribuirEstadosEntreProcessos(const IdProcess
 		int numero_total_estados = 0;
 		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= maior_estagio; idEstagio++) {
 			bool considera_estagio = false;
+
 			if (idEstagio <= estagio_final) {
 				if (a_modeloOtimizacao.getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, idEstagio, TipoProcessamentoParalelo()) == TipoProcessamentoParalelo_por_abertura)
 					considera_estagio = true;
 			}
-			else if ((idEstagio > estagio_final) && (pre_estudo))
+			else if ((idEstagio > estagio_final) && (pre_estudo) && (numero_total_estados > 0))
 				considera_estagio = true;
+
 			if (considera_estagio)
 				numero_total_estados += int(a_modeloOtimizacao.getMaiorId(idEstagio, IdVariavelEstado()));
 		}
@@ -1971,14 +1973,15 @@ void MetodoSolucao::executarPDDE_distribuirEstadosEntreProcessos(const IdProcess
 					for (IdEstagio idEstagio = estagio_inicial; idEstagio <= maior_estagio; idEstagio++) {
 
 						bool considera_estagio = false;
+
 						if (idEstagio <= estagio_final) {
 							if (a_modeloOtimizacao.getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, idEstagio, TipoProcessamentoParalelo()) == TipoProcessamentoParalelo_por_abertura)
 								considera_estagio = true;
 						}
-						else if ((idEstagio > estagio_final) && (pre_estudo))
+						else if ((idEstagio > estagio_final) && (pre_estudo) && (numero_total_estados > 0))
 							considera_estagio = true;
 
-						if (considera_estagio){
+						if (considera_estagio) {
 							for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_modeloOtimizacao.getMaiorId(idEstagio, IdVariavelEstado()); idVariavelEstado++) {
 								if (a_modeloOtimizacao.isVariavelEstadoInstanciada(idEstagio, idVariavelEstado)) {
 									for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
