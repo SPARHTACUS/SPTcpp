@@ -1,6 +1,5 @@
 [![Sparhtacus](https://sparhtacus.com/wp-content/uploads/2020/12/spt-hzG.png)](https://sparhtacus.com/sobre/)
 
-https://img.shields.io/github/license/SPARHTACUS/SPTcpp
 
 Modelo computacional open-source para programação hidrotérmica em C++, mais detalhes no [WIKI](https://github.com/SPARHTACUS/SPTcpp/wiki). 
 
