@@ -4,10 +4,12 @@ https://img.shields.io/github/license/SPARHTACUS/SPTcpp
 
 Modelo computacional open-source para programação hidrotérmica em C++, mais detalhes no [WIKI](https://github.com/SPARHTACUS/SPTcpp/wiki). 
 
-[![Versao](https://img.shields.io/github/license/SPARHTACUS/SPTcpp)](https://github.com/SPARHTACUS/SPTcpp/blob/main/LICENSE.md). 
+[![Versao](https://img.shields.io/github/license/SPARHTACUS/SPTcpp)](https://github.com/SPARHTACUS/SPTcpp/blob/main/LICENSE.md)
 
 
-Versão mais recente [SPTv2.0.](https://github.com/SPARHTACUS/SPTcpp/releases/tag/SPTv2.0).
+Versão mais recente:
+
+[![SPTv2.0.](https://img.shields.io/github/v/release/sparhtacus/SPTcpp)](https://github.com/SPARHTACUS/SPTcpp/releases/tag/SPTv2.0)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
