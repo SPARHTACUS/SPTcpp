@@ -10,6 +10,9 @@ Versão mais recente:
 
 [![SPTv2.0.](https://img.shields.io/github/v/release/sparhtacus/SPTcpp)](https://github.com/SPARHTACUS/SPTcpp/releases/tag/SPTv2.0)
 
+
+**github@sparhtacus.com** para entrar para a comunidade e colaborar tecnicamente com o projeto! 
+
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Baixar e executar
