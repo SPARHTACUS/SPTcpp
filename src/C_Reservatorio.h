@@ -44,6 +44,8 @@
 	  m(Reservatorio,  AttVetor,                   volume_morto_completo,              bool,        min,          max,           min,        Periodo) \
 	  m(Reservatorio,  AttVetor,                   enchendo_volume_morto,              bool,        min,          max,           min,        Periodo) \
 	  m(Reservatorio,  AttVetor,                         cota_referencia,            double,          0,        10000,             0,        Periodo) \
+	  m(Reservatorio,  AttVetor,                     cota_referencia_EAR,            double,          0,        10000,             0,        Periodo) \
+	  m(Reservatorio,  AttVetor,                     cota_referencia_ENA,            double,          0,        10000,             0,        Periodo) \
 	  m(Reservatorio,  AttVetor,                           volume_minimo,            double,          0,        50000,             0,        Periodo) \
 	  m(Reservatorio,  AttVetor,                           volume_maximo,            double,          0,       100000,             0,        Periodo) \
 	  m(Reservatorio,  AttVetor,            meta_enchimento_volume_morto,            double,          0,          max,             0,        Periodo) \

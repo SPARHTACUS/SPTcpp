@@ -620,7 +620,6 @@ void LeituraCEPEL::imprime_VAZOES_201906_DC29(Dados& a_dados, std::string nomeAr
 
 }
 
-
 void LeituraCEPEL::imprime_VAZOES_DAT() {
 
 	try {
@@ -650,7 +649,6 @@ void LeituraCEPEL::imprime_VAZOES_DAT() {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::imprime_VAZOES_DAT: \n" + std::string(erro.what())); }
 
 }
-
 
 void LeituraCEPEL::ler_vazao_probabilidade_estrutura_arvore_cenarios_from_VAZOES_201906_DC29(Dados& a_dados, std::string nomeArquivo) {
 
@@ -8721,7 +8719,6 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 }
 
-
 void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nomeArquivo, std::string nomeArquivo_pastaRaiz_relgnl, std::string nomeArquivo_pastaAdicionais_relgnl) {
 	try {
 
@@ -10427,7 +10424,6 @@ void LeituraCEPEL::set_termeletrica_potencia_disponivel_meta(Dados& a_dados)
 
 }
 
-
 void LeituraCEPEL::set_hidreletrica_vazao_turbinada_disponivel_meta(Dados& a_dados)
 {
 	try {
@@ -10503,7 +10499,6 @@ void LeituraCEPEL::set_hidreletrica_vazao_turbinada_disponivel_meta(Dados& a_dad
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::set_hidreletrica_vazao_turbinada_disponivel_meta: \n" + std::string(erro.what())); }
 
 }
-
 
 void LeituraCEPEL::set_hidreletrica_potencia_disponivel_meta_from_dec_oper_usih_DC(Dados& a_dados, std::string a_nomeArquivo)
 {
@@ -10792,7 +10787,6 @@ void LeituraCEPEL::set_hidreletrica_potencia_disponivel_meta_from_dec_oper_usih_
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::set_hidreletrica_potencia_disponivel_meta_from_dec_oper_usih_DC: \n" + std::string(erro.what())); }
 
 }
-
 
 void LeituraCEPEL::leitura_range_volume_from_eco_fpha_DC(Dados& a_dados, std::string a_nomeArquivo)
 {
@@ -11486,7 +11480,6 @@ void LeituraCEPEL::leitura_coeficientes_evaporacao_from_dec_cortes_evap_DC(Dados
 
 }
 
-
 bool LeituraCEPEL::leitura_turbinamento_maximo_from_avl_turb_max_DC(Dados& a_dados, std::string a_nomeArquivo_1)
 {
 	try {
@@ -11611,7 +11604,6 @@ bool LeituraCEPEL::leitura_turbinamento_maximo_from_avl_turb_max_DC(Dados& a_dad
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::leitura_turbinamento_maximo_from_avl_turb_max_DC: \n" + std::string(erro.what())); }
 
 }
-
 
 bool LeituraCEPEL::leitura_turbinamento_maximo_from_relato_e_avl_turb_max_DC(Dados& a_dados, std::string a_nomeArquivo_1, std::string a_nomeArquivo_2)
 {
@@ -12081,15 +12073,24 @@ void LeituraCEPEL::leitura_vRef_from_CadUsH_csv(Dados& a_dados, std::string a_no
 						line = line.substr(pos + 1, int(line.length()));
 					}
 
-					//Volume referência para o cálculo do turbinamento_máximo
+					//Volume referência
 					pos = int(line.find(';'));
 					atributo = line.substr(0, pos).c_str();
 					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-					const double volume_referencia_calculo_turbinamento_maximo = atof(atributo.c_str());
+					const double volume_referencia = atof(atributo.c_str());
 
-					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_volume_referencia_calculo_turbinamento_maximo, volume_referencia_calculo_turbinamento_maximo);
+					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_volume_referencia, volume_referencia);
 
+					//Tipo de regularização (mensal, semnal, diária)
+					pos = int(line.find(';'));
+					atributo = line.substr(0, pos).c_str();
+					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+					if      atributo.c_str() == 'M'{a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_mensal); }
+					else if atributo.c_str() == 'S'{a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_semanal); }
+					else if atributo.c_str() == 'D'{a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_diaria); }
+					else { throw std::invalid_argument("Nao identificado tipo_regularizacao: " + atributo.c_str()); }
 
 				}//if (idHidreletrica != IdHidreletrica_Nenhum) {
 
@@ -12709,7 +12710,6 @@ void LeituraCEPEL::define_numero_cenarios_CP(Dados& a_dados) {
 
 }
 
-
 void LeituraCEPEL::instanciar_variavelAleatoria_realizacao_from_vazoes_DC(Dados& a_dados) {
 
 	try {
@@ -12744,7 +12744,6 @@ void LeituraCEPEL::instanciar_variavelAleatoria_realizacao_from_vazoes_DC(Dados&
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_variavelAleatoria_realizacao_from_vazoes_DC: \n" + std::string(erro.what())); }
 
 } // void LeituraCEPEL::define_afluencia_postos_CP(Dados& a_dados) {
-
 
 void LeituraCEPEL::define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados) {
 
@@ -13142,8 +13141,6 @@ void LeituraCEPEL::modifica_lista_jusante_hidreletrica_com_casos_validados_CP(Da
 
 } // void LeituraCEPEL::modifica_lista_jusante_hidreletrica_com_casos_validados_CP(Dados& a_dados) {
 
-
-
 void LeituraCEPEL::inicializa_vazao_defluente_CP(Dados& a_dados) {
 
 	try {
@@ -13195,7 +13192,6 @@ void LeituraCEPEL::inicializa_vazao_defluente_CP(Dados& a_dados) {
 
 } // void LeituraCEPEL::inicializa_vazao_defluente_CP(Dados& a_dados) {
 
-
 void LeituraCEPEL::valida_bacia_sao_francisco(Dados& a_dados){
 
 	try{
@@ -13222,8 +13218,6 @@ void LeituraCEPEL::valida_bacia_sao_francisco(Dados& a_dados){
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::valida_bacia_sao_francisco: \n" + std::string(erro.what())); }
 
 } // void LeituraCEPEL::valida_bacia_sao_francisco(Dados& a_dados){
-
-
 
 void LeituraCEPEL::imprime_na_tela_avisos_de_possiveis_inviabilidades_fph(Dados& a_dados) {
 
@@ -13301,7 +13295,6 @@ void LeituraCEPEL::imprime_na_tela_avisos_de_possiveis_inviabilidades_fph(Dados&
 
 } // void LeituraCEPEL::imprime_na_tela_avisos_de_possiveis_inviabilidades_fph(Dados& a_dados) {
 
-
 void LeituraCEPEL::atualiza_volume_util_maximo_com_percentual_volume_util_maximo(Dados& a_dados) {
 
 	try {
@@ -13343,6 +13336,39 @@ void LeituraCEPEL::atualiza_volume_util_maximo_com_percentual_volume_util_maximo
 
 }
 
+void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, std::string a_nomeArquivo)
+{
+	try {
+
+		std::string line;
+		std::string atributo;
+
+		std::ifstream leituraArquivo(a_nomeArquivo);
+
+		if (leituraArquivo.is_open()) {
+
+			///////////////////////////////////////////////////////////////////////////////////////////////////////////
+			//Calcula produtibilidade_equivalente (cota_media(Vmax, Vmin), canal_fuga_medio) 
+			//Premissa: Usinas com regularização mensal utiliza o Vmax, Vmin (hidr.dat + modificações dadger)
+			//          Usinas com regularização semanal/diária utiliza VRef do hidr.dat
+			///////////////////////////////////////////////////////////////////////////////////////////////////////////
+			percentual_volume_util = 1.0
+			calcular_produtibilidade_para_cortes_NEWAVE(percentual_volume_util) //EAR
+			percentual_volume_util = 0.65
+			calcular_produtibilidade_para_cortes_NEWAVE(percentual_volume_util) //ENA
+
+
+
+
+
+
+
+		}//if (leituraArquivo.is_open()) {
+
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::leitura_cortes_NEWAVE: \n" + std::string(erro.what())); }
+
+}
 
 void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao) {
 
@@ -13526,6 +13552,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 
+		leitura_cortes_NEWAVE(a_dados, a_diretorio + "//DadosAdicionais//Cortes_NEWAVE" + "//fcfnwn." + a_revisao);
 
 	}//try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::validacoes_DC: \n" + std::string(erro.what())); }

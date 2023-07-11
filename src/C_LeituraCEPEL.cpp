@@ -304,7 +304,7 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 						//Se a usina for fio d'àgua utiliza o volume_referencia do Hidr.dat (pode ser maior do que o volume_máximo: verificado em consulta ao Cepel)
 						if (!bool(a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_regularizacao, periodo, bool()))) {
 							volume_minimo = volume_maximo;
-							volume = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_volume_referencia_calculo_turbinamento_maximo, double());
+							volume = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_volume_referencia, double());
 						}//if (!bool(a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_regularizacao, periodo, bool()))) {
 
 						const double h_mont = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getCota(periodo, volume);

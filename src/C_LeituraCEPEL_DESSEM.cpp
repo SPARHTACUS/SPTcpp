@@ -694,6 +694,8 @@ void LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16(Dados& a_dados, const 
 					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_canal_fuga_medio, double(uhe.canalMed));
 					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_vertimento_influencia_fcj, bool(uhe.vertInfCanalFuga));
 					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_vazao_defluente_minima_historica, double(uhe.vazMinHistorica));
+					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_fator_de_producao, double(uhe.produtibilidade));
+
 
 					switch (int(uhe.tipoTurb)) {
 					case 0: a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_turbina, TipoTurbina_sem_turbina);;  break;

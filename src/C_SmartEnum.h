@@ -1665,6 +1665,12 @@ DEFINE_SMART_ENUM(TipoIntercambioHidraulico, TIPO_INTERCAMBIOHIDRAULICO)
     m(TipoRestricaoHidraulica, limite)
 DEFINE_SMART_ENUM(TipoRestricaoHidraulica, TIPO_RESTRICAO_HIDRAULICA)
 
+#define TIPO_REGULARIZACAO(m)\
+    m(TipoRegularizacao, mensal)         \
+    m(TipoRegularizacao, semanal)         \
+    m(TipoRegularizacao, diaria)         
+DEFINE_SMART_ENUM(TipoRegularizacao, TIPO_RESTRICAO_HIDRAULICA)
+
 #define TIPO_ESTRUTURA_PERIODO(m)\
     m(TipoEstruturaPeriodo, flat)       \
     m(TipoEstruturaPeriodo, crescente)  \
@@ -1707,6 +1713,7 @@ m(TipoRelaxacaoAfluenciaIncremental) \
 m(TipoRepresentacaoHidrologica)      \
 m(TipoRestricaoContrato)             \
 m(TipoRestricaoHidraulica)           \
+m(TipoRegularizacao)                 \
 m(TipoSelecaoSolucaoProxy)           \
 m(TipoSemente)                       \
 m(TipoSolver)                        \

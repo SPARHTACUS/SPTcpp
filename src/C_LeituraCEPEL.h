@@ -182,6 +182,7 @@ private:
 	void set_termeletrica_potencia_disponivel_meta(Dados& a_dados);
 	void leitura_potencia_comandada_from_relgnl(Dados& a_dados, const std::string a_nomeArquivo_pastaRaiz_relgnl, const std::string a_nomeArquivo_pastaAdicionais_relgnl, const std::vector<int> a_codigo_gnl, const std::vector<std::string> a_nome_gnl, SmartEnupla<IdTermeletrica, SmartEnupla<Periodo, double>>& a_lista_termeletrica_potencia_pre_comandada);
 	void leitura_vRef_from_CadUsH_csv(Dados& a_dados, std::string a_nomeArquivo);
+	void leitura_cortes_NEWAVE(Dados& a_dados, std::string a_nomeArquivo);
 
 	//Validações
 	void validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao);
