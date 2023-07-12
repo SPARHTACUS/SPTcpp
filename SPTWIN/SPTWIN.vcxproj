@@ -119,6 +119,7 @@
     <ClInclude Include="..\src\C_VariavelAleatoria.h" />
     <ClInclude Include="..\src\C_VariavelAleatoriaInterna.h" />
     <ClInclude Include="..\src\C_VariavelDecisao.h" />
+    <ClInclude Include="..\src\C_VariavelDecisaoNEW.h" />
     <ClInclude Include="..\src\C_VariavelEstado.h" />
     <ClInclude Include="..\src\C_VariavelRealizacao.h" />
     <ClInclude Include="..\src\C_VariavelRealizacaoInterna.h" />
@@ -175,6 +176,8 @@
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <Optimization>MaxSpeed</Optimization>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

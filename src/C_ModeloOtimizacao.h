@@ -11,6 +11,7 @@
 #include "C_Iteracao.h"
 
 #include "C_VariavelDecisao.h"
+#include "C_VariavelDecisaoNEW.h"
 #include "C_RestricaoEquacaoLinear.h"
 #include "C_RestricaoInequacaoLinear.h"
 
@@ -662,6 +663,444 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		std::vector<std::vector<std::string>> lista_inequacoes_instanciadas;
 
 		IdCorteBenders maiorIdCorteExportadoPreEstudo = IdCorteBenders_Nenhum;
+
+
+
+
+		template<typename TListasIdxElem, typename TIt>
+		void alocConteudoIter(TListasIdxElem& a_listasIdxElem, TIt a_it) {
+			try {
+
+				// Inicializa Lista
+				if (a_listasIdxElem.size() == 0)
+					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
+
+				// Alocação do final da lista até iterador informado
+				else if (a_listasIdxElem.getIteradorFinal() < a_it) {
+					for (TIt it = a_listasIdxElem.getIteradorFinal(); it < a_it; a_listasIdxElem.incrementarIterador(it))
+						if (it > a_listasIdxElem.getIteradorFinal())
+							a_listasIdxElem.addElemento(it, a_listasIdxElem.getTipoElemento());
+					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
+				}
+
+				// Alocação do início da lista até o iterador informado
+				else if (a_it < a_listasIdxElem.getIteradorInicial()) {
+					for (TIt it = a_listasIdxElem.getIteradorInicial(); it > a_it; a_listasIdxElem.decrementarIterador(it))
+						if (it < a_listasIdxElem.getIteradorInicial())
+							a_listasIdxElem.addElemento(it, a_listasIdxElem.getTipoElemento());
+					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
+				}
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("alocConteudoIter(a_listasIdxElem," + getFullString(a_it) + "): \n" + std::string(erro.what())); }
+		};
+
+		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		void addConteudoIters_10(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10) {
+
+			try {
+
+				alocConteudoIter(a_listasIdxElem, a_it1);
+				alocConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
+
+				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9)..setElemento(a_it10, a_conteudo);
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what())); }
+		};
+
+		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11>
+		void addConteudoIters_11(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11) {
+
+			try {
+
+				alocConteudoIter(a_listasIdxElem, a_it1);
+				alocConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10), a_it11);
+
+				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).setElemento(a_it11, a_conteudo);
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_11(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "): \n" + std::string(erro.what())); }
+		};
+
+		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11, typename TIt12>
+		void addConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11, const TIt12 a_it12) {
+
+			try {
+
+				alocConteudoIter(a_listasIdxElem, a_it1);
+				alocConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10), a_it11);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11), a_it12);
+
+				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).setElemento(a_it12, a_conteudo);
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_12(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "," + getFullString(a_it12) + "): \n" + std::string(erro.what())); }
+		};
+
+		template<typename TListasIdxElem, typename TIt>
+		void varreduraIter(TListasIdxElem& a_listasIdxElem, TIt &a_it, const int a_estado_anterior, int &a_estado) {
+			try {
+				
+				// Último estado (Iterador Atual): 
+				//
+				// 
+				//  -1: Varedura não iniciada -> retornar iterador atual com estado -1
+				// 
+				//   0: Varredura finalizada   -> Existe iterador inicial e não é o final: retorná-lo e manter varredura em andamento com estado 1
+				//                             -> Existe iterador inicial e é o final: retorná-lo e finalizar varredura setando estado 0
+				//                             -> Ñ Exite iterador inicial: retornar iterador atual com estado 0
+				// 
+				//   1: Varredura em andamento -> Existe iterador seguinte e não é o final: retorná-lo e manter varredura em andamento com estado 1
+				//					           -> Existe iterador seguinte e é o final: retorná-lo e finalizar varredura setando estado 0
+				//                             -> Ñ Existe iterador seguinte: Erro - condição não viável
+				
+
+				if (a_estado_anterior == -1) {
+					a_estado = -1
+					return;
+				}
+
+				// Não existe iteradores
+				if (a_listasIdxElem.size() == 0) {
+					if (a_estado == 0) {
+						a_estado = -1
+						return;
+					}
+					else if (a_estado == 1)
+						throw std::invalid_argument("Erro - Condicao nao viavel 1.");
+					return;
+				}
+
+				if ((a_estado == -1) || (a_estado == 0)) {
+					a_estado = 1;
+					a_it = a_listasIdxElem.getIteradorInicial();
+					if (a_it == a_listasIdxElem.getIteradorFinal())
+						a_estado = 0;
+					return;
+				}
+				else if (a_estado == 1) {
+					a_listasIdxElem.incrementarIterador(a_it);
+					if (a_it == a_listasIdxElem.getIteradorFinal())
+						a_estado = 0;
+					return;
+				}
+
+				throw std::invalid_argument("Erro - Condicao nao viavel 2.");
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("iteraInterno(varreduraIter," + getFullString(a_it) + "," + getFullString(a_estado) + "): \n" + std::string(erro.what())); }
+		};
+
+		template<typename TListasIdxElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool varredurasIters_10(TListasIdxElem& a_listasIdxElem, std::vector<int>& a_estados, TIt1 &a_it1, TIt2 &a_it2, TIt3 &a_it3, TIt4 &a_it4, TIt5 &a_it5, TIt6 &a_it6, TIt7 &a_it7, TIt8 &a_it8, TIt9 &a_it9, TIt10 &a_it10) {
+
+			try {
+
+				if (a_estados.size() != 10)
+					throw std::invalid_argument("O numero de estados deve ser compatível com o número de iteradores.");
+
+				varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10, a_estado.at(9), a_estado.at(10));
+				if (a_estado.at(10) != 0) {
+					varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9, a_estado.at(8), a_estado.at(9));
+					if (a_estado.at(9) != 0) {
+						varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8, a_estado.at(7), a_estado.at(8));
+						if (a_estado.at(8) != 0) {
+							varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7, a_estado.at(6), a_estado.at(7));
+							if (a_estado.at(7) != 0) {
+								varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6, a_estado.at(5), a_estado.at(6));
+								if (a_estado.at(6) != 0) {
+									varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5, a_estado.at(4), a_estado.at(5));
+									if (a_estado.at(5) != 0) {
+										varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4, a_estado.at(3), a_estado.at(4));
+										if (a_estado.at(4) != 0) {
+											varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3, a_estado.at(2), a_estado.at(3));
+											if (a_estado.at(3) != 0) {
+												varreduraIter(a_listasIdxElem.at(a_it1), a_it2, a_estado.at(1), a_estado.at(2));
+												if (a_estado.at(2) != 0) {
+													varreduraIter(a_listasIdxElem, a_it1, 1, a_estado.at(1));
+												} // if (a_estado.at(2) != 0) {
+											} // if (a_estado.at(3) != 0) {
+										} // if (a_estado.at(4) != 0) {
+									} // if (a_estado.at(5) != 0) {
+								} // if (a_estado.at(6) != 0) {
+							} // if (a_estado.at(7) != 0) {
+						} // if (a_estado.at(8) != 0) {
+					} // if (a_estado.at(9) != 0) {
+				} // if (a_estado.at(10) != 0) {
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what())); }
+		};
+
+
+		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool getConteudoIters_10(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10) {
+
+			try {
+
+				if (a_listasIdxElem.size() == 0)
+					return false;
+				else if (a_listasIdxElem.getIteradorFinal() < a_it1)
+					return false;
+				else if (a_it1 < a_listasIdxElem.getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).getIteradorFinal() < a_it2)
+					return false;
+				else if (a_it2 < a_listasIdxElem.at(a_it1).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).getIteradorFinal() < a_it3)
+					return false;
+				else if (a_it3 < a_listasIdxElem.at(a_it1).at(a_it2).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorFinal() < a_it4)
+					return false;
+				else if (a_it4 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorFinal() < a_it5)
+					return false;
+				else if (a_it5 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorFinal() < a_it6)
+					return false;
+				else if (a_it6 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorFinal() < a_it7)
+					return false;
+				else if (a_it7 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorFinal() < a_it8)
+					return false;
+				else if (a_it8 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorFinal() < a_it9)
+					return false;
+				else if (a_it9 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorFinal() < a_it10)
+					return false;
+				else if (a_it10 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorInicial())
+					return false;
+
+				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10);
+				return true;
+
+			}
+			catch (const std::exception& erro) {
+				throw std::invalid_argument("getConteudoIters(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what()));
+			}
+		};
+
+		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11>
+		bool getConteudoIters_11(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11) {
+
+			try {
+
+				if (a_listasIdxElem.size() == 0)
+					return false;
+				else if (a_listasIdxElem.getIteradorFinal() < a_it1)
+					return false;
+				else if (a_it1 < a_listasIdxElem.getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).getIteradorFinal() < a_it2)
+					return false;
+				else if (a_it2 < a_listasIdxElem.at(a_it1).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).getIteradorFinal() < a_it3)
+					return false;
+				else if (a_it3 < a_listasIdxElem.at(a_it1).at(a_it2).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorFinal() < a_it4)
+					return false;
+				else if (a_it4 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorFinal() < a_it5)
+					return false;
+				else if (a_it5 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorFinal() < a_it6)
+					return false;
+				else if (a_it6 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorFinal() < a_it7)
+					return false;
+				else if (a_it7 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorFinal() < a_it8)
+					return false;
+				else if (a_it8 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorFinal() < a_it9)
+					return false;
+				else if (a_it9 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorFinal() < a_it10)
+					return false;
+				else if (a_it10 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).getIteradorFinal() < a_it11)
+					return false;
+				else if (a_it11 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).getIteradorInicial())
+					return false;
+
+				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11);
+				return true;
+
+			}
+			catch (const std::exception& erro) {
+				throw std::invalid_argument("getConteudoIters(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "): \n" + std::string(erro.what()));
+			}
+		};
+
+		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11, typename TIt12>
+		bool getConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo &a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11, const TIt12 a_it12) {
+
+			try {
+
+				if (a_listasIdxElem.size() == 0)
+					return false;
+				else if (a_listasIdxElem.getIteradorFinal() < a_it1)
+					return false;
+				else if (a_it1 < a_listasIdxElem.getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).getIteradorFinal() < a_it2)
+					return false;
+				else if (a_it2 < a_listasIdxElem.at(a_it1).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).getIteradorFinal() < a_it3)
+					return false;
+				else if (a_it3 < a_listasIdxElem.at(a_it1).at(a_it2).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorFinal() < a_it4)
+					return false;
+				else if (a_it4 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorFinal() < a_it5)
+					return false;
+				else if (a_it5 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorFinal() < a_it6)
+					return false;
+				else if (a_it6 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorFinal() < a_it7)
+					return false;
+				else if (a_it7 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorFinal() < a_it8)
+					return false;
+				else if (a_it8 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorFinal() < a_it9)
+					return false;
+				else if (a_it9 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorFinal() < a_it10)
+					return false;
+				else if (a_it10 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).getIteradorFinal() < a_it11)
+					return false;
+				else if (a_it11 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).getIteradorFinal() < a_it12)
+					return false;
+				else if (a_it12 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).getIteradorInicial())
+					return false;
+
+				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).at(a_it12);
+				return true;
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("getConteudoIters(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "," + getFullString(a_it12) + "): \n" + std::string(erro.what()));
+			}
+		};
+
 
 		VARIAVEL_DECISAO_2(DECLARAR_VARIAVEL_DECISAO_2)
 			VARIAVEL_DECISAO_3(DECLARAR_VARIAVEL_DECISAO_3)

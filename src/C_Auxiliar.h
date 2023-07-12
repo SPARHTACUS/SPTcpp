@@ -151,6 +151,21 @@ static int getintFromChar(const char * a_char) {
 
 }; // static int getintFromChar(const char * a_char) {
 
+
+template<typename TValue>
+static TValue getFromString(const TValue a_valor, const std::string a_str) { 
+	throw std::invalid_argument("getFromChar(" + a_str + "): Nao implementado.");
+};
+
+static int getFromString(const int a_valor, const std::string a_str) {
+	return getintFromChar(a_str.c_str());
+};
+
+static std::vector<int> getFromString(const std::vector<int> a_valor, const std::string a_str) {
+	return std::vector<int>(1, getintFromChar(a_str.c_str()));
+};
+
+
 static int getFromChar(const int a_int, const char * a_char) { return getintFromChar(a_char); };
 
 static std::string getString(int a_int) { 

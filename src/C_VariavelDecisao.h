@@ -692,7 +692,7 @@ consolidarResultadosVarDecisao_##Nome##_2(a_TSS, variavel_str, a_maiorIdProcesso
 //                                Variaveis de Decisão Continuas 3
 //
 // ---------------------------------------------------------------------------------------
-
+/*
 #define DECLARAR_VARIAVEL_DECISAO_3(Nome, TIt, TIt2, TIt3, ImprimirPrimal, ImprimirDual)   \
 std::vector<SmartEnupla<TIt, SmartEnupla<TIt2, SmartEnupla<TIt3, std::vector<int>>>>> idx_var_##Nome##_3 = std::vector<SmartEnupla<TIt, SmartEnupla<TIt2, SmartEnupla<TIt3, std::vector<int>>>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<TIt, SmartEnupla<TIt2, SmartEnupla<TIt3, std::vector<int>>>>());        \
 std::vector<SmartEnupla<TIt, bool>> is_var_decisao_##Nome##_3_pre_alocada = std::vector<SmartEnupla<TIt, bool>>(TipoSubproblemaSolver_Excedente, SmartEnupla<TIt, bool>());  \
@@ -1188,7 +1188,7 @@ void ModeloOtimizacao::consolidarResultadosVarDecisao_##Nome##_3(const TipoSubpr
 
 #define CONSOLIDAR_RESULTADOS_VARIAVEL_DECISAO_3(Nome, TIt, TIt2, TIt3, ImprimirPrimal, ImprimirDual) \
 consolidarResultadosVarDecisao_##Nome##_3(a_TSS, variavel_str, a_maiorIdProcesso, a_entradaSaidaDados);
-
+*/
 // ---------------------------------------------------------------------------------------
 //
 //                                Variaveis de Decisão Continuas 4
