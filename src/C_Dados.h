@@ -325,9 +325,6 @@ public:
 
 	SmartEnupla<IdHidreletrica, double> calculaAfluenciaIncremental(const SmartEnupla<IdHidreletrica, double>& a_afluenciaNatural);
 
-
-	void calcular_produtibilidade_para_cortes_NEWAVE(const double a_percentual_volume_util);
-
 	void defineCenariosOtimizacao(const IdIteracao a_iteracao_inicial, const IdIteracao a_iteracao_final);
 	void defineCenariosSimulacao();
 

@@ -181,8 +181,13 @@ private:
 	void set_hidreletrica_potencia_disponivel_meta_from_dec_oper_usih_DC(Dados& a_dados, std::string a_nomeArquivo);
 	void set_termeletrica_potencia_disponivel_meta(Dados& a_dados);
 	void leitura_potencia_comandada_from_relgnl(Dados& a_dados, const std::string a_nomeArquivo_pastaRaiz_relgnl, const std::string a_nomeArquivo_pastaAdicionais_relgnl, const std::vector<int> a_codigo_gnl, const std::vector<std::string> a_nome_gnl, SmartEnupla<IdTermeletrica, SmartEnupla<Periodo, double>>& a_lista_termeletrica_potencia_pre_comandada);
-	void leitura_vRef_from_CadUsH_csv(Dados& a_dados, std::string a_nomeArquivo);
-	void leitura_cortes_NEWAVE(Dados& a_dados, std::string a_nomeArquivo);
+	void leitura_volume_referencia_e_regularizacao_from_CadUsH_csv(Dados& a_dados, std::string a_nomeArquivo);
+	void leitura_cortes_NEWAVE(Dados& a_dados, std::string a_diretorio, std::string a_nomeArquivo);
+	double get_cota_para_conversao_cortes_NEWAVE(const Hidreletrica& a_hidreletrica, const Periodo a_periodo, const double a_percentual_volume_util);
+	double get_produtibilidade_para_conversao_cortes_NEWAVE(const Hidreletrica& a_hidreletrica, const double a_cota);
+	void instanciar_codigo_usina_jusante_EAR(Dados& a_dados);
+	void instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_EAR(Dados& a_dados, std::string a_nomeArquivo);
+	void instancia_atributos_hidreletrica_out_from_CadUsH_csv(Hidreletrica& a_hidreletrica, std::string a_nomeArquivo);
 
 	//Validações
 	void validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao);
@@ -357,6 +362,8 @@ private:
 	SmartEnupla<IdHidreletrica, IdHidreletrica> lista_jusante_desvio_hidreletrica; //Lista da jusante_desvio de cada hidrelétrica -> Somente para validação entre a configuração PD e CP
 
 	SmartEnupla<IdHidreletrica, int> lista_hidreletrica_NPOSNW; //Lista que registra se uma usina tem diferença de posto entre DECOMP  e NEWAVE
+
+	SmartEnupla<int, Hidreletrica> lista_hidreletrica_out_estudo; //Lista que registra usinas que não fazem parte do estudo mas são necessárias para desacoplar o corte NEWAVE (p.ex COMP PAF-MOX indicado no registro JUSENA para calcular a EAR do REE NE)
 
 	template<typename TipoIterador>
 	TipoIterador getIdFromCodigoONS(const SmartEnupla<TipoIterador, int>& a_lista_codigo_ONS, const int a_codigo_ONS) {
