@@ -710,7 +710,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
 				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
 
-				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9)..setElemento(a_it10, a_conteudo);
+				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).setElemento(a_it10, a_conteudo);
 
 			}
 			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what())); }
@@ -764,98 +764,190 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		};
 
 		template<typename TListasIdxElem, typename TIt>
-		void varreduraIter(TListasIdxElem& a_listasIdxElem, TIt &a_it, const int a_estado_anterior, int &a_estado) {
+		void varreduraIter(TListasIdxElem& a_listasIdxElem, TIt &a_it, int &a_estado) {
 			try {
 				
-				// Último estado (Iterador Atual): 
+				// Estado: 
 				//
 				// 
-				//  -1: Varedura não iniciada -> retornar iterador atual com estado -1
+				//  -1: Varredura parada 
 				// 
-				//   0: Varredura finalizada   -> Existe iterador inicial e não é o final: retorná-lo e manter varredura em andamento com estado 1
-				//                             -> Existe iterador inicial e é o final: retorná-lo e finalizar varredura setando estado 0
-				//                             -> Ñ Exite iterador inicial: retornar iterador atual com estado 0
+				//   0: Não realizar varredura                            
 				// 
-				//   1: Varredura em andamento -> Existe iterador seguinte e não é o final: retorná-lo e manter varredura em andamento com estado 1
-				//					           -> Existe iterador seguinte e é o final: retorná-lo e finalizar varredura setando estado 0
-				//                             -> Ñ Existe iterador seguinte: Erro - condição não viável
-				
+				//   1: Varredura iniciada
+				//					           
 
-				if (a_estado_anterior == -1) {
-					a_estado = -1
+				
+				if ((a_estado < -1) || (a_estado > 1))
+					throw std::invalid_argument("Erro - Estado nao viavel.");
+
+				if (a_estado == 0)
 					return;
-				}
 
 				// Não existe iteradores
 				if (a_listasIdxElem.size() == 0) {
-					if (a_estado == 0) {
-						a_estado = -1
+					if (a_estado == -1) {
 						return;
 					}
 					else if (a_estado == 1)
-						throw std::invalid_argument("Erro - Condicao nao viavel 1.");
+						throw std::invalid_argument("Erro - Condicao nao viavel A.");
 					return;
 				}
 
-				if ((a_estado == -1) || (a_estado == 0)) {
+				if (a_estado == -1) {
 					a_estado = 1;
 					a_it = a_listasIdxElem.getIteradorInicial();
-					if (a_it == a_listasIdxElem.getIteradorFinal())
-						a_estado = 0;
 					return;
 				}
 				else if (a_estado == 1) {
+					if (a_it == a_listasIdxElem.getIteradorFinal()) {
+						a_estado = -1;
+						return;
+					}
 					a_listasIdxElem.incrementarIterador(a_it);
-					if (a_it == a_listasIdxElem.getIteradorFinal())
-						a_estado = 0;
 					return;
 				}
 
-				throw std::invalid_argument("Erro - Condicao nao viavel 2.");
+				throw std::invalid_argument("Erro - Condicao nao viavel B.");
 
 			}
 			catch (const std::exception& erro) { throw std::invalid_argument("iteraInterno(varreduraIter," + getFullString(a_it) + "," + getFullString(a_estado) + "): \n" + std::string(erro.what())); }
 		};
 
 		template<typename TListasIdxElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_10(TListasIdxElem& a_listasIdxElem, std::vector<int>& a_estados, TIt1 &a_it1, TIt2 &a_it2, TIt3 &a_it3, TIt4 &a_it4, TIt5 &a_it5, TIt6 &a_it6, TIt7 &a_it7, TIt8 &a_it8, TIt9 &a_it9, TIt10 &a_it10) {
+		bool varredurasIters_10(const std::string a_nome, TListasIdxElem& a_listasIdxElem, std::vector<int>& a_estados, const int a_indice_parada, bool &a_parada, TIt1 &a_it1, TIt2 &a_it2, TIt3 &a_it3, TIt4 &a_it4, TIt5 &a_it5, TIt6 &a_it6, TIt7 &a_it7, TIt8 &a_it8, TIt9 &a_it9, TIt10 &a_it10) {
 
 			try {
 
 				if (a_estados.size() != 10)
 					throw std::invalid_argument("O numero de estados deve ser compatível com o número de iteradores.");
 
-				varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10, a_estado.at(9), a_estado.at(10));
-				if (a_estado.at(10) != 0) {
-					varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9, a_estado.at(8), a_estado.at(9));
-					if (a_estado.at(9) != 0) {
-						varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8, a_estado.at(7), a_estado.at(8));
-						if (a_estado.at(8) != 0) {
-							varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7, a_estado.at(6), a_estado.at(7));
-							if (a_estado.at(7) != 0) {
-								varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6, a_estado.at(5), a_estado.at(6));
-								if (a_estado.at(6) != 0) {
-									varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5, a_estado.at(4), a_estado.at(5));
-									if (a_estado.at(5) != 0) {
-										varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4, a_estado.at(3), a_estado.at(4));
-										if (a_estado.at(4) != 0) {
-											varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3, a_estado.at(2), a_estado.at(3));
-											if (a_estado.at(3) != 0) {
-												varreduraIter(a_listasIdxElem.at(a_it1), a_it2, a_estado.at(1), a_estado.at(2));
-												if (a_estado.at(2) != 0) {
-													varreduraIter(a_listasIdxElem, a_it1, 1, a_estado.at(1));
-												} // if (a_estado.at(2) != 0) {
-											} // if (a_estado.at(3) != 0) {
-										} // if (a_estado.at(4) != 0) {
-									} // if (a_estado.at(5) != 0) {
-								} // if (a_estado.at(6) != 0) {
-							} // if (a_estado.at(7) != 0) {
-						} // if (a_estado.at(8) != 0) {
-					} // if (a_estado.at(9) != 0) {
-				} // if (a_estado.at(10) != 0) {
+				int estado_parada = a_estados.at(a_indice_parada);
+
+				if (a_estados.at(8) != -1)
+					varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10, a_estados.at(9));
+
+				if (a_estados.at(9) != 1) {
+					if (a_estados.at(7) != -1)
+						varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9, a_estados.at(8));
+
+					if (a_estados.at(8) != 1) {
+						if (a_estados.at(6) != -1)
+							varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8, a_estados.at(7));
+
+						if (a_estados.at(7) != 1) {
+							if (a_estados.at(5) != -1)
+								varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7, a_estados.at(6));
+
+							if (a_estados.at(6) != 1) {
+								if (a_estados.at(4) != -1)
+									varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6, a_estados.at(5));
+
+								if (a_estados.at(5) != 1) {
+									if (a_estados.at(3) != -1)
+										varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5, a_estados.at(4));
+
+									if (a_estados.at(4) != 1) {
+										if (a_estados.at(2) != -1)
+											varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4, a_estados.at(3));
+
+										if (a_estados.at(3) != 1) {
+											if (a_estados.at(1) != -1)
+												varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3, a_estados.at(2));
+
+											if (a_estados.at(2) != 1) {
+												if (a_estados.at(0) != -1)
+													varreduraIter(a_listasIdxElem.at(a_it1), a_it2, a_estados.at(1));
+
+												if (a_estados.at(1) != 1) {
+													varreduraIter(a_listasIdxElem, a_it1, a_estados.at(0));
+												} // if (a_estados.at(1) != 0) {
+
+											} // if (a_estados.at(3) != 0) {
+										} // if (a_estados.at(4) != 0) {
+									} // if (a_estados.at(4) != 0) {
+								} // if (a_estados.at(5) != 0) {
+							} // if (a_estados.at(6) != 0) {
+						} // if (a_estados.at(7) != 0) {
+					} // if (a_estados.at(8) != 0) {
+				} // if (a_estados.at(9) != 0) {
+
+				if ((estado_parada == 1) && (a_estados.at(a_indice_parada) == -1)) {
+					a_parada = true;
+					return false;
+				}
+
+				if ((a_estados.at(9) == -1) || (a_estados.at(8) == -1) || (a_estados.at(7) == -1) || (a_estados.at(6) == -1) || (a_estados.at(5) == -1) || (a_estados.at(4) == -1) || (a_estados.at(3) == -1) || (a_estados.at(2) == -1) || (a_estados.at(1) == -1) || (a_estados.at(0) == -1)) {
+
+					if (a_estados.at(0) != -1) {
+						if (a_estados.at(1) == -1)
+							varreduraIter(a_listasIdxElem.at(a_it1), a_it2, a_estados.at(1));
+
+						if (a_estados.at(1) != -1) {
+							if (a_estados.at(2) == -1)
+								varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3, a_estados.at(2));
+
+							if (a_estados.at(2) != -1) {
+								if (a_estados.at(3) == -1)
+									varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4, a_estados.at(3));
+
+								if (a_estados.at(3) != -1) {
+									if (a_estados.at(4) == -1)
+										varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5, a_estados.at(4));
+
+									if (a_estados.at(4) != -1) {
+										if (a_estados.at(5) == -1)
+											varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6, a_estados.at(5));
+
+										if (a_estados.at(5) != -1) {
+											if (a_estados.at(6) == -1)
+												varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7, a_estados.at(6));
+
+											if (a_estados.at(6) != -1) {
+												if (a_estados.at(7) == -1)
+													varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8, a_estados.at(7));
+
+												if (a_estados.at(7) != -1) {
+													if (a_estados.at(8) == -1)
+														varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9, a_estados.at(8));
+
+													if (a_estados.at(8) != -1) {
+														if (a_estados.at(9) == -1)
+															varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10, a_estados.at(9));
+
+														if ((a_estados.at(9) == -1) || (a_estados.at(8) == -1) || (a_estados.at(7) == -1) || (a_estados.at(6) == -1) || (a_estados.at(5) == -1) || (a_estados.at(4) == -1) || (a_estados.at(3) == -1) || (a_estados.at(2) == -1) || (a_estados.at(1) == -1) || (a_estados.at(0) == -1))
+															return false;
+														else
+															return true;
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if ((a_estados.at(9) == -1) || (a_estados.at(8) == -1) || (a_estados.at(7) == -1) || (a_estados.at(6) == -1) || (a_estados.at(5) == -1) || (a_estados.at(4) == -1) || (a_estados.at(3) == -1) || (a_estados.at(2) == -1) || (a_estados.at(1) == -1) || (a_estados.at(0) == -1))
+					return false;
+				else
+					return true;
 
 			}
-			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what())); }
+			//catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what())); }
+			catch (const std::exception& erro) {
+
+				std::cout << std::string(erro.what()) << std::endl;
+
+			}
+
+			this;
+
+			return false;
+
+
 		};
 
 

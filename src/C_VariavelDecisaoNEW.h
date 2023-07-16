@@ -15,14 +15,22 @@
               SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, int>>>>>>>>>>());        \
 
 #define DECLARAR_VARIAVEL_DECISAO_3(Nome, TIt1, TIt2, TIt3, ImprimirPrimal, ImprimirDual)   \
+std::vector<int> is_var_decisao_##Nome##_3_instanciada = std::vector<int>(TipoSubproblemaSolver_Excedente, 0);  \
 std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, int>>>>>>>>>>>> idx_var_##Nome##_3 =\
 std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, int>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
             SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, int>>>>>>>>>>>());\
-std::vector<int> is_var_decisao_##Nome##_3_instanciada = std::vector<int>(TipoSubproblemaSolver_Excedente, 0);  \
-std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdCenario, double>>>>> vlrP_e_c_var_##Nome##_3 = std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdCenario, double>>>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdCenario, double>>>>()); \
-std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdCenario, double>>>>> vlrD_e_c_var_##Nome##_3 = std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdCenario, double>>>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdCenario, double>>>>()); \
-std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>> vlrP_e_c_r_var_##Nome##_3 = std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>()); \
-std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>> vlrD_e_c_r_var_##Nome##_3 = std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>()); \
+std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdCenario, double>>>>>>>>>>>> vlrP_e_c_var_##Nome##_3 =\
+std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdCenario, double>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
+            SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdCenario, double>>>>>>>>>>>());\
+std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdCenario, double>>>>>>>>>>>> vlrD_e_c_var_##Nome##_3 =\
+std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdCenario, double>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
+            SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdCenario, double>>>>>>>>>>>());\
+std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> vlrP_e_c_r_var_##Nome##_3 =\
+std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
+            SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>());\
+std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> vlrD_e_c_r_var_##Nome##_3 =\
+std::vector<SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
+            SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>());\
 void alocarVarDecisao_##Nome(const TipoSubproblemaSolver a_TSS, const TIt1 a_it1, const SmartEnupla<TIt2, SmartEnupla<TIt3, bool>> &a_enupla_alocacao){ \
 	try{ \
 		alocConteudoIter(idx_var_##Nome##_3.at(a_TSS), a_it1);\
@@ -60,6 +68,7 @@ int getVarDecisao_##Nome(const TipoSubproblemaSolver a_TSS, const TIt1 a_it1, co
 }; \
 int getVarDecisao_##Nome##seExistir(const TipoSubproblemaSolver a_TSS, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3){ \
 	try{ \
+		if (!is_var_decisao_##Nome##_3_instanciada.at(a_TSS)) return -1; \
 		int conteudo = -1; \
 		getConteudoIters_11(idx_var_##Nome##_3.at(a_TSS), conteudo, a_it1, a_it2, a_it3, 1, 1, 1, 1, 1, 1, 1, 1);\
 		return conteudo; \
@@ -69,7 +78,7 @@ int getVarDecisao_##Nome##seExistir(const TipoSubproblemaSolver a_TSS, const TIt
 void inicializarValorPrimalPorEstagioPorCenarioVarDecisao_##Nome(const TipoSubproblemaSolver a_TSS, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3){ \
 	try{ \
 		if (!getboolFromChar(#ImprimirPrimal)) \
-			return true;\
+			return;\
 		const IdCenario cIni = getAtributo(AttComumModeloOtimizacao_cenario_inicial, IdCenario()); \
 		const IdCenario cFim = getAtributo(AttComumModeloOtimizacao_cenario_final, IdCenario()); \
 		const int numero_cenarios = int(cFim) - int(cIni) + 1; \
@@ -118,62 +127,37 @@ void inicializarValorDualPorEstagioPorCenarioPorRealizacaoVarDecisao_##Nome(cons
 };\
 void armazenarValorPrimalPorEstagioPorCenarioVarDecisao_##Nome##_3(const TipoSubproblemaSolver a_TSS, const TIt1 a_it1, const IdCenario a_idCenario) { \
 	try{ \
-		if (!getboolFromChar(#ImprimirPrimal)) \
-			return; \
-		if (idx_var_##Nome##_3.at(a_TSS).size() == 0) \
-			return; \
-		if (idx_var_##Nome##_3.at(a_TSS).getIteradorInicial() > a_it1) \
-			return; \
-		if (idx_var_##Nome##_3.at(a_TSS).getIteradorFinal() < a_it1) \
-			return; \
-		if (idx_var_##Nome##_3.at(a_TSS).at(a_it1).size() == 0) \
-			return; \
-		const TIt2 menorIdIterador2 = idx_var_##Nome##_3.at(a_TSS).at(a_it1).getIteradorInicial(); \
-		const TIt2 maiorIdIterador2 = idx_var_##Nome##_3.at(a_TSS).at(a_it1).getIteradorFinal(); \
-		for (TIt2 idIterador2 = menorIdIterador2; idIterador2 <= maiorIdIterador2; idx_var_##Nome##_3.at(a_TSS).at(a_it1).incrementarIterador(idIterador2)) { \
-			if (idx_var_##Nome##_3.at(a_TSS).at(a_it1).at(idIterador2).size() > 0){ \
-				const TIt3 menorIdIterador3 = idx_var_##Nome##_3.at(a_TSS).at(a_it1).at(idIterador2).getIteradorInicial(); \
-				const TIt3 maiorIdIterador3 = idx_var_##Nome##_3.at(a_TSS).at(a_it1).at(idIterador2).getIteradorFinal(); \
-				for (TIt3 idIterador3 = menorIdIterador3; idIterador3 <= maiorIdIterador3; idx_var_##Nome##_3.at(a_TSS).at(a_it1).at(idIterador2).incrementarIterador(idIterador3)) { \
-					if (getVarDecisao_##Nome##seExistir(a_TSS, a_it1, idIterador2, idIterador3) > -1) {\
-						inicializarValorPrimalPorEstagioPorCenarioVarDecisao_##Nome(a_TSS, a_it1, idIterador2, idIterador3); \
-						vlrP_e_c_var_##Nome##_3.at(a_TSS).at(a_it1).at(idIterador2).at(idIterador3).at(a_idCenario) = vetorEstagio.att(a_it1).getSolver(a_TSS)->getValorPrimal(getVarDecisao_##Nome(a_TSS, a_it1, idIterador2, idIterador3)); \
-					}\
-				} \
+		if (!getboolFromChar(#ImprimirPrimal)) return; \
+		if (!is_var_decisao_##Nome##_3_instanciada.at(a_TSS)) return; \
+		if (idx_var_##Nome##_3.at(a_TSS).getIteradorInicial() > a_it1) return; \
+		if (idx_var_##Nome##_3.at(a_TSS).getIteradorFinal() < a_it1) return; \
+		TIt1 it1 = a_it1; TIt2 it2; TIt3 it3; int it4; int it5; int it6; int it7; int it8; int it9; int it10; \
+		std::vector<int> estados(10, -1); estados.at(0) = 0; bool parada = false;\
+		for (int i = 0; i <= 1000000; i++){ \
+			if (varredurasIters_10(std::string(std::string(#Nome) + "_3"), idx_var_##Nome##_3.at(a_TSS), estados, 1, parada, it1, it2, it3, it4, it5, it6, it7, it8, it9, it10)){\
+				double conteudo = vetorEstagio.att(a_it1).getSolver(a_TSS)->getValorPrimal(idx_var_##Nome##_3.at(a_TSS).at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10).at(1)); \
+				addConteudoIters_11(vlrP_e_c_var_##Nome##_3.at(a_TSS), conteudo, it1, it2, it3, it4, it5, it6, it7, it8, it9, it10, a_idCenario); \
 			} \
-		} \
+			if (parada) break; \
+		}\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorPrimalPorEstagioPorCenarioVarDecisao_" + std::string(#Nome) + "_3(" + getFullString(a_it1) + "," + getString(a_idCenario) + "): \n" + std::string(erro.what())); } \
 };\
 void armazenarValorDualPorEstagioPorCenarioVarDecisao_##Nome##_3(const TipoSubproblemaSolver a_TSS, const TIt1 a_it1, const IdCenario a_idCenario){ \
 	try{ \
-		if (!getboolFromChar(#ImprimirDual)) \
-			return; \
-		if (idx_var_##Nome##_3.at(a_TSS).size() == 0) \
-			return; \
-		if (idx_var_##Nome##_3.at(a_TSS).getIteradorInicial() > a_it1) \
-			return; \
-		if (idx_var_##Nome##_3.at(a_TSS).getIteradorFinal() < a_it1) \
-			return; \
-		if (idx_var_##Nome##_3.at(a_TSS).at(a_it1).size() == 0) \
-			return; \
-		const TIt2 menorIdIterador2 = idx_var_##Nome##_3.at(a_TSS).at(a_it1).getIteradorInicial(); \
-		const TIt2 maiorIdIterador2 = idx_var_##Nome##_3.at(a_TSS).at(a_it1).getIteradorFinal(); \
-		for (TIt2 idIterador2 = menorIdIterador2; idIterador2 <= maiorIdIterador2; idx_var_##Nome##_3.at(a_TSS).at(a_it1).incrementarIterador(idIterador2)) { \
-			if (idx_var_##Nome##_3.at(a_TSS).at(a_it1).at(idIterador2).size() > 0){ \
-				const TIt3 menorIdIterador3 = idx_var_##Nome##_3.at(a_TSS).at(a_it1).at(idIterador2).getIteradorInicial(); \
-				const TIt3 maiorIdIterador3 = idx_var_##Nome##_3.at(a_TSS).at(a_it1).at(idIterador2).getIteradorFinal(); \
-				for (TIt3 idIterador3 = menorIdIterador3; idIterador3 <= maiorIdIterador3; idx_var_##Nome##_3.at(a_TSS).at(a_it1).at(idIterador2).incrementarIterador(idIterador3)) { \
-					if (getVarDecisao_##Nome##seExistir(a_TSS, a_it1, idIterador2, idIterador3) > -1) {\
-						inicializarValorDualPorEstagioPorCenarioVarDecisao_##Nome(a_TSS, a_it1, idIterador2, idIterador3); \
-						if (std::string(#Nome) == "VI_$/hm3/h") \
-							vlrD_e_c_var_##Nome##_3.at(a_TSS).at(a_it1).at(idIterador2).at(idIterador3).at(a_idCenario) = vetorEstagio.att(a_it1).getSolver(a_TSS)->getReducedCost(getVarDecisao_##Nome(a_TSS, a_it1, idIterador2, idIterador3)) / getNumeroHorasFromIterador(idIterador2); \
-						else \
-							vlrD_e_c_var_##Nome##_3.at(a_TSS).at(a_it1).at(idIterador2).at(idIterador3).at(a_idCenario) = vetorEstagio.att(a_it1).getSolver(a_TSS)->getReducedCost(getVarDecisao_##Nome(a_TSS, a_it1, idIterador2, idIterador3)); \
-					}\
-				} \
+		if (!getboolFromChar(#ImprimirDual)) return; \
+		if (!is_var_decisao_##Nome##_3_instanciada.at(a_TSS)) return; \
+		if (idx_var_##Nome##_3.at(a_TSS).getIteradorInicial() > a_it1) return; \
+		if (idx_var_##Nome##_3.at(a_TSS).getIteradorFinal() < a_it1) return; \
+		TIt1 it1 = a_it1; TIt2 it2; TIt3 it3; int it4; int it5; int it6; int it7; int it8; int it9; int it10; \
+		std::vector<int> estados(10, -1); estados.at(0) = 0; bool parada = false;\
+		for (int i = 0; i <= 1000000; i++){ \
+			if (varredurasIters_10(std::string(std::string(#Nome) + "_3"), idx_var_##Nome##_3.at(a_TSS), estados, 1, parada, it1, it2, it3, it4, it5, it6, it7, it8, it9, it10)){\
+				double conteudo = vetorEstagio.att(a_it1).getSolver(a_TSS)->getValorPrimal(idx_var_##Nome##_3.at(a_TSS).at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10).at(1)); \
+				addConteudoIters_11(vlrD_e_c_var_##Nome##_3.at(a_TSS), conteudo, it1, it2, it3, it4, it5, it6, it7, it8, it9, it10, a_idCenario); \
 			} \
-		} \
+			if (parada) break; \
+		}\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorDualPorEstagioPorCenarioVarDecisao_" + std::string(#Nome) + "_3(" + getFullString(a_it1) + "," + getString(a_idCenario) + "): \n" + std::string(erro.what())); } \
 };\
@@ -251,8 +235,9 @@ void ModeloOtimizacao::imprimirValorPrimalPorEstagioPorCenarioVarDecisao_##Nome#
 			return; \
 		a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//var" + std::string(#Nome) + "_3"); \
 		const std::string nome_arquivo = std::string("var" + std::string(#Nome) + "_3_primal_" + a_nome_arquivo + ".csv"); \
-		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(true, vlrP_e_c_var_##Nome##_3.at(a_TSS))); \
-		vlrP_e_c_var_##Nome##_3.at(a_TSS) = SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdCenario, double>>>>(); \
+		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(3, vlrP_e_c_var_##Nome##_3.at(a_TSS))); \
+		vlrP_e_c_var_##Nome##_3.at(a_TSS) = \
+		SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdCenario, double>>>>>>>>>>>();\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("imprimirValorPrimalPorEstagioPorCenarioVarDecisao_" + std::string(#Nome) + "_3(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
 };\
@@ -262,8 +247,9 @@ void ModeloOtimizacao::imprimirValorDualPorEstagioPorCenarioVarDecisao_##Nome##_
 			return; \
 		a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//var" + std::string(#Nome) + "_3"); \
 		const std::string nome_arquivo = std::string("var" + std::string(#Nome) + "_3_dual_" + a_nome_arquivo + ".csv"); \
-		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(true, vlrD_e_c_var_##Nome##_3.at(a_TSS))); \
-		vlrD_e_c_var_##Nome##_3.at(a_TSS) = SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdCenario, double>>>>(); \
+		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(3, vlrD_e_c_var_##Nome##_3.at(a_TSS))); \
+		vlrD_e_c_var_##Nome##_3.at(a_TSS) = \
+		SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdCenario, double>>>>>>>>>>>();\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("imprimirValorDualPorEstagioPorCenarioVarDecisao_" + std::string(#Nome) + "_3(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
 };\
@@ -280,7 +266,8 @@ void ModeloOtimizacao::imprimirValorPrimalPorEstagioPorCenarioPorRealizacaoVarDe
 		a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//var" + std::string(#Nome) + "_3"); \
 		const std::string nome_arquivo = std::string("var" + std::string(#Nome) + "_3_primal_" + a_nome_arquivo + ".csv"); \
 		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(true, vlrP_e_c_r_var_##Nome##_3.at(a_TSS))); \
-		vlrP_e_c_r_var_##Nome##_3.at(a_TSS) = SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>(); \
+		vlrP_e_c_r_var_##Nome##_3.at(a_TSS) = \
+		SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>();\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("imprimirValorPrimalPorEstagioPorCenarioPorRealizacaoVarDecisao_" + std::string(#Nome) + "_3(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
 };\
@@ -291,7 +278,8 @@ void ModeloOtimizacao::imprimirValorDualPorEstagioPorCenarioPorRealizacaoVarDeci
 		a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//var" + std::string(#Nome) + "_3"); \
 		const std::string nome_arquivo = std::string("var" + std::string(#Nome) + "_3_dual_" + a_nome_arquivo + ".csv"); \
 		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(true, vlrD_e_c_r_var_##Nome##_3.at(a_TSS))); \
-		vlrD_e_c_r_var_##Nome##_3.at(a_TSS) = SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>(); \
+		vlrD_e_c_r_var_##Nome##_3.at(a_TSS) = \
+		SmartEnupla<TIt1, SmartEnupla<TIt2, SmartEnupla<TIt3, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>();\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("imprimirValorDualPorEstagioPorCenarioPorRealizacaoVarDecisao_" + std::string(#Nome) + "_3(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
 };\

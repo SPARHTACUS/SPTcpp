@@ -236,6 +236,14 @@ public:
 
 	template<typename Iterador, typename Valor>
 	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const SmartEnupla<Iterador, Valor>& a_enupla) {
+		if (a_incluir_iteradores)
+			return getDadosAsString(100, a_enupla);
+		else
+			return getDadosAsString(-1, a_enupla);
+	}
+
+	template<typename Iterador, typename Valor>
+	static std::vector<std::vector<std::string>> getDadosAsString(int a_nro_iteradores_incluir, const SmartEnupla<Iterador, Valor>& a_enupla) {
 
 		try {
 
@@ -248,9 +256,9 @@ public:
 			std::vector<std::vector<std::string>> matriz_retorno;
 
 			// Ultima camada da SmarEnupla
-			if (SmartEnupla<int, int>::getDadosAsString(a_incluir_iteradores, a_enupla.at(a_enupla.getIteradorInicial())).size() == 0) {
+			if (SmartEnupla<int, int>::getDadosAsString(a_nro_iteradores_incluir, a_enupla.at(a_enupla.getIteradorInicial())).size() == 0) {
 
-				if (a_incluir_iteradores)
+				if (a_nro_iteradores_incluir > -1)
 					matriz_retorno = std::vector<std::vector<std::string>>(2, std::vector<std::string>(a_enupla.size(), ""));
 				else
 					matriz_retorno = std::vector<std::vector<std::string>>(1, std::vector<std::string>(a_enupla.size(), ""));
@@ -258,7 +266,7 @@ public:
 				int i = 0;
 				for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; a_enupla.incrementarIterador(iterador)) {
 
-					if (a_incluir_iteradores) {
+					if (a_nro_iteradores_incluir > -1) {
 						matriz_retorno.at(0).at(i) = getFullString(iterador);
 						matriz_retorno.at(1).at(i) = getString(a_enupla.at(iterador));
 					} // if (a_incluir_cabecalho) {
@@ -276,16 +284,21 @@ public:
 
 			else {
 
+				int nro_iteradores_incluir = a_nro_iteradores_incluir;
+
+				if (nro_iteradores_incluir > 0)
+					nro_iteradores_incluir--;
+
 				for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; a_enupla.incrementarIterador(iterador)) {
 
-					const std::vector<std::vector<std::string>> matriz_retornada = SmartEnupla<int, int>::getDadosAsString(a_incluir_iteradores, a_enupla.at(iterador));
+					const std::vector<std::vector<std::string>> matriz_retornada = SmartEnupla<int, int>::getDadosAsString(nro_iteradores_incluir, a_enupla.at(iterador));
 
 					if (matriz_retornada.size() > 0) {
 
 						for (int l = 0; l < matriz_retornada.size(); l++) {
 							if (matriz_retornada.at(l).size() > 0) {
 
-								if (a_incluir_iteradores) {
+								if (a_nro_iteradores_incluir > 0) {
 
 									if (matriz_retorno.size() == 0) {
 										matriz_retorno.push_back(std::vector<std::string>(matriz_retornada.at(l).size() + 1, ""));
@@ -310,7 +323,7 @@ public:
 											matriz_retorno.at(matriz_retorno.size() - 1).at(c + 1) = matriz_retornada.at(l).at(c);
 									}
 
-								} // if (a_incluir_iteradores) {
+								} // if (a_nro_iteradores_incluir > -1) {
 
 								else {
 									matriz_retorno.push_back(std::vector<std::string>(matriz_retornada.at(l).size(), ""));
@@ -343,7 +356,7 @@ public:
 
 		} // try
 
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getDadosAsString(" + getString(a_incluir_iteradores) + ",a_enupla): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getDadosAsString(" + getString(a_nro_iteradores_incluir) + ",a_enupla): \n" + std::string(erro.what())); }
 
 	} // std::vector<std::vector<std::string>> SmartEnupla::getDadosAsString(const bool a_incluir_cabecalho){
 
