@@ -13402,7 +13402,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			//////////////////////////////////////////////////////////////////////////////////
 			//2 Cálculo da produtibilidade_EAR acumulada por usina
 			//////////////////////////////////////////////////////////////////////////////////
-
+			calcular_produtibilidade_EAR_acumulada_por_usina(a_dados);
 
 		}//if (leituraArquivo.is_open()) {
 
@@ -13748,6 +13748,94 @@ void LeituraCEPEL::instancia_atributos_hidreletrica_out_from_CadUsH_csv(Hidrelet
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instancia_atributos_hidreletrica_out_from_CadUsH_csv: \n" + std::string(erro.what())); }
 
 }
+
+void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados)
+{
+	try {
+		
+		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
+
+		for (int codigo_ONS_REE = 1; codigo_ONS_REE <= maior_ONS_REE; codigo_ONS_REE++) {
+
+			const std::vector<IdHidreletrica> idHidreletricas_REE = getIdsFromCodigoONS(lista_codigo_ONS_REE, codigo_ONS_REE);
+
+			////////////////////////////////////////////////////////////////////////
+			//1. Procura a 1 usina da cascata do REE (idHidreletrica_montante_REE)
+			////////////////////////////////////////////////////////////////////////
+			IdHidreletrica idHidreletrica_montante_REE = idHidreletricas_REE.at(0);
+			int codigo_usina_montante_REE = a_dados.vetorHidreletrica.att(idHidreletrica_montante_REE).getAtributo(AttComumHidreletrica_codigo_usina, int());
+
+			while (true) {
+
+				bool is_codigo_usina_montante_REE_cascata = true;
+
+				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+
+					//Atualiza o idHidreletrica_montante_REE se existe uma usina apontando o codigo_usina_jusante_EAR e está no mesmo REE 
+					if (codigo_usina_montante_REE == a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, int()) && lista_codigo_ONS_REE.getElemento(idHidreletrica) == codigo_ONS_REE) {
+						is_codigo_usina_montante_REE_cascata = false;
+						codigo_usina_montante_REE = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int());
+						idHidreletrica_montante_REE = idHidreletrica;
+						break;
+
+					}//if (codigo_usina_montante_REE == a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, int())) {
+
+				}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+
+				//Critério de parada
+				if (is_codigo_usina_montante_REE_cascata)
+					break;
+
+			}//while (true) {
+
+			////////////////////////////////////////////////////////////////////////
+			//2. Constroi o caminho da cascata com base no codigo_usina_jusante_EAR
+			// (Regras das usinas que valoram o volume armazenado)
+			////////////////////////////////////////////////////////////////////////
+
+			std::vector<IdHidreletrica> lista_ordem_cascata_idHidreletrica;
+			int codigo_usina_alvo = codigo_usina_montante_REE;
+			IdHidreletrica idHidreletrica = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina_alvo);
+			
+			while (true) {
+
+				lista_ordem_cascata_idHidreletrica.push_back(idHidreletrica);
+				
+				codigo_usina_alvo = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, int());
+				idHidreletrica = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina_alvo);
+
+				if (codigo_usina_alvo == 0 || lista_codigo_ONS_REE.getElemento(idHidreletrica) != codigo_ONS_REE)
+					break;
+
+			}//while (true) {
+
+			////////////////////////////////////////////////////////////////////////
+			//3. Calcula produtibilidade_acumulada_EAR
+			////////////////////////////////////////////////////////////////////////
+
+			for (int pos = 0; pos < int(lista_ordem_cascata_idHidreletrica.size()); pos++) {
+
+				for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+					double produtibilidade_acumulada_EAR = 0;
+
+					for (int pos_aux = pos; pos_aux < int(lista_ordem_cascata_idHidreletrica.size()); pos_aux++)
+						produtibilidade_acumulada_EAR += a_dados.vetorHidreletrica.att(lista_ordem_cascata_idHidreletrica.at(pos_aux)).getElementoVetor(AttVetorHidreletrica_produtibilidade_EAR, periodo, double());
+
+					a_dados.vetorHidreletrica.att(lista_ordem_cascata_idHidreletrica.at(pos)).addElemento(AttVetorHidreletrica_produtibilidade_acumulada_EAR, periodo, produtibilidade_acumulada_EAR);
+
+				}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+			}//for (int pos = 0; pos < int(lista_ordem_cascata_idHidreletrica.size()); pos++) {
+
+		}//for (int codigo_ONS_REE = 1; codigo_ONS_REE <= maior_ONS_REE; codigo_ONS_REE++) {
+		
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina: \n" + std::string(erro.what())); }
+
+}
+
 
 void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao) {
 

@@ -188,6 +188,7 @@ private:
 	void instanciar_codigo_usina_jusante_EAR(Dados& a_dados);
 	void instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_EAR(Dados& a_dados, std::string a_nomeArquivo);
 	void instancia_atributos_hidreletrica_out_from_CadUsH_csv(Hidreletrica& a_hidreletrica, std::string a_nomeArquivo);
+	void calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados);
 
 	//Validações
 	void validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao);
