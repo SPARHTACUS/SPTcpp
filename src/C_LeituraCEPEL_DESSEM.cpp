@@ -3990,7 +3990,7 @@ void LeituraCEPEL::validacoes_DESSEM(Dados& a_dados, const std::string a_diretor
 
 		a_dados.validacao_operacional_Dados(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
-		leitura_vRef_from_CadUsH_csv(a_dados, a_diretorio + "//CadUsH.csv");
+		leitura_volume_referencia_e_regularizacao_from_CadUsH_csv(a_dados, a_diretorio + "//CadUsH.csv");
 		calculaEngolimentoMaximo(a_dados, horizonte_estudo, Periodo(horizonte_estudo.getIteradorFinal() + 1), false);
 
 		a_dados.validacao_operacional_Submercado(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);

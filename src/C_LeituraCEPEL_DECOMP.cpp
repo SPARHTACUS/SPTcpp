@@ -12083,14 +12083,14 @@ void LeituraCEPEL::leitura_volume_referencia_e_regularizacao_from_CadUsH_csv(Dad
 					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_volume_referencia, volume_referencia);
 
 					//Tipo de regularização (mensal, semnal, diária)
-					pos = int(line.find(';'));
+					pos = int(line.find(';'));				
 					atributo = line.substr(0, pos).c_str();
 					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-					if      atributo.c_str() == 'M'{a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_mensal); }
-					else if atributo.c_str() == 'S'{a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_semanal); }
-					else if atributo.c_str() == 'D'{a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_diaria); }
-					else { throw std::invalid_argument("Nao identificado tipo_regularizacao: " + atributo.c_str()); }
+					if      (atributo == "M"){a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_mensal); }
+					else if (atributo == "S"){a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_semanal); }
+					else if (atributo == "D") { a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_diaria); }
+					else { throw std::invalid_argument("Nao identificado tipo_regularizacao: " + atributo); }
 
 				}//if (idHidreletrica != IdHidreletrica_Nenhum) {
 
@@ -13336,7 +13336,7 @@ void LeituraCEPEL::atualiza_volume_util_maximo_com_percentual_volume_util_maximo
 
 }
 
-void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, std::string a_diretorio, std::string a_nomeArquivo)
+void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, std::string a_diretorio, std::string a_nomeArquivo)
 {
 	try {
 
@@ -13364,10 +13364,10 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, std::string a_diretorio
 
 				for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
 
-					percentual_volume_util = 1.0 //Para cálculo produtibilidade_EAR
+					int percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
 					a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_EAR, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), periodo, percentual_volume_util)));
 
-					percentual_volume_util = 0.65 //Para cálculo produtibilidade_ENA
+					percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
 					a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), periodo, percentual_volume_util)));
 
 
@@ -13381,6 +13381,28 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, std::string a_diretorio
 			// Precisa-se ler o hidr.dat/CadUsH.csv para obter info de vMax, vMin, polinômios, canal_fuga_medio, perdas etc
 			//////////////////////////////////////////////////////////////////////////////////
 			instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_EAR(a_dados, a_diretorio +"//CadUsH.csv");
+
+			for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); lista_hidreletrica_out_estudo.incrementarIterador(pos_lista_hidreletrica_out_estudo)) {
+
+				for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
+
+					
+					int percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
+					lista_hidreletrica_out_estudo.getElemento(pos_lista_hidreletrica_out_estudo).addElemento(AttVetorHidreletrica_produtibilidade_EAR, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo, percentual_volume_util)));
+
+					percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
+					lista_hidreletrica_out_estudo.getElemento(pos_lista_hidreletrica_out_estudo).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo, percentual_volume_util)));
+
+
+				}//for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
+
+
+			}//for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); lista_hidreletrica_out_estudo.incrementarIterador(pos_lista_hidreletrica_out_estudo)) {
+
+			//////////////////////////////////////////////////////////////////////////////////
+			//2 Cálculo da produtibilidade_EAR acumulada por usina
+			//////////////////////////////////////////////////////////////////////////////////
+
 
 		}//if (leituraArquivo.is_open()) {
 
@@ -13397,10 +13419,11 @@ void LeituraCEPEL::instanciar_codigo_usina_jusante_EAR(Dados& a_dados)
 
 		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
 
-			idHidreletrica_jusante = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante, IdHidreletrica());
-			codigo_usina_jusante_EAR = a_dados.getAtributo(idHidreletrica_jusante, AttComumHidreletrica_codigo_usina, int());
+			const IdHidreletrica idHidreletrica_jusante = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante, IdHidreletrica());
+			const int codigo_usina_jusante_EAR = a_dados.getAtributo(idHidreletrica_jusante, AttComumHidreletrica_codigo_usina, int());
 
-			a_dados.setAtributo(idHidreletrica, AttComumHidreletrica_codigo_usina_jusante_EAR, codigo_usina_jusante_EAR);
+			a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, codigo_usina_jusante_EAR);
+
 		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
 
 	}//	try {
@@ -13408,7 +13431,7 @@ void LeituraCEPEL::instanciar_codigo_usina_jusante_EAR(Dados& a_dados)
 
 }
 
-double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(const Hidreletrica& a_hidreletrica, const Periodo a_periodo, const double a_percentual_volume_util)
+double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidreletrica, const Periodo a_periodo, const double a_percentual_volume_util)
 {
 	try {
 
@@ -13417,23 +13440,25 @@ double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(const Hidreletrica& a
 		// Usinas com regularização mensal utiliza o Vmax, Vmin (hidr.dat + modificações dadger)
 		// Usinas com regularização semanal/diária utiliza VRef do hidr.dat
 
-		double volume_minimo = a_dados.getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_volume_minimo, double());
-		double volume_maximo = a_dados.getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_volume_maximo, double());
+		double volume_minimo = a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_volume_minimo, double());
+		double volume_maximo = a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_volume_maximo, double());
 
-		volume_maximo = a_percentual_volume_util * (volume_maximo - volume_minimo) + volume_minimo
+		volume_maximo = a_percentual_volume_util * (volume_maximo - volume_minimo) + volume_minimo;
 
-		if getAtributo(idHidreletrica, AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao()) == TipoRegularizacao_semanal || getAtributo(idHidreletrica, AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao()) == TipoRegularizacao_diaria {
-			volume_minimo = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_volume_referencia, double());
-			volume_maximo = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_volume_referencia, double());
+		const TipoRegularizacao tipo_regularizacao = a_hidreletrica.getAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao());
+
+		if (tipo_regularizacao == TipoRegularizacao_semanal || tipo_regularizacao == TipoRegularizacao_diaria) {
+			volume_minimo = a_hidreletrica.getAtributo(AttComumHidreletrica_volume_referencia, double());
+			volume_maximo = a_hidreletrica.getAtributo(AttComumHidreletrica_volume_referencia, double());
 
 		}//if getAtributo(idHidreletrica, AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao()) == TipoRegularizacao_semanal || getAtributo(idHidreletrica, AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao()) == TipoRegularizacao_diaria {
 
 
 		const double canal_fuga_medio = a_hidreletrica.getElementoVetor(AttVetorHidreletrica_canal_fuga_medio, a_periodo, double());
-		const double cotaMedia = a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getCotaMedia(a_periodo, volume_minimo, volume_maximo)
+		const double cotaMedia = a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getCotaMedia(a_periodo, volume_minimo, volume_maximo);
 		const double cota = cotaMedia - canal_fuga_medio;
 
-		return cota
+		return cota;
 
 
 	}//	try {
@@ -13441,7 +13466,7 @@ double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(const Hidreletrica& a
 
 }
 
-double LeituraCEPEL::get_produtibilidade_para_conversao_cortes_NEWAVE(const Hidreletrica& a_hidreletrica, const double a_cota)
+double LeituraCEPEL::get_produtibilidade_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidreletrica, const double a_cota)
 {
 	try {
 
@@ -13449,9 +13474,8 @@ double LeituraCEPEL::get_produtibilidade_para_conversao_cortes_NEWAVE(const Hidr
 		const double perda_hidraulica = a_hidreletrica.getAtributo(AttComumHidreletrica_perda_hidraulica, double());
 		const double fator_de_producao = a_hidreletrica.getAtributo(AttComumHidreletrica_fator_de_producao, double());
 
-		return a_hidreletrica.calcularProdutibilidade(tipo_perda_hidraulica, perda_hidraulica, fator_de_producao, a_cota))
+		return a_hidreletrica.calcularProdutibilidade(tipo_perda_hidraulica, perda_hidraulica, fator_de_producao, a_cota);
 		
-
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::get_produtibilidade_para_conversao_cortes_NEWAVE: \n" + std::string(erro.what())); }
 
@@ -13465,18 +13489,17 @@ void LeituraCEPEL::instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jus
 
 		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
 
-			codigo_usina_jusante_EAR = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_codigo_usina_jusante_EAR, int());
+			const int codigo_usina_jusante_EAR = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_codigo_usina_jusante_EAR, int());
 
 			const IdHidreletrica idHidreletrica_jusante_EAR = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina_jusante_EAR);
 
-			if idHidreletrica_jusante_EAR == IdHidreletrica_Nenhum {//Significa que a usina a jusante_EAR não existe no CP (p.ex. COMP PAF-MOX)
+			if (idHidreletrica_jusante_EAR == IdHidreletrica_Nenhum) {//Significa que a usina a jusante_EAR não existe no CP (p.ex. COMP PAF-MOX)
 				
 				Hidreletrica hidreletrica_out;
 				hidreletrica_out.setAtributo(AttComumHidreletrica_codigo_usina, codigo_usina_jusante_EAR);
-				instancia_atributos_hidreletrica_out_from_CadUsH_csv(hidreletrica_out, a_nomeArquivo)
+				instancia_atributos_hidreletrica_out_from_CadUsH_csv(hidreletrica_out, a_nomeArquivo);
 
-
-
+				lista_hidreletrica_out_estudo.addElemento(hidreletrica_out);
 
 			}//if idHidreletrica_jusante_EAR == IdHidreletrica_Nenhum {
 
@@ -13497,117 +13520,114 @@ void LeituraCEPEL::instancia_atributos_hidreletrica_out_from_CadUsH_csv(Hidrelet
 
 		std::ifstream leituraArquivo(a_nomeArquivo);
 
-		codigo_usina_alvo = a_hidreletrica_out.getAtributo(AttComumHidreletrica_codigo_usina int());
+		const int codigo_usina_alvo = a_hidreletrica_out.getAtributo(AttComumHidreletrica_codigo_usina, int());
 
-		int registro_CodUsina = -1
-		int registro_nomeUsina = -1
-		int registro_Jusante = -1
-		int registro_VolMax = -1
-		int registro_VolMin = -1
-		int registro_poli_cota_volume_0 = -1
-		int registro_poli_cota_volume_1 = -1
-		int registro_poli_cota_volume_2 = -1
-		int registro_poli_cota_volume_3 = -1
-		int registro_poli_cota_volume_4 = -1
-		int registro_produtibilidade_especifica = -1
-		int registro_canal_fuga_medio = -1
-		int registro_tipo_perdas = -1
-		int registro_valor_perdas = -1
-		int registro_volume_referencia = -1
-		int registro_regularizacao = -1
+		int registro_CodUsina = -1;
+		int registro_nomeUsina = -1;
+		int registro_Jusante = -1;
+		int registro_VolMax = -1;
+		int registro_VolMin = -1;
+		int registro_poli_cota_volume_0 = -1;
+		int registro_poli_cota_volume_1 = -1;
+		int registro_poli_cota_volume_2 = -1;
+		int registro_poli_cota_volume_3 = -1;
+		int registro_poli_cota_volume_4 = -1;
+		int registro_produtibilidade_especifica = -1;
+		int registro_canal_fuga_medio = -1;
+		int registro_tipo_perdas = -1;
+		int registro_valor_perdas = -1;
+		int registro_volume_referencia = -1;
+		int registro_regularizacao = -1;
 		
 		if (leituraArquivo.is_open()) {
 
 			//Cabeçalho
 			std::getline(leituraArquivo, line);
 
-			registro = 0
+			int registro = 0;
 
-			while (True) {
+			while (std::getline(leituraArquivo, line)) {
 				pos = int(line.find(';'));
 				atributo = line.substr(0, pos).c_str();
 				atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-				if atributo == 'CodUsina'
+				if (atributo == "CodUsina")
 					registro_CodUsina = registro;
 
-				if atributo == 'Usina'
+				if (atributo == "Usina")
 					registro_nomeUsina = registro;
 
-				if atributo == 'Jusante'
+				if (atributo == "Jusante")
 					registro_Jusante = registro;
 
-				if atributo == 'Vol.Máx.(hm3)'
+				if (atributo == "Vol.Máx.(hm3)")
 					registro_VolMax = registro;
 
-				if atributo == 'Vol.min.(hm3)'
+				if (atributo == "Vol.min.(hm3)")
 					registro_VolMin = registro;
 
-				if atributo == 'PCV(0)'
+				if (atributo == "PCV(0)")
 					registro_poli_cota_volume_0 = registro;
 
-				if atributo == 'PCV(1)'
+				if (atributo == "PCV(1)")
 					registro_poli_cota_volume_1 = registro;
 
-				if atributo == 'PCV(2)'
+				if (atributo == "PCV(2)")
 					registro_poli_cota_volume_2 = registro;
 
-				if atributo == 'PCV(3)'
+				if (atributo == "PCV(3)")
 					registro_poli_cota_volume_3 = registro;
 
-				if atributo == 'PCV(4)'
+				if (atributo == "PCV(4)")
 					registro_poli_cota_volume_4 = registro;
 
-				if atributo == 'Prod.Esp.(MW/m3/s/m)'
+				if (atributo == "Prod.Esp.(MW/m3/s/m)")
 					registro_produtibilidade_especifica = registro;
 
-				if atributo == 'Canal Fuga Médio(m)'
+				if (atributo == "Canal Fuga Médio(m)")
 					registro_canal_fuga_medio = registro;
 
-				if atributo == 'Tipo Perdas(1=%/2=M/3=K)'
+				if (atributo == "Tipo Perdas(1=%/2=M/3=K)")
 					registro_tipo_perdas = registro;
 
-				if atributo == 'Valor Perdas'
+				if (atributo == "Valor Perdas")
 					registro_valor_perdas = registro;
 
-				if atributo == 'Vol.Ref.'
+				if (atributo == "Vol.Ref.")
 					registro_volume_referencia = registro;
 
-				if atributo == 'Reg'
+				if (atributo == "Reg")
 					registro_regularizacao = registro;
 
 				registro++;
 
-
-
-
 			}
 
-			if registro_CodUsina == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para CodUsina \n");}
-			if registro_nomeUsina == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para nomeUsina \n");}
-			if registro_Jusante == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para Jusante \n");}
-			if registro_VolMax == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para VolMax \n");}
-			if registro_VolMin == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para VolMin \n");}
-			if registro_poli_cota_volume_0 == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_0 \n");}
-			if registro_poli_cota_volume_1 == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_1 \n");}
-			if registro_poli_cota_volume_2 == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_2 \n");}
-			if registro_poli_cota_volume_3 == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_3 \n"); }
-			if registro_poli_cota_volume_4 == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_4 \n"); }
-			if registro_produtibilidade_especifica == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para produtibilidade_especifica \n"); }
-			if registro_canal_fuga_medio == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para canal_fuga_medio \n"); }
-			if registro_tipo_perdas == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para tipo_perdas \n"); }
-			if registro_valor_perdas == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para valor_perdas \n"); }
-			if registro_volume_referencia == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para volume_referencia \n"); }
-			if registro_regularizacao == -1 {throw std::invalid_argument("Nao encontrado posicao de registro para regularizacao \n"); }
+			if (registro_CodUsina == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para CodUsina \n");}
+			if (registro_nomeUsina == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para nomeUsina \n");}
+			if (registro_Jusante == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para Jusante \n");}
+			if (registro_VolMax == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para VolMax \n");}
+			if (registro_VolMin == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para VolMin \n");}
+			if (registro_poli_cota_volume_0 == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_0 \n");}
+			if (registro_poli_cota_volume_1 == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_1 \n");}
+			if (registro_poli_cota_volume_2 == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_2 \n");}
+			if (registro_poli_cota_volume_3 == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_3 \n"); }
+			if (registro_poli_cota_volume_4 == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_4 \n"); }
+			if (registro_produtibilidade_especifica == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para produtibilidade_especifica \n"); }
+			if (registro_canal_fuga_medio == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para canal_fuga_medio \n"); }
+			if (registro_tipo_perdas == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para tipo_perdas \n"); }
+			if (registro_valor_perdas == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para valor_perdas \n"); }
+			if (registro_volume_referencia == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para volume_referencia \n"); }
+			if (registro_regularizacao == -1) {throw std::invalid_argument("Nao encontrado posicao de registro para regularizacao \n"); }
 
 			
 			while (std::getline(leituraArquivo, line)) {
 
-				registro = 0;
+				int registro = 0;
 
 				strNormalizada(line);
 
-				if registro == registro_CodUsina {
+				if (registro == registro_CodUsina) {
 
 					pos = int(line.find(';'));
 					atributo = line.substr(0, pos).c_str();
@@ -13629,53 +13649,92 @@ void LeituraCEPEL::instancia_atributos_hidreletrica_out_from_CadUsH_csv(Hidrelet
 
 							line = line.substr(pos + 1, int(line.length()));
 
-							if registro == registro_nomeUsina {
-								nome = atributo;
-								a_hidreletrica_out.setAtributo(AttComumHidreletrica_nome, nome);
-							}//if registro == registro_nomeUsina{
+							if (registro == registro_nomeUsina) {a_hidreletrica_out.setAtributo(AttComumHidreletrica_nome, atributo);}
+							else if (registro == registro_Jusante) {
+
+								pos = int(atributo.find('-'));
+								const int jusante = std::atoi(atributo.substr(0, pos).c_str());
+
+								const IdHidreletrica idHidreletricaJusante = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, jusante);
+								if (idHidreletricaJusante != IdHidreletrica_Nenhum) { a_hidreletrica_out.setAtributo(AttComumHidreletrica_jusante, idHidreletricaJusante); }
+
+
+								a_hidreletrica_out.setAtributo(AttComumHidreletrica_nome, atributo);
+							}
+							else if (registro == registro_VolMax) {
+								const double volume_maximo = std::atof(atributo.c_str());
+								a_hidreletrica_out.vetorReservatorio.att(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_maximo, volume_maximo);
+							}
+							else if (registro == registro_VolMin) {
+								const double volume_minimo = std::atof(atributo.c_str());
+								a_hidreletrica_out.vetorReservatorio.att(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_maximo, volume_minimo);
+							}
+							else if (registro == registro_poli_cota_volume_0) {
+								const double poli_cota_volume_0 = std::atof(atributo.c_str());
+								a_hidreletrica_out.vetorReservatorio.att(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_0, poli_cota_volume_0);
+							}
+							else if (registro == registro_poli_cota_volume_1) {
+								const double poli_cota_volume_1 = std::atof(atributo.c_str());
+								a_hidreletrica_out.vetorReservatorio.att(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_1, poli_cota_volume_1);
+							}
+							else if (registro == registro_poli_cota_volume_2) {
+								const double poli_cota_volume_2 = std::atof(atributo.c_str());
+								a_hidreletrica_out.vetorReservatorio.att(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_2, poli_cota_volume_2);
+							}
+							else if (registro == registro_poli_cota_volume_3) {
+								const double poli_cota_volume_3 = std::atof(atributo.c_str());
+								a_hidreletrica_out.vetorReservatorio.att(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_3, poli_cota_volume_3);
+							}
+							else if (registro == registro_poli_cota_volume_4) {
+								const double poli_cota_volume_4 = std::atof(atributo.c_str());
+								a_hidreletrica_out.vetorReservatorio.att(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_4, poli_cota_volume_4);
+							}
+							else if (registro == registro_produtibilidade_especifica) {
+								const double fator_de_producao = std::atof(atributo.c_str());
+								a_hidreletrica_out.setAtributo(AttComumHidreletrica_fator_de_producao, fator_de_producao);
+							}
+							else if (registro == registro_canal_fuga_medio) {
+								const double canal_fuga_medio = std::atof(atributo.c_str());
+								a_hidreletrica_out.setAtributo(AttComumHidreletrica_canal_fuga_medio, canal_fuga_medio);
+							}
+							else if (registro == registro_tipo_perdas) {
+
+								TipoPerdaHidraulica tipo_de_perda_hidraulica = TipoPerdaHidraulica_Nenhum;
+
+									if (atributo == "1") { tipo_de_perda_hidraulica = TipoPerdaHidraulica_percentual;}
+									else if (atributo == "2") { tipo_de_perda_hidraulica = TipoPerdaHidraulica_metro;}
+
+								a_hidreletrica_out.setAtributo(AttComumHidreletrica_perda_hidraulica, tipo_de_perda_hidraulica);
+							}
+							else if (registro == registro_valor_perdas) {
+								double perda_hidraulica = std::atof(atributo.c_str());
+
+								if (a_hidreletrica_out.getAtributo(AttComumHidreletrica_perda_hidraulica, TipoPerdaHidraulica()) == TipoPerdaHidraulica_percentual)
+									perda_hidraulica /= 100;
+
+								a_hidreletrica_out.setAtributo(AttComumHidreletrica_perda_hidraulica, perda_hidraulica);
+							}
+							else if (registro == registro_volume_referencia) {
+								const double volume_referencia = std::atof(atributo.c_str());
+								a_hidreletrica_out.setAtributo(AttComumHidreletrica_volume_referencia, volume_referencia);
+							}
+							else if (registro == registro_regularizacao) {
+
+								if (atributo == "M") { a_hidreletrica_out.setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_mensal); }
+								else if (atributo == "S") { a_hidreletrica_out.setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_semanal); }
+								else if (atributo == "D") { a_hidreletrica_out.setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_diaria); }
+								else { throw std::invalid_argument("Nao identificado tipo_regularizacao: " + atributo); }
+
+							}
+
 
 							registro++;
-
-
 
 						}//while (int(line.length()) > 0) {
 
 					}//if (codigo_usina == codigo_usina_jusante_EAR) {
 
-
-
 				}//if registro == registro_CodUsina {
-
-
-				
-				if (codigo_usina == codigo_usina_jusante_EAR) {
-
-					//Descarta info nao necessária
-					for (int registro = 0; registro < 177; registro++) {
-						pos = int(line.find(';'));
-						line = line.substr(pos + 1, int(line.length()));
-					}
-
-					//Volume referência
-					pos = int(line.find(';'));
-					atributo = line.substr(0, pos).c_str();
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-					const double volume_referencia = atof(atributo.c_str());
-
-					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_volume_referencia, volume_referencia);
-
-					//Tipo de regularização (mensal, semnal, diária)
-					pos = int(line.find(';'));
-					atributo = line.substr(0, pos).c_str();
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-					if      atributo.c_str() == 'M'{a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_mensal); }
-					else if atributo.c_str() == 'S'{a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_semanal); }
-					else if atributo.c_str() == 'D'{a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_diaria); }
-					else { throw std::invalid_argument("Nao identificado tipo_regularizacao: " + atributo.c_str()); }
-
-				}//if (idHidreletrica != IdHidreletrica_Nenhum) {
 
 				registro++;
 
@@ -13689,7 +13748,6 @@ void LeituraCEPEL::instancia_atributos_hidreletrica_out_from_CadUsH_csv(Hidrelet
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instancia_atributos_hidreletrica_out_from_CadUsH_csv: \n" + std::string(erro.what())); }
 
 }
-
 
 void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao) {
 
@@ -13874,7 +13932,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 
-		leitura_cortes_NEWAVE(a_dados, a_diretorio, "//DadosAdicionais//Cortes_NEWAVE" + "//fcfnwn." + a_revisao);
+		leitura_cortes_NEWAVE(a_dados, horizonte_estudo, a_diretorio, "//DadosAdicionais//Cortes_NEWAVE//fcfnwn." + a_revisao);
 
 	}//try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::validacoes_DC: \n" + std::string(erro.what())); }

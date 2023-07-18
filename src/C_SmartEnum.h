@@ -1669,7 +1669,7 @@ DEFINE_SMART_ENUM(TipoRestricaoHidraulica, TIPO_RESTRICAO_HIDRAULICA)
     m(TipoRegularizacao, mensal)         \
     m(TipoRegularizacao, semanal)         \
     m(TipoRegularizacao, diaria)         
-DEFINE_SMART_ENUM(TipoRegularizacao, TIPO_RESTRICAO_HIDRAULICA)
+DEFINE_SMART_ENUM(TipoRegularizacao, TIPO_REGULARIZACAO)
 
 #define TIPO_ESTRUTURA_PERIODO(m)\
     m(TipoEstruturaPeriodo, flat)       \
