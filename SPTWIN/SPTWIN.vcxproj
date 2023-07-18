@@ -202,6 +202,9 @@
       <AdditionalOptions>/Bv /bigobj %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PreprocessToFile>false</PreprocessToFile>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <UseStandardPreprocessor>false</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -131,7 +131,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  ZF,                       IdEstagio,               Periodo,            sim,          nao)  
 // Nome,  TipoIterador1,         TipoIterador2, ImprimirPrimal, ImprimirDual
 
-#define VARIAVEL_DECISAO_3(m)                                                                     \
+//#define VARIAVEL_DECISAO_3(m)                                                                     \
 	m(  ZP,               IdEstagio,          Periodo,            IdPatamarCarga,        sim,          nao)  \
 	m(  ZO,               IdEstagio,          Periodo,            IdPatamarCarga,        sim,          nao)  \
 	m(  ZF,               IdEstagio,          Periodo,            IdRealizacao,          sim,          nao)  \
@@ -472,60 +472,60 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA(m)       m(IdEstagio) m(Periodo)        m(IdUsinaElevatoria)
 #define ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA(m)     m(IdEstagio) m(Periodo)        m(IdVariavelAleatoria)
 
-#define VARIAVEL_DECISAO_3_TESTE(m)                                                                     \
-	m(  ZP,               3,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,        sim,          nao)  \
-	m(  ZO,               3,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,        sim,          nao)  \
-	m(  ZF,               3,         ITERADORES_3_ESTAGIO_PERIODO_REALIZACAO,          sim,          nao)  \
-	m(  ZT,               3,         ITERADORES_3_ESTAGIO_PERIODO_REALIZACAO,          sim,          nao)  \
-	m(  ZO0_UTE,          3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,        sim,          nao)  \
-	m(  ZOp_UTE,          3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,        sim,          nao)  \
-	m(  ZO0p_UTE,         3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,        sim,          nao)  \
-	m(  ZO0_DEFICIT,      3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,        sim,          nao)  \
-	m(  ZO0p_DEFICIT,     3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,        sim,          nao)  \
-	m(  ZOp_DEFICIT,      3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,        sim,          nao)  \
-	m(  ZOp_UTE_COMANDO,  3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,        sim,          nao)  \
-	m(  ZO0p_UTE_COMANDO, 3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,        sim,          nao)  \
-	m(  ZO0_UTE_COMANDO,  3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,        sim,          nao)  \
-	m(  YH,       3,                 ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-	m(  YHF,      3,                 ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-	m(  QEV,      3,                 ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-	m(  QEV_REL,  3,                 ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-	m(  QEV_FINF, 3,                 ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-    m(  QDEF,          3,            ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-    m(  QDEF_FINF,     3,            ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-    m(  QDEF_FSUP,     3,            ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-    m(  VDEF_ACUMULADO,   3,         ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,              sim,          nao)  \
-    m(  VDEF,             3,         ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,              sim,          nao)  \
-    m(  VDEF_ACOPLAMENTO, 3,         ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,              sim,          nao)  \
-    m(  YP_ACUMULADO,     3,         ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA,         sim,          nao)  \
-    m(  YP_ACUMULANDO,        3,     ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA,              sim,          nao)  \
-	m(  VI,      3,                  ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          sim)  \
-	m(  VF,      3,                  ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-	m(  VMED,      3,                ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-    m(  VF_FINF, 3,                  ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-	m(  VMORTO_FINF,3,               ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-	m(  PL,        3,                ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,              sim,          nao)  \
-	m(  PBOMDISP,  3,                ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA,              sim,          nao)  \
-	m(  PD,        3,                ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,              sim,          nao)  \
-	m(  PHDISP,    3,                ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-    m(  PHDISPMETA,    3,            ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-    m(  PHDISPMETA_FINF,    3,       ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-    m(  PHDISPMETA_FSUP,    3,       ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-	m(  QVER,      3,                ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-	m(  QTURDISP,  3,                ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-	m(  PTDISP,    3,                ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
-	m(  PTDISPPRECOM,     3,         ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO,              sim,          nao)  \
-	m(  PTDISPCOM_FINF,   3,         ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO,              sim,          nao)  \
-	m(  PTDISPCOM_FSUP,   3,         ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO,              sim,          nao)  \
-	m(  PI,        3,                ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,              sim,          nao)  \
-	m(  PN,        3,                ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,              sim,          nao)  \
-    m(  RHA,       3,                ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,         sim,          nao)  \
-    m(  RHA_FINF,  3,                ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,         sim,          nao)  \
-    m(  RHA_FSUP,  3,                ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,         sim,          nao)  \
-    m(  RHV,       3,                ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,         sim,          nao)  \
-    m(  RHV_FINF,  3,                ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,         sim,          nao)  \
-    m(  RHV_FSUP,  3,                ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,         sim,          nao)
-   // Nome,  TipoIterador1,         TipoIterador2,         TipoIterador3,   ImprimirPrimal, ImprimirDual
+#define VARIAVEL_DECISAO_3_TESTE(m)\
+	m(  VarDecisao,   ZP,               3,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,              sim,          nao)  \
+	m(  VarDecisao,   ZO,               3,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,              sim,          nao)  \
+	m(  VarDecisao,   ZF,               3,         ITERADORES_3_ESTAGIO_PERIODO_REALIZACAO,                sim,          nao)  \
+	m(  VarDecisao,   ZT,               3,         ITERADORES_3_ESTAGIO_PERIODO_REALIZACAO,                sim,          nao)  \
+	m(  VarDecisao,   ZO0_UTE,          3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZOp_UTE,          3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZO0p_UTE,         3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZO0_DEFICIT,      3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZO0p_DEFICIT,     3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZOp_DEFICIT,      3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZOp_UTE_COMANDO,  3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZO0p_UTE_COMANDO, 3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZO0_UTE_COMANDO,  3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   YH,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   YHF,              3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   QEV,              3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   QEV_REL,          3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   QEV_FINF,         3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   QDEF,             3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   QDEF_FINF,        3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   QDEF_FSUP,        3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   VDEF_ACUMULADO,   3,         ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,              sim,          nao)  \
+    m(  VarDecisao,   VDEF,             3,         ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,              sim,          nao)  \
+    m(  VarDecisao,   VDEF_ACOPLAMENTO, 3,         ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,              sim,          nao)  \
+    m(  VarDecisao,   YP_ACUMULADO,     3,         ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA,         sim,          nao)  \
+    m(  VarDecisao,   YP_ACUMULANDO,    3,         ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA,         sim,          nao)  \
+	m(  VarDecisao,   VI,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          sim)  \
+	m(  VarDecisao,   VF,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   VMED,             3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   VF_FINF,          3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   VMORTO_FINF,      3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   PL,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,                sim,          nao)  \
+	m(  VarDecisao,   PBOMDISP,         3,         ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA,           sim,          nao)  \
+	m(  VarDecisao,   PD,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,                sim,          nao)  \
+	m(  VarDecisao,   PHDISP,           3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   PHDISPMETA,       3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   PHDISPMETA_FINF,  3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   PHDISPMETA_FSUP,  3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   QVER,             3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   QTURDISP,         3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   PTDISP,           3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   PTDISPPRECOM,     3,         ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO,              sim,          nao)  \
+	m(  VarDecisao,   PTDISPCOM_FINF,   3,         ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO,              sim,          nao)  \
+	m(  VarDecisao,   PTDISPCOM_FSUP,   3,         ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO,              sim,          nao)  \
+	m(  VarDecisao,   PI,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,                sim,          nao)  \
+	m(  VarDecisao,   PN,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,                sim,          nao)  \
+    m(  VarDecisao,   RHA,              3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao)  \
+    m(  VarDecisao,   RHA_FINF,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao)  \
+    m(  VarDecisao,   RHA_FSUP,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao)  \
+    m(  VarDecisao,   RHV,              3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao)  \
+    m(  VarDecisao,   RHV_FINF,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao)  \
+    m(  VarDecisao,   RHV_FSUP,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao)
+   //   Elemento,     Nome,       NroIter,         Iteradores,                                     Impr.Primal,     Impr.Dual
 
 
 	class ModeloOtimizacao : public SmartDados {
@@ -726,13 +726,14 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		TempoVariaveis tempoCriarVariaveis;
 
+		std::vector<std::vector<std::string>> lista_VarDecisao_instanciadas;
 		std::vector<std::vector<std::string>> lista_variaveis_instanciadas;
 		std::vector<std::vector<std::string>> lista_equacoes_instanciadas;
+		std::vector<std::vector<std::string>> lista_EquLinear_instanciadas;
 		std::vector<std::vector<std::string>> lista_inequacoes_instanciadas;
+		std::vector<std::vector<std::string>> lista_IneLinear_instanciadas;
 
 		IdCorteBenders maiorIdCorteExportadoPreEstudo = IdCorteBenders_Nenhum;
-
-
 
 
 		template<typename TListasIdxElem, typename TIt>
@@ -1257,17 +1258,18 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				return true;
 
 			}
-			catch (const std::exception& erro) { throw std::invalid_argument("getConteudoIters(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "," + getFullString(a_it12) + "): \n" + std::string(erro.what()));
-			}
+			catch (const std::exception& erro) { throw std::invalid_argument("getConteudoIters(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "," + getFullString(a_it12) + "): \n" + std::string(erro.what())); }
 		};
 
-
 		VARIAVEL_DECISAO_2(DECLARAR_VARIAVEL_DECISAO_2)
-			VARIAVEL_DECISAO_3(DECLARAR_VARIAVEL_DECISAO_3)
+
+			//VARIAVEL_DECISAO_3(DECLARAR_VARIAVEL_DECISAO_3)
+
+			VARIAVEL_DECISAO_3_TESTE(DECLARAR_ELEMENTO_TESTE)
+
 			VARIAVEL_DECISAO_4(DECLARAR_VARIAVEL_DECISAO_4)
 			VARIAVEL_DECISAO_5(DECLARAR_VARIAVEL_DECISAO_5)
 			VARIAVEL_DECISAO_6(DECLARAR_VARIAVEL_DECISAO_6)
-
 
 			RESTRICAO_EQUACAO_LINEAR_2(DECLARAR_RESTRICAO_EQUACAO_LINEAR_2)
 			RESTRICAO_EQUACAO_LINEAR_3(DECLARAR_RESTRICAO_EQUACAO_LINEAR_3)

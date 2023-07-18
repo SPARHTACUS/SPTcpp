@@ -327,27 +327,15 @@ consolidarResultadosVarDecisao_##Nome##_3(a_TSS, variavel_str, a_maiorIdProcesso
 
 
 
-
-//
-//  Chamada Geral Declaracao
-//
-
-#define DECLARAR_ELEMENTO_TESTE(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)   \
-DECLARAR_ALOCAR_ENUPLAS (Elem, Nome, Nro, Valores) \
-DECLARAR_ALOCAR_ELEMENTO(Elem, Nome, Nro, Valores) \
-DECLARAR_GET_NOME_ELEMENTO(Elem, Nome, Nro, Valores) \
-DECLARAR_ADD_ELEMENTO(Elem, Nome, Nro, Valores) \
-DECLARAR_GET_ELEMENTO(Elem, Nome, Nro, Valores) \
-DECLARAR_GET_ELEMENTO_SE_EXISTIR(Elem, Nome, Nro, Valores) \
-DECLARAR_ARMAZENAR_VALOR(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
-
 //
 // DEFINICOES GERAIS
 //
 
 #define ITERS_ARGS(TIt) , const TIt a_##TIt
 #define GET_STRING_ELEMENTO(TIt)  + "," + getString(a_##TIt)
+#define GET_STRING_S_ELEMENTO(TIt)  + getString(a_##TIt)
 #define GET_FULL_STRING_ELEMENTO(TIt)  + "," + getFullString(a_##TIt)
+#define GET_FULL_STRING_S_ELEMENTO(TIt)  + getFullString(a_##TIt)
 
 #define AT_A_ITERS(TIt).at(a_##TIt)
 #define AT_ITERS(TIt).at(_##TIt)
@@ -412,10 +400,6 @@ DECLARAR_ARMAZENAR_VALOR(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)
 #define AT_INT_9_10 .at(it10)
 #define AT_INT_10_10 
 
-//
-// ALOCAR ENUPLAS
-//
-
 #define DECLARAR_ALOCAR_ENUPLA_ITER(TIt) SmartEnupla<TIt, 
 
 #define DECLARAR_ALOCAR_ENUPLA_CONST_1  SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, 
@@ -429,75 +413,7 @@ DECLARAR_ARMAZENAR_VALOR(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)
 #define DECLARAR_ALOCAR_ENUPLA_CONST_9  SmartEnupla<int,  
 #define DECLARAR_ALOCAR_ENUPLA_CONST_10   
 
-#define DECLARAR_ALOCAR_ENUPLAS_PRIMAL (Elem, Nome, Nro, Valores) \
-std::vector<Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>> vlrP_e_c_##Elem##_##Nome##_##Nro =\
-std::vector<Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
-            Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>());\
-std::vector<Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> vlrP_e_c_r_##Elem##_##Nome##_##Nro =\
-std::vector<Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
-            Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>());\
 
-#define DECLARAR_ALOCAR_ENUPLAS_DUAL (Elem, Nome, Nro, Valores) \
-std::vector<Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>> vlrD_e_c_##Elem##_##Nome##_##Nro =\
-std::vector<Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
-            Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>());\
-std::vector<Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> vlrD_e_c_r_##Elem##_##Nome##_##Nro =\
-std::vector<Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
-            Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>());\
-
-#define DECLARAR_ALOCAR_ENUPLAS_VarDecisao (Elem, Nome, Nro, Valores) DECLARAR_ALOCAR_ENUPLAS_PRIMAL (Elem, Nome, Nro, Valores) DECLARAR_ALOCAR_ENUPLAS_DUAL   (Elem, Nome, Nro, Valores) 
-#define DECLARAR_ALOCAR_ENUPLAS_EquLinear  (Elem, Nome, Nro, Valores) DECLARAR_ALOCAR_ENUPLAS_DUAL   (Elem, Nome, Nro, Valores) 
-#define DECLARAR_ALOCAR_ENUPLAS_IneLinear  (Elem, Nome, Nro, Valores) DECLARAR_ALOCAR_ENUPLAS_DUAL   (Elem, Nome, Nro, Valores) 
-
-#define DECLARAR_ALOCAR_ENUPLAS (Elem, Nome, Nro, Valores) \
-std::vector<int> is_##Elem##_##Nome##_##Nro##_instanciada = std::vector<int>(TipoSubproblemaSolver_Excedente, 0);  \
-std::vector<DECLARAR_ALOCAR_ENUPLA_ITER DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<int, int>>>>>>>>>>>> idx_##Elem##_##Nome##_##Nro =\
-std::vector<DECLARAR_ALOCAR_ENUPLA_ITER DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<int, int>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
-            DECLARAR_ALOCAR_ENUPLA_ITER DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<int, int>>>>>>>>>>>());\
-DECLARAR_ALOCAR_ENUPLAS_##Elem (Elem, Nome, Nro, Valores)
-
-//
-// ALOCAR ELEMENTO (Funcionando somente para 3)
-//
-
-#define DECLARAR_ALOCAR_ELEMENTO(Elem, Nome, Nro, Valores) \ DECLARAR_ALOCAR_ELEMENTO_##Nro(Elem, Nome, Nro, Valores)
-#define DECLARAR_ALOCAR_ELEMENTO_1(Elem, Nome, Nro, Valores) 
-#define DECLARAR_ALOCAR_ELEMENTO_2(Elem, Nome, Nro, Valores) 
-#define DECLARAR_ALOCAR_ELEMENTO_3(Elem, Nome, Nro, Valores) \
-void alocar##Elem_##Nome(const TipoSubproblemaSolver a_TSS, const TIt1 a_it1, const SmartEnupla<TIt2, SmartEnupla<TIt3, bool>> &a_enupla_alocacao){ \
-	try{ \
-		alocConteudoIter(idx_var_##Nome##_3.at(a_TSS), a_it1);\
-		for (TIt2 it2 = a_enupla_alocacao.getIteradorInicial(); it2 <= a_enupla_alocacao.getIteradorFinal(); a_enupla_alocacao.incrementarIterador(it2)){ \
-			alocConteudoIter(idx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_it1), it2);\
-			for (TIt3 it3 = a_enupla_alocacao.at(it2).getIteradorInicial(); it3 <= a_enupla_alocacao.at(it2).getIteradorFinal(); a_enupla_alocacao.at(it2).incrementarIterador(it3)) \
-				alocConteudoIter(idx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_it1).at(it2), it3);\
-		} \
-	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("alocar" + std::string(#Elem) + "_" + std::string(#Nome) + std::string(#Nro) + "(a_enupla_alocacao): \n" + std::string(erro.what())); } \
-}
-#define DECLARAR_ALOCAR_ELEMENTO_4(Elem, Nome, Nro, Valores) 
-#define DECLARAR_ALOCAR_ELEMENTO_5(Elem, Nome, Nro, Valores) 
-#define DECLARAR_ALOCAR_ELEMENTO_6(Elem, Nome, Nro, Valores) 
-#define DECLARAR_ALOCAR_ELEMENTO_7(Elem, Nome, Nro, Valores) 
-#define DECLARAR_ALOCAR_ELEMENTO_8(Elem, Nome, Nro, Valores) 
-#define DECLARAR_ALOCAR_ELEMENTO_9(Elem, Nome, Nro, Valores) 
-#define DECLARAR_ALOCAR_ELEMENTO_10(Elem, Nome, Nro, Valores) 
-
-//
-// GET NOME ELEMENTO
-//
-
-#define DECLARAR_GET_NOME_ELEMENTO(Elem, Nome, Nro, Valores) \
-std::string getNome##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) ){\
-if (vetorEstagio.att(a_IdEstagio).getSolver(a_TSS)->isNomeSimplificado()) \
-	return std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_STRING_ELEMENTO); \
-else \
-	return std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_FULL_STRING_ELEMENTO); \
-};
-
-//
-// ADD ELEMENTO
-//
 
 #define DECLARAR_ADD_ELEMENTO_VarDecisao_1 , const double a_valor_inferior, const double a_valor_superior, const double a_valor_objetivo
 #define DECLARAR_ADD_ELEMENTO_EquLinear_1
@@ -511,13 +427,68 @@ else \
 #define DECLARAR_ADD_ELEMENTO_EquLinear_3 
 #define DECLARAR_ADD_ELEMENTO_IneLinear_3 
 
-#define DECLARAR_ADD_ELEMENTO(Elem, Nome, Nro, Valores) \
+#define DECLARAR_ARMAZENAR_VALOR_DUAL_VarDecisao getReducedCost
+#define DECLARAR_ARMAZENAR_VALOR_DUAL_EquLinear getMultiplicador
+#define DECLARAR_ARMAZENAR_VALOR_DUAL_IneLinear getMultiplicador
+
+//
+//  Chamada Geral Declaracao
+//
+
+#define DECLARAR_ELEMENTO_TESTE(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)\
+std::vector<int> is_##Elem##_##Nome##_##Nro##_instanciada = std::vector<int>(TipoSubproblemaSolver_Excedente, 0); \
+std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<int, int>>>>>>>>>>>> idx_##Elem##_##Nome##_##Nro = \
+std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<int, int>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
+             Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<int, int>>>>>>>>>>>()); \
+std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>> vlrP_e_c_##Elem##_##Nome##_##Nro = \
+std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
+             Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>());\
+std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> vlrP_e_c_r_##Elem##_##Nome##_##Nro = \
+std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
+             Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>());\
+std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>> vlrD_e_c_##Elem##_##Nome##_##Nro =\
+std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
+             Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>());\
+std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> vlrD_e_c_r_##Elem##_##Nome##_##Nro =\
+std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
+             Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>());\
+template<typename TIt1, typename TIt2, typename TIt3> \
+void alocar##Elem##_##Nome(const TipoSubproblemaSolver a_TSS, const TIt1 a_it1, const SmartEnupla<TIt2, SmartEnupla<TIt3, bool>> &a_enupla_alocacao){ \
+	try{ \
+		alocConteudoIter(idx_##Elem##_##Nome##_3.at(a_TSS), a_it1);\
+		for (TIt2 it2 = a_enupla_alocacao.getIteradorInicial(); it2 <= a_enupla_alocacao.getIteradorFinal(); a_enupla_alocacao.incrementarIterador(it2)){ \
+			alocConteudoIter(idx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_it1), it2);\
+			for (TIt3 it3 = a_enupla_alocacao.at(it2).getIteradorInicial(); it3 <= a_enupla_alocacao.at(it2).getIteradorFinal(); a_enupla_alocacao.at(it2).incrementarIterador(it3)) \
+				alocConteudoIter(idx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_it1).at(it2), it3);\
+		} \
+	} \
+	catch (const std::exception& erro) { throw std::invalid_argument("alocar" + std::string(#Elem) + "_" + std::string(#Nome) + std::string(#Nro) + "(a_enupla_alocacao): \n" + std::string(erro.what())); } \
+}; \
+std::string getNome##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) ){\
+if (vetorEstagio.att(a_IdEstagio).getSolver(a_TSS)->isNomeSimplificado()) \
+	return std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_STRING_S_ELEMENTO)); \
+else \
+	return std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_FULL_STRING_S_ELEMENTO)); \
+};\
+int get##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
+	try{ return idx_##Elem##_##Nome##_##Nro.at(a_TSS) Valores(AT_A_ITERS) AT_CONST_##Nro##_11; } \
+	catch (const std::exception& erro) { throw std::invalid_argument("get" + std::string(#Elem) +  "_" + std::string(#Nome) + "(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
+}; \
+int get##Elem##_##Nome##seExistir(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
+	try{ \
+		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)) return -1; \
+		int conteudo = -1; \
+		getConteudoIters_11(idx_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(ARGS_ITERS) ARGS_CONST_##Nro##_11); \
+		return conteudo; \
+	} \
+	catch (const std::exception& erro) { throw std::invalid_argument("get" + std::string(#Elem) + "_" + std::string(#Nome) + "seExistir(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
+}; \
 int add##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) DECLARAR_ADD_ELEMENTO_##Elem##_1){ \
 	try{ \
 		if (get##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS)) > -1) \
 			throw std::invalid_argument("Conteudo ja existente."); \
 		int id##Elem = vetorEstagio.att(a_IdEstagio).getSolver(a_TSS)-> DECLARAR_ADD_ELEMENTO_##Elem##_2 getNome##Elem##_##Nome(a_TSS Valores(ARGS_ITERS))); \
-		addConteudoIters_11(idx_##Elem##_##Nome##_3.at(a_TSS), id##Elem Valores(ARGS_ITERS) ARGS_CONST_##Nro##_11); \
+		addConteudoIters_11(idx_##Elem##_##Nome##_##Nro.at(a_TSS), id##Elem Valores(ARGS_ITERS) ARGS_CONST_##Nro##_11); \
 		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)){ \
 			is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS) = true;\
 			lista_##Elem##_instanciadas.at(a_TSS).push_back(std::string(std::string(#Nome) + "_" + std::string(#Nro))); \
@@ -526,49 +497,18 @@ int add##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) DEC
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("add" + std::string(#Elem) + "_" + std::string(#Nome) + "(" Valores(GET_FULL_STRING_ELEMENTO) DECLARAR_ADD_ELEMENTO_##Elem##_3 + "): \n" + std::string(erro.what())); } \
 }; \
-
-//
-// GET ELEMENTO
-//
-
-#define DECLARAR_GET_ELEMENTO(Elem, Nome, Nro, Valores) \
-int get##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
-	try{ return idx_##Elem##_##Nome##_##Nro.at(a_TSS)Valores(AT_A_ITERS)Valores(AT_CONST_##Nro##_11); } \
-	catch (const std::exception& erro) { throw std::invalid_argument("get" + std::string(#Elem) +  "_" + std::string(#Nome) + "(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
-}; \
-
-//
-// GET ELEMENTO SE EXISTIR
-//
-
-#define DECLARAR_GET_ELEMENTO_SE_EXISTIR(Elem, Nome, Nro, Valores) \
-int get##Elem##_##Nome##seExistir(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
-	try{ \
-		if (!is_##Elem##_##Nome##_##Nro_instanciada.at(a_TSS)) return -1; \
-		int conteudo = -1; \
-		getConteudoIters_11(idx_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(ARGS_ITERS) Valores(ARGS_CONST_##Nro##_11); \
-		return conteudo; \
-	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("get" + std::string(#Elem) + "_" + std::string(#Nome) + "seExistir(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
-}; \
-
-//
-// ARMAZENAR VALOR PRIMAL POR ESTAGIO POR CENARIO
-//
-
-#define DECLARAR_ARMAZENAR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal) \
 void armazenarValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEstagio a_IdEstagio, const IdCenario a_idCenario) { \
 	try{ \
 		if (!getboolFromChar(#ImprimirPrimal)) return; \
 		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)) return; \
 		if (idx_##Elem##_##Nome##_##Nro.at(a_TSS).getIteradorInicial() > a_IdEstagio) return; \
 		if (idx_##Elem##_##Nome##_##Nro.at(a_TSS).getIteradorFinal() < a_IdEstagio) return; \
-		Valores(DECLARA_ITERS) Valores(DECLARA_ITERS_CONST_##Nro##_10) \
+		Valores(DECLARA_ITERS) DECLARA_ITERS_CONST_##Nro##_10\
 		_IdEstagio = a_IdEstagio;\
 		std::vector<int> estados(10, -1); estados.at(0) = 0; bool parada = false;\
 		for (int i = 0; i <= 1000000; i++){ \
-			if (varredurasIters_10(std::string(std::string(#Nome) + "_" + std::string(#Nro), idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
-				double conteudo = vetorEstagio.att(a_IdEstagio).getSolver(a_TSS)->getValorPrimal(idx_##Elem##_##Nome##_##Nro.at(a_TSS)Valores(AT_ITERS)AT_INT_##Nro##_10.at(1)); \
+			if (varredurasIters_10(std::string(std::string(#Nome) + "_" + std::string(#Nro)), idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
+				double conteudo = vetorEstagio.att(a_IdEstagio).getSolver(a_TSS)->getValorPrimal(idx_##Elem##_##Nome##_##Nro.at(a_TSS) Valores(AT_ITERS) AT_INT_##Nro##_10.at(1)); \
 				addConteudoIters_11(vlrP_e_c_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(_ITERS) INT_ARG_##Nro##_10 , a_idCenario); \
 			} \
 			if (parada) break; \
@@ -576,28 +516,18 @@ void armazenarValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoS
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorPrimalPorEstagioPorCenario" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_IdEstagio) + "," + getString(a_idCenario) + "): \n" + std::string(erro.what())); } \
 }; \
-void imprimirValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados);
-
-//
-// ARMAZENAR VALOR DUAL POR ESTAGIO POR CENARIO
-//
-
-#define DECLARAR_ARMAZENAR_VALOR_DUAL_VarDecisao getReducedCost
-#define DECLARAR_ARMAZENAR_VALOR_DUAL_EquLinear getMultiplicador
-#define DECLARAR_ARMAZENAR_VALOR_DUAL_IneLinear getMultiplicador
-
-#define DECLARAR_ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirDual) \
+void imprimirValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados);\
 void armazenarValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEstagio a_IdEstagio, const IdCenario a_idCenario) { \
 	try{ \
 		if (!getboolFromChar(#ImprimirDual)) return; \
 		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)) return; \
 		if (idx_##Elem##_##Nome##_##Nro.at(a_TSS).getIteradorInicial() > a_IdEstagio) return; \
 		if (idx_##Elem##_##Nome##_##Nro.at(a_TSS).getIteradorFinal() < a_IdEstagio) return; \
-		Valores(DECLARA_ITERS) Valores(DECLARA_ITERS_CONST_##Nro##_10) \
+		Valores(DECLARA_ITERS) DECLARA_ITERS_CONST_##Nro##_10 \
 		_IdEstagio = a_IdEstagio;\
 		std::vector<int> estados(10, -1); estados.at(0) = 0; bool parada = false;\
 		for (int i = 0; i <= 1000000; i++){ \
-			if (varredurasIters_10(std::string(std::string(#Nome) + "_" + std::string(#Nro), idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
+			if (varredurasIters_10(std::string(std::string(#Nome) + "_" + std::string(#Nro)), idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
 				double conteudo = vetorEstagio.att(a_IdEstagio).getSolver(a_TSS)->DECLARAR_ARMAZENAR_VALOR_DUAL_##Elem(idx_##Elem##_##Nome##_##Nro.at(a_TSS)Valores(AT_ITERS)AT_INT_##Nro##_10.at(1)); \
 				addConteudoIters_11(vlrD_e_c_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(_ITERS) INT_ARG_##Nro##_10 , a_idCenario); \
 			} \
@@ -606,74 +536,70 @@ void armazenarValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSub
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorDualPorEstagioPorCenario" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_IdEstagio) + "," + getString(a_idCenario) + "): \n" + std::string(erro.what())); } \
 }; \
-void imprimirValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados);
-
-
-#define DECLARAR_ARMAZENAR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal) \
-void armazenarValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEstagio a_IdEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao) { \
+void imprimirValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados);\
+void armazenarValorPrimalPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEstagio a_IdEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao) { \
 	try{ \
 		if (!getboolFromChar(#ImprimirPrimal)) return; \
 		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)) return; \
 		if (idx_##Elem##_##Nome##_##Nro.at(a_TSS).getIteradorInicial() > a_IdEstagio) return; \
 		if (idx_##Elem##_##Nome##_##Nro.at(a_TSS).getIteradorFinal() < a_IdEstagio) return; \
-		Valores(DECLARA_ITERS) Valores(DECLARA_ITERS_CONST_##Nro##_10) \
+		Valores(DECLARA_ITERS) DECLARA_ITERS_CONST_##Nro##_10 \
 		_IdEstagio = a_IdEstagio;\
 		std::vector<int> estados(10, -1); estados.at(0) = 0; bool parada = false;\
 		for (int i = 0; i <= 1000000; i++){ \
-			if (varredurasIters_10(std::string(std::string(#Nome) + "_" + std::string(#Nro), idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
+			if (varredurasIters_10(std::string(std::string(#Nome) + "_" + std::string(#Nro)), idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
 				double conteudo = vetorEstagio.att(a_IdEstagio).getSolver(a_TSS)->getValorPrimal(idx_##Elem##_##Nome##_##Nro.at(a_TSS)Valores(AT_ITERS)AT_INT_##Nro##_10.at(1)); \
-				addConteudoIters_12(vlrP_e_c_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(_ITERS) INT_ARG_##Nro##_10 , a_idRealizacao, a_idCenario); \
+				addConteudoIters_12(vlrP_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(_ITERS) INT_ARG_##Nro##_10 , a_idRealizacao, a_idCenario); \
 			} \
 			if (parada) break; \
 		}\
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorPrimalPorEstagioPorCenario" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_IdEstagio) + "," + getString(a_idCenario) + "," + getString(a_idRealizacao) + "): \n" + std::string(erro.what())); } \
+	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorPrimalPorEstagioPorCenarioPorRealizacao" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_IdEstagio) + "," + getString(a_idCenario) + "," + getString(a_idRealizacao) + "): \n" + std::string(erro.what())); } \
 }; \
-void imprimirValorPrimalPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados);
-
-#define DECLARAR_ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirDual) \
-void armazenarValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEstagio a_IdEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao) { \
+void imprimirValorPrimalPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados); \
+void armazenarValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEstagio a_IdEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao) { \
 	try{ \
 		if (!getboolFromChar(#ImprimirDual)) return; \
 		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)) return; \
 		if (idx_##Elem##_##Nome##_##Nro.at(a_TSS).getIteradorInicial() > a_IdEstagio) return; \
 		if (idx_##Elem##_##Nome##_##Nro.at(a_TSS).getIteradorFinal() < a_IdEstagio) return; \
-		Valores(DECLARA_ITERS) Valores(DECLARA_ITERS_CONST_##Nro##_10) \
+		Valores(DECLARA_ITERS) DECLARA_ITERS_CONST_##Nro##_10 \
 		_IdEstagio = a_IdEstagio;\
 		std::vector<int> estados(10, -1); estados.at(0) = 0; bool parada = false;\
 		for (int i = 0; i <= 1000000; i++){ \
-			if (varredurasIters_10(std::string(std::string(#Nome) + "_" + std::string(#Nro), idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
+			if (varredurasIters_10(std::string(std::string(#Nome) + "_" + std::string(#Nro)), idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
 				double conteudo = vetorEstagio.att(a_IdEstagio).getSolver(a_TSS)->DECLARAR_ARMAZENAR_VALOR_DUAL_##Elem(idx_##Elem##_##Nome##_##Nro.at(a_TSS)Valores(AT_ITERS)AT_INT_##Nro##_10.at(1)); \
-				addConteudoIters_12(vlrD_e_c_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(_ITERS) INT_ARG_##Nro##_10 , a_idRealizacao, a_idCenario); \
+				addConteudoIters_12(vlrD_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(_ITERS) INT_ARG_##Nro##_10 , a_idRealizacao, a_idCenario); \
 			} \
 			if (parada) break; \
 		}\
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorDualPorEstagioPorCenario" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_IdEstagio) + "," + getString(a_idCenario) + "," + getString(a_idRealizacao) + "): \n" + std::string(erro.what())); } \
+	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorDualPorEstagioPorCenarioPorRealizacao" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_IdEstagio) + "," + getString(a_idCenario) + "," + getString(a_idRealizacao) + "): \n" + std::string(erro.what())); } \
 }; \
-void imprimirValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados);
-
-
-#define DECLARAR_ARMAZENAR_VALOR(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
-DECLARAR_ARMAZENAR_VALOR_##Elem(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
+void imprimirValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados); \
 void consolidarResultados##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_variavel, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados);
 
-#define DECLARAR_ARMAZENAR_VALOR_VarDecisao(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
-DECLARAR_ARMAZENAR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal) \
-DECLARAR_ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirDual) \
-DECLARAR_ARMAZENAR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal) \
-DECLARAR_ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirDual) 
+//
+// ARMAZENAR VALOR POR ESTAGIO POR CENARIO
+//
 
-#define DECLARAR_ARMAZENAR_VALOR_EquLinear(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
-DECLARAR_ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirDual) \
-DECLARAR_ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirDual) 
+#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
+armazenarValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio, a_idCenario);\
+armazenarValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio, a_idCenario);
 
-#define DECLARAR_ARMAZENAR_VALOR_IneLinear(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
-DECLARAR_ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirDual) \
-DECLARAR_ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirDual) 
+//
+// ARMAZENAR VALOR POR ESTAGIO POR CENARIO POR REALIZACAO
+//
 
+#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
+armazenarValorPrimalPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio, a_idCenario, a_idRealizacao);\
+armazenarValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio, a_idCenario, a_idRealizacao);
 
-#define DECLARAR_IMPRIMIR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal) \
+//
+// IMPRIMIR VALOR PRIMAL POR ESTAGIO POR CENARIO
+//
+
+#define DECLARAR_IMPRIMIR_VALOR(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
 void ModeloOtimizacao::imprimirValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados){ \
 	try{ \
 		if (!getboolFromChar(#ImprimirPrimal)) \
@@ -684,10 +610,8 @@ void ModeloOtimizacao::imprimirValorPrimalPorEstagioPorCenario##Elem##_##Nome##_
 		vlrP_e_c_##Elem##_##Nome##_##Nro.at(a_TSS) = \
 		Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>();\
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("imprimirValorPrimalPorEstagioPorCenarioVarDecisao_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
-};
-
-#define DECLARAR_IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirDual) \
+	catch (const std::exception& erro) { throw std::invalid_argument("imprimirValorPrimalPorEstagioPorCenario" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
+};\
 void ModeloOtimizacao::imprimirValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados){ \
 	try{ \
 		if (!getboolFromChar(#ImprimirDual)) \
@@ -698,26 +622,8 @@ void ModeloOtimizacao::imprimirValorDualPorEstagioPorCenario##Elem##_##Nome##_##
 		vlrD_e_c_##Elem##_##Nome##_##Nro.at(a_TSS) = \
 		Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>();\
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("imprimirValorDualPorEstagioPorCenarioVarDecisao_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
+	catch (const std::exception& erro) { throw std::invalid_argument("imprimirValorDualPorEstagioPorCenario" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
 };\
-
-
-#define DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_VarDecisao(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) DECLARAR_IMPRIMIR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal) DECLARAR_IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirDual)
-#define DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_EquLinear(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) DECLARAR_IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirDual) 
-#define DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_IneLinear(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) DECLARAR_IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirDual)
-
-#define DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_##Elem(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)
-
-#define IMPRIMIR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, ImprimirDual) imprimirValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(TSS, getFullString(a_idProcesso), a_entradaSaidaDados);
-#define IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, ImprimirDual) imprimirValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(TSS, getFullString(a_idProcesso), a_entradaSaidaDados);
-
-#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_VarDecisao(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) IMPRIMIR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, ImprimirPrimal) IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, ImprimirDual)
-#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_EquLinear(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)  IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, ImprimirDual)
-#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_IneLinear(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)  IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, ImprimirDual)
-
-#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_##Elem(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)
-
-#define DECLARAR_IMPRIMIR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal) \
 void ModeloOtimizacao::imprimirValorPrimalPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados){ \
 	try{ \
 		if (!getboolFromChar(#ImprimirPrimal)) \
@@ -729,9 +635,7 @@ void ModeloOtimizacao::imprimirValorPrimalPorEstagioPorCenarioPorRealizacao##Ele
 		Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>();\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("imprimirValorPrimalPorEstagioPorCenarioPorRealizacao" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
-};
-
-#define DECLARAR_IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirDual) \
+};\
 void ModeloOtimizacao::imprimirValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados){ \
 	try{ \
 		if (!getboolFromChar(#ImprimirDual)) \
@@ -745,42 +649,17 @@ void ModeloOtimizacao::imprimirValorDualPorEstagioPorCenarioPorRealizacao##Elem#
 	catch (const std::exception& erro) { throw std::invalid_argument("imprimirValorDualPorEstagioPorCenarioPorRealizacao" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
 };\
 
+#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
+imprimirValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(TSS, getFullString(a_idProcesso), a_entradaSaidaDados); \
+imprimirValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(TSS, getFullString(a_idProcesso), a_entradaSaidaDados);
 
-#define DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VarDecisao(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) DECLARAR_IMPRIMIR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal) DECLARAR_IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirDual)
-#define DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_EquLinear(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) DECLARAR_IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirDual) 
-#define DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_IneLinear(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) DECLARAR_IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirDual)
+#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
+imprimirValorPrimalPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(TSS, getFullString(a_idProcesso), a_entradaSaidaDados); \
+imprimirValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(TSS, getFullString(a_idProcesso), a_entradaSaidaDados);
 
-#define DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_##Elem(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)
-
-#define IMPRIMIR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, ImprimirDual) imprimirValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(TSS, getFullString(a_idProcesso), a_entradaSaidaDados);
-#define IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, ImprimirDual) imprimirValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(TSS, getFullString(a_idProcesso), a_entradaSaidaDados);
-
-#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VarDecisao(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) IMPRIMIR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, ImprimirPrimal) IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, ImprimirDual)
-#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_EquLinear(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)  IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, ImprimirDual)
-#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_IneLinear(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)  IMPRIMIR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, ImprimirDual)
-
-#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_##Elem(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)
-
-
-#define ARMAZENAR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro) armazenarValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio, a_idCenario);
-#define ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro) armazenarValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio, a_idCenario);
-
-#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VarDecisao(Elem, Nome, Nro) ARMAZENAR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro) ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro)
-#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_EquLinear(Elem, Nome, Nro) ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro)
-#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_IneLinear(Elem, Nome, Nro) ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro)
-
-#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) ARMAZENAR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO_##Elem(Elem, Nome, Nro)
-
-#define ARMAZENAR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) armazenarValorPrimalPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio, a_idCenario, a_idRealizacao);
-#define ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) armazenarValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio, a_idCenario, a_idRealizacao);
-
-#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VarDecisao(Elem, Nome, Nro) ARMAZENAR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro) ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro)
-#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_EquLinear(Elem, Nome, Nro) ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro)
-#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_IneLinear(Elem, Nome, Nro) ARMAZENAR_VALOR_DUAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro)
-
-#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) ARMAZENAR_VALOR_PRIMAL_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_##Elem(Elem, Nome, Nro)
-
-
+//
+// CONSOLIDAR RESULTADOS
+//
 
 #define DECLARAR_CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)  \
 void ModeloOtimizacao::consolidarResultados##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_variavel, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados) {	\
@@ -805,12 +684,11 @@ void ModeloOtimizacao::consolidarResultados##Elem##_##Nome##_##Nro(const TipoSub
 			a_entradaSaidaDados.imprimirConsolidacaoHorizontalCSV(nome_arquivo, lista_arquivos, ##Nro, true); \
 		} \
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao::consolidarResultadosVarDecisao_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_maiorIdProcesso) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao::consolidarResultados" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_maiorIdProcesso) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
 };\
 
 
 #define CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) consolidarResultados##Elem##_##Nome##_##Nro(a_TSS, variavel_str, a_maiorIdProcesso, a_entradaSaidaDados);
-
 
 
 
