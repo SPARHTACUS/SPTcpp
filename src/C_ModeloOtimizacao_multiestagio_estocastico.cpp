@@ -272,10 +272,10 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 				if (listaTipoSubproblemaSolver.at(i) != TipoSubproblemaSolver_mestre) {
 
-					alocarVarDecisao_YH(listaTipoSubproblemaSolver.at(i), idEstagio, alocacao_afluencia_incremental.at(idEstagio));
-					alocarVarDecisao_YHF(listaTipoSubproblemaSolver.at(i), idEstagio, alocacao_afluencia_incremental.at(idEstagio));
+					alocarVarDecisao_YH_3(listaTipoSubproblemaSolver.at(i), idEstagio, alocacao_afluencia_incremental.at(idEstagio));
+					alocarVarDecisao_YHF_3(listaTipoSubproblemaSolver.at(i), idEstagio, alocacao_afluencia_incremental.at(idEstagio));
 
-					alocarVarDecisao_QDEF(listaTipoSubproblemaSolver.at(i), idEstagio, alocacao_defluencia.at(idEstagio));
+					alocarVarDecisao_QDEF_3(listaTipoSubproblemaSolver.at(i), idEstagio, alocacao_defluencia.at(idEstagio));
 
 				} // if (listaTipoSubproblemaSolver.at(i) != TipoSubproblemaSolver_mestre) {
 
@@ -7266,10 +7266,6 @@ int ModeloOtimizacao::criarVariaveis_Decisao_e_Estado_YP(const TipoSubproblemaSo
 
 		else if (a_lag > 0) {
 
-			//if ((getElementoMatriz(a_tipo_processo_estocastico_hidrologico, a_idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo_processo_estocastico, a_lag, double()) == 0.0) && \
-				(getSize2Matriz(a_tipo_processo_estocastico_hidrologico, a_idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo_processo_estocastico) == 1))
-				//return -1;
-
 			const int varYP = addVarDecisao_YP(a_TSS, a_idEstagio, a_periodo_processo_estocastico, a_tipo_processo_estocastico_hidrologico, a_idVariavelAleatoria, a_lag, -infinito, infinito, 0.0);
 
 			const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
@@ -8210,7 +8206,7 @@ void ModeloOtimizacao::remCorteBendersFromZF(const TipoSubproblemaSolver a_TSS, 
 
 		vetorEstagio.att(a_idEstagio_anterior).getSolver(a_TSS)->remRestricao(posIneZF);
 
-		idx_ine_CB_ZF_4.at(a_TSS).at(a_idEstagio_anterior).at(periodo_otimizacao_anterior).at(a_idRealizacao).at(a_idCorteBenders) = std::vector<int>();
+		idx_IneLinear_CB_ZF_4.at(a_TSS).at(a_idEstagio_anterior).at(periodo_otimizacao_anterior).at(a_idRealizacao).at(a_idCorteBenders) = SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, int>>>>>>>();
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::remCorteBendersFromZF(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio_anterior) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "): \n" + std::string(erro.what())); }
@@ -8287,7 +8283,7 @@ void ModeloOtimizacao::remCorteBendersFromZT(const TipoSubproblemaSolver a_TSS, 
 
 		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->remRestricao(posIneZT);
 
-		idx_ine_CB_ZT_4.at(a_TSS).at(a_idEstagio).at(periodo_otimizacao).at(a_idRealizacao).at(a_idCorteBenders) = std::vector<int>();
+		idx_IneLinear_CB_ZT_4.at(a_TSS).at(a_idEstagio).at(periodo_otimizacao).at(a_idRealizacao).at(a_idCorteBenders) = SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, int>>>>>>>();
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::remCorteBendersFromZF(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "): \n" + std::string(erro.what())); }

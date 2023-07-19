@@ -99,8 +99,6 @@
     <ClInclude Include="..\src\C_ReservaPotencia.h" />
     <ClInclude Include="..\src\C_Reservatorio.h" />
     <ClInclude Include="..\src\C_RestricaoEletrica.h" />
-    <ClInclude Include="..\src\C_RestricaoEquacaoLinear.h" />
-    <ClInclude Include="..\src\C_RestricaoInequacaoLinear.h" />
     <ClInclude Include="..\src\C_RestricaoOperativaUHE.h" />
     <ClInclude Include="..\src\C_SmartAttComum.h" />
     <ClInclude Include="..\src\C_SmartAttMatriz.h" />
@@ -118,8 +116,7 @@
     <ClInclude Include="..\src\C_UsinaNaoSimulada.h" />
     <ClInclude Include="..\src\C_VariavelAleatoria.h" />
     <ClInclude Include="..\src\C_VariavelAleatoriaInterna.h" />
-    <ClInclude Include="..\src\C_VariavelDecisao.h" />
-    <ClInclude Include="..\src\C_VariavelDecisaoNEW.h" />
+    <ClInclude Include="..\src\C_ModeloOtimizacaoElementos.h" />
     <ClInclude Include="..\src\C_VariavelEstado.h" />
     <ClInclude Include="..\src\C_VariavelRealizacao.h" />
     <ClInclude Include="..\src\C_VariavelRealizacaoInterna.h" />
