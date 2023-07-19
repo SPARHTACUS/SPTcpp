@@ -6379,6 +6379,9 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 							a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AttVetorPremissa_PorPeriodo.csv", idHidreletrica, *this, periodo_estudo_inicial, periodo_final_estudo, attVetorHidreletrica);
 							impresso_AttVetorHidreletrica_PorPeriodo.at(0) = true;
 
+							//if (getSizeVetor(IdHidreletrica_1, AttVetorHidreletrica_produtibilidade_acumulada_EAR) > 0)
+								//a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AttVetorPremissa_PorPeriodo.csv", idHidreletrica, *this, periodo_estudo_inicial, periodo_final_estudo, attVetorHidreletrica);
+
 							vetorHidreletrica.att(idHidreletrica).clear(attVetorHidreletrica);
 
 						} // if ((preencher_AttVetorHidreletrica.at(idHidreletrica).at(attVetorHidreletrica) == sim_premissa) || ((preencher_AttVetorHidreletrica.at(idHidreletrica).at(attVetorHidreletrica) == nao_premissa_informado) && (a_imprimir_atributos_sem_recarregar))) {
