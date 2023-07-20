@@ -224,26 +224,167 @@ public:
 
 	std::string str() { return "SmartEnupla<iterador,valor>"; }
 
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const std::string a_string) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const char* a_char) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const bool a_bool) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const double a_double) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const int a_int) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const std::vector<int> a_vetor) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const std::vector<double> a_vetor) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const std::vector<std::vector<int>> a_vetor) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const std::vector<std::vector<double>> a_vetor) { return std::vector<std::vector<std::string>>(); };
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const std::string a_string, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const char* a_char, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const bool a_bool, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const double a_double, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const int a_int, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const std::vector<int> a_vetor, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const std::vector<double> a_vetor, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const std::vector<std::vector<int>> a_vetor, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const std::vector<std::vector<double>> a_vetor, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
 
 	template<typename Iterador, typename Valor>
 	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const SmartEnupla<Iterador, Valor>& a_enupla) {
+		std::vector<std::vector<std::string>> matriz_interna;
+		bool isUltimoCabecalhoIncluso = false;
+		int linAdded = 0;
 		if (a_incluir_iteradores)
-			return getDadosAsString(100, a_enupla);
+			return getDadosAsString(100, isUltimoCabecalhoIncluso, a_enupla, true, linAdded, matriz_interna);
 		else
-			return getDadosAsString(-1, a_enupla);
+			return getDadosAsString(-1, isUltimoCabecalhoIncluso, a_enupla, true, linAdded, matriz_interna);
 	}
 
 	template<typename Iterador, typename Valor>
 	static std::vector<std::vector<std::string>> getDadosAsString(int a_nro_iteradores_incluir, const SmartEnupla<Iterador, Valor>& a_enupla) {
+		int linAdded = 0;
+		std::vector<std::vector<std::string>> matriz_interna;
+		bool isUltimoCabecalhoIncluso = false;
+		return getDadosAsString(a_nro_iteradores_incluir, isUltimoCabecalhoIncluso, a_enupla, true, linAdded, matriz_interna);
+	}
+
+	template<typename Iterador, typename Valor>
+	static std::vector<std::vector<std::string>> getDadosAsString(int a_nro_iteradores_incluir, bool &a_isUltimoCabecalhoIncluso, const SmartEnupla<Iterador, Valor>& a_enupla, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>> &a_matriz_interna) {
+
+		try {
+
+			if (a_enupla.size() == 0) {
+				a_linAdded = 0;
+				return std::vector<std::vector<std::string>>();
+			}
+
+			const Iterador iteradorInicial = a_enupla.getIteradorInicial();
+			const Iterador iteradorFinal = a_enupla.getIteradorFinal();
+
+			int nro_iteradores_incluir = a_nro_iteradores_incluir;
+
+			if (nro_iteradores_incluir > 0)
+				nro_iteradores_incluir--;
+
+			for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; a_enupla.incrementarIterador(iterador)) {
+
+				SmartEnupla<int, int>::getDadosAsString(nro_iteradores_incluir, a_isUltimoCabecalhoIncluso, a_enupla.at(iterador), false, a_linAdded, a_matriz_interna);
+
+				if ((a_linAdded > 0) && (a_nro_iteradores_incluir > 0)) {
+
+					bool preencher_todas_linhas = true;
+
+					// Verifica se matriz interna não é quadrada
+					if (a_matriz_interna.at(0).size() != a_matriz_interna.at(a_matriz_interna.size() - 1).size())
+						preencher_todas_linhas = false;
+
+					for (int l = a_matriz_interna.size() - 1; l >= 0; l--) {
+						if (preencher_todas_linhas)
+							a_matriz_interna.at(l).insert(a_matriz_interna.at(l).begin(), getString(iterador));
+						else {
+							if (l == (a_matriz_interna.size() - 1))
+								a_matriz_interna.at(l).insert(a_matriz_interna.at(l).begin(), getString(iterador));
+							else if ((a_matriz_interna.at(l).size() + 1) == a_matriz_interna.at(l + 1).size())
+								a_matriz_interna.at(l).insert(a_matriz_interna.at(l).begin(), getString(iterador));
+							else
+								break;
+						}
+					}
+
+					if (a_isUltimoCabecalhoIncluso)
+						a_matriz_interna.at(0).at(0) = getStringTipo(iterador);
+
+				} // if (a_linAdded > 0) {
+
+				if (a_linAdded == -1)
+					break;
+
+			} // for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; incrementarIterador(iterador)) {
+
+			if (a_linAdded == -1) {
+
+				a_linAdded = 1;
+				bool is_cabecalho_adicionado = false;
+
+				if ((a_nro_iteradores_incluir > -1) && (a_matriz_interna.size() == 0)) {
+					is_cabecalho_adicionado = true;
+					a_isUltimoCabecalhoIncluso = true;
+					a_linAdded = 2;
+					a_matriz_interna = std::vector<std::vector<std::string>>(2, std::vector<std::string>(a_enupla.size(), ""));
+				}
+				else
+					a_matriz_interna.push_back(std::vector<std::string>(a_enupla.size(), ""));
+
+				const int l = a_matriz_interna.size() - 1;
+
+				int i = 0;
+				for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; a_enupla.incrementarIterador(iterador)) {
+
+					if (is_cabecalho_adicionado)
+						a_matriz_interna.at(l - 1).at(i) = getFullString(iterador);
+
+					a_matriz_interna.at(l).at(i) = getString(a_enupla.at(iterador));
+
+					i++;
+
+				} // for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; incrementarIterador(iterador)) {
+
+				if (a_chamada_inicial)
+					return a_matriz_interna;
+				else
+					return std::vector<std::vector<std::string>>();
+
+			} // if (a_linAdded == -1) {
+
+
+			if (a_chamada_inicial)
+				return a_matriz_interna;
+			else
+				return std::vector<std::vector<std::string>>();
+
+
+
+		} // try
+
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getDadosAsString(" + getFullString(a_nro_iteradores_incluir) + ",a_enupla," + getFullString(a_chamada_inicial) + "): \n" + std::string(erro.what())); }
+
+	} // std::vector<std::vector<std::string>> SmartEnupla::getDadosAsString(const bool a_incluir_cabecalho){
+
+
+	template<typename Iterador, typename Valor>
+	static std::vector<std::vector<std::string>> getDadosAsString(int a_nro_iteradores_incluir, const SmartEnupla<Iterador, Valor>& a_enupla, bool a_chamada_inicial) {
 
 		try {
 
@@ -256,7 +397,7 @@ public:
 			std::vector<std::vector<std::string>> matriz_retorno;
 
 			// Ultima camada da SmarEnupla
-			if (SmartEnupla<int, int>::getDadosAsString(a_nro_iteradores_incluir, a_enupla.at(a_enupla.getIteradorInicial())).size() == 0) {
+			if (SmartEnupla<int, int>::getDadosAsString(a_nro_iteradores_incluir, a_enupla.at(a_enupla.getIteradorInicial()), false).size() == 0) {
 
 				if (a_nro_iteradores_incluir > -1)
 					matriz_retorno = std::vector<std::vector<std::string>>(2, std::vector<std::string>(a_enupla.size(), ""));
@@ -291,7 +432,7 @@ public:
 
 				for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; a_enupla.incrementarIterador(iterador)) {
 
-					const std::vector<std::vector<std::string>> matriz_retornada = SmartEnupla<int, int>::getDadosAsString(nro_iteradores_incluir, a_enupla.at(iterador));
+					const std::vector<std::vector<std::string>> matriz_retornada = SmartEnupla<int, int>::getDadosAsString(nro_iteradores_incluir, a_enupla.at(iterador), false);
 
 					if (matriz_retornada.size() > 0) {
 
@@ -356,7 +497,7 @@ public:
 
 		} // try
 
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getDadosAsString(" + getString(a_nro_iteradores_incluir) + ",a_enupla): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getDadosAsString(" + getFullString(a_nro_iteradores_incluir) + ",a_enupla," + getFullString(a_chamada_inicial) + "): \n" + std::string(erro.what())); }
 
 	} // std::vector<std::vector<std::string>> SmartEnupla::getDadosAsString(const bool a_incluir_cabecalho){
 
