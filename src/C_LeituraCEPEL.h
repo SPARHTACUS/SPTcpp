@@ -187,8 +187,11 @@ private:
 	double get_produtibilidade_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidreletrica, const double a_cota);
 	void instanciar_codigo_usina_jusante_EAR(Dados& a_dados);
 	void instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_EAR(Dados& a_dados, std::string a_nomeArquivo);
-	void instancia_atributos_hidreletrica_out_from_CadUsH_csv(Hidreletrica& a_hidreletrica, std::string a_nomeArquivo);
+	void instancia_atributos_hidreletrica_out_from_CadUsH_csv(Dados& a_dados, Hidreletrica& a_hidreletrica, std::string a_nomeArquivo);
 	void calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados);
+	void calcular_produtibilidade_EAR_acumulada_por_usina_old(Dados& a_dados);
+
+	void imprime_produtibilidade_EAR_acumulada(Dados& a_dados, std::string nomeArquivo);
 
 	//Validações
 	void validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao);
