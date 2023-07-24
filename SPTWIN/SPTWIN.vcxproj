@@ -99,8 +99,6 @@
     <ClInclude Include="..\src\C_ReservaPotencia.h" />
     <ClInclude Include="..\src\C_Reservatorio.h" />
     <ClInclude Include="..\src\C_RestricaoEletrica.h" />
-    <ClInclude Include="..\src\C_RestricaoEquacaoLinear.h" />
-    <ClInclude Include="..\src\C_RestricaoInequacaoLinear.h" />
     <ClInclude Include="..\src\C_RestricaoOperativaUHE.h" />
     <ClInclude Include="..\src\C_SmartAttComum.h" />
     <ClInclude Include="..\src\C_SmartAttMatriz.h" />
@@ -118,7 +116,7 @@
     <ClInclude Include="..\src\C_UsinaNaoSimulada.h" />
     <ClInclude Include="..\src\C_VariavelAleatoria.h" />
     <ClInclude Include="..\src\C_VariavelAleatoriaInterna.h" />
-    <ClInclude Include="..\src\C_VariavelDecisao.h" />
+    <ClInclude Include="..\src\C_ModeloOtimizacaoElementos.h" />
     <ClInclude Include="..\src\C_VariavelEstado.h" />
     <ClInclude Include="..\src\C_VariavelRealizacao.h" />
     <ClInclude Include="..\src\C_VariavelRealizacaoInterna.h" />
@@ -175,6 +173,8 @@
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <Optimization>MaxSpeed</Optimization>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -197,8 +197,11 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/Bv /bigobj %(AdditionalOptions)</AdditionalOptions>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PreprocessToFile>false</PreprocessToFile>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <UseStandardPreprocessor>false</UseStandardPreprocessor>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

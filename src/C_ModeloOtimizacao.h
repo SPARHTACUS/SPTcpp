@@ -10,9 +10,7 @@
 #include "C_EstagioOtimizacao.h"
 #include "C_Iteracao.h"
 
-#include "C_VariavelDecisao.h"
-#include "C_RestricaoEquacaoLinear.h"
-#include "C_RestricaoInequacaoLinear.h"
+#include "C_ModeloOtimizacaoElementos.h"
 
 #include "C_EstruturaResultados.h"
 
@@ -101,362 +99,435 @@ class EntradaSaidaDados;
 
 DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
+//
+// ITERADORES 2
+//
 
-#define VARIAVEL_DECISAO_2(m)                                            \
-	m(  ZP0,                      IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZP0p,                     IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZPp,                      IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZO0,                      IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZO0p,                     IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZOp,                      IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZO0_UTE,                  IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZO0_DEFICIT,              IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZO0_UTE_COMANDO,          IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZT,                       IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZI,                       IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZPp_VF_FINF,            IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZP0p_VF_FINF,           IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZP0_VF_FINF,            IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZP0_VF_FINF_ACUMULADO,  IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZP0_VF_FINF_ACUMULANDO, IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZPp_QDEF_FINF,            IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZP0p_QDEF_FINF,           IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZP0_QDEF_FINF,            IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZPp_QDEF_FSUP,            IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZP0p_QDEF_FSUP,           IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZP0_QDEF_FSUP,            IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ZP,                       IdEstagio,               Periodo,            sim,          nao)  \
-	m(  ESTADO,                   IdEstagio,      IdVariavelEstado,            sim,          nao)  \
-	m(  ZF,                       IdEstagio,               Periodo,            sim,          nao)  
-// Nome,  TipoIterador1,         TipoIterador2, ImprimirPrimal, ImprimirDual
+#define ITERADORES_2_ESTAGIO_PERIODO(m)         m(1, IdEstagio) m(2, Periodo)
+#define ITERADORES_2_ESTAGIO_VARIAVELESTADO(m)  m(1, IdEstagio) m(2, IdVariavelEstado)
 
-#define VARIAVEL_DECISAO_3(m)                                                                     \
-	m(  ZP,               IdEstagio,          Periodo,            IdPatamarCarga,        sim,          nao)  \
-	m(  ZO,               IdEstagio,          Periodo,            IdPatamarCarga,        sim,          nao)  \
-	m(  ZF,               IdEstagio,          Periodo,            IdRealizacao,          sim,          nao)  \
-	m(  ZT,               IdEstagio,          Periodo,            IdRealizacao,          sim,          nao)  \
-	m(  ZO0_UTE,          IdEstagio,          Periodo,            IdTermeletrica,        sim,          nao)  \
-	m(  ZOp_UTE,          IdEstagio,          Periodo,            IdTermeletrica,        sim,          nao)  \
-	m(  ZO0p_UTE,         IdEstagio,          Periodo,            IdTermeletrica,        sim,          nao)  \
-	m(  ZO0_DEFICIT,      IdEstagio,          Periodo,            IdTermeletrica,        sim,          nao)  \
-	m(  ZO0p_DEFICIT,     IdEstagio,          Periodo,            IdTermeletrica,        sim,          nao)  \
-	m(  ZOp_DEFICIT,      IdEstagio,          Periodo,            IdTermeletrica,        sim,          nao)  \
-	m(  ZOp_UTE_COMANDO,  IdEstagio,          Periodo,            IdTermeletrica,        sim,          nao)  \
-	m(  ZO0p_UTE_COMANDO, IdEstagio,          Periodo,            IdTermeletrica,        sim,          nao)  \
-	m(  ZO0_UTE_COMANDO,  IdEstagio,          Periodo,            IdTermeletrica,        sim,          nao)  \
-	m(  YH,       IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-	m(  YHF,      IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-	m(  QEV,      IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-	m(  QEV_REL,  IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-	m(  QEV_FINF, IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-    m(  QDEF,          IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-    m(  QDEF_FINF,     IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-    m(  QDEF_FSUP,     IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-    m(  VDEF_ACUMULADO,   IdEstagio,      IdHidreletrica,               Periodo,              sim,          nao)  \
-    m(  VDEF,             IdEstagio,      IdHidreletrica,               Periodo,              sim,          nao)  \
-    m(  VDEF_ACOPLAMENTO, IdEstagio,      IdHidreletrica,               Periodo,              sim,          nao)  \
-    m(  YP_ACUMULADO,     IdEstagio,             Periodo,   IdVariavelAleatoria,         sim,          nao)  \
-    m(  YP_ACUMULANDO,        IdEstagio,         Periodo,   IdVariavelAleatoria,              sim,          nao)  \
-	m(  VI,      IdEstagio,               Periodo,        IdHidreletrica,              sim,          sim)  \
-	m(  VF,      IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-	m(  VMED,      IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-    m(  VF_FINF, IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-	m(  VMORTO_FINF,IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-	m(  PL,        IdEstagio,               Periodo,          IdSubmercado,              sim,          nao)  \
-	m(  PBOMDISP,  IdEstagio,               Periodo,     IdUsinaElevatoria,              sim,          nao)  \
-	m(  PD,        IdEstagio,               Periodo,          IdSubmercado,              sim,          nao)  \
-	m(  PHDISP,    IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-    m(  PHDISPMETA,    IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-    m(  PHDISPMETA_FINF,    IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-    m(  PHDISPMETA_FSUP,    IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-	m(  QVER,      IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-	m(  QTURDISP,  IdEstagio,               Periodo,        IdHidreletrica,              sim,          nao)  \
-	m(  PTDISP,    IdEstagio,               Periodo,        IdTermeletrica,              sim,          nao)  \
-	m(  PTDISPPRECOM,     IdEstagio,     IdTermeletrica,        Periodo,              sim,          nao)  \
-	m(  PTDISPCOM_FINF,   IdEstagio,     IdTermeletrica,        Periodo,              sim,          nao)  \
-	m(  PTDISPCOM_FSUP,   IdEstagio,     IdTermeletrica,        Periodo,              sim,          nao)  \
-	m(  PI,        IdEstagio,               Periodo,          IdSubmercado,              sim,          nao)  \
-	m(  PN,        IdEstagio,               Periodo,          IdSubmercado,              sim,          nao)  \
-    m(  RHA,       IdEstagio,               Periodo,    IdRestricaoOperativaUHE,         sim,          nao)  \
-    m(  RHA_FINF,  IdEstagio,               Periodo,    IdRestricaoOperativaUHE,         sim,          nao)  \
-    m(  RHA_FSUP,  IdEstagio,               Periodo,    IdRestricaoOperativaUHE,         sim,          nao)  \
-    m(  RHV,       IdEstagio,               Periodo,    IdRestricaoOperativaUHE,         sim,          nao)  \
-    m(  RHV_FINF,  IdEstagio,               Periodo,    IdRestricaoOperativaUHE,         sim,          nao)  \
-    m(  RHV_FSUP,  IdEstagio,               Periodo,    IdRestricaoOperativaUHE,         sim,          nao)
-   // Nome,  TipoIterador1,         TipoIterador2,         TipoIterador3,   ImprimirPrimal, ImprimirDual
+#define VARIAVEL_DECISAO_2(m)\
+	m(  VarDecisao,     ZP0,                      2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZP0p,                     2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZPp,                      2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZO0,                      2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZO0p,                     2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZOp,                      2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZO0_UTE,                  2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZO0_DEFICIT,              2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZO0_UTE_COMANDO,          2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZT,                       2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZI,                       2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZPp_VF_FINF,              2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZP0p_VF_FINF,             2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZP0_VF_FINF,              2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZP0_VF_FINF_ACUMULADO,    2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZP0_VF_FINF_ACUMULANDO,   2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZPp_QDEF_FINF,            2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZP0p_QDEF_FINF,           2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZP0_QDEF_FINF,            2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZPp_QDEF_FSUP,            2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZP0p_QDEF_FSUP,           2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZP0_QDEF_FSUP,            2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ZP,                       2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  \
+	m(  VarDecisao,     ESTADO,                   2,    ITERADORES_2_ESTAGIO_VARIAVELESTADO,     sim,          nao)  \
+	m(  VarDecisao,     ZF,                       2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao)  
+   //   Elemento,       Nome,               NroIter,    Iteradores,                      Impr.Primal,     Impr.Dual
 
-#define VARIAVEL_DECISAO_4(m)                                                                                             \
-	m(  ZO_COMANDO,      IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  ZO_UTE_COMANDO,  IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  PH,          IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-	m(  PH_REL,      IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-	m(  PH_FINF,     IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-	m(  PHDISP,      IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-	m(  PHDISP_REL,  IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-	m(  PHDISP_FINF, IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-    m(  QBOM,        IdEstagio,               Periodo,        IdPatamarCarga,   IdUsinaElevatoria,             sim,          nao)  \
-    m(  QBOM_FINF,   IdEstagio,               Periodo,        IdPatamarCarga,   IdUsinaElevatoria,             sim,          nao)  \
-    m(  QBOMDISP,        IdEstagio,               Periodo,        IdPatamarCarga,   IdUsinaElevatoria,             sim,          nao)  \
-    m(  QBOMDISP_FINF,   IdEstagio,               Periodo,        IdPatamarCarga,   IdUsinaElevatoria,             sim,          nao)  \
-    m(  QTURDISP,    IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-    m(  QTURDISP_FINF,    IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-    m(  QTUR,        IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-    m(  QTUR_FINF,   IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-	m(  QVER,        IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-	m(  QMON,        IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-    m(  QDEF,        IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-    m(  QDEF_FINF,    IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-    m(  QDEF_FSUP,    IdEstagio,               Periodo,        IdPatamarCarga,      IdHidreletrica,             sim,          nao)  \
-	m(  PL,          IdEstagio,               Periodo,        IdPatamarCarga,        IdSubmercado,             sim,          sim)  \
-	m(  DE,			 IdEstagio,               Periodo,        IdPatamarCarga,			 IdDemandaEspecial,             sim,          sim)  \
-	m(  CIMP,		 IdEstagio,               Periodo,        IdPatamarCarga,		            IdContrato,             sim,          sim)  \
-	m(  CEXP,		 IdEstagio,               Periodo,        IdPatamarCarga,			        IdContrato,             sim,          sim)  \
-	m(  PBOMDISP,    IdEstagio,               Periodo,        IdPatamarCarga,   IdUsinaElevatoria,             sim,          sim)  \
-	m(  RE_FINF,     IdEstagio,               Periodo,        IdPatamarCarga, IdRestricaoEletrica,             sim,          nao)  \
-    m(  RE_FSUP,     IdEstagio,               Periodo,        IdPatamarCarga, IdRestricaoEletrica,             sim,          nao)  \
-	m(  PI,          IdEstagio,               Periodo,        IdPatamarCarga,       IdIntercambio,             sim,          sim)  \
-    m(  PI_FINF,     IdEstagio,               Periodo,        IdPatamarCarga,       IdIntercambio,             sim,          nao)  \
-	m(  PT,          IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  PE,			 IdEstagio,               Periodo,        IdPatamarCarga,		         IdUsinaEolica,             sim,          nao)  \
-	m(  PT_UTIL,     IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  PT_MIN,      IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  LIG_T,       IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  DESL_T,      IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  ACIO_T,      IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  PT_REL,      IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  PT_FINF,     IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  PT_FSUP,     IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  PTDISP,      IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  PTDISP_REL,  IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  PTDISP_FINF, IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  PTDISP_FSUP, IdEstagio,               Periodo,        IdPatamarCarga,      IdTermeletrica,             sim,          nao)  \
-	m(  PTDISPCOM,           IdEstagio,     IdTermeletrica,          int,        Periodo,              sim,          nao)  \
-	m(  PTDISPCOM_ACUMULADO, IdEstagio,     IdTermeletrica,          int,        Periodo,              sim,          nao)  \
-	m(  RP,          IdEstagio,               Periodo, IdProcessoEstocastico, IdVariavelAleatoria,             sim,          nao)  \
-	m(  YP_REL,     IdEstagio,               Periodo, IdProcessoEstocastico, IdVariavelAleatoria,             sim,          nao)  \
-	m(  YPF,        IdEstagio,               Periodo, IdProcessoEstocastico, IdVariavelAleatoria,             sim,          nao)  \
-    m(  RHQ,         IdEstagio,               Periodo,        IdPatamarCarga, IdRestricaoOperativaUHE,         sim,          nao)  \
-    m(  RHQ_FINF,    IdEstagio,               Periodo,        IdPatamarCarga, IdRestricaoOperativaUHE,         sim,          nao)  \
-    m(  RHQ_FSUP,    IdEstagio,               Periodo,        IdPatamarCarga, IdRestricaoOperativaUHE,         sim,          nao)  \
-	m(  QILS_TRI,        IdEstagio,               Periodo,        IdPatamarCarga, IdIntercambioHidraulico,         sim,          nao)  \
-    m(  QILS_TRI_FINF,   IdEstagio,               Periodo,        IdPatamarCarga, IdIntercambioHidraulico,         sim,          nao)  \
-    m(  QILS_TRI_REL,    IdEstagio,               Periodo,        IdPatamarCarga, IdIntercambioHidraulico,         sim,          nao)  \
-    m(  QOUT,        IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,             sim,          nao)  \
-    m(  QOUT_FINF,   IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,             sim,          nao)
+#define EQUACAO_LINEAR_2(m)\
+	m(  EquLinear,     CUSTO_PENALIDADE_0,                  2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_PENALIDADE_0p,                 2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_PENALIDADE_p,                  2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_OPERACAO_0,                    2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_OPERACAO_0p,                   2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_OPERACAO_p,                    2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_OPERACAO_UTE_COMANDO_0,        2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_TOTAL,                         2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_TOTAL_MESTRE,                  2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_IMEDIATO,                      2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_PENALIDADE_VOLUME_0,           2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_PENALIDADE_VOLUME_0_ACUMULANDO,2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_PENALIDADE_VOLUME_p,           2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_PENALIDADE_VOLUME_0p,          2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_PENALIDADE,                    2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  \
+	m(  EquLinear,     CUSTO_FUTURO,                        2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao)  
+   //   Elemento,     Nome,                           NroIter,    Iteradores,                 Impr.Primal,    Impr.Dual
 
-   // Nome,  TipoIterador1,         TipoIterador2,         TipoIterador3,       TipoIterador4,  ImprimirPrimal, ImprimirDual
+//
+// ITERADORES 3
+//
 
-#define VARIAVEL_DECISAO_5(m)                                                                                                                             \
-	m(  PH,          IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,             sim,          nao)  \
-	m(  PH_REL,      IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,             sim,          nao)  \
-	m(  PH_FINF,     IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,             sim,          nao)  \
-	m(  PHDISP,      IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,             sim,          nao)  \
-	m(  PHDISP_REL,  IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,             sim,          nao)  \
-	m(  PHDISP_FINF, IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,             sim,          nao)  \
-    m(  QTURDISP,    IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,             sim,          nao)  \
-    m(  QTUR,        IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,             sim,          nao)  \
-    m(  QTUR_FINF,   IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,             sim,          nao)  \
-	m(  PN,          IdEstagio,               Periodo,        IdPatamarCarga,            IdSubmercado,         IdUsinaNaoSimulada,             sim,          nao)  \
-	m(  PT,          IdEstagio,               Periodo,        IdPatamarCarga,          IdTermeletrica,               IdUnidadeUTE,             sim,          nao)  \
-	m(  PT_UTIL,     IdEstagio,               Periodo,        IdPatamarCarga,          IdTermeletrica,               IdUnidadeUTE,             sim,          nao)  \
-	m(  PT_TRAJ_ACIO, IdEstagio,               Periodo,        IdPatamarCarga,          IdTermeletrica,               IdUnidadeUTE,             sim,          nao)  \
-	m(  PT_TRAJ_DESL,IdEstagio,               Periodo,        IdPatamarCarga,          IdTermeletrica,               IdUnidadeUTE,             sim,          nao)  \
-	m(  PT_MIN,      IdEstagio,               Periodo,        IdPatamarCarga,          IdTermeletrica,               IdUnidadeUTE,             sim,          nao)  \
-	m(  LIG_T,       IdEstagio,               Periodo,        IdPatamarCarga,          IdTermeletrica,               IdUnidadeUTE,             sim,          nao)  \
-	m(  DESL_T,      IdEstagio,               Periodo,        IdPatamarCarga,          IdTermeletrica,               IdUnidadeUTE,             sim,          nao)  \
-	m(  ACIO_T,      IdEstagio,               Periodo,        IdPatamarCarga,          IdTermeletrica,               IdUnidadeUTE,             sim,          nao)  \
-	m(  PT_REL,      IdEstagio,               Periodo,        IdPatamarCarga,          IdTermeletrica,               IdUnidadeUTE,             sim,          nao)  \
-	m(  PT_FINF,     IdEstagio,               Periodo,        IdPatamarCarga,          IdTermeletrica,               IdUnidadeUTE,             sim,          nao)  \
-	m(  PTDISP,      IdEstagio,               Periodo,        IdPatamarCarga,          IdTermeletrica,               IdUnidadeUTE,             sim,          nao)  \
-	m(  YP,          IdEstagio,               Periodo, IdProcessoEstocastico,     IdVariavelAleatoria,                        int,             sim,          nao)  \
-	m(  PD,          IdEstagio,               Periodo,        IdPatamarCarga,            IdSubmercado,           IdPatamarDeficit,             sim,          nao)  \
-    m(  QOUT,        IdEstagio,               Periodo,        IdPatamarCarga, IdIntercambioHidraulico,             IdHidreletrica,             sim,          nao)  \
-    m(  QOUT_FINF,   IdEstagio,               Periodo,        IdPatamarCarga, IdIntercambioHidraulico,             IdHidreletrica,             sim,          nao)  \
-    m(  QOUT_REL,    IdEstagio,               Periodo,        IdPatamarCarga, IdIntercambioHidraulico,             IdHidreletrica,             sim,          nao)  \
-    m(  QDES,        IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,             IdHidreletrica,             sim,          nao)  \
-    m(  QDES_FINF,   IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,             IdHidreletrica,             sim,          nao)
-   // Nome,      TipoIterador1,         TipoIterador2,         TipoIterador3,           TipoIterador4,              TipoIterador5,  ImprimirPrimal, ImprimirDual
+#define ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA(m)          m(1, IdEstagio) m(2, Periodo)        m(3, IdPatamarCarga)
+#define ITERADORES_3_ESTAGIO_PERIODO_REALIZACAO(m)            m(1, IdEstagio) m(2, Periodo)        m(3, IdRealizacao)
+#define ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA(m)          m(1, IdEstagio) m(2, Periodo)        m(3, IdTermeletrica)
+#define ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA(m)          m(1, IdEstagio) m(2, Periodo)        m(3, IdHidreletrica)
+#define ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO(m)          m(1, IdEstagio) m(2, IdHidreletrica) m(3, Periodo)
+#define ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO(m)          m(1, IdEstagio) m(2, IdTermeletrica) m(3, Periodo)
+#define ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO(m)            m(1, IdEstagio) m(2, Periodo)        m(3, IdSubmercado)
+#define ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE(m) m(1, IdEstagio) m(2, Periodo)        m(3, IdRestricaoOperativaUHE)
+#define ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA(m)       m(1, IdEstagio) m(2, Periodo)        m(3, IdUsinaElevatoria)
+#define ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA(m)     m(1, IdEstagio) m(2, Periodo)        m(3, IdVariavelAleatoria)
 
-#define VARIAVEL_DECISAO_6(m)                                                                                                                                               \
-	m(  PH,          IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,     IdUnidadeUHE,             sim,          nao)  \
-	m(  PH_REL,      IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,     IdUnidadeUHE,             sim,          nao)  \
-	m(  PH_FINF,     IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,     IdUnidadeUHE,             sim,          nao)  \
-	m(  PH_FSUP,     IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,     IdUnidadeUHE,             sim,          nao)  \
-	m(  PHDISP,      IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,     IdUnidadeUHE,             sim,          nao)  \
-	m(  PHDISP_REL,  IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,     IdUnidadeUHE,             sim,          nao)  \
-	m(  PHDISP_FINF, IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,     IdUnidadeUHE,             sim,          nao)  \
-    m(  QTURDISP,    IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,     IdUnidadeUHE,             sim,          nao)  \
-    m(  QTUR,        IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,     IdUnidadeUHE,             sim,          nao)  \
-    m(  QTUR_FINF,   IdEstagio,               Periodo,        IdPatamarCarga,          IdHidreletrica,       IdConjuntoHidraulico,     IdUnidadeUHE,             sim,          nao)  \
-    m(  QDES,        IdEstagio,               Periodo,        IdPatamarCarga, IdIntercambioHidraulico,             IdHidreletrica,   IdHidreletrica,             sim,          nao)
-   // Nome,    TipoIterador1,         TipoIterador2,         TipoIterador3,           TipoIterador4,              TipoIterador5,    TipoIterador6,  ImprimirPrimal, ImprimirDual
+#define VARIAVEL_DECISAO_3(m)\
+	m(  VarDecisao,   ZP,               3,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,              sim,          nao)  \
+	m(  VarDecisao,   ZO,               3,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,              sim,          nao)  \
+	m(  VarDecisao,   ZF,               3,         ITERADORES_3_ESTAGIO_PERIODO_REALIZACAO,                sim,          nao)  \
+	m(  VarDecisao,   ZT,               3,         ITERADORES_3_ESTAGIO_PERIODO_REALIZACAO,                sim,          nao)  \
+	m(  VarDecisao,   ZO0_UTE,          3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZOp_UTE,          3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZO0p_UTE,         3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZO0_DEFICIT,      3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZO0p_DEFICIT,     3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZOp_DEFICIT,      3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZOp_UTE_COMANDO,  3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZO0p_UTE_COMANDO, 3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   ZO0_UTE_COMANDO,  3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   YH,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   YHF,              3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   QEV,              3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   QEV_REL,          3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   QEV_FINF,         3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   QDEF,             3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   QDEF_FINF,        3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   QDEF_FSUP,        3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   VDEF_ACUMULADO,   3,         ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,              sim,          nao)  \
+    m(  VarDecisao,   VDEF,             3,         ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,              sim,          nao)  \
+    m(  VarDecisao,   VDEF_ACOPLAMENTO, 3,         ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,              sim,          nao)  \
+    m(  VarDecisao,   YP_ACUMULADO,     3,         ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA,         sim,          nao)  \
+    m(  VarDecisao,   YP_ACUMULANDO,    3,         ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA,         sim,          nao)  \
+	m(  VarDecisao,   VI,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          sim)  \
+	m(  VarDecisao,   VF,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   VMED,             3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   VF_FINF,          3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   VMORTO_FINF,      3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   PL,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,                sim,          nao)  \
+	m(  VarDecisao,   PBOMDISP,         3,         ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA,           sim,          nao)  \
+	m(  VarDecisao,   PD,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,                sim,          nao)  \
+	m(  VarDecisao,   PHDISP,           3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   PHDISPMETA,       3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   PHDISPMETA_FINF,  3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+    m(  VarDecisao,   PHDISPMETA_FSUP,  3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   QVER,             3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   QTURDISP,         3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   PTDISP,           3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
+	m(  VarDecisao,   PTDISPPRECOM,     3,         ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO,              sim,          nao)  \
+	m(  VarDecisao,   PTDISPCOM_FINF,   3,         ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO,              sim,          nao)  \
+	m(  VarDecisao,   PTDISPCOM_FSUP,   3,         ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO,              sim,          nao)  \
+	m(  VarDecisao,   PI,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,                sim,          nao)  \
+	m(  VarDecisao,   PN,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,                sim,          nao)  \
+    m(  VarDecisao,   RHA,              3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao)  \
+    m(  VarDecisao,   RHA_FINF,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao)  \
+    m(  VarDecisao,   RHA_FSUP,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao)  \
+    m(  VarDecisao,   RHV,              3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao)  \
+    m(  VarDecisao,   RHV_FINF,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao)  \
+    m(  VarDecisao,   RHV_FSUP,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao)
+   //   Elemento,     Nome,       NroIter,         Iteradores,                                     Impr.Primal,     Impr.Dual
+
+#define EQUACAO_LINEAR_3(m)\
+	m(  EquLinear,   CUSTO_PENALIDADE,                               3,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,       nao,  nao)  \
+	m(  EquLinear,   CUSTO_OPERACAO,                                 3,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,       nao,  nao)  \
+	m(  EquLinear,   CUSTO_OPERACAO_UTE_COMANDO_0,                   3,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,       nao,  nao)  \
+	m(  EquLinear,   CUSTO_OPERACAO_UTE_COMANDO_p,                   3,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,       nao,  nao)  \
+	m(  EquLinear,   CUSTO_OPERACAO_UTE_COMANDO_0p,                  3,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,       nao,  nao)  \
+	m(  EquLinear,   VOLUME_MEDIO,                                   3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
+	m(  EquLinear,   AFLUENCIA_INCREMENTAL,                          3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
+	m(  EquLinear,   DEMANDA,                                        3,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,         nao,  nao)  \
+	m(  EquLinear,   DEFICIT,                                        3,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,         nao,  nao)  \
+	m(  EquLinear,   INTERCAMBIO,                                    3,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,         nao,  nao)  \
+	m(  EquLinear,   POTENCIA_BOMBEAMENTO_DISPONIVEL,                3,   ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA,    nao,  nao)  \
+	m(  EquLinear,   POTENCIA_HIDRAULICA_DISPONIVEL,                 3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
+	m(  EquLinear,   POTENCIA_TERMICA_DISPONIVEL,                    3,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,       nao,  nao)  \
+	m(  EquLinear,   POTENCIA_TERMICA_DISPONIVEL_COMANDADA,          3,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,       nao,  nao)  \
+	m(  EquLinear,   POTENCIA_TERMICA_DISPONIVEL_COMANDADA_ACUMULADA,3,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,       nao,  nao)  \
+	m(  EquLinear,   PRODUCAO_USINA_NAO_SIMULADA,                    3,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,         nao,  nao)  \
+	m(  EquLinear,   VAZAO_EVAPORADA,                                3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
+	m(  EquLinear,   VAZAO_EVAPORADA_RELAXADA,                       3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
+	m(  EquLinear,   VAZAO_EVAPORADA_DISPONIVEL,                     3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
+	m(  EquLinear,   VAZAO_TURBINADA_DISPONIVEL,                     3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
+	m(  EquLinear,   VAZAO_DEFLUENTE,                                3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
+	m(  EquLinear,   VAZAO_VERTIDA,                                  3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
+    m(  EquLinear,   DEFLUENCIA_VIAJANTE_BALANCO_HIDRICO,            3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
+    m(  EquLinear,   DEFLUENCIA_VIAJANTE_ACOPLAMENTO,                3,   ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,       nao,  nao)  \
+    m(  EquLinear,   POTENCIA_DISPONIVEL_META,                       3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
+    m(  EquLinear,   AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA,       3,   ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA,  nao,  nao)
+	//  Elemento,    Nome,                                     NroIter,   Iteradores,                              Impr.Primal,  Impr.Dual
+
+#define INEQUACAO_LINEAR_3(m)\
+    m(  IneLinear,   RESTRICAO_HIDRAULICA_VOLUME,                    3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao)  \
+    m(  IneLinear,   RESTRICAO_HIDRAULICA_VOLUME_LIMITE_INFERIOR,    3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao)  \
+    m(  IneLinear,   RESTRICAO_HIDRAULICA_VOLUME_LIMITE_SUPERIOR,    3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao)  \
+    m(  IneLinear,   RESTRICAO_HIDRAULICA_AFLUENTE_LIMITE_INFERIOR,  3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao)  \
+    m(  IneLinear,   RESTRICAO_HIDRAULICA_AFLUENTE_LIMITE_SUPERIOR,  3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao)  \
+    m(  IneLinear,   RESTRICAO_HIDRAULICA_AFLUENTE,                  3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao)  \
+	m(  IneLinear,   VAZAO_DEFLUENTE_FOLGA_INFERIOR,                 3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              nao,  nao)  \
+    m(  IneLinear,   VAZAO_DEFLUENTE_FOLGA_SUPERIOR,                 3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              nao,  nao)  \
+    m(  IneLinear,   POTENCIA_TERMICA_COMANDADA_LIMITE_INFERIOR,     3,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              nao,  nao)  \
+    m(  IneLinear,   POTENCIA_TERMICA_COMANDADA_LIMITE_SUPERIOR,     3,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              nao,  nao)  \
+    m(  IneLinear,   VOLUME_UTIL_FOLGA_INFERIOR,                     3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              nao,  nao)  
+   //   Elemento,    Nome,                                     NroIter,   Iteradores,                                     Impr.Primal,  Impr.Dual
+
+//
+// ITERADORES 4
+//
+
+#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO(m)               m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado)
+#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica)
+#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdTermeletrica)
+#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA(m)          m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdUsinaElevatoria)
+#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAEOLICA(m)              m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdUsinaEolica)
+#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_CONTRATO(m)                 m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdContrato)
+#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA(m)        m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdRestricaoEletrica)
+#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_AGRUPAMENTOINTERCAMBIO(m)   m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdAgrupamentoIntercambio)
+#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIO(m)              m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdIntercambio)
+#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_DEMANDAESPECIAL(m)          m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdDemandaEspecial)
+#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE(m)    m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdRestricaoOperativaUHE)
+#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO(m)    m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdIntercambioHidraulico)
+#define ITERADORES_4_ESTAGIO_PERIODO_REALIZACAO_CORTEBENDERS(m)               m(1, IdEstagio) m(2, Periodo) m(3, IdRealizacao)   m(4, IdCorteBenders)
+#define ITERADORES_4_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA(m) m(1, IdEstagio) m(2, Periodo) m(3, IdProcessoEstocastico) m(4, IdVariavelAleatoria)
+#define ITERADORES_4_ESTAGIO_TERMELETRICA_INT_PERIODO(m)                      m(1, IdEstagio) m(2, IdTermeletrica) m(3, int) m(4, Periodo)
+
+#define VARIAVEL_DECISAO_4(m)\
+	m(  VarDecisao,    ZO_COMANDO,             4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    ZO_UTE_COMANDO,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PH,                     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PH_REL,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PH_FINF,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PHDISP,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PHDISP_REL,             4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PHDISP_FINF,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+    m(  VarDecisao,    QBOM,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,          sim,          nao)  \
+    m(  VarDecisao,    QBOM_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,          sim,          nao)  \
+    m(  VarDecisao,    QBOMDISP,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,          sim,          nao)  \
+    m(  VarDecisao,    QBOMDISP_FINF,          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,          sim,          nao)  \
+    m(  VarDecisao,    QTURDISP,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+    m(  VarDecisao,    QTURDISP_FINF,          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+    m(  VarDecisao,    QTUR,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+    m(  VarDecisao,    QTUR_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    QVER,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    QMON,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+    m(  VarDecisao,    QDEF,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+    m(  VarDecisao,    QDEF_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+    m(  VarDecisao,    QDEF_FSUP,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PL,                     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO,               sim,          sim)  \
+	m(  VarDecisao,    DE,			           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_DEMANDAESPECIAL,          sim,          sim)  \
+	m(  VarDecisao,    CIMP,		           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_CONTRATO,                 sim,          sim)  \
+	m(  VarDecisao,    CEXP,		           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_CONTRATO,                 sim,          sim)  \
+	m(  VarDecisao,    PBOMDISP,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,          sim,          sim)  \
+	m(  VarDecisao,    RE_FINF,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA,        sim,          nao)  \
+    m(  VarDecisao,    RE_FSUP,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA,        sim,          nao)  \
+	m(  VarDecisao,    PI,                     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIO,              sim,          sim)  \
+    m(  VarDecisao,    PI_FINF,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIO,              sim,          nao)  \
+	m(  VarDecisao,    PT,                     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PE,			           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAEOLICA,              sim,          nao)  \
+	m(  VarDecisao,    PT_UTIL,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PT_MIN,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    LIG_T,                  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    DESL_T,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    ACIO_T,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PT_REL,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PT_FINF,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PT_FSUP,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PTDISP,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PTDISP_REL,             4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PTDISP_FINF,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PTDISP_FSUP,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PTDISPCOM,              4,    ITERADORES_4_ESTAGIO_TERMELETRICA_INT_PERIODO,                      sim,          nao)  \
+	m(  VarDecisao,    PTDISPCOM_ACUMULADO,    4,    ITERADORES_4_ESTAGIO_TERMELETRICA_INT_PERIODO,                      sim,          nao)  \
+	m(  VarDecisao,    RP,                     4,    ITERADORES_4_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA, sim,          nao)  \
+	m(  VarDecisao,    YP_REL,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA, sim,          nao)  \
+	m(  VarDecisao,    YPF,                    4,    ITERADORES_4_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA, sim,          nao)  \
+    m(  VarDecisao,    RHQ,                    4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE,    sim,          nao)  \
+    m(  VarDecisao,    RHQ_FINF,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE,    sim,          nao)  \
+    m(  VarDecisao,    RHQ_FSUP,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE,    sim,          nao)  \
+	m(  VarDecisao,    QILS_TRI,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO,    sim,          nao)  \
+    m(  VarDecisao,    QILS_TRI_FINF,          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO,    sim,          nao)  \
+    m(  VarDecisao,    QILS_TRI_REL,           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO,    sim,          nao)  \
+    m(  VarDecisao,    QOUT,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+    m(  VarDecisao,    QOUT_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)
+   //   Elemento,      Nome,             NroIter,    Iteradores,                                                 Impr.Primal,     Impr.Dual
+
+#define EQUACAO_LINEAR_4(m)\
+	m(  EquLinear,    AFLUENCIA_PROCESSO_ESTOCASTICO,           4,    ITERADORES_4_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA, nao,         nao)  \
+	m(  EquLinear,    ATENDIMENTO_DEMANDA,                      4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO,               nao,         nao)  \
+	m(  EquLinear,    BALANCO_HIDRAULICO_VOL,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    CUSTO_OPERACAO_UTE_COMANDO,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+	m(  EquLinear,    BALANCO_HIDRAULICO_VAZ,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    VAZAO_MONTANTE,                           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+    m(  EquLinear,    VAZAO_DEFLUENTE,                          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    VAZAO_TURBINADA,                          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    VAZAO_TURBINADA_DISPONIVEL,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_TERMICA_RELAXADA,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_TERMICA_DISPONIVEL,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_TERMICA,                         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+	m(  EquLinear,    RELACAO_VARIAVEIS_BINARIAS_TERMICA,       4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+    m(  EquLinear,    POTENCIA_TERMICA_DISPONIVEL_RELAXADA,     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_BOMBEAMENTO_DISPONIVEL,          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,          nao,         nao)  \
+	m(  EquLinear,    POTENCIA_HIDRAULICA,                      4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_HIDRAULICA_RELAXADA,             4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_HIDRAULICA_DISPONIVEL,           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_HIDRAULICA_DISPONIVEL_RELAXADA,  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+    m(  EquLinear,    INTERCAMBIO_HIDRAULICO_RETIRADA_RELAXADA, 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO,    nao,         nao)  \
+    m(  EquLinear,    VAZAO_RETIRADA_FOLGA_INFERIOR,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+    m(  EquLinear,    VAZAO_BOMBEADA_DISPONIVEL,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,          nao,         nao)
+   //   Elemento,     Nome,                               NroIter,    Iteradores,                                                 Impr.Primal,    Impr.Dual
+
+#define INEQUACAO_LINEAR_4(m)\
+	m(  IneLinear,    CB_ZF,                                               4,    ITERADORES_4_ESTAGIO_PERIODO_REALIZACAO_CORTEBENDERS,             nao,         sim)  \
+	m(  IneLinear,    CB_ZT,                                               4,    ITERADORES_4_ESTAGIO_PERIODO_REALIZACAO_CORTEBENDERS,             nao,         sim)  \
+	m(  IneLinear,    RESTRICAO_ELETRICA_LIMITE_INFERIOR,                  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA,      nao,         nao)  \
+    m(  IneLinear,    RESTRICAO_ELETRICA_LIMITE_SUPERIOR,                  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA,      nao,         nao)  \
+	m(  IneLinear,    AGRUPAMENTO_INTERCAMBIO,                             4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_AGRUPAMENTOINTERCAMBIO, nao,         nao)  \
+    m(  IneLinear,    VOLUME_MINIMO_PENALIZADO,                            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,           nao,         nao)  \
+	m(  IneLinear,    META_ENCHENDO_VOLUME_MORTO,                          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,           nao,         nao)  \
+	m(  IneLinear,    VAZAO_DEFLUENTE_FOLGA_INFERIOR,                      4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,           nao,         nao)  \
+	m(  IneLinear,    VAZAO_DEFLUENTE_FOLGA_SUPERIOR,                      4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,           nao,         nao)  \
+	m(  IneLinear,    RELACAO_UNIDADES_EQUIVALENTE_TERMICA,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,           nao,         nao)  \
+    m(  IneLinear,    RESTRICAO_HIDRAULICA_DEFLUENCIA_LIMITE_INFERIOR,     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE,  nao,         nao)  \
+    m(  IneLinear,    RESTRICAO_HIDRAULICA_DEFLUENCIA_LIMITE_SUPERIOR,     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE,  nao,         nao)  \
+	m(  IneLinear,    POTENCIA_TERMELETRICA_UTIL,                          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,           nao,         nao)  \
+	m(  IneLinear,    POTENCIA_TERMELETRICA_PARTIDA,                       4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,           nao,         nao)  \
+	m(  IneLinear,    POTENCIA_TERMELETRICA_DESLIGAMENTO,                  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,           nao,         nao)  \
+	m(  IneLinear,    POTENCIA_TERMICA_DISPONIVEL_FINF,                    4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,           nao,         nao)  \
+	m(  IneLinear,    POTENCIA_TERMICA_DISPONIVEL_FSUP,                    4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,           nao,         nao)  \
+    m(  IneLinear,    RESTRICAO_HIDRAULICA_DEFLUENCIA,                     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE,  nao,         nao)  \
+    m(  IneLinear,    VAZAO_BOMBEADA_FOLGA_INFERIOR,                       4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,        nao,         nao)  \
+    m(  IneLinear,    VAZAO_BOMBEADA_DISPONIVEL_FOLGA_INFERIOR,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,        nao,         nao)  \
+    m(  IneLinear,    VAZAO_TURBINADA_DISPONIVEL_RELAXADA,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,           nao,         nao)  \
+    m(  IneLinear,    VAZAO_TURBINADA_RELAXADA,                            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,           nao,         nao)  \
+    m(  IneLinear,    INTERCAMBIO_RELAXADO,                                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIO,            nao,         nao)
+   //   Elemento,     Nome,                                          NroIter,    Iteradores,                                               Impr.Primal,    Impr.Dual
 
 
-#define RESTRICAO_EQUACAO_LINEAR_2(m)                                                            \
-	m(  CUSTO_PENALIDADE_0,                  IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_PENALIDADE_0p,                 IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_PENALIDADE_p,                  IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_OPERACAO_0,                    IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_OPERACAO_0p,                   IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_OPERACAO_p,                    IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_OPERACAO_UTE_COMANDO_0,        IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_TOTAL,                         IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_TOTAL_MESTRE,                  IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_IMEDIATO,                      IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_PENALIDADE_VOLUME_0,           IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_PENALIDADE_VOLUME_0_ACUMULANDO,IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_PENALIDADE_VOLUME_p,           IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_PENALIDADE_VOLUME_0p,          IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_PENALIDADE,                    IdEstagio,        Periodo,                    nao)  \
-	m(  CUSTO_FUTURO,                        IdEstagio,        Periodo,                    nao)  
-   // Nome,                              TipoIterador1,  TipoIterador2,  ImprimirMultiplicador
- 
-#define RESTRICAO_EQUACAO_LINEAR_3(m)                                                                                      \
-	m(  CUSTO_PENALIDADE,                     IdEstagio,        Periodo,         IdPatamarCarga,                      nao)  \
-	m(  CUSTO_OPERACAO,                       IdEstagio,        Periodo,         IdPatamarCarga,                      nao)  \
-	m(  CUSTO_OPERACAO_UTE_COMANDO_0,         IdEstagio,        Periodo,         IdTermeletrica,                      nao)  \
-	m(  CUSTO_OPERACAO_UTE_COMANDO_p,         IdEstagio,        Periodo,         IdTermeletrica,                      nao)  \
-	m(  CUSTO_OPERACAO_UTE_COMANDO_0p,        IdEstagio,        Periodo,         IdTermeletrica,                      nao)  \
-	m(  VOLUME_MEDIO,                         IdEstagio,        Periodo,         IdHidreletrica,                      nao)  \
-	m(  AFLUENCIA_INCREMENTAL,                IdEstagio,        Periodo,         IdHidreletrica,                      nao)  \
-	m(  DEMANDA,                              IdEstagio,        Periodo,           IdSubmercado,                      nao)  \
-	m(  DEFICIT,                              IdEstagio,        Periodo,           IdSubmercado,                      nao)  \
-	m(  INTERCAMBIO,                          IdEstagio,        Periodo,           IdSubmercado,                      nao)  \
-	m(  POTENCIA_BOMBEAMENTO_DISPONIVEL,      IdEstagio,        Periodo,      IdUsinaElevatoria,                      nao)  \
-	m(  POTENCIA_HIDRAULICA_DISPONIVEL,       IdEstagio,        Periodo,         IdHidreletrica,                      nao)  \
-	m(  POTENCIA_TERMICA_DISPONIVEL,          IdEstagio,        Periodo,         IdTermeletrica,                      nao)  \
-	m(  POTENCIA_TERMICA_DISPONIVEL_COMANDADA,          IdEstagio,        Periodo,         IdTermeletrica,                      nao)  \
-	m(  POTENCIA_TERMICA_DISPONIVEL_COMANDADA_ACUMULADA,IdEstagio,        Periodo,         IdTermeletrica,                      nao)  \
-	m(  PRODUCAO_USINA_NAO_SIMULADA,          IdEstagio,        Periodo,           IdSubmercado,                      nao)  \
-	m(  VAZAO_EVAPORADA,                      IdEstagio,        Periodo,           IdHidreletrica,                    nao)  \
-	m(  VAZAO_EVAPORADA_RELAXADA,             IdEstagio,        Periodo,           IdHidreletrica,                    nao)  \
-	m(  VAZAO_EVAPORADA_DISPONIVEL,           IdEstagio,        Periodo,           IdHidreletrica,                    nao)  \
-	m(  VAZAO_TURBINADA_DISPONIVEL,           IdEstagio,        Periodo,         IdHidreletrica,                      nao)  \
-	m(  VAZAO_DEFLUENTE,                      IdEstagio,        Periodo,         IdHidreletrica,                      nao)  \
-	m(  VAZAO_VERTIDA,                        IdEstagio,        Periodo,         IdHidreletrica,                      nao)  \
-    m(  DEFLUENCIA_VIAJANTE_BALANCO_HIDRICO,  IdEstagio,        Periodo,           IdHidreletrica,                    nao)  \
-    m(  DEFLUENCIA_VIAJANTE_ACOPLAMENTO,      IdEstagio,        IdHidreletrica,           Periodo,                    nao)  \
-    m(  POTENCIA_DISPONIVEL_META,             IdEstagio,        Periodo,           IdHidreletrica,                    nao)  \
-    m(  AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA,  IdEstagio,   Periodo,           IdVariavelAleatoria,               nao)
+//
+// ITERADORES 5
+//
 
-   // Nome,                              TipoIterador1,  TipoIterador2,          TipoIterador3,    ImprimirMultiplicador
+#define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_USINANAOSIMULADA(m)        m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado) m(5, IdUsinaNaoSimulada)
+#define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_PATAMARDEFICIT(m)          m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado) m(5, IdPatamarDeficit)
+#define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_INT(m)                   m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, int)
+#define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_HIDRELETRICA(m)          m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, IdHidreletrica)
+#define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO(m)    m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, IdConjuntoHidraulico)
+#define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE(m)            m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdTermeletrica) m(5, IdUnidadeUTE)
+#define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO_HIDRELETRICA(m) m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdIntercambioHidraulico) m(5, IdHidreletrica)
+#define ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_INT(m)       m(1, IdEstagio) m(2, Periodo) m(3, IdProcessoEstocastico) m(4, IdVariavelAleatoria) m(5, int)
 
-#define RESTRICAO_EQUACAO_LINEAR_4(m)                                                                                                                        \
-	m(  AFLUENCIA_PROCESSO_ESTOCASTICO,           IdEstagio,        Periodo,         IdProcessoEstocastico,    IdVariavelAleatoria,                    nao)  \
-	m(  ATENDIMENTO_DEMANDA,                      IdEstagio,        Periodo,                IdPatamarCarga,           IdSubmercado,                    nao)  \
-	m(  BALANCO_HIDRAULICO_VOL,                   IdEstagio,        Periodo,                IdPatamarCarga,         IdHidreletrica,                    nao)   \
-	m(  CUSTO_OPERACAO_UTE_COMANDO,               IdEstagio,        Periodo,                IdPatamarCarga,         IdTermeletrica,                    nao)  \
-	m(  BALANCO_HIDRAULICO_VAZ,                   IdEstagio,        Periodo,                IdPatamarCarga,         IdHidreletrica,                    nao)  \
-	m(  VAZAO_MONTANTE,                           IdEstagio,        Periodo,                IdPatamarCarga,         IdHidreletrica,                    nao)  \
-    m(  VAZAO_DEFLUENTE,                          IdEstagio,        Periodo,                IdPatamarCarga,         IdHidreletrica,                    nao)  \
-	m(  VAZAO_TURBINADA,                          IdEstagio,        Periodo,                IdPatamarCarga,         IdHidreletrica,                    nao)  \
-	m(  VAZAO_TURBINADA_DISPONIVEL,               IdEstagio,        Periodo,                IdPatamarCarga,         IdHidreletrica,                    nao)  \
-	m(  POTENCIA_TERMICA_RELAXADA,                IdEstagio,        Periodo,                IdPatamarCarga,         IdTermeletrica,                    nao)  \
-	m(  POTENCIA_TERMICA_DISPONIVEL,              IdEstagio,        Periodo,                IdPatamarCarga,         IdTermeletrica,                    nao)  \
-	m(  POTENCIA_TERMICA,                         IdEstagio,        Periodo,                IdPatamarCarga,         IdTermeletrica,                    nao)  \
-	m(  RELACAO_VARIAVEIS_BINARIAS_TERMICA,       IdEstagio,        Periodo,                IdPatamarCarga,         IdTermeletrica,                    nao)  \
-    m(  POTENCIA_TERMICA_DISPONIVEL_RELAXADA,     IdEstagio,        Periodo,                IdPatamarCarga,         IdTermeletrica,                    nao)  \
-	m(  POTENCIA_BOMBEAMENTO_DISPONIVEL,          IdEstagio,        Periodo,                IdPatamarCarga,      IdUsinaElevatoria,                    nao)  \
-	m(  POTENCIA_HIDRAULICA,                      IdEstagio,        Periodo,                IdPatamarCarga,         IdHidreletrica,                    nao)  \
-	m(  POTENCIA_HIDRAULICA_RELAXADA,             IdEstagio,        Periodo,                IdPatamarCarga,         IdHidreletrica,                    nao)  \
-	m(  POTENCIA_HIDRAULICA_DISPONIVEL,           IdEstagio,        Periodo,                IdPatamarCarga,         IdHidreletrica,                    nao)  \
-	m(  POTENCIA_HIDRAULICA_DISPONIVEL_RELAXADA,  IdEstagio,        Periodo,                IdPatamarCarga,         IdHidreletrica,                    nao)  \
-    m(  INTERCAMBIO_HIDRAULICO_RETIRADA_RELAXADA, IdEstagio,        Periodo,                IdPatamarCarga,   IdIntercambioHidraulico,                 nao)  \
-    m(  VAZAO_RETIRADA_FOLGA_INFERIOR,            IdEstagio,        Periodo,                IdPatamarCarga,         IdHidreletrica,                    nao)  \
-    m(  VAZAO_BOMBEADA_DISPONIVEL,                IdEstagio,        Periodo,                IdPatamarCarga,      IdUsinaElevatoria,                    nao)
-
-   // Nome,                                   TipoIterador1,  TipoIterador2,                 TipoIterador3,          TipoIterador4,   ImprimirMultiplicador
-
-#define RESTRICAO_EQUACAO_LINEAR_5(m)                                                                                                                                       \
-	m(  AFLUENCIA_PROCESSO_ESTOCASTICO,              IdEstagio,        Periodo,  IdProcessoEstocastico,  IdVariavelAleatoria,              int,                   nao)      \
-	m(  VAZAO_TURBINADA,                             IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,                   nao)      \
-	m(  VAZAO_TURBINADA_RELAXADA,                    IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,                   nao)      \
-	m(  VAZAO_TURBINADA_DISPONIVEL,                  IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,                   nao)      \
-	m(  POTENCIA_TERMICA,                            IdEstagio,        Periodo,      IdPatamarCarga,     IdTermeletrica,          IdUnidadeUTE,                   nao)      \
-	m(  POTENCIA_TERMICA_RELAXADA,                   IdEstagio,        Periodo,      IdPatamarCarga,     IdTermeletrica,          IdUnidadeUTE,                   nao)      \
-	m(  POTENCIA_TERMICA_DISPONIVEL,                 IdEstagio,        Periodo,      IdPatamarCarga,     IdTermeletrica,          IdUnidadeUTE,                   nao)      \
-    m(  POTENCIA_TERMICA_DISPONIVEL_RELAXADA,        IdEstagio,        Periodo,      IdPatamarCarga,     IdTermeletrica,          IdUnidadeUTE,                   nao)      \
-	m(  RELACAO_VARIAVEIS_BINARIAS_TERMICA,          IdEstagio,        Periodo,      IdPatamarCarga,     IdTermeletrica,          IdUnidadeUTE,                   nao)      \
-	m(  POTENCIA_HIDRAULICA,                         IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,                   nao)      \
-	m(  POTENCIA_HIDRAULICA_RELAXADA,                IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,                   nao)      \
-	m(  POTENCIA_HIDRAULICA_DISPONIVEL,              IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,                   nao)      \
-	m(  POTENCIA_HIDRAULICA_DISPONIVEL_RELAXADA,     IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,                   nao)      
-   // Nome,                                      TipoIterador1,  TipoIterador2,       TipoIterador3,      TipoIterador4,         TipoIterador5,  ImprimirMultiplicador
-
-#define RESTRICAO_EQUACAO_LINEAR_6(m)                                                                                                                                                       \
-	m(  VAZAO_TURBINADA_RELAXADA,                    IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,   IdUnidadeUHE,                   nao)      \
-	m(  VAZAO_TURBINADA_DISPONIVEL,                  IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,   IdUnidadeUHE,                   nao)      \
-	m(  POTENCIA_HIDRAULICA,                         IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,   IdUnidadeUHE,                   nao)      \
-	m(  POTENCIA_HIDRAULICA_RELAXADA,                IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,   IdUnidadeUHE,                   nao)      \
-	m(  POTENCIA_HIDRAULICA_DISPONIVEL,              IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,   IdUnidadeUHE,                   nao)      \
-	m(  POTENCIA_HIDRAULICA_DISPONIVEL_RELAXADA,     IdEstagio,        Periodo,      IdPatamarCarga,     IdHidreletrica,  IdConjuntoHidraulico,   IdUnidadeUHE,                   nao)      
-   // Nome,                                      TipoIterador1,  TipoIterador2,       TipoIterador3,      TipoIterador4,         TipoIterador5,  TipoIterador6,  ImprimirMultiplicador
+#define VARIAVEL_DECISAO_5(m)\
+	m(  VarDecisao,    PH,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao)  \
+	m(  VarDecisao,    PH_REL,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao)  \
+	m(  VarDecisao,    PH_FINF,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao)  \
+	m(  VarDecisao,    PHDISP,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao)  \
+	m(  VarDecisao,    PHDISP_REL,  5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao)  \
+	m(  VarDecisao,    PHDISP_FINF, 5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao)  \
+    m(  VarDecisao,    QTURDISP,    5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao)  \
+    m(  VarDecisao,    QTUR,        5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao)  \
+    m(  VarDecisao,    QTUR_FINF,   5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao)  \
+	m(  VarDecisao,    PN,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_USINANAOSIMULADA,         sim,          nao)  \
+	m(  VarDecisao,    PT,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao)  \
+	m(  VarDecisao,    PT_UTIL,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao)  \
+	m(  VarDecisao,    PT_TRAJ_ACIO,5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao)  \
+	m(  VarDecisao,    PT_TRAJ_DESL,5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao)  \
+	m(  VarDecisao,    PT_MIN,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao)  \
+	m(  VarDecisao,    LIG_T,       5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao)  \
+	m(  VarDecisao,    DESL_T,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao)  \
+	m(  VarDecisao,    ACIO_T,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao)  \
+	m(  VarDecisao,    PT_REL,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao)  \
+	m(  VarDecisao,    PT_FINF,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao)  \
+	m(  VarDecisao,    PTDISP,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao)  \
+	m(  VarDecisao,    YP,          5,     ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_INT,        sim,          nao)  \
+	m(  VarDecisao,    PD,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_PATAMARDEFICIT,           sim,          nao)  \
+    m(  VarDecisao,    QOUT,        5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO_HIDRELETRICA,  sim,          nao)  \
+    m(  VarDecisao,    QOUT_FINF,   5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO_HIDRELETRICA,  sim,          nao)  \
+    m(  VarDecisao,    QOUT_REL,    5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO_HIDRELETRICA,  sim,          nao)  \
+    m(  VarDecisao,    QDES,        5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_HIDRELETRICA,           sim,          nao)  \
+    m(  VarDecisao,    QDES_FINF,   5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_HIDRELETRICA,           sim,          nao)
+   //   Elemento,      Nome,  NroIter,     Iteradores,                                                            Impr.Primal,     Impr.Dual
 
 
+#define EQUACAO_LINEAR_5(m)\
+	m(  EquLinear,    AFLUENCIA_PROCESSO_ESTOCASTICO,              5,     ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_INT,     nao,        nao)      \
+	m(  EquLinear,    VAZAO_TURBINADA,                             5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao)      \
+	m(  EquLinear,    VAZAO_TURBINADA_RELAXADA,                    5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao)      \
+	m(  EquLinear,    VAZAO_TURBINADA_DISPONIVEL,                  5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao)      \
+	m(  EquLinear,    POTENCIA_TERMICA,                            5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,          nao,        nao)      \
+	m(  EquLinear,    POTENCIA_TERMICA_RELAXADA,                   5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,          nao,        nao)      \
+	m(  EquLinear,    POTENCIA_TERMICA_DISPONIVEL,                 5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,          nao,        nao)      \
+    m(  EquLinear,    POTENCIA_TERMICA_DISPONIVEL_RELAXADA,        5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,          nao,        nao)      \
+	m(  EquLinear,    RELACAO_VARIAVEIS_BINARIAS_TERMICA,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,          nao,        nao)      \
+	m(  EquLinear,    POTENCIA_HIDRAULICA,                         5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao)      \
+	m(  EquLinear,    POTENCIA_HIDRAULICA_RELAXADA,                5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao)      \
+	m(  EquLinear,    POTENCIA_HIDRAULICA_DISPONIVEL,              5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao)      \
+	m(  EquLinear,    POTENCIA_HIDRAULICA_DISPONIVEL_RELAXADA,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao)      
+   //   Elemento,      Nome,                                  NroIter,     Iteradores,                                                         Impr.Primal,   Impr.Dual
 
-#define RESTRICAO_INEQUACAO_LINEAR_3(m)                                                                                                      \
-    m(  RESTRICAO_HIDRAULICA_VOLUME,                    IdEstagio,        Periodo,         IdRestricaoOperativaUHE,                    nao)  \
-    m(  RESTRICAO_HIDRAULICA_VOLUME_LIMITE_INFERIOR,    IdEstagio,        Periodo,         IdRestricaoOperativaUHE,                    nao)  \
-    m(  RESTRICAO_HIDRAULICA_VOLUME_LIMITE_SUPERIOR,    IdEstagio,        Periodo,         IdRestricaoOperativaUHE,                    nao)  \
-    m(  RESTRICAO_HIDRAULICA_AFLUENTE_LIMITE_INFERIOR,  IdEstagio,        Periodo,         IdRestricaoOperativaUHE,                    nao)  \
-    m(  RESTRICAO_HIDRAULICA_AFLUENTE_LIMITE_SUPERIOR,  IdEstagio,        Periodo,         IdRestricaoOperativaUHE,                    nao)  \
-    m(  RESTRICAO_HIDRAULICA_AFLUENTE,                  IdEstagio,        Periodo,         IdRestricaoOperativaUHE,                    nao)  \
-	m(  VAZAO_DEFLUENTE_FOLGA_INFERIOR,                 IdEstagio,        Periodo,                  IdHidreletrica,                    nao)  \
-    m(  VAZAO_DEFLUENTE_FOLGA_SUPERIOR,                 IdEstagio,        Periodo,                  IdHidreletrica,                    nao)  \
-    m(  POTENCIA_TERMICA_COMANDADA_LIMITE_INFERIOR,     IdEstagio,        Periodo,                  IdTermeletrica,                    nao)  \
-    m(  POTENCIA_TERMICA_COMANDADA_LIMITE_SUPERIOR,     IdEstagio,        Periodo,                  IdTermeletrica,                    nao)  \
-    m(  VOLUME_UTIL_FOLGA_INFERIOR,                     IdEstagio,        Periodo,                  IdHidreletrica,                    nao)  
-      // Nome,                       TipoIterador1,  TipoIterador2,          TipoIterador3,           ImprimirMultiplicador
+#define INEQUACAO_LINEAR_5(m)\
+	m(  IneLinear,    POTENCIA_HIDRAULICA,                5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_INT,          nao,        sim)  \
+	m(  IneLinear,    POTENCIA_TERMELETRICA_UTIL,         5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,   nao,        nao)  \
+	m(  IneLinear,    POTENCIA_TERMELETRICA_PARTIDA,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,   nao,        nao)  \
+	m(  IneLinear,    POTENCIA_TERMELETRICA_DESLIGAMENTO, 5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,   nao,        nao)  \
+	m(  IneLinear,    TEMPO_MINIMO_LIGADA,                5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,   nao,        nao)  \
+	m(  IneLinear,    TEMPO_MINIMO_DESLIGADA,             5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,   nao,        nao)  \
+    m(  IneLinear,    VAZAO_DESVIADA_FOLGA_INFERIOR,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_HIDRELETRICA, nao,        nao)  
+   //   Elemento,      Nome,                         NroIter,     Iteradores,                                                  Impr.Primal,   Impr.Dual
 
-#define RESTRICAO_INEQUACAO_LINEAR_4(m)                                                                                                                                    \
-	m(  CB_ZF,                                               IdEstagio,        Periodo,           IdRealizacao,                   IdCorteBenders,                    sim)  \
-	m(  CB_ZT,                                               IdEstagio,        Periodo,           IdRealizacao,                   IdCorteBenders,                    sim)  \
-	m(  RESTRICAO_ELETRICA_LIMITE_INFERIOR,                  IdEstagio,        Periodo,         IdPatamarCarga,              IdRestricaoEletrica,                    nao)  \
-    m(  RESTRICAO_ELETRICA_LIMITE_SUPERIOR,                  IdEstagio,        Periodo,         IdPatamarCarga,              IdRestricaoEletrica,                    nao)  \
-	m(  AGRUPAMENTO_INTERCAMBIO,                             IdEstagio,        Periodo,         IdPatamarCarga,         IdAgrupamentoIntercambio,                    nao)  \
-    m(  VOLUME_MINIMO_PENALIZADO,                            IdEstagio,        Periodo,         IdPatamarCarga,                   IdHidreletrica,                    nao)  \
-	m(  META_ENCHENDO_VOLUME_MORTO,                          IdEstagio,        Periodo,         IdPatamarCarga,                   IdHidreletrica,                    nao)  \
-	m(  VAZAO_DEFLUENTE_FOLGA_INFERIOR,                      IdEstagio,        Periodo,         IdPatamarCarga,                   IdHidreletrica,                    nao)  \
-	m(  VAZAO_DEFLUENTE_FOLGA_SUPERIOR,                      IdEstagio,        Periodo,         IdPatamarCarga,                   IdHidreletrica,                    nao)  \
-	m(  RELACAO_UNIDADES_EQUIVALENTE_TERMICA,                IdEstagio,        Periodo,         IdPatamarCarga,                   IdTermeletrica,                    nao)  \
-    m(  RESTRICAO_HIDRAULICA_DEFLUENCIA_LIMITE_INFERIOR,     IdEstagio,        Periodo,         IdPatamarCarga,          IdRestricaoOperativaUHE,                    nao)  \
-    m(  RESTRICAO_HIDRAULICA_DEFLUENCIA_LIMITE_SUPERIOR,     IdEstagio,        Periodo,         IdPatamarCarga,          IdRestricaoOperativaUHE,                    nao)  \
-	m(  POTENCIA_TERMELETRICA_UTIL,                          IdEstagio,        Periodo,         IdPatamarCarga,                   IdTermeletrica,                    nao)  \
-	m(  POTENCIA_TERMELETRICA_PARTIDA,                       IdEstagio,        Periodo,         IdPatamarCarga,                   IdTermeletrica,                    nao)  \
-	m(  POTENCIA_TERMELETRICA_DESLIGAMENTO,                  IdEstagio,        Periodo,         IdPatamarCarga,                   IdTermeletrica,                    nao)  \
-	m(  POTENCIA_TERMICA_DISPONIVEL_FINF,                    IdEstagio,        Periodo,         IdPatamarCarga,                   IdTermeletrica,                    nao)  \
-	m(  POTENCIA_TERMICA_DISPONIVEL_FSUP,                    IdEstagio,        Periodo,         IdPatamarCarga,                   IdTermeletrica,                    nao)  \
-    m(  RESTRICAO_HIDRAULICA_DEFLUENCIA,                     IdEstagio,        Periodo,         IdPatamarCarga,          IdRestricaoOperativaUHE,                    nao)  \
-    m(  VAZAO_BOMBEADA_FOLGA_INFERIOR,                       IdEstagio,        Periodo,         IdPatamarCarga,                IdUsinaElevatoria,                    nao)  \
-    m(  VAZAO_BOMBEADA_DISPONIVEL_FOLGA_INFERIOR,            IdEstagio,        Periodo,         IdPatamarCarga,                IdUsinaElevatoria,                    nao)  \
-    m(  VAZAO_TURBINADA_DISPONIVEL_RELAXADA,                 IdEstagio,        Periodo,         IdPatamarCarga,                   IdHidreletrica,                    nao)  \
-    m(  VAZAO_TURBINADA_RELAXADA,                            IdEstagio,        Periodo,         IdPatamarCarga,                   IdHidreletrica,                    nao)  \
-    m(  INTERCAMBIO_RELAXADO,                                IdEstagio,        Periodo,         IdPatamarCarga,                    IdIntercambio,                    nao)
-	   // Nome,                       TipoIterador1,  TipoIterador2,          TipoIterador3,                    TipoIterador4,   ImprimirMultiplicador
+//
+// ITERADORES 6
+//
 
-#define RESTRICAO_INEQUACAO_LINEAR_5(m)                                                                                                                                             \
-	m(  POTENCIA_HIDRAULICA,                IdEstagio,        Periodo,         IdPatamarCarga,         IdHidreletrica,                              int,                      sim)  \
-	m(  POTENCIA_TERMELETRICA_UTIL,         IdEstagio,        Periodo,         IdPatamarCarga,         IdTermeletrica,                     IdUnidadeUTE,                      nao)  \
-	m(  POTENCIA_TERMELETRICA_PARTIDA,      IdEstagio,        Periodo,         IdPatamarCarga,         IdTermeletrica,                     IdUnidadeUTE,                      nao)  \
-	m(  POTENCIA_TERMELETRICA_DESLIGAMENTO, IdEstagio,        Periodo,         IdPatamarCarga,         IdTermeletrica,                     IdUnidadeUTE,                      nao)  \
-	m(  TEMPO_MINIMO_LIGADA,                IdEstagio,        Periodo,         IdPatamarCarga,         IdTermeletrica,                     IdUnidadeUTE,                      nao)  \
-	m(  TEMPO_MINIMO_DESLIGADA,             IdEstagio,        Periodo,         IdPatamarCarga,         IdTermeletrica,                     IdUnidadeUTE,                      nao)  \
-    m(  VAZAO_DESVIADA_FOLGA_INFERIOR,      IdEstagio,        Periodo,         IdPatamarCarga,         IdHidreletrica,                     IdHidreletrica,                    nao)  
-   // Nome,                            TipoIterador1,  TipoIterador2,          TipoIterador3,          TipoIterador4,                    TipoIterador5,     ImprimirMultiplicador
+#define ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_INT(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, IdConjuntoHidraulico) m(6, int)
+#define ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE(m)      m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, IdConjuntoHidraulico) m(6, IdUnidadeUHE)
+#define ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO(m)                 m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdTermeletrica) m(5, IdUnidadeUTE) m(6, Periodo)
+#define ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO_HIDRELETRICA_HIDRELETRICA(m) m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdIntercambioHidraulico) m(5, IdHidreletrica) m(6, IdHidreletrica)
 
-#define RESTRICAO_INEQUACAO_LINEAR_6(m)                                                                                                                                                                 \
-	m(  PT_TRAJETORIA_ACIONAMENTO_INF,          IdEstagio,        Periodo,         IdPatamarCarga,         IdTermeletrica,         IdUnidadeUTE,                        Periodo,                    nao)  \
-	m(  PT_TRAJETORIA_ACIONAMENTO_SUP,          IdEstagio,        Periodo,         IdPatamarCarga,         IdTermeletrica,         IdUnidadeUTE,                        Periodo,                    nao)  \
-	m(  PT_TRAJETORIA_ACIONAMENTO,              IdEstagio,        Periodo,         IdPatamarCarga,         IdTermeletrica,         IdUnidadeUTE,                        Periodo,                    nao)  \
-	m(  POTENCIA_HIDRAULICA,                    IdEstagio,        Periodo,         IdPatamarCarga,         IdHidreletrica, IdConjuntoHidraulico,                            int,                    nao)  
-   // Nome,                            TipoIterador1,  TipoIterador2,          TipoIterador3,          TipoIterador4,         TipoIterador5,                   TipoIterador6,   ImprimirMultiplicador
+#define VARIAVEL_DECISAO_6(m)\
+	m(  VarDecisao,     PH,          6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,             sim,          nao)  \
+	m(  VarDecisao,     PH_REL,      6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,             sim,          nao)  \
+	m(  VarDecisao,     PH_FINF,     6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,             sim,          nao)  \
+	m(  VarDecisao,     PH_FSUP,     6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,             sim,          nao)  \
+	m(  VarDecisao,     PHDISP,      6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,             sim,          nao)  \
+	m(  VarDecisao,     PHDISP_REL,  6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,             sim,          nao)  \
+	m(  VarDecisao,     PHDISP_FINF, 6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,             sim,          nao)  \
+    m(  VarDecisao,     QTURDISP,    6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,             sim,          nao)  \
+    m(  VarDecisao,     QTUR,        6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,             sim,          nao)  \
+    m(  VarDecisao,     QTUR_FINF,   6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,             sim,          nao)  \
+    m(  VarDecisao,     QDES,        6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO_HIDRELETRICA_HIDRELETRICA,        sim,          nao)
+   //   Elemento,       Nome,  NroIter,    Iteradores,                                                                               Impr.Primal,     Impr.Dual
 
-#define RESTRICAO_INEQUACAO_LINEAR_7(m)  \
-	m(  PT_TRAJETORIA_DESLIGAMENTO_INF,    IdEstagio,        Periodo,         IdPatamarCarga,         IdTermeletrica,         IdUnidadeUTE,		        Periodo,                  int,  nao)  \
-	m(  PT_TRAJETORIA_DESLIGAMENTO_SUP,    IdEstagio,        Periodo,         IdPatamarCarga,         IdTermeletrica,         IdUnidadeUTE,				Periodo,                  int,  nao)  \
-	m(  PT_TRAJETORIA_DESLIGAMENTO,        IdEstagio,        Periodo,         IdPatamarCarga,         IdTermeletrica,         IdUnidadeUTE,			    Periodo,                  int,  nao)  \
-	m(  POTENCIA_HIDRAULICA,               IdEstagio,        Periodo,         IdPatamarCarga,         IdHidreletrica,  IdConjuntoHidraulico,       IdUnidadeUHE,                  int,  nao)  
-   // Nome,                            TipoIterador1,  TipoIterador2,          TipoIterador3,          TipoIterador4,         TipoIterador5,      TipoIterador6,                      TipoIterador6,   ImprimirMultiplicador
+
+#define EQUACAO_LINEAR_6(m)\
+	m(  EquLinear,     VAZAO_TURBINADA_RELAXADA,                    6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,        nao,               nao)      \
+	m(  EquLinear,     VAZAO_TURBINADA_DISPONIVEL,                  6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,        nao,               nao)      \
+	m(  EquLinear,     POTENCIA_HIDRAULICA,                         6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,        nao,               nao)      \
+	m(  EquLinear,     POTENCIA_HIDRAULICA_RELAXADA,                6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,        nao,               nao)      \
+	m(  EquLinear,     POTENCIA_HIDRAULICA_DISPONIVEL,              6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,        nao,               nao)      \
+	m(  EquLinear,     POTENCIA_HIDRAULICA_DISPONIVEL_RELAXADA,     6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE,        nao,               nao)      
+   //   Elemento,       Nome,                                  NroIter,    Iteradores,                                                                          Impr.Primal,          Impr.Dual  
+
+#define INEQUACAO_LINEAR_6(m)\
+	m(  IneLinear,     PT_TRAJETORIA_ACIONAMENTO_INF,          6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO,         nao,               nao)  \
+	m(  IneLinear,     PT_TRAJETORIA_ACIONAMENTO_SUP,          6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO,         nao,               nao)  \
+	m(  IneLinear,     PT_TRAJETORIA_ACIONAMENTO,              6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO,         nao,               nao)  \
+	m(  IneLinear,     POTENCIA_HIDRAULICA,                    6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_INT,     nao,               nao)  
+   //   Elemento,       Nome,                             NroIter,    Iteradores,                                                                Impr.Primal,          Impr.Dual  
+
+
+//
+// ITERADORES 7
+//
+
+#define ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE_INT(m)   m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, IdConjuntoHidraulico) m(6, IdUnidadeUHE) m(7, int)
+#define ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO_INT(m)              m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdTermeletrica) m(5, IdUnidadeUTE) m(6, Periodo) m(7, int)
+
+
+#define INEQUACAO_LINEAR_7(m)\
+	m(  IneLinear,     PT_TRAJETORIA_DESLIGAMENTO_INF,    7,    ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO_INT,            nao,    nao)  \
+	m(  IneLinear,     PT_TRAJETORIA_DESLIGAMENTO_SUP,    7,    ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO_INT,            nao,    nao)  \
+	m(  IneLinear,     PT_TRAJETORIA_DESLIGAMENTO,        7,    ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO_INT,            nao,    nao)  \
+	m(  IneLinear,     POTENCIA_HIDRAULICA,               7,    ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE_INT, nao,    nao)  
+   //   Elemento,      Nome,                        NroIter,    Iteradores,                                                                       Impr.Primal,    Impr.Dual  
+
+
+
+
 
 
 	class ModeloOtimizacao : public SmartDados {
@@ -657,34 +728,561 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		TempoVariaveis tempoCriarVariaveis;
 
-		std::vector<std::vector<std::string>> lista_variaveis_instanciadas;
-		std::vector<std::vector<std::string>> lista_equacoes_instanciadas;
-		std::vector<std::vector<std::string>> lista_inequacoes_instanciadas;
+		std::vector<std::vector<std::string>> lista_VarDecisao_instanciadas;
+		std::vector<std::vector<std::string>> lista_EquLinear_instanciadas;
+		std::vector<std::vector<std::string>> lista_IneLinear_instanciadas;
 
 		IdCorteBenders maiorIdCorteExportadoPreEstudo = IdCorteBenders_Nenhum;
 
-		VARIAVEL_DECISAO_2(DECLARAR_VARIAVEL_DECISAO_2)
-			VARIAVEL_DECISAO_3(DECLARAR_VARIAVEL_DECISAO_3)
-			VARIAVEL_DECISAO_4(DECLARAR_VARIAVEL_DECISAO_4)
-			VARIAVEL_DECISAO_5(DECLARAR_VARIAVEL_DECISAO_5)
-			VARIAVEL_DECISAO_6(DECLARAR_VARIAVEL_DECISAO_6)
+
+		template<typename TListasIdxElem, typename TIt>
+		void alocConteudoIter(TListasIdxElem& a_listasIdxElem, TIt a_it) {
+			try {
+
+				// Inicializa Lista
+				if (a_listasIdxElem.size() == 0)
+					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
+
+				// Alocação do final da lista até iterador informado
+				else if (a_listasIdxElem.getIteradorFinal() < a_it) {
+					for (TIt it = a_listasIdxElem.getIteradorFinal(); it < a_it; a_listasIdxElem.incrementarIterador(it))
+						if (it > a_listasIdxElem.getIteradorFinal())
+							a_listasIdxElem.addElemento(it, a_listasIdxElem.getTipoElemento());
+					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
+				}
+
+				// Alocação do início da lista até o iterador informado
+				else if (a_it < a_listasIdxElem.getIteradorInicial()) {
+					for (TIt it = a_listasIdxElem.getIteradorInicial(); it > a_it; a_listasIdxElem.decrementarIterador(it))
+						if (it < a_listasIdxElem.getIteradorInicial())
+							a_listasIdxElem.addElemento(it, a_listasIdxElem.getTipoElemento());
+					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
+				}
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("alocConteudoIter(a_listasIdxElem," + getFullString(a_it) + "): \n" + std::string(erro.what())); }
+		};
+
+		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		void addConteudoIters_10(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10) {
+
+			try {
+
+				alocConteudoIter(a_listasIdxElem, a_it1);
+				alocConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
+
+				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).setElemento(a_it10, a_conteudo);
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what())); }
+		};
+
+		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11>
+		void addConteudoIters_11(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11) {
+
+			try {
+
+				alocConteudoIter(a_listasIdxElem, a_it1);
+				alocConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10), a_it11);
+
+				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).setElemento(a_it11, a_conteudo);
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_11(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "): \n" + std::string(erro.what())); }
+		};
+
+		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11, typename TIt12>
+		void addConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11, const TIt12 a_it12) {
+
+			try {
+
+				alocConteudoIter(a_listasIdxElem, a_it1);
+				alocConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10), a_it11);
+				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11), a_it12);
+
+				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).setElemento(a_it12, a_conteudo);
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_12(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "," + getFullString(a_it12) + "): \n" + std::string(erro.what())); }
+		};
+
+		template<typename TListasIdxElem, typename TIt>
+		void varreduraIter(TListasIdxElem& a_listasIdxElem, TIt &a_it, int &a_estado) {
+			try {
+				
+				// Estado: 
+				//
+				// 
+				//  -1: Varredura parada 
+				// 
+				//   0: Não realizar varredura                            
+				// 
+				//   1: Varredura iniciada
+				//					           
+
+				
+				if ((a_estado < -1) || (a_estado > 1))
+					throw std::invalid_argument("Erro - Estado nao viavel.");
+
+				if (a_estado == 0)
+					return;
+
+				// Não existe iteradores
+				if (a_listasIdxElem.size() == 0) {
+					if (a_estado == -1) {
+						return;
+					}
+					else if (a_estado == 1)
+						throw std::invalid_argument("Erro - Condicao nao viavel A.");
+					return;
+				}
+
+				if (a_estado == -1) {
+					a_estado = 1;
+					a_it = a_listasIdxElem.getIteradorInicial();
+					return;
+				}
+				else if (a_estado == 1) {
+					if (a_it == a_listasIdxElem.getIteradorFinal()) {
+						a_estado = -1;
+						return;
+					}
+					a_listasIdxElem.incrementarIterador(a_it);
+					return;
+				}
+
+				throw std::invalid_argument("Erro - Condicao nao viavel B.");
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("iteraInterno(varreduraIter," + getFullString(a_it) + "," + getFullString(a_estado) + "): \n" + std::string(erro.what())); }
+		};
+
+		template<typename TListasIdxElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool varredurasIters_10(const std::string a_nome, TListasIdxElem& a_listasIdxElem, std::vector<int>& a_estados, const int a_indice_parada, bool &a_parada, TIt1 &a_it1, TIt2 &a_it2, TIt3 &a_it3, TIt4 &a_it4, TIt5 &a_it5, TIt6 &a_it6, TIt7 &a_it7, TIt8 &a_it8, TIt9 &a_it9, TIt10 &a_it10) {
+
+			try {
+
+				if (a_estados.size() != 10)
+					throw std::invalid_argument("O numero de estados deve ser compatível com o número de iteradores.");
+
+				int estado_parada = a_estados.at(a_indice_parada);
+
+				if (a_estados.at(8) != -1)
+					varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10, a_estados.at(9));
+
+				if (a_estados.at(9) != 1) {
+					if (a_estados.at(7) != -1)
+						varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9, a_estados.at(8));
+
+					if (a_estados.at(8) != 1) {
+						if (a_estados.at(6) != -1)
+							varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8, a_estados.at(7));
+
+						if (a_estados.at(7) != 1) {
+							if (a_estados.at(5) != -1)
+								varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7, a_estados.at(6));
+
+							if (a_estados.at(6) != 1) {
+								if (a_estados.at(4) != -1)
+									varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6, a_estados.at(5));
+
+								if (a_estados.at(5) != 1) {
+									if (a_estados.at(3) != -1)
+										varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5, a_estados.at(4));
+
+									if (a_estados.at(4) != 1) {
+										if (a_estados.at(2) != -1)
+											varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4, a_estados.at(3));
+
+										if (a_estados.at(3) != 1) {
+											if (a_estados.at(1) != -1)
+												varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3, a_estados.at(2));
+
+											if (a_estados.at(2) != 1) {
+												if (a_estados.at(0) != -1)
+													varreduraIter(a_listasIdxElem.at(a_it1), a_it2, a_estados.at(1));
+
+												if (a_estados.at(1) != 1) {
+													varreduraIter(a_listasIdxElem, a_it1, a_estados.at(0));
+												} // if (a_estados.at(1) != 0) {
+
+											} // if (a_estados.at(3) != 0) {
+										} // if (a_estados.at(4) != 0) {
+									} // if (a_estados.at(4) != 0) {
+								} // if (a_estados.at(5) != 0) {
+							} // if (a_estados.at(6) != 0) {
+						} // if (a_estados.at(7) != 0) {
+					} // if (a_estados.at(8) != 0) {
+				} // if (a_estados.at(9) != 0) {
+
+				if ((estado_parada == 1) && (a_estados.at(a_indice_parada) == -1)) {
+					a_parada = true;
+					return false;
+				}
+
+				if ((a_estados.at(9) == -1) || (a_estados.at(8) == -1) || (a_estados.at(7) == -1) || (a_estados.at(6) == -1) || (a_estados.at(5) == -1) || (a_estados.at(4) == -1) || (a_estados.at(3) == -1) || (a_estados.at(2) == -1) || (a_estados.at(1) == -1) || (a_estados.at(0) == -1)) {
+
+					if (a_estados.at(0) != -1) {
+						if (a_estados.at(1) == -1)
+							varreduraIter(a_listasIdxElem.at(a_it1), a_it2, a_estados.at(1));
+
+						if (a_estados.at(1) != -1) {
+							if (a_estados.at(2) == -1)
+								varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3, a_estados.at(2));
+
+							if (a_estados.at(2) != -1) {
+								if (a_estados.at(3) == -1)
+									varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4, a_estados.at(3));
+
+								if (a_estados.at(3) != -1) {
+									if (a_estados.at(4) == -1)
+										varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5, a_estados.at(4));
+
+									if (a_estados.at(4) != -1) {
+										if (a_estados.at(5) == -1)
+											varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6, a_estados.at(5));
+
+										if (a_estados.at(5) != -1) {
+											if (a_estados.at(6) == -1)
+												varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7, a_estados.at(6));
+
+											if (a_estados.at(6) != -1) {
+												if (a_estados.at(7) == -1)
+													varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8, a_estados.at(7));
+
+												if (a_estados.at(7) != -1) {
+													if (a_estados.at(8) == -1)
+														varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9, a_estados.at(8));
+
+													if (a_estados.at(8) != -1) {
+														if (a_estados.at(9) == -1)
+															varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10, a_estados.at(9));
+
+														if ((a_estados.at(9) == -1) || (a_estados.at(8) == -1) || (a_estados.at(7) == -1) || (a_estados.at(6) == -1) || (a_estados.at(5) == -1) || (a_estados.at(4) == -1) || (a_estados.at(3) == -1) || (a_estados.at(2) == -1) || (a_estados.at(1) == -1) || (a_estados.at(0) == -1))
+															return false;
+														else
+															return true;
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if ((a_estados.at(9) == -1) || (a_estados.at(8) == -1) || (a_estados.at(7) == -1) || (a_estados.at(6) == -1) || (a_estados.at(5) == -1) || (a_estados.at(4) == -1) || (a_estados.at(3) == -1) || (a_estados.at(2) == -1) || (a_estados.at(1) == -1) || (a_estados.at(0) == -1))
+					return false;
+				else
+					return true;
+
+			}
+			//catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what())); }
+			catch (const std::exception& erro) {
+
+				std::cout << std::string(erro.what()) << std::endl;
+
+			}
+
+			this;
+
+			return false;
 
 
-			RESTRICAO_EQUACAO_LINEAR_2(DECLARAR_RESTRICAO_EQUACAO_LINEAR_2)
-			RESTRICAO_EQUACAO_LINEAR_3(DECLARAR_RESTRICAO_EQUACAO_LINEAR_3)
-			RESTRICAO_EQUACAO_LINEAR_4(DECLARAR_RESTRICAO_EQUACAO_LINEAR_4)
-			RESTRICAO_EQUACAO_LINEAR_5(DECLARAR_RESTRICAO_EQUACAO_LINEAR_5)
-			RESTRICAO_EQUACAO_LINEAR_6(DECLARAR_RESTRICAO_EQUACAO_LINEAR_6)
+		};
 
 
-			RESTRICAO_INEQUACAO_LINEAR_3(DECLARAR_RESTRICAO_INEQUACAO_LINEAR_3)
-			RESTRICAO_INEQUACAO_LINEAR_4(DECLARAR_RESTRICAO_INEQUACAO_LINEAR_4)
-			RESTRICAO_INEQUACAO_LINEAR_5(DECLARAR_RESTRICAO_INEQUACAO_LINEAR_5)
-			RESTRICAO_INEQUACAO_LINEAR_6(DECLARAR_RESTRICAO_INEQUACAO_LINEAR_6)
-			RESTRICAO_INEQUACAO_LINEAR_7(DECLARAR_RESTRICAO_INEQUACAO_LINEAR_7)
+		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool getConteudoIters_10(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10) {
+
+			try {
+
+				if (a_listasIdxElem.size() == 0)
+					return false;
+				else if (a_listasIdxElem.getIteradorFinal() < a_it1)
+					return false;
+				else if (a_it1 < a_listasIdxElem.getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).getIteradorFinal() < a_it2)
+					return false;
+				else if (a_it2 < a_listasIdxElem.at(a_it1).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).getIteradorFinal() < a_it3)
+					return false;
+				else if (a_it3 < a_listasIdxElem.at(a_it1).at(a_it2).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorFinal() < a_it4)
+					return false;
+				else if (a_it4 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorFinal() < a_it5)
+					return false;
+				else if (a_it5 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorFinal() < a_it6)
+					return false;
+				else if (a_it6 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorFinal() < a_it7)
+					return false;
+				else if (a_it7 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorFinal() < a_it8)
+					return false;
+				else if (a_it8 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorFinal() < a_it9)
+					return false;
+				else if (a_it9 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorFinal() < a_it10)
+					return false;
+				else if (a_it10 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorInicial())
+					return false;
+
+				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10);
+				return true;
+
+			}
+			catch (const std::exception& erro) {
+				throw std::invalid_argument("getConteudoIters(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what()));
+			}
+		};
+
+		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11>
+		bool getConteudoIters_11(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11) {
+
+			try {
+
+				if (a_listasIdxElem.size() == 0)
+					return false;
+				else if (a_listasIdxElem.getIteradorFinal() < a_it1)
+					return false;
+				else if (a_it1 < a_listasIdxElem.getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).getIteradorFinal() < a_it2)
+					return false;
+				else if (a_it2 < a_listasIdxElem.at(a_it1).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).getIteradorFinal() < a_it3)
+					return false;
+				else if (a_it3 < a_listasIdxElem.at(a_it1).at(a_it2).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorFinal() < a_it4)
+					return false;
+				else if (a_it4 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorFinal() < a_it5)
+					return false;
+				else if (a_it5 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorFinal() < a_it6)
+					return false;
+				else if (a_it6 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorFinal() < a_it7)
+					return false;
+				else if (a_it7 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorFinal() < a_it8)
+					return false;
+				else if (a_it8 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorFinal() < a_it9)
+					return false;
+				else if (a_it9 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorFinal() < a_it10)
+					return false;
+				else if (a_it10 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).getIteradorFinal() < a_it11)
+					return false;
+				else if (a_it11 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).getIteradorInicial())
+					return false;
+
+				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11);
+				return true;
+
+			}
+			catch (const std::exception& erro) {
+				throw std::invalid_argument("getConteudoIters(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "): \n" + std::string(erro.what()));
+			}
+		};
+
+		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11, typename TIt12>
+		bool getConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo &a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11, const TIt12 a_it12) {
+
+			try {
+
+				if (a_listasIdxElem.size() == 0)
+					return false;
+				else if (a_listasIdxElem.getIteradorFinal() < a_it1)
+					return false;
+				else if (a_it1 < a_listasIdxElem.getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).getIteradorFinal() < a_it2)
+					return false;
+				else if (a_it2 < a_listasIdxElem.at(a_it1).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).getIteradorFinal() < a_it3)
+					return false;
+				else if (a_it3 < a_listasIdxElem.at(a_it1).at(a_it2).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorFinal() < a_it4)
+					return false;
+				else if (a_it4 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorFinal() < a_it5)
+					return false;
+				else if (a_it5 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorFinal() < a_it6)
+					return false;
+				else if (a_it6 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorFinal() < a_it7)
+					return false;
+				else if (a_it7 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorFinal() < a_it8)
+					return false;
+				else if (a_it8 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorFinal() < a_it9)
+					return false;
+				else if (a_it9 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorFinal() < a_it10)
+					return false;
+				else if (a_it10 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).getIteradorFinal() < a_it11)
+					return false;
+				else if (a_it11 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).getIteradorInicial())
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).size() == 0)
+					return false;
+				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).getIteradorFinal() < a_it12)
+					return false;
+				else if (a_it12 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).getIteradorInicial())
+					return false;
+
+				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).at(a_it12);
+				return true;
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("getConteudoIters(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "," + getFullString(a_it12) + "): \n" + std::string(erro.what())); }
+		};
+
+			VARIAVEL_DECISAO_2(DECLARAR_METODOS_ELEMENTO)
+
+			VARIAVEL_DECISAO_3(DECLARAR_METODOS_ELEMENTO)
+
+			VARIAVEL_DECISAO_4(DECLARAR_METODOS_ELEMENTO)
+			VARIAVEL_DECISAO_5(DECLARAR_METODOS_ELEMENTO)
+			VARIAVEL_DECISAO_6(DECLARAR_METODOS_ELEMENTO)
+
+			EQUACAO_LINEAR_2(DECLARAR_METODOS_ELEMENTO)
+			EQUACAO_LINEAR_3(DECLARAR_METODOS_ELEMENTO)
+			EQUACAO_LINEAR_4(DECLARAR_METODOS_ELEMENTO)
+			EQUACAO_LINEAR_5(DECLARAR_METODOS_ELEMENTO)
+			EQUACAO_LINEAR_6(DECLARAR_METODOS_ELEMENTO)
 
 
-			void instanciarProcessoEstocastico(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso);
+			INEQUACAO_LINEAR_3(DECLARAR_METODOS_ELEMENTO)
+			INEQUACAO_LINEAR_4(DECLARAR_METODOS_ELEMENTO)
+			INEQUACAO_LINEAR_5(DECLARAR_METODOS_ELEMENTO)
+			INEQUACAO_LINEAR_6(DECLARAR_METODOS_ELEMENTO)
+			INEQUACAO_LINEAR_7(DECLARAR_METODOS_ELEMENTO)
+
+
+		void instanciarProcessoEstocastico(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso);
 
 		void criarVariaveis_e_Restricoes_ComandoTermeletrico(const TipoSubproblemaSolver a_TSS, Dados& a_dados);
 

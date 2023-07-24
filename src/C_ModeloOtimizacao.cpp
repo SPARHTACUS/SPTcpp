@@ -18,9 +18,9 @@ ModeloOtimizacao::ModeloOtimizacao(const IdModeloOtimizacao a_idModeloOtimizacao
 
 	try { 
 		   
-		lista_variaveis_instanciadas = std::vector<std::vector<std::string>>(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
-		lista_equacoes_instanciadas = std::vector<std::vector<std::string>>(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
-		lista_inequacoes_instanciadas = std::vector<std::vector<std::string>>(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
+		lista_VarDecisao_instanciadas = std::vector<std::vector<std::string>>(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
+		lista_EquLinear_instanciadas = std::vector<std::vector<std::string>>(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
+		lista_IneLinear_instanciadas = std::vector<std::vector<std::string>>(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
 
 		contadorLog10005 = 0;
 		escreverLog10005(TipoSubproblemaSolver_Nenhum, IdIteracao_Nenhum, IdEstagio_Nenhum, IdCenario_Nenhum, IdRealizacao_Nenhum, std::string());
@@ -87,69 +87,78 @@ void ModeloOtimizacao::instanciarCorteBenders(const IdEstagio a_idEstagio, const
 
 			for (TipoSubproblemaSolver tss = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tss < TipoSubproblemaSolver_Excedente; tss++) {
 
-				if (idx_ine_CB_ZF_4.at(tss).size() > 0) {
-					if (idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).size() > 0) {
+				if (idx_IneLinear_CB_ZF_4.at(tss).size() > 0) {
+					if (idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).size() > 0) {
 
-						for (Periodo periodo = idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).getIteradorInicial(); periodo <= idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).getIteradorFinal(); idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).incrementarIterador(periodo)) {
-							if (idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).size() > 0) {
-								for (IdRealizacao idReal = idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).getIteradorInicial(); idReal <= idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).getIteradorFinal(); idReal++) {
+						for (Periodo periodo = idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).getIteradorInicial(); periodo <= idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).getIteradorFinal(); idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).incrementarIterador(periodo)) {
+							if (idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).size() > 0) {
+								for (IdRealizacao idReal = idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).getIteradorInicial(); idReal <= idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).getIteradorFinal(); idReal++) {
 
-									if (idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).size() > 0) {
+									if (idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).size() > 0) {
 
-										SmartEnupla<IdCorteBenders, std::vector<int>> idx_ine_CB_ZF_4_novo(IdCorteBenders_1, std::vector<std::vector<int>>(mapeamento_cortes_sequenciados.getIteradorFinal(), std::vector<int>()));
-
-										for (IdCorteBenders idCorte = idx_ine_CB_ZF_4_novo.getIteradorInicial(); idCorte <= idx_ine_CB_ZF_4_novo.getIteradorFinal(); idCorte++) {
+										SmartEnupla<IdEstagio, SmartEnupla <Periodo, SmartEnupla <IdRealizacao, SmartEnupla<IdCorteBenders, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, int>>>>>>>>>>> idx_ine_CB_ZF_4_novo;
+										
+										for (IdCorteBenders idCorte = IdCorteBenders_1; idCorte <= mapeamento_cortes_sequenciados.getIteradorFinal(); idCorte++) {
 
 											const IdCorteBenders idCorte_old = mapeamento_cortes_sequenciados.at(idCorte);
 
-											if ((idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).getIteradorInicial() <= idCorte_old) && (idCorte_old <= idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).getIteradorFinal())) {
-												if (idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).at(idCorte_old).size() > 0) {
-													idx_ine_CB_ZF_4_novo.at(idCorte) = idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).at(idCorte_old);
-													vetorEstagio.att(estagio_anterior).getSolver(tss)->setNomeRestricao(idx_ine_CB_ZF_4_novo.at(idCorte).at(0), getNomeIneLinear_CB_ZF(tss, estagio_anterior, periodo, idReal, idCorte));
-												} // if (idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).at(idCorte_old).size() > 0) {
+											if ((idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).getIteradorInicial() <= idCorte_old) && (idCorte_old <= idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).getIteradorFinal())) {
+												if (idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).at(idCorte_old).size() > 0) {
+
+													int idxCB = idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).at(idCorte_old).at(1).at(1).at(1).at(1).at(1).at(1).at(1);
+
+													addConteudoIters_11(idx_ine_CB_ZF_4_novo, idxCB, estagio_anterior, periodo, idReal, idCorte, 1, 1, 1, 1, 1, 1, 1);
+
+													vetorEstagio.att(estagio_anterior).getSolver(tss)->setNomeRestricao(idxCB, getNomeIneLinear_CB_ZF(tss, estagio_anterior, periodo, idReal, idCorte));
+												} // if (idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).at(idCorte_old).size() > 0) {
 											}
 										} // for (IdCorteBenders idCorte = idx_ine_CB_ZF_4_novo.getIteradorInicial(); idCorte <= idx_ine_CB_ZF_4_novo.getIteradorFinal(); idCorte++) {
 
-										idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal) = idx_ine_CB_ZF_4_novo;
+										idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal) = idx_ine_CB_ZF_4_novo.at(estagio_anterior).at(periodo).at(idReal);
 
-									} // if (idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).size() > 0) {
-								} // for (IdRealizacao idReal = idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).getIteradorInicial(); idReal <= idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).getIteradorFinal(); idReal++) {
-							} // if (idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo) > 0) {
-						} // for (Periodo periodo = idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).getIteradorInicial(); periodo <= idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).getIteradorFinal(); idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).incrementarIterador(periodo)) {
-					} // if (idx_ine_CB_ZF_4.at(tss).at(estagio_anterior).size() > 0){
-				} // if (idx_ine_CB_ZF_4.at(tss).size() > 0) {
+									} // if (idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).size() > 0) {
+								} // for (IdRealizacao idReal = idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).getIteradorInicial(); idReal <= idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo).getIteradorFinal(); idReal++) {
+							} // if (idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).at(periodo) > 0) {
+						} // for (Periodo periodo = idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).getIteradorInicial(); periodo <= idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).getIteradorFinal(); idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).incrementarIterador(periodo)) {
+					} // if (idx_IneLinear_CB_ZF_4.at(tss).at(estagio_anterior).size() > 0){
+				} // if (idx_IneLinear_CB_ZF_4.at(tss).size() > 0) {
 
-				if (idx_ine_CB_ZT_4.at(tss).size() > 0) {
-					if (idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).size() > 0) {
+				if (idx_IneLinear_CB_ZT_4.at(tss).size() > 0) {
+					if (idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).size() > 0) {
 
-						for (Periodo periodo = idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).getIteradorInicial(); periodo <= idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).getIteradorFinal(); idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).incrementarIterador(periodo)) {
-							if (idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).size() > 0) {
-								for (IdRealizacao idReal = idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).getIteradorInicial(); idReal <= idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).getIteradorFinal(); idReal++) {
+						for (Periodo periodo = idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).getIteradorInicial(); periodo <= idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).getIteradorFinal(); idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).incrementarIterador(periodo)) {
+							if (idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).size() > 0) {
+								for (IdRealizacao idReal = idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).getIteradorInicial(); idReal <= idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).getIteradorFinal(); idReal++) {
 
-									if (idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).at(idReal).size() > 0) {
+									if (idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).at(idReal).size() > 0) {
 
-										SmartEnupla<IdCorteBenders, std::vector<int>> idx_ine_CB_ZT_4_novo(IdCorteBenders_1, std::vector<std::vector<int>>(mapeamento_cortes_sequenciados.getIteradorFinal(), std::vector<int>()));
+										SmartEnupla<IdEstagio, SmartEnupla <Periodo, SmartEnupla <IdRealizacao, SmartEnupla<IdCorteBenders, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, int>>>>>>>>>>> idx_ine_CB_ZT_4_novo;
 
-										for (IdCorteBenders idCorte = idx_ine_CB_ZT_4_novo.getIteradorInicial(); idCorte <= idx_ine_CB_ZT_4_novo.getIteradorFinal(); idCorte++) {
+										for (IdCorteBenders idCorte = IdCorteBenders_1; idCorte <= mapeamento_cortes_sequenciados.getIteradorFinal(); idCorte++) {
 
 											const IdCorteBenders idCorte_old = mapeamento_cortes_sequenciados.at(idCorte);
 
-											if ((idx_ine_CB_ZT_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).getIteradorInicial() <= idCorte_old) && (idCorte_old <= idx_ine_CB_ZT_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).getIteradorFinal())) {
-												if (idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).at(idReal).at(idCorte_old).size() > 0) {
-													idx_ine_CB_ZT_4_novo.at(idCorte) = idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).at(idReal).at(idCorte_old);
-													vetorEstagio.att(a_idEstagio).getSolver(tss)->setNomeRestricao(idx_ine_CB_ZT_4_novo.at(idCorte).at(0), getNomeIneLinear_CB_ZT(tss, a_idEstagio, periodo, idReal, idCorte));
-												} // if (idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).at(idReal).at(idCorte_old).size() > 0) {
+											if ((idx_IneLinear_CB_ZT_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).getIteradorInicial() <= idCorte_old) && (idCorte_old <= idx_IneLinear_CB_ZT_4.at(tss).at(estagio_anterior).at(periodo).at(idReal).getIteradorFinal())) {
+												if (idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).at(idReal).at(idCorte_old).size() > 0) {
+
+													int idxCB = idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).at(idReal).at(idCorte_old).at(1).at(1).at(1).at(1).at(1).at(1).at(1);
+
+													addConteudoIters_11(idx_ine_CB_ZT_4_novo, idxCB, a_idEstagio, periodo, idReal, idCorte, 1, 1, 1, 1, 1, 1, 1);
+
+													vetorEstagio.att(a_idEstagio).getSolver(tss)->setNomeRestricao(idxCB, getNomeIneLinear_CB_ZT(tss, a_idEstagio, periodo, idReal, idCorte));
+
+												} // if (idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).at(idReal).at(idCorte_old).size() > 0) {
 											}
 										} // for (IdCorteBenders idCorte = idx_ine_CB_ZT_4_novo.getIteradorInicial(); idCorte <= idx_ine_CB_ZT_4_novo.getIteradorFinal(); idCorte++) {
 
-										idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).at(idReal) = idx_ine_CB_ZT_4_novo;
+										idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).at(idReal) = idx_ine_CB_ZT_4_novo.at(estagio_anterior).at(periodo).at(idReal);;
 
-									} // if (idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).at(idReal).size() > 0) {
-								} // for (IdRealizacao idReal = idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).getIteradorInicial(); idReal <= idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).getIteradorFinal(); idReal++) {
-							} // if (idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo) > 0) {
-						} // for (Periodo periodo = idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).getIteradorInicial(); periodo <= idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).getIteradorFinal(); idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).incrementarIterador(periodo)) {
-					} // if (idx_ine_CB_ZT_4.at(tss).at(a_idEstagio).size() > 0){
-				} // if (idx_ine_CB_ZT_4.at(tss).size() > 0) {
+									} // if (idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).at(idReal).size() > 0) {
+								} // for (IdRealizacao idReal = idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).getIteradorInicial(); idReal <= idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo).getIteradorFinal(); idReal++) {
+							} // if (idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).at(periodo) > 0) {
+						} // for (Periodo periodo = idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).getIteradorInicial(); periodo <= idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).getIteradorFinal(); idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).incrementarIterador(periodo)) {
+					} // if (idx_IneLinear_CB_ZT_4.at(tss).at(a_idEstagio).size() > 0){
+				} // if (idx_IneLinear_CB_ZT_4.at(tss).size() > 0) {
 
 			} // for (TipoSubproblemaSolver tss = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tss < TipoSubproblemaSolver_Excedente; tss++) {
 
@@ -584,53 +593,53 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao == IdRealizacao_Nenhum)) {
 
-				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_2)
-					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_3)
-					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_4)
-					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_5)
-					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_6)
+				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 
 			} // if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao == IdRealizacao_Nenhum)) {
 
 			else if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao != IdRealizacao_Nenhum)) {
 
-				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_2)
-					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_3)
-					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_4)
-					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_5)
-					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_6)
+				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 
 			} // else if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao != IdRealizacao_Nenhum)) {
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao == IdRealizacao_Nenhum)) {
 
-					RESTRICAO_EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_2)
-					RESTRICAO_EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_3)
-					RESTRICAO_EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_4)
-					RESTRICAO_EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_5)
-					RESTRICAO_EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_6)
+					EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 
-					RESTRICAO_INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_3)
-					RESTRICAO_INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_4)
-					RESTRICAO_INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_5)
-					RESTRICAO_INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_6)
-					RESTRICAO_INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_7)
+					INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 
 			} // if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao == IdRealizacao_Nenhum)) {
 
 			else if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao != IdRealizacao_Nenhum)) {
 
-					RESTRICAO_EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_2)
-					RESTRICAO_EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_3)
-					RESTRICAO_EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_4)
-					RESTRICAO_EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_5)
-					RESTRICAO_EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_6)
+					EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 
-					RESTRICAO_INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_3)
-					RESTRICAO_INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_4)
-					RESTRICAO_INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_5)
-					RESTRICAO_INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_6)
-					RESTRICAO_INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_7)
+					INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 
 			} // else if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao != IdRealizacao_Nenhum)) {
 
@@ -2248,25 +2257,23 @@ bool ModeloOtimizacao::isVariavelEstadoInstanciada(const IdEstagio a_idEstagio, 
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::isVariavelEstadoInstanciada(" + getFullString(a_idEstagio) + "," + getFullString(a_idVariavelEstado) + "): \n" + std::string(erro.what())); }
 }
 
+VARIAVEL_DECISAO_2(DECLARAR_IMPRIMIR_VALOR)
+VARIAVEL_DECISAO_3(DECLARAR_IMPRIMIR_VALOR)
+VARIAVEL_DECISAO_4(DECLARAR_IMPRIMIR_VALOR)
+VARIAVEL_DECISAO_5(DECLARAR_IMPRIMIR_VALOR)
+VARIAVEL_DECISAO_6(DECLARAR_IMPRIMIR_VALOR)
 
+EQUACAO_LINEAR_2(DECLARAR_IMPRIMIR_VALOR)
+EQUACAO_LINEAR_3(DECLARAR_IMPRIMIR_VALOR)
+EQUACAO_LINEAR_4(DECLARAR_IMPRIMIR_VALOR)
+EQUACAO_LINEAR_5(DECLARAR_IMPRIMIR_VALOR)
+EQUACAO_LINEAR_6(DECLARAR_IMPRIMIR_VALOR)
 
-VARIAVEL_DECISAO_2(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_2)
-VARIAVEL_DECISAO_3(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_3)
-VARIAVEL_DECISAO_4(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_4)
-VARIAVEL_DECISAO_5(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_5)
-VARIAVEL_DECISAO_6(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_6)
-
-RESTRICAO_EQUACAO_LINEAR_2(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_2)
-RESTRICAO_EQUACAO_LINEAR_3(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_3)
-RESTRICAO_EQUACAO_LINEAR_4(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_4)
-RESTRICAO_EQUACAO_LINEAR_5(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_5)
-RESTRICAO_EQUACAO_LINEAR_6(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_6)
-
-RESTRICAO_INEQUACAO_LINEAR_3(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_3)
-RESTRICAO_INEQUACAO_LINEAR_4(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_4)
-RESTRICAO_INEQUACAO_LINEAR_5(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_5)
-RESTRICAO_INEQUACAO_LINEAR_6(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_6)
-RESTRICAO_INEQUACAO_LINEAR_7(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_7);
+INEQUACAO_LINEAR_3(DECLARAR_IMPRIMIR_VALOR)
+INEQUACAO_LINEAR_4(DECLARAR_IMPRIMIR_VALOR)
+INEQUACAO_LINEAR_5(DECLARAR_IMPRIMIR_VALOR)
+INEQUACAO_LINEAR_6(DECLARAR_IMPRIMIR_VALOR)
+INEQUACAO_LINEAR_7(DECLARAR_IMPRIMIR_VALOR);
 
 
 
@@ -2286,28 +2293,29 @@ void ModeloOtimizacao::imprimirSolucaoPorEstagioPorCenario_porEstagio(const IdPr
 				if ((TSS == TipoSubproblemaSolver_viabilidade_hidraulica) && (!getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()))){}
 				else {
 
-					VARIAVEL_DECISAO_2(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_2)
-						VARIAVEL_DECISAO_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_3)
-						VARIAVEL_DECISAO_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_4)
-						VARIAVEL_DECISAO_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_5)
-						VARIAVEL_DECISAO_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_6)
+
+					VARIAVEL_DECISAO_2(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						VARIAVEL_DECISAO_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						VARIAVEL_DECISAO_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						VARIAVEL_DECISAO_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						VARIAVEL_DECISAO_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
 
 				}
 			}
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, bool())) {
 
-				RESTRICAO_EQUACAO_LINEAR_2(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_2)
-					RESTRICAO_EQUACAO_LINEAR_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_3)
-					RESTRICAO_EQUACAO_LINEAR_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_4)
-					RESTRICAO_EQUACAO_LINEAR_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_5)
-					RESTRICAO_EQUACAO_LINEAR_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_6)
+				EQUACAO_LINEAR_2(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					EQUACAO_LINEAR_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					EQUACAO_LINEAR_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					EQUACAO_LINEAR_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					EQUACAO_LINEAR_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
 
-					RESTRICAO_INEQUACAO_LINEAR_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_3)
-					RESTRICAO_INEQUACAO_LINEAR_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_4)
-					RESTRICAO_INEQUACAO_LINEAR_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_5)
-					RESTRICAO_INEQUACAO_LINEAR_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_6)
-					RESTRICAO_INEQUACAO_LINEAR_7(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_7)
+					INEQUACAO_LINEAR_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					INEQUACAO_LINEAR_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					INEQUACAO_LINEAR_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					INEQUACAO_LINEAR_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					INEQUACAO_LINEAR_7(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
 			}
 
 		}
@@ -2317,24 +2325,6 @@ void ModeloOtimizacao::imprimirSolucaoPorEstagioPorCenario_porEstagio(const IdPr
 	catch (const std::exception & erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::imprimirSolucaoPorEstagioPorCenario(" + getString(a_idProcesso) + "," + a_subdiretorio + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::imprimirSolucao(EntradaSaidaDados a_entradaSaidaDados){
-
-VARIAVEL_DECISAO_2(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_2)
-VARIAVEL_DECISAO_3(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_3)
-VARIAVEL_DECISAO_4(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_4)
-VARIAVEL_DECISAO_5(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_5)
-VARIAVEL_DECISAO_6(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_6)
-
-RESTRICAO_EQUACAO_LINEAR_2(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_2)
-RESTRICAO_EQUACAO_LINEAR_3(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_3)
-RESTRICAO_EQUACAO_LINEAR_4(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_4)
-RESTRICAO_EQUACAO_LINEAR_5(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_5)
-RESTRICAO_EQUACAO_LINEAR_6(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_6)
-
-RESTRICAO_INEQUACAO_LINEAR_3(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_3)
-RESTRICAO_INEQUACAO_LINEAR_4(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_4)
-RESTRICAO_INEQUACAO_LINEAR_5(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_5)
-RESTRICAO_INEQUACAO_LINEAR_6(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_6)
-RESTRICAO_INEQUACAO_LINEAR_7(DECLARAR_IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_7);
 
 
 void ModeloOtimizacao::imprimirSolucaoPorEstagioPorCenarioPorRealizacao_porEstagio(const IdProcesso a_idProcesso, const std::string a_subdiretorio, EntradaSaidaDados a_entradaSaidaDados) {
@@ -2352,28 +2342,29 @@ void ModeloOtimizacao::imprimirSolucaoPorEstagioPorCenarioPorRealizacao_porEstag
 				if ((TSS == TipoSubproblemaSolver_viabilidade_hidraulica) && (!getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()))) {}
 				else {
 
-					VARIAVEL_DECISAO_2(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_2)
-						VARIAVEL_DECISAO_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_3)
-						VARIAVEL_DECISAO_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_4)
-						VARIAVEL_DECISAO_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_5)
-						VARIAVEL_DECISAO_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_6)
+
+					VARIAVEL_DECISAO_2(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						VARIAVEL_DECISAO_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						VARIAVEL_DECISAO_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						VARIAVEL_DECISAO_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						VARIAVEL_DECISAO_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 
 				}
 			}
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, bool())) {
 
-				RESTRICAO_EQUACAO_LINEAR_2(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_2)
-					RESTRICAO_EQUACAO_LINEAR_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_3)
-					RESTRICAO_EQUACAO_LINEAR_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_4)
-					RESTRICAO_EQUACAO_LINEAR_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_5)
-					RESTRICAO_EQUACAO_LINEAR_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_6)
+				EQUACAO_LINEAR_2(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					EQUACAO_LINEAR_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					EQUACAO_LINEAR_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					EQUACAO_LINEAR_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					EQUACAO_LINEAR_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 
-					RESTRICAO_INEQUACAO_LINEAR_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_3)
-					RESTRICAO_INEQUACAO_LINEAR_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_4)
-					RESTRICAO_INEQUACAO_LINEAR_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_5)
-					RESTRICAO_INEQUACAO_LINEAR_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_6)
-					RESTRICAO_INEQUACAO_LINEAR_7(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_7)
+					INEQUACAO_LINEAR_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					INEQUACAO_LINEAR_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					INEQUACAO_LINEAR_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					INEQUACAO_LINEAR_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					INEQUACAO_LINEAR_7(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 			}
 
 		}
@@ -2722,27 +2713,27 @@ double ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS
 
 				if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool())) {
 
-					VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_2)
-						VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_3)
-						VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_4)
-						VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_5)
-						VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_6)
+					VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 
 				}
 
 				if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, bool())) {
 
-						RESTRICAO_EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_2)
-						RESTRICAO_EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_3)
-						RESTRICAO_EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_4)
-						RESTRICAO_EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_5)
-						RESTRICAO_EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_6)
+						EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 
-						RESTRICAO_INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_3)
-						RESTRICAO_INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_4)
-						RESTRICAO_INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_5)
-						RESTRICAO_INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_6)
-						RESTRICAO_INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_7)
+						INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 
 				}
 
@@ -2814,27 +2805,27 @@ double ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS
 
 				if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool())) {
 
-					VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_2);
-					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_3);
-					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_4);
-					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_5);
-					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_6);
+					VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
+					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
+					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
+					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
+					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
 
 				}
 
 				if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, bool())) {
 
-					RESTRICAO_EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_2);
-					RESTRICAO_EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_3);
-					RESTRICAO_EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_4);
-					RESTRICAO_EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_5);
-					RESTRICAO_EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_6);
+					EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
+					EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
+					EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
+					EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
+					EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
 
-					RESTRICAO_INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_3);
-					RESTRICAO_INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_4);
-					RESTRICAO_INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_5);
-					RESTRICAO_INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_6);
-					RESTRICAO_INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_7);
+					INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
+					INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
+					INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
+					INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
+					INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO);
 
 				}
 
@@ -2925,27 +2916,27 @@ bool ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS, 
 
 				if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, bool())) {
 
-					VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_2)
-						VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_3)
-						VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_4)
-						VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_5)
-						VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_VARIAVEL_DECISAO_6)
+					VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 
 				}
 
 				if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool())) {
 
-					RESTRICAO_EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_2)
-						RESTRICAO_EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_3)
-						RESTRICAO_EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_4)
-						RESTRICAO_EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_5)
-						RESTRICAO_EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_EQUACAO_LINEAR_6)
+					EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 
-						RESTRICAO_INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_3)
-						RESTRICAO_INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_4)
-						RESTRICAO_INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_5)
-						RESTRICAO_INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_6)
-						RESTRICAO_INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO_RESTRICAO_INEQUACAO_LINEAR_7)
+						INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+						INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 
 				}
 
@@ -3065,27 +3056,27 @@ void ModeloOtimizacao::calcularCustoPrimalViaSubproblemaMestre(const TipoSubprob
 
 				if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_mestre, bool())) {
 
-					VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_2)
-						VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_3)
-						VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_4)
-						VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_5)
-						VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_VARIAVEL_DECISAO_6)
+					VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 
 				}
 
 				if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_mestre, bool())) {
 
-						RESTRICAO_EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_2)
-						RESTRICAO_EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_3)
-						RESTRICAO_EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_4)
-						RESTRICAO_EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_5)
-						RESTRICAO_EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_EQUACAO_LINEAR_6)
+						EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 
-						RESTRICAO_INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_3)
-						RESTRICAO_INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_4)
-						RESTRICAO_INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_5)
-						RESTRICAO_INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_6)
-						RESTRICAO_INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_RESTRICAO_INEQUACAO_LINEAR_7)
+						INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+						INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 
 				} // if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_mestre, bool())) {
 
@@ -3259,11 +3250,11 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::consolidarVariaveis(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
 } // void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
 
-VARIAVEL_DECISAO_2(DECLARAR_CONSOLIDAR_RESULTADOS_VARIAVEL_DECISAO_2)
-VARIAVEL_DECISAO_3(DECLARAR_CONSOLIDAR_RESULTADOS_VARIAVEL_DECISAO_3)
-VARIAVEL_DECISAO_4(DECLARAR_CONSOLIDAR_RESULTADOS_VARIAVEL_DECISAO_4)
-VARIAVEL_DECISAO_5(DECLARAR_CONSOLIDAR_RESULTADOS_VARIAVEL_DECISAO_5)
-VARIAVEL_DECISAO_6(DECLARAR_CONSOLIDAR_RESULTADOS_VARIAVEL_DECISAO_6);
+VARIAVEL_DECISAO_2(DECLARAR_CONSOLIDAR_RESULTADOS)
+VARIAVEL_DECISAO_3(DECLARAR_CONSOLIDAR_RESULTADOS)
+VARIAVEL_DECISAO_4(DECLARAR_CONSOLIDAR_RESULTADOS)
+VARIAVEL_DECISAO_5(DECLARAR_CONSOLIDAR_RESULTADOS)
+VARIAVEL_DECISAO_6(DECLARAR_CONSOLIDAR_RESULTADOS)
 
 void ModeloOtimizacao::consolidarVariaveis(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
 
@@ -3275,9 +3266,9 @@ void ModeloOtimizacao::consolidarVariaveis(const IdProcesso a_idProcesso, const 
 
 			a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS));
 
-			int numero_variaveis_consolidar = int(lista_variaveis_instanciadas.at(a_TSS).size()) / int(a_maiorIdProcesso);
+			int numero_variaveis_consolidar = int(lista_VarDecisao_instanciadas.at(a_TSS).size()) / int(a_maiorIdProcesso);
 
-			const int resto_variaveis_consolidar = int(lista_variaveis_instanciadas.at(a_TSS).size()) % int(a_maiorIdProcesso);
+			const int resto_variaveis_consolidar = int(lista_VarDecisao_instanciadas.at(a_TSS).size()) % int(a_maiorIdProcesso);
 
 			int pos_inicial = -1;
 			int pos_final = -1;
@@ -3294,17 +3285,17 @@ void ModeloOtimizacao::consolidarVariaveis(const IdProcesso a_idProcesso, const 
 			} // if (a_idProcesso < a_maiorIdProcesso) {
 
 			else
-				pos_final = int(lista_variaveis_instanciadas.at(a_TSS).size());
+				pos_final = int(lista_VarDecisao_instanciadas.at(a_TSS).size());
 
 			for (int i = pos_inicial; i < pos_final; i++) {
 
-				const std::string variavel_str = lista_variaveis_instanciadas.at(a_TSS).at(i);
+				const std::string VarDecisao_str = lista_VarDecisao_instanciadas.at(a_TSS).at(i);
 
-				VARIAVEL_DECISAO_2(CONSOLIDAR_RESULTADOS_VARIAVEL_DECISAO_2)
-					VARIAVEL_DECISAO_3(CONSOLIDAR_RESULTADOS_VARIAVEL_DECISAO_3)
-					VARIAVEL_DECISAO_4(CONSOLIDAR_RESULTADOS_VARIAVEL_DECISAO_4)
-					VARIAVEL_DECISAO_5(CONSOLIDAR_RESULTADOS_VARIAVEL_DECISAO_5)
-					VARIAVEL_DECISAO_6(CONSOLIDAR_RESULTADOS_VARIAVEL_DECISAO_6)
+				VARIAVEL_DECISAO_2(CONSOLIDAR_RESULTADOS)
+					VARIAVEL_DECISAO_3(CONSOLIDAR_RESULTADOS)
+					VARIAVEL_DECISAO_4(CONSOLIDAR_RESULTADOS)
+					VARIAVEL_DECISAO_5(CONSOLIDAR_RESULTADOS)
+					VARIAVEL_DECISAO_6(CONSOLIDAR_RESULTADOS)
 
 			} // for (int i = pos_inicial; i < pos_final; i++) {
 
@@ -3315,11 +3306,11 @@ void ModeloOtimizacao::consolidarVariaveis(const IdProcesso a_idProcesso, const 
 
 } // void ModeloOtimizacao::consolidarVariaveis(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
 
-RESTRICAO_EQUACAO_LINEAR_2(DECLARAR_CONSOLIDAR_RESULTADOS_RESTRICAO_EQUACAO_LINEAR_2)
-RESTRICAO_EQUACAO_LINEAR_3(DECLARAR_CONSOLIDAR_RESULTADOS_RESTRICAO_EQUACAO_LINEAR_3)
-RESTRICAO_EQUACAO_LINEAR_4(DECLARAR_CONSOLIDAR_RESULTADOS_RESTRICAO_EQUACAO_LINEAR_4)
-RESTRICAO_EQUACAO_LINEAR_5(DECLARAR_CONSOLIDAR_RESULTADOS_RESTRICAO_EQUACAO_LINEAR_5)
-RESTRICAO_EQUACAO_LINEAR_6(DECLARAR_CONSOLIDAR_RESULTADOS_RESTRICAO_EQUACAO_LINEAR_6);
+EQUACAO_LINEAR_2(DECLARAR_CONSOLIDAR_RESULTADOS)
+EQUACAO_LINEAR_3(DECLARAR_CONSOLIDAR_RESULTADOS)
+EQUACAO_LINEAR_4(DECLARAR_CONSOLIDAR_RESULTADOS)
+EQUACAO_LINEAR_5(DECLARAR_CONSOLIDAR_RESULTADOS)
+EQUACAO_LINEAR_6(DECLARAR_CONSOLIDAR_RESULTADOS)
 
 void ModeloOtimizacao::consolidarEquacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados) {
 
@@ -3331,9 +3322,9 @@ void ModeloOtimizacao::consolidarEquacoes(const IdProcesso a_idProcesso, const I
 
 			a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS));
 
-			int numero_equacoes_consolidar = int(lista_equacoes_instanciadas.at(a_TSS).size()) / int(a_maiorIdProcesso);
+			int numero_equacoes_consolidar = int(lista_EquLinear_instanciadas.at(a_TSS).size()) / int(a_maiorIdProcesso);
 
-			const int resto_equacoes_consolidar = int(lista_equacoes_instanciadas.at(a_TSS).size()) % int(a_maiorIdProcesso);
+			const int resto_equacoes_consolidar = int(lista_EquLinear_instanciadas.at(a_TSS).size()) % int(a_maiorIdProcesso);
 
 			int pos_inicial = -1;
 			int pos_final = -1;
@@ -3350,17 +3341,17 @@ void ModeloOtimizacao::consolidarEquacoes(const IdProcesso a_idProcesso, const I
 			} // if (a_idProcesso < a_maiorIdProcesso) {
 
 			else
-				pos_final = int(lista_equacoes_instanciadas.at(a_TSS).size());
+				pos_final = int(lista_EquLinear_instanciadas.at(a_TSS).size());
 
 			for (int i = pos_inicial; i < pos_final; i++) {
 
-				const std::string restricao_str = lista_equacoes_instanciadas.at(a_TSS).at(i);
+				const std::string EquLinear_str = lista_EquLinear_instanciadas.at(a_TSS).at(i);
 
-				    RESTRICAO_EQUACAO_LINEAR_2(CONSOLIDAR_RESULTADOS_RESTRICAO_EQUACAO_LINEAR_2)
-					RESTRICAO_EQUACAO_LINEAR_3(CONSOLIDAR_RESULTADOS_RESTRICAO_EQUACAO_LINEAR_3)
-					RESTRICAO_EQUACAO_LINEAR_4(CONSOLIDAR_RESULTADOS_RESTRICAO_EQUACAO_LINEAR_4)
-					RESTRICAO_EQUACAO_LINEAR_5(CONSOLIDAR_RESULTADOS_RESTRICAO_EQUACAO_LINEAR_5)
-					RESTRICAO_EQUACAO_LINEAR_6(CONSOLIDAR_RESULTADOS_RESTRICAO_EQUACAO_LINEAR_6)
+				    EQUACAO_LINEAR_2(CONSOLIDAR_RESULTADOS)
+					EQUACAO_LINEAR_3(CONSOLIDAR_RESULTADOS)
+					EQUACAO_LINEAR_4(CONSOLIDAR_RESULTADOS)
+					EQUACAO_LINEAR_5(CONSOLIDAR_RESULTADOS)
+					EQUACAO_LINEAR_6(CONSOLIDAR_RESULTADOS)
 
 			} // for (int i = pos_inicial; i < pos_final; i++) {
 
@@ -3372,11 +3363,11 @@ void ModeloOtimizacao::consolidarEquacoes(const IdProcesso a_idProcesso, const I
 } // void ModeloOtimizacao::consolidarEquacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
 
 
-RESTRICAO_INEQUACAO_LINEAR_3(DECLARAR_CONSOLIDAR_RESULTADOS_RESTRICAO_INEQUACAO_LINEAR_3)
-RESTRICAO_INEQUACAO_LINEAR_4(DECLARAR_CONSOLIDAR_RESULTADOS_RESTRICAO_INEQUACAO_LINEAR_4)
-RESTRICAO_INEQUACAO_LINEAR_5(DECLARAR_CONSOLIDAR_RESULTADOS_RESTRICAO_INEQUACAO_LINEAR_5)
-RESTRICAO_INEQUACAO_LINEAR_6(DECLARAR_CONSOLIDAR_RESULTADOS_RESTRICAO_INEQUACAO_LINEAR_6)
-RESTRICAO_INEQUACAO_LINEAR_7(DECLARAR_CONSOLIDAR_RESULTADOS_RESTRICAO_INEQUACAO_LINEAR_7);
+INEQUACAO_LINEAR_3(DECLARAR_CONSOLIDAR_RESULTADOS)
+INEQUACAO_LINEAR_4(DECLARAR_CONSOLIDAR_RESULTADOS)
+INEQUACAO_LINEAR_5(DECLARAR_CONSOLIDAR_RESULTADOS)
+INEQUACAO_LINEAR_6(DECLARAR_CONSOLIDAR_RESULTADOS)
+INEQUACAO_LINEAR_7(DECLARAR_CONSOLIDAR_RESULTADOS)
 
 void ModeloOtimizacao::consolidarInequacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados) {
 
@@ -3388,9 +3379,9 @@ void ModeloOtimizacao::consolidarInequacoes(const IdProcesso a_idProcesso, const
 
 			a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS));
 
-			int numero_inequacoes_consolidar = int(lista_inequacoes_instanciadas.at(a_TSS).size()) / int(a_maiorIdProcesso);
+			int numero_inequacoes_consolidar = int(lista_IneLinear_instanciadas.at(a_TSS).size()) / int(a_maiorIdProcesso);
 
-			const int resto_inequacoes_consolidar = int(lista_inequacoes_instanciadas.at(a_TSS).size()) % int(a_maiorIdProcesso);
+			const int resto_inequacoes_consolidar = int(lista_IneLinear_instanciadas.at(a_TSS).size()) % int(a_maiorIdProcesso);
 
 			int pos_inicial = -1;
 			int pos_final = -1;
@@ -3407,17 +3398,17 @@ void ModeloOtimizacao::consolidarInequacoes(const IdProcesso a_idProcesso, const
 			} // if (a_idProcesso < a_maiorIdProcesso) {
 
 			else
-				pos_final = int(lista_inequacoes_instanciadas.at(a_TSS).size());
+				pos_final = int(lista_IneLinear_instanciadas.at(a_TSS).size());
 
 			for (int i = pos_inicial; i < pos_final; i++) {
 
-				const std::string restricao_str = lista_inequacoes_instanciadas.at(a_TSS).at(i);
+				const std::string IneLinear_str = lista_IneLinear_instanciadas.at(a_TSS).at(i);
 
-					RESTRICAO_INEQUACAO_LINEAR_3(CONSOLIDAR_RESULTADOS_RESTRICAO_INEQUACAO_LINEAR_3)
-					RESTRICAO_INEQUACAO_LINEAR_4(CONSOLIDAR_RESULTADOS_RESTRICAO_INEQUACAO_LINEAR_4)
-					RESTRICAO_INEQUACAO_LINEAR_5(CONSOLIDAR_RESULTADOS_RESTRICAO_INEQUACAO_LINEAR_5)
-					RESTRICAO_INEQUACAO_LINEAR_6(CONSOLIDAR_RESULTADOS_RESTRICAO_INEQUACAO_LINEAR_6)
-					RESTRICAO_INEQUACAO_LINEAR_7(CONSOLIDAR_RESULTADOS_RESTRICAO_INEQUACAO_LINEAR_7)
+					INEQUACAO_LINEAR_3(CONSOLIDAR_RESULTADOS)
+					INEQUACAO_LINEAR_4(CONSOLIDAR_RESULTADOS)
+					INEQUACAO_LINEAR_5(CONSOLIDAR_RESULTADOS)
+					INEQUACAO_LINEAR_6(CONSOLIDAR_RESULTADOS)
+					INEQUACAO_LINEAR_7(CONSOLIDAR_RESULTADOS)
 
 			} // for (int i = pos_inicial; i < pos_final; i++) {
 

@@ -18,13 +18,14 @@ typedef std::string string;
 //
 // ----------------------------------------------------
 
+
 //
 // Declaração Geral
 //
 template<class TipoIterador, class TipoValor>
 class SmartEnupla {
 public:
-	
+
 	SmartEnupla() {};
 	SmartEnupla(const int a_valor_alocar) { smartEnupla.reserve(a_valor_alocar); };
 	SmartEnupla(const bool a_inicializar_from_0, const TipoIterador a_iteradorInicial, const std::vector<TipoValor>& a_vetorInicial) {
@@ -42,14 +43,14 @@ public:
 		smartEnupla = a_vetorInicial;
 		iteradorFinal = TipoIterador(iteradorInicial + int(smartEnupla.size()) - 1);
 	};
-	SmartEnupla(const TipoIterador a_iteradorInicial, const std::vector<TipoValor> &a_vetorInicial) {
+	SmartEnupla(const TipoIterador a_iteradorInicial, const std::vector<TipoValor>& a_vetorInicial) {
 		if (a_iteradorInicial < getFromChar(TipoIterador(), "min"))
 			throw std::invalid_argument("O iterador Inicial deve ser maior ou igual a " + getString(getFromChar(TipoIterador(), "min")));
 		else if (a_vetorInicial.size() == 0)
 			throw std::invalid_argument("O vetor inicial deve possuir algum elemento.");
 		iteradorInicial = a_iteradorInicial;
-		smartEnupla      = a_vetorInicial;
-		iteradorFinal   = TipoIterador(iteradorInicial + int(smartEnupla.size()) - 1);
+		smartEnupla = a_vetorInicial;
+		iteradorFinal = TipoIterador(iteradorInicial + int(smartEnupla.size()) - 1);
 	};
 
 	int size() const { return int(smartEnupla.size()); };
@@ -80,21 +81,36 @@ public:
 			smartEnupla.push_back(a_valor);
 			iteradorFinal = TipoIterador(int(smartEnupla.size()));
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::addElemento(" +  getString(a_valor) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::addElemento(" + getString(a_valor) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoValor a_valor) {
 
 	void addElemento(TipoIterador a_iterador, TipoValor a_valor) {
 		try {
+
 			if (size() == 0) {
 				if (a_iterador < getFromChar(TipoIterador(), "min"))
-					throw std::invalid_argument("O iterador Inicial deve ser maior ou igual a " + getString(getFromChar(TipoIterador(), "min")));
+					throw std::invalid_argument("O iterador Inicial deve ser maior ou igual a " + getFullString(getFromChar(TipoIterador(), "min")));
+				else if (a_iterador > getFromChar(TipoIterador(), "max"))
+					throw std::invalid_argument("O iterador Inicial deve ser menor ou igual a " + getFullString(getFromChar(TipoIterador(), "max")));
 				iteradorInicial = a_iterador;
+				iteradorFinal = a_iterador;
+				smartEnupla.push_back(a_valor);
 			}
-			else if (getIteradorFinal() != a_iterador - 1)
-				throw std::invalid_argument("Argumento Iterador - " + getString(a_iterador) + " - nao sequencial ao Iterador final do SmartEnupla - " + getString(getIteradorFinal()) + ".");
+			else if (getIteradorFinal() == (a_iterador - 1)) {
+				if (a_iterador > getFromChar(TipoIterador(), "max"))
+					throw std::invalid_argument("O iterador Inicial deve ser menor ou igual a " + getFullString(getFromChar(TipoIterador(), "max")));
+				iteradorFinal = a_iterador;
+				smartEnupla.push_back(a_valor);
+			}
+			else if (getIteradorInicial() == (a_iterador + 1)) {
+				if (a_iterador < getFromChar(TipoIterador(), "min"))
+					throw std::invalid_argument("O iterador Inicial deve ser maior ou igual a " + getFullString(getFromChar(TipoIterador(), "min")));
+				iteradorInicial = a_iterador;
+				smartEnupla.insert(smartEnupla.begin(), a_valor);
+			}
+			else
+				throw std::invalid_argument("Argumento Iterador - " + getFullString(a_iterador) + " - nao sequencial ao Iterador inicial: " + getFullString(getIteradorInicial()) +  " ou Iterador final: " + getFullString(getIteradorFinal()) + " da Smartenupla.");
 
-			smartEnupla.push_back(a_valor);
-			iteradorFinal = a_iterador;
 		} // try{
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::addElemento(" + getString(a_iterador) + "," + getString(a_valor) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iterador, TipoValor a_valor) {
@@ -106,11 +122,25 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::setElemento(" + getString(a_iterador) + "," + getString(a_valor) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iterador, TipoValor a_valor) {
 
+	void setElementoFromStr(TipoIterador a_iterador, std::string a_valor) {
+		try {
+			smartEnupla.at(getIndice(a_iterador)) = getFromString(TipoValor(), a_valor);
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::setElemento(" + getString(a_iterador) + "," + getString(a_valor) + "): \n" + std::string(erro.what())); }
+	}; // void addElemento(TipoIterador a_iterador, TipoValor a_valor) {
+
 	TipoValor getElemento(TipoIterador a_iterador)const {
 		try {
 			return smartEnupla.at(getIndice(a_iterador));
 		} // try{
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getElemento(" + getString(a_iterador) + "): \n" + std::string(erro.what())); }
+	}; // void addElemento(TipoIterador a_iterador, TipoValor a_valor) {
+
+	TipoValor getTipoElemento()const {
+		try {
+			return TipoValor();
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getTipoElemento(): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iterador, TipoValor a_valor) {
 
 	TipoValor at(TipoIterador a_iterador)const {
@@ -120,7 +150,7 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::at(" + getFullString(a_iterador) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iterador, TipoValor a_valor) {
 
-	TipoValor& at(TipoIterador a_iterador){
+	TipoValor& at(TipoIterador a_iterador) {
 		try {
 			return smartEnupla.at(getIndice(a_iterador));
 		} // try{
@@ -148,7 +178,7 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getElementos(): \n" + std::string(erro.what())); }
 	};
 
-	void incrementarIterador(TipoIterador &a_iterador, const int a_inteiro) const {
+	void incrementarIterador(TipoIterador& a_iterador, const int a_inteiro) const {
 		try {
 			if (a_inteiro < 0)
 				throw std::invalid_argument("Inteiro invalido.");
@@ -158,7 +188,7 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::incrementaIterador(" + getString(a_iterador) + "," + getString(a_inteiro) + "): \n" + std::string(erro.what())); }
 	} // void incrementarIterador(Periodo &a_periodo, const int a_inteiro) const {
 
-	void incrementarIterador(TipoIterador &a_iterador) const {
+	void incrementarIterador(TipoIterador& a_iterador) const {
 		try {
 			if (size() == 0)
 				throw std::invalid_argument("Nao ha elementos na SmartEnupla.");
@@ -171,7 +201,7 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::incrementaIterador(" + getString(a_iterador) + "): \n" + std::string(erro.what())); }
 	} // void operator++(Periodo &a_periodo) const {
 
-	void decrementarIterador(TipoIterador &a_iterador) const {
+	void decrementarIterador(TipoIterador& a_iterador) const {
 		try {
 			if (size() == 0)
 				throw std::invalid_argument("Nao ha elementos na SmartEnupla.");
@@ -194,18 +224,167 @@ public:
 
 	std::string str() { return "SmartEnupla<iterador,valor>"; }
 
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const std::string a_string) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const char * a_char) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const bool a_bool) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const double a_double) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const int a_int) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const std::vector<int> a_vetor) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const std::vector<double> a_vetor) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const std::vector<std::vector<int>> a_vetor) { return std::vector<std::vector<std::string>>(); };
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const std::vector<std::vector<double>> a_vetor) { return std::vector<std::vector<std::string>>(); };
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const std::string a_string, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const char* a_char, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const bool a_bool, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const double a_double, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const int a_int, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const std::vector<int> a_vetor, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const std::vector<double> a_vetor, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const std::vector<std::vector<int>> a_vetor, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, bool& a_cabecalho_incluir, const std::vector<std::vector<double>> a_vetor, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>>& a_matriz_interna) {
+		a_linAdded = -1;
+		return std::vector<std::vector<std::string>>(); 
+	};
 
 	template<typename Iterador, typename Valor>
-	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const SmartEnupla<Iterador, Valor> &a_enupla){
+	static std::vector<std::vector<std::string>> getDadosAsString(const bool a_incluir_iteradores, const SmartEnupla<Iterador, Valor>& a_enupla) {
+		std::vector<std::vector<std::string>> matriz_interna;
+		bool isUltimoCabecalhoIncluso = false;
+		int linAdded = 0;
+		if (a_incluir_iteradores)
+			return getDadosAsString(100, isUltimoCabecalhoIncluso, a_enupla, true, linAdded, matriz_interna);
+		else
+			return getDadosAsString(-1, isUltimoCabecalhoIncluso, a_enupla, true, linAdded, matriz_interna);
+	}
+
+	template<typename Iterador, typename Valor>
+	static std::vector<std::vector<std::string>> getDadosAsString(int a_nro_iteradores_incluir, const SmartEnupla<Iterador, Valor>& a_enupla) {
+		int linAdded = 0;
+		std::vector<std::vector<std::string>> matriz_interna;
+		bool isUltimoCabecalhoIncluso = false;
+		return getDadosAsString(a_nro_iteradores_incluir, isUltimoCabecalhoIncluso, a_enupla, true, linAdded, matriz_interna);
+	}
+
+	template<typename Iterador, typename Valor>
+	static std::vector<std::vector<std::string>> getDadosAsString(int a_nro_iteradores_incluir, bool &a_isUltimoCabecalhoIncluso, const SmartEnupla<Iterador, Valor>& a_enupla, bool a_chamada_inicial, int &a_linAdded, std::vector<std::vector<std::string>> &a_matriz_interna) {
+
+		try {
+
+			if (a_enupla.size() == 0) {
+				a_linAdded = 0;
+				return std::vector<std::vector<std::string>>();
+			}
+
+			const Iterador iteradorInicial = a_enupla.getIteradorInicial();
+			const Iterador iteradorFinal = a_enupla.getIteradorFinal();
+
+			int nro_iteradores_incluir = a_nro_iteradores_incluir;
+
+			if (nro_iteradores_incluir > 0)
+				nro_iteradores_incluir--;
+
+			for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; a_enupla.incrementarIterador(iterador)) {
+
+				SmartEnupla<int, int>::getDadosAsString(nro_iteradores_incluir, a_isUltimoCabecalhoIncluso, a_enupla.at(iterador), false, a_linAdded, a_matriz_interna);
+
+				if ((a_linAdded > 0) && (a_nro_iteradores_incluir > 0)) {
+
+					bool preencher_todas_linhas = true;
+
+					// Verifica se matriz interna não é quadrada
+					if (a_matriz_interna.at(0).size() != a_matriz_interna.at(a_matriz_interna.size() - 1).size())
+						preencher_todas_linhas = false;
+
+					for (int l = a_matriz_interna.size() - 1; l >= 0; l--) {
+						if (preencher_todas_linhas)
+							a_matriz_interna.at(l).insert(a_matriz_interna.at(l).begin(), getString(iterador));
+						else {
+							if (l == (a_matriz_interna.size() - 1))
+								a_matriz_interna.at(l).insert(a_matriz_interna.at(l).begin(), getString(iterador));
+							else if ((a_matriz_interna.at(l).size() + 1) == a_matriz_interna.at(l + 1).size())
+								a_matriz_interna.at(l).insert(a_matriz_interna.at(l).begin(), getString(iterador));
+							else
+								break;
+						}
+					}
+
+					if (a_isUltimoCabecalhoIncluso)
+						a_matriz_interna.at(0).at(0) = getStringTipo(iterador);
+
+				} // if (a_linAdded > 0) {
+
+				if (a_linAdded == -1)
+					break;
+
+			} // for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; incrementarIterador(iterador)) {
+
+			if (a_linAdded == -1) {
+
+				a_linAdded = 1;
+				bool is_cabecalho_adicionado = false;
+
+				if ((a_nro_iteradores_incluir > -1) && (a_matriz_interna.size() == 0)) {
+					is_cabecalho_adicionado = true;
+					a_isUltimoCabecalhoIncluso = true;
+					a_linAdded = 2;
+					a_matriz_interna = std::vector<std::vector<std::string>>(2, std::vector<std::string>(a_enupla.size(), ""));
+				}
+				else
+					a_matriz_interna.push_back(std::vector<std::string>(a_enupla.size(), ""));
+
+				const int l = a_matriz_interna.size() - 1;
+
+				int i = 0;
+				for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; a_enupla.incrementarIterador(iterador)) {
+
+					if (is_cabecalho_adicionado)
+						a_matriz_interna.at(l - 1).at(i) = getFullString(iterador);
+
+					a_matriz_interna.at(l).at(i) = getString(a_enupla.at(iterador));
+
+					i++;
+
+				} // for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; incrementarIterador(iterador)) {
+
+				if (a_chamada_inicial)
+					return a_matriz_interna;
+				else
+					return std::vector<std::vector<std::string>>();
+
+			} // if (a_linAdded == -1) {
+
+
+			if (a_chamada_inicial)
+				return a_matriz_interna;
+			else
+				return std::vector<std::vector<std::string>>();
+
+
+
+		} // try
+
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getDadosAsString(" + getFullString(a_nro_iteradores_incluir) + ",a_enupla," + getFullString(a_chamada_inicial) + "): \n" + std::string(erro.what())); }
+
+	} // std::vector<std::vector<std::string>> SmartEnupla::getDadosAsString(const bool a_incluir_cabecalho){
+
+
+	template<typename Iterador, typename Valor>
+	static std::vector<std::vector<std::string>> getDadosAsString(int a_nro_iteradores_incluir, const SmartEnupla<Iterador, Valor>& a_enupla, bool a_chamada_inicial) {
 
 		try {
 
@@ -218,9 +397,9 @@ public:
 			std::vector<std::vector<std::string>> matriz_retorno;
 
 			// Ultima camada da SmarEnupla
-			if (SmartEnupla<int, int>::getDadosAsString(a_incluir_iteradores, a_enupla.at(a_enupla.getIteradorInicial())).size() == 0) {
+			if (SmartEnupla<int, int>::getDadosAsString(a_nro_iteradores_incluir, a_enupla.at(a_enupla.getIteradorInicial()), false).size() == 0) {
 
-				if (a_incluir_iteradores)
+				if (a_nro_iteradores_incluir > -1)
 					matriz_retorno = std::vector<std::vector<std::string>>(2, std::vector<std::string>(a_enupla.size(), ""));
 				else
 					matriz_retorno = std::vector<std::vector<std::string>>(1, std::vector<std::string>(a_enupla.size(), ""));
@@ -228,7 +407,7 @@ public:
 				int i = 0;
 				for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; a_enupla.incrementarIterador(iterador)) {
 
-					if (a_incluir_iteradores) {
+					if (a_nro_iteradores_incluir > -1) {
 						matriz_retorno.at(0).at(i) = getFullString(iterador);
 						matriz_retorno.at(1).at(i) = getString(a_enupla.at(iterador));
 					} // if (a_incluir_cabecalho) {
@@ -246,16 +425,21 @@ public:
 
 			else {
 
+				int nro_iteradores_incluir = a_nro_iteradores_incluir;
+
+				if (nro_iteradores_incluir > 0)
+					nro_iteradores_incluir--;
+
 				for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; a_enupla.incrementarIterador(iterador)) {
 
-					const std::vector<std::vector<std::string>> matriz_retornada = SmartEnupla<int, int>::getDadosAsString(a_incluir_iteradores, a_enupla.at(iterador));
+					const std::vector<std::vector<std::string>> matriz_retornada = SmartEnupla<int, int>::getDadosAsString(nro_iteradores_incluir, a_enupla.at(iterador), false);
 
 					if (matriz_retornada.size() > 0) {
 
 						for (int l = 0; l < matriz_retornada.size(); l++) {
 							if (matriz_retornada.at(l).size() > 0) {
 
-								if (a_incluir_iteradores) {						
+								if (a_nro_iteradores_incluir > 0) {
 
 									if (matriz_retorno.size() == 0) {
 										matriz_retorno.push_back(std::vector<std::string>(matriz_retornada.at(l).size() + 1, ""));
@@ -266,7 +450,7 @@ public:
 
 									else if ((matriz_retorno.size() > 0) && (l == 0)) {
 										if (matriz_retornada.at(0).size() > matriz_retorno.at(0).size() - 1) {
-											matriz_retorno.at(0)  = std::vector<std::string>(matriz_retornada.at(0).size() + 1, "");
+											matriz_retorno.at(0) = std::vector<std::string>(matriz_retornada.at(0).size() + 1, "");
 											matriz_retorno.at(0).at(0) = getStringTipo(iterador);
 											for (int c = 0; c < matriz_retornada.at(0).size(); c++)
 												matriz_retorno.at(0).at(c + 1) = matriz_retornada.at(0).at(c);
@@ -280,7 +464,7 @@ public:
 											matriz_retorno.at(matriz_retorno.size() - 1).at(c + 1) = matriz_retornada.at(l).at(c);
 									}
 
-								} // if (a_incluir_iteradores) {
+								} // if (a_nro_iteradores_incluir > -1) {
 
 								else {
 									matriz_retorno.push_back(std::vector<std::string>(matriz_retornada.at(l).size(), ""));
@@ -313,13 +497,13 @@ public:
 
 		} // try
 
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getDadosAsString(" + getString(a_incluir_iteradores) + ",a_enupla): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getDadosAsString(" + getFullString(a_nro_iteradores_incluir) + ",a_enupla," + getFullString(a_chamada_inicial) + "): \n" + std::string(erro.what())); }
 
 	} // std::vector<std::vector<std::string>> SmartEnupla::getDadosAsString(const bool a_incluir_cabecalho){
 
 private:
 
-	int getIndice(TipoIterador a_iterador) const{
+	int getIndice(TipoIterador a_iterador) const {
 		try {
 			return int(a_iterador - getIteradorInicial());
 		} // try{
@@ -706,11 +890,57 @@ public:
 				numero_elementos++;
 
 			} // else if (size() == 0) {
+			
+			else if (a_iterador + 1 == Periodo(a_iterador.getTipoPeriodo(), getIteradorInicial())) {
 
-			else if (Periodo(a_iterador.getTipoPeriodo(), getIteradorFinal() + 1) != a_iterador)
-				throw std::invalid_argument("Argumento Iterador - " + getString(a_iterador) + " - nao sequencial ao Iterador final do SmartEnupla - " + getString(getIteradorFinal()) + ".");
+				////////////////////////////////////
+				//Câmbio de Tipo de Periodo
+				////////////////////////////////////
 
-			else {
+				if (a_iterador.getTipoPeriodo() != lista_estrutura.at(0).tipo_iterador_inicial) {
+
+					//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					//Estrutura_flat: Mantém a mesma estrutura e identifica se a lista é crescente ou decrescente
+					//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+					if (lista_estrutura.at(0).tipoEstruturaPeriodo == TipoEstruturaPeriodo_flat && a_iterador.getTipoPeriodo() > lista_estrutura.at(0).tipo_iterador_inicial)
+						lista_estrutura.at(0).tipoEstruturaPeriodo = TipoEstruturaPeriodo_crescente;
+
+					else if (lista_estrutura.at(0).tipoEstruturaPeriodo == TipoEstruturaPeriodo_flat && a_iterador.getTipoPeriodo() < lista_estrutura.at(0).tipo_iterador_inicial)
+						lista_estrutura.at(0).tipoEstruturaPeriodo = TipoEstruturaPeriodo_decrescente;
+
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					//Estrutura_crescente/decrescente : 
+					//Caso crescente: Cria uma nova estrutura, se o tipo_periodo > tipo_iterador_inicial
+					//Caso decrescente: Cria uma nova estrutura, se o tipo_periodo < tipo_iterador_inicial
+					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+					else if ((lista_estrutura.at(0).tipoEstruturaPeriodo == TipoEstruturaPeriodo_crescente && a_iterador.getTipoPeriodo() < lista_estrutura.at(0).tipo_iterador_inicial) \
+						|| (lista_estrutura.at(0).tipoEstruturaPeriodo == TipoEstruturaPeriodo_decrescente && a_iterador.getTipoPeriodo() > lista_estrutura.at(0).tipo_iterador_inicial)) {
+						inicializacaoEstruturaPeriodo(true, 0);//Cria uma nova estrutura
+						lista_estrutura.at(0).tipo_iterador_final = a_iterador.getTipoPeriodo();
+					}
+
+				}//if (a_iterador.getTipoPeriodo() != lista_estrutura.at(0).tipo_iterador_inicial) {
+
+				////////////////////////////////////////////
+
+				lista_estrutura.at(0).tipo_iterador_inicial = a_iterador.getTipoPeriodo();
+
+				if (lista_estrutura.at(0).iteradores_iniciais.at(lista_estrutura.at(0).tipo_iterador_inicial).size() == 0)
+					lista_estrutura.at(0).iteradores_iniciais.at(lista_estrutura.at(0).tipo_iterador_inicial).push_back(a_iterador);
+				else
+					lista_estrutura.at(0).iteradores_iniciais.at(lista_estrutura.at(0).tipo_iterador_inicial).at(0) = a_iterador;
+
+				if (lista_estrutura.at(0).iteradores_finais.at(lista_estrutura.at(0).tipo_iterador_inicial).size() == 0)
+					lista_estrutura.at(0).iteradores_finais.at(lista_estrutura.at(0).tipo_iterador_inicial).push_back(a_iterador);
+
+				lista_estrutura.at(0).smartEnupla.at(lista_estrutura.at(0).tipo_iterador_inicial).insert(lista_estrutura.at(0).smartEnupla.at(lista_estrutura.at(0).tipo_iterador_inicial).begin(), a_valor);
+				numero_elementos++;
+
+			}
+
+			else if (Periodo(a_iterador.getTipoPeriodo(), getIteradorFinal() + 1) == a_iterador) {
 
 				////////////////////////////////////
 				//Câmbio de Tipo de Periodo
@@ -736,7 +966,7 @@ public:
 
 					else if ((lista_estrutura.at(int(lista_estrutura.size()) - 1).tipoEstruturaPeriodo == TipoEstruturaPeriodo_crescente && a_iterador.getTipoPeriodo() > lista_estrutura.at(int(lista_estrutura.size()) - 1).tipo_iterador_final) \
 						|| (lista_estrutura.at(int(lista_estrutura.size()) - 1).tipoEstruturaPeriodo == TipoEstruturaPeriodo_decrescente && a_iterador.getTipoPeriodo() < lista_estrutura.at(int(lista_estrutura.size()) - 1).tipo_iterador_final)) {
-						inicializacaoEstruturaPeriodo();//Cria uma nova estrutura
+						inicializacaoEstruturaPeriodo(false, 0);//Cria uma nova estrutura
 						lista_estrutura.at(int(lista_estrutura.size()) - 1).tipo_iterador_inicial = a_iterador.getTipoPeriodo();
 					}
 
@@ -757,6 +987,10 @@ public:
 				lista_estrutura.at(int(lista_estrutura.size()) - 1).smartEnupla.at(lista_estrutura.at(int(lista_estrutura.size()) - 1).tipo_iterador_final).push_back(a_valor);
 				numero_elementos++;
 			}
+
+			else
+				throw std::invalid_argument("Argumento Iterador - " + getString(a_iterador) + " - nao sequencial ao Iterador inicial: " + getString(getIteradorInicial()) + " ou final: " + getString(getIteradorFinal()) + " do SmartEnupla.");
+
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::addElemento(" + getString(a_iterador) + "," + getString(a_valor) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(Periodo a_iterador, TipoValor a_valor) {
@@ -770,6 +1004,23 @@ public:
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::setElemento(" + getString(a_iterador) + "," + getString(a_valor) + "): \n" + std::string(erro.what())); }
 	}; // void setElemento(Periodo a_iterador, TipoValor a_valor) {
+
+	void setElementoFromStr(Periodo a_iterador, std::string a_valor) {
+		try {
+
+			const int pos = getIndiceEstrutura(a_iterador);
+			lista_estrutura.at(pos).smartEnupla.at(a_iterador.getTipoPeriodo()).at(getIndice(a_iterador, pos)) = getFromString(TipoValor(), a_valor);
+
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::setElemento(" + getString(a_iterador) + "," + getString(a_valor) + "): \n" + std::string(erro.what())); }
+	}; // void addElemento(TipoIterador a_iterador, TipoValor a_valor) {
+
+	TipoValor getTipoElemento()const {
+		try {
+			return TipoValor();
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getTipoElemento(): \n" + std::string(erro.what())); }
+	}; // TipoValor getTipoElemento()const {
 
 	TipoValor getElemento(Periodo a_iterador)const {
 		try { 
@@ -1022,15 +1273,14 @@ private:
 				throw std::invalid_argument("Alocacao deve ser maior que 0.");
 			numero_elementos = 0;
 
-			inicializacaoEstruturaPeriodo(a_alocacao);
+			inicializacaoEstruturaPeriodo(false, a_alocacao);
 
 		}
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::inicializacao(" + getFullString(a_alocacao) + "): \n" + std::string(erro.what())); }
 	}; // void inicializacao(const int a_alocacao) {
 
-	void inicializacaoEstruturaPeriodo() { inicializacaoEstruturaPeriodo(0); };
 
-	void inicializacaoEstruturaPeriodo(const int a_alocacao) {
+	void inicializacaoEstruturaPeriodo(bool a_inserir_inicio_lista, const int a_alocacao) {
 		try {
 			if (a_alocacao < 0)
 				throw std::invalid_argument("Alocacao deve ser maior que 0.");
@@ -1050,7 +1300,10 @@ private:
 
 			estruturaPeriodo.tipoEstruturaPeriodo = TipoEstruturaPeriodo_flat;
 
-			lista_estrutura.push_back(estruturaPeriodo);
+			if (a_inserir_inicio_lista)
+				lista_estrutura.insert(lista_estrutura.begin(), estruturaPeriodo);
+			else
+				lista_estrutura.push_back(estruturaPeriodo);
 		}
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::inicializacaoEstruturaPeriodo(" + getFullString(a_alocacao) + "): \n" + std::string(erro.what())); }
 	}; // void inicializacaoEstruturaPeriodo(const int a_alocacao) {
