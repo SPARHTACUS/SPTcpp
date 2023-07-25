@@ -189,7 +189,6 @@ private:
 	void instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_EAR(Dados& a_dados, std::string a_nomeArquivo);
 	void instancia_atributos_hidreletrica_out_from_CadUsH_csv(Dados& a_dados, Hidreletrica& a_hidreletrica, std::string a_nomeArquivo);
 	void calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados);
-	void calcular_produtibilidade_EAR_acumulada_por_usina_old(Dados& a_dados);
 
 	void imprime_produtibilidade_EAR_acumulada(Dados& a_dados, std::string nomeArquivo);
 
@@ -368,6 +367,9 @@ private:
 	SmartEnupla<IdHidreletrica, int> lista_hidreletrica_NPOSNW; //Lista que registra se uma usina tem diferença de posto entre DECOMP  e NEWAVE
 
 	SmartEnupla<int, Hidreletrica> lista_hidreletrica_out_estudo; //Lista que registra usinas que não fazem parte do estudo mas são necessárias para desacoplar o corte NEWAVE (p.ex COMP PAF-MOX indicado no registro JUSENA para calcular a EAR do REE NE)
+
+	SmartEnupla<IdHidreletrica, SmartEnupla<int, IdReservatorioEquivalente>> lista_idHidreletrica_idReservatorioEquivalente_EAR;//Lista com idReservatoriosEquivalentes onde é valorado no NW o volume armazenado da idHidreletrica
+
 
 	template<typename TipoIterador>
 	TipoIterador getIdFromCodigoONS(const SmartEnupla<TipoIterador, int>& a_lista_codigo_ONS, const int a_codigo_ONS) {

@@ -62,7 +62,9 @@
       m(Hidreletrica,  AttComum,                  queda_referencia,                               double,          0,         1000,                  0,         nao) \
       m(Hidreletrica,  AttComum,                 volume_referencia,                               double,          0,       100000,                  0,         nao) \
       m(Hidreletrica,  AttComum,                tipo_regularizacao,                    TipoRegularizacao,     Nenhum,          max,             Nenhum,         nao) \
-      m(Hidreletrica,  AttComum,          codigo_usina_jusante_EAR,                                  int,          0,          500,                  0,         nao)
+      m(Hidreletrica,  AttComum,          codigo_usina_jusante_EAR,                                  int,          0,          500,                  0,         nao) \
+      m(Hidreletrica,  AttComum,               produtibilidade_EAR,                               double,          0,       100000,                  0,         nao) \
+      m(Hidreletrica,  AttComum,               produtibilidade_ENA,                               double,          0,       100000,                  0,         nao)
 //          c_classe,   smrtAtt,                      nomeAtributo,                                 tipo, lowerBound,   upperBound,      initialValue, mustRead?
 
 
@@ -93,9 +95,8 @@
 	  m(Hidreletrica,  AttVetor,                indisponibilidade_forcada,                                double,          0,            1,             0,    Periodo) \
       m(Hidreletrica,  AttVetor,             indisponibilidade_programada,                                double,          0,            1,             0,    Periodo) \
       m(Hidreletrica,  AttVetor,                          disponibilidade,                                double,          0,            1,             0,    Periodo) \
-      m(Hidreletrica,  AttVetor,                      produtibilidade_EAR,                                double,          0,        50000,             0,    Periodo) \
-      m(Hidreletrica,  AttVetor,            produtibilidade_acumulada_EAR,                                double,          0,        50000,             0,    Periodo) \
-      m(Hidreletrica,  AttVetor,                      produtibilidade_ENA,                                double,          0,        50000,             0,    Periodo)
+      m(Hidreletrica,  AttVetor,            produtibilidade_acumulada_EAR,                                double,          0,        50000,             0,    IdReservatorioEquivalente)
+
 
 //          c_classe,   smrtAtt,                             nomeAtributo,                                  Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 

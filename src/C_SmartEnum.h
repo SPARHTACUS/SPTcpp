@@ -1313,6 +1313,21 @@ DEFINE_SMART_ENUM(IdMetodoSolucao, ID_METODO_SOLUCAO)
 	 m(IdParcelaDefluenciaViajante,    1) m(IdParcelaDefluenciaViajante,    2) m(IdParcelaDefluenciaViajante,    3) m(IdParcelaDefluenciaViajante,    4) m(IdParcelaDefluenciaViajante,    5) m(IdParcelaDefluenciaViajante,    6) m(IdParcelaDefluenciaViajante,    7) m(IdParcelaDefluenciaViajante,    8) m(IdParcelaDefluenciaViajante,    9) m(IdParcelaDefluenciaViajante,   10) m(IdParcelaDefluenciaViajante,   11) m(IdParcelaDefluenciaViajante,   12) m(IdParcelaDefluenciaViajante,   13) m(IdParcelaDefluenciaViajante,   14) m(IdParcelaDefluenciaViajante,   15) m(IdParcelaDefluenciaViajante,   16) m(IdParcelaDefluenciaViajante,   17) m(IdParcelaDefluenciaViajante,   18) m(IdParcelaDefluenciaViajante,   19) m(IdParcelaDefluenciaViajante,   20) m(IdParcelaDefluenciaViajante,   21) m(IdParcelaDefluenciaViajante,   22) m(IdParcelaDefluenciaViajante,   23) m(IdParcelaDefluenciaViajante,   24) m(IdParcelaDefluenciaViajante,   25) m(IdParcelaDefluenciaViajante,   26) m(IdParcelaDefluenciaViajante,   27) m(IdParcelaDefluenciaViajante,   28) m(IdParcelaDefluenciaViajante,   29) m(IdParcelaDefluenciaViajante,   30) m(IdParcelaDefluenciaViajante,   31) m(IdParcelaDefluenciaViajante,   32) m(IdParcelaDefluenciaViajante,   33) m(IdParcelaDefluenciaViajante,   34) m(IdParcelaDefluenciaViajante,   35) m(IdParcelaDefluenciaViajante,   36) m(IdParcelaDefluenciaViajante,   37) m(IdParcelaDefluenciaViajante,   38) m(IdParcelaDefluenciaViajante,   39) m(IdParcelaDefluenciaViajante,   40)	m(IdParcelaDefluenciaViajante,   41) m(IdParcelaDefluenciaViajante,   42) m(IdParcelaDefluenciaViajante,   43) m(IdParcelaDefluenciaViajante,   44) m(IdParcelaDefluenciaViajante,   45) m(IdParcelaDefluenciaViajante,   46) m(IdParcelaDefluenciaViajante,   47) m(IdParcelaDefluenciaViajante,   48) m(IdParcelaDefluenciaViajante,   49) m(IdParcelaDefluenciaViajante,   50) m(IdParcelaDefluenciaViajante,   51) m(IdParcelaDefluenciaViajante,   52) m(IdParcelaDefluenciaViajante,   53) m(IdParcelaDefluenciaViajante,   54) m(IdParcelaDefluenciaViajante,   55) m(IdParcelaDefluenciaViajante,   56) m(IdParcelaDefluenciaViajante,   57) m(IdParcelaDefluenciaViajante,   58) m(IdParcelaDefluenciaViajante,   59) m(IdParcelaDefluenciaViajante,   60) m(IdParcelaDefluenciaViajante,   61) m(IdParcelaDefluenciaViajante,   62) m(IdParcelaDefluenciaViajante,   63) m(IdParcelaDefluenciaViajante,   64) m(IdParcelaDefluenciaViajante,   65) m(IdParcelaDefluenciaViajante,   66) m(IdParcelaDefluenciaViajante,   67) m(IdParcelaDefluenciaViajante,   68) m(IdParcelaDefluenciaViajante,   69) m(IdParcelaDefluenciaViajante,   70) m(IdParcelaDefluenciaViajante,   71) m(IdParcelaDefluenciaViajante,   72) m(IdParcelaDefluenciaViajante,   73) m(IdParcelaDefluenciaViajante,   74) m(IdParcelaDefluenciaViajante,   75) m(IdParcelaDefluenciaViajante,   76) m(IdParcelaDefluenciaViajante,   77) m(IdParcelaDefluenciaViajante,   78) m(IdParcelaDefluenciaViajante,   79) m(IdParcelaDefluenciaViajante,   80) m(IdParcelaDefluenciaViajante,   81) m(IdParcelaDefluenciaViajante,   82) m(IdParcelaDefluenciaViajante,   83) m(IdParcelaDefluenciaViajante,   84) m(IdParcelaDefluenciaViajante,   85) m(IdParcelaDefluenciaViajante,   86) m(IdParcelaDefluenciaViajante,   87) m(IdParcelaDefluenciaViajante,   88) m(IdParcelaDefluenciaViajante,   89) m(IdParcelaDefluenciaViajante,   90) m(IdParcelaDefluenciaViajante,   91) m(IdParcelaDefluenciaViajante,   92) m(IdParcelaDefluenciaViajante,   93) m(IdParcelaDefluenciaViajante,   94) m(IdParcelaDefluenciaViajante,   95) m(IdParcelaDefluenciaViajante,   96) m(IdParcelaDefluenciaViajante,   97) m(IdParcelaDefluenciaViajante,   98) m(IdParcelaDefluenciaViajante,   99) m(IdParcelaDefluenciaViajante,  100)
 DEFINE_SMART_ENUM(IdParcelaDefluenciaViajante, ID_PARCELADEFLUENCIAVIAJANTE)
 
+#define ID_RESERVATORIOEQUIVALENTE(m)\
+	 m(IdReservatorioEquivalente,    1) \
+     m(IdReservatorioEquivalente,    2) \
+	 m(IdReservatorioEquivalente,    3) \
+     m(IdReservatorioEquivalente,    4) \
+     m(IdReservatorioEquivalente,    5) \
+     m(IdReservatorioEquivalente,    6) \
+     m(IdReservatorioEquivalente,    7) \
+     m(IdReservatorioEquivalente,    8) \
+     m(IdReservatorioEquivalente,    9) \
+     m(IdReservatorioEquivalente,   10) \
+     m(IdReservatorioEquivalente,   11) \
+     m(IdReservatorioEquivalente,   12) 
+DEFINE_SMART_ENUM(IdReservatorioEquivalente, ID_RESERVATORIOEQUIVALENTE)
+
 // A Lista está em ordem alfabética.
 
 #define LISTA_ID(m)             \
@@ -1361,6 +1376,7 @@ m(IdRealizacao)                 \
 m(IdRegua11)                    \
 m(IdReservaPotencia)            \
 m(IdReservatorio)               \
+m(IdReservatorioEquivalente)               \
 m(IdRestricaoEletrica)          \
 m(IdRestricaoOperativaUHE)      \
 m(IdSubmercado)                 \

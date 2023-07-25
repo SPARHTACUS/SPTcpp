@@ -13357,32 +13357,30 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			//////////////////////////////////////////////////////////////////////////////////
 			//1.1 Cálculo da produtibilidade média para as usinas instanciadas no CP, 
 			//seguindo a metodologia ONS - Submódulo 23.5: Critérios para estudos hidrológicos
+			// Premissa: Utiliza os atributos do hidr.dat (sem modificações do deck!) -> i.e. a produtibilidade_EAR é estática (AttComum)
 			//////////////////////////////////////////////////////////////////////////////////
 
 			const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
+			const Periodo periodo_canal_fuga_medio = a_horizonte_estudo.getIteradorInicial();
 
 			for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
 
-				for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
+				if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
 
-					if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
+					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, 0.0);
+					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, 0.0);
 
-						a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_EAR, periodo, 0.0);
-						a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, 0.0);
+				}//if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
+				else {
 
-					}//if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
-					else {
+					int percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
+					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), periodo_canal_fuga_medio, percentual_volume_util)));
 
-						int percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
-						a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_EAR, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), periodo, percentual_volume_util)));
+					percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
+					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_ENA, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), periodo_canal_fuga_medio, percentual_volume_util)));
 
-						percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
-						a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), periodo, percentual_volume_util)));
+				}//else {
 
-					}//else {
-
-
-				}//for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
 
 			}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
 
@@ -13394,16 +13392,12 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_EAR(a_dados, a_diretorio +"//CadUsH.csv");
 
 			for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); pos_lista_hidreletrica_out_estudo++) {
-
-				for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
 					
-					int percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
-					lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo).addElemento(AttVetorHidreletrica_produtibilidade_EAR, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo, percentual_volume_util)));
+				int percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
+				lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo_canal_fuga_medio, percentual_volume_util)));
 
-					percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
-					lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo, percentual_volume_util)));
-
-				}//for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
+				percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
+				lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo).setAtributo(AttComumHidreletrica_produtibilidade_ENA, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo_canal_fuga_medio, percentual_volume_util)));
 
 			}//for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); lista_hidreletrica_out_estudo.incrementarIterador(pos_lista_hidreletrica_out_estudo)) {
 
@@ -13454,7 +13448,7 @@ double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidre
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Premissa: Vmax e Vmin não mudam por período para desacoplamento cortes NEWAVE
-		// Usinas com regularização mensal utiliza o Vmax, Vmin (hidr.dat + modificações dadger)
+		// Usinas com regularização mensal utiliza o Vmax, Vmin (hidr.dat)
 		// Usinas com regularização semanal/diária utiliza VRef do hidr.dat
 
 		double volume_minimo = a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_volume_minimo, double());
@@ -13470,16 +13464,13 @@ double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidre
 
 		}//if getAtributo(idHidreletrica, AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao()) == TipoRegularizacao_semanal || getAtributo(idHidreletrica, AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao()) == TipoRegularizacao_diaria {
 
-		//Instancia AttComum_canal_fuga_medio como AttVetor_canal_fuga_medio (caso necessário)
-		if (a_hidreletrica.getSizeVetor(AttVetorHidreletrica_canal_fuga_medio) == 0)
-			a_hidreletrica.addElemento(AttVetorHidreletrica_canal_fuga_medio, a_periodo, a_hidreletrica.getAtributo(AttComumHidreletrica_canal_fuga_medio, double()));
-		else if (a_hidreletrica.getIteradorFinal(AttVetorHidreletrica_canal_fuga_medio, Periodo()) < a_periodo)
-			a_hidreletrica.addElemento(AttVetorHidreletrica_canal_fuga_medio, a_periodo, a_hidreletrica.getAtributo(AttComumHidreletrica_canal_fuga_medio, double()));
+
+		double canal_fuga_medio = a_hidreletrica.getAtributo(AttComumHidreletrica_canal_fuga_medio, double());
+
+		if(a_hidreletrica.getSizeVetor(AttVetorHidreletrica_canal_fuga_medio) > 0)//Para quem teve registro JUSENA pega o valor do canal_fuga_medio do AttVetor
+			canal_fuga_medio = a_hidreletrica.getElementoVetor(AttVetorHidreletrica_canal_fuga_medio, a_periodo, double());
 		
-
-
-		const double canal_fuga_medio = a_hidreletrica.getElementoVetor(AttVetorHidreletrica_canal_fuga_medio, a_periodo, double());
-		const double cotaMedia = a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getCotaMedia(a_periodo, volume_minimo, volume_maximo);
+		const double cotaMedia = a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getCotaMedia(volume_minimo, volume_maximo);
 		const double cota = cotaMedia - canal_fuga_medio;
 
 		return cota;
@@ -13819,20 +13810,63 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 {
 	try {
 
-		//Nota: Itaipu - REE 5
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Informação das hidrelétricas onde é valorado o volume armazenado em diferentes REEs
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		std::vector<int> codigo_usina_aporte_varios_reservatorios;
+		std::vector<std::vector<int>> codigo_ONS_REE_aporte_varios_reservatorios;
 
-		std::vector<int> codigo_usina_a_montante_desconsider_Itaipu; //Na valoração da EAR existem usinas a montante de Itaipu que não consideram no cálculo da produtibilidade acumulada a produtibilidade de Itaipu
+		//////
 
-		codigo_usina_a_montante_desconsider_Itaipu.push_back(153); //São Domingos - REE 10
-		codigo_usina_a_montante_desconsider_Itaipu.push_back(45);  //Jupiá        - REE 10
-		codigo_usina_a_montante_desconsider_Itaipu.push_back(46);  //P.Primavera  - REE 10
-		codigo_usina_a_montante_desconsider_Itaipu.push_back(63);  //Rosana       - REE 12
-		codigo_usina_a_montante_desconsider_Itaipu.push_back(62);  //Taquaruçu       - REE 12
+		//155 - Retiro Baixo (aporta em REE 1 - SUDESTE / REE 3 - NORDESTE)
+		codigo_usina_aporte_varios_reservatorios.push_back(155);
+		codigo_ONS_REE_aporte_varios_reservatorios.push_back(std::vector<int> {1, 3});
+
+		//156 - Três Marias (aporta em REE 1 - SUDESTE / REE 3 - NORDESTE)
+		codigo_usina_aporte_varios_reservatorios.push_back(156);
+		codigo_ONS_REE_aporte_varios_reservatorios.push_back(std::vector<int> {1, 3});
+
+		//162 - Queimado (aporta em REE 1 - SUDESTE / REE 3 - NORDESTE)
+		codigo_usina_aporte_varios_reservatorios.push_back(162);
+		codigo_ONS_REE_aporte_varios_reservatorios.push_back(std::vector<int> {1, 3});
+
+		//////
+
+		//57 - Maua (aporta em REE 11 - IGUAÇU / REE 12 - PARANAPANEMA)
+		codigo_usina_aporte_varios_reservatorios.push_back(57);
+		codigo_ONS_REE_aporte_varios_reservatorios.push_back(std::vector<int> {11, 12});
+
+		//////
+
+		//148 - Irape (aporta em REE 1 - SUDESTE / REE 3 - NORDESTE)
+		codigo_usina_aporte_varios_reservatorios.push_back(148);
+		codigo_ONS_REE_aporte_varios_reservatorios.push_back(std::vector<int> {1, 3});
+
+		//////
+
+		//251 - Serra Mesa (aporta em REE 1 - SUDESTE / REE 4 - NORTE)
+		codigo_usina_aporte_varios_reservatorios.push_back(251);
+		codigo_ONS_REE_aporte_varios_reservatorios.push_back(std::vector<int> {1, 4});
+
+		//257 - Peixe Angical (aporta em REE 1 - SUDESTE / REE 4 - NORTE)
+		codigo_usina_aporte_varios_reservatorios.push_back(257);
+		codigo_ONS_REE_aporte_varios_reservatorios.push_back(std::vector<int> {1, 4});
+
+		////////////////////////////////////////
+		//Vetores com as premissas incorporadas
+		////////////////////////////////////////
+
+		std::vector<int> codigo_usina_a_montante_desconsidera_Itaipu; //Na valoração da EAR existem usinas a montante de Itaipu que não consideram no cálculo da produtibilidade acumulada a produtibilidade de Itaipu
+
+		codigo_usina_a_montante_desconsidera_Itaipu.push_back(153); //São Domingos - REE 10
+		codigo_usina_a_montante_desconsidera_Itaipu.push_back(45);  //Jupiá        - REE 10
+		codigo_usina_a_montante_desconsidera_Itaipu.push_back(46);  //P.Primavera  - REE 10
+		codigo_usina_a_montante_desconsidera_Itaipu.push_back(63);  //Rosana       - REE 12
+		codigo_usina_a_montante_desconsidera_Itaipu.push_back(62);  //Taquaruçu       - REE 12
 
 		std::vector<int> codigo_ONS_REE_considera_Itaipu;
 		codigo_ONS_REE_considera_Itaipu.push_back(10); // REE 10 - SUDESTE
 		codigo_ONS_REE_considera_Itaipu.push_back(12);  // REE 12 - PARANAPANEMA
-		codigo_ONS_REE_considera_Itaipu.push_back(11);  // REE 11 - IGUAÇU
 
 		//////////////////////////////
 		//1.Usinas dentro do estudo
@@ -13843,41 +13877,90 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 
 		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
 
-			if (idHidreletrica == IdHidreletrica_43)
-				int a = 1;
+			//Instancia produtibilidade_acumulada_EAR x idHidreletrica para todos os REEs
+			a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR, SmartEnupla<IdReservatorioEquivalente, double>(IdReservatorioEquivalente_1, std::vector<double>(IdReservatorioEquivalente(maior_ONS_REE), 0.0)));
 
 			const int codigo_ONS_REE_alvo = lista_codigo_ONS_REE.getElemento(idHidreletrica);
 			const int codigo_usina_alvo = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int());
 
 
-			//Determina se deve considerar Itaipu (caso precise na lógica)
+			//Determina vetor_REE onde vai ser realizado o cálculo da produtibilidade_acumulada
 
-			bool is_REE_considerando_Itaipu = false;
+			std::vector<int> codigos_ONS_REE_aporte_EAR {codigo_ONS_REE_alvo}; //Vetor indicando os REEs onde vai ser calculada a produtibilidade_acumulada
 
-			for (int pos = 0; pos < int(codigo_ONS_REE_considera_Itaipu.size()); pos++) {
-				if (codigo_ONS_REE_considera_Itaipu.at(pos) == codigo_ONS_REE_alvo) {
-					is_REE_considerando_Itaipu = true;
+			for (int pos = 0; pos < int(codigo_usina_aporte_varios_reservatorios.size()); pos++) {
+
+				if (codigo_usina_aporte_varios_reservatorios.at(pos) == codigo_usina_alvo) {//Existem usinas valoradas em diferentes REEs
+
+					////////////////////////
+					//Valida que o REE onde pertence a usina esteja registrado em vetor codigo_ONS_REE_aporte_varios_reservatorios
+					
+					bool is_codigo_ONS_REE_alvo_in_codigo_ONS_REE_aporte_varios_reservatorios = false;
+
+					for (int aux = 0; aux < int(codigo_ONS_REE_aporte_varios_reservatorios.at(pos).size()); aux++) {
+
+						if (codigo_ONS_REE_aporte_varios_reservatorios.at(pos).at(aux) == codigo_ONS_REE_alvo) {
+							is_codigo_ONS_REE_alvo_in_codigo_ONS_REE_aporte_varios_reservatorios = true;
+							break;
+						}//if (codigo_ONS_REE_aporte_varios_reservatorios.at(pos).at(aux) == codigo_ONS_REE_alvo) {
+
+					}//for (int aux = 0; aux < int(codigo_ONS_REE_aporte_varios_reservatorios.at(pos).size()); aux++) {
+
+					////////////////////////
+
+					if (is_codigo_ONS_REE_alvo_in_codigo_ONS_REE_aporte_varios_reservatorios)
+						codigos_ONS_REE_aporte_EAR = codigo_ONS_REE_aporte_varios_reservatorios.at(pos);
+					else
+						throw std::invalid_argument("Nao encontrada codigo_ONS_REE_alvo em vetor codigo_ONS_REE_aporte_varios_reservatorios para a idHidreletrica_" + getString(idHidreletrica));
+
 					break;
-				}//if (codigo_ONS_REE_considera_Itaipu.at(pos) == codigo_ONS_REE_alvo) {
-			}//for (int pos = 0; int(codigo_ONS_REE_considera_Itaipu.size()); pos++) {
 
+				}//if (codigo_usina_aporte_varios_reservatorios.at(pos) == codigo_usina_alvo) {
+
+			}//for (int pos = 0; pos < int(codigo_usina_aporte_varios_reservatorios.size()); pos++) {
 
 			//Determina se deve considerar Itaipu (caso precise na lógica)
 
 			bool is_desconsiderar_Itaipu_no_calculo_produtibilidade_acumulada = false;
 
-			for (int pos = 0; pos < int(codigo_usina_a_montante_desconsider_Itaipu.size()); pos++) {
-				if (codigo_usina_a_montante_desconsider_Itaipu.at(pos) == codigo_usina_alvo) {
+			for (int pos = 0; pos < int(codigo_usina_a_montante_desconsidera_Itaipu.size()); pos++) {
+				if (codigo_usina_a_montante_desconsidera_Itaipu.at(pos) == codigo_usina_alvo) {
 					is_desconsiderar_Itaipu_no_calculo_produtibilidade_acumulada = true;
 					break;
-				}//if (codigo_usina_a_montante_desconsider_Itaipu.at(pos) ==  codigo_usina_alvo) {
-			}//for (int pos = 0; int(codigo_usina_a_montante_desconsider_Itaipu.size()); pos++) {
+				}//if (codigo_usina_a_montante_desconsidera_Itaipu.at(pos) ==  codigo_usina_alvo) {
+			}//for (int pos = 0; int(codigo_usina_a_montante_desconsidera_Itaipu.size()); pos++) {
 
-			/////////////////
+			//////////////////////////////////////////
+			//Cálculo produtibilidade_acumulada_EAR
+			//Realizado para REE onde a usina tem aporte
+			//////////////////////////////////////////
 
-			for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+			for (int pos = 0; pos < int(codigos_ONS_REE_aporte_EAR.size()); pos++) {
 
-				double produtibilidade_acumulada = a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(AttVetorHidreletrica_produtibilidade_EAR, periodo, double());
+				bool is_REE_encontrado = false; //Identifica desde qual usina começa a soma da produtibilidade_acumulada_EAR
+
+				const IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente(codigos_ONS_REE_aporte_EAR.at(pos));
+
+				//Determina se deve considerar Itaipu (caso precise na lógica)
+
+				bool is_REE_considerando_Itaipu = false;
+
+				for (int aux = 0; aux < int(codigo_ONS_REE_considera_Itaipu.size()); aux++) {
+					if (codigo_ONS_REE_considera_Itaipu.at(aux) == codigos_ONS_REE_aporte_EAR.at(pos)) {
+						is_REE_considerando_Itaipu = true;
+						break;
+					}//if (codigo_ONS_REE_considera_Itaipu.at(aux) == codigos_ONS_REE_aporte_EAR.at(pos)) {
+				}//for (int aux = 0; aux < int(codigo_ONS_REE_considera_Itaipu.size()); aux++) {
+
+				////////////////
+
+				double produtibilidade_acumulada = 0.0;
+				
+				if (codigo_ONS_REE_alvo == codigos_ONS_REE_aporte_EAR.at(pos)) {
+					produtibilidade_acumulada += a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_produtibilidade_EAR, double());
+					is_REE_encontrado = true;
+				}//if (codigo_ONS_REE_alvo == codigos_ONS_REE_aporte_EAR.at(pos)) {
+				
 				int codigo_usina_jusante = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, int());
 
 				//////////////////////////////////
@@ -13889,6 +13972,11 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 				while (codigo_usina_jusante > 0) {
 
 					const IdHidreletrica idHidreletrica_jusante = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina_jusante);
+
+					if (idHidreletrica_jusante != IdHidreletrica_Nenhum) {
+						if (lista_codigo_ONS_REE.getElemento(idHidreletrica_jusante) == codigos_ONS_REE_aporte_EAR.at(pos))
+							is_REE_encontrado = true;
+					}//if (idHidreletrica_jusante != IdHidreletrica_Nenhum) {
 
 					aux_pos_lista_hidreletrica_out_estudo = -1;
 					if (idHidreletrica_jusante == IdHidreletrica_Nenhum && codigo_usina_jusante > 0) {//Procura codigo_usina_jusante em lista_hidreletrica_out_estudo ->Podem existir usinas fora do estudo CP para o acoplamento com o corte NEWAVE (e.g. COMP PAF-MOX)
@@ -13904,7 +13992,9 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 							throw std::invalid_argument("Nao encontrada hidreletrica em vetorHidreletrica nem em lista_hidreletrica_out_estudo com codigo_usina:" + std::string(getString(codigo_usina_jusante)) + "\n");
 
 						/////////////////////////////
-						produtibilidade_acumulada += lista_hidreletrica_out_estudo.at(aux_pos_lista_hidreletrica_out_estudo).getElementoVetor(AttVetorHidreletrica_produtibilidade_EAR, periodo, double());
+						if (is_REE_encontrado)
+							produtibilidade_acumulada += lista_hidreletrica_out_estudo.at(aux_pos_lista_hidreletrica_out_estudo).getAtributo(AttComumHidreletrica_produtibilidade_EAR, double());
+						
 						codigo_usina_jusante = lista_hidreletrica_out_estudo.at(aux_pos_lista_hidreletrica_out_estudo).getAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, int());
 
 					}//if (idHidreletrica == IdHidreletrica_Nenhum && codigo_usina_jusante > 0) {
@@ -13913,15 +14003,18 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 						///////////////////////////////////////////////////////////////////////////////////////////
 						//Verifica se está no mesmo REE
 						// Premissa: REE PARANÁ (codigo REE: 10) e REE PARANAPANEMA (REE:12) conta a produtibildiade de Itaipu (codigo REE: 5)
-						//           a exceção das usinas em vetor codigo_usina_a_montante_desconsider_Itaipu
+						//           a exceção das usinas em vetor codigo_usina_a_montante_desconsidera_Itaipu
 						///////////////////////////////////////////////////////////////////////////////////////////
 
-						if (codigo_ONS_REE_alvo != lista_codigo_ONS_REE.getElemento(idHidreletrica_jusante) and (!is_REE_considerando_Itaipu))
+						if (codigos_ONS_REE_aporte_EAR.at(pos) != lista_codigo_ONS_REE.getElemento(idHidreletrica_jusante) and is_REE_encontrado and (!is_REE_considerando_Itaipu))
 							break;
-						else if (codigo_ONS_REE_alvo != lista_codigo_ONS_REE.getElemento(idHidreletrica_jusante) and is_desconsiderar_Itaipu_no_calculo_produtibilidade_acumulada)
+						else if (codigos_ONS_REE_aporte_EAR.at(pos) != lista_codigo_ONS_REE.getElemento(idHidreletrica_jusante) and is_REE_encontrado and is_desconsiderar_Itaipu_no_calculo_produtibilidade_acumulada)
 							break;
 						else {
-							produtibilidade_acumulada += a_dados.vetorHidreletrica.att(idHidreletrica_jusante).getElementoVetor(AttVetorHidreletrica_produtibilidade_EAR, periodo, double());
+							
+							if(is_REE_encontrado)
+								produtibilidade_acumulada += a_dados.vetorHidreletrica.att(idHidreletrica_jusante).getAtributo(AttComumHidreletrica_produtibilidade_EAR, double());
+														
 							codigo_usina_jusante = a_dados.vetorHidreletrica.att(idHidreletrica_jusante).getAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, int());
 						}//else {
 
@@ -13929,160 +14022,12 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 				
 				}//while (codigo_usina_jusante > 0) {
 
-				a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_acumulada_EAR, periodo, produtibilidade_acumulada);
+				a_dados.vetorHidreletrica.att(idHidreletrica).setElemento(AttVetorHidreletrica_produtibilidade_acumulada_EAR, idReservatorioEquivalente, produtibilidade_acumulada);
 
-			}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+			}//for (int pos = 0; pos < int(codigos_ONS_REE_aporte_EAR.size()); pos++) {
 
 		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
 
-	}//	try {
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina: \n" + std::string(erro.what())); }
-
-}
-
-
-void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina_old(Dados& a_dados)
-{
-	try {
-		
-		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
-		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
-
-		for (int codigo_ONS_REE = 1; codigo_ONS_REE <= maior_ONS_REE; codigo_ONS_REE++) {
-
-			const std::vector<IdHidreletrica> idHidreletricas_REE = getIdsFromCodigoONS(lista_codigo_ONS_REE, codigo_ONS_REE);
-
-			////////////////////////////////////////////////////////////////////////
-			//1. Procura a 1 usina da cascata do REE (idHidreletrica_montante_REE)
-			////////////////////////////////////////////////////////////////////////
-			IdHidreletrica idHidreletrica_montante_REE = idHidreletricas_REE.at(0);
-			int codigo_usina_montante_REE = a_dados.vetorHidreletrica.att(idHidreletrica_montante_REE).getAtributo(AttComumHidreletrica_codigo_usina, int());
-
-			while (true) {
-
-				bool is_codigo_usina_montante_REE_cascata = true;
-
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
-
-					//Atualiza o idHidreletrica_montante_REE se existe uma usina apontando o codigo_usina_jusante_EAR e está no mesmo REE 
-					if (codigo_usina_montante_REE == a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, int()) && lista_codigo_ONS_REE.getElemento(idHidreletrica) == codigo_ONS_REE) {
-						is_codigo_usina_montante_REE_cascata = false;
-						codigo_usina_montante_REE = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int());
-						idHidreletrica_montante_REE = idHidreletrica;
-						break;
-
-					}//if (codigo_usina_montante_REE == a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, int())) {
-
-				}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
-
-				//Critério de parada
-				if (is_codigo_usina_montante_REE_cascata)
-					break;
-
-			}//while (true) {
-
-			////////////////////////////////////////////////////////////////////////
-			//2. Constroi o caminho da cascata com base no codigo_usina_jusante_EAR
-			// (i.e. Regras das usinas que valoram o volume armazenado)
-			// Regra i: REE 10 (PARANA)  - Conta também a produtibilidade de Itaipu (REE 5)
-			////////////////////////////////////////////////////////////////////////
-
-			std::vector<Hidreletrica> lista_ordem_cascata_hidreletrica;
-			int codigo_usina_alvo = codigo_usina_montante_REE;
-			int aux_pos_lista_hidreletrica_out_estudo = -1;
-			IdHidreletrica idHidreletrica = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina_alvo);
-			
-			while (true) {
-
-				if (aux_pos_lista_hidreletrica_out_estudo == -1) { //Significa que a usina está dentro do vetorHidreletrica
-					lista_ordem_cascata_hidreletrica.push_back(a_dados.vetorHidreletrica.att(idHidreletrica));
-					codigo_usina_alvo = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, int());
-				}//if (aux_pos_lista_hidreletrica_out_estudo == -1) {
-				else if (aux_pos_lista_hidreletrica_out_estudo >= 0) { //Significa que a usina está dentro da lista_hidreletrica_out_estudo (mapeada pelo registro JUSENA)
-					lista_ordem_cascata_hidreletrica.push_back(lista_hidreletrica_out_estudo.getElemento(aux_pos_lista_hidreletrica_out_estudo));
-					codigo_usina_alvo = lista_hidreletrica_out_estudo.getElemento(aux_pos_lista_hidreletrica_out_estudo).getAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, int());
-				}//else if (aux_pos_lista_hidreletrica_out_estudo >= 0) {
-
-				//////////////////////				
-				idHidreletrica = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina_alvo);
-
-				//Procura codigo_usina_alvo em lista_hidreletrica_out_estudo ->Podem existir usinas fora do estudo CP (e.g. COMP PAF-MOX)
-				aux_pos_lista_hidreletrica_out_estudo = -1;
-				if (idHidreletrica == IdHidreletrica_Nenhum && codigo_usina_alvo > 0){
-
-					for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); lista_hidreletrica_out_estudo.incrementarIterador(pos_lista_hidreletrica_out_estudo)) {
-						if (lista_hidreletrica_out_estudo.getElemento(pos_lista_hidreletrica_out_estudo).getAtributo(AttComumHidreletrica_codigo_usina, int()) == codigo_usina_alvo) {
-							aux_pos_lista_hidreletrica_out_estudo = pos_lista_hidreletrica_out_estudo;
-							break;
-						}//if (lista_hidreletrica_out_estudo.getElemento(pos_lista_hidreletrica_out_estudo).getAtributo(AttComumHidreletrica_codigo_usina, int()) == codigo_usina_alvo) {
-					}//for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); lista_hidreletrica_out_estudo.incrementarIterador(pos_lista_hidreletrica_out_estudo)) {
-
-					if (aux_pos_lista_hidreletrica_out_estudo == -1)
-						throw std::invalid_argument("Nao encontrada hidreletrica em vetorHidreletrica nem em lista_hidreletrica_out_estudo com codigo_usina:" + std::string(getString(codigo_usina_alvo)) + "\n");
-
-				}//if (idHidreletrica == IdHidreletrica_Nenhum && codigo_usina_alvo > 0){
-
-				/////////////////////////////
-				//Critério de parada
-				/////////////////////////////
-
-				if (codigo_ONS_REE == 10) {//REE PARANA - Conta produtibilidade de Itaipu (REE 5)
-
-					if (codigo_usina_alvo == 0)
-						break;
-
-				}//if (codigo_ONS_REE == 10) {
-				else if (codigo_usina_alvo == 0 || lista_codigo_ONS_REE.getElemento(idHidreletrica) != codigo_ONS_REE)
-					break;
-
-			}//while (true) {
-
-			////////////////////////////////////////////////////////////////////////
-			//3. Calcula produtibilidade_acumulada_EAR
-			////////////////////////////////////////////////////////////////////////
-
-			for (int pos = 0; pos < int(lista_ordem_cascata_hidreletrica.size()); pos++) {
-
-				const int codigo_usina = lista_ordem_cascata_hidreletrica.at(pos).getAtributo(AttComumHidreletrica_codigo_usina, int());
-				const IdHidreletrica idHidreletrica = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina);
-
-				for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
-
-					double produtibilidade_acumulada_EAR = 0;
-
-					for (int pos_aux = pos; pos_aux < int(lista_ordem_cascata_hidreletrica.size()); pos_aux++)
-						produtibilidade_acumulada_EAR += lista_ordem_cascata_hidreletrica.at(pos_aux).getElementoVetor(AttVetorHidreletrica_produtibilidade_EAR, periodo, double());
-
-					//Mapea a hidreletrica na lista_ordem_cascata_hidreletrica
-					
-					if (idHidreletrica == IdHidreletrica_Nenhum) {//Procura codigo_usina em lista_hidreletrica_out_estudo ->Podem existir usinas fora do estudo CP (e.g. COMP PAF-MOX)
-
-						int aux_pos_lista_hidreletrica_out_estudo = -1;
-
-						for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); lista_hidreletrica_out_estudo.incrementarIterador(pos_lista_hidreletrica_out_estudo)) {
-							if (lista_hidreletrica_out_estudo.getElemento(pos_lista_hidreletrica_out_estudo).getAtributo(AttComumHidreletrica_codigo_usina, int()) == codigo_usina) {
-								aux_pos_lista_hidreletrica_out_estudo = pos_lista_hidreletrica_out_estudo;
-								break;
-							}//if (lista_hidreletrica_out_estudo.getElemento(pos_lista_hidreletrica_out_estudo).getAtributo(AttComumHidreletrica_codigo_usina, int()) == codigo_usina_alvo) {
-						}//for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); lista_hidreletrica_out_estudo.incrementarIterador(pos_lista_hidreletrica_out_estudo)) {
-
-						if (aux_pos_lista_hidreletrica_out_estudo == -1)
-							throw std::invalid_argument("Nao encontrada hidreletrica em vetorHidreletrica nem em lista_hidreletrica_out_estudo com codigo_usina:" + std::string(getString(codigo_usina)) + "\n");
-
-						lista_hidreletrica_out_estudo.getElemento(aux_pos_lista_hidreletrica_out_estudo).addElemento(AttVetorHidreletrica_produtibilidade_acumulada_EAR, periodo, produtibilidade_acumulada_EAR);
-
-
-					}//if (idHidreletrica == IdHidreletrica_Nenhum) {
-					else
-						a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_acumulada_EAR, periodo, produtibilidade_acumulada_EAR);
-
-					
-				}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
-
-			}//for (int pos = 0; pos < int(lista_ordem_cascata_idHidreletrica.size()); pos++) {
-
-		}//for (int codigo_ONS_REE = 1; codigo_ONS_REE <= maior_ONS_REE; codigo_ONS_REE++) {
-		
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina: \n" + std::string(erro.what())); }
 
@@ -14104,8 +14049,8 @@ void LeituraCEPEL::imprime_produtibilidade_EAR_acumulada(Dados& a_dados, std::st
 		//Cabeçalho
 		////////////////
 		fp_out << "idHidreletrica" << ";" << "nome" << ";" << "codigo_usina" << ";";
-		for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo))
-			fp_out << getString(periodo) << ";";
+		for (IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente_1; idReservatorioEquivalente <= IdReservatorioEquivalente(maior_ONS_REE); idReservatorioEquivalente++)
+			fp_out << getString(idReservatorioEquivalente) << ";";
 
 		fp_out << std::endl; //Passa de linha
 
@@ -14117,8 +14062,8 @@ void LeituraCEPEL::imprime_produtibilidade_EAR_acumulada(Dados& a_dados, std::st
 			fp_out << getString(a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_nome, string())) << ";";
 			fp_out << getString(a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int())) << ";";
 
-			for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
-				const double produtibilidade_acumulada_EAR = a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR, periodo, double()) * 1000 / 3600;
+			for (IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente_1; idReservatorioEquivalente <= IdReservatorioEquivalente(maior_ONS_REE); idReservatorioEquivalente++) {
+				const double produtibilidade_acumulada_EAR = a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR, idReservatorioEquivalente, double()) * 1000 / 3600;
 				fp_out << produtibilidade_acumulada_EAR << ";";
 
 			}
