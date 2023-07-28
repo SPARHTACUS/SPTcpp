@@ -736,7 +736,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 
 		template<typename TListasIdxElem, typename TIt>
-		void alocConteudoIter(TListasIdxElem& a_listasIdxElem, TIt a_it) {
+		void alocConteudoIter(TListasIdxElem& a_listasIdxElem, const TIt a_it) {
 			try {
 
 				// Inicializa Lista
@@ -745,23 +745,28 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 				// Alocação do final da lista até iterador informado
 				else if (a_listasIdxElem.getIteradorFinal() < a_it) {
-					for (TIt it = a_listasIdxElem.getIteradorFinal(); it < a_it; a_listasIdxElem.incrementarIterador(it))
-						if (it > a_listasIdxElem.getIteradorFinal())
+					for (TIt it = a_listasIdxElem.getIteradorFinal(); it < a_it; a_listasIdxElem.incrementarIteradorMinimo(it))
+						if (it >= a_listasIdxElem.getIteradorFinal() + 1)
 							a_listasIdxElem.addElemento(it, a_listasIdxElem.getTipoElemento());
 					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
 				}
 
 				// Alocação do início da lista até o iterador informado
 				else if (a_it < a_listasIdxElem.getIteradorInicial()) {
-					for (TIt it = a_listasIdxElem.getIteradorInicial(); it > a_it; a_listasIdxElem.decrementarIterador(it))
+					for (TIt it = a_listasIdxElem.getIteradorInicial(); it >= a_it + 1; a_listasIdxElem.decrementarIteradorMinimo(it))
 						if (it < a_listasIdxElem.getIteradorInicial())
 							a_listasIdxElem.addElemento(it, a_listasIdxElem.getTipoElemento());
 					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
 				}
+
+				//else
+					//a_listasIdxElem.alterarValorSeAlterarIterador(a_it, a_listasIdxElem.getTipoElemento());
+
 			}
 			catch (const std::exception& erro) { throw std::invalid_argument("alocConteudoIter(a_listasIdxElem," + getFullString(a_it) + "): \n" + std::string(erro.what())); }
 		};
 
+		
 		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
 		void addConteudoIters_10(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10) {
 
@@ -1004,17 +1009,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 					return true;
 
 			}
-			//catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what())); }
-			catch (const std::exception& erro) {
-
-				std::cout << std::string(erro.what()) << std::endl;
-
-			}
-
-			this;
-
-			return false;
-
+			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what())); }
 
 		};
 

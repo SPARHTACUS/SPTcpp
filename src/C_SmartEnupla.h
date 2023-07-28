@@ -157,6 +157,19 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::at(" + getFullString(a_iterador) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iterador, TipoValor a_valor) {
 
+	void alterarValorSeAlterarIterador(const TipoIterador a_iterador, const TipoValor a_valor) {
+		try {
+
+			if ((getIteradorInicial() <= a_iterador) && (a_iterador <= getIteradorFinal()))
+				return;
+			
+			throw std::invalid_argument("Metodo nao valido para TipoIterador e TipoValor");
+
+
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::alterarValorSeAlterarIterador(" + getFullString(a_iterador) + ",a_valor) : \n" + std::string(erro.what())); }
+	}
+
 	void random_shuffle() { std::random_shuffle(smartEnupla.begin(), smartEnupla.end()); };
 
 
@@ -188,6 +201,8 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::incrementaIterador(" + getString(a_iterador) + "," + getString(a_inteiro) + "): \n" + std::string(erro.what())); }
 	} // void incrementarIterador(Periodo &a_periodo, const int a_inteiro) const {
 
+	void incrementarIteradorMinimo(TipoIterador& a_iterador) const { incrementarIterador(a_iterador); }
+
 	void incrementarIterador(TipoIterador& a_iterador) const {
 		try {
 			if (size() == 0)
@@ -200,6 +215,8 @@ public:
 		} // try{
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::incrementaIterador(" + getString(a_iterador) + "): \n" + std::string(erro.what())); }
 	} // void operator++(Periodo &a_periodo) const {
+
+	void decrementarIteradorMinimo(TipoIterador& a_iterador) const { decrementarIterador(a_iterador); }
 
 	void decrementarIterador(TipoIterador& a_iterador) const {
 		try {
@@ -635,13 +652,21 @@ public:
 			if (size() == 0)
 				throw std::invalid_argument("Iteradores nao definidos.");
 
+			Periodo periodo_inicial;
+
+			const int indice_estrutura = getIndiceEstruturaSeExistir(a_periodo_externo);
+			if (indice_estrutura > -1)
+				periodo_inicial = lista_estrutura.at(indice_estrutura).iteradores_iniciais.at(lista_estrutura.at(indice_estrutura).tipo_iterador_inicial).at(0);
+			else
+				periodo_inicial = getIteradorInicial();
+
 			const Periodo periodo_externo_seguinte = a_periodo_externo + 1;
 
 			std::vector<Periodo> iteradores;
 
 			bool is_sobreposicao = false;
 
-			for (Periodo periodo_interno = getIteradorInicial(); periodo_interno <= getIteradorFinal(); incrementarIterador(periodo_interno)) {
+			for (Periodo periodo_interno = periodo_inicial; periodo_interno <= getIteradorFinal(); incrementarIterador(periodo_interno)) {
 
 				const double sobreposicao = a_periodo_externo.sobreposicao(periodo_interno);
 
@@ -696,6 +721,16 @@ public:
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::incrementaIterador(" + getString(a_periodo) + "," + getString(a_inteiro) + "): \n" + std::string(erro.what())); }
 	} // void incrementarIterador(Periodo &a_periodo, const int a_inteiro) const {
+
+	void incrementarIteradorMinimo(Periodo& a_periodo) const {
+		try {
+			
+			a_periodo = Periodo(TipoPeriodo_meia_hora, a_periodo) + 1;
+
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::incrementarIteradorMinimo(" + getString(a_periodo) + "): \n" + std::string(erro.what())); }
+
+	}
 
 	void incrementarIterador(Periodo& a_periodo) const {
 		try {
@@ -783,6 +818,16 @@ public:
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::incrementaIterador(" + getString(a_periodo) + "): \n" + std::string(erro.what())); }
 	} // void operator++(Periodo &a_periodo) const {
+
+	void decrementarIteradorMinimo(Periodo& a_periodo) const {
+		try {
+
+			a_periodo = Periodo(TipoPeriodo_meia_hora, a_periodo) - 1;
+
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::incrementarIteradorMinimo(" + getString(a_periodo) + "): \n" + std::string(erro.what())); }
+
+	}
 
 	void decrementarIterador(Periodo& a_periodo) const {
 		try {
@@ -917,7 +962,7 @@ public:
 
 					else if ((lista_estrutura.at(0).tipoEstruturaPeriodo == TipoEstruturaPeriodo_crescente && a_iterador.getTipoPeriodo() < lista_estrutura.at(0).tipo_iterador_inicial) \
 						|| (lista_estrutura.at(0).tipoEstruturaPeriodo == TipoEstruturaPeriodo_decrescente && a_iterador.getTipoPeriodo() > lista_estrutura.at(0).tipo_iterador_inicial)) {
-						inicializacaoEstruturaPeriodo(true, 0);//Cria uma nova estrutura
+						inicializacaoEstruturaPeriodo(0, 0);//Cria uma nova estrutura
 						lista_estrutura.at(0).tipo_iterador_final = a_iterador.getTipoPeriodo();
 					}
 
@@ -966,7 +1011,7 @@ public:
 
 					else if ((lista_estrutura.at(int(lista_estrutura.size()) - 1).tipoEstruturaPeriodo == TipoEstruturaPeriodo_crescente && a_iterador.getTipoPeriodo() > lista_estrutura.at(int(lista_estrutura.size()) - 1).tipo_iterador_final) \
 						|| (lista_estrutura.at(int(lista_estrutura.size()) - 1).tipoEstruturaPeriodo == TipoEstruturaPeriodo_decrescente && a_iterador.getTipoPeriodo() < lista_estrutura.at(int(lista_estrutura.size()) - 1).tipo_iterador_final)) {
-						inicializacaoEstruturaPeriodo(false, 0);//Cria uma nova estrutura
+						inicializacaoEstruturaPeriodo(-1, 0);//Cria uma nova estrutura
 						lista_estrutura.at(int(lista_estrutura.size()) - 1).tipo_iterador_inicial = a_iterador.getTipoPeriodo();
 					}
 
@@ -994,6 +1039,341 @@ public:
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::addElemento(" + getString(a_iterador) + "," + getString(a_valor) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(Periodo a_iterador, TipoValor a_valor) {
+
+
+	void alterarValorSeAlterarIterador(const Periodo a_iterador, TipoValor a_valor) {
+		try {
+
+			std::vector<Periodo> iteradores = getIteradores(a_iterador);
+
+			if (iteradores.size() == 0)
+				throw std::invalid_argument("Nao ha iteradores compativeis.");
+			else if (iteradores.size() == 1) {
+				if (iteradores.at(0) == a_iterador)
+					return;
+			}
+
+			const Periodo periodo_inicial_orig = iteradores.at(0);
+			const Periodo periodo_final_orig = iteradores.at(iteradores.size() - 1);
+
+			if ((Periodo(periodo_inicial_orig.getTipoPeriodo(), a_iterador) != periodo_inicial_orig) || \
+				(Periodo(periodo_final_orig.getTipoPeriodo(), a_iterador + 1) - 1 != periodo_final_orig))
+					throw std::invalid_argument("Periodo nao se encaixa exatamente em range de iteradores.");
+
+
+			TipoEstruturaPeriodo tipo_estrutura_anterior = TipoEstruturaPeriodo_Nenhum;
+			TipoPeriodo tipo_periodo_anterior = TipoPeriodo_Nenhum;
+			int indice_estrutura_anterior = -1;
+			Periodo periodo_anterior = periodo_inicial_orig;
+			if (periodo_inicial_orig > getIteradorInicial()) {
+				decrementarIterador(periodo_anterior);
+				indice_estrutura_anterior = getIndiceEstrutura(periodo_anterior);
+				tipo_estrutura_anterior = lista_estrutura.at(indice_estrutura_anterior).tipoEstruturaPeriodo;
+				tipo_periodo_anterior = periodo_anterior.getTipoPeriodo();
+			}
+
+			TipoEstruturaPeriodo tipo_estrutura_posterior = TipoEstruturaPeriodo_Nenhum;
+			TipoPeriodo tipo_periodo_posterior = TipoPeriodo_Nenhum;
+			int indice_estrutura_posterior = -1;
+			Periodo periodo_posterior = periodo_final_orig; 
+			if (periodo_final_orig < getIteradorFinal()){
+				incrementarIterador(periodo_posterior);
+				indice_estrutura_posterior = getIndiceEstrutura(periodo_posterior);
+				tipo_estrutura_posterior = lista_estrutura.at(indice_estrutura_posterior).tipoEstruturaPeriodo;
+				tipo_periodo_posterior = periodo_posterior.getTipoPeriodo();
+			}
+
+			std::vector<EstruturaPeriodo> lista_estrutura_copia = lista_estrutura;
+
+			bool estruturas_anterior_posterior_duplicadas = false;
+			// Verifica necessidade de duplicar estrutura atual
+			if ((tipo_estrutura_anterior != TipoEstruturaPeriodo_Nenhum) && (tipo_estrutura_posterior != TipoEstruturaPeriodo_Nenhum)) {
+				// Caso estruturas anterior e posterior sejam a mesma, duplica-se estrutura para inclusao entre ambas
+				if (indice_estrutura_anterior == indice_estrutura_posterior) {
+					lista_estrutura_copia.insert(lista_estrutura_copia.begin() + indice_estrutura_anterior, lista_estrutura_copia.at(indice_estrutura_anterior));
+					indice_estrutura_posterior++;
+					estruturas_anterior_posterior_duplicadas = true;
+				}
+			}// if ((tipo_estrutura_anterior != TipoEstruturaPeriodo_Nenhum) && (tipo_estrutura_posterior != TipoEstruturaPeriodo_Nenhum)) {
+
+			const TipoPeriodo tipo_periodo_iterador = a_iterador.getTipoPeriodo();
+			
+			int status_inclusao_iterador = -1; // -1 Iterador novo em nova estrutura a ser criada | 0 iterador novo na estrutura de inicio | 1 iterador novo na estrutura do fim
+
+			// Iterador novo em toda enupla.
+			if ((tipo_estrutura_anterior == TipoEstruturaPeriodo_Nenhum) && (tipo_estrutura_posterior == TipoEstruturaPeriodo_Nenhum))
+				lista_estrutura_copia = std::vector<EstruturaPeriodo>();
+
+			// Iterador novo no inicio da enupla
+			else if ((tipo_estrutura_anterior == TipoEstruturaPeriodo_Nenhum) && (tipo_estrutura_posterior != TipoEstruturaPeriodo_Nenhum)) {
+
+				// Remove estruturas dos periodos que sairao
+				const int nro_estruturas_a_remover = indice_estrutura_posterior;
+				for (int i = 0; i < nro_estruturas_a_remover; i++) {
+					lista_estrutura_copia.erase(lista_estrutura_copia.begin());
+					indice_estrutura_posterior--;
+				}
+
+				// Realiza adequacoes na estrutura posterior
+				if (tipo_periodo_posterior > lista_estrutura_copia.at(indice_estrutura_posterior).tipo_iterador_final) {
+					tipo_estrutura_posterior = TipoEstruturaPeriodo_crescente;
+					if (tipo_periodo_iterador >= tipo_periodo_posterior)
+						status_inclusao_iterador = 1;
+				}
+				else if (tipo_periodo_posterior < lista_estrutura_copia.at(indice_estrutura_posterior).tipo_iterador_final) {
+					tipo_estrutura_posterior = TipoEstruturaPeriodo_decrescente;
+					if (tipo_periodo_iterador <= tipo_periodo_posterior)
+						status_inclusao_iterador = 1;
+				}
+				else if (tipo_periodo_posterior == lista_estrutura_copia.at(indice_estrutura_posterior).tipo_iterador_final) {
+					status_inclusao_iterador = 1;
+					if (tipo_periodo_iterador >= tipo_periodo_posterior)
+						tipo_estrutura_posterior = TipoEstruturaPeriodo_crescente;
+					else if (tipo_periodo_iterador <= tipo_periodo_posterior)
+						tipo_estrutura_posterior = TipoEstruturaPeriodo_decrescente;
+					else
+						tipo_estrutura_posterior = TipoEstruturaPeriodo_flat;
+				}
+
+				lista_estrutura_copia.at(indice_estrutura_posterior).tipoEstruturaPeriodo = tipo_estrutura_posterior;
+					
+			} // else if ((tipo_estrutura_anterior == TipoEstruturaPeriodo_Nenhum) && (tipo_estrutura_posterior != TipoEstruturaPeriodo_Nenhum)) {
+
+			// Iterador novo no final da enupla
+			else if ((tipo_estrutura_anterior != TipoEstruturaPeriodo_Nenhum) && (tipo_estrutura_posterior == TipoEstruturaPeriodo_Nenhum)) {
+
+				// Remove estruturas dos periodos que sairao
+				const int nro_estruturas_a_remover = lista_estrutura_copia.size() - (indice_estrutura_anterior + 1);
+				for (int i = 0; i < nro_estruturas_a_remover; i++)
+					lista_estrutura_copia.pop_back();
+
+				if (lista_estrutura_copia.at(indice_estrutura_anterior).tipo_iterador_inicial > tipo_periodo_anterior) {
+					tipo_estrutura_anterior = TipoEstruturaPeriodo_crescente;
+					if (tipo_periodo_anterior >= tipo_periodo_iterador)
+						status_inclusao_iterador = 0;
+				}
+				else if (lista_estrutura_copia.at(indice_estrutura_anterior).tipo_iterador_inicial < tipo_periodo_anterior) {
+					tipo_estrutura_anterior = TipoEstruturaPeriodo_decrescente;
+					if (tipo_periodo_anterior <= tipo_periodo_iterador)
+						status_inclusao_iterador = 0;
+				}
+				else if (lista_estrutura_copia.at(indice_estrutura_anterior).tipo_iterador_inicial == tipo_periodo_anterior) {
+					status_inclusao_iterador = 0;
+					if (tipo_periodo_anterior >= tipo_periodo_iterador)
+						tipo_estrutura_anterior = TipoEstruturaPeriodo_crescente;
+					else if (tipo_periodo_anterior <= tipo_periodo_iterador)
+						tipo_estrutura_anterior = TipoEstruturaPeriodo_decrescente;
+					else
+						tipo_estrutura_anterior = TipoEstruturaPeriodo_flat;
+				}
+
+				lista_estrutura_copia.at(indice_estrutura_anterior).tipoEstruturaPeriodo = tipo_estrutura_anterior;
+
+			} // else if ((tipo_estrutura_anterior != TipoEstruturaPeriodo_Nenhum) && (tipo_estrutura_posterior == TipoEstruturaPeriodo_Nenhum)) {
+
+			// Iterador novo no meio da enupla
+			else if ((tipo_estrutura_anterior != TipoEstruturaPeriodo_Nenhum) && (tipo_estrutura_posterior != TipoEstruturaPeriodo_Nenhum)) {
+
+				// Remove estruturas dos periodos que sairao
+				const int nro_estruturas_a_remover = indice_estrutura_posterior - indice_estrutura_anterior - 1;
+				for (int i = 0; i < nro_estruturas_a_remover; i++)
+					lista_estrutura_copia.erase(lista_estrutura_copia.begin() + indice_estrutura_anterior + 1);
+
+				// Realiza adequacoes na estrutura anterior
+				if (lista_estrutura_copia.at(indice_estrutura_anterior).tipo_iterador_inicial > tipo_periodo_anterior) {
+					tipo_estrutura_anterior = TipoEstruturaPeriodo_crescente;
+					if (tipo_periodo_anterior >= tipo_periodo_iterador)
+						status_inclusao_iterador = 0;
+				}
+				else if (lista_estrutura_copia.at(indice_estrutura_anterior).tipo_iterador_inicial < tipo_periodo_anterior) {
+					tipo_estrutura_anterior = TipoEstruturaPeriodo_decrescente;
+					if (tipo_periodo_anterior <= tipo_periodo_iterador)
+						status_inclusao_iterador = 0;
+				}
+				else if (lista_estrutura_copia.at(indice_estrutura_anterior).tipo_iterador_inicial == tipo_periodo_anterior) {
+					status_inclusao_iterador = 0;
+					if (tipo_periodo_anterior >= tipo_periodo_iterador)
+						tipo_estrutura_anterior = TipoEstruturaPeriodo_crescente;
+					else if (tipo_periodo_anterior <= tipo_periodo_iterador)
+						tipo_estrutura_anterior = TipoEstruturaPeriodo_decrescente;
+					else
+						tipo_estrutura_anterior = TipoEstruturaPeriodo_flat;
+				}
+
+				lista_estrutura_copia.at(indice_estrutura_anterior).tipoEstruturaPeriodo = tipo_estrutura_anterior;
+
+				// Realiza adequacoes na estrutura posterior
+				if (tipo_periodo_posterior > lista_estrutura_copia.at(indice_estrutura_posterior).tipo_iterador_final) {
+					tipo_estrutura_posterior = TipoEstruturaPeriodo_crescente;
+					if ((tipo_periodo_iterador >= tipo_periodo_posterior) && (status_inclusao_iterador == -1))
+						status_inclusao_iterador = 1;
+				}
+				else if (tipo_periodo_posterior < lista_estrutura_copia.at(indice_estrutura_posterior).tipo_iterador_final) {
+					tipo_estrutura_posterior = TipoEstruturaPeriodo_decrescente;
+					if ((tipo_periodo_iterador <= tipo_periodo_posterior) && (status_inclusao_iterador == -1))
+						status_inclusao_iterador = 1;
+				}
+				else if (tipo_periodo_posterior == lista_estrutura_copia.at(indice_estrutura_posterior).tipo_iterador_final) {
+					tipo_estrutura_posterior = TipoEstruturaPeriodo_flat;
+					if (status_inclusao_iterador == -1) {
+						status_inclusao_iterador = 1;
+						if (tipo_periodo_iterador >= tipo_periodo_posterior)
+							tipo_estrutura_posterior = TipoEstruturaPeriodo_crescente;
+						else if (tipo_periodo_iterador <= tipo_periodo_posterior)
+							tipo_estrutura_posterior = TipoEstruturaPeriodo_decrescente;
+					}
+				}
+
+				lista_estrutura_copia.at(indice_estrutura_posterior).tipoEstruturaPeriodo = tipo_estrutura_posterior;
+
+			} // else if ((tipo_estrutura_anterior != TipoEstruturaPeriodo_Nenhum) && (tipo_estrutura_posterior != TipoEstruturaPeriodo_Nenhum)) {
+
+
+			//
+			// Criacao estrutura intermediaria
+			//
+			if (status_inclusao_iterador == -1) {
+
+				const int indice_nova_estrutura = indice_estrutura_anterior + 1;
+
+				if (true) {
+					EstruturaPeriodo estruturaPeriodo;
+					estruturaPeriodo.tipo_iterador_inicial = TipoPeriodo_Nenhum;
+					estruturaPeriodo.tipo_iterador_final = TipoPeriodo_Nenhum;
+					estruturaPeriodo.iteradores_iniciais = std::vector<std::vector<Periodo>>(TipoPeriodo_Excedente, std::vector<Periodo>());
+					estruturaPeriodo.iteradores_finais = std::vector<std::vector<Periodo>>(TipoPeriodo_Excedente, std::vector<Periodo>());
+					estruturaPeriodo.smartEnupla = std::vector<std::vector<TipoValor>>(TipoPeriodo_Excedente, std::vector<TipoValor>());
+					for (TipoPeriodo tipo = TipoPeriodo(1); tipo < TipoPeriodo_Excedente; tipo++) {
+						estruturaPeriodo.iteradores_iniciais.at(tipo).reserve(1);
+						estruturaPeriodo.iteradores_finais.at(tipo).reserve(1);
+						estruturaPeriodo.smartEnupla.at(tipo).reserve(1);
+					}
+
+					estruturaPeriodo.tipoEstruturaPeriodo = TipoEstruturaPeriodo_flat;
+					lista_estrutura_copia.insert(lista_estrutura_copia.begin() + indice_nova_estrutura, estruturaPeriodo);
+				}
+
+				if (indice_estrutura_posterior > -1)
+					indice_estrutura_posterior++;
+
+				lista_estrutura_copia.at(indice_nova_estrutura).tipoEstruturaPeriodo = TipoEstruturaPeriodo_flat;
+
+				lista_estrutura_copia.at(indice_nova_estrutura).tipo_iterador_inicial = tipo_periodo_iterador;
+				lista_estrutura_copia.at(indice_nova_estrutura).tipo_iterador_final   = tipo_periodo_iterador;
+
+				lista_estrutura_copia.at(indice_nova_estrutura).iteradores_iniciais.at(tipo_periodo_iterador).push_back(a_iterador);
+				lista_estrutura_copia.at(indice_nova_estrutura).iteradores_finais.at(tipo_periodo_iterador).push_back(a_iterador);
+				lista_estrutura_copia.at(indice_nova_estrutura).smartEnupla.at(tipo_periodo_iterador).push_back(a_valor);
+
+			} // if (status_inclusao_iterador == -1) {
+
+			//
+			// Adequacao estrutura anterior
+			//
+			if (tipo_estrutura_anterior != TipoEstruturaPeriodo_Nenhum) {
+
+				TipoPeriodo tipo_periodo_final_estrutura_anterior = lista_estrutura_copia.at(indice_estrutura_anterior).tipo_iterador_final;
+				Periodo periodo_final_estrutura_anterior = lista_estrutura_copia.at(indice_estrutura_anterior).iteradores_finais.at(tipo_periodo_final_estrutura_anterior).at(0);
+
+				while (periodo_final_estrutura_anterior > periodo_anterior) {
+
+					Periodo novo_periodo_final_estrutura_anterior = periodo_final_estrutura_anterior;
+					decrementarIterador(novo_periodo_final_estrutura_anterior);
+
+					TipoPeriodo novo_tipo_periodo_final_estrutura_anterior = novo_periodo_final_estrutura_anterior.getTipoPeriodo();
+
+					if (novo_tipo_periodo_final_estrutura_anterior == tipo_periodo_final_estrutura_anterior) {
+						lista_estrutura_copia.at(indice_estrutura_anterior).iteradores_finais.at(tipo_periodo_final_estrutura_anterior).at(0) = novo_periodo_final_estrutura_anterior;
+						lista_estrutura_copia.at(indice_estrutura_anterior).smartEnupla.at(tipo_periodo_final_estrutura_anterior).pop_back();
+					}
+					else{
+						lista_estrutura_copia.at(indice_estrutura_anterior).iteradores_iniciais.at(tipo_periodo_final_estrutura_anterior) = std::vector<Periodo>();
+						lista_estrutura_copia.at(indice_estrutura_anterior).iteradores_finais.at(tipo_periodo_final_estrutura_anterior) = std::vector<Periodo>();
+						lista_estrutura_copia.at(indice_estrutura_anterior).smartEnupla.at(tipo_periodo_final_estrutura_anterior) = std::vector<TipoValor>();
+					}
+
+					periodo_final_estrutura_anterior = novo_periodo_final_estrutura_anterior;
+					tipo_periodo_final_estrutura_anterior = novo_tipo_periodo_final_estrutura_anterior;
+
+				} // while (periodo_final_estrutura_anterior > periodo_anterior) {
+
+				lista_estrutura_copia.at(indice_estrutura_anterior).tipo_iterador_final = tipo_periodo_final_estrutura_anterior;
+
+				if (status_inclusao_iterador == 0) {
+
+					if (tipo_periodo_final_estrutura_anterior == tipo_periodo_iterador) {
+						lista_estrutura_copia.at(indice_estrutura_anterior).iteradores_finais.at(tipo_periodo_final_estrutura_anterior).at(0) = a_iterador;
+						lista_estrutura_copia.at(indice_estrutura_anterior).smartEnupla.at(tipo_periodo_final_estrutura_anterior).push_back(a_valor);
+					}
+
+					else {
+						lista_estrutura_copia.at(indice_estrutura_anterior).iteradores_iniciais.at(tipo_periodo_iterador) = std::vector<Periodo>(1, a_iterador);
+						lista_estrutura_copia.at(indice_estrutura_anterior).iteradores_finais.at(tipo_periodo_iterador) = std::vector<Periodo>(1, a_iterador);
+						lista_estrutura_copia.at(indice_estrutura_anterior).smartEnupla.at(tipo_periodo_iterador) = std::vector<TipoValor>(1, a_valor);
+					}
+
+					lista_estrutura_copia.at(indice_estrutura_anterior).tipo_iterador_final = tipo_periodo_iterador;
+
+				} // if (status_inclusao_iterador == 0) {
+			} // if (tipo_estrutura_anterior != TipoEstruturaPeriodo_Nenhum) {
+			
+			//
+			// Adequacao estrutura posterior
+			//
+			if (tipo_estrutura_posterior != TipoEstruturaPeriodo_Nenhum) {
+
+				TipoPeriodo tipo_periodo_inicial_estrutura_posterior = lista_estrutura_copia.at(indice_estrutura_posterior).tipo_iterador_inicial;
+				Periodo periodo_inicial_estrutura_posterior = lista_estrutura_copia.at(indice_estrutura_posterior).iteradores_iniciais.at(tipo_periodo_inicial_estrutura_posterior).at(0);
+
+				while (periodo_inicial_estrutura_posterior < periodo_posterior) {
+
+					Periodo novo_periodo_inicial_estrutura_posterior = periodo_inicial_estrutura_posterior;
+					incrementarIterador(novo_periodo_inicial_estrutura_posterior);
+
+					TipoPeriodo novo_tipo_periodo_inicial_estrutura_posterior = novo_periodo_inicial_estrutura_posterior.getTipoPeriodo();
+
+					if (novo_tipo_periodo_inicial_estrutura_posterior == tipo_periodo_inicial_estrutura_posterior) {
+						lista_estrutura_copia.at(indice_estrutura_posterior).iteradores_iniciais.at(tipo_periodo_inicial_estrutura_posterior).at(0) = novo_periodo_inicial_estrutura_posterior;
+						lista_estrutura_copia.at(indice_estrutura_posterior).smartEnupla.at(tipo_periodo_inicial_estrutura_posterior).erase(lista_estrutura_copia.at(indice_estrutura_posterior).smartEnupla.at(tipo_periodo_inicial_estrutura_posterior).begin());
+					}
+					else {
+						lista_estrutura_copia.at(indice_estrutura_posterior).iteradores_iniciais.at(tipo_periodo_inicial_estrutura_posterior) = std::vector<Periodo>();
+						lista_estrutura_copia.at(indice_estrutura_posterior).iteradores_finais.at(tipo_periodo_inicial_estrutura_posterior) = std::vector<Periodo>();
+						lista_estrutura_copia.at(indice_estrutura_posterior).smartEnupla.at(tipo_periodo_inicial_estrutura_posterior) = std::vector<TipoValor>();
+					}
+			
+					periodo_inicial_estrutura_posterior = novo_periodo_inicial_estrutura_posterior;
+					tipo_periodo_inicial_estrutura_posterior = novo_tipo_periodo_inicial_estrutura_posterior;
+
+				} // while (periodo_inicial_estrutura_posterior > periodo_posterior) {
+
+				lista_estrutura_copia.at(indice_estrutura_posterior).tipo_iterador_inicial = tipo_periodo_inicial_estrutura_posterior;
+
+				if (status_inclusao_iterador == 1) {
+
+					if (tipo_periodo_inicial_estrutura_posterior == tipo_periodo_iterador) {
+						lista_estrutura_copia.at(indice_estrutura_posterior).iteradores_iniciais.at(tipo_periodo_inicial_estrutura_posterior).at(0) = a_iterador;
+						lista_estrutura_copia.at(indice_estrutura_posterior).smartEnupla.at(tipo_periodo_inicial_estrutura_posterior).push_back(a_valor);
+					}
+
+					else {
+						lista_estrutura_copia.at(indice_estrutura_posterior).iteradores_iniciais.at(tipo_periodo_iterador) = std::vector<Periodo>(1, a_iterador);
+						lista_estrutura_copia.at(indice_estrutura_posterior).iteradores_finais.at(tipo_periodo_iterador) = std::vector<Periodo>(1, a_iterador);
+						lista_estrutura_copia.at(indice_estrutura_posterior).smartEnupla.at(tipo_periodo_iterador) = std::vector<TipoValor>(1, a_valor);
+					}
+
+					lista_estrutura_copia.at(indice_estrutura_posterior).tipo_iterador_inicial = tipo_periodo_iterador;
+
+				} // if (status_inclusao_iterador == 1) {
+			} // if (tipo_estrutura_posterior != TipoEstruturaPeriodo_Nenhum) {
+
+			lista_estrutura = lista_estrutura_copia;
+			numero_elementos = numero_elementos - iteradores.size() + 1;
+
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::alterarValorSeAlterarIterador(" + getFullString(a_iterador) + ",a_tipo_valor): \n" + std::string(erro.what())); }
+	}
+
 
 	void setElemento(Periodo a_iterador, TipoValor a_valor) {
 		try { 
@@ -1051,6 +1431,7 @@ public:
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::at(" + getString(a_iterador) + "): \n" + std::string(erro.what())); }
 	}; // TipoValor getElemento(Periodo a_iterador)const {
+
 
 	void random_shuffle() {
 		for (int estrutura = 0; estrutura < int(lista_estrutura.size()); estrutura++) {
@@ -1217,6 +1598,18 @@ private:
 
 	int getIndiceEstrutura(Periodo a_periodo) const {
 		try {
+			const int indice = getIndiceEstruturaSeExistir(a_periodo);
+
+			if (indice < 0)
+				throw std::invalid_argument("Nao existem estruturas definidas para o periodo " + getFullString(a_periodo));
+
+			return indice;
+		}
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getIndiceEstrutura(" + getString(a_periodo) + "): \n" + std::string(erro.what())); }
+	}
+
+	int getIndiceEstruturaSeExistir(Periodo a_periodo) const {
+		try {
 
 			bool procurar_em_todas_as_estruturas = false;
 
@@ -1248,14 +1641,14 @@ private:
 					}
 				}//for (int estrutura = 0; estrutura < int(lista_estrutura.size()); estrutura++) {
 				
-				throw std::invalid_argument("Nao existem estruturas definidas para o periodo " + getFullString(a_periodo));
+				
 
 			}//if (a_periodo.estrutura == 0 || procurar_em_todas_as_estruturas) {
 
 			return -1;
 			
 		} // try{
-		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::getIndiceEstrutura(" + getString(a_periodo) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::getIndiceEstruturaSeExistir(" + getString(a_periodo) + "): \n" + std::string(erro.what())); }
 	}; // int getIndice(Periodo a_iterador, const int a_estrutura) const {
 
 	int getIndice(Periodo a_iterador, const int a_estrutura) const {
@@ -1273,14 +1666,14 @@ private:
 				throw std::invalid_argument("Alocacao deve ser maior que 0.");
 			numero_elementos = 0;
 
-			inicializacaoEstruturaPeriodo(false, a_alocacao);
+			inicializacaoEstruturaPeriodo(-1, a_alocacao);
 
 		}
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::inicializacao(" + getFullString(a_alocacao) + "): \n" + std::string(erro.what())); }
 	}; // void inicializacao(const int a_alocacao) {
 
 
-	void inicializacaoEstruturaPeriodo(bool a_inserir_inicio_lista, const int a_alocacao) {
+	void inicializacaoEstruturaPeriodo(const int a_insercao, const int a_alocacao) {
 		try {
 			if (a_alocacao < 0)
 				throw std::invalid_argument("Alocacao deve ser maior que 0.");
@@ -1300,10 +1693,13 @@ private:
 
 			estruturaPeriodo.tipoEstruturaPeriodo = TipoEstruturaPeriodo_flat;
 
-			if (a_inserir_inicio_lista)
-				lista_estrutura.insert(lista_estrutura.begin(), estruturaPeriodo);
-			else
+			// Final lista
+			if ((a_insercao < 0) || (lista_estrutura.size() == 0))
 				lista_estrutura.push_back(estruturaPeriodo);
+			// Decorrer lista
+			else 
+				lista_estrutura.insert(lista_estrutura.begin() + a_insercao, estruturaPeriodo);
+
 		}
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::inicializacaoEstruturaPeriodo(" + getFullString(a_alocacao) + "): \n" + std::string(erro.what())); }
 	}; // void inicializacaoEstruturaPeriodo(const int a_alocacao) {
