@@ -272,10 +272,10 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 				if (listaTipoSubproblemaSolver.at(i) != TipoSubproblemaSolver_mestre) {
 
-					alocarVarDecisao_YH_3(listaTipoSubproblemaSolver.at(i), idEstagio, alocacao_afluencia_incremental.at(idEstagio));
-					alocarVarDecisao_YHF_3(listaTipoSubproblemaSolver.at(i), idEstagio, alocacao_afluencia_incremental.at(idEstagio));
+					//alocarVarDecisao_YH_3(listaTipoSubproblemaSolver.at(i), idEstagio, alocacao_afluencia_incremental.at(idEstagio));
+					//alocarVarDecisao_YHF_3(listaTipoSubproblemaSolver.at(i), idEstagio, alocacao_afluencia_incremental.at(idEstagio));
 
-					alocarVarDecisao_QDEF_3(listaTipoSubproblemaSolver.at(i), idEstagio, alocacao_defluencia.at(idEstagio));
+					//alocarVarDecisao_QDEF_3(listaTipoSubproblemaSolver.at(i), idEstagio, alocacao_defluencia.at(idEstagio));
 
 				} // if (listaTipoSubproblemaSolver.at(i) != TipoSubproblemaSolver_mestre) {
 
