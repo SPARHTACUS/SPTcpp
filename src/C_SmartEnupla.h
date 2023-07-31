@@ -230,7 +230,7 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::decrementarIterador(" + getString(a_iterador) + "): \n" + std::string(erro.what())); }
 	} // void operator++(Periodo &a_periodo) const {
 
-	bool isProximoIterador(const TipoIterador a_iterador) {
+	bool isProximoIterador(const TipoIterador a_iterador) const{
 		try {
 			if (TipoIterador(getIteradorFinal() + 1) == a_iterador)
 				return true;
@@ -238,6 +238,27 @@ public:
 		} // try{
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::isProximoIterador(" + getString(a_iterador) + "): \n" + std::string(erro.what())); }
 	}
+
+	bool isIteradorValido(const TipoIterador a_iterador) const{
+		try {
+			if (size() == 0)
+				return false;
+			if ((a_iterador < getIteradorInicial()) || (getIteradorFinal() < a_iterador))
+				return false;
+			return true;
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::isIteradorValido(" + getString(a_iterador) + "): \n" + std::string(erro.what())); }
+	}
+
+
+	std::vector<TipoIterador> getIteradores(const TipoIterador a_iterador)const {
+		try {
+
+			return std::vector<TipoIterador>();
+
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getIteradores(" + getFullString(a_iterador) + "): \n" + std::string(erro.what())); }
+	} // SmartEnupla<Periodo, bool> getIteradores(const Periodo a_periodo)const {
 
 	std::string str() { return "SmartEnupla<iterador,valor>"; }
 
@@ -327,7 +348,7 @@ public:
 					if (a_matriz_interna.at(0).size() != a_matriz_interna.at(a_matriz_interna.size() - 1).size())
 						preencher_todas_linhas = false;
 
-					for (int l = a_matriz_interna.size() - 1; l >= 0; l--) {
+					for (int l = int(a_matriz_interna.size()) - 1; l >= 0; l--) {
 						if (preencher_todas_linhas)
 							a_matriz_interna.at(l).insert(a_matriz_interna.at(l).begin(), getString(iterador));
 						else {
@@ -364,7 +385,7 @@ public:
 				else
 					a_matriz_interna.push_back(std::vector<std::string>(a_enupla.size(), ""));
 
-				const int l = a_matriz_interna.size() - 1;
+				const int l = int(a_matriz_interna.size()) - 1;
 
 				int i = 0;
 				for (Iterador iterador = iteradorInicial; iterador <= iteradorFinal; a_enupla.incrementarIterador(iterador)) {
@@ -905,13 +926,26 @@ public:
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::decrementarIterador(" + getString(a_periodo) + "): \n" + std::string(erro.what())); }
 	} // void operator++(Periodo &a_periodo) const {
 
-	bool isProximoIterador(const Periodo a_iterador) {
+	bool isProximoIterador(const Periodo a_iterador) const {
 		try {
 			if (Periodo(a_iterador.getTipoPeriodo(), getIteradorFinal() + 1) == a_iterador)
 				return true;
 			return false;
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::isProximoIterador(" + getString(a_iterador) + "): \n" + std::string(erro.what())); }
+	}
+
+	bool isIteradorValido(const Periodo a_iterador) const {
+		try {
+			if (size() == 0)
+				return false;
+			else if ((a_iterador < getIteradorInicial()) || (getIteradorFinal() < a_iterador))
+				return false;
+			else if (getIndiceEstruturaSeExistir(a_iterador) == -1)
+				return false;
+			return true;
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::isIteradorValido(" + getString(a_iterador) + "): \n" + std::string(erro.what())); }
 	}
 
 	void addElemento(TipoValor a_valor) {
@@ -1143,7 +1177,7 @@ public:
 			else if ((tipo_estrutura_anterior != TipoEstruturaPeriodo_Nenhum) && (tipo_estrutura_posterior == TipoEstruturaPeriodo_Nenhum)) {
 
 				// Remove estruturas dos periodos que sairao
-				const int nro_estruturas_a_remover = lista_estrutura_copia.size() - (indice_estrutura_anterior + 1);
+				const int nro_estruturas_a_remover = int(lista_estrutura_copia.size()) - (indice_estrutura_anterior + 1);
 				for (int i = 0; i < nro_estruturas_a_remover; i++)
 					lista_estrutura_copia.pop_back();
 
@@ -1368,7 +1402,7 @@ public:
 			} // if (tipo_estrutura_posterior != TipoEstruturaPeriodo_Nenhum) {
 
 			lista_estrutura = lista_estrutura_copia;
-			numero_elementos = numero_elementos - iteradores.size() + 1;
+			numero_elementos = numero_elementos - int(iteradores.size()) + 1;
 
 		} // try{
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::alterarValorSeAlterarIterador(" + getFullString(a_iterador) + ",a_tipo_valor): \n" + std::string(erro.what())); }
@@ -1611,8 +1645,8 @@ private:
 	int getIndiceEstruturaSeExistir(Periodo a_periodo) const {
 		try {
 
-			bool procurar_em_todas_as_estruturas = false;
-
+			bool procurar_em_todas_as_estruturas = true;
+			/*
 			if (a_periodo.estrutura > 0) {
 
 				if (lista_estrutura.size() > a_periodo.estrutura) {
@@ -1628,17 +1662,24 @@ private:
 					procurar_em_todas_as_estruturas = true;
 
 			}//if (a_periodo.estrutura > 0) {
-
+			*/
 			if (a_periodo.estrutura == 0 || procurar_em_todas_as_estruturas) {//Procura em todas as estruturas até encontrar
 
 				const int numero_estruturas = int(lista_estrutura.size());
 				
+				const TipoPeriodo tipo_periodo_iterador = a_periodo.getTipoPeriodo();
+
 				for (int pos = 0; pos < numero_estruturas; pos++) {
 
-					if (lista_estrutura.at(pos).iteradores_iniciais.at(lista_estrutura.at(pos).tipo_iterador_inicial).at(0) <= a_periodo \
-						&& lista_estrutura.at(pos).iteradores_finais.at(lista_estrutura.at(pos).tipo_iterador_final).at(0) >= a_periodo) {
-						return pos;							
+					if (lista_estrutura.at(pos).iteradores_iniciais.at(tipo_periodo_iterador).size() > 0) {
+
+						if ((lista_estrutura.at(pos).iteradores_iniciais.at(tipo_periodo_iterador).at(0) <= a_periodo) && \
+						   (a_periodo <= lista_estrutura.at(pos).iteradores_finais.at(tipo_periodo_iterador).at(0))){
+							return pos;
+						}
+
 					}
+
 				}//for (int estrutura = 0; estrutura < int(lista_estrutura.size()); estrutura++) {
 				
 				

@@ -736,7 +736,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 
 		template<typename TListasIdxElem, typename TIt>
-		void alocConteudoIter(TListasIdxElem& a_listasIdxElem, const TIt a_it) {
+		std::vector<TIt> alocConteudoIter(TListasIdxElem& a_listasIdxElem, const TIt a_it) {
 			try {
 
 				// Inicializa Lista
@@ -759,29 +759,51 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
 				}
 
-				//else
-					//a_listasIdxElem.alterarValorSeAlterarIterador(a_it, a_listasIdxElem.getTipoElemento());
+				if (!a_listasIdxElem.isIteradorValido(a_it))
+					return a_listasIdxElem.getIteradores(a_it);
+
+				return std::vector<TIt>();
 
 			}
 			catch (const std::exception& erro) { throw std::invalid_argument("alocConteudoIter(a_listasIdxElem," + getFullString(a_it) + "): \n" + std::string(erro.what())); }
 		};
 
+		template<typename TListasIdxElem, typename TIt>
+		void tratConteudoIter(TListasIdxElem& a_listasIdxElem, const TIt a_it) {
+			try {
+
+		        const std::vector<TIt> iteradores_multiplos = alocConteudoIter(a_listasIdxElem, a_it);
+
+				if (iteradores_multiplos.size() <= 1)
+					return;
+
+				for (int i = 0; i < int(iteradores_multiplos.size()); i++) {
+					if (a_listasIdxElem.at(iteradores_multiplos.at(i)).size() > 0)
+						throw std::invalid_argument("Nao foi possivel alocar conteudo devido a existencia de multiplos iteradores com elementos em " + getString(iteradores_multiplos.at(i)));
+				}
+
+				a_listasIdxElem.alterarValorSeAlterarIterador(a_it, a_listasIdxElem.getTipoElemento());
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("tratConteudoIter(a_listasIdxElem," + getFullString(a_it) + "): \n" + std::string(erro.what())); }
+		};
 		
 		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
 		void addConteudoIters_10(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10) {
 
 			try {
 
-				alocConteudoIter(a_listasIdxElem, a_it1);
-				alocConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
+				tratConteudoIter(a_listasIdxElem, a_it1);
+				tratConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
+				if (alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10).size() > 1)
+					throw std::invalid_argument("Multiplos iteradores na ultima camada.");
 
 				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).setElemento(a_it10, a_conteudo);
 
@@ -794,17 +816,18 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 			try {
 
-				alocConteudoIter(a_listasIdxElem, a_it1);
-				alocConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10), a_it11);
+				tratConteudoIter(a_listasIdxElem, a_it1);
+				tratConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
+				if (alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10), a_it11).size() > 1)
+					throw std::invalid_argument("Multiplos iteradores na ultima camada.");
 
 				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).setElemento(a_it11, a_conteudo);
 
@@ -817,18 +840,19 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 			try {
 
-				alocConteudoIter(a_listasIdxElem, a_it1);
-				alocConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10), a_it11);
-				alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11), a_it12);
+				tratConteudoIter(a_listasIdxElem, a_it1);
+				tratConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
+				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10), a_it11);
+				if (alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11), a_it12).size() > 1)
+					throw std::invalid_argument("Multiplos iteradores na ultima camada.");
 
 				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).setElemento(a_it12, a_conteudo);
 
@@ -1019,73 +1043,22 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 			try {
 
-				if (a_listasIdxElem.size() == 0)
-					return false;
-				else if (a_listasIdxElem.getIteradorFinal() < a_it1)
-					return false;
-				else if (a_it1 < a_listasIdxElem.getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).getIteradorFinal() < a_it2)
-					return false;
-				else if (a_it2 < a_listasIdxElem.at(a_it1).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).getIteradorFinal() < a_it3)
-					return false;
-				else if (a_it3 < a_listasIdxElem.at(a_it1).at(a_it2).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorFinal() < a_it4)
-					return false;
-				else if (a_it4 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorFinal() < a_it5)
-					return false;
-				else if (a_it5 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorFinal() < a_it6)
-					return false;
-				else if (a_it6 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorFinal() < a_it7)
-					return false;
-				else if (a_it7 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorFinal() < a_it8)
-					return false;
-				else if (a_it8 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorFinal() < a_it9)
-					return false;
-				else if (a_it9 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorFinal() < a_it10)
-					return false;
-				else if (a_it10 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorInicial())
-					return false;
-
+				if (!a_listasIdxElem.isIteradorValido(a_it1)) return false;
+				else if (!a_listasIdxElem.at(a_it1).isIteradorValido(a_it2)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).isIteradorValido(a_it3)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).isIteradorValido(a_it4)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).isIteradorValido(a_it5)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).isIteradorValido(a_it6)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).isIteradorValido(a_it7)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).isIteradorValido(a_it8)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).isIteradorValido(a_it9)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).isIteradorValido(a_it10)) return false;
 				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10);
 				return true;
 
 			}
 			catch (const std::exception& erro) {
-				throw std::invalid_argument("getConteudoIters(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what()));
+				throw std::invalid_argument("getConteudoIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what()));
 			}
 		};
 
@@ -1094,79 +1067,24 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 			try {
 
-				if (a_listasIdxElem.size() == 0)
-					return false;
-				else if (a_listasIdxElem.getIteradorFinal() < a_it1)
-					return false;
-				else if (a_it1 < a_listasIdxElem.getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).getIteradorFinal() < a_it2)
-					return false;
-				else if (a_it2 < a_listasIdxElem.at(a_it1).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).getIteradorFinal() < a_it3)
-					return false;
-				else if (a_it3 < a_listasIdxElem.at(a_it1).at(a_it2).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorFinal() < a_it4)
-					return false;
-				else if (a_it4 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorFinal() < a_it5)
-					return false;
-				else if (a_it5 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorFinal() < a_it6)
-					return false;
-				else if (a_it6 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorFinal() < a_it7)
-					return false;
-				else if (a_it7 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorFinal() < a_it8)
-					return false;
-				else if (a_it8 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorFinal() < a_it9)
-					return false;
-				else if (a_it9 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorFinal() < a_it10)
-					return false;
-				else if (a_it10 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).getIteradorFinal() < a_it11)
-					return false;
-				else if (a_it11 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).getIteradorInicial())
-					return false;
+				if (!a_listasIdxElem.isIteradorValido(a_it1)) return false;
+				else if (!a_listasIdxElem.at(a_it1).isIteradorValido(a_it2)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).isIteradorValido(a_it3)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).isIteradorValido(a_it4)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).isIteradorValido(a_it5)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).isIteradorValido(a_it6)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).isIteradorValido(a_it7)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).isIteradorValido(a_it8)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).isIteradorValido(a_it9)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).isIteradorValido(a_it10)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).isIteradorValido(a_it11)) return false;
 
 				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11);
 				return true;
 
 			}
 			catch (const std::exception& erro) {
-				throw std::invalid_argument("getConteudoIters(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "): \n" + std::string(erro.what()));
+				throw std::invalid_argument("getConteudoIters_11(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "): \n" + std::string(erro.what()));
 			}
 		};
 
@@ -1175,84 +1093,24 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 			try {
 
-				if (a_listasIdxElem.size() == 0)
-					return false;
-				else if (a_listasIdxElem.getIteradorFinal() < a_it1)
-					return false;
-				else if (a_it1 < a_listasIdxElem.getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).getIteradorFinal() < a_it2)
-					return false;
-				else if (a_it2 < a_listasIdxElem.at(a_it1).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).getIteradorFinal() < a_it3)
-					return false;
-				else if (a_it3 < a_listasIdxElem.at(a_it1).at(a_it2).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorFinal() < a_it4)
-					return false;
-				else if (a_it4 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorFinal() < a_it5)
-					return false;
-				else if (a_it5 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorFinal() < a_it6)
-					return false;
-				else if (a_it6 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorFinal() < a_it7)
-					return false;
-				else if (a_it7 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorFinal() < a_it8)
-					return false;
-				else if (a_it8 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorFinal() < a_it9)
-					return false;
-				else if (a_it9 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorFinal() < a_it10)
-					return false;
-				else if (a_it10 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).getIteradorFinal() < a_it11)
-					return false;
-				else if (a_it11 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).getIteradorInicial())
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).size() == 0)
-					return false;
-				else if (a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).getIteradorFinal() < a_it12)
-					return false;
-				else if (a_it12 < a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).getIteradorInicial())
-					return false;
+				if (!a_listasIdxElem.isIteradorValido(a_it1)) return false;
+				else if (!a_listasIdxElem.at(a_it1).isIteradorValido(a_it2)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).isIteradorValido(a_it3)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).isIteradorValido(a_it4)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).isIteradorValido(a_it5)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).isIteradorValido(a_it6)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).isIteradorValido(a_it7)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).isIteradorValido(a_it8)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).isIteradorValido(a_it9)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).isIteradorValido(a_it10)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).isIteradorValido(a_it11)) return false;
+				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).isIteradorValido(a_it12)) return false;
 
 				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).at(a_it12);
 				return true;
 
 			}
-			catch (const std::exception& erro) { throw std::invalid_argument("getConteudoIters(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "," + getFullString(a_it12) + "): \n" + std::string(erro.what())); }
+			catch (const std::exception& erro) { throw std::invalid_argument("getConteudoIters12(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "," + getFullString(a_it12) + "): \n" + std::string(erro.what())); }
 		};
 
 			VARIAVEL_DECISAO_2(DECLARAR_METODOS_ELEMENTO)
