@@ -182,20 +182,19 @@ private:
 	void set_termeletrica_potencia_disponivel_meta(Dados& a_dados);
 	void leitura_potencia_comandada_from_relgnl(Dados& a_dados, const std::string a_nomeArquivo_pastaRaiz_relgnl, const std::string a_nomeArquivo_pastaAdicionais_relgnl, const std::vector<int> a_codigo_gnl, const std::vector<std::string> a_nome_gnl, SmartEnupla<IdTermeletrica, SmartEnupla<Periodo, double>>& a_lista_termeletrica_potencia_pre_comandada);
 	void leitura_volume_referencia_e_regularizacao_from_CadUsH_csv(Dados& a_dados, std::string a_nomeArquivo);
-	void leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, std::string a_diretorio, std::string a_nomeArquivo);
+	void leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, std::string a_diretorio, std::string a_diretorio_cortes, std::string a_nomeArquivo);
 	double get_cota_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidreletrica, const Periodo a_periodo, const double a_percentual_volume_util, const bool a_is_calculo_para_ENA);
 	double get_produtibilidade_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidreletrica, const double a_cota);
 	void instanciar_codigo_usina_jusante_EAR(Dados& a_dados);
 	void instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_EAR(Dados& a_dados, std::string a_nomeArquivo);
 	void instancia_atributos_hidreletrica_out_from_CadUsH_csv(Dados& a_dados, Hidreletrica& a_hidreletrica, std::string a_nomeArquivo);
-	void calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados);
-	void calcular_produtibilidade_ENA_acumulada_por_usina(Dados& a_dados);
-	void calcular_ENA_por_REE(Dados& a_dados);
+	void calcular_produtibilidade_EAR_acumulada_e_produtibilidade_ENA_acumulada_por_usina(Dados& a_dados);
+	void calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados);
 
 	void imprime_produtibilidade_EAR_acumulada(Dados& a_dados, std::string nomeArquivo);
 	void imprime_produtibilidade_ENA_acumulada(Dados& a_dados, std::string nomeArquivo);
 	void imprime_produtibilidade_EAR_e_produtibilidade_ENA(Dados& a_dados, std::string nomeArquivo);
-	void imprime_ENA_calculada(Dados& a_dados, std::string nomeArquivo);
+	void imprime_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados, std::string nomeArquivo);
 
 	//Validações
 	void validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao);
@@ -373,8 +372,9 @@ private:
 
 	SmartEnupla<int, Hidreletrica> lista_hidreletrica_out_estudo; //Lista que registra usinas que não fazem parte do estudo mas são necessárias para desacoplar o corte NEWAVE (p.ex COMP PAF-MOX indicado no registro JUSENA para calcular a EAR do REE NE)
 
-	SmartEnupla<IdReservatorioEquivalente, double> lista_ENA_calculada;
+	SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> lista_ENA_calculada_x_REE_x_cenario_x_periodo;
 
+	////
 
 	template<typename TipoIterador>
 	TipoIterador getIdFromCodigoONS(const SmartEnupla<TipoIterador, int>& a_lista_codigo_ONS, const int a_codigo_ONS) {
