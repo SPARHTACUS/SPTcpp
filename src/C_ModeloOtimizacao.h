@@ -190,9 +190,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
     m(  VarDecisao,   QDEF,             3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
     m(  VarDecisao,   QDEF_FINF,        3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
     m(  VarDecisao,   QDEF_FSUP,        3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-    m(  VarDecisao,   VDEF_ACUMULADO,   3,         ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,              sim,          nao)  \
-    m(  VarDecisao,   VDEF,             3,         ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,              sim,          nao)  \
-    m(  VarDecisao,   VDEF_ACOPLAMENTO, 3,         ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,              sim,          nao)  \
     m(  VarDecisao,   YP_ACUMULADO,     3,         ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA,         sim,          nao)  \
     m(  VarDecisao,   YP_ACUMULANDO,    3,         ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA,         sim,          nao)  \
 	m(  VarDecisao,   VI,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          sim)  \
@@ -246,8 +243,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  EquLinear,   VAZAO_TURBINADA_DISPONIVEL,                     3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
 	m(  EquLinear,   VAZAO_DEFLUENTE,                                3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
 	m(  EquLinear,   VAZAO_VERTIDA,                                  3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
-    m(  EquLinear,   DEFLUENCIA_VIAJANTE_BALANCO_HIDRICO,            3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
-    m(  EquLinear,   DEFLUENCIA_VIAJANTE_ACOPLAMENTO,                3,   ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO,       nao,  nao)  \
     m(  EquLinear,   POTENCIA_DISPONIVEL_META,                       3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao)  \
     m(  EquLinear,   AFLUENCIA_PROCESSO_ESTOCASTICO_ACUMULADA,       3,   ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA,  nao,  nao)
 	//  Elemento,    Nome,                                     NroIter,   Iteradores,                              Impr.Primal,  Impr.Dual
@@ -270,6 +265,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 // ITERADORES 4
 //
 
+#define ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO(m)                  m(1, IdEstagio) m(2, Periodo) m(3, IdHidreletrica) m(4, Periodo)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO(m)               m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdTermeletrica)
@@ -305,6 +301,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
     m(  VarDecisao,    QTUR_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
 	m(  VarDecisao,    QVER,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
 	m(  VarDecisao,    QMON,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
+    m(  VarDecisao,    QDEFLAG,                4,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO,                  sim,          nao)  \
+    m(  VarDecisao,    QDEFLAG_ADDING,         4,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO,                  sim,          nao)  \
     m(  VarDecisao,    QDEF,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
     m(  VarDecisao,    QDEF_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
     m(  VarDecisao,    QDEF_FSUP,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
@@ -354,6 +352,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  EquLinear,    BALANCO_HIDRAULICO_VAZ,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
 	m(  EquLinear,    VAZAO_MONTANTE,                           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
     m(  EquLinear,    VAZAO_DEFLUENTE,                          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+    m(  EquLinear,    VAZAO_DEFLUENTE_LAG,                      4,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO,                  nao,         nao)  \
 	m(  EquLinear,    VAZAO_TURBINADA,                          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
 	m(  EquLinear,    VAZAO_TURBINADA_DISPONIVEL,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
 	m(  EquLinear,    POTENCIA_TERMICA_RELAXADA,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
@@ -1159,16 +1158,10 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		int criarVariaveis_Decisao_e_Estado_YH_From_CorteBenders(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const Periodo a_periodo_processo_estocastico, const IdHidreletrica a_idHidreletrica);
 
-		int retornarVariaveis_Decisao_QDEF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_defluencia_passada, const Periodo a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica);
+		int criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo_lag);
 
-		int criarVariaveis_Decisao_QDEF_From_CorteBenders(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_defluencia_passada, const Periodo a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica);
-
-		void somar_VDEF_estagio(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_deslocado, const Periodo a_periodo_estudo, const Periodo a_periodo_estudo_inicial, const Periodo a_menor_periodo_estagio_acoplamento_pre_estudo, const IdHidreletrica a_idHidreletrica, const SmartEnupla <Periodo, bool> a_horizonte_defluencia_passada, const int a_posEquDEF_VIAJ_BH);
-		
 		void somar_YP_parcela(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_processo_estocastico_PAR, const Periodo a_periodo_estudo_inicial, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const SmartEnupla <Periodo, bool> a_horizonte_tendencia_mais_processo_estocastico, const int a_posEqu_YP_ACUMULADO);
 
-		int criarVariaveis_Decisao_e_Estado_VDEF_ACUMULADO_e_VDEF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_deslocado, const Periodo a_periodo_estudo, const Periodo a_periodo_estudo_inicial, const Periodo a_menor_periodo_estagio_acoplamento_pre_estudo, const IdHidreletrica a_idHidreletrica, const IdParcelaDefluenciaViajante a_maiorParcelaDefluenciaViajante, const SmartEnupla <Periodo, bool> a_horizonte_defluencia_passada, const SmartEnupla <IdParcelaDefluenciaViajante, IdEstagio> a_enupla_idEstagio_parcela);
-		
 		int criarVariaveis_Decisao_e_Estado_YP_ACUMULADO(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_processo_estocastico_PAR, const Periodo a_periodo_estudo_inicial, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const int a_numero_parcelas_processo_estocastico_PAR, const SmartEnupla <Periodo, bool> a_horizonte_tendencia_mais_processo_estocastico, const SmartEnupla <int, IdEstagio> a_enupla_idEstagio_parcela, IdVariavelEstado &a_idVariavelEstado_criada);
 
 		void criarVariaveis_Decisao_YHF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_processo_estocastico, const IdProcessoEstocastico a_tipo_processo_estocastico_hidrologico, const TipoRelaxacaoAfluenciaIncremental a_tipo_relaxacao_afluencia_incremental);
@@ -1224,8 +1217,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		void criarRestricoesVazaoRetirada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga);
 
 		void criarRestricoesVazaoBombeada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdUsinaElevatoria a_idUsinaElevatoria, const IdPatamarCarga a_idPatamarCarga);
-
-		void criarRestricoesDefluenciaPorSuperposicaoPeriodosTempoViagemAgua(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, const Periodo a_periodo_acoplamento, const Periodo a_periodo_estudo, const Periodo a_periodo_estudo_inicial, const Periodo a_menor_periodo_estagio_acoplamento_pre_estudo, const Periodo a_periodo_otimizacao_final, const IdHidreletrica a_idHidreletrica, const SmartEnupla <Periodo, bool> a_horizonte_defluencia_passada);
 
 		void criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga);
 
