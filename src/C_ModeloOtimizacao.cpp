@@ -1297,7 +1297,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 							const std::vector<std::string> nome = vetorEstagio.att(idEstagio).getNomeVariavelEstado(idVariavelEstado);
 
-							if ((nome.at(0) != "varYP") && (nome.at(0) != "varVI")) {
+							if ((nome.at(0) != "VarDecisaoYP") && (nome.at(0) != "VarDecisaoVI")) {
 								throw std::invalid_argument(getFullString(idVariavelEstado) + " " + getAtributo(idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, std::string()) + " presente no modelo, nao consta no corte em " + getFullString(idEstagio));
 							}
 
@@ -1322,12 +1322,12 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 							const std::vector<std::string> nome = vetorEstagio_aux.att(idEstagio).getNomeVariavelEstado(idVariavelEstado_corte);
 
-							if ((nome.at(0) != "varYP") && (nome.at(0) != "varVI") && (nome.at(0) != "varVDEF")) {
+							if ((nome.at(0) != "VarDecisaoYP") && (nome.at(0) != "VarDecisaoVI") && (nome.at(0) != "VarDecisaoQDEFLAG")) {
 								throw std::invalid_argument(getFullString(idVariavelEstado_corte) + " " + vetorEstagio_aux.att(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()) + " presente no corte, nao consta no modelo em " + getFullString(idEstagio));
 							}
 
 
-							if (nome.at(0) == "varVI") {
+							if (nome.at(0) == "VarDecisaoVI") {
 
 								const Periodo periodo(nome.at(2));
 
@@ -1342,11 +1342,11 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 								for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVarivelEstado; idVariavelEstado++) {
 									const std::string nome_modelo = getAtributo(idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, std::string());
-									if (strCompara(nome_modelo, std::string("varVI," + getString(idEstagio) + "," + getString(periodo_estudo_inicial) + "," + getString(idHidreletrica)))) {
+									if (strCompara(nome_modelo, std::string("VarDecisaoVI," + getString(idEstagio) + "," + getString(periodo_estudo_inicial) + "," + getString(idHidreletrica)))) {
 										idVariavelEstado_encontrada = idVariavelEstado;
 										break;
 									}
-									else if (strCompara(nome_modelo, std::string("varVI," + getFullString(idEstagio) + "," + getString(periodo_estudo_inicial) + "," + getFullString(idHidreletrica)))) {
+									else if (strCompara(nome_modelo, std::string("VarDecisaoVI," + getFullString(idEstagio) + "," + getString(periodo_estudo_inicial) + "," + getFullString(idHidreletrica)))) {
 										idVariavelEstado_encontrada = idVariavelEstado;
 										break;
 									}
@@ -1357,9 +1357,9 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 								else
 									vetorEstagio_aux.att(idEstagio).vetorVariavelEstado.rem(idVariavelEstado_corte);
 
-							} // if (nome.at(0) == "varVI") {
+							} // if (nome.at(0) == "VarDecisaoVI") {
 
-							else if (nome.at(0) == "varYP") {
+							else if (nome.at(0) == "VarDecisaoYP") {
 
 								const Periodo periodo = Periodo(nome.at(2));
 
@@ -1388,11 +1388,11 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 									vetorEstagio_aux.att(idEstagio).vetorVariavelEstado.rem(idVariavelEstado_corte);
 								} // else if (varYH == -1) {
 
-							} // else if (nome.at(0) == "varYP") {
+							} // else if (nome.at(0) == "VarDecisaoYP") {
 
-							else if (nome.at(0) == "varVDEF") {
+							else if (nome.at(0) == "VarDecisaoQDEFLAG") {
 								vetorEstagio_aux.att(idEstagio).vetorVariavelEstado.rem(idVariavelEstado_corte);
-							} // else if (nome.at(0) == "varVDEF") {
+							} // else if (nome.at(0) == "VarDecisaoVDEF") {
 
 
 						} // if (variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) == IdVariavelEstado_Nenhum) {
@@ -1466,7 +1466,6 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 	catch (const std::exception & erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::importarCorteBenders(" + getFullString(a_TSS) + "," + a_diretorio_impressao_selecao_cortes + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::importarCorteBenders(const std::string a_diretorio_recuperacao_cortes, EntradaSaidaDados a_entradaSaidaDados){
-
 
 void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubproblemaSolver a_TSS, const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const std::string a_diretorio_impressao_selecao_cortes, EntradaSaidaDados a_entradaSaidaDados) {
 
@@ -1829,10 +1828,10 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 				const std::vector<std::string> nome = estagio.getNomeVariavelEstado(idVariavelEstado);
 
 				//
-				// Volume Inicial
+				// Volume Minimo
 				//
 				
-				if (nome.at(0) == "varZP0_VF_FINF_ACUMULADO") {
+				if (nome.at(0) == "VarDecisaoZP0_VF_FINF_ACUMULADO") {
 
 					const Periodo periodo(nome.at(2));
 
@@ -1851,14 +1850,14 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					else
 						throw std::invalid_argument("Nao foi possivel encontrar a variavel varZP0_VF_FINF_ACUMULANDO " + getString(periodo) + " em " + getFullString(idEstagio));
 
-				} // if (nome.at(0) == "varZP0_VF_FINF_ACUMULADO") {
+				} // if (nome.at(0) == "VarDecisaoZP0_VF_FINF_ACUMULADO") {
 				
 
 				//
 				// Volume Inicial
 				//
 
-				else if (nome.at(0) == "varVI") {
+				else if (nome.at(0) == "VarDecisaoVI") {
 
 					const Periodo periodo(nome.at(2));
 
@@ -1882,13 +1881,13 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 					} // else if (varVF == -1)
 
-				} // if (nome.at(0) == "varVI") {
+				} // if (nome.at(0) == "VarDecisaoVI") {
 
 				//
 				// Afluencia Incremental
 				//
 
-				else if (nome.at(0) == "varYH") {
+				else if (nome.at(0) == "VarDecisaoYH") {
 
 					const Periodo periodo(nome.at(2));
 
@@ -1904,13 +1903,13 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					else if (varYH == -1) {
 						estagio.vetorVariavelEstado.rem(idVariavelEstado);
 					}
-				} // else if (nome.at(0) == "varYH") {
+				} // else if (nome.at(0) == "VarDecisaoYH") {
 
 				//
 				// Afluencia Processo Estocastico
 				//
 
-				else if (nome.at(0) == "varYP") {
+				else if (nome.at(0) == "VarDecisaoYP") {
 
 					const Periodo periodo = Periodo(nome.at(2)) - 1;
 
@@ -1941,76 +1940,34 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 						estagio.vetorVariavelEstado.rem(idVariavelEstado);
 					} // else if (varYH == -1) {
 
-				} // else if (nome.at(0) == "varYP") {
+				} // else if (nome.at(0) == "VarDecisaoYP") {
 
 
 				//
-				// Volume viajante
+				// Defluencia viajante
 				//
 
-				else if (nome.at(0) == "varVDEF") {
+				else if (nome.at(0) == "VarDecisaoQDEFLAG") {
 
-					const Periodo periodo_deslocado(nome.at(3));
+					const Periodo periodo = Periodo(nome.at(2));
+					const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
+					const Periodo periodo_lag = Periodo(nome.at(4));
 
-					const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(2).c_str());
+					if (periodo.getTipoPeriodo() != periodo_lag.getTipoPeriodo())
+						throw std::invalid_argument("Ambos os periodos devem ser do mesmo tipo em " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 
-					if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_tempo_viagem_agua, int()) > 0) {
+					const int tempo_viagem_agua_estado = Periodo(TipoPeriodo_horario, periodo) - Periodo(TipoPeriodo_horario, periodo_lag);
+					const int tempo_viagem_agua = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_tempo_viagem_agua, int());
 
-						//Cria variável do requerimento do corte e logo cria restrição com somatório as defluências superpostas dentro do horizonte de afluências passadas
+					if (tempo_viagem_agua_estado != tempo_viagem_agua)
+						throw std::invalid_argument("Tempo de viagem da agua " + getString(tempo_viagem_agua) + "h em " + getFullString(idHidreletrica) + " nao compativel com " + getString(tempo_viagem_agua_estado) + "h em " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 
-						const double infinito = vetorEstagio.att(idEstagio).getSolver(a_TSS)->getInfinito();
+					if (criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(a_TSS, a_dados, idEstagio, periodo, idHidreletrica, periodo_lag) == -1)
+						throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDEFLAG de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 
-						const int posVDEF_ACOPLAMENTO = addVarDecisao_VDEF_ACOPLAMENTO(a_TSS, idEstagio, idHidreletrica, periodo_deslocado, -0.0, infinito, 0.0);
+				} // else if (nome.at(0) == "VarDecisaoQDEFLAG") {
 
-						//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-						//Cria restrição VDEF_ACOPLAMENTO = %1 QDEF1*conversor_vazao_volume_1 + ... + %n QDEFn*conversor_vazao_volume_n
-						//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-						const int posEquDEF_ACOPLAMENTO = addEquLinear_DEFLUENCIA_VIAJANTE_ACOPLAMENTO(a_TSS, idEstagio, idHidreletrica, periodo_deslocado);
-						vetorEstagio.att(idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquDEF_ACOPLAMENTO, 0.0);
-
-						vetorEstagio.att(idEstagio).getSolver(a_TSS)->setCofRestricao(posVDEF_ACOPLAMENTO, posEquDEF_ACOPLAMENTO, 1.0);
-
-						//Nota: o horizonte_defluencia_passada começa no periodo das defluências passadas e termina no fim do horizonte_estudo
-						const Periodo periodo_defluencia_passada_inicial = a_horizonte_defluencia_passada.getIteradorInicial();
-						const Periodo periodo_defluencia_passada_final = a_horizonte_defluencia_passada.getIteradorFinal();
-
-						bool sobreposicao_encontrada = false;
-
-						for (Periodo periodo_defluencia_passada = periodo_defluencia_passada_inicial; periodo_defluencia_passada <= periodo_defluencia_passada_final; a_horizonte_defluencia_passada.incrementarIterador(periodo_defluencia_passada)) {
-
-							//O periodo_ficticio_deslocado indica a água com tempo de viagem d'água que passa para o futuro
-							const double sobreposicao = periodo_defluencia_passada.sobreposicao(periodo_deslocado);
-
-							if (sobreposicao > 0.0) {
-
-								const int pos_QDEF = criarVariaveis_Decisao_QDEF_From_CorteBenders(a_TSS, a_dados, idEstagio, periodo_defluencia_passada, periodo_horizonte_estudo_inicial, idHidreletrica);
-								
-								const double conversor_vazao_volume_periodo = a_dados.getElementoVetor(AttVetorDados_conversor_vazao_volume, periodo_defluencia_passada, double());
-								
-								vetorEstagio.att(idEstagio).getSolver(a_TSS)->setCofRestricao(pos_QDEF, posEquDEF_ACOPLAMENTO, -sobreposicao* conversor_vazao_volume_periodo);
-
-								sobreposicao_encontrada = true;
-
-							}//if (sobreposicao > 0.0 ) {
-
-							if (sobreposicao == 0.0 && sobreposicao_encontrada) //Se já tinha encontrado algum periodo com sobreposicao e a sobreposicao volta a ser zero, não existem mais periodos com sobreposição
-								break;
-
-						}//for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_defluencia_passada.incrementarIterador(periodo)) {
-
-						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, posVDEF_ACOPLAMENTO);
-
-					} // if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_tempo_viagem_agua, int()) > 0) {
-
-					else if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_tempo_viagem_agua, int()) == 0) {
-						estagio.anularVariavelEstadoCorteBenders(idVariavelEstado);
-						estagio.vetorVariavelEstado.rem(idVariavelEstado);
-					} // else if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_tempo_viagem_agua, int()) == 0) {
-
-				} // else if (nome.at(0) == "varVDEF") {
-
-				else if (nome.at(0) == "varPTDISPCOM") {
+				else if (nome.at(0) == "VarDecisaoPTDISPCOM") {
 
 					Estrutura_PTDISPCOMANDADA estrutura_PTDISPCOMANDADA;
 
@@ -2041,9 +1998,9 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 					lista_PTDISPCOMANDADA.push_back(estrutura_PTDISPCOMANDADA);
 
-				} // else if (nome.at(0) == "varPTDISPCOM") {
+				} // else if (nome.at(0) == "VarDecisaoPTDISPCOM") {
 
-				else if (nome.at(0) == "varPTDISPCOM_ACUMULADO") {
+				else if (nome.at(0) == "VarDecisaoPTDISPCOM_ACUMULADO") {
 
 					Estrutura_PTDISPCOMANDADA estrutura_PTDISPCOMANDADA_ACUMULADO;
 
@@ -2071,7 +2028,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 					lista_PTDISPCOMANDADA_ACUMULADO.push_back(estrutura_PTDISPCOMANDADA_ACUMULADO);
 
-				} // else if (nome.at(0) == "varPTDISPCOM_ACUMULADO") {
+				} // else if (nome.at(0) == "VarDecisaoPTDISPCOM_ACUMULADO") {
 
 				else
 					throw std::invalid_argument("Variavel de estado " + nome.at(0) + " nao compativel com modelo em " + getFullString(idEstagio));  
@@ -3627,6 +3584,8 @@ int ModeloOtimizacao::getNumeroCenarios(const IdCenario a_cenario_inicial, const
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::getNumeroCenarios(" + getFullString(a_cenario_inicial) + "," + getFullString(a_cenario_final) + "): \n" + std::string(erro.what())); }
 }
+
+
 
 
 void ModeloOtimizacao::criarModeloOtimizacao(Dados &a_dados, EntradaSaidaDados a_entradaSaidaDados) {

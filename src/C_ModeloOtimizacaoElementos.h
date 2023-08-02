@@ -8,9 +8,7 @@
 
 #define ITERS_ARGS(nIt, TIt) , const TIt a_##TIt##_##nIt
 #define GET_STRING_ELEMENTO(nIt, TIt)  + "," + getString(a_##TIt##_##nIt)
-#define GET_STRING_S_ELEMENTO(nIt, TIt)  + getString(a_##TIt##_##nIt)
 #define GET_FULL_STRING_ELEMENTO(nIt, TIt)  + "," + getFullString(a_##TIt##_##nIt)
-#define GET_FULL_STRING_S_ELEMENTO(nIt, TIt)  + getFullString(a_##TIt##_##nIt)
 
 #define AT_A_ITERS(nIt, TIt).at(a_##TIt##_##nIt)
 #define AT_ITERS(nIt, TIt).at(_##TIt##_##nIt)
@@ -141,9 +139,9 @@ void alocar##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const TIt1
 }; \
 std::string getNome##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) ){\
 if (vetorEstagio.att(a_IdEstagio_1).getSolver(a_TSS)->isNomeSimplificado()) \
-	return std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_STRING_S_ELEMENTO)); \
+	return std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_STRING_ELEMENTO)); \
 else \
-	return std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_FULL_STRING_S_ELEMENTO)); \
+	return std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_FULL_STRING_ELEMENTO)); \
 };\
 int get##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
 	try{ return idx_##Elem##_##Nome##_##Nro.at(a_TSS) Valores(AT_A_ITERS) AT_CONST_##Nro##_11; } \

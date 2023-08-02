@@ -123,7 +123,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 		//
 
 
-		SmartEnupla<IdEstagio, SmartEnupla<Periodo, SmartEnupla <IdHidreletrica, bool>>> alocacao_defluencia(estagio_inicial, std::vector<SmartEnupla<Periodo, SmartEnupla <IdHidreletrica, bool>>>(int(estagio_final) - int(estagio_inicial) + 1, SmartEnupla<Periodo, SmartEnupla <IdHidreletrica, bool>>()));
 		SmartEnupla<IdEstagio, SmartEnupla<Periodo, SmartEnupla <IdHidreletrica, bool>>> alocacao_afluencia_incremental(estagio_inicial, std::vector<SmartEnupla<Periodo, SmartEnupla <IdHidreletrica, bool>>>(int(estagio_final) - int(estagio_inicial) + 1, SmartEnupla<Periodo, SmartEnupla <IdHidreletrica, bool>>()));
 
 		if (true) {
@@ -213,12 +212,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 					/////////////////////////////////////////////////////////
 
-					alocacao_defluencia.setElemento(idEstagio, SmartEnupla<Periodo, SmartEnupla <IdHidreletrica, bool>>(horizonte_defluencia_passada, SmartEnupla <IdHidreletrica, bool>(IdHidreletrica_1, std::vector<bool>(a_dados.getMaiorId(IdHidreletrica()), false))));
-
 				}//if (idEstagio == estagio_inicial) {
-
-				if (idEstagio > estagio_inicial)
-					alocacao_defluencia.setElemento(idEstagio, alocacao_defluencia.at(estagio_inicial));
 
 			} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
@@ -357,7 +351,8 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 						//CRIA RESTRIÇÕES DE SUPERPOSIÇÃO PERIODOS DO TEMPO DE VIAGEM D'AGUA (QVIAJ_parcela = %1 QDEF1 + %2 QDEF2 e QVIAJ_0 = Q_CORTE + QVIAG_parcela)
 						start_clock = std::chrono::high_resolution_clock::now();
-						criarRestricoesDefluenciaPorSuperposicaoPeriodosTempoViagemAgua(listaTipoSubproblemaSolver.at(i), a_dados, idEstagio, idEstagio_acoplamento, periodo_acoplamento, periodo_estudo, periodo_estudo_inicial, menor_periodo_estagio_acoplamento_pre_estudo, periodo_otimizacao_final, idHidreletrica, horizonte_defluencia_passada);
+
+						//criarRestricoesDefluenciaPorSuperposicaoPeriodosTempoViagemAgua(listaTipoSubproblemaSolver.at(i), a_dados, idEstagio, idEstagio_acoplamento, periodo_acoplamento, periodo_estudo, periodo_estudo_inicial, menor_periodo_estagio_acoplamento_pre_estudo, periodo_otimizacao_final, idHidreletrica, horizonte_defluencia_passada);
 						tempoCriarVariaveis.restricaoSuperposicaoPeriodosTempoViagemAgua += std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock).count() / 60;
 
 					}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
@@ -1525,81 +1520,6 @@ void ModeloOtimizacao::criarRestricoesVazaoDefluente(const TipoSubproblemaSolver
 
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarRestricoesvazaoDefluente(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_periodo_estudo) + "): \n" + std::string(erro.what())); }
 }
-
-void ModeloOtimizacao::criarRestricoesDefluenciaPorSuperposicaoPeriodosTempoViagemAgua(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, const Periodo a_periodo_acoplamento, const Periodo a_periodo_estudo, const Periodo a_periodo_estudo_inicial, const Periodo a_menor_periodo_estagio_acoplamento_pre_estudo, const Periodo a_periodo_otimizacao_final, const IdHidreletrica a_idHidreletrica, const SmartEnupla <Periodo, bool> a_horizonte_defluencia_passada) {
-
-	try {
-
-		if (a_TSS == TipoSubproblemaSolver_mestre)
-			return;
-
-		const IdEstagio estagio_inicial = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
-
-		Periodo periodo_estudo_auxiliar = a_periodo_estudo;
-		const Periodo periodo_deslocado = periodo_estudo_auxiliar.deslocarPeriodo(periodo_estudo_auxiliar, -a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_tempo_viagem_agua, int()));
-
-		if ((a_idEstagio == a_idEstagio_acoplamento && periodo_deslocado.sobreposicao(a_periodo_acoplamento) < 1 && a_periodo_acoplamento <= a_periodo_otimizacao_final) \
-			|| (a_idEstagio < a_idEstagio_acoplamento && a_periodo_acoplamento <= a_periodo_otimizacao_final && a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_tempo_viagem_agua, int()) > 0) \
-			|| a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_considerar_tempo_viagem_agua, bool())) {
-
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//Estabelece o número de parcelas da defluencia viajante
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			int numero_parcelas_defluencia_viajante = 0;
-
-			SmartEnupla<IdParcelaDefluenciaViajante, IdEstagio> enupla_idEstagio_parcela;
-
-			if (periodo_deslocado < a_periodo_estudo_inicial && periodo_deslocado.sobreposicao(a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, estagio_inicial, Periodo())) == 0) {
-				numero_parcelas_defluencia_viajante = 1;
-				const IdParcelaDefluenciaViajante idParcelaDefluenciaViajante = IdParcelaDefluenciaViajante(numero_parcelas_defluencia_viajante);
-
-				enupla_idEstagio_parcela.addElemento(idParcelaDefluenciaViajante, estagio_inicial);
-			}//if (periodo_deslocado < a_periodo_estudo_inicial && periodo_deslocado.sobreposicao(a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, estagio_inicial, Periodo())) == 0) {				
-			else {
-
-				bool sobreposicao_encontrada = false;
-
-				const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
-
-				for (IdEstagio idEstagio_aux = estagio_inicial; idEstagio_aux <= estagio_final; idEstagio_aux++) {
-
-					const double sobreposicao = periodo_deslocado.sobreposicao(a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio_aux, Periodo()));
-
-					if (sobreposicao > 0) {
-						numero_parcelas_defluencia_viajante++;
-						const IdParcelaDefluenciaViajante idParcelaDefluenciaViajante = IdParcelaDefluenciaViajante(numero_parcelas_defluencia_viajante);
-
-						enupla_idEstagio_parcela.addElemento(idParcelaDefluenciaViajante, idEstagio_aux);
-
-						sobreposicao_encontrada = true;
-
-					}//if (periodo_deslocado.sobreposicao(a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio_aux, Periodo())) > 0) {
-
-					if (sobreposicao == 0 && sobreposicao_encontrada) //Se já tinha encontrado algum periodo com sobreposicao e a sobreposicao volta a ser zero, não existem mais periodos com sobreposição
-						break;
-
-				}//for (IdEstagio idEstagio_aux = estagio_inicial; idEstagio_aux <= estagio_final; idEstagio_aux++) {
-
-			}//else {
-
-			const IdParcelaDefluenciaViajante maiorParcelaDefluenciaViajante = IdParcelaDefluenciaViajante(numero_parcelas_defluencia_viajante);
-
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//Cria restricao VDEF_ACUMULADO = VDEF + VDEF_VIAJ_parcela 
-			//VDEF_ACUMULADO : variàvel que entra no balanço hídrico
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			criarVariaveis_Decisao_e_Estado_VDEF_ACUMULADO_e_VDEF(a_TSS, a_dados, a_idEstagio, periodo_deslocado, a_periodo_estudo, a_periodo_estudo_inicial, a_menor_periodo_estagio_acoplamento_pre_estudo, a_idHidreletrica, maiorParcelaDefluenciaViajante, a_horizonte_defluencia_passada, enupla_idEstagio_parcela);
-
-		}//if 
-
-	}//try {
-
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarRestricoesDefluenciaPorSuperposicaoPeriodosTempoViagemAgua(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_periodo_estudo) + "): \n" + std::string(erro.what())); }
-}
-
-
 
 void ModeloOtimizacao::criarRestricoesBombeamentoHidraulico(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga, const IdUsinaElevatoria a_idUsinaElevatoria) {
 
@@ -3552,17 +3472,13 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 		for (int m = 1; m <= numero_hidreletricas_montante; m++) {
 			const IdHidreletrica idHidreletrica_montante = a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_montante, m, IdHidreletrica());
 
-			Periodo periodo_estudo_auxiliar = a_periodo_estudo;
-			const Periodo periodo_deslocado = periodo_estudo_auxiliar.deslocarPeriodo(periodo_estudo_auxiliar, -a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_tempo_viagem_agua, int()));
+			const int tempo_viagem_agua = a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_tempo_viagem_agua, int());
 
-			if ((a_idEstagio == a_idEstagio_acoplamento && periodo_deslocado.sobreposicao(a_periodo_acoplamento) < 1 && a_periodo_acoplamento <= a_periodo_otimizacao_final) \
-				|| (a_idEstagio < a_idEstagio_acoplamento && a_periodo_acoplamento <= a_periodo_otimizacao_final && a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_tempo_viagem_agua, int()) > 0) \
-				|| a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_considerar_tempo_viagem_agua, bool())) {
-
-				// Variável VDEF_ACUMULADO
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VDEF_ACUMULADO(a_TSS, a_idEstagio, idHidreletrica_montante, periodo_deslocado), posEquBH, -1.0 / conversor_vazao_volume);
-
-			}//if ((a_idEstagio == idEstagio_acoplamento && periodo_deslocado.sobreposicao(periodo_acoplamento) < 1) || a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_considerar_tempo_viagem_agua, bool())) {
+			if (tempo_viagem_agua > 0) {
+				const Periodo periodo_lag = Periodo(a_periodo_estudo.getTipoPeriodo(), Periodo(TipoPeriodo_horario, a_periodo_estudo) - tempo_viagem_agua);
+				// Variável QDEFLAG
+				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(a_TSS, a_dados, a_idEstagio, a_periodo_estudo, idHidreletrica_montante, periodo_lag), posEquBH, -1.0);
+			}
 			else {
 
 				// Variável QDEF
@@ -3722,7 +3638,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 
 		// --------------------
 		//
-		// Vazao Montante
+		// Vazao Afluente Montante
 		// 
 		// --------------------
 
@@ -3854,23 +3770,19 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 			for (int m = 1; m <= numero_hidreletricas_montante; m++) {
 				const IdHidreletrica idHidreletrica_montante = a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_montante, m, IdHidreletrica());
 
-				Periodo periodo_estudo_auxiliar = a_periodo_estudo;
-				const Periodo periodo_deslocado = periodo_estudo_auxiliar.deslocarPeriodo(periodo_estudo_auxiliar, -a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_tempo_viagem_agua, int()));
+				const int tempo_viagem_agua = a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_tempo_viagem_agua, int());
 
-				if ((a_idEstagio == a_idEstagio_acoplamento && periodo_deslocado.sobreposicao(a_periodo_acoplamento) < 1 && a_periodo_acoplamento <= a_periodo_otimizacao_final) \
-					|| (a_idEstagio < a_idEstagio_acoplamento && a_periodo_acoplamento <= a_periodo_otimizacao_final && a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_tempo_viagem_agua, int()) > 0) \
-					|| a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_considerar_tempo_viagem_agua, bool())) {
+				if (tempo_viagem_agua > 0) {
+					const Periodo periodo_lag = Periodo(a_periodo_estudo.getTipoPeriodo(), Periodo(TipoPeriodo_horario, a_periodo_estudo) - tempo_viagem_agua);
+					// Variável QDEFLAG
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(a_TSS, a_dados, a_idEstagio, a_periodo_estudo, idHidreletrica_montante, periodo_lag), posEquBH, -conversor_vazao_volume_periodo);
+				}
 
-					// Variável VDEF_ACUMULADO
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VDEF_ACUMULADO(a_TSS, a_idEstagio, idHidreletrica_montante, periodo_deslocado), posEquBH, -1.0);
-
-				}//if ((a_idEstagio == idEstagio_acoplamento && periodo_deslocado.sobreposicao(periodo_acoplamento) < 1) || a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_considerar_tempo_viagem_agua, bool())) {
-				else {
+				else
 
 					// Variável QDEF
 					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica_montante), posEquBH, -conversor_vazao_volume_periodo);
 
-				}//else {
 
 			} // for (int m = 1; m <= numero_hidreletricas_montante; m++) {
 
@@ -7877,254 +7789,135 @@ void ModeloOtimizacao::criarVariaveis_Decisao_YHF(const TipoSubproblemaSolver a_
 } // void ModeloOtimizacao::criarVariaveis_Decisao_YHF(Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_processo_estocastico, const IdProcessoEstocastico a_tipo_processo_estocastico_hidrologico){
 
 
-void ModeloOtimizacao::somar_VDEF_estagio(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_deslocado, const Periodo a_periodo_estudo, const Periodo a_periodo_estudo_inicial, const Periodo a_menor_periodo_estagio_acoplamento_pre_estudo, const IdHidreletrica a_idHidreletrica, const SmartEnupla <Periodo, bool> a_horizonte_defluencia_passada, const int a_posEquDEF_VIAJ_BH) {
-
-	try {
-
-		//Nota: o horizonte_defluencia_passada começa no periodo das defluências passadas e termina no fim do horizonte_estudo
-		const Periodo periodo_defluencia_passada_inicial = a_horizonte_defluencia_passada.getIteradorInicial();
-		const Periodo periodo_defluencia_passada_final = a_horizonte_defluencia_passada.getIteradorFinal();
-
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// VDEF_VIAJ_parcela = %1 QDEF1*conversor_vazao_volume1 + ... + %n QDEFn*conversor_vazao_volume_n
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		bool sobreposicao_encontrada = false;
-
-		for (Periodo periodo_defluencia_passada = periodo_defluencia_passada_inicial; periodo_defluencia_passada <= periodo_defluencia_passada_final; a_horizonte_defluencia_passada.incrementarIterador(periodo_defluencia_passada)) {
-
-			double sobreposicao = periodo_defluencia_passada.sobreposicao(a_periodo_deslocado);
-
-			if ((sobreposicao > 0) && (periodo_defluencia_passada.sobreposicao(a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, a_idEstagio, Periodo())) == 1.0 || ((a_idEstagio == getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio())) && (periodo_defluencia_passada < a_periodo_estudo_inicial)))) {
-
-				//Nota: Se é o primeiro periodo do estágio do acoplamento e NÃO considera o tempo viagem d'agua (relação tempo viagem d'agua / periodo < parametro_considerar) recebe toda a água do própio estágio e uma porcentagem do periodo anterior
-				if ((periodo_defluencia_passada == a_menor_periodo_estagio_acoplamento_pre_estudo && !a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_considerar_tempo_viagem_agua, bool())))
-					sobreposicao = 1;
-
-				const int pos_QDEF = retornarVariaveis_Decisao_QDEF(a_TSS, a_dados, a_idEstagio, periodo_defluencia_passada, a_periodo_estudo_inicial, a_idHidreletrica);
-
-				const double conversor_vazao_volume_periodo = a_dados.getElementoVetor(AttVetorDados_conversor_vazao_volume, periodo_defluencia_passada, double());
-
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(pos_QDEF, a_posEquDEF_VIAJ_BH, -sobreposicao * conversor_vazao_volume_periodo);
-
-				sobreposicao_encontrada = true;
-
-			}//if (sobreposicao > 0) {
-
-			if (sobreposicao == 0 && sobreposicao_encontrada) //Se já tinha encontrado algum periodo com sobreposicao e a sobreposicao volta a ser zero, não existem mais periodos com sobreposição
-				break;
-
-		}//for (Periodo periodo_defluencia_passada = periodo_defluencia_passada_inicial; periodo_defluencia_passada <= periodo_defluencia_passada_final; a_horizonte_defluencia_passada.incrementarIterador(periodo_defluencia_passada)) {
-
-	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::somar_VDEF_estagio(a_dados," + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getString(a_periodo_deslocado) + "," + getFullString(a_idHidreletrica) + "): \n" + std::string(erro.what())); }
-
-}//void ModeloOtimizacao::somar_VDEF_estagio
-
-
-int ModeloOtimizacao::criarVariaveis_Decisao_e_Estado_VDEF_ACUMULADO_e_VDEF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_deslocado, const Periodo a_periodo_estudo, const Periodo a_periodo_estudo_inicial, const Periodo a_menor_periodo_estagio_acoplamento_pre_estudo, const IdHidreletrica a_idHidreletrica, const IdParcelaDefluenciaViajante a_maiorParcelaDefluenciaViajante, const SmartEnupla <Periodo, bool> a_horizonte_defluencia_passada, const SmartEnupla <IdParcelaDefluenciaViajante, IdEstagio> a_enupla_idEstagio_parcela) {
+int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo_lag) {
 
 	try {
 
 		if ((!vetorEstagio.att(a_idEstagio).isSolverInstanciado(a_TSS)) && (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica))
 			return -1;
 
-		const double infinito = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
-
-		//Primeira parcela da defluencia viajante
-		if (a_idEstagio == a_enupla_idEstagio_parcela.getElemento(IdParcelaDefluenciaViajante_1)) {
-
-			//Defluencia que vai para o estágio seguinte oU no BH do estágio correspondente		
-			const int pos_VDEF_ACUMULADO = addVarDecisao_VDEF_ACUMULADO(a_TSS, a_idEstagio, a_idHidreletrica, a_periodo_deslocado, 0.0, infinito, 0.0);
-
-			//Cria restriçao VDEF_ACUMULADO = VDEF_VIAJ_1
-			const int posEquDEF_VIAJ_BH = addEquLinear_DEFLUENCIA_VIAJANTE_BALANCO_HIDRICO(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquDEF_VIAJ_BH, 0.0);
-
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(pos_VDEF_ACUMULADO, posEquDEF_VIAJ_BH, 1);
-
-			somar_VDEF_estagio(a_TSS, a_dados, a_idEstagio, a_periodo_deslocado, a_periodo_estudo, a_periodo_estudo_inicial, a_menor_periodo_estagio_acoplamento_pre_estudo, a_idHidreletrica, a_horizonte_defluencia_passada, posEquDEF_VIAJ_BH);
-
-			return pos_VDEF_ACUMULADO;
-
-		}//if (a_idEstagio == a_enupla_idEstagio_parcela.getElemento(1)) {
-
-		//Condiçao quando a defluencia viajante nao tem parcelas no estágio
-		if (a_idEstagio > a_enupla_idEstagio_parcela.getElemento(a_maiorParcelaDefluenciaViajante)) {
-
-			const int pos_VDEF_ACUMULADO_anterior = criarVariaveis_Decisao_e_Estado_VDEF_ACUMULADO_e_VDEF(a_TSS, a_dados, IdEstagio(a_idEstagio - 1), a_periodo_deslocado, a_periodo_estudo, a_periodo_estudo_inicial, a_menor_periodo_estagio_acoplamento_pre_estudo, a_idHidreletrica, a_maiorParcelaDefluenciaViajante, a_horizonte_defluencia_passada, a_enupla_idEstagio_parcela);
-
-			//Cria variável e variável de estado entre estágios
-
-			const int varVDEF = addVarDecisao_VDEF(a_TSS, a_idEstagio, a_idHidreletrica, a_periodo_deslocado, 0.0, infinito, 0.0);
-
-			vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_VDEF(a_TSS, a_idEstagio, a_idHidreletrica, a_periodo_deslocado), varVDEF, pos_VDEF_ACUMULADO_anterior);
-
-			//Cria restriçao VDEF_ACUMULADO = VDEF
-
-			//Defluencia que vai para o estágio seguinte o no BH do estágio correspondente		
-			const int pos_VDEF_ACUMULADO = addVarDecisao_VDEF_ACUMULADO(a_TSS, a_idEstagio, a_idHidreletrica, a_periodo_deslocado, 0.0, infinito, 0.0);
-
-			const int posEquDEF_VIAJ_BH = addEquLinear_DEFLUENCIA_VIAJANTE_BALANCO_HIDRICO(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquDEF_VIAJ_BH, 0.0);
-
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(pos_VDEF_ACUMULADO, posEquDEF_VIAJ_BH, 1);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVDEF, posEquDEF_VIAJ_BH, -1);
-
-			return pos_VDEF_ACUMULADO;
-
-		}//if (a_idEstagio > a_enupla_idEstagio_parcela.getElemento(a_numero_parcelas_defluencia_viajante)) {
-
-		/////////////////////////////////////
-
-		const int pos_VDEF_ACUMULADO_anterior = criarVariaveis_Decisao_e_Estado_VDEF_ACUMULADO_e_VDEF(a_TSS, a_dados, IdEstagio(a_idEstagio - 1), a_periodo_deslocado, a_periodo_estudo, a_periodo_estudo_inicial, a_menor_periodo_estagio_acoplamento_pre_estudo, a_idHidreletrica, a_maiorParcelaDefluenciaViajante, a_horizonte_defluencia_passada, a_enupla_idEstagio_parcela);
-
-		//Cria variável e variável de estado entre estágios
-
-		const int varVDEF = addVarDecisao_VDEF(a_TSS, a_idEstagio, a_idHidreletrica, a_periodo_deslocado, 0.0, infinito, 0.0);
-
-		vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_VDEF(a_TSS, a_idEstagio, a_idHidreletrica, a_periodo_deslocado), varVDEF, pos_VDEF_ACUMULADO_anterior);
-
-		//Cria restriçao VDEF_ACUMULADO = VDEF + VDEF_VIAJ_X
-
-		//Defluencia que vai para o estágio seguinte ou no BH do estágio correspondente
-		const int pos_VDEF_ACUMULADO = addVarDecisao_VDEF_ACUMULADO(a_TSS, a_idEstagio, a_idHidreletrica, a_periodo_deslocado, 0.0, infinito, 0.0);
-
-		const int posEquDEF_VIAJ_BH = addEquLinear_DEFLUENCIA_VIAJANTE_BALANCO_HIDRICO(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica);
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquDEF_VIAJ_BH, 0.0);
-
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(pos_VDEF_ACUMULADO, posEquDEF_VIAJ_BH, 1);
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVDEF, posEquDEF_VIAJ_BH, -1);
-
-		somar_VDEF_estagio(a_TSS, a_dados, a_idEstagio, a_periodo_deslocado, a_periodo_estudo, a_periodo_estudo_inicial, a_menor_periodo_estagio_acoplamento_pre_estudo, a_idHidreletrica, a_horizonte_defluencia_passada, posEquDEF_VIAJ_BH);
-
-		return pos_VDEF_ACUMULADO;
-
-	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveis_Decisao_e_Estado_VDEF_ACUMULADO_e_VDEF(a_dados," + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getString(a_periodo_deslocado) + "," + getFullString(a_idHidreletrica) + "): \n" + std::string(erro.what())); }
-
-}
-
-int ModeloOtimizacao::retornarVariaveis_Decisao_QDEF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_defluencia_passada, const Periodo a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica) {
-
-	try {
-
-		//Nota: QDEF por estágio já foi declarada de antemão
-
-		// Identifica se variável de decião já foi criada.
-		if (getVarDecisao_QDEFseExistir(a_TSS, a_idEstagio, a_periodo_defluencia_passada, a_idHidreletrica) > -1)
-			return getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_defluencia_passada, a_idHidreletrica);
-
 		const IdEstagio menor_estagio = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
 
 		if (a_idEstagio < menor_estagio)
 			return -1;
 
+		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
+
+		const Periodo periodo_final_horizonte_estudo = getIterador2Final(AttMatrizModeloOtimizacao_horizonte_estudo, a_idEstagio, Periodo());
+
+		// Verifica se periodo não é mais necessario para compor ou repassar lag
+		if (periodo_final_horizonte_estudo + 1 <= a_periodo_lag)
+			return -1;
+
+		const SmartEnupla<Periodo, double> horizonte_estudo = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_estudo, a_idEstagio, Periodo(), double());
+		const Periodo periodo_inicial_horizonte_estudo = horizonte_estudo.getIteradorInicial();
+
+
+		int varQDEFLAG = getVarDecisao_QDEFLAGseExistir(a_TSS, a_idEstagio, a_periodo, a_idHidreletrica, a_periodo_lag);
+		if (varQDEFLAG > -1)
+			return varQDEFLAG;
+
 		const double infinito = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
-		//Cria variável no primeiro estágio das defluencias viajantes
-		if (a_idEstagio == menor_estagio && a_periodo_defluencia_passada < a_periodo_estudo_inicial) {
+		varQDEFLAG = addVarDecisao_QDEFLAG(a_TSS, a_idEstagio, a_periodo, a_idHidreletrica, a_periodo_lag, 0.0, infinito, 0.0);
 
-			//Dados de água viajante anterior ao horizonte de estudo
+		// Composicao de lag com periodos do horizonte de estudo
+		int equQDEFLAG = -1;
+		const double sobreposicao_periodo_otimizacao = periodo_otimizacao.sobreposicao(a_periodo_lag);
+		if (sobreposicao_periodo_otimizacao > 0.0) {
+
+			equQDEFLAG = addEquLinear_VAZAO_DEFLUENTE_LAG(a_TSS, a_idEstagio, a_periodo, a_idHidreletrica, a_periodo_lag);
+			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEFLAG, equQDEFLAG, 1.0);
+
+			bool sobreposicao_encontrada = false;
+			for (Periodo periodo = periodo_inicial_horizonte_estudo; periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo)) {
+
+				const double sobreposicao = a_periodo_lag.sobreposicao(periodo);
+
+				if (sobreposicao > 0.0) {
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, periodo, a_idHidreletrica), equQDEFLAG, -sobreposicao);
+					if (!sobreposicao_encontrada)
+						sobreposicao_encontrada = true;
+				}
+				else if ((sobreposicao == 0.0) && (sobreposicao_encontrada))
+					break;
+
+			} // for (Periodo periodo = periodo_inicial_horizonte_estudo; periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo)) {
+		} // if (sobreposicao_periodo_otimizacao > 0.0) {
+
+		// No estagio 1, variáveis de estado são criadas para as variáveis QDEF pré-estudo.
+		if (a_idEstagio == IdEstagio_1) {
 
 			const IdCenario cenario_inicial = getAtributo(AttComumModeloOtimizacao_cenario_inicial, IdCenario());
 			const IdCenario cenario_final = getAtributo(AttComumModeloOtimizacao_cenario_final, IdCenario());
 
-			const int varQDEF = addVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_defluencia_passada, a_idHidreletrica, 0.0, infinito, 0.0);
+			const SmartEnupla<Periodo, double> vazao_defluencia = a_dados.getVetor(a_idHidreletrica, IdDefluencia_passada, AttVetorDefluencia_vazao_defluencia, Periodo(), double());
 
-			const IdVariavelEstado idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_defluencia_passada, a_idHidreletrica), varQDEF, -1);
+			if (vazao_defluencia.getIteradorInicial() > a_periodo_lag)
+				throw std::invalid_argument("Necessario mais periodos de defluencia passada anteriores a " + getString(a_periodo_lag) + " em " + getFullString(AttVetorDefluencia_vazao_defluencia) + " de " + getFullString(a_idHidreletrica));
 
-			if (menor_estagio == IdEstagio_1) {
-				for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++)
-					vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, false, a_dados.getAtributo(AttComumDados_idProcesso, IdProcesso()), a_dados.getAtributo(AttComumDados_maior_processo, IdProcesso()), idCenario, a_dados.getElementoVetor(a_idHidreletrica, IdDefluencia_passada, AttVetorDefluencia_vazao_defluencia, a_periodo_defluencia_passada, double()));
-			}
+			bool sobreposicao_encontrada = false;
+			for (Periodo periodo = vazao_defluencia.getIteradorInicial(); periodo <= vazao_defluencia.getIteradorFinal(); vazao_defluencia.incrementarIterador(periodo)) {
 
-			return varQDEF;
+				const double sobreposicao = a_periodo_lag.sobreposicao(periodo);
 
-		}//if (a_idEstagio == menor_estagio && a_periodo_defluencia_passada < a_periodo_estudo_inicial) {
+				if (sobreposicao > 0.0) {
 
-		//Se o periodo está dentro do estágio -> cria variável de QDEF zerada (caso do acoplamento entre modelos, quando o corte requer uma defluência que o modelo não considera)
-		//if (a_periodo_defluencia_passada.sobreposicao(a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, a_idEstagio, Periodo())))
-			//return addVarDecisao_QDEF(a_idEstagio, a_periodo_defluencia_passada, a_idHidreletrica, 0.0, 0.0, 0.0);
+					int varQDEF = getVarDecisao_QDEFseExistir(a_TSS, a_idEstagio, periodo, a_idHidreletrica);
 
-		return -1;
+					if (varQDEF == -1) {
+						varQDEF = addVarDecisao_QDEF(a_TSS, a_idEstagio, periodo, a_idHidreletrica, 0.0, infinito, 0.0);
+						const IdVariavelEstado idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QDEF(a_TSS, a_idEstagio, periodo, a_idHidreletrica), varQDEF, -1);
+						for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++)
+							vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, false, a_dados.getAtributo(AttComumDados_idProcesso, IdProcesso()), a_dados.getAtributo(AttComumDados_maior_processo, IdProcesso()), idCenario, vazao_defluencia.at(periodo));
+					}
 
-	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveis_Decisao_e_Estado_QDEF(a_dados," + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getString(a_periodo_defluencia_passada) + "," + getFullString(a_idHidreletrica) + "): \n" + std::string(erro.what())); }
+					int equQDEFLAG = getEquLinear_VAZAO_DEFLUENTE_LAGseExistir(a_TSS, a_idEstagio, a_periodo, a_idHidreletrica, a_periodo_lag);
 
-} // void ModeloOtimizacao::criarVariaveis_Decisao_e_Estado_YH_Tendencia(Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_processo_estocastico, const IdProcessoEstocastico a_tipo_processo_estocastico_hidrologico) {
+					if (equQDEFLAG == -1) {
+						equQDEFLAG = addEquLinear_VAZAO_DEFLUENTE_LAG(a_TSS, a_idEstagio, a_periodo, a_idHidreletrica, a_periodo_lag);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEFLAG, equQDEFLAG, 1.0);
+					}
 
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEF, equQDEFLAG, -sobreposicao);
 
-int ModeloOtimizacao::criarVariaveis_Decisao_QDEF_From_CorteBenders(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_defluencia_passada, const Periodo a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica) {
+					if (!sobreposicao_encontrada)
+						sobreposicao_encontrada = true;
 
-	try {
+				} // if (sobreposicao > 0.0) {
+				else if ((sobreposicao == 0.0) && (sobreposicao_encontrada))
+					break;
 
-		//Nota: QDEF por estágio já foi declarada de antemão
+			} // for (Periodo periodo = vazao_defluencia.getIteradorInicial(); periodo <= vazao_defluencia.getIteradorFinal(); vazao_defluencia.incrementarIterador(periodo)) {
+		} // if (a_idEstagio == IdEstagio_1) {
 
-		// Identifica se variável de decião já foi criada.
-		if (getVarDecisao_QDEFseExistir(a_TSS, a_idEstagio, a_periodo_defluencia_passada, a_idHidreletrica) > -1)
-			return getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_defluencia_passada, a_idHidreletrica);
+		else if (a_idEstagio > IdEstagio_1) {
 
-		if (a_periodo_defluencia_passada.sobreposicao(a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, a_idEstagio, Periodo())) == 1) {
+			const IdEstagio idEstagio_anterior = IdEstagio(a_idEstagio - 1);
+			const int varQDEFLAG_anterior = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(a_TSS, a_dados, idEstagio_anterior, a_periodo, a_idHidreletrica, a_periodo_lag);
 
-			//Se a variàvel QDEF nao existe e o a_periodo_defluencia_passada pertence ao estàgio em questao,
-			//significa que a solicitaçao do corte deve criar uma variàvel zerada
+			if ((varQDEFLAG_anterior > -1) || ((idEstagio_anterior == menor_estagio) && (periodo_inicial_horizonte_estudo > a_periodo_lag))) {
 
-			const int varQDEF = addVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_defluencia_passada, a_idHidreletrica, 0.0, 0.0, 0.0);
-			return varQDEF;
+				// Variáveis de estado a repassar lag
+				if (sobreposicao_periodo_otimizacao == 0.0)
+					vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QDEFLAG(a_TSS, a_idEstagio, a_periodo, a_idHidreletrica, a_periodo_lag), varQDEFLAG, varQDEFLAG_anterior);
 
-		}//if (a_periodo_defluencia_passada.sobreposicao(a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, a_idEstagio, Periodo()))) {
+				// Variáveis de estado a compor lag
+				else if (sobreposicao_periodo_otimizacao > 0.0) {
+					const int varQDEFLAG_ADDING = addVarDecisao_QDEFLAG_ADDING(a_TSS, a_idEstagio, a_periodo, a_idHidreletrica, a_periodo_lag, 0.0, infinito, 0.0);
+					vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QDEFLAG(a_TSS, a_idEstagio, a_periodo, a_idHidreletrica, a_periodo_lag), varQDEFLAG_ADDING, varQDEFLAG_anterior);
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEFLAG_ADDING, equQDEFLAG, -1.0);
+				}
 
-		const IdEstagio menor_estagio = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
-
-		if (a_idEstagio < menor_estagio)
-			return -1;
-
-		const double infinito = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
-
-		//Cria variável no primeiro estágio das defluencias viajantes
-		if (a_idEstagio == menor_estagio && a_periodo_defluencia_passada < a_periodo_estudo_inicial) {
-
-			//Dados de água viajante anterior ao horizonte de estudo
-
-			const IdCenario cenario_inicial = getAtributo(AttComumModeloOtimizacao_cenario_inicial, IdCenario());
-			const IdCenario cenario_final = getAtributo(AttComumModeloOtimizacao_cenario_final, IdCenario());
-
-			const int varQDEF = addVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_defluencia_passada, a_idHidreletrica, 0.0, infinito, 0.0);
-
-			const IdVariavelEstado idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_defluencia_passada, a_idHidreletrica), varQDEF, -1);
-
-			if (menor_estagio == IdEstagio_1) {
-				for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++)
-					vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, false, a_dados.getAtributo(AttComumDados_idProcesso, IdProcesso()), a_dados.getAtributo(AttComumDados_maior_processo, IdProcesso()), idCenario, a_dados.getElementoVetor(a_idHidreletrica, IdDefluencia_passada, AttVetorDefluencia_vazao_defluencia, a_periodo_defluencia_passada, double()));
-			}
-
-			return varQDEF;
-
-		}//if (a_idEstagio == menor_estagio && a_periodo_defluencia_passada < a_periodo_estudo_inicial) {
-
-
-		const int pos_QDEF_anterior = criarVariaveis_Decisao_QDEF_From_CorteBenders(a_TSS, a_dados, IdEstagio(a_idEstagio - 1), a_periodo_defluencia_passada, a_periodo_estudo_inicial, a_idHidreletrica);
-
-		//Cria variável e variável de estado entre estágios
-
-		if (pos_QDEF_anterior > -1) {
-
-			const int varQDEF = addVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_defluencia_passada, a_idHidreletrica, 0.0, infinito, 0.0);
-
-			vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_defluencia_passada, a_idHidreletrica), varQDEF, pos_QDEF_anterior);
-
-			return varQDEF;
-
-		}
-
-		else
-			return -1;
+			} // if ((varQDEFLAG_anterior > -1) || ((idEstagio_anterior == menor_estagio) && (periodo_inicial_horizonte_estudo > a_periodo_lag))) {
+		} // else if (a_idEstagio > IdEstagio_1) {
+		
+		return varQDEFLAG;
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveis_Decisao_QDEF_From_CorteBenders(a_dados," + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getString(a_periodo_defluencia_passada) + "," + getFullString(a_idHidreletrica) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveis_e_Restricoes_QDEFLAG(a_dados," + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getString(a_periodo) + "," + getFullString(a_idHidreletrica) + "): \n" + std::string(erro.what())); }
 
-} // void ModeloOtimizacao::criarVariaveis_Decisao_QDEF_From_CorteBenders(Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_processo_estocastico, const IdProcessoEstocastico a_tipo_processo_estocastico_hidrologico) {
+} // int ModeloOtimizacao::criarVariaveis_e_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdHidreletrica a_idHidreletrica) {
 
 
 void ModeloOtimizacao::addCorteBendersToZF(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_anterior, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders, const double a_rhs, const SmartEnupla<IdVariavelEstado, double>& a_coeficiente) {
