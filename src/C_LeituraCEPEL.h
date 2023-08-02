@@ -190,6 +190,7 @@ private:
 	void instancia_atributos_hidreletrica_out_from_CadUsH_csv(Dados& a_dados, Hidreletrica& a_hidreletrica, std::string a_nomeArquivo);
 	void calcular_produtibilidade_EAR_acumulada_e_produtibilidade_ENA_acumulada_por_usina(Dados& a_dados);
 	void calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados);
+	IdMes get_IdMes_operativo(const Periodo a_periodo, const bool is_periodo_inicial);
 
 	void imprime_produtibilidade_EAR_acumulada(Dados& a_dados, std::string nomeArquivo);
 	void imprime_produtibilidade_ENA_acumulada(Dados& a_dados, std::string nomeArquivo);
