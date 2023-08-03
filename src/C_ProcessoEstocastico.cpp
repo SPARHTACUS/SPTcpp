@@ -707,6 +707,13 @@ int ProcessoEstocastico::getMaiorOrdemAutocorrelacaoLinear(const Periodo a_perio
 
 } // int ProcessoEstocastico::getMaiorOrdemAutocorrelacaoLinear(){
 
+double ProcessoEstocastico::getGrauLiberdade(const IdVariavelAleatoria a_idVariavelAleatoria){
+	try {
+		return vetorVariavelAleatoria.att(a_idVariavelAleatoria).getGrauLiberdade();
+	}
+	catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getGrauLiberdade(" + getFullString(a_idVariavelAleatoria) + "): \n" + std::string(erro.what())); }
+}
+
 
 void ProcessoEstocastico::calcularCorrelacaoSazonalVariaveisAleatorias() {
 

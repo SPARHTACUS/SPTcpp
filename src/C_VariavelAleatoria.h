@@ -184,6 +184,8 @@ public:
 
 	double calcularResiduo_lognormal_3p(double a_ruido_correlacionado, const Periodo a_periodo) const;
 
+	double getGrauLiberdade();
+
 };
 
 GET_STRING_FROM_CLASS(VariavelAleatoria)

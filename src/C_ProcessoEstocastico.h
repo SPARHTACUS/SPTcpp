@@ -101,6 +101,8 @@ public:
 
 	int getMaiorOrdemAutocorrelacaoLinear(const Periodo a_periodo);
 
+	double getGrauLiberdade(const IdVariavelAleatoria a_idVariavelAleatoria);
+
 	void reducao_espaco_amostral(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_reducao_cenarios, IdProcesso a_idProcesso, const SmartEnupla <IdEstagio, int> a_numero_aberturas, const SmartEnupla <IdEstagio, Periodo> a_horizonte_otimizacao, const IdEstagio a_estagio_acoplamento_pre_estudo, const IdEstagio a_estagio_final, TipoSolver& a_tipoSolver);
 	
 	void reducao_inicial(EntradaSaidaDados a_entradaSaidaDados, std::vector<std::vector<std::vector<double>>> &a_residuo_espaco_amostral_reduzido, const SmartEnupla <IdEstagio, int> a_numero_aberturas, const SmartEnupla <IdEstagio, Periodo> a_horizonte_otimizacao, const IdEstagio a_estagio_acoplamento_pre_estudo, const IdEstagio a_estagio_final);

@@ -289,6 +289,27 @@ static std::string getString(const std::vector<std::vector<double>> a_vetor) { r
 template<typename TipoValor>
 static std::string getString(TipoValor a_tipoValor) { return a_tipoValor.str(); }
 
+template<typename TipoValor>
+static std::string getStringFromLista(const std::vector<TipoValor> &a_lista, const std::string a_delimitador, bool a_full_string) {
+	
+	std::string retorno;
+
+	for (int i = 0; i < int(a_lista.size()); i++) {
+
+		std::string delimitador = a_delimitador;
+
+		if (i == int(a_lista.size()) - 1)
+			delimitador = "";
+
+		if (a_full_string)
+			retorno = retorno + getFullString(a_lista.at(i)) + delimitador;
+		else
+			retorno = retorno + getString(a_lista.at(i)) + delimitador;
+	}
+
+	return retorno;
+
+};
 
 static void strNormalizada(std::string &a_string){
 	

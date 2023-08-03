@@ -1911,6 +1911,20 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 				else if (nome.at(0) == "VarDecisaoYP") {
 
+					const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(3).c_str());
+
+					if (idProcessoEstocastico != getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()))
+						throw std::invalid_argument(getFullString(idProcessoEstocastico) + " do acoplamento incompativel com " + getFullString(a_dados.processoEstocastico_hidrologico.getAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico())) + " do modelo");
+
+					const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(4).c_str());
+
+					const Periodo periodo_lag = Periodo(nome.at(5));
+
+					//if (criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, periodo, idProcessoEstocastico, idVariavelAleatoria, periodo_lag) == -1)
+						//throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDEFLAG de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
+
+
+					/*
 					const Periodo periodo = Periodo(nome.at(2)) - 1;
 
 					const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(3).c_str());
@@ -1939,6 +1953,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					else if (varYP == -1) {
 						estagio.vetorVariavelEstado.rem(idVariavelEstado);
 					} // else if (varYH == -1) {
+					*/
 
 				} // else if (nome.at(0) == "VarDecisaoYP") {
 

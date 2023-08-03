@@ -1906,3 +1906,23 @@ double VariavelAleatoria::calcularResiduo_lognormal_3p(double a_ruido_correlacio
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::calcularResiduo_lognormal_3p("  + getString(a_ruido_correlacionado) + "," + getString(a_periodo) + "): \n" + std::string(erro.what())); }
 
 } // double VariavelAleatoria::calcularResiduo_lognormal_3p(double a_ruido_correlacionado, const Periodo a_periodo){
+
+double VariavelAleatoria::getGrauLiberdade() {
+
+	try {
+
+		double grau_liberdade = 0.0;
+
+		const IdVariavelAleatoriaInterna maiorIdVariavelAleatoria = getMaiorId(IdVariavelAleatoriaInterna());
+
+		for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoria; idVariavelAleatoriaInterna++) {
+			grau_liberdade += getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
+		}
+
+		return grau_liberdade;
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::getGrauLiberdade(): \n" + std::string(erro.what())); }
+
+
+}
