@@ -69,6 +69,19 @@ static bool strCompara(std::string const& a, std::string const& b) {
 
 }; // static bool strCompara(std::string const& a, std::string const& b) {
 
+template<typename TValue>
+static bool vectorCompara(std::vector<TValue> a_lista1, std::vector<TValue> a_lista2) {
+
+	if (a_lista1.size() != a_lista2.size())
+		return false;
+
+	for (int i = 0; i < a_lista1.size(); i++) {
+		if (a_lista1.at(i) != a_lista2.at(i))
+			return false;
+	}
+	return true;
+}
+
 static std::string alterar_CHARc_na_STRINGs_por_CHARn(const unsigned char c, std::string s, const unsigned char n) {
 
 	for (int i = 0; i < int(s.length()); i++) {
