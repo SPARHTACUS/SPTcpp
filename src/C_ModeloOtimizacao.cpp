@@ -1496,41 +1496,62 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 		Estagio estagio_auxiliar;
 		while (true) {
 
-			if (!estagio_carregado)
-				estagio_carregado = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("estagio_" + getFullString(a_idIteracao) + ".csv", estagio_auxiliar, TipoAcessoInstancia_direto);
+			bool cortes_encontrados = false;
 
-			if (estagio_carregado) {
+			std::string prefixo = "";
 
-				rhs_carregado = a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("corteBenders_rhs_" + getFullString(a_idIteracao) + ".csv", vetorEstagio.att(idEstagio_futuro), TipoAcessoInstancia_membro);
-				std_carregado = vetorEstagio.att(idEstagio_futuro).carregarEstadosCortesBenders(a_entradaSaidaDados.getDiretorioEntrada() + "//corteBenders_estado_" + getFullString(a_idIteracao) + ".csv");
-				cof_carregado = vetorEstagio.att(idEstagio_futuro).carregarCoeficientesCortesBenders(a_entradaSaidaDados.getDiretorioEntrada() + "//corteBenders_coeficientes_" + getFullString(a_idIteracao) + ".csv");
+			for (int pref = 0; pref < int(IdEstagio_Excedente); pref++) {
 
-			} // if (estagio_carregado) {
+				if (pref > 0)
+					prefixo = getFullString(IdEstagio(pref) + "_");
 
-			if ((rhs_carregado) && (std_carregado) && (cof_carregado)) {
-				if (a_idProcesso == IdProcesso_mestre)
-					std::cout << "Cortes de Benders pos-estudo detectados." << std::endl;
-				break;
-			}
+				if (!estagio_carregado)
+					estagio_carregado = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(prefixo + "estagio_" + getFullString(a_idIteracao) + ".csv", estagio_auxiliar, TipoAcessoInstancia_direto);
 
-			if (!estagio_carregado) {
-				estagio_carregado_sem_iterador = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("estagio.csv", estagio_auxiliar, TipoAcessoInstancia_direto);
+				if (estagio_carregado) {
 
-				if (estagio_carregado_sem_iterador) {
+					rhs_carregado = a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir(prefixo + "corteBenders_rhs_" + getFullString(a_idIteracao) + ".csv", vetorEstagio.att(idEstagio_futuro), TipoAcessoInstancia_membro);
+					std_carregado = vetorEstagio.att(idEstagio_futuro).carregarEstadosCortesBenders(a_entradaSaidaDados.getDiretorioEntrada() + "//" + prefixo + "corteBenders_estado_" + getFullString(a_idIteracao) + ".csv");
+					cof_carregado = vetorEstagio.att(idEstagio_futuro).carregarCoeficientesCortesBenders(a_entradaSaidaDados.getDiretorioEntrada() + "//" + prefixo + "corteBenders_coeficientes_" + getFullString(a_idIteracao) + ".csv");
 
-					if (a_idIteracao == getAtributo(AttComumModeloOtimizacao_iteracao_inicial, IdIteracao())) {
-						a_entradaSaidaDados.carregarArquivoCSV_AttVetor("corteBenders_rhs.csv", vetorEstagio.att(idEstagio_futuro), TipoAcessoInstancia_membro);
-						vetorEstagio.att(idEstagio_futuro).carregarEstadosCortesBenders(a_entradaSaidaDados.getDiretorioEntrada() + "//corteBenders_estado.csv");
-						vetorEstagio.att(idEstagio_futuro).carregarCoeficientesCortesBenders(a_entradaSaidaDados.getDiretorioEntrada() + "//corteBenders_coeficientes.csv");
-					}
-					else {
-						return;
-					}
+				} // if (estagio_carregado) {
+
+				if ((rhs_carregado) && (std_carregado) && (cof_carregado)) {
+					cortes_encontrados = true;
 					break;
 				}
 
-			}
+				if (!estagio_carregado) {
+					estagio_carregado_sem_iterador = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(prefixo + "estagio.csv", estagio_auxiliar, TipoAcessoInstancia_direto);
 
+					if (estagio_carregado_sem_iterador) {
+
+						if (a_idIteracao == getAtributo(AttComumModeloOtimizacao_iteracao_inicial, IdIteracao())) {
+							a_entradaSaidaDados.carregarArquivoCSV_AttVetor(prefixo + "corteBenders_rhs.csv", vetorEstagio.att(idEstagio_futuro), TipoAcessoInstancia_membro);
+							vetorEstagio.att(idEstagio_futuro).carregarEstadosCortesBenders(a_entradaSaidaDados.getDiretorioEntrada() + "//" + prefixo + "corteBenders_estado.csv");
+							vetorEstagio.att(idEstagio_futuro).carregarCoeficientesCortesBenders(a_entradaSaidaDados.getDiretorioEntrada() + "//" + prefixo + "corteBenders_coeficientes.csv");
+						}
+						else {
+							return;
+						}
+						cortes_encontrados = true;
+						break;
+					}
+
+				}
+
+			} // for (int pref = 0; pref < int(IdEstagio_Excedente); pref++) {
+
+			if (cortes_encontrados) {
+				if (a_idProcesso == IdProcesso_mestre) {
+					std::cout << std::endl;
+					if (prefixo == "")
+						std::cout << "Cortes de Benders pos-estudo detectados." << std::endl;
+					else
+						std::cout << "Cortes de Benders pos-estudo detectados. Prefixo: " << prefixo << std::endl;
+				}
+				break;
+			}
 
 			if ((!impressao) && (a_idProcesso == IdProcesso_mestre)) {
 				if (a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("eop.txt", estagio_auxiliar, TipoAcessoInstancia_direto))
@@ -1758,28 +1779,48 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 			Estagio estagio;
 
+			std::string prefixo = "";
 
 			bool impressao = false;
 			while (true) {
 
-				estagio_carregado_sem_iterador = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("estagio.csv", estagio, TipoAcessoInstancia_direto);
+				prefixo = "";
 
-				if (!estagio_carregado_sem_iterador)
-					estagio_carregado = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("estagio_" + getFullString(getAtributo(AttComumModeloOtimizacao_iteracao_inicial, IdIteracao())) + ".csv", estagio, TipoAcessoInstancia_direto);
+				bool variaveis_encontradas = false;
 
-				if (estagio_carregado_sem_iterador || estagio_carregado) {
-					if (a_idProcesso == IdProcesso_mestre)
-						std::cout << "Variaveis Estado pos-estudo detectadas." << std::endl;
-					break;
+				for (int pref = 0; pref < int(IdEstagio_Excedente); pref++) {
+
+					if (pref > 0)
+						prefixo = getFullString(IdEstagio(pref) + "_");
+
+					estagio_carregado_sem_iterador = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(prefixo + "estagio.csv", estagio, TipoAcessoInstancia_direto);
+
+					if (!estagio_carregado_sem_iterador)
+						estagio_carregado = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(prefixo + "estagio_" + getFullString(getAtributo(AttComumModeloOtimizacao_iteracao_inicial, IdIteracao())) + ".csv", estagio, TipoAcessoInstancia_direto);
+
+					if (estagio_carregado_sem_iterador || estagio_carregado) {
+						if (a_idProcesso == IdProcesso_mestre) {
+							std::cout << std::endl;
+							if (prefixo == "")
+								std::cout << "Variaveis Estado pos-estudo detectados." << std::endl;
+							else
+								std::cout << "Variaveis Estado pos-estudo detectados. Prefixo: " << prefixo << std::endl;
+						}
+						variaveis_encontradas = true;
+						break;
+					}
+
+					if ((!impressao) && (a_idProcesso == IdProcesso_mestre)) {
+						std::cout << "Aguardando variaveis de estado no diretorio: " << diretorio_importacao_pos_estudo << std::endl;
+						std::cout << "Caso NAO haja acoplamento pos-estudo, pressione Ctrl+C para sair e altere valor de " << getFullString(AttComumDados_diretorio_importacao_pos_estudo) << " para: Nenhum" << std::endl;
+						impressao = true;
+					} // if ((!impressao) && (a_idProcesso == IdProcesso_mestre)) {
+
+					aguardarTempo(5000);
+
 				}
-
-				if ((!impressao) && (a_idProcesso == IdProcesso_mestre)) {
-					std::cout << "Aguardando variaveis de estado no diretorio: " << diretorio_importacao_pos_estudo << std::endl;
-					std::cout << "Caso NAO haja acoplamento pos-estudo, pressione Ctrl+C para sair e altere valor de " << getFullString(AttComumDados_diretorio_importacao_pos_estudo) << " para: Nenhum" << std::endl;
-					impressao = true;
-				} // if ((!impressao) && (a_idProcesso == IdProcesso_mestre)) {
-
-				aguardarTempo(5000);
+				if (variaveis_encontradas)
+					break;
 
 			} // while (true) {
 
@@ -1794,9 +1835,9 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 			} // if (true) {
 
 			if (estagio_carregado_sem_iterador)
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum("estado.csv", estagio, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum(prefixo + "estado.csv", estagio, TipoAcessoInstancia_membro);
 			else
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum("estado_" + getFullString(getAtributo(AttComumModeloOtimizacao_iteracao_inicial, IdIteracao())) + ".csv", estagio, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum(prefixo + "estado_" + getFullString(getAtributo(AttComumModeloOtimizacao_iteracao_inicial, IdIteracao())) + ".csv", estagio, TipoAcessoInstancia_membro);
 
 
 			idEstagio_futuro = IdEstagio(estagio_final + 1);
