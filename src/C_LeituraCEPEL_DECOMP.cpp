@@ -14062,7 +14062,7 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_e_produtibilidade_ENA_
 
 }
 
-void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
+void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo_old(Dados& a_dados)
 {
 	try {
 
@@ -14131,6 +14131,95 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 							const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
 							afluencia = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
 						}//else {
+
+						//Regras
+						if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()) == 107) { //107-Edgard de Souza
+
+							double afluencia_243 = -1.0;
+							double afluencia_161 = -1.0;
+							double afluencia_117 = -1.0;
+							double afluencia_301 = -1.0;
+
+							//Procura as afluências dos postos que compõem a regra
+							for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 243) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_243 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_243 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 243) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 161) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_161 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_161 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 161) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 117) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_117 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_117 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 117) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 301) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_301 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_301 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 301) {
+
+								//Critério de saída
+								if (afluencia_243 >= 0 && afluencia_161 >= 0 && afluencia_117 >= 0 && afluencia_301 >= 0)
+									break;
+
+							}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+							//Validação que os postos foram encontrados
+							if (afluencia_243 == -1.0) { throw std::invalid_argument("Nao encontrado posto 243 nas usinas instanciadas \n"); }
+							if (afluencia_161 == -1.0) { throw std::invalid_argument("Nao encontrado posto 161 nas usinas instanciadas \n"); }
+							if (afluencia_117 == -1.0) { throw std::invalid_argument("Nao encontrado posto 117 nas usinas instanciadas \n"); }
+							if (afluencia_301 == -1.0) { throw std::invalid_argument("Nao encontrado posto 301 nas usinas instanciadas \n"); }
+
+							//Regra de acoplamento NW (REGRAS.DAT)
+							//afluencia = afluencia_161 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							
+							//afluencia = afluencia_161 + 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) + afluencia_117 + afluencia_301;
+							
+							
+							
+							//afluencia = afluencia_161 - 0.1 * (afluencia_161 + afluencia_117 + afluencia_301) - afluencia_117 - afluencia_301;
+							//afluencia = afluencia_161 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301);
+							//afluencia = afluencia_161 - 0.1 * (afluencia_161) - afluencia_117 - afluencia_301;
+							//afluencia = afluencia_161;
+							//afluencia = afluencia_161 - 0.1 * afluencia_161;
+							//afluencia = afluencia_161 - 0.1 * (afluencia_161 - afluencia_117) - afluencia_117;
+							//afluencia = afluencia_161 - 0.1 * (afluencia_161  - afluencia_301)  - afluencia_301;
+
+							//afluencia = afluencia_161 - 0.1 * (afluencia_161) + 0.9 * (afluencia_117 - afluencia_301);
+							//afluencia = afluencia_161 - 0.1 * (afluencia_161) + 0.1 * (afluencia_117 + afluencia_301);
+							//afluencia = afluencia_161 - 0.1 * (afluencia_161) - 0.1 * (afluencia_117 + afluencia_301);
+							//afluencia = afluencia_161 - 0.05 * (afluencia_161) + 0.05 * (afluencia_117 + afluencia_301);
+							
+							afluencia = afluencia_161 - 0.1 * (afluencia_161);
+
+						}//if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()) == 107) { //107-Edgard de Souza
+
 
 					}//if (codigo_posto_acoplamento_NW < 0) {
 					else if (codigo_posto_acoplamento_NW >= 0) {
@@ -14203,9 +14292,10 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 							if (afluencia_301 == -1.0) { throw std::invalid_argument("Nao encontrado posto 301 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT)
-							afluencia = afluencia_243 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							//afluencia = afluencia_243 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							afluencia = afluencia_243;
 
-						}//if (codigo_posto_acoplamento_NW == 43) {
+						}//if (codigo_posto_acoplamento_NW == 43) {//Três Irmaos
 						else if (codigo_posto_acoplamento_NW == 37) {//Barra Bonita
 
 							double afluencia_237 = -1.0;
@@ -14270,7 +14360,8 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 							if (afluencia_301 == -1.0) { throw std::invalid_argument("Nao encontrado posto 301 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT)
-							afluencia = afluencia_237 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							//afluencia = afluencia_237 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							afluencia = afluencia_237;
 
 						}//else if (codigo_posto_acoplamento_NW == 37) {//Barra Bonita
 						else if (codigo_posto_acoplamento_NW == 38) {//BARIRI (A. S. LIMA)
@@ -14337,7 +14428,8 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 							if (afluencia_301 == -1.0) { throw std::invalid_argument("Nao encontrado posto 301 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT)
-							afluencia = afluencia_238 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							//afluencia = afluencia_238 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							afluencia = afluencia_238;
 
 						}//else if (codigo_posto_acoplamento_NW == 38) {//BARIRI (A. S. LIMA)
 						else if (codigo_posto_acoplamento_NW == 39) {//IBITINGA
@@ -14404,7 +14496,8 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 							if (afluencia_301 == -1.0) { throw std::invalid_argument("Nao encontrado posto 301 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT)
-							afluencia = afluencia_239 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							//afluencia = afluencia_239 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							afluencia = afluencia_239;
 
 						}//else if (codigo_posto_acoplamento_NW == 39) {//IBITINGA
 						else if (codigo_posto_acoplamento_NW == 40) {//PROMISSAO
@@ -14471,7 +14564,8 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 							if (afluencia_301 == -1.0) { throw std::invalid_argument("Nao encontrado posto 301 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT)
-							afluencia = afluencia_240 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							//afluencia = afluencia_240 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							afluencia = afluencia_240;
 
 						}//else if (codigo_posto_acoplamento_NW == 40) {//PROMISSAO
 						else if (codigo_posto_acoplamento_NW == 42) {//NAVANHANDAVA
@@ -14538,7 +14632,8 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 							if (afluencia_301 == -1.0) { throw std::invalid_argument("Nao encontrado posto 301 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT)
-							afluencia = afluencia_242 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							//afluencia = afluencia_242 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							afluencia = afluencia_242;
 
 						}//else if (codigo_posto_acoplamento_NW == 42) {//NAVANHANDAVA
 						else if (codigo_posto_acoplamento_NW == 45) {//JUPIA
@@ -14605,7 +14700,9 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 							if (afluencia_301 == -1.0) { throw std::invalid_argument("Nao encontrado posto 301 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT)
-							afluencia = afluencia_245 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							//afluencia = afluencia_245 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							afluencia = afluencia_245;
+							
 
 						}//else if (codigo_posto_acoplamento_NW == 45) {//JUPIA
 						else if (codigo_posto_acoplamento_NW == 46) {//P. PRIMAVERA
@@ -14672,7 +14769,8 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 							if (afluencia_301 == -1.0) { throw std::invalid_argument("Nao encontrado posto 301 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT)
-							afluencia = afluencia_246 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							//afluencia = afluencia_246 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							afluencia = afluencia_246;
 
 						}//else if (codigo_posto_acoplamento_NW == 46) {//P. PRIMAVERA
 						else if (codigo_posto_acoplamento_NW == 66) {//ITAIPU
@@ -14739,7 +14837,8 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 							if (afluencia_301 == -1.0) { throw std::invalid_argument("Nao encontrado posto 301 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT)
-							afluencia = afluencia_266 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							//afluencia = afluencia_266 - 0.1 * (afluencia_161 - afluencia_117 - afluencia_301) - afluencia_117 - afluencia_301;
+							afluencia = afluencia_266;
 
 						}//else if (codigo_posto_acoplamento_NW == 66) {//ITAIPU
 						else if (codigo_posto_acoplamento_NW == 75) {//SEGREDO + DESVIO
@@ -14793,22 +14892,55 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 						}//else if (codigo_posto_acoplamento_NW == 75) {//SEGREDO + DESVIO
 						else if (codigo_posto_acoplamento_NW == 126) {//SIMPLICIO
 
-							double afluencia_127 = -1.0;
+							double afluencia_129 = -1.0;
+							double afluencia_125 = -1.0;
+							double afluencia_203 = -1.0;
+							double afluencia_201 = -1.0;
 							double afluencia_123 = -1.0;
 
 							//Procura as afluências dos postos que compõem a regra
 							for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
 
-								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 127) {
+								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 129) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-										afluencia_127 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+										afluencia_129 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
 									else {
 										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-										afluencia_127 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+										afluencia_129 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
 									}//else {
 
-								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 127) {
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 129) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 125) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_125 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_125 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 125) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 203) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_203 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_203 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 203) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 201) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_201 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_201 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 201) {
 								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 123) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
@@ -14821,16 +14953,62 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 123) {
 
 								//Critério de saída
-								if (afluencia_127 >= 0 && afluencia_123 >= 0)
+								if (afluencia_129 >= 0 && afluencia_125 >= 0 && afluencia_203 >= 0 && afluencia_201 >= 0 && afluencia_123 >= 0)
 									break;
 
 							}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
 
 							//Validação que os postos foram encontrados
-							if (afluencia_127 == -1.0) { throw std::invalid_argument("Nao encontrado posto 127 nas usinas instanciadas \n"); }
+							if (afluencia_129 == -1.0) { throw std::invalid_argument("Nao encontrado posto 129 nas usinas instanciadas \n"); }
+							if (afluencia_125 == -1.0) { throw std::invalid_argument("Nao encontrado posto 125 nas usinas instanciadas \n"); }
+							if (afluencia_203 == -1.0) { throw std::invalid_argument("Nao encontrado posto 203 nas usinas instanciadas \n"); }
+							if (afluencia_201 == -1.0) { throw std::invalid_argument("Nao encontrado posto 201 nas usinas instanciadas \n"); }
 							if (afluencia_123 == -1.0) { throw std::invalid_argument("Nao encontrado posto 123 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT): VAZ(126) = SE(VAZ(127)<=430;MAX(0;VAZ(127)-90);340)+VAZ(123)
+							//                                      VAZ(127) = VAZ(129)-vaz(298)-vaz(203)+vaz(304)
+							//                                      VAZ(298) = SE(VAZ(125)<=190;(VAZ(125)*119)/190;SE(VAZ(125)<=209;119;SE(VAZ(125)<=250;VAZ(125)-90;160)))
+							//                                      VAZ(304) =vaz(315)-vaz(316)
+							//                                      VAZ(315) = (VAZ(203)-VAZ(201))+VAZ(317)+VAZ(298)
+							//                                      VAZ(317) = MAX(0;VAZ(201)-25)
+							//                                      VAZ(316) = MIN(VAZ(315);190)
+
+							
+							double afluencia_298 = -1;
+
+							if (afluencia_125 <= 190)
+								afluencia_298 = afluencia_125 * (119 / 190);
+							else if (afluencia_125 <= 209)
+								afluencia_298 = 119;
+							else if (afluencia_125 <= 250)
+								afluencia_298 = afluencia_125 - 90;
+							else
+								afluencia_298 = 160;
+
+							///////
+							double afluencia_317 = 0;
+
+							if ((afluencia_201 - 25) > afluencia_317)
+								afluencia_317 = (afluencia_201 - 25);
+
+							///////
+							double afluencia_315 = afluencia_203 - afluencia_201 + afluencia_317 + afluencia_298;
+
+							///////
+							double afluencia_316 = 190;
+
+							if (afluencia_315 < afluencia_316)
+								afluencia_316 = afluencia_315;
+
+							///////
+
+							double afluencia_304 = afluencia_315 - afluencia_316;
+
+							///////
+							
+							double afluencia_127 = afluencia_129 - afluencia_298 - afluencia_203 + afluencia_304;
+
+							///////
 
 							if (afluencia_127 <= 430) {
 
@@ -14848,22 +15026,44 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 						}//else if (codigo_posto_acoplamento_NW == 126) {//SIMPLICIO
 						else if (codigo_posto_acoplamento_NW == 131) {//NILO PECANHA
 
-							double afluencia_316 = -1.0;
+							double afluencia_203 = -1.0;
+							double afluencia_201 = -1.0;
+							double afluencia_125 = -1.0;
 							double afluencia_123 = -1.0;
 
 							//Procura as afluências dos postos que compõem a regra
 							for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
 
-								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 316) {
+								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 203) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-										afluencia_316 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+										afluencia_203 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
 									else {
 										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-										afluencia_316 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+										afluencia_203 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
 									}//else {
 
 								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 127) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 201) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_201 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_201 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 201) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 125) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_125 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_125 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 125) {
 								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 123) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
@@ -14876,17 +15076,53 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 123) {
 
 								//Critério de saída
-								if (afluencia_316 >= 0 && afluencia_123 >= 0)
+								if (afluencia_203 >= 0 && afluencia_201 >= 0 && afluencia_125 >= 0 && afluencia_123 >= 0)
 									break;
 
 							}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
 
 							//Validação que os postos foram encontrados
-							if (afluencia_316 == -1.0) { throw std::invalid_argument("Nao encontrado posto 316 nas usinas instanciadas \n"); }
+							if (afluencia_203 == -1.0) { throw std::invalid_argument("Nao encontrado posto 203 nas usinas instanciadas \n"); }
+							if (afluencia_201 == -1.0) { throw std::invalid_argument("Nao encontrado posto 201 nas usinas instanciadas \n"); }
+							if (afluencia_125 == -1.0) { throw std::invalid_argument("Nao encontrado posto 125 nas usinas instanciadas \n"); }
 							if (afluencia_123 == -1.0) { throw std::invalid_argument("Nao encontrado posto 123 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT): VAZ(131) = MIN(VAZ(316);144)-VAZ(123)
+							//                                      VAZ(298) = SE(VAZ(125)<=190;(VAZ(125)*119)/190;SE(VAZ(125)<=209;119;SE(VAZ(125)<=250;VAZ(125)-90;160)))
+							//                                      VAZ(304) =vaz(315)-vaz(316)
+							//                                      VAZ(315) = (VAZ(203)-VAZ(201))+VAZ(317)+VAZ(298)
+							//                                      VAZ(317) = MAX(0;VAZ(201)-25)
+							//                                      VAZ(316) = MIN(VAZ(315);190)
 
+
+							double afluencia_298 = -1;
+
+							if (afluencia_125 <= 190)
+								afluencia_298 = afluencia_125 * (119 / 190);
+							else if (afluencia_125 <= 209)
+								afluencia_298 = 119;
+							else if (afluencia_125 <= 250)
+								afluencia_298 = afluencia_125 - 90;
+							else
+								afluencia_298 = 160;
+
+							///////
+							double afluencia_317 = 0;
+
+							if ((afluencia_201 - 25) > afluencia_317)
+								afluencia_317 = (afluencia_201 - 25);
+
+							///////
+							double afluencia_315 = afluencia_203 - afluencia_201 + afluencia_317 + afluencia_298;
+
+							///////
+							double afluencia_316 = 190;
+
+							if (afluencia_315 < afluencia_316)
+								afluencia_316 = afluencia_315;
+
+
+							////////
 							afluencia = 144;
 
 							if (afluencia_316 < afluencia)
@@ -14898,9 +15134,9 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 						else if (codigo_posto_acoplamento_NW == 299) {//ILHA POMBOS
 
 							double afluencia_130 = -1.0;
-							double afluencia_298 = -1.0;
+							double afluencia_125 = -1.0;
 							double afluencia_203 = -1.0;
-							double afluencia_304 = -1.0;
+							double afluencia_201 = -1.0;
 							double afluencia_123 = -1.0;
 
 							//Procura as afluências dos postos que compõem a regra
@@ -14916,16 +15152,16 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 									}//else {
 
 								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 130) {
-								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 298) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 125) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-										afluencia_298 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+										afluencia_125 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
 									else {
 										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-										afluencia_298 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+										afluencia_125 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
 									}//else {
 
-								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 298) {
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 125) {
 								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 203) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
@@ -14936,16 +15172,16 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 									}//else {
 
 								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 203) {
-								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 304) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 201) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-										afluencia_304 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+										afluencia_201 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
 									else {
 										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-										afluencia_304 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+										afluencia_201 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
 									}//else {
 
-								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 304) {
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 201) {
 								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 123) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
@@ -14958,19 +15194,58 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 123) {
 
 								//Critério de saída
-								if (afluencia_130 >= 0 && afluencia_298 >= 0 && afluencia_203 >= 0 && afluencia_304 >= 0 && afluencia_123 >= 0)
+								if (afluencia_130 >= 0 && afluencia_125 >= 0 && afluencia_203 >= 0 && afluencia_201 >= 0 && afluencia_123 >= 0)
 									break;
 
 							}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
 
 							//Validação que os postos foram encontrados
 							if (afluencia_130 == -1.0) { throw std::invalid_argument("Nao encontrado posto 130 nas usinas instanciadas \n"); }
-							if (afluencia_298 == -1.0) { throw std::invalid_argument("Nao encontrado posto 298 nas usinas instanciadas \n"); }
+							if (afluencia_125 == -1.0) { throw std::invalid_argument("Nao encontrado posto 125 nas usinas instanciadas \n"); }
 							if (afluencia_203 == -1.0) { throw std::invalid_argument("Nao encontrado posto 203 nas usinas instanciadas \n"); }
-							if (afluencia_304 == -1.0) { throw std::invalid_argument("Nao encontrado posto 304 nas usinas instanciadas \n"); }
+							if (afluencia_201 == -1.0) { throw std::invalid_argument("Nao encontrado posto 201 nas usinas instanciadas \n"); }
 							if (afluencia_123 == -1.0) { throw std::invalid_argument("Nao encontrado posto 123 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT): VAZ(299) = VAZ(130)-VAZ(298)-VAZ(203)+VAZ(304)+VAZ(123)
+							//                                      VAZ(298) = SE(VAZ(125)<=190;(VAZ(125)*119)/190;SE(VAZ(125)<=209;119;SE(VAZ(125)<=250;VAZ(125)-90;160)))
+							//                                      VAZ(304) =vaz(315)-vaz(316)
+							//                                      VAZ(315) = (VAZ(203)-VAZ(201))+VAZ(317)+VAZ(298)
+							//                                      VAZ(317) = MAX(0;VAZ(201)-25)
+							//                                      VAZ(316) = MIN(VAZ(315);190)
+
+
+							double afluencia_298 = -1;
+
+							if (afluencia_125 <= 190)
+								afluencia_298 = afluencia_125 * (119 / 190);
+							else if (afluencia_125 <= 209)
+								afluencia_298 = 119;
+							else if (afluencia_125 <= 250)
+								afluencia_298 = afluencia_125 - 90;
+							else
+								afluencia_298 = 160;
+
+							///////
+							double afluencia_317 = 0;
+
+							if ((afluencia_201 - 25) > afluencia_317)
+								afluencia_317 = (afluencia_201 - 25);
+
+							///////
+							double afluencia_315 = afluencia_203 - afluencia_201 + afluencia_317 + afluencia_298;
+
+							///////
+							double afluencia_316 = 190;
+
+							if (afluencia_315 < afluencia_316)
+								afluencia_316 = afluencia_315;
+
+							///////
+
+							double afluencia_304 = afluencia_315 - afluencia_316;
+
+
+							///////
 
 							afluencia = afluencia_130 - afluencia_298 - afluencia_203 + afluencia_304 + afluencia_123;
 
@@ -14978,44 +15253,55 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 						}//else if (codigo_posto_acoplamento_NW == 299) {//ILHA POMBOS
 						else if (codigo_posto_acoplamento_NW == 303) {//FONTES C
 
-							double afluencia_132 = -1.0;
-							double afluencia_316 = -1.0;
-							double afluencia_131 = -1.0;
+							double afluencia_201 = -1.0;
+							double afluencia_202 = -1.0;
+							double afluencia_203 = -1.0;
+							double afluencia_125 = -1.0;
 							double afluencia_123 = -1.0;
 
 							//Procura as afluências dos postos que compõem a regra
 							for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
 
-								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 132) {
+								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 201) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-										afluencia_132 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+										afluencia_201 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
 									else {
 										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-										afluencia_132 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+										afluencia_201 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
 									}//else {
 
-								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 132) {
-								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 316) {
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 201) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 202) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-										afluencia_316 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+										afluencia_202 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
 									else {
 										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-										afluencia_316 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+										afluencia_202 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
 									}//else {
 
-								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 316) {
-								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 131) {
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 202) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 203) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-										afluencia_131 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+										afluencia_203 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
 									else {
 										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-										afluencia_131 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+										afluencia_203 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
 									}//else {
 
-								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 131) {
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 203) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 125) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_125 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_125 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 125) {
 								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 123) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
@@ -15028,18 +15314,72 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 123) {
 
 								//Critério de saída
-								if (afluencia_132 >= 0 && afluencia_316 >= 0 && afluencia_131 >= 0 && afluencia_123 >= 0)
+								if (afluencia_201 >= 0 && afluencia_202 >= 0 && afluencia_203 >= 0 && afluencia_125 >= 0 && afluencia_123 >= 0)
 									break;
 
 							}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
 
 							//Validação que os postos foram encontrados
-							if (afluencia_132 == -1.0) { throw std::invalid_argument("Nao encontrado posto 132 nas usinas instanciadas \n"); }
-							if (afluencia_316 == -1.0) { throw std::invalid_argument("Nao encontrado posto 316 nas usinas instanciadas \n"); }
-							if (afluencia_131 == -1.0) { throw std::invalid_argument("Nao encontrado posto 131 nas usinas instanciadas \n"); }
+							if (afluencia_201 == -1.0) { throw std::invalid_argument("Nao encontrado posto 201 nas usinas instanciadas \n"); }
+							if (afluencia_202 == -1.0) { throw std::invalid_argument("Nao encontrado posto 202 nas usinas instanciadas \n"); }
+							if (afluencia_203 == -1.0) { throw std::invalid_argument("Nao encontrado posto 203 nas usinas instanciadas \n"); }
+							if (afluencia_125 == -1.0) { throw std::invalid_argument("Nao encontrado posto 125 nas usinas instanciadas \n"); }
 							if (afluencia_123 == -1.0) { throw std::invalid_argument("Nao encontrado posto 123 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT): VAZ(303) = SE(VAZ(132)<17;VAZ(132)+MIN(VAZ(316)-(VAZ(131)+VAZ(123));34);17+MIN(VAZ(316)-(VAZ(131)+VAZ(123));34))
+							//                                      VAZ(298) = SE(VAZ(125)<=190;(VAZ(125)*119)/190;SE(VAZ(125)<=209;119;SE(VAZ(125)<=250;VAZ(125)-90;160)))
+							//                                      VAZ(315) = (VAZ(203)-VAZ(201))+VAZ(317)+VAZ(298)
+							//                                      VAZ(317) = MAX(0;VAZ(201)-25)
+							//                                      VAZ(316) = MIN(VAZ(315);190)
+							//                                      VAZ(132) = VAZ(202)+MIN(VAZ(201);25)
+							//                                      VAZ(131) = MIN(VAZ(316);144)-VAZ(123)
+
+
+							double afluencia_298 = -1;
+
+							if (afluencia_125 <= 190)
+								afluencia_298 = afluencia_125 * (119 / 190);
+							else if (afluencia_125 <= 209)
+								afluencia_298 = 119;
+							else if (afluencia_125 <= 250)
+								afluencia_298 = afluencia_125 - 90;
+							else
+								afluencia_298 = 160;
+
+							///////
+							double afluencia_317 = 0;
+
+							if ((afluencia_201 - 25) > afluencia_317)
+								afluencia_317 = (afluencia_201 - 25);
+
+							///////
+							double afluencia_315 = afluencia_203 - afluencia_201 + afluencia_317 + afluencia_298;
+
+							///////
+							double afluencia_316 = 190;
+
+							if (afluencia_315 < afluencia_316)
+								afluencia_316 = afluencia_315;
+
+							
+							//////
+							double afluencia_132 = 25;
+
+							if (afluencia_201 < afluencia_132)
+								afluencia_132 = afluencia_201;
+
+							afluencia_132 += afluencia_202;
+
+							//////
+							double afluencia_131 = 144;
+
+							if (afluencia_316 < afluencia_131)
+								afluencia_131 = afluencia_316;
+
+							afluencia_131 -= afluencia_123;
+
+							
+							//////
 
 							if (afluencia_132 < 17) {
 
@@ -15065,46 +15405,163 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 						}//else if (codigo_posto_acoplamento_NW == 303) {//FONTES C
 						else if (codigo_posto_acoplamento_NW == 306) {//P.PASSOS
 
-							double afluencia_303 = -1.0;
-							double afluencia_131 = -1.0;
+							double afluencia_203 = -1.0;
+							double afluencia_201 = -1.0;
+							double afluencia_202 = -1.0;
+							double afluencia_123 = -1.0;
+							double afluencia_125 = -1.0;
 
 							//Procura as afluências dos postos que compõem a regra
 							for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
 
-								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 303) {
+								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 203) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-										afluencia_303 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+										afluencia_203 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
 									else {
 										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-										afluencia_303 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+										afluencia_203 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
 									}//else {
 
-								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 303) {
-								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 131) {
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 203) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 201) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-										afluencia_131 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+										afluencia_201 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
 									else {
 										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-										afluencia_131 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+										afluencia_201 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
 									}//else {
 
-								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 131) {
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 201) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 202) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_202 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_202 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 202) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 123) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_123 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_123 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 123) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 125) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_125 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_125 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 125) {
 
 
 								//Critério de saída
-								if (afluencia_303 >= 0 && afluencia_131 >= 0)
+								if (afluencia_203 >= 0 && afluencia_201 >= 0 && afluencia_202 >= 0 && afluencia_123 >= 0 && afluencia_125 >= 0)
 									break;
 
 							}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
 
 							//Validação que os postos foram encontrados
-							if (afluencia_303 == -1.0) { throw std::invalid_argument("Nao encontrado posto 303 nas usinas instanciadas \n"); }
-							if (afluencia_131 == -1.0) { throw std::invalid_argument("Nao encontrado posto 131 nas usinas instanciadas \n"); }
-
+							if (afluencia_203 == -1.0) { throw std::invalid_argument("Nao encontrado posto 203 nas usinas instanciadas \n"); }
+							if (afluencia_201 == -1.0) { throw std::invalid_argument("Nao encontrado posto 201 nas usinas instanciadas \n"); }
+							if (afluencia_202 == -1.0) { throw std::invalid_argument("Nao encontrado posto 202 nas usinas instanciadas \n"); }
+							if (afluencia_123 == -1.0) { throw std::invalid_argument("Nao encontrado posto 123 nas usinas instanciadas \n"); }
+							if (afluencia_125 == -1.0) { throw std::invalid_argument("Nao encontrado posto 125 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT): VAZ(306) = VAZ(303)+VAZ(131)
+							//                                      VAZ(303) = SE(VAZ(132)<17;VAZ(132)+MIN(VAZ(316)-(VAZ(131)+VAZ(123));34);17+MIN(VAZ(316)-(VAZ(131)+VAZ(123));34))
+							//                                      VAZ(132) = VAZ(202)+MIN(VAZ(201);25)
+							//                                      VAZ(298) = SE(VAZ(125)<=190;(VAZ(125)*119)/190;SE(VAZ(125)<=209;119;SE(VAZ(125)<=250;VAZ(125)-90;160)))
+							//                                      VAZ(304) =vaz(315)-vaz(316)
+							//                                      VAZ(315) = (VAZ(203)-VAZ(201))+VAZ(317)+VAZ(298)
+							//                                      VAZ(317) = MAX(0;VAZ(201)-25)
+							//                                      VAZ(316) = MIN(VAZ(315);190)
+							//                                      VAZ(131) = MIN(VAZ(316);144)-VAZ(123)
+
+							double afluencia_298 = -1;
+
+							if (afluencia_125 <= 190)
+								afluencia_298 = afluencia_125 * (119 / 190);
+							else if (afluencia_125 <= 209)
+								afluencia_298 = 119;
+							else if (afluencia_125 <= 250)
+								afluencia_298 = afluencia_125 - 90;
+							else
+								afluencia_298 = 160;
+
+							///////
+							double afluencia_317 = 0;
+
+							if ((afluencia_201 - 25) > afluencia_317)
+								afluencia_317 = (afluencia_201 - 25);
+
+							///////
+							double afluencia_315 = afluencia_203 - afluencia_201 + afluencia_317 + afluencia_298;
+
+							///////
+							double afluencia_316 = 190;
+
+							if (afluencia_315 < afluencia_316)
+								afluencia_316 = afluencia_315;
+
+							///////
+														
+							double afluencia_132 = 25;
+
+							if (afluencia_201 < afluencia_132)
+								afluencia_132 = afluencia_201;
+
+							afluencia_132 += afluencia_202;
+
+							///////
+							//MIN(VAZ(316);144)-VAZ(123)
+
+							double afluencia_131 = 144;
+
+							if (afluencia_316 < afluencia_131)
+								afluencia_131 = afluencia_316;
+
+
+							afluencia_131 -= afluencia_123;
+
+
+							///////
+
+							double afluencia_303 = -1;
+
+							if (afluencia_132 < 17) {
+
+								afluencia_303 = 34;
+
+								if ((afluencia_316 - afluencia_131 - afluencia_123) < afluencia_303)
+									afluencia_303 = (afluencia_316 - afluencia_131 - afluencia_123);
+
+								afluencia_303 += afluencia_132;
+
+							}//if (afluencia_132 < 17) {
+							else {
+
+								afluencia_303 = 34;
+
+								if ((afluencia_316 - afluencia_131 - afluencia_123) < afluencia_303)
+									afluencia_303 = (afluencia_316 - afluencia_131 - afluencia_123);
+
+								afluencia_303 += 17;
+
+							}//else {
+
+							///////
 
 							afluencia = afluencia_303 + afluencia_131;
 
@@ -15219,45 +15676,91 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 						}//else if (codigo_posto_acoplamento_NW == 318) {//HENRY BORDEN
 						else if (codigo_posto_acoplamento_NW == 304) {//SANTANA
 
-							double afluencia_315 = -1.0;
-							double afluencia_316 = -1.0;
+							double afluencia_203 = -1.0;
+							double afluencia_201 = -1.0;
+							double afluencia_125 = -1.0;
 
 							//Procura as afluências dos postos que compõem a regra
 							for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
 
-								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 315) {
+								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 203) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-										afluencia_315 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+										afluencia_203 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
 									else {
 										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-										afluencia_315 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+										afluencia_203 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
 									}//else {
 
-								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 315) {
-								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 316) {
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 203) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 201) {
 
 									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-										afluencia_316 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+										afluencia_201 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
 									else {
 										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-										afluencia_316 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+										afluencia_201 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
 									}//else {
 
-								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 316) {
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 201) {
+								else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 125) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_125 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_125 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 125) {
 
 
 								//Critério de saída
-								if (afluencia_315 >= 0 && afluencia_316 >= 0)
+								if (afluencia_203 >= 0 && afluencia_201 >= 0 && afluencia_125 >= 0)
 									break;
 
 							}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
 
 							//Validação que os postos foram encontrados
-							if (afluencia_315 == -1.0) { throw std::invalid_argument("Nao encontrado posto 315 nas usinas instanciadas \n"); }
-							if (afluencia_316 == -1.0) { throw std::invalid_argument("Nao encontrado posto 316 nas usinas instanciadas \n"); }
+							if (afluencia_203 == -1.0) { throw std::invalid_argument("Nao encontrado posto 203 nas usinas instanciadas \n"); }
+							if (afluencia_201 == -1.0) { throw std::invalid_argument("Nao encontrado posto 201 nas usinas instanciadas \n"); }
+							if (afluencia_125 == -1.0) { throw std::invalid_argument("Nao encontrado posto 125 nas usinas instanciadas \n"); }
 
 							//Regra de acoplamento NW (REGRAS.DAT): VAZ(304) = vaz(315)-vaz(316)
+							//                                      VAZ(298) = SE(VAZ(125)<=190;(VAZ(125)*119)/190;SE(VAZ(125)<=209;119;SE(VAZ(125)<=250;VAZ(125)-90;160)))
+							//                                      VAZ(304) =vaz(315)-vaz(316)
+							//                                      VAZ(315) = (VAZ(203)-VAZ(201))+VAZ(317)+VAZ(298)
+							//                                      VAZ(317) = MAX(0;VAZ(201)-25)
+							//                                      VAZ(316) = MIN(VAZ(315);190)
+
+
+							double afluencia_298 = -1;
+
+							if (afluencia_125 <= 190)
+								afluencia_298 = afluencia_125 * (119 / 190);
+							else if (afluencia_125 <= 209)
+								afluencia_298 = 119;
+							else if (afluencia_125 <= 250)
+								afluencia_298 = afluencia_125 - 90;
+							else
+								afluencia_298 = 160;
+
+							///////
+							double afluencia_317 = 0;
+
+							if ((afluencia_201 - 25) > afluencia_317)
+								afluencia_317 = (afluencia_201 - 25);
+
+							///////
+							double afluencia_315 = afluencia_203 - afluencia_201 + afluencia_317 + afluencia_298;
+
+							///////
+							double afluencia_316 = 190;
+
+							if (afluencia_315 < afluencia_316)
+								afluencia_316 = afluencia_315;
+
+							////
 
 							afluencia = afluencia_315 + afluencia_316;
 
@@ -15403,8 +15906,368 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 							afluencia = vazao_no_posto.at(no).at(posto - 1);
 								
 						}//else if (codigo_posto_acoplamento_NW == 169) {//SOBRADINHO - Posto para acoplamento com a FCF
-						else{ throw std::invalid_argument("Nao implementada regra de cálculo de vazao para posto com codigo:" + getString(codigo_posto_acoplamento_NW) + "\n"); }
+						else if (codigo_posto_acoplamento_NW == 292) {//BELO MONTE
 
+							double afluencia_288 = -1.0;
+
+							//Procura as afluências dos postos que compõem a regra
+							for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 288) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_288 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_288 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 288) {
+
+								//Critério de saída
+								if (afluencia_288 >= 0)
+									break;
+
+							}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+							//Validação que os postos foram encontrados
+							if (afluencia_288 == -1.0) { throw std::invalid_argument("Nao encontrado posto 288 nas usinas instanciadas \n"); }
+
+							//Regra de acoplamento NW (REGRAS.DAT):
+							//POST    MES  CONF    FORMULA
+							//	XXX    XX     X    XXXXXXXXXXXXXXXXXXXXXXXXXXX
+							//  292     1          SE(VAZ(288) <= 1100; 0; SE(VAZ(288) <= (1100 + 13900); VAZ(288) - 1100; 13900))
+							//  292     2          SE(VAZ(288) <= 1600; 0; SE(VAZ(288) <= (1600 + 13900); VAZ(288) - 1600; 13900))
+							//	292     3          SE(VAZ(288) <= 3250; 0; SE(VAZ(288) <= (3250 + 13900); VAZ(288) - 3250; 13900))
+							//	292     4          SE(VAZ(288) <= 6000; 0; SE(VAZ(288) <= (6000 + 13900); VAZ(288) - 6000; 13900))
+							//	292     5          SE(VAZ(288) <= 2900; 0; SE(VAZ(288) <= (2900 + 13900); VAZ(288) - 2900; 13900))
+							//	292     6          SE(VAZ(288) <= 1600; 0; SE(VAZ(288) <= (1600 + 13900); VAZ(288) - 1600; 13900))
+							//	292     7          SE(VAZ(288) <= 1100; 0; SE(VAZ(288) <= (1100 + 13900); VAZ(288) - 1100; 13900))
+							//	292     8          SE(VAZ(288) <= 900; 0; SE(VAZ(288) <= (900 + 13900); VAZ(288) - 900; 13900))
+							//	292     9          SE(VAZ(288) <= 750; 0; SE(VAZ(288) <= (750 + 13900); VAZ(288) - 750; 13900))
+							//	292    10          SE(VAZ(288) <= 700; 0; SE(VAZ(288) <= (700 + 13900); VAZ(288) - 700; 13900))
+							//	292    11          SE(VAZ(288) <= 800; 0; SE(VAZ(288) <= (800 + 13900); VAZ(288) - 800; 13900))
+							//	292    12          SE(VAZ(288) <= 900; 0; SE(VAZ(288) <= (900 + 13900); VAZ(288) - 900; 13900))
+
+							bool is_periodo_inicial = false;
+							if (periodo == periodo_inicial)
+								is_periodo_inicial = true;
+
+							const IdMes idMes_alvo = get_IdMes_operativo(periodo, is_periodo_inicial);
+
+							double afluencia_292 = -1;
+
+							if (idMes_alvo == IdMes_1) {
+								
+								if (afluencia_288 <= 1100)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (1100 + 13900))
+									afluencia_292 = afluencia_288 - 1100;
+								else
+									afluencia_292 = 13900;
+
+							}//if (idMes_alvo == IdMes_1) {
+							else if (idMes_alvo == IdMes_2) {
+
+								if (afluencia_288 <= 1600)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (1600 + 13900))
+									afluencia_292 = afluencia_288 - 1600;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_2) {
+							else if (idMes_alvo == IdMes_3) {
+
+								if (afluencia_288 <= 3250)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (3250 + 13900))
+									afluencia_292 = afluencia_288 - 3250;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_3) {
+							else if (idMes_alvo == IdMes_4) {
+
+								if (afluencia_288 <= 6000)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (6000 + 13900))
+									afluencia_292 = afluencia_288 - 6000;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_4) {
+							else if (idMes_alvo == IdMes_5) {
+
+								if (afluencia_288 <= 2900)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (2900 + 13900))
+									afluencia_292 = afluencia_288 - 2900;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_5) {
+							else if (idMes_alvo == IdMes_6) {
+
+								if (afluencia_288 <= 1600)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (1600 + 13900))
+									afluencia_292 = afluencia_288 - 1600;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_6) {
+							else if (idMes_alvo == IdMes_7) {
+
+								if (afluencia_288 <= 1100)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (1100 + 13900))
+									afluencia_292 = afluencia_288 - 1100;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_7) {
+							else if (idMes_alvo == IdMes_8) {
+
+								if (afluencia_288 <= 900)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (900 + 13900))
+									afluencia_292 = afluencia_288 - 900;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_8) {
+							else if (idMes_alvo == IdMes_9) {
+
+								if (afluencia_288 <= 750)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (750 + 13900))
+									afluencia_292 = afluencia_288 - 750;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_9) {
+							else if (idMes_alvo == IdMes_10) {
+
+								if (afluencia_288 <= 700)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (700 + 13900))
+									afluencia_292 = afluencia_288 - 700;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_10) {
+							else if (idMes_alvo == IdMes_11) {
+
+								if (afluencia_288 <= 800)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (800 + 13900))
+									afluencia_292 = afluencia_288 - 800;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_11) {
+							else if (idMes_alvo == IdMes_12) {
+
+								if (afluencia_288 <= 900)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (900 + 13900))
+									afluencia_292 = afluencia_288 - 900;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_12) {
+
+							else { throw std::invalid_argument("Nao identificado idMes: " + getString(idMes_alvo) + " \n"); }
+
+
+							afluencia = afluencia_292;
+
+
+						}//else if (codigo_posto_acoplamento_NW == 292) {//BELO MONTE
+						else if (codigo_posto_acoplamento_NW == 302) {//PIMENTAL
+
+							double afluencia_288 = -1.0;
+
+							//Procura as afluências dos postos que compõem a regra
+							for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+								if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 288) {
+
+									if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+										afluencia_288 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+									else {
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+										afluencia_288 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+									}//else {
+
+								}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 288) {
+
+								//Critério de saída
+								if (afluencia_288 >= 0)
+									break;
+
+							}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+							//Validação que os postos foram encontrados
+							if (afluencia_288 == -1.0) { throw std::invalid_argument("Nao encontrado posto 288 nas usinas instanciadas \n"); }
+
+							//Regra de acoplamento NW (REGRAS.DAT):
+							// 
+							// VAZ(302) = VAZ(288)-VAZ(292) 
+							// 
+							//POST    MES  CONF    FORMULA
+							//	XXX    XX     X    XXXXXXXXXXXXXXXXXXXXXXXXXXX
+							//  292     1          SE(VAZ(288) <= 1100; 0; SE(VAZ(288) <= (1100 + 13900); VAZ(288) - 1100; 13900))
+							//  292     2          SE(VAZ(288) <= 1600; 0; SE(VAZ(288) <= (1600 + 13900); VAZ(288) - 1600; 13900))
+							//	292     3          SE(VAZ(288) <= 3250; 0; SE(VAZ(288) <= (3250 + 13900); VAZ(288) - 3250; 13900))
+							//	292     4          SE(VAZ(288) <= 6000; 0; SE(VAZ(288) <= (6000 + 13900); VAZ(288) - 6000; 13900))
+							//	292     5          SE(VAZ(288) <= 2900; 0; SE(VAZ(288) <= (2900 + 13900); VAZ(288) - 2900; 13900))
+							//	292     6          SE(VAZ(288) <= 1600; 0; SE(VAZ(288) <= (1600 + 13900); VAZ(288) - 1600; 13900))
+							//	292     7          SE(VAZ(288) <= 1100; 0; SE(VAZ(288) <= (1100 + 13900); VAZ(288) - 1100; 13900))
+							//	292     8          SE(VAZ(288) <= 900; 0; SE(VAZ(288) <= (900 + 13900); VAZ(288) - 900; 13900))
+							//	292     9          SE(VAZ(288) <= 750; 0; SE(VAZ(288) <= (750 + 13900); VAZ(288) - 750; 13900))
+							//	292    10          SE(VAZ(288) <= 700; 0; SE(VAZ(288) <= (700 + 13900); VAZ(288) - 700; 13900))
+							//	292    11          SE(VAZ(288) <= 800; 0; SE(VAZ(288) <= (800 + 13900); VAZ(288) - 800; 13900))
+							//	292    12          SE(VAZ(288) <= 900; 0; SE(VAZ(288) <= (900 + 13900); VAZ(288) - 900; 13900))
+
+							bool is_periodo_inicial = false;
+							if (periodo == periodo_inicial)
+								is_periodo_inicial = true;
+
+							const IdMes idMes_alvo = get_IdMes_operativo(periodo, is_periodo_inicial);
+
+							double afluencia_292 = -1;
+
+							if (idMes_alvo == IdMes_1) {
+								
+								if (afluencia_288 <= 1100)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (1100 + 13900))
+									afluencia_292 = afluencia_288 - 1100;
+								else
+									afluencia_292 = 13900;
+
+							}//if (idMes_alvo == IdMes_1) {
+							else if (idMes_alvo == IdMes_2) {
+
+								if (afluencia_288 <= 1600)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (1600 + 13900))
+									afluencia_292 = afluencia_288 - 1600;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_2) {
+							else if (idMes_alvo == IdMes_3) {
+
+								if (afluencia_288 <= 3250)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (3250 + 13900))
+									afluencia_292 = afluencia_288 - 3250;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_3) {
+							else if (idMes_alvo == IdMes_4) {
+
+								if (afluencia_288 <= 6000)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (6000 + 13900))
+									afluencia_292 = afluencia_288 - 6000;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_4) {
+							else if (idMes_alvo == IdMes_5) {
+
+								if (afluencia_288 <= 2900)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (2900 + 13900))
+									afluencia_292 = afluencia_288 - 2900;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_5) {
+							else if (idMes_alvo == IdMes_6) {
+
+								if (afluencia_288 <= 1600)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (1600 + 13900))
+									afluencia_292 = afluencia_288 - 1600;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_6) {
+							else if (idMes_alvo == IdMes_7) {
+
+								if (afluencia_288 <= 1100)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (1100 + 13900))
+									afluencia_292 = afluencia_288 - 1100;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_7) {
+							else if (idMes_alvo == IdMes_8) {
+
+								if (afluencia_288 <= 900)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (900 + 13900))
+									afluencia_292 = afluencia_288 - 900;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_8) {
+							else if (idMes_alvo == IdMes_9) {
+
+								if (afluencia_288 <= 750)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (750 + 13900))
+									afluencia_292 = afluencia_288 - 750;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_9) {
+							else if (idMes_alvo == IdMes_10) {
+
+								if (afluencia_288 <= 700)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (700 + 13900))
+									afluencia_292 = afluencia_288 - 700;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_10) {
+							else if (idMes_alvo == IdMes_11) {
+
+								if (afluencia_288 <= 800)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (800 + 13900))
+									afluencia_292 = afluencia_288 - 800;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_11) {
+							else if (idMes_alvo == IdMes_12) {
+
+								if (afluencia_288 <= 900)
+									afluencia_292 = 0;
+								else if (afluencia_288 <= (900 + 13900))
+									afluencia_292 = afluencia_288 - 900;
+								else
+									afluencia_292 = 13900;
+
+							}//else if (idMes_alvo == IdMes_12) {
+
+							else { throw std::invalid_argument("Nao identificado idMes: " + getString(idMes_alvo) + " \n"); }
+
+
+							afluencia = afluencia_288 - afluencia_292;
+
+
+						}//else if (codigo_posto_acoplamento_NW == 292) {//BELO MONTE						
+						else{ throw std::invalid_argument("Nao implementada regra de cálculo de vazao para posto com codigo: " + getString(codigo_posto_acoplamento_NW) + "\n"); }
 
 					}//else if (codigo_posto_acoplamento_NW >= 0) {
 					
@@ -15461,12 +16324,536 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 
 }
 
+void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
+{
+	try {
+
+		///////////////////////////////////////////////////////////////////////
+		//Instancia lista_ENA_calculada_x_REE_x_cenario_x_periodo
+		///////////////////////////////////////////////////////////////////////
+
+		SmartEnupla <Periodo, bool> horizonte_processo_estocastico; //Vai conter nos iteradores os periodos da tendencia_temporal + periodos do mapeamento_espaco_amostral
+
+		//Tendência temporal
+		const SmartEnupla<IdCenario, SmartEnupla <Periodo, double>> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario(), Periodo(), double());
+
+		for (Periodo periodo = tendencia_temporal.at(IdCenario_1).getIteradorInicial(); periodo <= tendencia_temporal.at(IdCenario_1).getIteradorFinal(); tendencia_temporal.at(IdCenario_1).incrementarIterador(periodo))
+			horizonte_processo_estocastico.addElemento(periodo, true);
+
+		//Processo estocástico
+		const SmartEnupla<IdCenario, SmartEnupla <Periodo, IdRealizacao>> mapeamento_espaco_amostral = a_dados.processoEstocastico_hidrologico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao());
+
+		const IdCenario idCenario_inicial = mapeamento_espaco_amostral.getIteradorInicial();
+		const IdCenario idCenario_final = mapeamento_espaco_amostral.getIteradorFinal();
+
+		for (Periodo periodo = mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial(); periodo <= mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorFinal(); mapeamento_espaco_amostral.at(idCenario_inicial).incrementarIterador(periodo))
+			horizonte_processo_estocastico.addElemento(periodo, true);
+
+		////////////////////////
+		const Periodo periodo_inicial = horizonte_processo_estocastico.getIteradorInicial();
+		const Periodo periodo_final = horizonte_processo_estocastico.getIteradorFinal();
+
+		SmartEnupla<Periodo, double> ENA_x_periodo;
+
+		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_processo_estocastico.incrementarIterador(periodo))
+			ENA_x_periodo.addElemento(periodo, 0.0);
+
+		for (IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente_1; idReservatorioEquivalente <= IdReservatorioEquivalente(maior_ONS_REE); idReservatorioEquivalente++)
+			lista_ENA_calculada_x_REE_x_cenario_x_periodo.addElemento(idReservatorioEquivalente, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>(IdCenario_1, std::vector<SmartEnupla<Periodo, double>>(idCenario_final, ENA_x_periodo)));
+
+		///////////////////////////////////////////////////////////////////////
+
+		const IdHidreletrica  maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
+
+		for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
+
+			for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_processo_estocastico.incrementarIterador(periodo)) {
+
+				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+
+					const int codigo_posto_acoplamento_NW = lista_hidreletrica_NPOSNW.getElemento(idHidreletrica);
+
+					double afluencia = 0.0;
+
+					//Usinas que seu próprio posto acopla com o corte do NW sem nenhuma regra adicional
+
+					if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+						afluencia = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+					else {
+						const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+						afluencia = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+					}//else {
+
+					/////////////////////////////////////////////////////
+					//Regras para cálculo de ENAs
+					/////////////////////////////////////////////////////
+					if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()) == 107) { //107-Edgard de Souza
+						afluencia *= 0.9;
+
+					}//if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()) == 107) {
+					else if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()) == 169) {//SOBRADINHO - Posto para acoplamento com a FCF
+
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//169 - Sobradinho
+						// Nota: Pega a afluência do posto 169 ("natural" de sobradinho) da estrutura árvore DC 
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						IdEstagio idEstagio_DC_alvo = IdEstagio_Nenhum;
+
+						for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+
+							if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == periodo) {
+								idEstagio_DC_alvo = idEstagio_DC;
+								break;
+							}//if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == periodo) {
+
+						}//for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+
+						if (idEstagio_DC_alvo == IdEstagio_Nenhum) { throw std::invalid_argument("Nao encontrado idEstagio_DC do periodo: " + getString(periodo) + "\n"); }
+
+						///////////////////////////////////////////
+
+						int no = -1;
+
+						if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal())
+							no = int(idEstagio_DC_alvo) + int(idCenario) - 2;
+						else
+							no = int(idEstagio_DC_alvo) - 1;
+
+
+						const int posto = 169;
+						afluencia = vazao_no_posto.at(no).at(posto - 1);
+
+					}//else if (codigo_posto_acoplamento_NW == 169) {//SOBRADINHO - Posto para acoplamento com a FCF
+					else if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()) == 288) {//BELO MONTE
+
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//288 - Belo Monte
+						// Nota: Segue o hidrograma para Belo Monte
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						double afluencia_288 = -1.0;
+
+						//Procura as afluências dos postos que compõem a regra
+						for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+							if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 288) {
+
+								if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+									afluencia_288 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								else {
+									const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+									afluencia_288 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								}//else {
+
+							}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 288) {
+
+							//Critério de saída
+							if (afluencia_288 >= 0)
+								break;
+
+						}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+						//Validação que os postos foram encontrados
+						if (afluencia_288 == -1.0) { throw std::invalid_argument("Nao encontrado posto 288 nas usinas instanciadas \n"); }
+
+
+						bool is_periodo_inicial = false;
+						if (periodo == periodo_inicial)
+							is_periodo_inicial = true;
+
+						const IdMes idMes_alvo = get_IdMes_operativo(periodo, is_periodo_inicial);
+						const double afluencia_292 = get_afluencia_incremental_posto_292(afluencia_288, idMes_alvo);
+
+						afluencia = afluencia_292;
+
+
+					}//else if (codigo_posto_acoplamento_NW == 292) {//BELO MONTE
+					else if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()) == 314) {//PIMENTAL
+
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//314 - Pimental
+						// Nota: Segue o hidrograma para Belo Monte
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						double afluencia_288 = -1.0;
+
+						//Procura as afluências dos postos que compõem a regra
+						for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+							if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 288) {
+
+								if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+									afluencia_288 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								else {
+									const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+									afluencia_288 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								}//else {
+
+							}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 288) {
+
+							//Critério de saída
+							if (afluencia_288 >= 0)
+								break;
+
+						}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+						//Validação que os postos foram encontrados
+						if (afluencia_288 == -1.0) { throw std::invalid_argument("Nao encontrado posto 288 nas usinas instanciadas \n"); }
+
+						bool is_periodo_inicial = false;
+						if (periodo == periodo_inicial)
+							is_periodo_inicial = true;
+
+						const IdMes idMes_alvo = get_IdMes_operativo(periodo, is_periodo_inicial);
+						const double afluencia_292 = get_afluencia_incremental_posto_292(afluencia_288, idMes_alvo);
+
+						afluencia = afluencia_288 - afluencia_292;
+
+
+					}//else if (codigo_posto_acoplamento_NW == 292) {//BELO MONTE						
+					else if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()) == 66) {
+
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//66 - Itaipu
+						// Nota: Soma à incremental de Itaipu as incrementais de São Domingos, Jupiá , P.Primavera, Taquaruçu, Rosana
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						double afluencia_154 = -1.0; //São Domingos
+						double afluencia_245 = -1.0; //Jupiá
+						double afluencia_246 = -1.0; //P.Primavera
+						double afluencia_62 = -1.0; //Taquaruçu
+						double afluencia_63 = -1.0; //Rosana
+
+						//Procura as afluências dos postos que compõem a regra
+						for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+							if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 154) {
+
+								if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+									afluencia_154 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								else {
+									const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+									afluencia_154 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								}//else {
+
+							}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 154) {
+							else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 245) {
+
+								if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+									afluencia_245 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								else {
+									const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+									afluencia_245 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								}//else {
+
+							}//else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 245) {
+							else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 246) {
+
+								if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+									afluencia_246 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								else {
+									const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+									afluencia_246 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								}//else {
+
+							}//else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 246) {
+							else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 62) {
+
+								if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+									afluencia_62 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								else {
+									const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+									afluencia_62 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								}//else {
+
+							}//else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 62) {
+							else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 63) {
+
+								if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+									afluencia_63 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								else {
+									const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+									afluencia_63 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								}//else {
+
+							}//else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 63) {
+
+							//Critério de saída
+							if (afluencia_154 >= 0 && afluencia_245 >= 0 && afluencia_246 >= 0 && afluencia_62 >= 0 && afluencia_63 >= 0)
+								break;
+
+						}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+						//Validação que os postos foram encontrados
+						if (afluencia_154 == -1.0) { throw std::invalid_argument("Nao encontrado posto 154 nas usinas instanciadas \n"); }
+						if (afluencia_245 == -1.0) { throw std::invalid_argument("Nao encontrado posto 245 nas usinas instanciadas \n"); }
+						if (afluencia_246 == -1.0) { throw std::invalid_argument("Nao encontrado posto 246 nas usinas instanciadas \n"); }
+						if (afluencia_62 == -1.0) { throw std::invalid_argument("Nao encontrado posto 62 nas usinas instanciadas \n"); }
+						if (afluencia_63 == -1.0) { throw std::invalid_argument("Nao encontrado posto 63 nas usinas instanciadas \n"); }
+
+						afluencia += (afluencia_154 + afluencia_245 + afluencia_246 + afluencia_62 + afluencia_63);
+
+
+					}//else if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()) == 66) {
+					else if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()) == 76) {
+
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//76 - Segredo
+						// Nota: 
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						double afluencia_71 = -1.0; //
+						double afluencia_72 = -1.0; //
+						double afluencia_73 = -1.0; //
+
+						//Procura as afluências dos postos que compõem a regra
+						for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+							if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 71) {
+
+								if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+									afluencia_71 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								else {
+									const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+									afluencia_71 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								}//else {
+
+							}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 71) {
+							else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 72) {
+
+								if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+									afluencia_72 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								else {
+									const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+									afluencia_72 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								}//else {
+
+							}//else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 72) {
+							else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 73) {
+
+								if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
+									afluencia_73 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								else {
+									const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+									afluencia_73 = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica_aux)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								}//else {
+
+							}//else if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_posto, int()) == 73) {
+
+							//Critério de saída
+							if (afluencia_71 >= 0 && afluencia_72 >= 0 && afluencia_73 >= 0)
+								break;
+
+						}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
+
+						//Validação que os postos foram encontrados
+						if (afluencia_71 == -1.0) { throw std::invalid_argument("Nao encontrado posto 71 nas usinas instanciadas \n"); }
+						if (afluencia_72 == -1.0) { throw std::invalid_argument("Nao encontrado posto 72 nas usinas instanciadas \n"); }
+						if (afluencia_73 == -1.0) { throw std::invalid_argument("Nao encontrado posto 73 nas usinas instanciadas \n"); }
+
+						/*
+						if ((afluencia_71 + afluencia_72 + afluencia_73 - 10) < 173.5)
+							afluencia += (afluencia_71 + afluencia_72 + afluencia_73 - 10);
+						else
+							afluencia += 173.5;
+						*/
+
+						afluencia += 173.5;
+
+					}//else if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()) == 66) {
+
+
+					//////////////////////////////////
+					//Cálculo da ENA
+					//////////////////////////////////
+
+					for (IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente_1; idReservatorioEquivalente <= IdReservatorioEquivalente(maior_ONS_REE); idReservatorioEquivalente++) {
+
+						double produtibilidade_acumulada_ENA = a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(AttVetorHidreletrica_produtibilidade_acumulada_ENA, idReservatorioEquivalente, double());
+
+						if (produtibilidade_acumulada_ENA > 0.0) {
+
+							const double ENA_calculada = afluencia * produtibilidade_acumulada_ENA;
+
+							const double ENA_calculada_anterior = lista_ENA_calculada_x_REE_x_cenario_x_periodo.at(idReservatorioEquivalente).at(idCenario).getElemento(periodo);
+							const double ENA_calculada_nova = ENA_calculada_anterior + ENA_calculada;
+
+							lista_ENA_calculada_x_REE_x_cenario_x_periodo.at(idReservatorioEquivalente).at(idCenario).setElemento(periodo, ENA_calculada_nova);
+
+						}//if (produtibilidade_acumulada_ENA > 0.0) {
+					}//for (IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente_1; idReservatorioEquivalente <= IdReservatorioEquivalente(maior_ONS_REE); idReservatorioEquivalente++) {
+
+				}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+
+			}//for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_processo_estocastico.incrementarIterador(periodo)) {
+
+		}//for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
+
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo: \n" + std::string(erro.what())); }
+
+}
+
+double LeituraCEPEL::get_afluencia_incremental_posto_292(const double a_afluencia_incremental_posto_288, const IdMes a_idMes) {
+
+	try {
+
+		//Regra de acoplamento NW (REGRAS.DAT):
+		//POST    MES  CONF    FORMULA
+		//	XXX    XX     X    XXXXXXXXXXXXXXXXXXXXXXXXXXX
+		//  292     1          SE(VAZ(288) <= 1100; 0; SE(VAZ(288) <= (1100 + 13900); VAZ(288) - 1100; 13900))
+		//  292     2          SE(VAZ(288) <= 1600; 0; SE(VAZ(288) <= (1600 + 13900); VAZ(288) - 1600; 13900))
+		//	292     3          SE(VAZ(288) <= 3250; 0; SE(VAZ(288) <= (3250 + 13900); VAZ(288) - 3250; 13900))
+		//	292     4          SE(VAZ(288) <= 6000; 0; SE(VAZ(288) <= (6000 + 13900); VAZ(288) - 6000; 13900))
+		//	292     5          SE(VAZ(288) <= 2900; 0; SE(VAZ(288) <= (2900 + 13900); VAZ(288) - 2900; 13900))
+		//	292     6          SE(VAZ(288) <= 1600; 0; SE(VAZ(288) <= (1600 + 13900); VAZ(288) - 1600; 13900))
+		//	292     7          SE(VAZ(288) <= 1100; 0; SE(VAZ(288) <= (1100 + 13900); VAZ(288) - 1100; 13900))
+		//	292     8          SE(VAZ(288) <= 900; 0; SE(VAZ(288) <= (900 + 13900); VAZ(288) - 900; 13900))
+		//	292     9          SE(VAZ(288) <= 750; 0; SE(VAZ(288) <= (750 + 13900); VAZ(288) - 750; 13900))
+		//	292    10          SE(VAZ(288) <= 700; 0; SE(VAZ(288) <= (700 + 13900); VAZ(288) - 700; 13900))
+		//	292    11          SE(VAZ(288) <= 800; 0; SE(VAZ(288) <= (800 + 13900); VAZ(288) - 800; 13900))
+		//	292    12          SE(VAZ(288) <= 900; 0; SE(VAZ(288) <= (900 + 13900); VAZ(288) - 900; 13900))
+
+
+		double afluencia_incremental_posto_292 = -1;
+
+		if (a_idMes == IdMes_1) {
+
+			if (a_afluencia_incremental_posto_288 <= 1100)
+				afluencia_incremental_posto_292 = 0;
+			else if (a_afluencia_incremental_posto_288 <= (1100 + 13900))
+				afluencia_incremental_posto_292 = a_afluencia_incremental_posto_288 - 1100;
+			else
+				afluencia_incremental_posto_292 = 13900;
+
+		}//if (a_idMes == IdMes_1) {
+		else if (a_idMes == IdMes_2) {
+
+			if (a_afluencia_incremental_posto_288 <= 1600)
+				afluencia_incremental_posto_292 = 0;
+			else if (a_afluencia_incremental_posto_288 <= (1600 + 13900))
+				afluencia_incremental_posto_292 = a_afluencia_incremental_posto_288 - 1600;
+			else
+				afluencia_incremental_posto_292 = 13900;
+
+		}//else if (a_idMes == IdMes_2) {
+		else if (a_idMes == IdMes_3) {
+
+			if (a_afluencia_incremental_posto_288 <= 3250)
+				afluencia_incremental_posto_292 = 0;
+			else if (a_afluencia_incremental_posto_288 <= (3250 + 13900))
+				afluencia_incremental_posto_292 = a_afluencia_incremental_posto_288 - 3250;
+			else
+				afluencia_incremental_posto_292 = 13900;
+
+		}//else if (a_idMes == IdMes_3) {
+		else if (a_idMes == IdMes_4) {
+
+			if (a_afluencia_incremental_posto_288 <= 6000)
+				afluencia_incremental_posto_292 = 0;
+			else if (a_afluencia_incremental_posto_288 <= (6000 + 13900))
+				afluencia_incremental_posto_292 = a_afluencia_incremental_posto_288 - 6000;
+			else
+				afluencia_incremental_posto_292 = 13900;
+
+		}//else if (a_idMes == IdMes_4) {
+		else if (a_idMes == IdMes_5) {
+
+			if (a_afluencia_incremental_posto_288 <= 2900)
+				afluencia_incremental_posto_292 = 0;
+			else if (a_afluencia_incremental_posto_288 <= (2900 + 13900))
+				afluencia_incremental_posto_292 = a_afluencia_incremental_posto_288 - 2900;
+			else
+				afluencia_incremental_posto_292 = 13900;
+
+		}//else if (a_idMes == IdMes_5) {
+		else if (a_idMes == IdMes_6) {
+
+			if (a_afluencia_incremental_posto_288 <= 1600)
+				afluencia_incremental_posto_292 = 0;
+			else if (a_afluencia_incremental_posto_288 <= (1600 + 13900))
+				afluencia_incremental_posto_292 = a_afluencia_incremental_posto_288 - 1600;
+			else
+				afluencia_incremental_posto_292 = 13900;
+
+		}//else if (a_idMes == IdMes_6) {
+		else if (a_idMes == IdMes_7) {
+
+			if (a_afluencia_incremental_posto_288 <= 1100)
+				afluencia_incremental_posto_292 = 0;
+			else if (a_afluencia_incremental_posto_288 <= (1100 + 13900))
+				afluencia_incremental_posto_292 = a_afluencia_incremental_posto_288 - 1100;
+			else
+				afluencia_incremental_posto_292 = 13900;
+
+		}//else if (a_idMes == IdMes_7) {
+		else if (a_idMes == IdMes_8) {
+
+			if (a_afluencia_incremental_posto_288 <= 900)
+				afluencia_incremental_posto_292 = 0;
+			else if (a_afluencia_incremental_posto_288 <= (900 + 13900))
+				afluencia_incremental_posto_292 = a_afluencia_incremental_posto_288 - 900;
+			else
+				afluencia_incremental_posto_292 = 13900;
+
+		}//else if (a_idMes == IdMes_8) {
+		else if (a_idMes == IdMes_9) {
+
+			if (a_afluencia_incremental_posto_288 <= 750)
+				afluencia_incremental_posto_292 = 0;
+			else if (a_afluencia_incremental_posto_288 <= (750 + 13900))
+				afluencia_incremental_posto_292 = a_afluencia_incremental_posto_288 - 750;
+			else
+				afluencia_incremental_posto_292 = 13900;
+
+		}//else if (a_idMes == IdMes_9) {
+		else if (a_idMes == IdMes_10) {
+
+			if (a_afluencia_incremental_posto_288 <= 700)
+				afluencia_incremental_posto_292 = 0;
+			else if (a_afluencia_incremental_posto_288 <= (700 + 13900))
+				afluencia_incremental_posto_292 = a_afluencia_incremental_posto_288 - 700;
+			else
+				afluencia_incremental_posto_292 = 13900;
+
+		}//else if (a_idMes == IdMes_10) {
+		else if (a_idMes == IdMes_11) {
+
+			if (a_afluencia_incremental_posto_288 <= 800)
+				afluencia_incremental_posto_292 = 0;
+			else if (a_afluencia_incremental_posto_288 <= (800 + 13900))
+				afluencia_incremental_posto_292 = a_afluencia_incremental_posto_288 - 800;
+			else
+				afluencia_incremental_posto_292 = 13900;
+
+		}//else if (a_idMes == IdMes_11) {
+		else if (a_idMes == IdMes_12) {
+
+			if (a_afluencia_incremental_posto_288 <= 900)
+				afluencia_incremental_posto_292 = 0;
+			else if (a_afluencia_incremental_posto_288 <= (900 + 13900))
+				afluencia_incremental_posto_292 = a_afluencia_incremental_posto_288 - 900;
+			else
+				afluencia_incremental_posto_292 = 13900;
+
+		}//else if (a_idMes == IdMes_12) {
+		else { throw std::invalid_argument("Nao identificado idMes: " + getString(a_idMes) + " \n"); }
+
+
+		return afluencia_incremental_posto_292;
+
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::get_afluencia_incremental_posto_292: \n" + std::string(erro.what())); }
+
+}
+
 IdMes LeituraCEPEL::get_IdMes_operativo(const Periodo a_periodo, const bool is_periodo_inicial)
 {
 	try {
 
-		if(a_periodo.getTipoPeriodo() < TipoPeriodo_semanal)
-			throw std::invalid_argument("Nao implementada regra para periodos menores a TipoPeriodo_semanal \n");
+		if(a_periodo.getTipoPeriodo() > TipoPeriodo_semanal)
+			throw std::invalid_argument("Nao implementada regra para periodos com duracao menor a TipoPeriodo_semanal \n");
 
 		Periodo periodo_teste = a_periodo;
 
