@@ -9053,7 +9053,7 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(cons
 
 		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
 
-		const IdEstagio idEstagio_acoplamento = getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio());
+		const IdEstagio idEstagio_acoplamento = a_estagio_inicial;// getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio());
 
 		//Estrutura �rvore
 		if (a_processo_estocastico.getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) == 0 && a_processo_estocastico.getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_arvore_cenarios) > 0)

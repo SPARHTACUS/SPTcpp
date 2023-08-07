@@ -183,7 +183,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,   ZO0p_UTE_COMANDO, 3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
 	m(  VarDecisao,   ZO0_UTE_COMANDO,  3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
 	m(  VarDecisao,   YH,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
-	m(  VarDecisao,   YHB,              3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
 	m(  VarDecisao,   YHF,              3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
 	m(  VarDecisao,   QEV,              3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
 	m(  VarDecisao,   QEV_REL,          3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
@@ -1197,7 +1196,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		void criarVariaveisAssociadasHorizonteOtimizacao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_estagio_final, const IdEstagio a_estagio_inicial, const Periodo a_periodo_otimizacao);
 
-		void criarVariaveisAssociadasHorizonteProcessoEstocastico(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const TipoRelaxacaoAfluenciaIncremental a_tipo_relaxacao_afluencia_incremental, const IdProcessoEstocastico a_tipo_processo_estocastico_hidrologico, const IdEstagio a_estagio_inicial, const IdCenario a_cenario_final, const IdCenario a_cenario_inicial);
+		void criarVariaveisAssociadasHorizonteProcessoEstocastico_old(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const TipoRelaxacaoAfluenciaIncremental a_tipo_relaxacao_afluencia_incremental, const IdProcessoEstocastico a_tipo_processo_estocastico_hidrologico, const IdEstagio a_estagio_inicial, const IdCenario a_cenario_final, const IdCenario a_cenario_inicial);
+		void criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidrologico(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const TipoRelaxacaoAfluenciaIncremental a_tipo_relaxacao_afluencia_incremental, const IdProcessoEstocastico a_tipo_processo_estocastico_hidrologico, const IdEstagio a_estagio_inicial, const IdCenario a_cenario_final, const IdCenario a_cenario_inicial);
 
 		void criarRestricoesPotenciaHidraulicaDisponivel(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
 
@@ -1273,6 +1273,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		std::vector<IdHidreletrica> getIdHidreletricaFromIdProcessoEstocasticoIdVariavelAleatoria(const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria);
 
 		void getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdHidreletrica(const IdProcessoEstocastico a_idProcessoEstocastico, IdVariavelAleatoria &a_idVariavelAleatoria, IdVariavelAleatoriaInterna& a_idVariavelAleatoriaInterna, const IdHidreletrica a_hidreletrica);
+
+		IdVariavelAleatoriaInterna getIdVariavelAleatoriaInternaFromIdVariavelAleatoriaIdHidreletrica(const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdHidreletrica a_hidreletrica);
 
 		template<typename TipoIterador, typename Valor>
 		struct GetNumeroHorasFromIterador {

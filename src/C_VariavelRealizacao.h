@@ -7,6 +7,7 @@
 	  m(VariavelRealizacao,  AttComum,        idVariavelRealizacao,      IdVariavelRealizacao,         min,          max,           min,      sim) \
 	  m(VariavelRealizacao,  AttComum,                        nome,                    string,         min,          max,           min,      sim) \
 	  m(VariavelRealizacao,  AttComum,                     periodo,                   Periodo,         min,          max,           min,      sim) \
+	  m(VariavelRealizacao,  AttComum,                       fator,                    double,         0.0,          1.0,           1.0,      sim) \
 	  m(VariavelRealizacao,  AttComum,       idProcessoEstocastico,     IdProcessoEstocastico,         min,          max,           min,      sim) \
 	  m(VariavelRealizacao,  AttComum,         idVariavelAleatoria,       IdVariavelAleatoria,         min,          max,           min,      sim) 
 

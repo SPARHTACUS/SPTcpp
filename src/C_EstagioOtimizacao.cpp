@@ -92,7 +92,7 @@ IdVariavelEstado Estagio::addVariavelEstado(const TipoSubproblemaSolver a_TSS, c
 } // IdVariavelEstado Estagio::adicionarVariavelEstado(const string a_nome, const IdEstagio a_idEstagio, const int a_indice_variavel_decisao, const IdEstagio a_idEstagioDE, const int a_indice_variavel_decisaoDE){
 
 
-IdVariavelRealizacao Estagio::addVariavelRealizacao(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo) {
+IdVariavelRealizacao Estagio::addVariavelRealizacao(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo, const double a_fator) {
 
 	try {
 
@@ -137,7 +137,7 @@ IdVariavelRealizacao Estagio::addVariavelRealizacao(const TipoSubproblemaSolver 
 } // IdVariavelRealizacao Estagio::adicionarVariavelRealizacao(const string a_nome, const IdEstagio a_idEstagio, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria){
 
 
-IdVariavelRealizacaoInterna Estagio::addVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const Periodo a_periodo, const TipoValor a_tipo_valor, const double a_percentual_inicial, const double a_percentual_passo){
+IdVariavelRealizacaoInterna Estagio::addVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const Periodo a_periodo, const double a_fator, const TipoValor a_tipo_valor, const double a_percentual_inicial, const double a_percentual_passo){
 
 	try {
 
