@@ -188,7 +188,8 @@ private:
 	void instanciar_codigo_usina_jusante_EAR(Dados& a_dados);
 	void instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_EAR(Dados& a_dados, std::string a_nomeArquivo);
 	void instancia_atributos_hidreletrica_out_from_CadUsH_csv(Dados& a_dados, Hidreletrica& a_hidreletrica, std::string a_nomeArquivo);
-	void calcular_produtibilidade_EAR_acumulada_e_produtibilidade_ENA_acumulada_por_usina(Dados& a_dados);
+	void calcular_produtibilidade_ENA_regras_especiais(Dados& a_dados);
+	void calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados);
 	void calcular_ENA_x_REE_x_cenario_x_periodo_old(Dados& a_dados);
 	void calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados);
 	IdMes get_IdMes_operativo(const Periodo a_periodo, const bool is_periodo_inicial);
@@ -196,7 +197,6 @@ private:
 
 
 	void imprime_produtibilidade_EAR_acumulada(Dados& a_dados, std::string nomeArquivo);
-	void imprime_produtibilidade_ENA_acumulada(Dados& a_dados, std::string nomeArquivo);
 	void imprime_produtibilidade_EAR_e_produtibilidade_ENA(Dados& a_dados, std::string nomeArquivo);
 	void imprime_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados, std::string nomeArquivo);
 

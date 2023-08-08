@@ -10479,6 +10479,69 @@ void Dados::adicionaHidreletricasMontanteDesvio() {
 
 } // void Dados::adicionaHidreletricasMontanteDesvio(const IdHidreletrica a_idHidreletrica){
 
+void Dados::defineHidreletricasMontanteNaCascataENA() {
+
+	try {
+
+		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
+
+		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+
+			/////////////////////////////////////////////////////////////
+			//1. Inicializa vetor usinas_calculo_ENA com o próprio idHidreletrica
+			/////////////////////////////////////////////////////////////
+			vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_usinas_calculo_ENA, getSizeVetor(idHidreletrica, AttVetorHidreletrica_usinas_calculo_ENA) + 1, idHidreletrica);
+
+			/////////////////////////////////////////////////////////////
+			//2. Completa vetor usinas_calculo_ENA com todas o idHidreletrica 
+			// de TODAS as usinas a montante na cascata
+			/////////////////////////////////////////////////////////////
+			std::vector<IdHidreletrica> vetor_dinamico_controle_usinas_montante;
+
+			//Inicializa vetor_dinamico_controle_usinas_montante com as usinas a montante de idHidreletrica
+			if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_montante) == 0) {
+
+				for (IdHidreletrica idUHE_montante = IdHidreletrica_1; idUHE_montante <= maiorIdHidreletrica; idUHE_montante++) {
+
+					if (getAtributo(idUHE_montante, AttComumHidreletrica_jusante, IdHidreletrica()) == idHidreletrica)
+						vetor_dinamico_controle_usinas_montante.push_back(idUHE_montante);
+
+				} // for (IdHidreletrica idUHE_montante = IdHidreletrica_1; idUHE_montante <= maiorIdHidreletrica; idUHE++) {
+
+			}//if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_montante) == 0) {
+
+			////////
+			//Dinamicamente procura todas as usinas a montante da cascata
+
+			while (int(vetor_dinamico_controle_usinas_montante.size()) > 0) {
+
+				//Premissa: vai alocando o idHidreletrica da primeira posição do vetor_dinamico_controle_usinas_montante
+				vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_usinas_calculo_ENA, getSizeVetor(idHidreletrica, AttVetorHidreletrica_usinas_calculo_ENA) + 1, vetor_dinamico_controle_usinas_montante.at(0));
+
+				//Atualiza vetor_dinamico_controle_usinas_montante com as usinas a montante de vetor_dinamico_controle_usinas_montante.at(0)
+				if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_montante) == 0) {
+
+					for (IdHidreletrica idUHE_montante = IdHidreletrica_1; idUHE_montante <= maiorIdHidreletrica; idUHE_montante++) {
+
+						if (getAtributo(idUHE_montante, AttComumHidreletrica_jusante, IdHidreletrica()) == vetor_dinamico_controle_usinas_montante.at(0))
+							vetor_dinamico_controle_usinas_montante.push_back(idUHE_montante);
+
+					} // for (IdHidreletrica idUHE_montante = IdHidreletrica_1; idUHE_montante <= maiorIdHidreletrica; idUHE++) {
+
+				}//if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_montante) == 0) {
+
+				//Apaga vetor_dinamico_controle_usinas_montante.at(0)
+				vetor_dinamico_controle_usinas_montante.erase(vetor_dinamico_controle_usinas_montante.begin());
+
+			}//while (int(vetor_dinamico_controle_montante.size()) > 0) {
+
+		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("Dados::defineHidreletricasMontanteNaCascataENA(): \n" + std::string(erro.what())); }
+
+} // void Dados::defineHidreletricasMontanteNaCascataENA() {
+
 
 SmartEnupla<IdHidreletrica, double> Dados::calculaAfluenciaIncremental(const SmartEnupla<IdHidreletrica, double>& a_afluencia_natural) {
 
