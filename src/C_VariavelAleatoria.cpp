@@ -1289,20 +1289,6 @@ void VariavelAleatoria::expandirParametrosEspacoAmostral(const SmartEnupla<Perio
 
 } // void VariavelAleatoria::expandirParametrosEspacoAmostral(const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral){
 
-void VariavelAleatoria::expandirParametrosHorizonteCompleto(const SmartEnupla<Periodo, double>& a_horizonte_completo) {
-	try {
-
-		for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= getMaiorId(IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++) {
-			if (getSizeVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_grau_liberdade) == 0) {
-				SmartEnupla<Periodo, double> grau_liberdade(a_horizonte_completo, getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double()));
-				vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).setVetor_forced(AttVetorVariavelAleatoriaInterna_grau_liberdade, grau_liberdade);
-			} // if (getSizeVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_grau_liberdade) == 0) {
-		} // for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= getMaiorId(IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++) {
-
-	} // try{
-	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::expandirParametrosHorizonteCompleto(a_horizonte_completo): \n" + std::string(erro.what())); }
-} // void VariavelAleatoria::expandirParametrosHorizonteCompleto(const SmartEnupla<Periodo, double>& a_horizonte_completo){
-
 
 double VariavelAleatoria::getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const Periodo a_periodo) const{
 
@@ -1466,7 +1452,7 @@ double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral_recursivo(cons
 							if (sobreposicao > 0.0) {
 
 								for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++)
-									valor_realizacao += sobreposicao * (vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo_tendencia, double()) + vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).getElementoVetor(AttVetorVariavelAleatoriaInterna_grau_liberdade, periodo_tendencia, double()));
+									valor_realizacao += sobreposicao * (vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo_tendencia, double()) + vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).getAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, double()));
 
 								sobreposicao_encontrada = true;
 							}
@@ -1550,12 +1536,12 @@ double VariavelAleatoria::getTendenciaTemporalTransformadaFromVariavelAleatoriaI
 			}
 
 			if ((!tendencia_temporal_interna_encontrada) && (getSize1Matriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_tendencia_temporal) > 0)) {
-				tendencia_temporal_transformada += getElementoMatriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, a_mapeamento_cenarios_tendencia.getElemento(a_idCenario), a_periodo, double()) + getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_grau_liberdade, a_periodo, double());
+				tendencia_temporal_transformada += getElementoMatriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, a_mapeamento_cenarios_tendencia.getElemento(a_idCenario), a_periodo, double()) + getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
 				tendencia_temporal_interna_encontrada = true;
 			}
 
 			if ((!tendencia_temporal_interna_encontrada) && (getSize1Matriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) > 0)) {
-				tendencia_temporal_transformada += getElementoMatriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, a_periodo, double()) + getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_grau_liberdade, a_periodo, double());
+				tendencia_temporal_transformada += getElementoMatriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, a_periodo, double()) + getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
 				tendencia_temporal_interna_encontrada = true;
 			}
 

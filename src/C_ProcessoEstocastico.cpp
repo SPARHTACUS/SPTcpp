@@ -304,7 +304,6 @@ void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_ent
 			espaco_amostral_mesmo_tipo_periodo = true;
 
 		for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= getMaiorIdVariavelAleatoria(); idVar++) {
-			vetorVariavelAleatoria.att(idVar).expandirParametrosHorizonteCompleto(horizonte_processo_estocastico);
 			vetorVariavelAleatoria.att(idVar).gerarCenariosEspacoAmostral(getVetor(AttVetorProcessoEstocastico_mapeamento_tendencia_temporal, IdCenario(), IdCenario()), mapeamento_espaco_amostral, cenarios_horizonte_processo_estocastico, a_gerar_cenarios_buffer, a_gerar_cenarios_internos, espaco_amostral_mesmo_tipo_periodo);
 		}
 

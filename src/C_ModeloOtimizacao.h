@@ -303,7 +303,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,    YH,                     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
 	m(  VarDecisao,    YHF,                    4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
     m(  VarDecisao,    QDEFLAG,                4,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO,                  sim,          nao)  \
-    m(  VarDecisao,    QDEFLAG_ADDING,         4,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO,                  sim,          nao)  \
+    m(  VarDecisao,    QDEFLAG_ADD,         4,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO,                  sim,          nao)  \
     m(  VarDecisao,    QDEF,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
     m(  VarDecisao,    QDEF_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
     m(  VarDecisao,    QDEF_FSUP,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
@@ -433,7 +433,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,    PTDISP,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao)  \
 	m(  VarDecisao,    RP,          5,     ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO,    sim,          nao)  \
 	m(  VarDecisao,    YP,          5,     ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO,    sim,          nao)  \
-	m(  VarDecisao,    YP_ADDING,   5,     ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO,    sim,          nao)  \
+	m(  VarDecisao,    YP_ADD,   5,     ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO,    sim,          nao)  \
 	m(  VarDecisao,    PD,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_PATAMARDEFICIT,           sim,          nao)  \
     m(  VarDecisao,    QOUT,        5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO_HIDRELETRICA,  sim,          nao)  \
     m(  VarDecisao,    QOUT_FINF,   5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO_HIDRELETRICA,  sim,          nao)  \

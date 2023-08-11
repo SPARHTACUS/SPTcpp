@@ -12932,18 +12932,17 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados, const Id
 
 			////////////////////////
 
-			const Periodo periodo_acoplamento = horizonte_otimizacao.getElemento(a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio()));
+			//const Periodo periodo_acoplamento = horizonte_otimizacao.getElemento(a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio()));
 
 			// XXX DECOMP
 
+			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).setAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, 0.0);
+
+
 			for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
-				a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_grau_liberdade, periodo, 0.0);
-
-				if (periodo >= periodo_acoplamento) {
 					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).addElemento(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo, 1, 0.0);
 					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodo, 1.0);
-				} // if (periodo >= periodo_acoplamento) {
 
 			}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
@@ -13021,8 +13020,8 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados, const Id
 
 					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, idCenario, periodo, afluencia);
 
-					if (periodo < periodo_acoplamento)
-						a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, idCenario, periodo, afluencia);
+					//if (periodo < periodo_acoplamento)
+						//a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, idCenario, periodo, afluencia);
 
 				}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 

@@ -524,7 +524,6 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_grau_liberdade) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro);
 		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_coeficiente_participacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro);
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttMatrizVariavelAleatoriaInterna_tendencia_temporal) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro);
@@ -8744,7 +8743,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 				a_entradaSaidaDados.imprimirArquivoCSV_AttComum("VARIAVEL_ALEATORIA_AttComumOperacional.csv", IdVariavelAleatoria_Nenhum, processoEstocastico_hidrologico);
 
-				a_entradaSaidaDados.imprimirArquivoCSV_AttComum("VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv", IdVariavelAleatoria_Nenhum, IdVariavelAleatoriaInterna_Nenhum, processoEstocastico_hidrologico, std::vector<AttComumVariavelAleatoriaInterna>{AttComumVariavelAleatoriaInterna_idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_nome});
+				a_entradaSaidaDados.imprimirArquivoCSV_AttComum("VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv", IdVariavelAleatoria_Nenhum, IdVariavelAleatoriaInterna_Nenhum, processoEstocastico_hidrologico, std::vector<AttComumVariavelAleatoriaInterna>{AttComumVariavelAleatoriaInterna_idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_nome, AttComumVariavelAleatoriaInterna_grau_liberdade});
 
 				if (processoEstocastico_hidrologico.getSize1Matriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral) > 0)
 					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_residuo_espaco_amostral) + ".csv", IdVariavelAleatoria_Nenhum, processoEstocastico_hidrologico, AttMatrizVariavelAleatoria_residuo_espaco_amostral);
@@ -8760,7 +8759,6 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) + ".csv", IdVariavelAleatoria_Nenhum, processoEstocastico_hidrologico, horizonte_coeficiente_linear_auto_correlacao.getIteradorInicial(), horizonte_coeficiente_linear_auto_correlacao.getIteradorFinal(), 1, maior_ordem_horizonte, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao);
 				}
 
-				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_grau_liberdade) + ".csv", IdVariavelAleatoria_Nenhum, IdVariavelAleatoriaInterna_Nenhum, processoEstocastico_hidrologico, AttVetorVariavelAleatoriaInterna_grau_liberdade);
 				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_coeficiente_participacao) + ".csv", IdVariavelAleatoria_Nenhum, IdVariavelAleatoriaInterna_Nenhum, processoEstocastico_hidrologico, AttVetorVariavelAleatoriaInterna_coeficiente_participacao);
 
 				//Imprime estrutura �rvore de cenarios

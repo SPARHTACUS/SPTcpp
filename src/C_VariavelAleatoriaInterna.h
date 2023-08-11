@@ -13,7 +13,6 @@
 #define ATT_VETOR_VARIAVEL_ALEATORIA_INTERNA(m)  \
 	  m(VariavelAleatoriaInterna,  AttVetor,                                serie_temporal,   double,        min,          max,             1,  Periodo)   \
 	  m(VariavelAleatoriaInterna,  AttVetor,                   serie_temporal_transformada,   double,        min,          max,             1,  Periodo)   \
-	  m(VariavelAleatoriaInterna,  AttVetor,                                grau_liberdade,   double,        min,          max,             1,  Periodo)   \
 	  m(VariavelAleatoriaInterna,  AttVetor,                      coeficiente_participacao,   double,        min,          max,             1,  Periodo)   \
 	  m(VariavelAleatoriaInterna,  AttVetor,                          media_serie_temporal,   double,        min,          max,             1,  IdEstacao) \
 	  m(VariavelAleatoriaInterna,  AttVetor,                      media_serie_transformada,   double,          1,          max,             1,  IdEstacao) \

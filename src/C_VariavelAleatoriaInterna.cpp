@@ -286,7 +286,7 @@ double VariavelAleatoriaInterna::calcularRealizacao(const double a_realizacao_va
 
 	try{
 
-		const double realizacao_interna = a_realizacao_variavel_aleatoria * getElementoVetor(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, a_periodo, double()) - getElementoVetor(AttVetorVariavelAleatoriaInterna_grau_liberdade, a_periodo, double());
+		const double realizacao_interna = a_realizacao_variavel_aleatoria * getElementoVetor(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, a_periodo, double()) - getAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, double());
 
 		return realizacao_interna;
 
@@ -300,7 +300,7 @@ double VariavelAleatoriaInterna::calcularRealizacaoVariavelAleatoriaParaValor(co
 
 	try {
 
-		const double realizacao_variavel_aleatoria = (a_realizacao_variavel_aleatoria_interna + getElementoVetor(AttVetorVariavelAleatoriaInterna_grau_liberdade, a_periodo, double())) / getElementoVetor(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, a_periodo, double());
+		const double realizacao_variavel_aleatoria = (a_realizacao_variavel_aleatoria_interna + getAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, double())) / getElementoVetor(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, a_periodo, double());
 
 		return realizacao_variavel_aleatoria;
 

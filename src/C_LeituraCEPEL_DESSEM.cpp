@@ -385,7 +385,7 @@ void LeituraCEPEL::InstanciaProcessoEstocastico(Dados& a_dados, SmartEnupla<Peri
 
 			Periodo periodo_inicial = a_horizonte_estudo.getIteradorInicial();
 
-			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_grau_liberdade, periodo_inicial, 0.0);
+			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).setAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, 0.0);
 
 			if (a_dados.getSize1Matriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental) > 0) {
 				for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); (periodo = periodo + 48)) {

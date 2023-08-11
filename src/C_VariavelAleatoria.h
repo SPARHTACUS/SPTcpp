@@ -147,8 +147,6 @@ public:
 
 	void expandirParametrosEspacoAmostral(const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral);
 
-	void expandirParametrosHorizonteCompleto(const SmartEnupla<Periodo, double>& a_horizonte_completo);
-
 	//double getResiduoEspacoAmostral(const IdRealizacao a_idRealizacao, const Periodo a_periodo) const;
 	//double getResiduoEspacoAmostral(const IdCenario a_idCenario, const Periodo a_periodo) const;
 
