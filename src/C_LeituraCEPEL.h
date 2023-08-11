@@ -190,10 +190,11 @@ private:
 	void instancia_atributos_hidreletrica_out_from_CadUsH_csv(Dados& a_dados, Hidreletrica& a_hidreletrica, std::string a_nomeArquivo);
 	void calcular_produtibilidade_ENA_regras_especiais(Dados& a_dados);
 	void calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados);
-	void calcular_ENA_x_REE_x_cenario_x_periodo_old(Dados& a_dados);
 	void calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados);
+	void retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const IdCenario a_idCenario, const Periodo a_periodo_inicial, const Periodo a_periodo, SmartEnupla<int, IdHidreletrica>& a_idHidreletricas_calculo_ENA, SmartEnupla<int, double>& a_coeficiente_idHidreletricas_calculo_ENA, double& a_termo_independente_calculo_ENA);
+	void retorna_equacionamento_afluencia_natural_x_posto(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const int a_codigo_posto, const double a_coeficiente, SmartEnupla<int, IdHidreletrica>& a_idHidreletricas_calculo_ENA, SmartEnupla<int, double>& a_coeficiente_idHidreletricas_calculo_ENA);
 	IdMes get_IdMes_operativo(const Periodo a_periodo, const bool is_periodo_inicial);
-	double get_afluencia_incremental_posto_292(const double a_afluencia_incremental_posto_288, const IdMes a_idMes);//Regras do hidrograma de Belo Monte
+	double get_afluencia_natural_posto(Dados& a_dados, const int a_codigo_posto, const IdCenario a_idCenario, const Periodo a_periodo);//Regras do hidrograma de Belo Monte
 
 
 	void imprime_produtibilidade_EAR_acumulada(Dados& a_dados, std::string nomeArquivo);
