@@ -5,10 +5,10 @@
 #include "C_SmartElemento.h"
 
 #define ATT_COMUM_VARIAVEL_ALEATORIA_INTERNA(m)  \
-	  m(VariavelAleatoriaInterna,  AttComum,                 idVariavelAleatoriaInterna,        IdVariavelAleatoriaInterna,         min,         max,                 min,      nao) \
-	  m(VariavelAleatoriaInterna,  AttComum,                                       nome,                            string,         min,         max,              Nenhum,      nao) \
-	  m(VariavelAleatoriaInterna,  AttComum,                             grau_liberdade,                            double,           0,         max,                   0,      nao) 
-//                      c_classe,   smrtAtt,                               nomeAtributo,                              tipo,  lowerBound,  upperBound,     initialValue, mustRead?
+	  m(VariavelAleatoriaInterna,  AttComum,                 idVariavelAleatoriaInterna,            IdVariavelAleatoriaInterna,         min,         max,                 min,      sim) \
+	  m(VariavelAleatoriaInterna,  AttComum,                                       nome,                                string,         min,         max,              Nenhum,      sim) \
+	  m(VariavelAleatoriaInterna,  AttComum,                             grau_liberdade,                                double,           0,         max,                   0,      sim) 
+//                      c_classe,   smrtAtt,                               nomeAtributo,                                  tipo,  lowerBound,  upperBound,     initialValue, mustRead?
 
 #define ATT_VETOR_VARIAVEL_ALEATORIA_INTERNA(m)  \
 	  m(VariavelAleatoriaInterna,  AttVetor,                                serie_temporal,   double,        min,          max,             1,  Periodo)   \

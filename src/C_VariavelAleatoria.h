@@ -23,6 +23,7 @@
 	  m(VariavelAleatoria,  AttVetor,                       serie_residuo_lognormal,   double,          1,          max,             1,  Periodo)   \
 	  m(VariavelAleatoria,  AttVetor,                            tendencia_temporal,   double,          1,          max,             1,  Periodo)   \
 	  m(VariavelAleatoria,  AttVetor,               tendencia_temporal_transformada,   double,          1,          max,             1,  Periodo)   \
+	  m(VariavelAleatoria,  AttVetor,                                tipo_relaxacao,   TipoRelaxacaoVariavelAleatoria,        min,          max, sem_relaxacao,  Periodo) \
 	  m(VariavelAleatoria,  AttVetor,                          media_serie_temporal,   double,        min,          max,             1,  IdEstacao) \
 	  m(VariavelAleatoria,  AttVetor,                      media_serie_transformada,   double,          1,          max,             1,  IdEstacao) \
 	  m(VariavelAleatoria,  AttVetor,                          media_residuo_normal,   double,          0,          max,             1,  IdEstacao) \

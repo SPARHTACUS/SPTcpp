@@ -2011,10 +2011,17 @@ void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdPro
 
 	try {
 
-		if ((a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental()) == TipoRelaxacaoAfluenciaIncremental_truncamento) || \
-			(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental()) == TipoRelaxacaoAfluenciaIncremental_viabilidade_hidraulica_truncamento) || \
-			(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental()) == TipoRelaxacaoAfluenciaIncremental_viabilidade_hidraulica_penalizacao)) {}
-		else
+		const IdEstagio estagio_inicial = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
+		const IdEstagio estagio_final = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
+
+		bool algum_truncamento = false;
+		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
+			if (a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, idEstagio, bool())) {
+				algum_truncamento = true;
+				break;
+			}
+		}
+		if (!algum_truncamento)
 			return;
 
 		const IdProcessoEstocastico idProcessoEstocastico = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
@@ -2027,8 +2034,7 @@ void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdPro
 
 			int numero_periodos = 0;
 
-			const IdEstagio estagio_inicial = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
-			const IdEstagio estagio_final = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
+
 
 			for (Periodo periodo = periodos.getIteradorInicial(); periodo <= periodos.getIteradorFinal(); periodos.incrementarIterador(periodo)) {
 				for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {

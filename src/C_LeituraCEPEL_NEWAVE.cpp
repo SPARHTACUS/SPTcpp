@@ -461,7 +461,7 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 
 				a_dados.setAtributo(AttComumDados_tipo_modelo_geracao_cenario_hidrologico, TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal);
 
-				a_dados.setAtributo(AttComumDados_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental_truncamento);
+				a_dados.setAtributo(AttComumDados_relaxar_afluencia_incremental_com_viabilidade_hidraulica, true);
 
 				a_dados.setAtributo(AttComumDados_imprimir_espaco_amostral_geracao_cenario_hidrologico, true);
 				a_dados.setAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, true);

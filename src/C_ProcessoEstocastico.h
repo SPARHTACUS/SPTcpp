@@ -15,10 +15,6 @@
 //                 c_classe,   smrtAtt,                            nomeAtributo,                                tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
 
-#define ATT_VETOR_PROCESSO_ESTOCASTICO(m)  \
-	  m(ProcessoEstocastico,  AttVetor,     mapeamento_tendencia_temporal,     IdCenario,        min,          max,           min,  IdCenario) 
-
-
 #define ATT_MATRIZ_PROCESSO_ESTOCASTICO(m)  \
 	  m(ProcessoEstocastico,  AttMatriz,      mapeamento_espaco_amostral, IdRealizacao,          min,          max,             1,  IdCenario,      Periodo)  \
 	  m(ProcessoEstocastico,  AttMatriz,        probabilidade_realizacao,       double,          min,          max,             1,  Periodo,   IdRealizacao)  \
@@ -34,7 +30,6 @@
 
 #define SMART_ELEMENTO_PROCESSO_ESTOCASTICO(m) \
 	m(ProcessoEstocastico,  AttComum, ATT_COMUM_PROCESSO_ESTOCASTICO) \
-	m(ProcessoEstocastico,  AttVetor, ATT_VETOR_PROCESSO_ESTOCASTICO) \
 	m(ProcessoEstocastico, AttMatriz, ATT_MATRIZ_PROCESSO_ESTOCASTICO) \
 	m(ProcessoEstocastico,   Membro,    MEMBRO_PROCESSO_ESTOCASTICO) 
 
@@ -66,14 +61,12 @@ public:
 
 	void avaliarModeloViaSerieSintetica(const EntradaSaidaDados &a_entradaSaidaDados, const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, const int a_numero_periodos_avaliacao_sintetica);
 
-	void gerarEspacoAmostralPorSorteio(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_amostra, const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> &a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, int &a_semente);
+	void gerarEspacoAmostralPorSorteio(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_amostra, const TipoRelaxacaoVariavelAleatoria a_tipo_relaxacao, const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> &a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, int &a_semente);
 	
-	void mapearCenariosTendencia(const int a_numero_cenarios, const int a_numero_cenarios_tendencia);
-
 	void validar_probabilidade_realizacao();
 
-	void gerarCenariosPorSorteio(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_tendencia, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente);
-	SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> gerarCenariosPorSorteioRetorno(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_tendencia, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente);
+	void gerarCenariosPorSorteio(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente);
+	SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> gerarCenariosPorSorteioRetorno(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente);
 
 	void setCenariosMapeamento(                                                 const AttMatrizProcessoEstocastico           a_attMatrizProcessoEstocastico,                                         const SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>>  &a_matriz);
 	void setCenarios          (                                                 const AttMatrizVariavelAleatoria               a_attMatrizVariavelAleatoria, const SmartEnupla<IdVariavelAleatoria,        SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> &a_matriz);
@@ -117,8 +110,8 @@ private:
 
 	std::vector<TipoPeriodo> tipo_periodo_espaco_amostral;
 
-	void mapearCenariosEspacoAmostralPorSorteio  (const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_tendencia, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int &a_semente);
-	bool mapearCenariosEspacoAmostralCompleto    (const int a_numero_cenarios_tendencia, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);
+	void mapearCenariosEspacoAmostralPorSorteio  (const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int &a_semente);
+	bool mapearCenariosEspacoAmostralCompleto    (const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);
 
 	void calcularCorrelacaoSazonalVariaveisAleatorias();
 

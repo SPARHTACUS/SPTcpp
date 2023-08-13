@@ -46,11 +46,10 @@
 	  m(Dados,  AttComum,                            tipo_aversao_a_risco,                  TipoAversaoRisco,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                                      alpha_CVAR,                            double,           0,           1,             0,      nao) \
 	  m(Dados,  AttComum,                                     lambda_CVAR,                            double,           0,           1,             0,      nao) \
-	  m(Dados,  AttComum,           numero_cenarios_tendencia_hidrologica,                               int,           1,         max,             1,      nao) \
 	  m(Dados,  AttComum,                      tipo_tendencia_hidrologica,          TipoTendenciaEstocastica,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,         periodo_tendencia_hidrologica_historica,                           Periodo,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,           tipo_processo_estocastico_hidrologico,             IdProcessoEstocastico,         min,         max,           min,      sim) \
-	  m(Dados,  AttComum,            tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental,         min,         max,           min,      nao) \
+	  m(Dados,  AttComum, relaxar_afluencia_incremental_com_viabilidade_hidraulica,                     bool,         min,         max,           nao,      nao) \
 	  m(Dados,  AttComum,    calcular_custo_primal_via_subproblema_mestre,                              bool,          min,         max,           min,     nao) \
 	  m(Dados,  AttComum,            tipo_espaco_amostral_geracao_cenario_hidrologico,                TipoEspacoAmostral,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                 tipo_correlacao_geracao_cenario_hidrologico, TipoCorrelacaoVariaveisAleatorias,         min,         max,                 min,      nao) \
@@ -260,7 +259,7 @@ public:
 
 	void instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncremental(const IdProcessoEstocastico a_tipo_processo_estocastico, ProcessoEstocastico& a_processo_estocastico);
 
-	int isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, ProcessoEstocastico& a_processo_estocastico, const IdProcessoEstocastico a_tipo_processo_estocastico, const TipoEspacoAmostral a_tipo_espaco_amostral, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const bool a_estacionar, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_maxima_auto_correlacao, const TipoRelaxacaoAfluenciaIncremental a_tipo_relaxacao_afluencia_incremental);
+	int isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, ProcessoEstocastico& a_processo_estocastico, const IdProcessoEstocastico a_tipo_processo_estocastico, const TipoEspacoAmostral a_tipo_espaco_amostral, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const bool a_estacionar, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_maxima_auto_correlacao);
 
 	void validaHidreletrica();
 

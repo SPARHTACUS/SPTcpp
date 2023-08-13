@@ -515,10 +515,10 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_probabilidade_realizacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_direto);
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_direto);
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("PROCESSO_ESTOCASTICO_" + getString(AttVetorProcessoEstocastico_mapeamento_tendencia_temporal) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_direto);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("VARIAVEL_ALEATORIA_AttComumOperacional.csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
+		//a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("VARIAVEL_ALEATORIA_AttComumOperacional.csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
 
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_" + getString(AttVetorVariavelAleatoria_tipo_relaxacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_residuo_espaco_amostral) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
 
@@ -8395,8 +8395,6 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 		const int  ordem_maxima_auto_correlacao_hidrologica = getAtributo(AttComumDados_ordem_maxima_auto_correlacao_geracao_cenario_hidrologico, int());
 
-		const TipoRelaxacaoAfluenciaIncremental tipo_relaxacao_afluencia_incremental = getAtributo(AttComumDados_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental());
-
 		const TipoTendenciaEstocastica tipo_tendencia_hidrologica = getAtributo(AttComumDados_tipo_tendencia_hidrologica, TipoTendenciaEstocastica());
 
 		const TipoEstudo tipo_estudo = getAtributo(AttComumDados_tipo_estudo, TipoEstudo());
@@ -8413,7 +8411,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 		const IdCenario cenario_inicial = getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario());
 		const IdCenario cenario_final = getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario());
 
-		int calcular_att_operacionais_processo_estocastico_hidrologico = isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(cenario_inicial, cenario_final, estagio_inicial, estagio_final, processoEstocastico_hidrologico, tipo_processo_estocastico_hidrologico, tipo_espaco_amostral_hidrologico, tipo_correlacao_variaveis_aleatorias, tipo_modelo_geracao_sintetica, false, tipo_coeficiente_auto_correlacao, ordem_maxima_auto_correlacao_hidrologica, tipo_relaxacao_afluencia_incremental);
+		int calcular_att_operacionais_processo_estocastico_hidrologico = isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(cenario_inicial, cenario_final, estagio_inicial, estagio_final, processoEstocastico_hidrologico, tipo_processo_estocastico_hidrologico, tipo_espaco_amostral_hidrologico, tipo_correlacao_variaveis_aleatorias, tipo_modelo_geracao_sintetica, false, tipo_coeficiente_auto_correlacao, ordem_maxima_auto_correlacao_hidrologica);
 
 		if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
 			for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++) {
@@ -8684,16 +8682,15 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 			int semente_espaco_amostral_hidrologico = getAtributo(AttComumDados_semente_espaco_amostral_geracao_cenario_hidrologico, int());
 
 			if (realizar_reducao_espaco_amostral)
-				processoEstocastico_hidrologico.gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, imprimir_espaco_amostral_hidrologico, getHorizonteEspacoAmostralHidrologico(estagio_inicial, estagio_final, IdRealizacao(getAtributo(AttComumDados_numero_aberturas, int())), true), getAtributo(AttComumDados_tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico, TipoSorteio()), semente_espaco_amostral_hidrologico);
+				processoEstocastico_hidrologico.gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, imprimir_espaco_amostral_hidrologico, TipoRelaxacaoVariavelAleatoria_truncamento, getHorizonteEspacoAmostralHidrologico(estagio_inicial, estagio_final, IdRealizacao(getAtributo(AttComumDados_numero_aberturas, int())), true), getAtributo(AttComumDados_tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico, TipoSorteio()), semente_espaco_amostral_hidrologico);
 			else
-				processoEstocastico_hidrologico.gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, imprimir_espaco_amostral_hidrologico, getHorizonteEspacoAmostralHidrologico(estagio_inicial, estagio_final), getAtributo(AttComumDados_tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico, TipoSorteio()), semente_espaco_amostral_hidrologico);
+				processoEstocastico_hidrologico.gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, imprimir_espaco_amostral_hidrologico, TipoRelaxacaoVariavelAleatoria_truncamento, getHorizonteEspacoAmostralHidrologico(estagio_inicial, estagio_final), getAtributo(AttComumDados_tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico, TipoSorteio()), semente_espaco_amostral_hidrologico);
 
-			processoEstocastico_hidrologico.mapearCenariosTendencia(getAtributo(AttComumDados_numero_cenarios, int()), getAtributo(AttComumDados_numero_cenarios_tendencia_hidrologica, int()));
 
 
 			//
 			// Reducao Espaco Amostral
-//
+			//
 			if (realizar_reducao_espaco_amostral) {
 
 				const TipoEstudo tipo_estudo = getAtributo(AttComumDados_tipo_estudo, TipoEstudo());
@@ -8715,7 +8712,8 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 			//
 
 			int semente_geracao_cenario_hidrologico = getAtributo(AttComumDados_semente_geracao_cenario_hidrologico, int());
-			processoEstocastico_hidrologico.gerarCenariosPorSorteio(a_entradaSaidaDados, imprimir_cenarios_hidrologicos, true, true, getAtributo(AttComumDados_numero_cenarios_tendencia_hidrologica, int()), getAtributo(AttComumDados_numero_cenarios, int()), cenario_inicial, cenario_final, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
+			processoEstocastico_hidrologico.gerarCenariosPorSorteio(a_entradaSaidaDados, imprimir_cenarios_hidrologicos, true, true, getAtributo(AttComumDados_numero_cenarios, int()), cenario_inicial, cenario_final, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
+
 
 
 		} // if (calcular_att_operacionais_processo_estocastico_hidrologico) {
@@ -8741,7 +8739,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 				if (processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0)
 					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_probabilidade_realizacao) + ".csv", processoEstocastico_hidrologico, AttMatrizProcessoEstocastico_probabilidade_realizacao);
 
-				a_entradaSaidaDados.imprimirArquivoCSV_AttComum("VARIAVEL_ALEATORIA_AttComumOperacional.csv", IdVariavelAleatoria_Nenhum, processoEstocastico_hidrologico);
+				//a_entradaSaidaDados.imprimirArquivoCSV_AttComum("VARIAVEL_ALEATORIA_AttComumOperacional.csv", IdVariavelAleatoria_Nenhum, processoEstocastico_hidrologico);
 
 				a_entradaSaidaDados.imprimirArquivoCSV_AttComum("VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv", IdVariavelAleatoria_Nenhum, IdVariavelAleatoriaInterna_Nenhum, processoEstocastico_hidrologico, std::vector<AttComumVariavelAleatoriaInterna>{AttComumVariavelAleatoriaInterna_idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_nome, AttComumVariavelAleatoriaInterna_grau_liberdade});
 
@@ -8758,6 +8756,8 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 					}
 					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) + ".csv", IdVariavelAleatoria_Nenhum, processoEstocastico_hidrologico, horizonte_coeficiente_linear_auto_correlacao.getIteradorInicial(), horizonte_coeficiente_linear_auto_correlacao.getIteradorFinal(), 1, maior_ordem_horizonte, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao);
 				}
+
+				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("VARIAVEL_ALEATORIA_" + getString(AttVetorVariavelAleatoria_tipo_relaxacao) + ".csv", IdVariavelAleatoria_Nenhum, processoEstocastico_hidrologico, AttVetorVariavelAleatoria_tipo_relaxacao);
 
 				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_coeficiente_participacao) + ".csv", IdVariavelAleatoria_Nenhum, IdVariavelAleatoriaInterna_Nenhum, processoEstocastico_hidrologico, AttVetorVariavelAleatoriaInterna_coeficiente_participacao);
 
@@ -8798,7 +8798,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 				if (processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getSizeMatriz(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) == 0) {
 
 					int semente_geracao_cenario_hidrologico = getAtributo(AttComumDados_semente_geracao_cenario_hidrologico, int());
-					processoEstocastico_hidrologico.gerarCenariosPorSorteio(a_entradaSaidaDados, false, true, true, getAtributo(AttComumDados_numero_cenarios_tendencia_hidrologica, int()), getAtributo(AttComumDados_numero_cenarios, int()), cenario_inicial, cenario_final, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
+					processoEstocastico_hidrologico.gerarCenariosPorSorteio(a_entradaSaidaDados, false, true, true, getAtributo(AttComumDados_numero_cenarios, int()), cenario_inicial, cenario_final, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
 
 				} // if (processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getSizeMatriz(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) == 0) {
 
@@ -9025,7 +9025,7 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 } // void Dados::instanciarProcessoEstocasticoHidrologico(const IdProcessoEstocastico a_tipo_processo_estocastico) {
 
 
-int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, ProcessoEstocastico& a_processo_estocastico, const IdProcessoEstocastico a_tipo_processo_estocastico, const TipoEspacoAmostral a_tipo_espaco_amostral, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const bool a_estacionar, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_maxima_auto_correlacao, const TipoRelaxacaoAfluenciaIncremental a_tipo_relaxacao_afluencia_incremental) {
+int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, ProcessoEstocastico& a_processo_estocastico, const IdProcessoEstocastico a_tipo_processo_estocastico, const TipoEspacoAmostral a_tipo_espaco_amostral, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const bool a_estacionar, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_maxima_auto_correlacao) {
 
 	try {
 
@@ -9105,14 +9105,9 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(cons
 
 		for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++) {
 
-			if ((a_processo_estocastico.getAtributo(idVariavelAleatoria, AttComumVariavelAleatoria_tipo_modelo_geracao_sintetica, TipoModeloGeracaoSinteticaCenario()) != a_tipo_modelo_geracao_sintetica) || \
-				(a_processo_estocastico.getAtributo(idVariavelAleatoria, AttComumVariavelAleatoria_tipo_coeficiente_auto_correlacao, TipoValor()) != a_tipo_coeficiente_auto_correlacao) || \
-				(a_processo_estocastico.getAtributo(idVariavelAleatoria, AttComumVariavelAleatoria_ordem_maxima_coeficiente_auto_correlacao, int()) != a_ordem_maxima_auto_correlacao))
-				return 10;
-
 			if (true) {
 
-				if (a_tipo_modelo_geracao_sintetica == TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal) {
+				if (true) {
 
 					const SmartEnupla<Periodo, SmartEnupla<int, double>> coeficiente_linear_auto_correlacao = a_processo_estocastico.getMatriz(idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, Periodo(), int(), double());
 
@@ -9125,7 +9120,21 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(cons
 					if (coeficiente_linear_auto_correlacao.getIteradorFinal() < periodo_final)
 						return 23;
 
-				} // if (a_tipo_modelo_geracao_sintetica == TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal) {
+				}
+
+				if (true) {
+
+					const SmartEnupla<Periodo, TipoRelaxacaoVariavelAleatoria> tipo_relaxacao = a_processo_estocastico.getVetor(idVariavelAleatoria, AttVetorVariavelAleatoria_tipo_relaxacao, Periodo(), TipoRelaxacaoVariavelAleatoria());
+
+					if (tipo_relaxacao.size() == 0)
+						return 222;
+
+					if (tipo_relaxacao.getIteradorInicial() > periodo_inicial)
+						return 223;
+
+					if (tipo_relaxacao.getIteradorFinal() < periodo_final)
+						return 223;
+				}
 
 				const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> residuo_espaco_amostral = a_processo_estocastico.getMatriz(idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double());
 
@@ -9239,7 +9248,7 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(cons
 		return 0;
 
 	} // try{
-	catch (const std::exception& erro) { throw std::invalid_argument("Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(" + getFullString(a_cenario_final) + "," + getFullString(a_estagio_final) + ",a_processo_estocastico," + getFullString(a_tipo_espaco_amostral) + "," + getFullString(a_tipo_processo_estocastico) + "," + getFullString(a_tipo_correlacao) + "," + getFullString(a_tipo_modelo_geracao_sintetica) + "," + getFullString(a_estacionar) + "," + getFullString(a_tipo_coeficiente_auto_correlacao) + "," + getFullString(a_ordem_maxima_auto_correlacao) + "," + getFullString(a_tipo_relaxacao_afluencia_incremental) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(" + getFullString(a_cenario_final) + "," + getFullString(a_estagio_final) + ",a_processo_estocastico," + getFullString(a_tipo_espaco_amostral) + "," + getFullString(a_tipo_processo_estocastico) + "," + getFullString(a_tipo_correlacao) + "," + getFullString(a_tipo_modelo_geracao_sintetica) + "," + getFullString(a_estacionar) + "," + getFullString(a_tipo_coeficiente_auto_correlacao) + "," + getFullString(a_ordem_maxima_auto_correlacao) + "): \n" + std::string(erro.what())); }
 
 } // bool Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(){
 

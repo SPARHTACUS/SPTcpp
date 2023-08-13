@@ -1570,13 +1570,11 @@ DEFINE_SMART_ENUM(TipoCorrelacaoVariaveisAleatorias, TIPO_CORRELACAO_VARIAVEIS_A
 DEFINE_SMART_ENUM(TipoValor, TIPO_VALOR)
 
 
-#define TIPO_RELAXACAO_AFLUENCIA_INCREMENTAL(m)\
-	m(TipoRelaxacaoAfluenciaIncremental, sem_relaxacao)       \
-	m(TipoRelaxacaoAfluenciaIncremental, penalizacao)         \
-	m(TipoRelaxacaoAfluenciaIncremental, truncamento)         \
-	m(TipoRelaxacaoAfluenciaIncremental, viabilidade_hidraulica_penalizacao) \
-	m(TipoRelaxacaoAfluenciaIncremental, viabilidade_hidraulica_truncamento)                   
-DEFINE_SMART_ENUM(TipoRelaxacaoAfluenciaIncremental, TIPO_RELAXACAO_AFLUENCIA_INCREMENTAL)
+#define TIPO_RELAXACAO_VARIAVEL_ALEATORIA_INTERNA(m)\
+	m(TipoRelaxacaoVariavelAleatoria, sem_relaxacao)       \
+	m(TipoRelaxacaoVariavelAleatoria, penalizacao)         \
+	m(TipoRelaxacaoVariavelAleatoria, truncamento)                        
+DEFINE_SMART_ENUM(TipoRelaxacaoVariavelAleatoria, TIPO_RELAXACAO_VARIAVEL_ALEATORIA_INTERNA)
 
 
 #define TIPO_TURBINA(m)               \
@@ -1739,7 +1737,7 @@ m(TipoPatamar)                       \
 m(TipoPerdaHidraulica)               \
 m(TipoProcessamentoParalelo)         \
 m(TipoRecuperacaoCortes)             \
-m(TipoRelaxacaoAfluenciaIncremental) \
+m(TipoRelaxacaoVariavelAleatoria) \
 m(TipoRepresentacaoHidrologica)      \
 m(TipoRestricaoContrato)             \
 m(TipoRestricaoHidraulica)           \
