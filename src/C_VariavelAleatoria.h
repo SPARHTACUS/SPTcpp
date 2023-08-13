@@ -21,6 +21,8 @@
 	  m(VariavelAleatoria,  AttVetor,                                 serie_residuo,   double,        min,          max,             1,  Periodo)   \
 	  m(VariavelAleatoria,  AttVetor,                          serie_residuo_normal,   double,          0,          max,             0,  Periodo)   \
 	  m(VariavelAleatoria,  AttVetor,                       serie_residuo_lognormal,   double,          1,          max,             1,  Periodo)   \
+	  m(VariavelAleatoria,  AttVetor,                            tendencia_temporal,   double,          1,          max,             1,  Periodo)   \
+	  m(VariavelAleatoria,  AttVetor,               tendencia_temporal_transformada,   double,          1,          max,             1,  Periodo)   \
 	  m(VariavelAleatoria,  AttVetor,                          media_serie_temporal,   double,        min,          max,             1,  IdEstacao) \
 	  m(VariavelAleatoria,  AttVetor,                      media_serie_transformada,   double,          1,          max,             1,  IdEstacao) \
 	  m(VariavelAleatoria,  AttVetor,                          media_residuo_normal,   double,          0,          max,             1,  IdEstacao) \
@@ -48,8 +50,6 @@
 //               c_classe,   smrtAtt,                                  nomeAtributo,     Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define ATT_MATRIZ_VARIAVEL_ALEATORIA(m)  \
-	  m(VariavelAleatoria,  AttMatriz,                               tendencia_temporal,       double,          min,          max,             1,  IdCenario,      Periodo)   \
-	  m(VariavelAleatoria,  AttMatriz,                  tendencia_temporal_transformada,       double,          min,          max,             1,  IdCenario,      Periodo)   \
 	  m(VariavelAleatoria,  AttMatriz, cenarios_realizacao_transformada_espaco_amostral,       double,          min,          max,             1,  IdCenario,      Periodo)   \
 	  m(VariavelAleatoria,  AttMatriz,                     ruido_branco_espaco_amostral,       double,          min,          max,             0,    Periodo, IdRealizacao)   \
 	  m(VariavelAleatoria,  AttMatriz,             ruido_correlacionado_espaco_amostral,       double,          min,          max,             0,    Periodo, IdRealizacao)   \
@@ -92,7 +92,7 @@ public:
 
 	void addSerieTemporalVariavelAleatoriaInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const SmartEnupla<Periodo, double> &a_serie_temporal);
 
-	void addTendenciaTemporalVariavelAleatoriaInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const SmartEnupla <IdCenario, SmartEnupla<Periodo, double>> &a_tendencia_temporal);
+	void addTendenciaTemporalVariavelAleatoriaInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const SmartEnupla<Periodo, double> &a_tendencia_temporal);
 
 	void gerarTendenciaTemporalMediaVariavelAleatoriaInterna(const Periodo a_periodo_final);
 
@@ -143,7 +143,7 @@ public:
 
 	void gerarEspacoAmostralFromRuido(const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral);
 
-	void gerarCenariosEspacoAmostral(const SmartEnupla<IdCenario, IdCenario> &a_mapeamento_cenarios_tendencia, const SmartEnupla <IdCenario, SmartEnupla<Periodo, IdRealizacao>> &a_mapeamento_amostra_comum, const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>> &a_horizonte_processo_estocastico, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const bool a_espaco_amostral_mesmo_tipo_periodo);
+	void gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario, SmartEnupla<Periodo, IdRealizacao>> &a_mapeamento_amostra_comum, const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>> &a_horizonte_processo_estocastico, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const bool a_espaco_amostral_mesmo_tipo_periodo);
 
 	void expandirParametrosEspacoAmostral(const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral);
 
@@ -158,8 +158,8 @@ public:
 	double getRealizacaoTransformadaEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const bool a_espaco_amostral_mesmo_tipo_periodo) const;
 	double getRealizacaoTransformadaEspacoAmostral_recursivo(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao,  const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const Periodo a_periodo, const Periodo a_periodo_realizacao, const SmartEnupla<Periodo, double> a_horizonte_completo, const bool a_espaco_amostral_mesmo_tipo_periodo);
 
-	double getTendenciaTemporalTransformada(const SmartEnupla<IdCenario, IdCenario> a_mapeamento_cenarios_tendencia, const IdCenario a_idCenario, const Periodo a_periodo);
-	double getTendenciaTemporalTransformadaFromVariavelAleatoriaInterna(const SmartEnupla<IdCenario, IdCenario> a_mapeamento_cenarios_tendencia, const IdCenario a_idCenario, const Periodo a_periodo);
+	double getTendenciaTemporalTransformada(const IdCenario a_idCenario, const Periodo a_periodo);
+	double getTendenciaTemporalTransformadaFromVariavelAleatoriaInterna(const IdCenario a_idCenario, const Periodo a_periodo);
 
 	double calcularResiduo             (const double a_ruido_correlacionado, const Periodo a_periodo) const;
 	double calcularResiduo             (const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia, const double a_realizacao, const bool a_espaco_amostral_mesmo_tipo_periodo) const;
@@ -176,7 +176,7 @@ public:
 	void addRealizacaoInterna(const IdCenario a_idCenario, const Periodo a_periodo);
 
 	void setRealizacaoInterna(const IdCenario a_idCenario, const Periodo a_periodo);
-	void setRealizacaoInternaFromTendencia(const IdCenario a_idCenario, const IdCenario a_idCenario_tendencia, const Periodo a_periodo);
+	void setRealizacaoInternaFromTendencia(const IdCenario a_idCenario, const Periodo a_periodo);
 
 	double calcularRegressivo_lognormal_3p(const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia, const bool a_espaco_amostral_mesmo_tipo_periodo) const;
 

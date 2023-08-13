@@ -14,6 +14,8 @@
 	  m(VariavelAleatoriaInterna,  AttVetor,                                serie_temporal,   double,        min,          max,             1,  Periodo)   \
 	  m(VariavelAleatoriaInterna,  AttVetor,                   serie_temporal_transformada,   double,        min,          max,             1,  Periodo)   \
 	  m(VariavelAleatoriaInterna,  AttVetor,                      coeficiente_participacao,   double,        min,          max,             1,  Periodo)   \
+	  m(VariavelAleatoriaInterna,  AttVetor,                            tendencia_temporal,   double,        min,          max,             1,  Periodo)   \
+	  m(VariavelAleatoriaInterna,  AttVetor,               tendencia_temporal_transformada,   double,        min,          max,             1,  Periodo)   \
 	  m(VariavelAleatoriaInterna,  AttVetor,                          media_serie_temporal,   double,        min,          max,             1,  IdEstacao) \
 	  m(VariavelAleatoriaInterna,  AttVetor,                      media_serie_transformada,   double,          1,          max,             1,  IdEstacao) \
 	  m(VariavelAleatoriaInterna,  AttVetor,                         desvio_serie_temporal,   double,          0,          max,             1,  IdEstacao) \
@@ -26,8 +28,6 @@
 //                         c_classe,   smrtAtt,                                  nomeAtributo,     Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define ATT_MATRIZ_VARIAVEL_ALEATORIA_INTERNA(m)  \
-	  m(VariavelAleatoriaInterna,  AttMatriz,                               tendencia_temporal,       double,          min,          max,             1,  IdCenario,      Periodo)   \
-	  m(VariavelAleatoriaInterna,  AttMatriz,                  tendencia_temporal_transformada,       double,          min,          max,             1,  IdCenario,      Periodo)   \
 	  m(VariavelAleatoriaInterna,  AttMatriz,              cenarios_realizacao_espaco_amostral,       double,          min,          max,             1,  IdCenario,      Periodo)   \
 	  m(VariavelAleatoriaInterna,  AttMatriz,                                 auto_covariancia,       double,          min,          max,             0,  IdEstacao, int)       \
 	  m(VariavelAleatoriaInterna,  AttMatriz,                                  auto_correlacao,       double,          min,          max,             0,  IdEstacao, int)       \
@@ -84,7 +84,7 @@ public:
 	void addRealizacao(const double a_realizacao_variavel_aleatoria, const IdCenario a_idCenario, const Periodo a_periodo);
 
 	void setRealizacao(const double a_realizacao_variavel_aleatoria, const IdCenario a_idCenario, const Periodo a_periodo);
-	void setRealizacaoFromTendencia(const IdCenario a_idCenario, const IdCenario a_idCenario_tendencia, const Periodo a_periodo);
+	void setRealizacaoFromTendencia(const IdCenario a_idCenario, const Periodo a_periodo);
 
 };
 

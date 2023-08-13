@@ -58,7 +58,7 @@ public:
 	void addSeriesTemporais(const TipoVariavelAleatoria a_tipo_variavel_aleatoria, const SmartEnupla<int, TipoVariavelAleatoriaInterna> a_lista_variavel_aleatoria_interna, const SmartEnupla<int, SmartEnupla<Periodo, double>>& a_series_temporais);
 
 	template<typename TipoVariavelAleatoria, typename TipoVariavelAleatoriaInterna>
-	void addTendenciasTemporais(const TipoVariavelAleatoria a_tipo_variavel_aleatoria, const SmartEnupla<int, TipoVariavelAleatoriaInterna> a_lista_tipo_variavel_aleatoria_interna, const SmartEnupla<int, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>& a_tendencias_temporais);
+	void addTendenciasTemporais(const TipoVariavelAleatoria a_tipo_variavel_aleatoria, const SmartEnupla<int, TipoVariavelAleatoriaInterna> a_lista_tipo_variavel_aleatoria_interna, const SmartEnupla<int, SmartEnupla<Periodo, double>>& a_tendencias_temporais);
 
 	void gerarTendenciaTemporalMedia(const Periodo a_periodo_final);
 
@@ -193,7 +193,7 @@ inline void ProcessoEstocastico::addSeriesTemporais(const TipoVariavelAleatoria 
 
 
 template<typename TipoVariavelAleatoria, typename TipoVariavelAleatoriaInterna>
-inline void ProcessoEstocastico::addTendenciasTemporais(const TipoVariavelAleatoria a_tipo_variavel_aleatoria, const SmartEnupla<int, TipoVariavelAleatoriaInterna> a_lista_tipo_variavel_aleatoria_interna, const SmartEnupla<int, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>& a_tendencias_temporais){
+inline void ProcessoEstocastico::addTendenciasTemporais(const TipoVariavelAleatoria a_tipo_variavel_aleatoria, const SmartEnupla<int, TipoVariavelAleatoriaInterna> a_lista_tipo_variavel_aleatoria_interna, const SmartEnupla<int, SmartEnupla<Periodo, double>>& a_tendencias_temporais){
 
 	try {
 

@@ -47,11 +47,9 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 		TipoSolver tipoSolver = a_dados.getAtributo(AttComumDados_tipo_solver, TipoSolver());
 
 		SmartEnupla<Periodo, IdEstagio> horizonte_estudo;
-		SmartEnupla<Periodo, bool>      horizonte_defluencia_passada;
-		SmartEnupla<Periodo, bool>		horizonte_tendencia_mais_processo_estocastico;
 
 		SmartEnupla<IdEstagio, SmartEnupla<Periodo, double>> horizonte_estudo_por_estagio(estagio_inicial, std::vector<SmartEnupla<Periodo, double>>(int(estagio_final - estagio_inicial) + 1, SmartEnupla<Periodo, double>()));
-		SmartEnupla<IdEstagio, SmartEnupla<Periodo, double>> horizonte_processo_estocastico_hidrologico_por_estagio(estagio_inicial, std::vector<SmartEnupla<Periodo, double>>(int(estagio_final - estagio_inicial) + 1, SmartEnupla<Periodo, double>()));
+		SmartEnupla<IdEstagio, SmartEnupla<Periodo, int>> horizonte_processo_estocastico_hidrologico_por_estagio(estagio_inicial, std::vector<SmartEnupla<Periodo, int>>(int(estagio_final - estagio_inicial) + 1, SmartEnupla<Periodo, int>()));
 
 		// Instanciamento Estagio
 
@@ -123,8 +121,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 		//
 
 
-		SmartEnupla<IdEstagio, SmartEnupla<Periodo, SmartEnupla <IdHidreletrica, bool>>> alocacao_afluencia_incremental(estagio_inicial, std::vector<SmartEnupla<Periodo, SmartEnupla <IdHidreletrica, bool>>>(int(estagio_final) - int(estagio_inicial) + 1, SmartEnupla<Periodo, SmartEnupla <IdHidreletrica, bool>>()));
-
 		if (true) {
 
 			SmartEnupla<IdEstagio, SmartEnupla<IdRealizacao, double>> custo_medio(estagio_inicial, std::vector<SmartEnupla<IdRealizacao, double>>(int(estagio_final) - int(estagio_inicial) + 1, SmartEnupla<IdRealizacao, double>()));
@@ -133,93 +129,28 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 				const Periodo periodo_otimizacao = getAtributo(idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
 
-				custo_medio.at(idEstagio) = SmartEnupla<IdRealizacao, double>(IdRealizacao_1, std::vector<double>(getAtributo(idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()), 0.0));
-
-				std::vector<Periodo> horizonte_processo_estocastico_tendencia, horizonte_processo_estocastico_espaco_amostral;
-
-				if (getSize1Matriz(tipo_processo_estocastico_hidrologico, IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_tendencia_temporal) > 0) {
-					const SmartEnupla < Periodo, double> horizonte_processo_estocastico_tendencia_completo = getElementosMatriz(tipo_processo_estocastico_hidrologico, IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, Periodo(), double());
-					horizonte_processo_estocastico_tendencia = horizonte_processo_estocastico_tendencia_completo.getIteradores(periodo_otimizacao);
-					for (Periodo periodo = horizonte_processo_estocastico_tendencia_completo.getIteradorInicial(); periodo <= horizonte_processo_estocastico_tendencia_completo.getIteradorFinal(); horizonte_processo_estocastico_tendencia_completo.incrementarIterador(periodo)) {
-						alocacao_afluencia_incremental.at(idEstagio).addElemento(periodo, SmartEnupla <IdHidreletrica, bool>(IdHidreletrica_1, std::vector<bool>(a_dados.getMaiorId(IdHidreletrica()), true)));
-						if(idEstagio == estagio_inicial)
-							horizonte_tendencia_mais_processo_estocastico.addElemento(periodo, true);
-					}			
-				}
+				custo_medio.at(idEstagio) = SmartEnupla<IdRealizacao, double>(IdRealizacao_1, std::vector<double>(getAtributo(idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()), 0.0));		
 
 				if (getSize1Matriz(tipo_processo_estocastico_hidrologico, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) > 0) {
 					const SmartEnupla<Periodo, IdRealizacao> horizonte_processo_estocastico_espaco_amostral_completo = getElementosMatriz(tipo_processo_estocastico_hidrologico, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, cenario_inicial, Periodo(), IdRealizacao());
-					horizonte_processo_estocastico_espaco_amostral = horizonte_processo_estocastico_espaco_amostral_completo.getIteradores(periodo_otimizacao);
-					
-					if (idEstagio == estagio_inicial) {
-						for (Periodo periodo = horizonte_processo_estocastico_espaco_amostral_completo.getIteradorInicial(); periodo <= horizonte_processo_estocastico_espaco_amostral_completo.getIteradorFinal(); horizonte_processo_estocastico_espaco_amostral_completo.incrementarIterador(periodo))
-							horizonte_tendencia_mais_processo_estocastico.addElemento(periodo, true);
-					}//if (idEstagio == estagio_inicial) {
-										
-					Periodo periodo_final = periodo_otimizacao + 1;
-					if (idEstagio < estagio_final)
-						periodo_final = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(idEstagio + 1), Periodo());
-					for (Periodo periodo = horizonte_processo_estocastico_espaco_amostral_completo.getIteradorInicial(); periodo < periodo_final; horizonte_processo_estocastico_espaco_amostral_completo.incrementarIterador(periodo)) {
-						if (periodo > horizonte_processo_estocastico_espaco_amostral_completo.getIteradorFinal())
-							break;
-						alocacao_afluencia_incremental.at(idEstagio).addElemento(periodo, SmartEnupla <IdHidreletrica, bool>(IdHidreletrica_1, std::vector<bool>(a_dados.getMaiorId(IdHidreletrica()), true)));						
-					}
+					const std::vector<Periodo> horizonte_processo_estocastico_espaco_amostral = horizonte_processo_estocastico_espaco_amostral_completo.getIteradores(periodo_otimizacao);
+
+					for (int i = 0; i < int(horizonte_processo_estocastico_espaco_amostral.size()); i++)
+						horizonte_processo_estocastico_hidrologico_por_estagio.at(idEstagio).addElemento(horizonte_processo_estocastico_espaco_amostral.at(i), getSize2Matriz(tipo_processo_estocastico_hidrologico, IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, horizonte_processo_estocastico_espaco_amostral.at(i)));
 
 				}
-
-				for (int i = 0; i < int(horizonte_processo_estocastico_tendencia.size()); i++)
-					horizonte_processo_estocastico_hidrologico_por_estagio.at(idEstagio).addElemento(horizonte_processo_estocastico_tendencia.at(i), 0.0);
-
-				for (int i = 0; i < int(horizonte_processo_estocastico_espaco_amostral.size()); i++)
-					horizonte_processo_estocastico_hidrologico_por_estagio.at(idEstagio).addElemento(horizonte_processo_estocastico_espaco_amostral.at(i), 0.0);
 
 				for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 					if (horizonte_estudo.at(periodo) == idEstagio)
 						horizonte_estudo_por_estagio.at(idEstagio).addElemento(periodo, 0.0);
 				}
 
-				//Aloca defuência dependendo do tempo de viagem d'agua
-
-				if (idEstagio == estagio_inicial) {
-
-					/////////////////////////////////////////////////////////
-					//Cria horizonte_defluencia
-					/////////////////////////////////////////////////////////
-					for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
-
-						if (a_dados.vetorHidreletrica.at(idHidreletrica).vetorDefluencia.isInstanciado(IdDefluencia_passada)) {
-
-							const SmartEnupla<Periodo, double> vetor_defluencia = a_dados.getVetor(idHidreletrica, IdDefluencia_passada, AttVetorDefluencia_vazao_defluencia, Periodo(), double());
-
-							for (Periodo periodo = vetor_defluencia.getIteradorInicial(); periodo <= vetor_defluencia.getIteradorFinal(); vetor_defluencia.incrementarIterador(periodo))
-								horizonte_defluencia_passada.addElemento(periodo, true);
-
-							break;
-
-						} // if (a_dados.vetorHidreletrica.at(idHidreletrica).vetorDefluencia.isInstanciado(IdDefluencia_passada)) {
-
-					}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
-
-					const SmartEnupla<Periodo, IdEstagio> horizonte_estudo_original = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
-
-					//Adiciona periodos do horizonte_estudo
-					for (Periodo periodo = horizonte_estudo_original.getIteradorInicial(); periodo <= horizonte_estudo_original.getIteradorFinal(); horizonte_estudo_original.incrementarIterador(periodo)) {
-						if (estagio_final < horizonte_estudo_original.at(periodo))
-							break;
-						if ((estagio_inicial == IdEstagio_1) || ((periodo.sobreposicao(periodo_estudo_inicial) > 0.0) || (periodo > periodo_estudo_inicial)))
-							horizonte_defluencia_passada.addElemento(periodo, true);
-					}
-
-					/////////////////////////////////////////////////////////
-
-				}//if (idEstagio == estagio_inicial) {
-
 			} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
 			setVetor(AttVetorModeloOtimizacao_horizonte_estudo, horizonte_estudo);
 
 			setMatriz(AttMatrizModeloOtimizacao_horizonte_estudo, horizonte_estudo_por_estagio);
-			setMatriz(AttMatrizModeloOtimizacao_horizonte_processo_estocastico_hidrologico, horizonte_processo_estocastico_hidrologico_por_estagio);
+			setMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, horizonte_processo_estocastico_hidrologico_por_estagio);
 
 			setVetor(AttVetorModeloOtimizacao_cortes_multiplos, a_dados.getVetor(AttVetorDados_cortes_multiplos, IdEstagio(), int()));
 
@@ -281,7 +212,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 			} // for (int i = 0; i < int(listaTipoSubproblemaSolver.size()); i++) {
 
-			SmartEnupla<Periodo, double> horizonte_processo_estocastico = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_processo_estocastico_hidrologico, idEstagio, Periodo(), double());
+			SmartEnupla<Periodo, int> horizonte_processo_estocastico = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo(), int());
 
 			const Periodo periodo_otimizacao = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
 
@@ -508,7 +439,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 				//RESTRIÇÕES DE IGUALDADE ASSOCIOADAS AO HORIZONTE DO PROCESSO ESTOCÁSTICO
 				/*
-				SmartEnupla<Periodo, double> horizonte_processo_estocastico_hidrologico = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_processo_estocastico_hidrologico, idEstagio, Periodo(), double());
+				SmartEnupla<Periodo, double> horizonte_processo_estocastico_hidrologico = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo(), double());
 
 				for (Periodo periodo_processo_estocastico = horizonte_processo_estocastico_hidrologico.getIteradorInicial(); periodo_processo_estocastico <= horizonte_processo_estocastico_hidrologico.getIteradorFinal(); horizonte_processo_estocastico_hidrologico.incrementarIterador(periodo_processo_estocastico)) {
 
@@ -546,9 +477,9 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 		const IdProcesso idProcesso = a_dados.getAtributo(AttComumDados_idProcesso, IdProcesso());
 		const IdProcesso maiorIdProcesso = a_dados.getAtributo(AttComumDados_maior_processo, IdProcesso());
 
-		importarVariaveisEstado_AcoplamentoPosEstudo(TipoSubproblemaSolver_geral, a_dados, idProcesso, a_entradaSaidaDados, horizonte_defluencia_passada, horizonte_tendencia_mais_processo_estocastico);
+		importarVariaveisEstado_AcoplamentoPosEstudo(TipoSubproblemaSolver_geral, a_dados, idProcesso, a_entradaSaidaDados);
 
-		importarCorteBenders(TipoSubproblemaSolver_geral, a_dados, idProcesso, std::string(a_entradaSaidaDados.getDiretorioSaida() + "//" + getFullString(getAtributo(AttComumModeloOtimizacao_iteracao_inicial, IdIteracao())) + "//Selecao_Cortes_Importacao"), a_entradaSaidaDados, horizonte_tendencia_mais_processo_estocastico);
+		importarCorteBenders(TipoSubproblemaSolver_geral, a_dados, idProcesso, std::string(a_entradaSaidaDados.getDiretorioSaida() + "//" + getFullString(getAtributo(AttComumModeloOtimizacao_iteracao_inicial, IdIteracao())) + "//Selecao_Cortes_Importacao"), a_entradaSaidaDados);
 
 		if (idProcesso == IdProcesso_mestre)
 			exportarVariaveisEstado_AcoplamentoPreEstudo(a_entradaSaidaDados);
@@ -1850,8 +1781,8 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 
 		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
 
-		SmartEnupla<Periodo, double> horizonte_estudo               = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_estudo, a_idEstagio, Periodo(), double());
-		SmartEnupla<Periodo, double> horizonte_processo_estocastico = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_processo_estocastico_hidrologico, a_idEstagio, Periodo(), double());
+		SmartEnupla<Periodo, double> horizonte_estudo            = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_estudo, a_idEstagio, Periodo(), double());
+		SmartEnupla<Periodo, int> horizonte_processo_estocastico = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo(), int());
 
 		const TipoLagAutocorrelacao tipo_lag_autocorrelacao = getAtributo(a_tipo_processo_estocastico_hidrologico, AttComumProcessoEstocastico_tipo_lag_autocorrelacao, TipoLagAutocorrelacao());
 
@@ -1943,56 +1874,42 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 							// Variável YP
 							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, posEquYH, -coeficiente_participacao * sobreposicao);
 
+							// Variável YF: será adicionada caso espaço amostral seja maior que 1
+							if (horizonte_processo_estocastico.at(periodo_processo_estocastico) > 1) {
 
-							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+								// Variável Afluencia Incremental Folga (YHF): definida por periodo estocastico
+								int varYHF = -1;
 
-								// Afluencia Incremental (YH): definida por periodo estudo por patamar
-								const int varYH_pat = addVarDecisao_YH(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, -infinito, infinito, 0.0);
+								// Afluencia Incremental Folga (YHF)
+								if (a_tipo_relaxacao_afluencia_incremental == TipoRelaxacaoAfluenciaIncremental_penalizacao)
+									varYHF = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica, 0.0, infinito, 0.0);
 
-								// Restricao Afluencia Incremental: definida por periodo estudo por patamar
-								const int posEquYH_pat = addEquLinear_AFLUENCIA_INCREMENTAL(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica);
+								// Afluencia Incremental Folga (YHF)
+								else if (a_tipo_relaxacao_afluencia_incremental == TipoRelaxacaoAfluenciaIncremental_truncamento) {
+									varYHF = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica, 0.0, 0.0, 0.0);
+									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYHF);
+									vetorEstagio.att(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica), varYHF, a_tipo_processo_estocastico_hidrologico, idVariavelAleatoria, idVarInt, periodo_processo_estocastico, sobreposicao, TipoValor_positivo, 1.0, 1.0);
+								}
 
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYH_pat, posEquYH_pat, 1.0);
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYH, posEquYH_pat, -1.0);
+								else if (a_tipo_relaxacao_afluencia_incremental != TipoRelaxacaoAfluenciaIncremental_sem_relaxacao) {
 
-								// Folga só será adicionada caso espaço amostral seja maior que 1
-								if (getSize2Matriz(a_tipo_processo_estocastico_hidrologico, idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_processo_estocastico) > 1) {
+									if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica)
+										varYHF = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica, 0.0, 0.0, 0.0);
 
-									// Variável Afluencia Incremental Folga (YHF): definida por periodo estudo por patamar
-									int varYHF_pat = -1;
+									else if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+										varYHF = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica, 0.0, infinito, 100.0);
 
-									// Afluencia Incremental Folga (YHF)
-									if (a_tipo_relaxacao_afluencia_incremental == TipoRelaxacaoAfluenciaIncremental_penalizacao)
-										varYHF_pat = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, 0.0, infinito, 0.0);
+									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYHF);
 
-									// Afluencia Incremental Folga (YHF)
-									else if (a_tipo_relaxacao_afluencia_incremental == TipoRelaxacaoAfluenciaIncremental_truncamento) {
-										varYHF_pat = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, 0.0, 0.0, 0.0);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYHF_pat);
-										vetorEstagio.att(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeVarDecisao_YHF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), varYHF_pat, a_tipo_processo_estocastico_hidrologico, idVariavelAleatoria, idVarInt, periodo_processo_estocastico, sobreposicao, TipoValor_positivo, 1.0, 1.0);
-									}
+									vetorEstagio.att(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica), varYHF, a_tipo_processo_estocastico_hidrologico, idVariavelAleatoria, idVarInt, periodo_processo_estocastico, sobreposicao, TipoValor_positivo, 1.0, 1.0);
 
-									else if (a_tipo_relaxacao_afluencia_incremental != TipoRelaxacaoAfluenciaIncremental_sem_relaxacao) {
+								}
 
-										if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica)
-											varYHF_pat = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, 0.0, 0.0, 0.0);
+								// Variável Afluencia Incremental Folga (YHF): definida por periodo estocastico
+								if (varYHF > -1)
+									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYHF, posEquYH, -sobreposicao);
 
-										else if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
-											varYHF_pat = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, 0.0, infinito, 100.0);
-
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYHF_pat);
-
-										vetorEstagio.att(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeVarDecisao_YHF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), varYHF_pat, a_tipo_processo_estocastico_hidrologico, idVariavelAleatoria, idVarInt, periodo_processo_estocastico, sobreposicao, TipoValor_positivo, 1.0, 1.0);
-
-									}
-
-									// Variável Afluencia Incremental Folga (YHF): definida por periodo estudo por patamar
-									if (varYHF_pat > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYHF_pat, posEquYH_pat, -1.0);
-
-								} // if (getSize2Matriz(a_tipo_processo_estocastico_hidrologico, idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_processo_estocastico) > 1) {
-
-							} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+							} // if (horizonte_processo_estocastico.at(periodo_processo_estocastico) > 1) {
 
 						} // for (int i = 0; i < int(lista_hidreletrica.size()); i++) {
 
@@ -3517,7 +3434,7 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteOtimizacao(const TipoSub
 }
 
 
-void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, const Periodo a_periodo_acoplamento, const Periodo a_periodo_estudo, const Periodo a_periodo_otimizacao_final, const Periodo a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const TipoRelaxacaoAfluenciaIncremental a_tipo_relaxacao_afluencia_incremental, const SmartEnupla<Periodo, double>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, const Periodo a_periodo_acoplamento, const Periodo a_periodo_estudo, const Periodo a_periodo_otimizacao_final, const Periodo a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const TipoRelaxacaoAfluenciaIncremental a_tipo_relaxacao_afluencia_incremental, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
 
 	try {
 
@@ -3543,7 +3460,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 
 			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QMON(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQMONT, 1.0);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQMONT, -1.0);
+			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquQMONT, -1.0);
 
 		}// try
 
@@ -3777,7 +3694,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 }
 
 
-void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, const Periodo a_periodo_acoplamento, const Periodo a_periodo_estudo, const Periodo a_periodo_otimizacao_final, const Periodo a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const TipoRelaxacaoAfluenciaIncremental a_tipo_relaxacao_afluencia_incremental, const SmartEnupla<Periodo, double>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, const Periodo a_periodo_acoplamento, const Periodo a_periodo_estudo, const Periodo a_periodo_otimizacao_final, const Periodo a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const TipoRelaxacaoAfluenciaIncremental a_tipo_relaxacao_afluencia_incremental, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
 
 	try {
 
@@ -3800,7 +3717,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 
 			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QMON(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQMONT, 1.0);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQMONT, -1.0);
+			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquQMONT, -1.0);
 
 		}// try
 
@@ -4078,7 +3995,7 @@ void ModeloOtimizacao::criarRestricoesEvaporacao(const TipoSubproblemaSolver a_T
 		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquEV_REL, 1.0);
 		if (getVarDecisao_QEV_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1) {
 			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquEV_REL, 1.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), 1.01 * a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, a_periodo_estudo, double()));
+			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), 1.2 * a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, a_periodo_estudo, double()));
 		}
 
 	}// try
@@ -4788,7 +4705,26 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo(const TipoSu
 
 		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
 
-		
+		// Variáveis Hidreletricas Folga Afluencia Incremental
+		const SmartEnupla<Periodo, int> horizonte_espaco_amostral_hidrologico = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo(), int());
+		bool sobreposicao_encontrada = false;
+		for (Periodo periodo = horizonte_espaco_amostral_hidrologico.getIteradorInicial(); periodo <= horizonte_espaco_amostral_hidrologico.getIteradorFinal(); horizonte_espaco_amostral_hidrologico.incrementarIterador(periodo)) {
+			const double sobreposicao = a_periodo_estudo.sobreposicao(periodo);
+			if (sobreposicao > 0.0) {
+
+				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; idHidreletrica++) {
+					// Variável YHF
+					if (getVarDecisao_YHFseExistir(a_TSS, a_idEstagio, periodo, idHidreletrica) > -1)
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YHF(a_TSS, a_idEstagio, periodo, idHidreletrica), posEquZP, -sobreposicao * a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_afluencia_incremental, double()));
+				}
+
+				if (!sobreposicao_encontrada)
+					sobreposicao_encontrada = true;
+			}
+			else if (sobreposicao_encontrada)
+				break;
+		}
+
 
 	}// try
 
@@ -4882,10 +4818,6 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 		// Variáveis Hidreletricas
 		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; idHidreletrica++) {
-
-			// Variável YHF
-			if (getVarDecisao_YHFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YHF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_afluencia_incremental, double()));
 
 			// Variável QTUR / QTURDISP (penaliza a variável que está na FPH)
 
@@ -7395,13 +7327,13 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 
 		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
 
-		const Periodo periodo_final_proc_estoc_hidrologico = getIterador2Final(AttMatrizModeloOtimizacao_horizonte_processo_estocastico_hidrologico, a_idEstagio, Periodo());
+		const Periodo periodo_final_proc_estoc_hidrologico = getIterador2Final(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo());
 
 		// Verifica se periodo não é mais necessario para compor ou repassar lag
 		if (periodo_final_proc_estoc_hidrologico + 1 <= a_periodo_lag)
 			return -1;
 
-		const SmartEnupla<Periodo, double> proc_estoc_hidrologico = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_processo_estocastico_hidrologico, a_idEstagio, Periodo(), double());
+		const SmartEnupla<Periodo, int> proc_estoc_hidrologico = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo(), int());
 		const Periodo periodo_inicial_proc_estoc_hidrologico = proc_estoc_hidrologico.getIteradorInicial();
 
 		const IdProcessoEstocastico idProcessoEstocastico_modelo = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
@@ -7517,9 +7449,9 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 			IdVariavelAleatoria idVar; IdVariavelAleatoriaInterna idVarInt;
 			getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdHidreletrica(idProcessoEstocastico_modelo, idVar, idVarInt, a_listaIdHidreletrica.at(0));
 
-			const SmartEnupla<Periodo, double> afluencia_tendencia = getElementosMatriz(idProcessoEstocastico_modelo, idVar, idVarInt, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, Periodo(), double());
+			const SmartEnupla<Periodo, double> afluencia_tendencia = getVetor(idProcessoEstocastico_modelo, idVar, idVarInt, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 			if (afluencia_tendencia.getIteradorInicial() > a_periodo_lag)
-				throw std::invalid_argument("Necessario mais periodos de defluencia passada anteriores a " + getString(a_periodo_lag) + " em " + getFullString(AttMatrizVariavelAleatoriaInterna_tendencia_temporal) + " de " + getFullString(idProcessoEstocastico_modelo) + " de " + getFullString(idVar) + " de " + getFullString(idVarInt));
+				throw std::invalid_argument("Necessario mais periodos de defluencia passada anteriores a " + getString(a_periodo_lag) + " em " + getFullString(AttVetorVariavelAleatoriaInterna_tendencia_temporal) + " de " + getFullString(idProcessoEstocastico_modelo) + " de " + getFullString(idVar) + " de " + getFullString(idVarInt));
 
 			bool sobreposicao_encontrada = false;
 			for (Periodo periodo = afluencia_tendencia.getIteradorInicial(); periodo <= afluencia_tendencia.getIteradorFinal(); afluencia_tendencia.incrementarIterador(periodo)) {
@@ -7540,11 +7472,9 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 							varYH = addVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica, -infinito, infinito, 0.0);
 							const IdVariavelEstado idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica), varYH, -1);
 							if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica) {
-								for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-									const IdCenario idCenario_map = getElementoVetor(idProcessoEstocastico_modelo, AttVetorProcessoEstocastico_mapeamento_tendencia_temporal, idCenario, IdCenario());
-									const double tendencia = getElementoMatriz(idProcessoEstocastico_modelo, idVar, idVarInt, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, idCenario_map, periodo, double());
-									vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, false, a_dados.getAtributo(AttComumDados_idProcesso, IdProcesso()), a_dados.getAtributo(AttComumDados_maior_processo, IdProcesso()), idCenario_map, tendencia);
-								}
+								const double tendencia = getElementoVetor(idProcessoEstocastico_modelo, idVar, idVarInt, AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double());
+								for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++)
+									vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, false, a_dados.getAtributo(AttComumDados_idProcesso, IdProcesso()), a_dados.getAtributo(AttComumDados_maior_processo, IdProcesso()), idCenario, tendencia);
 							}
 						}
 
@@ -7788,13 +7718,19 @@ bool ModeloOtimizacao::isNecessarioInstanciarSolver(const IdEstagio a_idEstagio,
 
 		if (a_tipoSubproblemaSolver == TipoSubproblemaSolver_viabilidade_hidraulica) {
 
-			if (getAtributo(AttComumModeloOtimizacao_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental()) == TipoRelaxacaoAfluenciaIncremental_viabilidade_hidraulica_truncamento)
-				return true;
+			if ((getAtributo(AttComumModeloOtimizacao_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental()) == TipoRelaxacaoAfluenciaIncremental_viabilidade_hidraulica_truncamento) || \
+				(getAtributo(AttComumModeloOtimizacao_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental()) == TipoRelaxacaoAfluenciaIncremental_viabilidade_hidraulica_penalizacao)) {
+				
+				// Viabilidade hidraulica criada em estágios com espaço amostral maiores que 1
 
-
-			else if (getAtributo(AttComumModeloOtimizacao_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental()) == TipoRelaxacaoAfluenciaIncremental_viabilidade_hidraulica_penalizacao)
-				return true;
-
+				const SmartEnupla<Periodo, int> horizonte_espaco_amostral = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo(), int());
+				for (Periodo periodo = horizonte_espaco_amostral.getIteradorInicial(); periodo <= horizonte_espaco_amostral.getIteradorFinal(); horizonte_espaco_amostral.incrementarIterador(periodo)) {
+					if (horizonte_espaco_amostral.at(periodo) > 1)
+						return true;
+				}
+				
+				return false;
+			}
 
 			return false;
 
@@ -7817,7 +7753,7 @@ bool ModeloOtimizacao::isNecessarioInstanciarSolver(const IdEstagio a_idEstagio,
 }
 
 
-void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const SmartEnupla<Periodo, double>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio)
+void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio)
 {
 
 	try {

@@ -263,10 +263,10 @@ void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_ent
 
 		SmartEnupla<Periodo, double> horizonte_tendencia;
 		
-		if (getSize1Matriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_tendencia_temporal) > 0)
-			horizonte_tendencia = getElementosMatriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, getElementoVetor(AttVetorProcessoEstocastico_mapeamento_tendencia_temporal, a_cenario_inicial, IdCenario()), Periodo(), double());
-		else if (getSize1Matriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_tendencia_temporal_transformada) > 0)
-			horizonte_tendencia = getElementosMatriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_tendencia_temporal_transformada, getElementoVetor(AttVetorProcessoEstocastico_mapeamento_tendencia_temporal, a_cenario_inicial, IdCenario()), Periodo(), double());
+		if (getSizeVetor(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal) > 0)
+			horizonte_tendencia = getVetor(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
+		else if (getSizeVetor(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada) > 0)
+			horizonte_tendencia = getVetor(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, Periodo(), double());
 		else
 			horizonte_tendencia = getElementosMatriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_cenario_inicial, Periodo(), double());
 
@@ -304,7 +304,7 @@ void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_ent
 			espaco_amostral_mesmo_tipo_periodo = true;
 
 		for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= getMaiorIdVariavelAleatoria(); idVar++) {
-			vetorVariavelAleatoria.att(idVar).gerarCenariosEspacoAmostral(getVetor(AttVetorProcessoEstocastico_mapeamento_tendencia_temporal, IdCenario(), IdCenario()), mapeamento_espaco_amostral, cenarios_horizonte_processo_estocastico, a_gerar_cenarios_buffer, a_gerar_cenarios_internos, espaco_amostral_mesmo_tipo_periodo);
+			vetorVariavelAleatoria.att(idVar).gerarCenariosEspacoAmostral(mapeamento_espaco_amostral, cenarios_horizonte_processo_estocastico, a_gerar_cenarios_buffer, a_gerar_cenarios_internos, espaco_amostral_mesmo_tipo_periodo);
 		}
 
 		if (a_imprimir_cenarios)

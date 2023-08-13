@@ -6081,7 +6081,7 @@ void LeituraCEPEL::leitura_VAZPAST_201908_NW25(Dados& a_dados, std::string nomeA
 					try {
 
 						for (Periodo periodo = periodo_inicial_tendencia; periodo <= periodo_final_tendencia; periodo++)
-							a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).addElemento(AttMatrizAfluencia_natural_tendencia, IdCenario_1, periodo, afluencia_tendencia_mensal.at(periodo.getMes()));
+							a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_natural_tendencia, periodo, afluencia_tendencia_mensal.at(periodo.getMes()));
 
 					}
 					catch (const std::exception & erro) { 

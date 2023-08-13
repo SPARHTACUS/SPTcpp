@@ -298,7 +298,7 @@ public:
 
 	void calcular_historico_afluencia_incremental_com_natural();
 
-	bool valida_tendencia_AfluenciaEmHidreletrica(const AttMatrizAfluencia a_attMatrizAfluencia);
+	bool valida_tendencia_AfluenciaEmHidreletrica(const AttVetorAfluencia a_attVetorAfluencia);
 
 	void calcular_tendencia_afluencia_incremental_com_natural();
 
