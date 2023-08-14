@@ -1888,7 +1888,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 			// Validar se estados possuem variáveis de decisão no modelo e ajustar cortes se necessário.
 			for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= estagio.getMaiorId(IdVariavelEstado()); idVariavelEstado++) {
 
-				std::vector<std::string> nome = estagio.getNomeVariavelEstado(idVariavelEstado);
+				const std::vector<std::string> nome = estagio.getNomeVariavelEstado(idVariavelEstado);
 
 				//
 				// Volume Minimo
@@ -1964,8 +1964,6 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					const Periodo periodo_lag = Periodo(nome.at(5));
 
 					const double grau_liberdade = getdoubleFromChar(nome.at(6).c_str());
-
-					nome.push_back(nome.at(4));
 
 					if (nome.size() < 8)
 						throw std::invalid_argument(getFullString(idVariavelEstado) + " com termos ausentes de VarDecisaoYP.");
