@@ -43,12 +43,12 @@ void VariavelAleatoria::addSerieTemporalVariavelAleatoriaInterna(const IdVariave
 } // void VariavelAleatoria::addSerieTemporalVariavelAleatoriaInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const SmartEnupla<Periodo, double>& a_serie_temporal){
 
 
-void VariavelAleatoria::addTendenciaTemporalVariavelAleatoriaInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>& a_tendencia_temporal){
+void VariavelAleatoria::addTendenciaTemporalVariavelAleatoriaInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const SmartEnupla<Periodo, double>& a_tendencia_temporal){
 
 	try{
 
-		vetorVariavelAleatoriaInterna.att(a_idVariavelAleatoriaInterna).setMatriz_forced(AttMatrizVariavelAleatoriaInterna_tendencia_temporal,              a_tendencia_temporal);
-		vetorVariavelAleatoriaInterna.att(a_idVariavelAleatoriaInterna).setMatriz_forced(AttMatrizVariavelAleatoriaInterna_tendencia_temporal_transformada, a_tendencia_temporal);
+		vetorVariavelAleatoriaInterna.att(a_idVariavelAleatoriaInterna).setVetor_forced(AttVetorVariavelAleatoriaInterna_tendencia_temporal,              a_tendencia_temporal);
+		vetorVariavelAleatoriaInterna.att(a_idVariavelAleatoriaInterna).setVetor_forced(AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, a_tendencia_temporal);
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::addTendenciaTemporalVariavelAleatoriaInterna(" + getFullString(a_idVariavelAleatoriaInterna) + ",a_tendencia_temporal): \n" + std::string(erro.what())); }
@@ -150,56 +150,37 @@ void VariavelAleatoria::calcularTendenciaTemporal(){
 		if (maiorIdVariavelAleatoriaInterna == IdVariavelAleatoriaInterna_Nenhum)
 			throw std::invalid_argument("Nenhuma variavel aleatoria interna foi instanciada.");
 
-		const IdCenario cenario_inicial = getIterador1Inicial(IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario());
-		const IdCenario cenario_final   = getIterador1Final  (IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario());
+		const Periodo periodo_inicial = getIteradorInicial(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo());
+		const Periodo periodo_final   = getIteradorFinal  (IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo());
 
-		if (cenario_inicial != IdCenario_1)
-			throw std::invalid_argument("O cenario inicial deve ser 1.");
-
-		const Periodo periodo_inicial = getIterador2Inicial(IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, Periodo());
-		const Periodo periodo_final   = getIterador2Final  (IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, Periodo());
-
-		const SmartEnupla<Periodo, double> horizonte_tendencia = getElementosMatriz(IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, Periodo(), double());
+		const SmartEnupla<Periodo, double> horizonte_tendencia = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
 		for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
 
-			if (getIterador1Inicial(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario()) != cenario_inicial)
-				throw std::invalid_argument("O cenario inicial das tendencias temporais de variaveis aleatorias internas deve ser o mesmo.");
-			else if (getIterador1Final  (idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario()) != cenario_final)
-				throw std::invalid_argument("O cenario final das tendencias temporais de variaveis aleatorias internas deve ser o mesmo.");
-
-			for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-
-				if (getIterador2Inicial(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, idCenario, Periodo()) != periodo_inicial)
-					throw std::invalid_argument("O periodo inicial das tendencias temporais de variaveis aleatorias internas deve ser o mesmo.");
-				else if (getIterador2Final  (idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, idCenario, Periodo()) != periodo_final)
-					throw std::invalid_argument("O periodo final das tendencias temporais de variaveis aleatorias internas deve ser o mesmo.");
-
-			} // for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
+			if (getIteradorInicial(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo()) != periodo_inicial)
+				throw std::invalid_argument("O periodo inicial das tendencias temporais de variaveis aleatorias internas deve ser o mesmo.");
+			else if (getIteradorFinal(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo()) != periodo_final)
+				throw std::invalid_argument("O periodo final das tendencias temporais de variaveis aleatorias internas deve ser o mesmo.");
 
 			vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).deslocarTendenciaComGrauLiberdade();
 
 		} // for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
 
-		SmartEnupla<IdCenario, SmartEnupla<Periodo, double>> tendencia_temporal(cenario_inicial, std::vector<SmartEnupla<Periodo, double>>(cenario_final, SmartEnupla<Periodo, double>(horizonte_tendencia, NAN)));
+		SmartEnupla<Periodo, double> tendencia_temporal(horizonte_tendencia, NAN);
 
-		for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
+		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_tendencia.incrementarIterador(periodo)) {
 
-			for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_tendencia.incrementarIterador(periodo)) {
+			double valor = 0.0;
 
-				double valor = 0.0;
+			for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++)
+				valor += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, periodo, double());
 
-				for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++)
-					valor += getElementoMatriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_tendencia_temporal_transformada, idCenario, periodo, double());
+			tendencia_temporal.setElemento(periodo, valor);
 
-				tendencia_temporal.at(idCenario).setElemento(periodo, valor);
+		} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_tendencia.incrementarIterador(periodo)) {
 
-			} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_tendencia.incrementarIterador(periodo)) {
-
-		} // for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-
-		setMatriz_forced(AttMatrizVariavelAleatoria_tendencia_temporal,              tendencia_temporal);
-		setMatriz_forced(AttMatrizVariavelAleatoria_tendencia_temporal_transformada, tendencia_temporal);
+		setVetor_forced(AttVetorVariavelAleatoria_tendencia_temporal, tendencia_temporal);
+		setVetor_forced(AttVetorVariavelAleatoria_tendencia_temporal_transformada, tendencia_temporal);
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::calcularTendenciaTemporal(): \n" + std::string(erro.what())); }
@@ -1182,12 +1163,9 @@ void VariavelAleatoria::gerarEspacoAmostralFromRuido(const SmartEnupla<Periodo, 
 } // void VariavelAleatoria::gerarEspacoAmostralFromRuido(const SmartEnupla<Periodo, IdRealizacao>& a_horizonte_amostra_comum, const TipoSorteio a_tipo_sorteio, int & a_semente){
 
 
-void VariavelAleatoria::gerarCenariosEspacoAmostral(const SmartEnupla<IdCenario, IdCenario> &a_mapeamento_cenarios_tendencia, const SmartEnupla <IdCenario, SmartEnupla<Periodo, IdRealizacao>> &a_mapeamento_amostra_comum, const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>& a_horizonte_processo_estocastico, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const bool a_espaco_amostral_mesmo_tipo_periodo){
+void VariavelAleatoria::gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario, SmartEnupla<Periodo, IdRealizacao>> &a_mapeamento_amostra_comum, const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>& a_horizonte_processo_estocastico, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const bool a_espaco_amostral_mesmo_tipo_periodo){
 
 	try{
-
-		if (a_mapeamento_cenarios_tendencia.size() == 0)
-			throw std::invalid_argument("O Argumento a_mapeamento_cenarios_tendencia deve possuir elementos.");
 
 		setMatriz_forced(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, a_horizonte_processo_estocastico);
 
@@ -1220,10 +1198,10 @@ void VariavelAleatoria::gerarCenariosEspacoAmostral(const SmartEnupla<IdCenario,
 
 				// Realização Transformada é a própria Tendencia Transformada
 
-				setElemento(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, idCenario, periodo, getTendenciaTemporalTransformada(a_mapeamento_cenarios_tendencia, idCenario, periodo));
+				setElemento(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, idCenario, periodo, getTendenciaTemporalTransformada(idCenario, periodo));
 
 				if (a_gerar_cenarios_internos)
-					setRealizacaoInternaFromTendencia(idCenario, a_mapeamento_cenarios_tendencia.getElemento(idCenario), periodo);
+					setRealizacaoInternaFromTendencia(idCenario, periodo);
 
 			} // for (Periodo periodo = periodo_inicial_tendencia; periodo <= periodo_final_amostra; periodo++) {
 
@@ -1289,20 +1267,6 @@ void VariavelAleatoria::expandirParametrosEspacoAmostral(const SmartEnupla<Perio
 
 } // void VariavelAleatoria::expandirParametrosEspacoAmostral(const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral){
 
-void VariavelAleatoria::expandirParametrosHorizonteCompleto(const SmartEnupla<Periodo, double>& a_horizonte_completo) {
-	try {
-
-		for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= getMaiorId(IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++) {
-			if (getSizeVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_grau_liberdade) == 0) {
-				SmartEnupla<Periodo, double> grau_liberdade(a_horizonte_completo, getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double()));
-				vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).setVetor_forced(AttVetorVariavelAleatoriaInterna_grau_liberdade, grau_liberdade);
-			} // if (getSizeVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_grau_liberdade) == 0) {
-		} // for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= getMaiorId(IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++) {
-
-	} // try{
-	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::expandirParametrosHorizonteCompleto(a_horizonte_completo): \n" + std::string(erro.what())); }
-} // void VariavelAleatoria::expandirParametrosHorizonteCompleto(const SmartEnupla<Periodo, double>& a_horizonte_completo){
-
 
 double VariavelAleatoria::getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const Periodo a_periodo) const{
 
@@ -1334,7 +1298,7 @@ double VariavelAleatoria::getRealizacaoEspacoAmostral(const IdCenario a_idCenari
 		
 		SmartEnupla<Periodo, double> horizonte_completo;
 
-		const SmartEnupla<Periodo, double> horizonte_tendencia = vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementosMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, Periodo(), double());
+		const SmartEnupla<Periodo, double> horizonte_tendencia = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
 		for(Periodo periodo_tendencia = horizonte_tendencia.getIteradorInicial(); periodo_tendencia <= horizonte_tendencia.getIteradorFinal(); horizonte_tendencia.incrementarIterador(periodo_tendencia))
 			horizonte_completo.addElemento(periodo_tendencia, 0.0);
@@ -1421,7 +1385,7 @@ double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral_recursivo(cons
 
 		SmartEnupla<Periodo, double> tendencia_por_periodo;
 
-		const Periodo periodo_tendencia_final = vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getIterador2Final(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, Periodo());
+		const Periodo periodo_tendencia_final = getIteradorFinal(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo());
 
 		for (int lag = ordem_auto_correlacao; lag >= 1; lag--) {
 
@@ -1452,7 +1416,7 @@ double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral_recursivo(cons
 
 						double valor_realizacao = 0;
 
-						const SmartEnupla<Periodo, double> horizonte_tendencia = vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementosMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, Periodo(), double());
+						const SmartEnupla<Periodo, double> horizonte_tendencia = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
 						const Periodo periodo_tendencia_inicial = horizonte_tendencia.getIteradorInicial();
 
@@ -1466,7 +1430,7 @@ double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral_recursivo(cons
 							if (sobreposicao > 0.0) {
 
 								for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++)
-									valor_realizacao += sobreposicao * (vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo_tendencia, double()) + vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).getElementoVetor(AttVetorVariavelAleatoriaInterna_grau_liberdade, periodo_tendencia, double()));
+									valor_realizacao += sobreposicao * (getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo_tendencia, double()) + getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double()));
 
 								sobreposicao_encontrada = true;
 							}
@@ -1497,21 +1461,17 @@ double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral_recursivo(cons
 } // double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral_recursivo(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo) const{
 
 
-double VariavelAleatoria::getTendenciaTemporalTransformada(const SmartEnupla<IdCenario, IdCenario> a_mapeamento_cenarios_tendencia, const IdCenario a_idCenario, const Periodo a_periodo){
+double VariavelAleatoria::getTendenciaTemporalTransformada(const IdCenario a_idCenario, const Periodo a_periodo){
 
 	try {
 
-		const double tendencia_temporal_transformada = getTendenciaTemporalTransformadaFromVariavelAleatoriaInterna(a_mapeamento_cenarios_tendencia, a_idCenario, a_periodo);
+		const double tendencia_temporal_transformada = getTendenciaTemporalTransformadaFromVariavelAleatoriaInterna(a_idCenario, a_periodo);
 
 		if (!std::isnan(tendencia_temporal_transformada))
 			return tendencia_temporal_transformada;
 
-		if (getSizeMatriz(AttMatrizVariavelAleatoria_tendencia_temporal_transformada) > 0) {
-
-			if (a_mapeamento_cenarios_tendencia.size() > 0)
-				return getElementoMatriz(AttMatrizVariavelAleatoria_tendencia_temporal_transformada, a_mapeamento_cenarios_tendencia.getElemento(a_idCenario), a_periodo, double());
-
-		} // if (getSizeMatriz(AttMatrizVariavelAleatoria_tendencia_temporal_transformada) > 0) {
+		if (getSizeVetor(AttVetorVariavelAleatoria_tendencia_temporal_transformada) > 0)
+			return getElementoVetor(AttVetorVariavelAleatoria_tendencia_temporal_transformada, a_periodo, double());
 
 		if (getSizeMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral) > 0) {
 
@@ -1532,7 +1492,7 @@ double VariavelAleatoria::getTendenciaTemporalTransformada(const SmartEnupla<IdC
 } // double VariavelAleatoria::getTendenciaTemporalTransformada(const IdCenario a_idCenario, const Periodo a_periodo){
 
 
-double VariavelAleatoria::getTendenciaTemporalTransformadaFromVariavelAleatoriaInterna(const SmartEnupla<IdCenario, IdCenario> a_mapeamento_cenarios_tendencia, const IdCenario a_idCenario, const Periodo a_periodo) {
+double VariavelAleatoria::getTendenciaTemporalTransformadaFromVariavelAleatoriaInterna(const IdCenario a_idCenario, const Periodo a_periodo) {
 
 	try {
 
@@ -1544,18 +1504,18 @@ double VariavelAleatoria::getTendenciaTemporalTransformadaFromVariavelAleatoriaI
 
 			tendencia_temporal_interna_encontrada = false;
 
-			if (getSize1Matriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_tendencia_temporal_transformada) > 0) {
-				tendencia_temporal_transformada += getElementoMatriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_tendencia_temporal_transformada, a_mapeamento_cenarios_tendencia.getElemento(a_idCenario), a_periodo, double());
+			if (getSizeVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada) > 0) {
+				tendencia_temporal_transformada += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, a_periodo, double());
 				tendencia_temporal_interna_encontrada = true;
 			}
 
-			if ((!tendencia_temporal_interna_encontrada) && (getSize1Matriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_tendencia_temporal) > 0)) {
-				tendencia_temporal_transformada += getElementoMatriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_tendencia_temporal, a_mapeamento_cenarios_tendencia.getElemento(a_idCenario), a_periodo, double()) + getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_grau_liberdade, a_periodo, double());
+			if ((!tendencia_temporal_interna_encontrada) && (getSizeVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal) > 0)) {
+				tendencia_temporal_transformada += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodo, double()) + getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
 				tendencia_temporal_interna_encontrada = true;
 			}
 
 			if ((!tendencia_temporal_interna_encontrada) && (getSize1Matriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) > 0)) {
-				tendencia_temporal_transformada += getElementoMatriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, a_periodo, double()) + getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_grau_liberdade, a_periodo, double());
+				tendencia_temporal_transformada += getElementoMatriz(idVariavelAleatoriaInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, a_periodo, double()) + getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
 				tendencia_temporal_interna_encontrada = true;
 			}
 
@@ -1772,14 +1732,14 @@ void VariavelAleatoria::setRealizacaoInterna(const IdCenario a_idCenario, const 
 } // void VariavelAleatoria::addRealizacaoInterna(const IdCenario a_idCenario, const Periodo a_periodo){
 
 
-void VariavelAleatoria::setRealizacaoInternaFromTendencia(const IdCenario a_idCenario, const IdCenario a_idCenario_tendencia, const Periodo a_periodo) {
+void VariavelAleatoria::setRealizacaoInternaFromTendencia(const IdCenario a_idCenario, const Periodo a_periodo) {
 
 	try {
 
 		const IdVariavelAleatoriaInterna maiorIdVariavelAleatoria = getMaiorId(IdVariavelAleatoriaInterna());
 
 		for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoria; idVariavelAleatoriaInterna++)
-			vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).setRealizacaoFromTendencia(a_idCenario, a_idCenario_tendencia, a_periodo);
+			vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).setRealizacaoFromTendencia(a_idCenario, a_periodo);
 
 	} // try{
 	catch (const std::exception & erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::setRealizacaoInternaFromTendencia(" + getFullString(a_idCenario) + "," + getFullString(a_periodo) + "): \n" + std::string(erro.what())); }
@@ -1906,3 +1866,23 @@ double VariavelAleatoria::calcularResiduo_lognormal_3p(double a_ruido_correlacio
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::calcularResiduo_lognormal_3p("  + getString(a_ruido_correlacionado) + "," + getString(a_periodo) + "): \n" + std::string(erro.what())); }
 
 } // double VariavelAleatoria::calcularResiduo_lognormal_3p(double a_ruido_correlacionado, const Periodo a_periodo){
+
+double VariavelAleatoria::getGrauLiberdade() {
+
+	try {
+
+		double grau_liberdade = 0.0;
+
+		const IdVariavelAleatoriaInterna maiorIdVariavelAleatoria = getMaiorId(IdVariavelAleatoriaInterna());
+
+		for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoria; idVariavelAleatoriaInterna++) {
+			grau_liberdade += getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
+		}
+
+		return grau_liberdade;
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::getGrauLiberdade(): \n" + std::string(erro.what())); }
+
+
+}

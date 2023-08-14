@@ -303,7 +303,7 @@ void ModeloOtimizacao::imprimirValorPrimalPorEstagioPorCenarioPorRealizacao##Ele
 			return; \
 		a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//" + std::string(#Elem)  + std::string(#Nome) + "_" + std::string(#Nro)); \
 		const std::string nome_arquivo = std::string(std::string(#Elem) + std::string(#Nome) + "_" + std::string(#Nro) + "_primal_" + a_nome_arquivo + ".csv"); \
-		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(##Nro, vlrP_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS))); \
+		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(12, vlrP_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS))); \
 		vlrP_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS) = \
 		Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>();\
 	} \
@@ -315,7 +315,7 @@ void ModeloOtimizacao::imprimirValorDualPorEstagioPorCenarioPorRealizacao##Elem#
 			return; \
 		a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//" + std::string(#Elem)  + std::string(#Nome) + "_" + std::string(#Nro)); \
 		const std::string nome_arquivo = std::string(std::string(#Elem) + std::string(#Nome) + "_" + std::string(#Nro) + "_dual_" + a_nome_arquivo + ".csv"); \
-		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(##Nro, vlrD_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS))); \
+		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(12, vlrD_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS))); \
 		vlrD_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS) = \
 		Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>();\
 	} \

@@ -674,6 +674,8 @@ struct Atributo##Classe##_Struct{\
 \
 	virtual bool   addElemento(const IdEstagio			 a_iterador1, const Periodo             a_iterador2, const double              a_valor)      { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addAtributo(): \nEstrutura de dados nao definida."); return false; }; \
 \
+	virtual bool   addElemento(const IdEstagio			 a_iterador1, const Periodo             a_iterador2, const int                a_valor)      { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addAtributo(): \nEstrutura de dados nao definida."); return false; }; \
+\
 	virtual bool   addElemento(const IdEstagio			 a_iterador1, const IdRealizacao         a_iterador2, const double              a_valor)      { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addAtributo(): \nEstrutura de dados nao definida."); return false; }; \
 \
 	virtual bool   addElemento(const IdEstagio			 a_iterador1, const IdRealizacao         a_iterador2, const int              a_valor)      { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addAtributo(): \nEstrutura de dados nao definida."); return false; }; \
@@ -736,6 +738,8 @@ struct Atributo##Classe##_Struct{\
 	virtual bool   setElemento(const Periodo             a_iterador1, const IdNo                a_iterador2, const IdNo           a_valor)      { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setAtributo(): \nEstrutura de dados nao definida."); return false; }; \
 \
 	virtual bool   setElemento(const Periodo             a_iterador1, const IdNo                a_iterador2, const double         a_valor)      { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setAtributo(): \nEstrutura de dados nao definida."); return false; }; \
+\
+	virtual bool   setElemento(const IdEstagio           a_iterador1, const Periodo             a_iterador2, const int         a_valor)      { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setAtributo(): \nEstrutura de dados nao definida."); return false; }; \
 \
 	virtual bool   setElemento(const IdEstagio           a_iterador1, const Periodo             a_iterador2, const double         a_valor)      { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setAtributo(): \nEstrutura de dados nao definida."); return false; }; \
 \
@@ -804,6 +808,8 @@ struct Atributo##Classe##_Struct{\
 \
 	virtual bool   setElementos(const IdEstagio           a_iterador1, const SmartEnupla<Periodo,             double> &a_valor)      { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setAtributo(): \nEstrutura de dados nao definida."); return false; }; \
 \
+	virtual bool   setElementos(const IdEstagio           a_iterador1, const SmartEnupla<Periodo,             int> &a_valor)      { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setAtributo(): \nEstrutura de dados nao definida."); return false; }; \
+\
 	virtual bool   setElementos(const IdEstagio           a_iterador1, const SmartEnupla<IdRealizacao,         double> &a_valor)      { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setAtributo(): \nEstrutura de dados nao definida."); return false; }; \
 \
 	virtual bool   setElementos(const IdEstagio           a_iterador1, const SmartEnupla<IdRealizacao,         int> &a_valor)      { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setAtributo(): \nEstrutura de dados nao definida."); return false; }; \
@@ -868,6 +874,8 @@ struct Atributo##Classe##_Struct{\
 	virtual double         getElementoMatriz(const Periodo             a_iterador1, const IdNo                a_iterador2, const double           a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getAtributo(): \nEstrutura de dados nao definida.");}; \
 \
 	virtual double         getElementoMatriz(const IdEstagio           a_iterador1, const Periodo             a_iterador2, const double           a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getAtributo(): \nEstrutura de dados nao definida.");}; \
+\
+	virtual int            getElementoMatriz(const IdEstagio           a_iterador1, const Periodo             a_iterador2, const int           a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getAtributo(): \nEstrutura de dados nao definida.");}; \
 \
 	virtual int            getElementoMatriz(const IdEstagio           a_iterador1, const IdRealizacao        a_iterador2, const int              a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getAtributo(): \nEstrutura de dados nao definida.");}; \
 \
@@ -1074,6 +1082,8 @@ struct Atributo##Classe##_Struct{\
 \
 	virtual SmartEnupla<Periodo,             double> getElementosMatriz(const IdEstagio           a_iterador1, const Periodo             a_iterador2, const double         a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getAtributo(): \nEstrutura de dados nao definida.");}; \
 \
+	virtual SmartEnupla<Periodo,             int> getElementosMatriz(const IdEstagio           a_iterador1, const Periodo             a_iterador2, const int         a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getAtributo(): \nEstrutura de dados nao definida.");}; \
+\
 	virtual SmartEnupla<IdRealizacao,         double> getElementosMatriz(const IdEstagio           a_iterador1, const IdRealizacao         a_iterador2, const double         a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getAtributo(): \nEstrutura de dados nao definida.");}; \
 \
 	virtual SmartEnupla<IdRealizacao,         int> getElementosMatriz(const IdEstagio           a_iterador1, const IdRealizacao         a_iterador2, const int         a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getAtributo(): \nEstrutura de dados nao definida.");}; \
@@ -1138,6 +1148,8 @@ struct Atributo##Classe##_Struct{\
 	virtual double* getReferenciaElementosMatriz(const Periodo             a_iterador1, const IdNo                a_iter2_ini, const IdNo a_iter2_fim, const double a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getReferenciaElementosMatriz(): \nEstrutura de dados nao definida.");}; \
 \
 	virtual double* getReferenciaElementosMatriz(const IdEstagio           a_iterador1, const Periodo             a_iter2_ini, const Periodo a_iter2_fim, const double         a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getReferenciaElementosMatriz(): \nEstrutura de dados nao definida.");}; \
+\
+	virtual int* getReferenciaElementosMatriz(const IdEstagio           a_iterador1, const Periodo             a_iter2_ini, const Periodo a_iter2_fim, const int         a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getReferenciaElementosMatriz(): \nEstrutura de dados nao definida.");}; \
 \
 	virtual double* getReferenciaElementosMatriz(const IdEstagio           a_iterador1, const IdRealizacao         a_iter2_ini, const IdRealizacao a_iter2_fim, const double         a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getReferenciaElementosMatriz(): \nEstrutura de dados nao definida.");}; \
 \
@@ -1204,6 +1216,8 @@ struct Atributo##Classe##_Struct{\
 \
 	virtual bool setMatriz(const SmartEnupla<IdEstagio,           SmartEnupla<Periodo,             double>> &a_matriz){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setMatriz(): \nEstrutura de dados nao definida."); return false; }; \
 \
+	virtual bool setMatriz(const SmartEnupla<IdEstagio,           SmartEnupla<Periodo,             int>> &a_matriz){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setMatriz(): \nEstrutura de dados nao definida."); return false; }; \
+\
 	virtual bool setMatriz(const SmartEnupla<IdEstagio,           SmartEnupla<IdRealizacao,         double>> &a_matriz){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setMatriz(): \nEstrutura de dados nao definida."); return false; }; \
 \
 	virtual bool setMatriz(const SmartEnupla<IdEstagio,           SmartEnupla<IdRealizacao,         int>> &a_matriz){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setMatriz(): \nEstrutura de dados nao definida."); return false; }; \
@@ -1269,6 +1283,8 @@ struct Atributo##Classe##_Struct{\
 \
 	virtual bool setMatriz_forced(const SmartEnupla<IdEstagio,           SmartEnupla<Periodo,             double>> &a_matriz){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setMatriz_forced(): \nEstrutura de dados nao definida."); return false; }; \
 \
+	virtual bool setMatriz_forced(const SmartEnupla<IdEstagio,           SmartEnupla<Periodo,             int>> &a_matriz){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setMatriz_forced(): \nEstrutura de dados nao definida."); return false; }; \
+\
 	virtual bool setMatriz_forced(const SmartEnupla<IdEstagio,           SmartEnupla<IdRealizacao,         double>> &a_matriz){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setMatriz_forced(): \nEstrutura de dados nao definida."); return false; }; \
 \
 	virtual bool setMatriz_forced(const SmartEnupla<IdEstagio,           SmartEnupla<IdRealizacao,         int>> &a_matriz){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setMatriz_forced(): \nEstrutura de dados nao definida."); return false; }; \
@@ -1333,6 +1349,8 @@ struct Atributo##Classe##_Struct{\
 	virtual SmartEnupla<Periodo,             SmartEnupla<IdNo,                double>> getMatriz(const Periodo             a_iterador1, const IdNo                a_iterador2, const double         a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getMatriz(): \nEstrutura de dados nao definida.");}; \
 \
 	virtual SmartEnupla<IdEstagio,           SmartEnupla<Periodo,             double>> getMatriz(const IdEstagio           a_iterador1, const Periodo             a_iterador2, const double         a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getMatriz(): \nEstrutura de dados nao definida.");}; \
+\
+	virtual SmartEnupla<IdEstagio,           SmartEnupla<Periodo,             int>> getMatriz(const IdEstagio           a_iterador1, const Periodo             a_iterador2, const int         a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getMatriz(): \nEstrutura de dados nao definida.");}; \
 \
 	virtual SmartEnupla<IdEstagio,           SmartEnupla<IdRealizacao,         double>> getMatriz(const IdEstagio          a_iterador1, const IdRealizacao         a_iterador2, const double         a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getMatriz(): \nEstrutura de dados nao definida.");}; \
 \

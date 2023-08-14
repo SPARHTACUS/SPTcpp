@@ -461,7 +461,7 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 
 				a_dados.setAtributo(AttComumDados_tipo_modelo_geracao_cenario_hidrologico, TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal);
 
-				a_dados.setAtributo(AttComumDados_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental_truncamento);
+				a_dados.setAtributo(AttComumDados_relaxar_afluencia_incremental_com_viabilidade_hidraulica, true);
 
 				a_dados.setAtributo(AttComumDados_imprimir_espaco_amostral_geracao_cenario_hidrologico, true);
 				a_dados.setAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, true);
@@ -6081,7 +6081,7 @@ void LeituraCEPEL::leitura_VAZPAST_201908_NW25(Dados& a_dados, std::string nomeA
 					try {
 
 						for (Periodo periodo = periodo_inicial_tendencia; periodo <= periodo_final_tendencia; periodo++)
-							a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).addElemento(AttMatrizAfluencia_natural_tendencia, IdCenario_1, periodo, afluencia_tendencia_mensal.at(periodo.getMes()));
+							a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_natural_tendencia, periodo, afluencia_tendencia_mensal.at(periodo.getMes()));
 
 					}
 					catch (const std::exception & erro) { 

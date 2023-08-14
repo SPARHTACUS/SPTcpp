@@ -342,7 +342,7 @@ void LeituraCEPEL::InstanciaProcessoEstocastico(Dados& a_dados, SmartEnupla<Peri
 		a_dados.setAtributo(AttComumDados_tipo_metodo_solucao, IdMetodoSolucao_MILP);
 		a_dados.setAtributo(AttComumDados_tipo_espaco_amostral_geracao_cenario_hidrologico, TipoEspacoAmostral_arvore_cenarios);
 		a_dados.setAtributo(AttComumDados_tipo_estudo, TipoEstudo_otimizacao);
-		a_dados.setAtributo(AttComumDados_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental_sem_relaxacao);
+		a_dados.setAtributo(AttComumDados_relaxar_afluencia_incremental_com_viabilidade_hidraulica, false);
 		a_dados.setAtributo(AttComumDados_tipo_correlacao_geracao_cenario_hidrologico, TipoCorrelacaoVariaveisAleatorias_sem_correlacao);
 
 		a_dados.setVetor(AttVetorDados_numero_aberturas, SmartEnupla<IdEstagio, int>(IdEstagio_1, std::vector<int>(IdEstagio_1, 1)));
@@ -385,14 +385,14 @@ void LeituraCEPEL::InstanciaProcessoEstocastico(Dados& a_dados, SmartEnupla<Peri
 
 			Periodo periodo_inicial = a_horizonte_estudo.getIteradorInicial();
 
-			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_grau_liberdade, periodo_inicial, 0.0);
+			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).setAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, 0.0);
 
 			if (a_dados.getSize1Matriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental) > 0) {
 				for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); (periodo = periodo + 48)) {
 					//a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).addElemento(AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(periodo.getDia(), periodo.getMes(), periodo.getAno()), IdRealizacao_1, a_dados.getElementoMatriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental, IdCenario_1, getPeriodoInicialResticao(periodo, a_horizonte_estudo), double()));
 					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario_1,  Periodo(periodo.getDia(), periodo.getMes(), periodo.getAno()), a_dados.getElementoMatriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental, IdCenario_1, getPeriodoInicialResticao(periodo, a_horizonte_estudo), double()));
-					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, Periodo(periodo.getDia(), periodo.getMes(), periodo.getAno()), a_dados.getElementoMatriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental, IdCenario_1, getPeriodoInicialResticao(periodo, a_horizonte_estudo), double()));
-
+					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(periodo.getDia(), periodo.getMes(), periodo.getAno()), a_dados.getElementoMatriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental, IdCenario_1, getPeriodoInicialResticao(periodo, a_horizonte_estudo), double()));
+					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).addElemento(AttVetorVariavelAleatoria_tipo_relaxacao, periodo, TipoRelaxacaoVariavelAleatoria_sem_relaxacao);
 					//if (preencher_horizonte) {
 					//	a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo(periodo.getDia(), periodo.getMes(), periodo.getAno()), IdRealizacao_1);
 					//}

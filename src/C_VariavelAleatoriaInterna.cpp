@@ -111,18 +111,14 @@ void VariavelAleatoriaInterna::deslocarTendenciaComGrauLiberdade(){
 
 	try {
 
-		SmartEnupla<IdCenario, SmartEnupla<Periodo, double>> tendencias = getMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal_transformada, IdCenario(), Periodo(), double());
+		SmartEnupla<Periodo, double> tendencias = getVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, Periodo(), double());
 
 		const double grau_liberdade = getAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, double());
 
-		const IdCenario cenario_final = getIterador1Final(AttMatrizVariavelAleatoriaInterna_tendencia_temporal_transformada, IdCenario());
-
 		double grau_liberdade_final = grau_liberdade;
-		for (IdCenario idCenario = IdCenario_1; idCenario <= cenario_final; idCenario++) {
-			const double grau_liberdade_cenario = deslocarComGrauLiberdade(tendencias.at(idCenario), grau_liberdade_final);
-			if (grau_liberdade_cenario > grau_liberdade_final)
-				grau_liberdade_final = grau_liberdade_cenario;
-		} // for (IdCenario idCenario = IdCenario_1; idCenario <= cenario_final; idCenario++) {
+			const double grau_liberdade_tendencia = deslocarComGrauLiberdade(tendencias, grau_liberdade_final);
+			if (grau_liberdade_tendencia > grau_liberdade_final)
+				grau_liberdade_final = grau_liberdade_tendencia;
 
 		// Em caso de diferença, uma nova transformação das tendencias é procedida de maneira a garantir 
 		// que todos os cenarios sejam deslocados com o mesmo grau de liberdade: grau_liberdade_final.
@@ -133,7 +129,7 @@ void VariavelAleatoriaInterna::deslocarTendenciaComGrauLiberdade(){
 		} // if (grau_liberdade_final > grau_liberdade) {
 
 		else if (grau_liberdade_final == grau_liberdade)
-			setMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal_transformada, tendencias);
+			setVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, tendencias);
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoriaInterna(" + getString(getIdObjeto()) + ")::deslocarTendenciaComGrauLiberdade(): \n" + std::string(erro.what())); }
@@ -286,7 +282,7 @@ double VariavelAleatoriaInterna::calcularRealizacao(const double a_realizacao_va
 
 	try{
 
-		const double realizacao_interna = a_realizacao_variavel_aleatoria * getElementoVetor(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, a_periodo, double()) - getElementoVetor(AttVetorVariavelAleatoriaInterna_grau_liberdade, a_periodo, double());
+		const double realizacao_interna = a_realizacao_variavel_aleatoria * getElementoVetor(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, a_periodo, double()) - getAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, double());
 
 		return realizacao_interna;
 
@@ -300,7 +296,7 @@ double VariavelAleatoriaInterna::calcularRealizacaoVariavelAleatoriaParaValor(co
 
 	try {
 
-		const double realizacao_variavel_aleatoria = (a_realizacao_variavel_aleatoria_interna + getElementoVetor(AttVetorVariavelAleatoriaInterna_grau_liberdade, a_periodo, double())) / getElementoVetor(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, a_periodo, double());
+		const double realizacao_variavel_aleatoria = (a_realizacao_variavel_aleatoria_interna + getAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, double())) / getElementoVetor(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, a_periodo, double());
 
 		return realizacao_variavel_aleatoria;
 
@@ -334,12 +330,12 @@ void VariavelAleatoriaInterna::setRealizacao(const double a_realizacao_variavel_
 } // void VariavelAleatoriaInterna::addRealizacao(const double a_realizacao_variavel_aleatoria, const IdCenario a_idCenario, const Periodo a_periodo){
 
 
-void VariavelAleatoriaInterna::setRealizacaoFromTendencia(const IdCenario a_idCenario, const IdCenario a_idCenario_tendencia, const Periodo a_periodo) {
+void VariavelAleatoriaInterna::setRealizacaoFromTendencia(const IdCenario a_idCenario, const Periodo a_periodo) {
 
 	try {
 
-		if (getSizeMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal) > 0)
-			setElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, a_periodo, getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, a_idCenario_tendencia, a_periodo, double()));
+		if (getSizeVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal) > 0)
+			setElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, a_periodo, getElementoVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodo, double()));
 
 	} // try{
 	catch (const std::exception & erro) { throw std::invalid_argument("VariavelAleatoriaInterna(" + getString(getIdObjeto()) + ")::setRealizacaoFromTendencia(" + getFullString(a_idCenario) + "," + getFullString(a_periodo) + "): \n" + std::string(erro.what())); }

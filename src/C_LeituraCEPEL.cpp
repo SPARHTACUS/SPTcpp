@@ -698,9 +698,9 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 
 			}
 
-			int numero_cenarios_tendencia_hidrologica_natural = 0;
-			int numero_cenarios_tendencia_hidrologica_incremental = 0;
 
+			bool tendencia_natural = false;
+			bool tendencia_incremental = false;
 			if (a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).size() > 0) {
 
 				Periodo periodo_final_tendencia = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, IdEstagio_1, Periodo());
@@ -709,46 +709,28 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 
 					if (a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.isInstanciado(IdAfluencia_vazao_afluente)) {
 
-						if ((a_dados.getSize1Matriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental_tendencia) > 0) && (numero_cenarios_tendencia_hidrologica_incremental == 0)) {
-							numero_cenarios_tendencia_hidrologica_incremental = int(a_dados.getIterador1Final(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental_tendencia, IdCenario()));
-							periodo_final_tendencia = a_dados.getIterador2Final(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental_tendencia, IdCenario_1, Periodo());
+						if (a_dados.getSizeVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_tendencia) > 0) {
+							periodo_final_tendencia = a_dados.getIteradorFinal(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_tendencia, Periodo());
+							tendencia_incremental = true;
 						}
-						else if ((a_dados.getSize1Matriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental_tendencia) == 0) && (numero_cenarios_tendencia_hidrologica_incremental > 0))
-							throw std::invalid_argument("Atributo " + getFullString(AttMatrizAfluencia_incremental_tendencia) + " nao informado em " + getFullString(idHidreletrica) + ".");
 
-						else if ((a_dados.getSize1Matriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_natural_tendencia) > 0) && (numero_cenarios_tendencia_hidrologica_natural == 0)) {
-							numero_cenarios_tendencia_hidrologica_natural = int(a_dados.getIterador1Final(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_natural_tendencia, IdCenario()));
-							periodo_final_tendencia = a_dados.getIterador2Final(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_natural_tendencia, IdCenario_1, Periodo());
+						else if (a_dados.getSizeVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia) > 0) {
+							periodo_final_tendencia = a_dados.getIteradorFinal(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia, Periodo());
+							tendencia_natural = true;
 						}
-						else if ((a_dados.getSize1Matriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_natural_tendencia) == 0) && (numero_cenarios_tendencia_hidrologica_natural > 0))
-							throw std::invalid_argument("Atributo " + getFullString(AttMatrizAfluencia_natural_tendencia) + " nao informado em " + getFullString(idHidreletrica) + ".");
+						
 
 					} // if (a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.isInstanciado(IdAfluencia_vazao_afluente)) {
 
 				} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
 
-
-				int numero_cenarios_tendencia_hidrologica = 0;
-
-				if ((numero_cenarios_tendencia_hidrologica_natural > 0) && (numero_cenarios_tendencia_hidrologica_incremental > 0))
-					throw std::invalid_argument("Apenas um dos atributos " + getFullString(AttMatrizAfluencia_incremental_tendencia) + " e " + getFullString(AttMatrizAfluencia_natural_tendencia) + " deve ser informado na pre configuracao.");
-
-				else if (numero_cenarios_tendencia_hidrologica_natural > 0)
-					numero_cenarios_tendencia_hidrologica = numero_cenarios_tendencia_hidrologica_natural;
-
-				else if (numero_cenarios_tendencia_hidrologica_incremental > 0)
-					numero_cenarios_tendencia_hidrologica = numero_cenarios_tendencia_hidrologica_incremental;
-
-				if (numero_cenarios_tendencia_hidrologica > 0) {
+				if (tendencia_natural && tendencia_incremental)
+					throw std::invalid_argument("Apenas um tipo de tendencia deve ser instnciado. Natural ou incremental.");
+				else if (tendencia_natural || tendencia_incremental){
 
 					tendenciaPreConfig_instanciadas = true;
 
 					a_dados.setAtributo(AttComumDados_tipo_tendencia_hidrologica, TipoTendenciaEstocastica_serie_informada);
-
-					a_dados.setAtributo(AttComumDados_numero_cenarios_tendencia_hidrologica, numero_cenarios_tendencia_hidrologica);
-
-					if (!dadosPreConfig_instanciados)
-						a_dados.setAtributo(AttComumDados_numero_cenarios, numero_cenarios_tendencia_hidrologica * a_dados.getAtributo(AttComumDados_numero_maximo_iteracoes, int()));
 
 					bool sobreposicao = false;
 					IdEstagio estagio_acoplamento_pre_estudo = IdEstagio_1;
@@ -766,7 +748,7 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 
 					a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, estagio_acoplamento_pre_estudo);
 
-				} // if (numero_cenarios_tendencia_hidrologica > 0) {
+				} // else if (tendencia_natural || tendencia_incremental){
 
 			}////if (a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).size() > 0) {
 

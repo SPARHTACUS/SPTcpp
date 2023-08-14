@@ -12,16 +12,16 @@
 #define ATT_VETOR_AFLUENCIA(m)  \
 	  m(Afluencia,  AttVetor,          media_mensal_longo_termo,        int,          0,          max,             0,  IdMes)     \
 	  m(Afluencia,  AttVetor,                 natural_historico,     double,        min,          max,             0,  Periodo)   \
-	  m(Afluencia,  AttVetor,             incremental_historico,     double,        min,          max,             0,  Periodo) 
+	  m(Afluencia,  AttVetor,             incremental_historico,     double,        min,          max,             0,  Periodo) \
+	  m(Afluencia,  AttVetor,                 natural_tendencia,     double,        min,          max,             0,  Periodo) \
+	  m(Afluencia,  AttVetor,             incremental_tendencia,     double,        min,          max,             0,  Periodo) 
 //       c_classe,   smrtAtt,                      nomeAtributo,       Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 
 #define ATT_MATRIZ_AFLUENCIA(m)  \
 	  m(Afluencia,  AttMatriz,                   natural,     double,          0,          max,             0,  IdCenario, Periodo) \
 	  m(Afluencia,  AttMatriz,               incremental,     double,          0,          max,             0,  IdCenario, Periodo) \
-	  m(Afluencia,  AttMatriz,              regularizada,     double,          0,          max,             0,  IdCenario, Periodo) \
-	  m(Afluencia,  AttMatriz,         natural_tendencia,     double,        min,          max,             0,  IdCenario, Periodo) \
-	  m(Afluencia,  AttMatriz,     incremental_tendencia,     double,        min,          max,             0,  IdCenario, Periodo) 
+	  m(Afluencia,  AttMatriz,              regularizada,     double,          0,          max,             0,  IdCenario, Periodo) 
 //       c_classe,   smrtAtt,               nomeAtributo,       Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 
