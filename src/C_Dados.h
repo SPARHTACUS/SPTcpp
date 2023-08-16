@@ -336,8 +336,6 @@ public:
 
 	void instanciaCotaJusanteUsinaJusante();
 
-	void defineHidreletricasMontanteNaCascataENA();
-
 	void carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados);
 
 	void carregarArquivosEntrada_TERMELETRICA_COMANDO(EntradaSaidaDados& a_entradaSaidaDados, bool a_carregar_pre_comando, bool a_carregar_comando);
