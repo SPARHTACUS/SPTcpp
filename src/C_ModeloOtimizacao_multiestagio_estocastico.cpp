@@ -7179,7 +7179,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(c
 
 	try {
 
-		if ((!vetorEstagio.att(a_idEstagio).isSolverInstanciado(a_TSS)) && (a_TSS == TipoSubproblemaSolver_mestre))
+		if ((!vetorEstagio.att(a_idEstagio).isSolverInstanciado(a_TSS)) || (a_TSS == TipoSubproblemaSolver_mestre))
 			return -1;
 
 		const IdEstagio menor_estagio = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
@@ -7325,7 +7325,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(c
 
 
 
-int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo_lag, const double a_grau_liberdade, std::vector<IdHidreletrica> a_listaIdHidreletrica){
+int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo_lag, const double a_grau_liberdade, std::vector<IdHidreletrica> a_listaIdHidreletrica) {
 
 	try {
 
@@ -7354,7 +7354,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 		const IdProcessoEstocastico idProcessoEstocastico_modelo = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
 
 		int varYP = -1;
-		
+
 		std::vector<IdVariavelAleatoria> idVarEquiv;
 		std::vector<std::vector<IdVariavelAleatoriaInterna>> idVarIntEquiv;
 
@@ -7504,7 +7504,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 
 					} // for (int i = 0; i < int(a_listaIdHidreletrica.size()); i++) {
 
-					rhs_equYP += (a_grau_liberdade) * sobreposicao;
+					rhs_equYP += (a_grau_liberdade)*sobreposicao;
 
 					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equYP, rhs_equYP);
 
@@ -7545,12 +7545,12 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 				// Variáveis de estado a repassar lag
 				if (sobreposicao_periodo_otimizacao == 0.0)
 					vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_YP(a_TSS, a_idEstagio, a_periodo, a_idProcessoEstocastico, a_idVariavelAleatoria, a_periodo_lag) + "," + getString(a_grau_liberdade) + "," + getStringFromLista(a_listaIdHidreletrica, ",", false)), varYP, varYP_anterior);
-				
+
 				// Variáveis de estado a compor lag
 				else if (sobreposicao_periodo_otimizacao > 0.0) {
 					const int varYP_ADD = addVarDecisao_YP_ADD(a_TSS, a_idEstagio, a_periodo, a_idProcessoEstocastico, a_idVariavelAleatoria, a_periodo_lag, -infinito, infinito, 0.0);
 					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP_ADD, equYP, -1.0);
-					vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_YP(a_TSS, a_idEstagio, a_periodo, a_idProcessoEstocastico, a_idVariavelAleatoria, a_periodo_lag) + "," + getString(a_grau_liberdade) + "," + getStringFromLista(a_listaIdHidreletrica, ",", false)), varYP_ADD, varYP_anterior);			
+					vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_YP(a_TSS, a_idEstagio, a_periodo, a_idProcessoEstocastico, a_idVariavelAleatoria, a_periodo_lag) + "," + getString(a_grau_liberdade) + "," + getStringFromLista(a_listaIdHidreletrica, ",", false)), varYP_ADD, varYP_anterior);
 				}
 
 			} // if ((varYP_anterior > -1) || ((idEstagio_anterior == menor_estagio) && (periodo_inicial_proc_estoc_hidrologico > a_idVariavelAleatoria))) {
@@ -7562,6 +7562,187 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_dados," + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getString(a_periodo) + "," + getFullString(a_idProcessoEstocastico) + "," + getFullString(a_idVariavelAleatoria) + "," + getString(a_periodo_lag) + "," + getString(a_grau_liberdade) + "): \n" + std::string(erro.what())); }
 
 }
+
+int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdPatamarCarga a_idPatamarCarga, const IdTermeletrica a_idTermeletrica, const double a_potencia_disponivel_minima, const double a_potencia_disponivel_maxima) {
+
+	try {
+
+		if ((!vetorEstagio.att(a_idEstagio).isSolverInstanciado(a_TSS)) || (a_TSS == TipoSubproblemaSolver_mestre) || (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica))
+			return -1;
+
+		const IdEstagio menor_estagio = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
+
+		if (a_idEstagio < menor_estagio)
+			return -1;
+
+		const int lag_mensal_potencia_comandada = a_dados.getAtributo(a_idTermeletrica, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int());
+		if (lag_mensal_potencia_comandada == 0)
+			throw std::invalid_argument(getFullString(a_idTermeletrica) + " com atributo " + getFullString(AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada) + " igual a zero.");
+
+		// Quando patamar é inexistente, cria-se PTDISPCOMLAG recursivamente
+		if (a_idPatamarCarga == IdPatamarCarga_Nenhum) {
+
+			const Periodo periodo_comando_minuto = Periodo(TipoPeriodo_minuto, a_periodo);
+			const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
+
+			if (periodo_comando_minuto < periodo_otimizacao)
+				return -1;
+
+			int varPTDISPCOM = getVarDecisao_PTDISPCOMLAGseExistir(a_TSS, a_idEstagio, a_periodo, a_idTermeletrica);
+
+			if (varPTDISPCOM == -1)
+				varPTDISPCOM = addVarDecisao_PTDISPCOMLAG(a_TSS, a_idEstagio, a_periodo, a_idTermeletrica, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+
+			const int varPTDISPCOM_anterior = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, IdEstagio(a_idEstagio - 1), a_periodo, a_idPatamarCarga, a_idTermeletrica, a_potencia_disponivel_minima, a_potencia_disponivel_maxima);
+
+			if (varPTDISPCOM_anterior == -1) {
+				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPTDISPCOM, a_potencia_disponivel_minima);
+				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varPTDISPCOM, a_potencia_disponivel_maxima);
+			}
+
+			vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_PTDISPCOMLAG(a_TSS, a_idEstagio, a_periodo, a_idTermeletrica) + "," + getString(a_potencia_disponivel_minima) + "," + getString(a_potencia_disponivel_maxima)), varPTDISPCOM, varPTDISPCOM_anterior);
+
+			return varPTDISPCOM;
+
+		} // if (a_idPatamarCarga == IdPatamarCarga_Nenhum) {
+
+		// Quando patamar é existente, cria-se PTDISPCOMLAG_pat e PTDISPCOMLAG recursivamente (caso necessário)
+
+		int varPTDISPCOM_pat = getVarDecisao_PTDISPCOM_NEWseExistir(a_TSS, a_idEstagio, a_periodo, a_idPatamarCarga, a_idTermeletrica);
+		if (varPTDISPCOM_pat > -1)
+			return varPTDISPCOM_pat;
+
+		varPTDISPCOM_pat = addVarDecisao_PTDISPCOM_NEW(a_TSS, a_idEstagio, a_periodo, a_idPatamarCarga, a_idTermeletrica, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+
+		// Verifica incidencia de pré comando em dados de entrada
+		Periodo ultimo_periodo_sobreposicao;
+		double sobreposicao_acumulada = 0.0;
+		if (a_dados.getSize1Matriz(a_idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada) > 0) {
+
+			const Periodo periodo_inicial_potencia_disponivel_comandada = a_dados.getIterador1Inicial(a_idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
+			const Periodo periodo_final_potencia_disponivel_comandada = a_dados.getIterador1Final(a_idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
+
+			if (((periodo_inicial_potencia_disponivel_comandada <= a_periodo) || (periodo_inicial_potencia_disponivel_comandada.sobreposicao(a_periodo) > 0.0)) && \
+				((periodo_final_potencia_disponivel_comandada >= a_periodo) || (periodo_final_potencia_disponivel_comandada.sobreposicao(a_periodo) > 0.0))) {
+
+				const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> horizonte_potencia_disponivel_comandada = a_dados.getMatriz(a_idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo(), IdPatamarCarga(), double());
+				for (Periodo periodo = periodo_inicial_potencia_disponivel_comandada; periodo <= periodo_final_potencia_disponivel_comandada; horizonte_potencia_disponivel_comandada.incrementarIterador(periodo)) {
+
+					const double sobreposicao = a_periodo.sobreposicao(periodo);
+
+					if (sobreposicao > 0.0) {
+
+						ultimo_periodo_sobreposicao = periodo;
+						const double potencia_disponivel_comandada = horizonte_potencia_disponivel_comandada.at(periodo).at(a_idPatamarCarga);
+
+						// Com sobreposicao ~exata, restrição POTENCIA_TERMICA_DISPONIVEL_COMANDADA_pat não é criada
+						if (doubleCompara(1e-6, sobreposicao, 1.0)) {
+							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPTDISPCOM_pat, potencia_disponivel_comandada);
+							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varPTDISPCOM_pat, potencia_disponivel_comandada);
+							return varPTDISPCOM_pat;
+						}
+
+						int equPTDISPCOM_pat = getEquLinear_POTENCIA_TERMICA_DISPONIVEL_COMANDADAseExistir(a_TSS, a_idEstagio, a_periodo, a_idPatamarCarga, a_idTermeletrica);
+
+						if (equPTDISPCOM_pat == -1) {
+							equPTDISPCOM_pat = addEquLinear_POTENCIA_TERMICA_DISPONIVEL_COMANDADA(a_TSS, a_idEstagio, a_periodo, a_idPatamarCarga, a_idTermeletrica);
+							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_pat, equPTDISPCOM_pat, 1.0);
+						}
+
+						int varPTDISPPRECOM_pat = addVarDecisao_PTDISPPRECOM(a_TSS, a_idEstagio, a_periodo, a_idPatamarCarga, a_idTermeletrica, potencia_disponivel_comandada, potencia_disponivel_comandada, 0.0);
+
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPPRECOM_pat, equPTDISPCOM_pat, -sobreposicao);
+
+						sobreposicao_acumulada += sobreposicao;
+
+						if (doubleCompara(1e-6, sobreposicao_acumulada, 1.0))
+							return varPTDISPCOM_pat;
+
+					}
+					else if ((sobreposicao == 0.0) && (sobreposicao_acumulada > 0.0))
+						break;
+
+				} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+			}
+		} // if (a_dados.getSize1Matriz(a_idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada) > 0) {
+
+		// Cria-se PTDISPCOMLAG recursivamente para complementar PTDISPCOMLAG_pat
+
+		Periodo periodo_complementar_inicio = Periodo(TipoPeriodo_minuto, a_periodo);
+
+		if (periodo_complementar_inicio < 1.0)
+			periodo_complementar_inicio = Periodo(TipoPeriodo_minuto, ultimo_periodo_sobreposicao + 1);
+
+		const Periodo periodo_complementar_final = Periodo(TipoPeriodo_minuto, a_periodo + 1) - 1;
+
+		const IdMes idMes_inicio = periodo_complementar_inicio.getMes();
+		const IdMes idMes_final = periodo_complementar_final.getMes();
+		const IdAno idAno_inicio = periodo_complementar_inicio.getAno();
+		const IdAno idAno_final = periodo_complementar_final.getAno();
+
+		double sobreposicao_complementar = 1.0 - sobreposicao_acumulada;
+
+		// Verifica se periodo complementar engloba um único mês (maxima performance)
+		if ((idMes_inicio == idMes_final) && (idAno_inicio == idAno_final)) {
+
+			const Periodo periodo_comando = Periodo(idMes_inicio, idAno_inicio);
+
+			const int varPTDISPCOM = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, a_idEstagio, periodo_comando, IdPatamarCarga_Nenhum, a_idTermeletrica, a_potencia_disponivel_minima, a_potencia_disponivel_maxima);
+
+			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM, getEquLinear_POTENCIA_TERMICA_DISPONIVEL_COMANDADA(a_TSS, a_idEstagio, a_periodo, a_idPatamarCarga, a_idTermeletrica), -sobreposicao_complementar);
+
+			return varPTDISPCOM_pat;
+
+		} // if ((idMes_inicio == idMes_final) && (idAno_inicio == idAno_final)) {
+
+		// Verificacao generica do periodo complementar (performance depende do tamanho do período complementar)
+		int contador_minuto = 1;
+		IdMes idMes_ultimo = idMes_inicio;
+		IdAno idAno_ultimo = idAno_inicio;
+		for (Periodo periodo = periodo_complementar_inicio; periodo <= periodo_complementar_final + 1; periodo++) {
+
+			const IdMes idMes = periodo.getMes();
+			const IdAno idAno = periodo.getAno();
+
+			if ((idMes != idMes_ultimo) || (idAno != idAno_ultimo)) {
+
+				const double parcela_sobreposicao_complementar = double(contador_minuto)  / double(a_periodo.getMinutos());
+
+				const Periodo periodo_comando = Periodo(idMes_ultimo, idAno_ultimo);
+
+				const int varPTDISPCOM = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, a_idEstagio, periodo_comando, IdPatamarCarga_Nenhum, a_idTermeletrica, a_potencia_disponivel_minima, a_potencia_disponivel_maxima);
+
+				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM, getEquLinear_POTENCIA_TERMICA_DISPONIVEL_COMANDADA(a_TSS, a_idEstagio, a_periodo, a_idPatamarCarga, a_idTermeletrica), -sobreposicao_complementar);
+
+				sobreposicao_complementar -= parcela_sobreposicao_complementar;
+
+				contador_minuto = 1;
+
+				if (periodo == periodo_complementar_final + 1) {
+					if (!doubleCompara(1e-6, sobreposicao_complementar, 0.0))
+						throw std::invalid_argument("Erro calculo sobreposicao complementar.");
+
+					return varPTDISPCOM_pat;
+
+				}
+
+			} // if ((idMes != idMes_ultimo) || (idAno != idAno_ultimo)) {
+
+
+			idMes_ultimo = idMes;
+			idAno_ultimo = idAno;
+
+			contador_minuto++;
+
+		}
+
+		return -1;
+
+	} // try
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(a_dados," + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getString(a_periodo) + "," + getFullString(a_idPatamarCarga) + "," + "," + getFullString(a_idTermeletrica) + "," + "): \n" + std::string(erro.what())); }
+
+} // int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdHidreletrica a_idHidreletrica) {
 
 
 void ModeloOtimizacao::addCorteBendersToZF(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_anterior, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders, const double a_rhs, const SmartEnupla<IdVariavelEstado, double>& a_coeficiente) {

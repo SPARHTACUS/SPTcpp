@@ -206,6 +206,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,   QTURDISP,         3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao)  \
 	m(  VarDecisao,   PTDISP,           3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
 	m(  VarDecisao,   PTDISPPRECOM,     3,         ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO,              sim,          nao)  \
+	m(  VarDecisao,   PTDISPCOMLAG,     3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao)  \
 	m(  VarDecisao,   PTDISPCOM_FINF,   3,         ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO,              sim,          nao)  \
 	m(  VarDecisao,   PTDISPCOM_FSUP,   3,         ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO,              sim,          nao)  \
 	m(  VarDecisao,   PI,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,                sim,          nao)  \
@@ -329,6 +330,10 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,    PTDISP_REL,             4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
 	m(  VarDecisao,    PTDISP_FINF,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
 	m(  VarDecisao,    PTDISP_FSUP,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PTDISPCOM_NEW,          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PTDISPPRECOM,           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PTDISPCOM_FINF,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
+	m(  VarDecisao,    PTDISPCOM_FSUP,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             sim,          nao)  \
 	m(  VarDecisao,    PTDISPCOM,              4,    ITERADORES_4_ESTAGIO_TERMELETRICA_INT_PERIODO,                      sim,          nao)  \
 	m(  VarDecisao,    PTDISPCOM_ACUMULADO,    4,    ITERADORES_4_ESTAGIO_TERMELETRICA_INT_PERIODO,                      sim,          nao)  \
     m(  VarDecisao,    RHQ,                    4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE,    sim,          nao)  \
@@ -342,29 +347,31 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
    //   Elemento,      Nome,             NroIter,    Iteradores,                                                 Impr.Primal,     Impr.Dual
 
 #define EQUACAO_LINEAR_4(m)\
-	m(  EquLinear,    ATENDIMENTO_DEMANDA,                      4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO,               nao,         nao)  \
-	m(  EquLinear,    BALANCO_HIDRAULICO_VOL,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
-	m(  EquLinear,    CUSTO_OPERACAO_UTE_COMANDO,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
-	m(  EquLinear,    BALANCO_HIDRAULICO_VAZ,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
-	m(  EquLinear,    VAZAO_MONTANTE,                           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
-    m(  EquLinear,    VAZAO_DEFLUENTE,                          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
-    m(  EquLinear,    VAZAO_DEFLUENTE_LAG,                      4,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO,                  nao,         nao)  \
-	m(  EquLinear,    VAZAO_TURBINADA,                          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
-	m(  EquLinear,    VAZAO_TURBINADA_DISPONIVEL,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
-	m(  EquLinear,    POTENCIA_TERMICA_RELAXADA,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
-	m(  EquLinear,    POTENCIA_TERMICA_DISPONIVEL,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
-	m(  EquLinear,    POTENCIA_TERMICA,                         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
-	m(  EquLinear,    RELACAO_VARIAVEIS_BINARIAS_TERMICA,       4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
-    m(  EquLinear,    POTENCIA_TERMICA_DISPONIVEL_RELAXADA,     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
-	m(  EquLinear,    POTENCIA_BOMBEAMENTO_DISPONIVEL,          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,          nao,         nao)  \
-	m(  EquLinear,    POTENCIA_HIDRAULICA,                      4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
-	m(  EquLinear,    POTENCIA_HIDRAULICA_RELAXADA,             4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
-	m(  EquLinear,    POTENCIA_HIDRAULICA_DISPONIVEL,           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
-	m(  EquLinear,    POTENCIA_HIDRAULICA_DISPONIVEL_RELAXADA,  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
-    m(  EquLinear,    INTERCAMBIO_HIDRAULICO_RETIRADA_RELAXADA, 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO,    nao,         nao)  \
-    m(  EquLinear,    VAZAO_RETIRADA_FOLGA_INFERIOR,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
-    m(  EquLinear,    VAZAO_BOMBEADA_DISPONIVEL,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,          nao,         nao)
-   //   Elemento,     Nome,                               NroIter,    Iteradores,                                                 Impr.Primal,    Impr.Dual
+	m(  EquLinear,    ATENDIMENTO_DEMANDA,                               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO,               nao,         nao)  \
+	m(  EquLinear,    BALANCO_HIDRAULICO_VOL,                            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    CUSTO_OPERACAO_UTE_COMANDO,                        4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+	m(  EquLinear,    BALANCO_HIDRAULICO_VAZ,                            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    VAZAO_MONTANTE,                                    4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+    m(  EquLinear,    VAZAO_DEFLUENTE,                                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+    m(  EquLinear,    VAZAO_DEFLUENTE_LAG,                               4,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO,                  nao,         nao)  \
+	m(  EquLinear,    VAZAO_TURBINADA,                                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    VAZAO_TURBINADA_DISPONIVEL,                        4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_TERMICA_RELAXADA,                         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_TERMICA_DISPONIVEL,                       4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_TERMICA_DISPONIVEL_COMANDADA,             4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_TERMICA_DISPONIVEL_COMANDADA_RELAXADA,    4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_TERMICA,                                  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+	m(  EquLinear,    RELACAO_VARIAVEIS_BINARIAS_TERMICA,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+    m(  EquLinear,    POTENCIA_TERMICA_DISPONIVEL_RELAXADA,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_BOMBEAMENTO_DISPONIVEL,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,          nao,         nao)  \
+	m(  EquLinear,    POTENCIA_HIDRAULICA,                               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_HIDRAULICA_RELAXADA,                      4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_HIDRAULICA_DISPONIVEL,                    4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+	m(  EquLinear,    POTENCIA_HIDRAULICA_DISPONIVEL_RELAXADA,           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+    m(  EquLinear,    INTERCAMBIO_HIDRAULICO_RETIRADA_RELAXADA,          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO,    nao,         nao)  \
+    m(  EquLinear,    VAZAO_RETIRADA_FOLGA_INFERIOR,                     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
+    m(  EquLinear,    VAZAO_BOMBEADA_DISPONIVEL,                         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA,          nao,         nao)
+   //   Elemento,     Nome,                                        NroIter,    Iteradores,                                                 Impr.Primal,    Impr.Dual
 
 #define INEQUACAO_LINEAR_4(m)\
 	m(  IneLinear,    CB_ZF,                                               4,    ITERADORES_4_ESTAGIO_PERIODO_REALIZACAO_CORTEBENDERS,             nao,         sim)  \
@@ -1150,6 +1157,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo_lag);
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo_lag, const double a_grau_liberdade, std::vector<IdHidreletrica> a_idHidreletrica = std::vector<IdHidreletrica>());
+
+		int criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdPatamarCarga a_idPatamarCarga, const IdTermeletrica a_idTermeletrica, const double a_potencia_disponivel_minima, const double a_potencia_disponivel_maxima);
 
 		void criarModeloOtimizacao(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados);
 

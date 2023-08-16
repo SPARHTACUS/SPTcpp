@@ -239,6 +239,8 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
 
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_COMANDO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+
 		if (tipo_estudo == TipoEstudo_simulacao)
 			a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_AttMatrizOperacional_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_membro);
 
@@ -2896,12 +2898,13 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 				} // if (true){
 
+				
 				// ----------------------------------------
 				//
 				// AttVetorTermeletrica_custo_de_operacao
 				//
 				// ---------------------------------------
-
+				/*
 				if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_operacional)) {
 
 					//
@@ -2944,7 +2947,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 				}
 
 				validarTermeletricaComandada(idTermeletrica, preencher_AttVetorTermeletrica.at(idTermeletrica), preencher_AttMatrizTermeletrica.at(idTermeletrica), a_imprimir_atributos_sem_recarregar);
-
+				*/
 				// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 				//
 				//                                                                                            Impress�o de Atributos
