@@ -310,8 +310,6 @@ public:
 
 	void valida_considerar_tempo_viagem_agua(const IdHidreletrica a_idHidreletrica);
 
-	void validarTermeletricaComandada(const IdTermeletrica a_idTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>& a_preencher_AttVetorTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>& a_preencher_AttMatrizTermeletrica, const bool a_imprimir_atributos_sem_recarregar);
-
 	bool isRestricaoEletrica_simples(const IdRestricaoEletrica a_idRestricao_eletrica);
 	bool isRestricaoOperativaUHE_simples(const IdRestricaoOperativaUHE a_idRestricaoOperacionalUHE);
 
@@ -337,8 +335,6 @@ public:
 	void instanciaCotaJusanteUsinaJusante();
 
 	void carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados);
-
-	void carregarArquivosEntrada_TERMELETRICA_COMANDO(EntradaSaidaDados& a_entradaSaidaDados, bool a_carregar_pre_comando, bool a_carregar_comando);
 
 	SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> getHorizonteEspacoAmostralHidrologico(const IdEstagio a_idEstagioInicial, const IdEstagio a_idEstagioFinal)const;
 	SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> getHorizonteEspacoAmostralHidrologico(const IdEstagio a_idEstagioInicial, const IdEstagio a_idEstagioFinal, const IdRealizacao a_maiorIdRealizacao)const;

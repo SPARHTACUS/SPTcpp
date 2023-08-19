@@ -230,8 +230,6 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttComum("TERMELETRICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
 
-		carregarArquivosEntrada_TERMELETRICA_COMANDO(a_entradaSaidaDados, true, true);
-
 		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
 		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
 		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_UNIDADE_AttVetorPremissa_PorInteiro.csv", *this, TipoAcessoInstancia_membroMembro);
@@ -555,77 +553,6 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::carregarArquivosEntrada(a_entradaSaidaDados): \n" + std::string(erro.what())); }
 } // void Dados::carregarArquivosEntrada(){
 
-
-
-void Dados::carregarArquivosEntrada_TERMELETRICA_COMANDO(EntradaSaidaDados& a_entradaSaidaDados, bool a_carregar_pre_comando, bool a_carregar_comando) {
-
-	try {
-
-		Dados dados;
-
-		std::vector<IdTermeletrica> lista_termicas_carregadas;
-
-		for (int codigo_usina = 1; codigo_usina <= 500; codigo_usina++) {
-			bool comando_carregado = false;
-			bool pre_comando_carregado = false;
-			if (a_carregar_comando)
-				comando_carregado = a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_COMANDO_" + getString(AttComumTermeletrica_codigo_usina) + "_" + getString(codigo_usina) + "_AttVetorOperacional_PorPeriodo.csv", dados, TipoAcessoInstancia_membro);
-			if (a_carregar_pre_comando)
-				pre_comando_carregado = a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_PRE_COMANDO_" + getString(AttComumTermeletrica_codigo_usina) + "_" + getString(codigo_usina) + "_AttVetorOperacional_PorPeriodo.csv", dados, TipoAcessoInstancia_membro);
-			if (comando_carregado || pre_comando_carregado) {
-				for (IdTermeletrica idTermeletrica_carregada = IdTermeletrica_1; idTermeletrica_carregada <= dados.vetorTermeletrica.getMaiorId(); idTermeletrica_carregada++) {
-					if (dados.vetorTermeletrica.isInstanciado(idTermeletrica_carregada)) {
-						bool nova_termica_instanciada = true;
-						for (int i = 0; i < int(lista_termicas_carregadas.size()); i++) {
-							if (lista_termicas_carregadas.at(i) == idTermeletrica_carregada) {
-								nova_termica_instanciada = false;
-								break;
-							}
-						}
-						if (nova_termica_instanciada) {
-							lista_termicas_carregadas.push_back(idTermeletrica_carregada);
-							dados.vetorTermeletrica.att(idTermeletrica_carregada).setAtributo(AttComumTermeletrica_codigo_usina, codigo_usina);
-							break;
-						}
-					}
-				} // for (IdTermeletrica idTermeletrica_carregada = IdTermeletrica_1; idTermeletrica_carregada <= dados.vetorTermeletrica.getMaiorId(); idTermeletrica_carregada++) {
-			} // if (comando_carregado || pre_comando_carregado) {
-		}
-
-		for (IdTermeletrica idTermeletrica_carregada = IdTermeletrica_1; idTermeletrica_carregada <= dados.vetorTermeletrica.getMaiorId(); idTermeletrica_carregada++) {
-
-			if (dados.vetorTermeletrica.isInstanciado(idTermeletrica_carregada)) {
-
-				int codigo_usina = dados.getAtributo(idTermeletrica_carregada, AttComumTermeletrica_codigo_usina, int());
-
-				IdTermeletrica idTermeletrica_encontrada = IdTermeletrica_Nenhum;
-				for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= getMaiorId(IdTermeletrica()); idTermeletrica++) {
-					if (getAtributo(idTermeletrica, AttComumTermeletrica_codigo_usina, int()) == codigo_usina) {
-						idTermeletrica_encontrada = idTermeletrica;
-						break;
-					}
-				}
-
-				if (idTermeletrica_encontrada == IdTermeletrica_Nenhum)
-					throw std::invalid_argument("Nao foi encontrada termeletrica com codigo " + getString(codigo_usina));
-
-				if (dados.getSizeVetor(idTermeletrica_carregada, AttVetorTermeletrica_potencia_disponivel_pre_comandada) > 0)
-					vetorTermeletrica.att(idTermeletrica_encontrada).setVetor_forced(AttVetorTermeletrica_potencia_disponivel_pre_comandada, dados.getVetor(idTermeletrica_carregada, AttVetorTermeletrica_potencia_disponivel_pre_comandada, Periodo(), double()));
-
-				if (dados.getSizeVetor(idTermeletrica_carregada, AttVetorTermeletrica_potencia_disponivel_comandada_minima) > 0)
-					vetorTermeletrica.att(idTermeletrica_encontrada).setVetor_forced(AttVetorTermeletrica_potencia_disponivel_comandada_minima, dados.getVetor(idTermeletrica_carregada, AttVetorTermeletrica_potencia_disponivel_comandada_minima, Periodo(), double()));
-
-				if (dados.getSizeVetor(idTermeletrica_carregada, AttVetorTermeletrica_potencia_disponivel_comandada_maxima) > 0)
-					vetorTermeletrica.att(idTermeletrica_encontrada).setVetor_forced(AttVetorTermeletrica_potencia_disponivel_comandada_maxima, dados.getVetor(idTermeletrica_carregada, AttVetorTermeletrica_potencia_disponivel_comandada_maxima, Periodo(), double()));
-
-			} // if (dados.vetorTermeletrica.isInstanciado(idTermeletrica_carregada)) {
-
-		} // for (IdTermeletrica idTermeletrica_carregada = IdTermeletrica_1; idTermeletrica_carregada <= dados.vetorTermeletrica.getMaiorId(); idTermeletrica_carregada++) {
-
-	} // try{
-	catch (const std::exception& erro) { throw std::invalid_argument("Dados::carregarArquivosEntrada_TERMELETRICA_COMANDO(a_entradaSaidaDados, " + getString(a_carregar_pre_comando) + "): \n" + std::string(erro.what())); }
-
-} // void Dados::carregarArquivosEntrada_TERMELETRICA_COMANDO(EntradaSaidaDados& a_entradaSaidaDados){
 
 
 
@@ -1923,18 +1850,17 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 		bool recarregar_AttVetorReservatorio_PorIdMes = false;
 		bool recarregar_AttVetorReservatorio_PorPeriodo = false;
 		bool recarregar_AttVetorTermeletrica_PorPeriodo = false;
-		bool recarregar_AttVetorTermeletrica_COMANDO_PorPeriodo = false;
 		bool recarregar_AttVetorTermeletrica_PorInteiro = false;
+		bool recarregar_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga = false;
 		bool recarregar_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga = false;
 		bool recarregar_AttVetorUnidadeUTE_PorPeriodo = false;
 		bool recarregar_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga = false;
 		bool impresso_AttComumUnidadeUTE = false;
 		bool impresso_AttComumTermeletrica = false;
 
-		SmartEnupla<IdTermeletrica, bool> impresso_AttVetorTermeletrica_COMANDO_PorPeriodo(IdTermeletrica_1, std::vector<bool>(maiorIdTermeletrica, false));
-
 		std::vector<bool> impresso_AttVetorTermeletrica_PorPeriodo(3, false);
 		std::vector<bool> impresso_AttVetorTermeletrica_PorInteiro(2, false);
+		std::vector<bool> impresso_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga(2, false);
 		std::vector<bool> impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga(2, false);
 		std::vector<bool> impresso_AttMatrizTermeletrica_PorIdCenarioPorPeriodo(2, false);
 		std::vector<bool> impresso_AttVetorUnidadeUTE_PorInteiro(2, false);
@@ -1942,8 +1868,6 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 		std::vector<bool> impresso_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga(2, false);
 
 		// SMART ENUPLA AUXILIARES
-		SmartEnupla<IdTermeletrica, SmartEnupla<AttVetorReservatorio, PreencherAtributo>> preencher_AttVetorReservatorio(IdTermeletrica_1, std::vector<SmartEnupla<AttVetorReservatorio, PreencherAtributo>>(maiorIdTermeletrica, SmartEnupla<AttVetorReservatorio, PreencherAtributo>()));
-
 		SmartEnupla<IdTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>> preencher_AttVetorTermeletrica(IdTermeletrica_1, std::vector<SmartEnupla<AttVetorTermeletrica, PreencherAtributo>>(maiorIdTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>()));
 		SmartEnupla<IdTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>> preencher_AttMatrizTermeletrica(IdTermeletrica_1, std::vector<SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>>(maiorIdTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>()));
 
@@ -1980,13 +1904,6 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 			if (maiorIdPatamarCarga > maiorIdPatamarCarga_horizonte)
 				maiorIdPatamarCarga_horizonte = maiorIdPatamarCarga;
 		} // for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
-
-		int maior_lag_mensal_potencia_comandada = 0;
-		for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= maiorIdTermeletrica; idTermeletrica++) {
-			const int lag_mensal_potencia_comandada = getAtributo(idTermeletrica, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int());
-			if (lag_mensal_potencia_comandada > maior_lag_mensal_potencia_comandada)
-				maior_lag_mensal_potencia_comandada = lag_mensal_potencia_comandada;
-		} // for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= maiorIdTermeletrica; idTermeletrica++) {
 
 
 		for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= maiorIdTermeletrica; idTermeletrica++) {
@@ -2155,6 +2072,35 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) = nao_operacional_informado;
 
 				} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) > 0) {
+
+
+				// -------------------------------------
+				//
+				// AttMatrizTermeletrica_potencia_disponivel_comandada
+				//
+				// -------------------------------------
+
+
+				if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada) > 0) {
+
+					if (getAtributo(idTermeletrica, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int()) == 0)
+						throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_comandada) + " nao deve ser informado em " + getFullString(idTermeletrica) + " de " + getFullString(AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada) + " zero.");
+
+					if (getAtributo(AttComumDados_estagio_inicial, IdEstagio()) > IdEstagio_1)
+						throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_comandada) + " nao deve ser informado em " + getFullString(idTermeletrica) + " pois estudo inicia em " + getFullString(getAtributo(AttComumDados_estagio_inicial, IdEstagio())) + ".");
+
+					const Periodo periodo_inicial_potencia_disponivel_comandada = getIterador1Inicial(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
+					const Periodo periodo_final_potencia_disponivel_comandada = getIterador1Final(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
+
+					if (((periodo_inicial_potencia_disponivel_comandada <= periodo_estudo_inicial) || (periodo_inicial_potencia_disponivel_comandada.sobreposicao(periodo_estudo_inicial) > 0.0)) && \
+						((periodo_final_potencia_disponivel_comandada >= periodo_estudo_inicial) || (periodo_final_potencia_disponivel_comandada.sobreposicao(periodo_estudo_inicial) > 0.0))) {
+					}
+					else
+						throw std::invalid_argument("O periodo inicial do atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_comandada) + " em " + getFullString(idTermeletrica) + " deve iniciar com horizonte de estudo.");
+
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_comandada) = nao_operacional_informado;
+
+				} // if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada) > 0) {
 
 
 				// -----------------------------------------------
@@ -2995,43 +2941,15 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 						else if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(attVetorTermeletrica) == sim_operacional) || ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(attVetorTermeletrica) == nao_operacional_informado) && (a_imprimir_atributos_sem_recarregar))) {
 
-							if ((attVetorTermeletrica == AttVetorTermeletrica_potencia_disponivel_pre_comandada) || (attVetorTermeletrica == AttVetorTermeletrica_potencia_disponivel_comandada_minima) || (attVetorTermeletrica == AttVetorTermeletrica_potencia_disponivel_comandada_maxima)) {
+							a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
-								const int codigo_usina = getAtributo(idTermeletrica, AttComumTermeletrica_codigo_usina, int());
+							a_entradaSaidaDados.setAppendArquivo(impresso_AttVetorTermeletrica_PorPeriodo.at(1));
+							a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("TERMELETRICA_AttVetorOperacional_PorPeriodo.csv", idTermeletrica, *this, periodo_estudo_inicial, periodo_final_estudo, attVetorTermeletrica);
+							impresso_AttVetorTermeletrica_PorPeriodo.at(1) = true;
 
-								if (attVetorTermeletrica == AttVetorTermeletrica_potencia_disponivel_pre_comandada) {
-									a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
-									a_entradaSaidaDados.setAppendArquivo(false);
-									a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("TERMELETRICA_PRE_COMANDO_" + getString(AttComumTermeletrica_codigo_usina) + "_" + getString(codigo_usina) + "_AttVetorOperacional_PorPeriodo.csv", idTermeletrica, *this, attVetorTermeletrica);
-								}
-								else {
-									a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
-									a_entradaSaidaDados.setAppendArquivo(impresso_AttVetorTermeletrica_COMANDO_PorPeriodo.getElemento(idTermeletrica));
-									a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("TERMELETRICA_COMANDO_" + getString(AttComumTermeletrica_codigo_usina) + "_" + getString(codigo_usina) + "_AttVetorOperacional_PorPeriodo.csv", idTermeletrica, *this, attVetorTermeletrica);
-									impresso_AttVetorTermeletrica_COMANDO_PorPeriodo.setElemento(idTermeletrica, true);
-
-									if (!a_imprimir_atributos_sem_recarregar) {
-										vetorTermeletrica.att(idTermeletrica).clear(attVetorTermeletrica);
-										recarregar_AttVetorTermeletrica_COMANDO_PorPeriodo = true;
-									}
-
-								}
-
-							} // if ((attVetorTermeletrica == AttVetorTermeletrica_potencia_disponivel_pre_comandada) || (attVetorTermeletrica == AttVetorTermeletrica_potencia_disponivel_comandada_minima) || (attVetorTermeletrica == AttVetorTermeletrica_potencia_disponivel_comandada_maxima)) {
-
-							else {
-
-								a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
-
-								a_entradaSaidaDados.setAppendArquivo(impresso_AttVetorTermeletrica_PorPeriodo.at(1));
-								a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("TERMELETRICA_AttVetorOperacional_PorPeriodo.csv", idTermeletrica, *this, periodo_estudo_inicial, periodo_final_estudo, attVetorTermeletrica);
-								impresso_AttVetorTermeletrica_PorPeriodo.at(1) = true;
-
-								if (!a_imprimir_atributos_sem_recarregar) {
-									vetorTermeletrica.att(idTermeletrica).clear(attVetorTermeletrica);
-									recarregar_AttVetorTermeletrica_PorPeriodo = true;
-								}
-
+							if (!a_imprimir_atributos_sem_recarregar) {
+								vetorTermeletrica.att(idTermeletrica).clear(attVetorTermeletrica);
+								recarregar_AttVetorTermeletrica_PorPeriodo = true;
 							}
 
 						} // else if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(attVetorTermeletrica) == sim_operacional) || ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(attVetorTermeletrica) == nao_operacional_informado) && (a_imprimir_atributos_sem_recarregar))) {
@@ -3060,15 +2978,33 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 						else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(attMatrizTermeletrica) == sim_operacional) || ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(attMatrizTermeletrica) == nao_operacional_informado) && (a_imprimir_atributos_sem_recarregar))) {
 
-							a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
+							if (attMatrizTermeletrica == AttMatrizTermeletrica_potencia_disponivel_comandada) {
 
-							a_entradaSaidaDados.setAppendArquivo(impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga.at(1));
-							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("TERMELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idTermeletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, attMatrizTermeletrica);
-							impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga.at(1) = true;
+								a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
-							if (!a_imprimir_atributos_sem_recarregar) {
-								vetorTermeletrica.att(idTermeletrica).clear(attMatrizTermeletrica);
-								recarregar_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga = true;
+								a_entradaSaidaDados.setAppendArquivo(impresso_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga.at(1));
+								a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("TERMELETRICA_COMANDO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idTermeletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, attMatrizTermeletrica);
+								impresso_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga.at(1) = true;
+
+								if (!a_imprimir_atributos_sem_recarregar) {
+									vetorTermeletrica.att(idTermeletrica).clear(attMatrizTermeletrica);
+									recarregar_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga = true;
+								}
+							}
+
+							else {
+
+								a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
+
+								a_entradaSaidaDados.setAppendArquivo(impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga.at(1));
+								a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("TERMELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idTermeletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, attMatrizTermeletrica);
+								impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga.at(1) = true;
+
+								if (!a_imprimir_atributos_sem_recarregar) {
+									vetorTermeletrica.att(idTermeletrica).clear(attMatrizTermeletrica);
+									recarregar_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga = true;
+								}
+
 							}
 
 						} // else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(attMatrizTermeletrica) == sim_operacional) || ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(attMatrizTermeletrica) == nao_operacional_informado) && (a_imprimir_atributos_sem_recarregar))) {
@@ -3272,9 +3208,6 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 			a_entradaSaidaDados.setDiretorioEntrada(a_diretorio_att_operacional);
 
-			if (recarregar_AttVetorTermeletrica_COMANDO_PorPeriodo)
-				carregarArquivosEntrada_TERMELETRICA_COMANDO(a_entradaSaidaDados, false, true);
-
 			if (recarregar_AttVetorTermeletrica_PorPeriodo)
 				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("TERMELETRICA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
 
@@ -3283,6 +3216,9 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 			if (recarregar_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga)
 				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("TERMELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+
+			if (recarregar_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga)
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("TERMELETRICA_COMANDO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
 
 			if (recarregar_AttVetorUnidadeUTE_PorPeriodo)
 				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("TERMELETRICA_UNIDADE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembroMembro);
@@ -3488,210 +3424,6 @@ void Dados::valida_considerar_tempo_viagem_agua(const IdHidreletrica a_idHidrele
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::valida_considerar_tempo_viagem_agua(): " + getFullString(a_idHidreletrica) + std::string(erro.what())); }
 } // void Dados::validaHidreletrica(){
-
-void Dados::validarTermeletricaComandada(const IdTermeletrica a_idTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>& a_preencher_AttVetorTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>& a_preencher_AttMatrizTermeletrica, const bool a_imprimir_atributos_sem_recarregar) {
-
-	try {
-
-		const int lag_mensal = getAtributo(a_idTermeletrica, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int());
-
-		if ((lag_mensal == 0) && (getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_pre_comandada) == 0) && (getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_minima) == 0) && (getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_maxima) == 0))
-			return;
-
-		if ((lag_mensal == 0) && ((getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_pre_comandada) > 0) || (getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_minima) > 0) || (getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_maxima) > 0)))
-			throw std::invalid_argument("Para " + getFullString(AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada) + " nulo, nao devera haver elementos em " + getFullString(AttVetorTermeletrica_potencia_disponivel_pre_comandada) + ", " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_minima) + ", " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_maxima) + ".");
-
-		if (getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_minima) != getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_maxima))
-			throw std::invalid_argument("Os atributos " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_minima) + " e " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_maxima) + " devem possuir o mesmo numero de elementos.");
-
-		const Periodo periodo_inicial_horizonte_estudo = getMenorPeriodoHorizonteEstudo();
-		const Periodo periodo_final_horizonte_estudo = getMaiorPeriodoHorizonteEstudo();
-
-		if (getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_minima) > 0) {
-
-			if (getIteradorInicial(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_minima, Periodo()) != getIteradorInicial(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_maxima, Periodo()))
-				throw std::invalid_argument("Os iteradores iniciais de " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_minima) + " e " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_maxima) + " devem ser os mesmos.");
-
-			if (getIteradorFinal(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_minima, Periodo()) != getIteradorFinal(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_maxima, Periodo()))
-				throw std::invalid_argument("Os iteradores finais de " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_minima) + " e " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_maxima) + " devem ser os mesmos.");
-
-			const Periodo periodo_inicial_potencia_disponivel_comandada_minima = getIteradorInicial(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_minima, Periodo());
-			const Periodo periodo_final_potencia_disponivel_comandada_minima = getIteradorFinal(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_minima, Periodo());
-
-			SmartEnupla<Periodo, double> horizonte_potencia_disponivel_comandada_minima = getVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_minima, Periodo(), double());
-
-			for (Periodo periodo = periodo_inicial_potencia_disponivel_comandada_minima; periodo <= periodo_final_potencia_disponivel_comandada_minima; horizonte_potencia_disponivel_comandada_minima.incrementarIterador(periodo)) {
-				if (periodo > periodo_inicial_potencia_disponivel_comandada_minima) {
-					if (periodo.getTipoPeriodo() != TipoPeriodo_mensal)
-						throw std::invalid_argument("O segundo periodo em diante de " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_minima) + " e " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_maxima) + " devem ser do tipo mensal.");
-				} // if (periodo > periodo_inicial_potencia_disponivel_comandada_minima) {
-			} // for (Periodo periodo = periodo_inicial_potencia_disponivel_comandada_minima; periodo <= periodo_final_potencia_disponivel_comandada_minima; horizonte_potencia_disponivel_comandada_minima.incrementarIterador(periodo)) {
-
-			if (Periodo(TipoPeriodo_minuto, periodo_final_horizonte_estudo + 1) > Periodo(TipoPeriodo_minuto, periodo_final_potencia_disponivel_comandada_minima + 1))
-				throw std::invalid_argument("Os iteradores finais de " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_minima) + " e " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_maxima) + " devem ao menos encerrar com o horizonte de estudo");
-
-			if (getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_pre_comandada) > 0) {
-				const Periodo periodo_final_potencia_disponivel_pre_comandada = getIteradorFinal(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_pre_comandada, Periodo());
-				if (Periodo(TipoPeriodo_minuto, periodo_final_potencia_disponivel_pre_comandada + 1) != Periodo(TipoPeriodo_minuto, periodo_inicial_potencia_disponivel_comandada_minima))
-					throw std::invalid_argument("O iterador inicial de " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_minima) + " e " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_maxima) + " deve ser sequencial ao iterador final de " + getFullString(AttVetorTermeletrica_potencia_disponivel_pre_comandada) + ".");
-
-				a_preencher_AttVetorTermeletrica.at(AttVetorTermeletrica_potencia_disponivel_pre_comandada) = nao_operacional_informado;
-
-			} // if (getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_pre_comandada) > 0) {
-
-			else {
-
-				if (Periodo(TipoPeriodo_minuto, periodo_inicial_horizonte_estudo) < Periodo(TipoPeriodo_minuto, periodo_inicial_potencia_disponivel_comandada_minima))
-					throw std::invalid_argument("Caso nao haja elementos em " + getFullString(AttVetorTermeletrica_potencia_disponivel_pre_comandada) + " os iteradores iniciais de " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_minima) + " e " + getFullString(AttVetorTermeletrica_potencia_disponivel_comandada_maxima) + " devem inicial com o horizonte de estudo");
-
-				a_preencher_AttVetorTermeletrica.at(AttVetorTermeletrica_potencia_disponivel_pre_comandada) = nao_sem_utilizacao;
-
-			}
-
-			a_preencher_AttVetorTermeletrica.at(AttVetorTermeletrica_potencia_disponivel_comandada_minima) = nao_operacional_informado;
-			a_preencher_AttVetorTermeletrica.at(AttVetorTermeletrica_potencia_disponivel_comandada_maxima) = nao_operacional_informado;
-
-		} // if (getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_comandada_minima) > 0) {
-
-		else {
-
-			Periodo periodo_final_pre_comandado = getIteradorInicial(AttVetorDados_horizonte_estudo, Periodo()) - 1;
-
-			if (getSizeVetor(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_pre_comandada) == 0)
-				a_preencher_AttVetorTermeletrica.at(AttVetorTermeletrica_potencia_disponivel_pre_comandada) = nao_sem_utilizacao;
-			else {
-				a_preencher_AttVetorTermeletrica.at(AttVetorTermeletrica_potencia_disponivel_pre_comandada) = nao_operacional_informado;
-				periodo_final_pre_comandado = getIteradorFinal(a_idTermeletrica, AttVetorTermeletrica_potencia_disponivel_pre_comandada, Periodo());
-			}
-
-			a_preencher_AttVetorTermeletrica.at(AttVetorTermeletrica_potencia_disponivel_comandada_minima) = nao_sem_utilizacao;
-			a_preencher_AttVetorTermeletrica.at(AttVetorTermeletrica_potencia_disponivel_comandada_maxima) = nao_sem_utilizacao;
-
-			if ((periodo_final_pre_comandado.getHora() != IdHor_0) && (periodo_final_pre_comandado.getMinuto() != IdMin_0))
-				throw std::invalid_argument("Periodo final de " + getFullString(AttVetorTermeletrica_potencia_disponivel_pre_comandada) + " deve iniciar em 0Horas e 0Minutos.");
-
-			const Periodo periodo_mensal_inicial_comandado = Periodo(Periodo(periodo_final_pre_comandado + 1).getMes(), Periodo(periodo_final_pre_comandado + 1).getAno());
-
-			const Periodo periodo_minuto_final = Periodo(TipoPeriodo_minuto, periodo_final_horizonte_estudo + 1) - 1;
-
-			const Periodo periodo_mensal_final_comandado = Periodo(TipoPeriodo_mensal, periodo_minuto_final.getMes(), periodo_minuto_final.getAno());
-
-			if (periodo_mensal_inicial_comandado <= periodo_mensal_final_comandado) {
-
-				double sobreposicao = 0.0;
-
-				Periodo periodo_interface;
-
-				for (periodo_interface = periodo_mensal_inicial_comandado; periodo_interface <= periodo_mensal_final_comandado; periodo_interface++) {
-
-					sobreposicao = periodo_interface.sobreposicao(periodo_final_pre_comandado);
-
-					if (sobreposicao > 0.0)
-						break;
-
-				} // for (Periodo periodo = periodo_mensal_inicial_comandado; periodo <= periodo_mensal_final_comandado; periodo++) {
-
-				if ((sobreposicao == 0.0) && (Periodo(TipoPeriodo_mensal, periodo_final_pre_comandado + 1) != periodo_mensal_inicial_comandado) && (periodo_final_pre_comandado < periodo_mensal_final_comandado))
-					throw std::invalid_argument("Periodo final de " + getFullString(AttVetorTermeletrica_potencia_disponivel_pre_comandada) + " nao compativel com periodo a ser comandada.");
-
-				Periodo periodo_inicial_comandado;
-				Periodo periodo_final_comandado;
-
-				if ((sobreposicao == 0.0) && (Periodo(TipoPeriodo_mensal, periodo_final_pre_comandado + 1) == periodo_mensal_inicial_comandado)) {
-					periodo_inicial_comandado = periodo_mensal_inicial_comandado;
-					periodo_final_comandado = periodo_mensal_final_comandado;
-				}
-
-				else if (sobreposicao > 0.0) {
-
-					periodo_inicial_comandado = Periodo(TipoPeriodo_diario, periodo_final_pre_comandado + 1);
-
-					Periodo periodo_diario = periodo_inicial_comandado;
-
-					int cont = 0;
-					while (true) {
-						if (periodo_diario.getMes() != periodo_inicial_comandado.getMes())
-							break;
-						periodo_diario++;
-						cont++;
-					} // while (true) {
-
-					periodo_inicial_comandado = Periodo(TipoPeriodo(TipoPeriodo_diario - cont + 1), periodo_inicial_comandado);
-
-					if (periodo_mensal_inicial_comandado == periodo_mensal_final_comandado)
-						periodo_final_comandado = periodo_inicial_comandado;
-					else
-						periodo_final_comandado = periodo_mensal_final_comandado;
-
-				} // else if (sobreposicao > 0.0) {
-
-				if (periodo_inicial_comandado.isValido()) {
-
-					SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
-
-					a_preencher_AttVetorTermeletrica.at(AttVetorTermeletrica_potencia_disponivel_comandada_minima) = sim_operacional;
-					a_preencher_AttVetorTermeletrica.at(AttVetorTermeletrica_potencia_disponivel_comandada_maxima) = sim_operacional;
-
-					Periodo periodo_comandado = periodo_inicial_comandado;
-
-					while (true) {
-
-						double potencia_disponivel_comandada_minima = 0.0;
-						double potencia_disponivel_comandada_maxima = 0.0;
-
-						for (Periodo periodo_estudo = horizonte_estudo.getIteradorInicial(); periodo_estudo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo_estudo)) {
-
-							const IdPatamarCarga maiorIdPatamarCarga = getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga());
-
-							const double sobreposicao = periodo_comandado.sobreposicao(periodo_estudo);
-
-							if (sobreposicao > 0.0) {
-
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-
-									const double percentual_duracao_patamar = getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, idPatamarCarga, double());
-
-									if (getSize1Matriz(a_idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima) > 0)
-										potencia_disponivel_comandada_minima += sobreposicao * percentual_duracao_patamar * getElementoMatriz(a_idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima, periodo_estudo, idPatamarCarga, double());
-									else
-										potencia_disponivel_comandada_minima += sobreposicao * percentual_duracao_patamar * getElementoVetor(a_idTermeletrica, AttVetorTermeletrica_disponibilidade, periodo_estudo, double()) * getElementoMatriz(a_idTermeletrica, AttMatrizTermeletrica_potencia_minima, periodo_estudo, idPatamarCarga, double());
-
-									if (getSize1Matriz(a_idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) > 0)
-										potencia_disponivel_comandada_maxima += sobreposicao * percentual_duracao_patamar * getElementoMatriz(a_idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, periodo_estudo, idPatamarCarga, double());
-									else
-										potencia_disponivel_comandada_maxima += sobreposicao * percentual_duracao_patamar * getElementoVetor(a_idTermeletrica, AttVetorTermeletrica_disponibilidade, periodo_estudo, double()) * getElementoMatriz(a_idTermeletrica, AttMatrizTermeletrica_potencia_maxima, periodo_estudo, idPatamarCarga, double());
-
-								} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-
-							} // if (sobreposicao > 0.0) {
-
-						} // for (Periodo periodo_estudo = horizonte_estudo.getIteradorInicial(); periodo_estudo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_estudo)) {
-
-						vetorTermeletrica.att(a_idTermeletrica).addElemento(AttVetorTermeletrica_potencia_disponivel_comandada_minima, periodo_comandado, potencia_disponivel_comandada_minima);
-						vetorTermeletrica.att(a_idTermeletrica).addElemento(AttVetorTermeletrica_potencia_disponivel_comandada_maxima, periodo_comandado, potencia_disponivel_comandada_maxima);
-
-						if (periodo_comandado == periodo_final_comandado)
-							break;
-						else {
-							if (periodo_comandado == periodo_inicial_comandado)
-								periodo_comandado = Periodo(TipoPeriodo_mensal, periodo_inicial_comandado + 1);
-							else
-								periodo_comandado++;
-						}
-					}
-
-				} // if (periodo_inicial_comandado.isValido()) {
-
-			} // if (periodo_mensal_inicial_comandado <= periodo_mensal_final_comandado) {
-
-
-
-		} // else {
-
-	} // try{
-	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validarTermeletricaComandada(" + getFullString(a_idTermeletrica) + "): \n" + std::string(erro.what())); }
-
-} // void Dados::validarTermeletricaComandada(const IdTermeletrica a_idTermeletrica){
 
 bool Dados::isRestricaoEletrica_simples(const IdRestricaoEletrica a_idRestricaoEletrica){
 

@@ -158,8 +158,6 @@ private:
 	void leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nomeArquivo, std::string nomeArquivo_pastaRaiz_relgnl, std::string nomeArquivo_pastaAdicionais_relgnl);
 	void leitura_DADGNL_201906_DC29_B(Dados& a_dados, const std::string a_diretorio, const std::string nomeArquivo);
 
-	void leitura_PATAMAR_201908_NW25_em_DADGNL(const std::string a_diretorio, const std::string a_nomeArquivo, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizonte_comandado);
-
 	// PERDAS    fatores de perda para centro de gravidade da carga  
 	void leitura_PERDAS_201906_DC29(Dados& a_dados, std::string nomeArquivo);
 
@@ -180,7 +178,6 @@ private:
 	void set_hidreletrica_vazao_turbinada_disponivel_meta(Dados& a_dados);
 	void set_hidreletrica_potencia_disponivel_meta_from_dec_oper_usih_DC(Dados& a_dados, std::string a_nomeArquivo);
 	void set_termeletrica_potencia_disponivel_meta(Dados& a_dados);
-	void leitura_potencia_comandada_from_relgnl(Dados& a_dados, const std::string a_nomeArquivo_pastaRaiz_relgnl, const std::string a_nomeArquivo_pastaAdicionais_relgnl, const std::vector<int> a_codigo_gnl, const std::vector<std::string> a_nome_gnl, SmartEnupla<IdTermeletrica, SmartEnupla<Periodo, double>>& a_lista_termeletrica_potencia_pre_comandada);
 	void leitura_vRef_from_CadUsH_csv(Dados& a_dados, std::string a_nomeArquivo);
 
 	//Validações

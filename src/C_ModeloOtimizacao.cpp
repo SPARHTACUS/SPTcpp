@@ -1871,18 +1871,6 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 			const Periodo periodo_horizonte_estudo_inicial = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_estudo, getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()), Periodo(), double()).getIteradorInicial();
 
-			struct Estrutura_PTDISPCOMANDADA {
-				IdVariavelEstado idVariavelEstado = IdVariavelEstado_Nenhum;
-				IdTermeletrica idTermeletrica_importada = IdTermeletrica_Nenhum;
-				int codigo_usina = -1;
-				IdTermeletrica idTermeletrica = IdTermeletrica_Nenhum;
-				IdPatamarCarga idPatamarCarga = IdPatamarCarga_Nenhum;
-				Periodo periodo_comandado;
-			};
-
-			std::vector<Estrutura_PTDISPCOMANDADA> lista_PTDISPCOMANDADA;
-			std::vector<Estrutura_PTDISPCOMANDADA> lista_PTDISPCOMANDADA_ACUMULADO;
-
 			SmartEnupla<IdVariavelAleatoria, std::vector<IdHidreletrica>> isIdHidreletricaNosEstadosYP(IdVariavelAleatoria_1, std::vector<std::vector<IdHidreletrica>>(IdVariavelAleatoria(IdVariavelAleatoria_Excedente - 1), std::vector<IdHidreletrica>()));
 
 			// Validar se estados possuem variáveis de decisão no modelo e ajustar cortes se necessário.
@@ -1894,26 +1882,23 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 				// Volume Minimo
 				//
 				
-				if (nome.at(0) == "VarDecisaoZP0_VF_FINF_ACUMULADO") {
+				if (nome.at(0) == "VarDecisaoZP0_VF_FINF") {
+				
+					const Periodo periodo_penalizacao(nome.at(2));
 
-					const Periodo periodo(nome.at(2));
+					const int varZP0_VF_FINF = criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(a_TSS, a_dados, idEstagio, periodo_penalizacao);
 
-					estagio.setVariavelDecisaoEmVariavelEstado(idVariavelEstado, a_TSS, -1);
+					if (varZP0_VF_FINF > -1)
+						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varZP0_VF_FINF);
+				
+					else{
+						estagio.anularVariavelEstadoCorteBenders(idVariavelEstado);
+						estagio.vetorVariavelEstado.rem(idVariavelEstado);
+						if (a_idProcesso == IdProcesso_mestre)
+							std::cout << "Removendo " << getFullString(idVariavelEstado) << " com abatimento no RHS do corte." << std::endl;
+					}				
 
-					const int varZP0_VF_FINF_ACUMULANDO = getVarDecisao_ZP0_VF_FINF_ACUMULANDOseExistir(a_TSS, idEstagio, periodo);
-
-					if (varZP0_VF_FINF_ACUMULANDO > -1)
-						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varZP0_VF_FINF_ACUMULANDO);
-
-					else if ((varZP0_VF_FINF_ACUMULANDO == -1) && (a_dados.getAtributo(AttComumDados_mes_penalizacao_volume_util_minimo, IdMes()) == IdMes_Nenhum)) {
-						const int varZP0_VF_FINF_ACUMULANDO_nova = addVarDecisao_ZP0_VF_FINF_ACUMULANDO(a_TSS, idEstagio, periodo_estudo_final, 0.0, 0.0, 0.0);
-						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varZP0_VF_FINF_ACUMULANDO_nova);
-					} // else if (varVF == -1)
-
-					else
-						throw std::invalid_argument("Nao foi possivel encontrar a variavel varZP0_VF_FINF_ACUMULANDO " + getString(periodo) + " em " + getFullString(idEstagio));
-
-				} // if (nome.at(0) == "VarDecisaoZP0_VF_FINF_ACUMULADO") {
+				} // if (nome.at(0) == "VarDecisaoZP0_VF_FINF") {
 				
 
 				//
@@ -2033,189 +2018,25 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 				else if (nome.at(0) == "VarDecisaoPTDISPCOM") {
 
-					Estrutura_PTDISPCOMANDADA estrutura_PTDISPCOMANDADA;
+					const Periodo periodo_comando = Periodo(nome.at(2));
+					const IdTermeletrica idTermeletrica = getIdTermeletricaFromChar(nome.at(3).c_str());
 
-					estrutura_PTDISPCOMANDADA.idVariavelEstado = idVariavelEstado;
+					const double potencia_minima_disponivel = getdoubleFromChar(nome.at(4).c_str());
+					const double potencia_maxima_disponivel = getdoubleFromChar(nome.at(5).c_str());
 
-					estrutura_PTDISPCOMANDADA.idTermeletrica_importada = getIdTermeletricaFromChar(nome.at(2).c_str());
 
-					estrutura_PTDISPCOMANDADA.codigo_usina = atoi(nome.at(3).c_str());
-
-					IdTermeletrica idTermeletrica = IdTermeletrica_Nenhum;
-
-					for (IdTermeletrica idTermeletrica_aux = IdTermeletrica_1; idTermeletrica_aux <= a_dados.getMaiorId(IdTermeletrica()); idTermeletrica_aux++) {
-						if (a_dados.getAtributo(idTermeletrica_aux, AttComumTermeletrica_codigo_usina, int()) == estrutura_PTDISPCOMANDADA.codigo_usina) {
-							idTermeletrica = idTermeletrica_aux;
-							break;
-						}
-					}
-
-					if (idTermeletrica == IdTermeletrica_Nenhum)
-						throw std::invalid_argument("Nao foi possivel criar variavel de estado " + estagio.getAtributo(idVariavelEstado, AttComumVariavelEstado_nome, std::string()) + " pois nenhuma termeletrica eh compativel com " + getFullString(estrutura_PTDISPCOMANDADA.idTermeletrica_importada));
-
-					estrutura_PTDISPCOMANDADA.idTermeletrica = idTermeletrica;
-
-					estrutura_PTDISPCOMANDADA.periodo_comandado = Periodo(nome.at(4));
-
-					if (nome.size() == 6)
-						estrutura_PTDISPCOMANDADA.idPatamarCarga = getIdPatamarCargaFromChar(nome.at(5).c_str());
-
-					lista_PTDISPCOMANDADA.push_back(estrutura_PTDISPCOMANDADA);
+					const int varPTDISPCOM = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, idEstagio, periodo_comando, IdPatamarCarga_Nenhum, idTermeletrica, potencia_minima_disponivel, potencia_maxima_disponivel);
+					if (varPTDISPCOM == -1)
+						throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes PTDISPCOM de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
+					else
+						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varPTDISPCOM);
 
 				} // else if (nome.at(0) == "VarDecisaoPTDISPCOM") {
 
-				else if (nome.at(0) == "VarDecisaoPTDISPCOM_ACUMULADO") {
-
-					Estrutura_PTDISPCOMANDADA estrutura_PTDISPCOMANDADA_ACUMULADO;
-
-					estrutura_PTDISPCOMANDADA_ACUMULADO.idVariavelEstado = idVariavelEstado;
-
-					estrutura_PTDISPCOMANDADA_ACUMULADO.idTermeletrica_importada = getIdTermeletricaFromChar(nome.at(2).c_str());
-
-					estrutura_PTDISPCOMANDADA_ACUMULADO.codigo_usina = atoi(nome.at(3).c_str());
-
-					IdTermeletrica idTermeletrica = IdTermeletrica_Nenhum;
-
-					for (IdTermeletrica idTermeletrica_aux = IdTermeletrica_1; idTermeletrica_aux <= a_dados.getMaiorId(IdTermeletrica()); idTermeletrica_aux++) {
-						if (a_dados.getAtributo(idTermeletrica_aux, AttComumTermeletrica_codigo_usina, int()) == estrutura_PTDISPCOMANDADA_ACUMULADO.codigo_usina) {
-							idTermeletrica = idTermeletrica_aux;
-							break;
-						}
-					}
-
-					if (idTermeletrica == IdTermeletrica_Nenhum)
-						throw std::invalid_argument("Nao foi possivel criar variavel de estado " + estagio.getAtributo(idVariavelEstado, AttComumVariavelEstado_nome, std::string()) + " pois nenhuma termeletrica eh compativel com " + getFullString(estrutura_PTDISPCOMANDADA_ACUMULADO.idTermeletrica_importada));
-
-					estrutura_PTDISPCOMANDADA_ACUMULADO.idTermeletrica = idTermeletrica;
-
-					estrutura_PTDISPCOMANDADA_ACUMULADO.periodo_comandado = Periodo(nome.at(4));
-
-					lista_PTDISPCOMANDADA_ACUMULADO.push_back(estrutura_PTDISPCOMANDADA_ACUMULADO);
-
-				} // else if (nome.at(0) == "VarDecisaoPTDISPCOM_ACUMULADO") {
-
 				else
-					throw std::invalid_argument("Variavel de estado " + nome.at(0) + " nao compativel com modelo em " + getFullString(idEstagio));  
+				throw std::invalid_argument("Variavel de estado " + nome.at(0) + " nao compativel com modelo em " + getFullString(idEstagio));
 
 			} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= estagio.getMaiorId(IdVariavelEstado()); idVariavelEstado++) {
-
-			if (lista_PTDISPCOMANDADA.size() > 0) {
-
-				std::vector<std::vector<int>> indice_PTDISPCOMANDADA(2, std::vector<int>());
-
-				for (int i = 0; i < int(lista_PTDISPCOMANDADA.size()); i++) {
-					const int idTermeletrica_int = int(lista_PTDISPCOMANDADA.at(i).idTermeletrica);
-					if (indice_PTDISPCOMANDADA.at(0).size() == 0) {
-						indice_PTDISPCOMANDADA.at(0).push_back(idTermeletrica_int);
-						indice_PTDISPCOMANDADA.at(1).push_back(i);
-					}
-					else {
-						bool termeletrica_indexada = false;
-						for (int j = 0; j < indice_PTDISPCOMANDADA.at(0).size(); j++) {
-							if (idTermeletrica_int < indice_PTDISPCOMANDADA.at(0).at(j)) {
-								indice_PTDISPCOMANDADA.at(0).insert(indice_PTDISPCOMANDADA.at(0).begin() + j, idTermeletrica_int);
-								indice_PTDISPCOMANDADA.at(1).insert(indice_PTDISPCOMANDADA.at(1).begin() + j, i);
-								termeletrica_indexada = true;
-								break;
-							}
-							else if ((idTermeletrica_int == indice_PTDISPCOMANDADA.at(0).at(j)) && (j < indice_PTDISPCOMANDADA.at(0).size() - 1)) {
-								indice_PTDISPCOMANDADA.at(0).insert(indice_PTDISPCOMANDADA.at(0).begin() + j + 1, idTermeletrica_int);
-								indice_PTDISPCOMANDADA.at(1).insert(indice_PTDISPCOMANDADA.at(1).begin() + j + 1, i);
-								termeletrica_indexada = true;
-								break;
-							}
-						}
-						if (!termeletrica_indexada) {
-							indice_PTDISPCOMANDADA.at(0).push_back(idTermeletrica_int);
-							indice_PTDISPCOMANDADA.at(1).push_back(i);
-						}
-					}
-				} // for (int i = 0; i < int(lista_PTDISPCOMANDADA.size()); i++) {
-
-				for (int i = 0; i < int(lista_PTDISPCOMANDADA.size()); i++) {
-
-					Estrutura_PTDISPCOMANDADA estrutura_PTDISPCOMANDADA = lista_PTDISPCOMANDADA.at(indice_PTDISPCOMANDADA.at(1).at(i));
-
-					estagio.setVariavelDecisaoEmVariavelEstado(estrutura_PTDISPCOMANDADA.idVariavelEstado, a_TSS, -1);
-
-					const int varPTDISPCOM = getVarDecisao_PTDISPCOM(a_TSS, idEstagio, estrutura_PTDISPCOMANDADA.idTermeletrica, estrutura_PTDISPCOMANDADA.codigo_usina, estrutura_PTDISPCOMANDADA.periodo_comandado);
-
-					if (varPTDISPCOM > -1) {
-						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(estrutura_PTDISPCOMANDADA.idVariavelEstado, a_TSS, varPTDISPCOM);
-						criarVariaveis_Decisao_e_Estado_PTDISPCOM_ACUMULADO(a_TSS, a_dados, idEstagio, estrutura_PTDISPCOMANDADA.periodo_comandado, estrutura_PTDISPCOMANDADA.idTermeletrica, estrutura_PTDISPCOMANDADA.codigo_usina);
-						//criarRestricoes_PTDISPCOM_CUSTOS(a_dados, idEstagio, estrutura_PTDISPCOMANDADA.periodo_comandado, estrutura_PTDISPCOMANDADA.idTermeletrica, estrutura_PTDISPCOMANDADA.codigo_usina);
-					}
-
-					else {
-						throw std::invalid_argument("Nao foi possivel encontrar a variavel PTDISPCOM de " + getFullString(estrutura_PTDISPCOMANDADA.idTermeletrica) + " em " + getString(estrutura_PTDISPCOMANDADA.periodo_comandado));
-					}
-
-				} // for (int i = 0; i < int(lista_PTDISPCOMANDADA.size()); i++) {
-
-			} // if (lista_PTDISPCOMANDADA.size() > 0) {
-
-
-			if (lista_PTDISPCOMANDADA_ACUMULADO.size() > 0) {
-
-				std::vector<std::vector<int>> indice_PTDISPCOMANDADA_ACUMULADO(2, std::vector<int>());
-
-				for (int i = 0; i < int(lista_PTDISPCOMANDADA_ACUMULADO.size()); i++) {
-					const int idTermeletrica_int = int(lista_PTDISPCOMANDADA_ACUMULADO.at(i).idTermeletrica);
-					if (indice_PTDISPCOMANDADA_ACUMULADO.at(0).size() == 0) {
-						indice_PTDISPCOMANDADA_ACUMULADO.at(0).push_back(idTermeletrica_int);
-						indice_PTDISPCOMANDADA_ACUMULADO.at(1).push_back(i);
-					}
-					else {
-						bool termeletrica_indexada = false;
-						for (int j = 0; j < indice_PTDISPCOMANDADA_ACUMULADO.at(0).size(); j++) {
-							if (idTermeletrica_int < indice_PTDISPCOMANDADA_ACUMULADO.at(0).at(j)) {
-								indice_PTDISPCOMANDADA_ACUMULADO.at(0).insert(indice_PTDISPCOMANDADA_ACUMULADO.at(0).begin() + j, idTermeletrica_int);
-								indice_PTDISPCOMANDADA_ACUMULADO.at(1).insert(indice_PTDISPCOMANDADA_ACUMULADO.at(1).begin() + j, i);
-								termeletrica_indexada = true;
-								break;
-							}
-							else if ((idTermeletrica_int == indice_PTDISPCOMANDADA_ACUMULADO.at(0).at(j)) && (j < indice_PTDISPCOMANDADA_ACUMULADO.at(0).size() - 1)) {
-								indice_PTDISPCOMANDADA_ACUMULADO.at(0).insert(indice_PTDISPCOMANDADA_ACUMULADO.at(0).begin() + j + 1, idTermeletrica_int);
-								indice_PTDISPCOMANDADA_ACUMULADO.at(1).insert(indice_PTDISPCOMANDADA_ACUMULADO.at(1).begin() + j + 1, i);
-								termeletrica_indexada = true;
-								break;
-							}
-						}
-						if (!termeletrica_indexada) {
-							indice_PTDISPCOMANDADA_ACUMULADO.at(0).push_back(idTermeletrica_int);
-							indice_PTDISPCOMANDADA_ACUMULADO.at(1).push_back(i);
-						}
-					}
-				} // for (int i = 0; i < int(lista_PTDISPCOMANDADA_ACUMULADO.size()); i++) {
-
-
-				for (int i = 0; i < int(lista_PTDISPCOMANDADA_ACUMULADO.size()); i++) {
-
-					Estrutura_PTDISPCOMANDADA estrutura_PTDISPCOMANDADA_ACUMULADO = lista_PTDISPCOMANDADA_ACUMULADO.at(indice_PTDISPCOMANDADA_ACUMULADO.at(1).at(i));
-
-					estagio.setVariavelDecisaoEmVariavelEstado(estrutura_PTDISPCOMANDADA_ACUMULADO.idVariavelEstado, a_TSS, -1);
-
-					const int varPTDISPCOM_ACUMULADO = criarVariaveis_Decisao_e_Estado_PTDISPCOM_ACUMULADO(a_TSS, a_dados, idEstagio, estrutura_PTDISPCOMANDADA_ACUMULADO.periodo_comandado, estrutura_PTDISPCOMANDADA_ACUMULADO.idTermeletrica, estrutura_PTDISPCOMANDADA_ACUMULADO.codigo_usina);
-
-					if (varPTDISPCOM_ACUMULADO > -1) {
-						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(estrutura_PTDISPCOMANDADA_ACUMULADO.idVariavelEstado, a_TSS, varPTDISPCOM_ACUMULADO);
-
-						SmartEnupla<Periodo, double> horizonte_estudo_estagio = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_estudo, idEstagio, Periodo(), double());
-
-						//for (Periodo periodo_estudo = horizonte_estudo_estagio.getIteradorInicial(); periodo_estudo <= horizonte_estudo_estagio.getIteradorFinal(); horizonte_estudo_estagio.incrementarIterador(periodo_estudo))
-							//if (periodo_estudo.sobreposicao(estrutura_PTDISPCOMANDADA_ACUMULADO.periodo_comandado) > 0.0)
-								//criarRestricoes_PTDISPCOM_BALANCO_POTENCIA(a_dados, idEstagio, periodo_estudo, estrutura_PTDISPCOMANDADA_ACUMULADO.periodo_comandado, estrutura_PTDISPCOMANDADA_ACUMULADO.idTermeletrica, estrutura_PTDISPCOMANDADA_ACUMULADO.codigo_usina);
-
-					} // if (varPTDISPCOM_ACUMULADO > -1) {
-
-					else {
-						estagio.anularVariavelEstadoCorteBenders(estrutura_PTDISPCOMANDADA_ACUMULADO.idVariavelEstado);
-						estagio.vetorVariavelEstado.rem(estrutura_PTDISPCOMANDADA_ACUMULADO.idVariavelEstado);
-					}
-
-				}
-
-			} // if (lista_PTDISPCOMANDADA_ACUMULADO.size() > 0) {
 
 			vetorEstagio.add(estagio);
 

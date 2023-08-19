@@ -31,9 +31,6 @@
 
 #define ATT_VETOR_TERMELETRICA(m)  \
 	  m(Termeletrica,  AttVetor,            tipo_detalhamento_producao,  TipoDetalhamentoProducaoTermeletrica,         min,              max,           min,        Periodo) \
-	  m(Termeletrica,  AttVetor,     potencia_disponivel_pre_comandada,                                double,           0,              max,             0,        Periodo) \
-	  m(Termeletrica,  AttVetor,  potencia_disponivel_comandada_minima,                                double,           0,              max,             0,        Periodo) \
-	  m(Termeletrica,  AttVetor,  potencia_disponivel_comandada_maxima,                                double,           0,              max,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,                 potencia_minima_media,                                double,           0,              max,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,                 potencia_maxima_media,                                double,           0,              max,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,      potencia_disponivel_minima_media,                                double,           0,              max,             0,        Periodo) \
