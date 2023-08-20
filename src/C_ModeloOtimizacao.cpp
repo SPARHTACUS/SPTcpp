@@ -3411,8 +3411,10 @@ int ModeloOtimizacao::getNumeroTotalCenariosEmEstados(const IdProcesso a_idProce
 
 		int numero_total_cenarios_em_estados = 0;
 		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) {
-			if ((a_idProcesso == idProcesso) || (getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, a_idEstagio, TipoProcessamentoParalelo()) == TipoProcessamentoParalelo_por_abertura))
-				numero_total_cenarios_em_estados += getSize2Matriz(a_idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso);
+			if ((a_idProcesso == idProcesso) || (getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, a_idEstagio, TipoProcessamentoParalelo()) == TipoProcessamentoParalelo_por_abertura)) {
+				if (getSize1Matriz(a_idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor) > 0)
+					numero_total_cenarios_em_estados += getSize2Matriz(a_idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso);
+			}
 		}
 		
 		return numero_total_cenarios_em_estados;
