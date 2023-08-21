@@ -14516,7 +14516,25 @@ void LeituraCEPEL::atualizar_equacionamento_afluencia_natural_x_hidreletrica(Dad
 
 			const int codigo_usina_jusante_EAR = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, int());
 
-			if (codigo_usina_jusante_EAR > 0) {//Significa que a usina tem um registro JUSENA
+			/////////////////////////////////
+			bool is_registro_JUSENA = false;
+
+			if (lista_modificacaoUHE.size() > int(idHidreletrica)) {//Pode ter usinas do MP que não existem no CP
+
+				for (int idModificacaoUHE = 0; idModificacaoUHE < lista_modificacaoUHE.at(idHidreletrica).size(); idModificacaoUHE++) {
+
+					if (lista_modificacaoUHE.at(idHidreletrica).at(idModificacaoUHE).tipo_de_modificacao == TipoModificacaoUHE_JUSENA) {
+						is_registro_JUSENA = true;
+						break;
+					}//if (lista_modificacaoUHE.at(idHidreletrica).at(idModificacaoUHE).tipo_de_modificacao == TipoModificacaoUHE_JUSENA) {
+
+				}//for (int idModificacaoUHE = 0; idModificacaoUHE < lista_modificacaoUHE.at(idHidreletrica).size(); idModificacaoUHE++) {
+
+			}//if (lista_modificacaoUHE.size() > int(idHidreletrica)) {
+
+			/////////////////////////////////
+
+			if (is_registro_JUSENA) {//Significa que a usina tem um registro JUSENA
 
 				////////////////////////////////////////////////////////////////////
 				//1.1 Identifica as usinas a jusante do caminho "novo" por JUSENA
@@ -14545,6 +14563,8 @@ void LeituraCEPEL::atualizar_equacionamento_afluencia_natural_x_hidreletrica(Dad
 							if (idHidreletrica_jusante != IdHidreletrica_Nenhum)
 								codigo_usina_alvo = a_dados.vetorHidreletrica.att(idHidreletrica_jusante).getAtributo(AttComumHidreletrica_codigo_usina, int());
 
+							break;
+
 						}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_usina, int()) == codigo_usina_alvo) {
 
 					}//for (IdHidreletrica idHidreletrica_aux = IdHidreletrica_1; idHidreletrica_aux <= maiorIdHidreletrica; idHidreletrica_aux++) {
@@ -14567,6 +14587,8 @@ void LeituraCEPEL::atualizar_equacionamento_afluencia_natural_x_hidreletrica(Dad
 
 								if (idHidreletrica_jusante != IdHidreletrica_Nenhum)
 									codigo_usina_alvo = a_dados.vetorHidreletrica.att(idHidreletrica_jusante).getAtributo(AttComumHidreletrica_codigo_usina, int());
+
+								break;
 
 							}//if (lista_hidreletrica_out_estudo.at(pos).getAtributo(AttComumHidreletrica_codigo_usina, int()) == codigo_usina_alvo) {
 
@@ -14602,6 +14624,8 @@ void LeituraCEPEL::atualizar_equacionamento_afluencia_natural_x_hidreletrica(Dad
 
 							if (idHidreletrica_jusante != IdHidreletrica_Nenhum)
 								codigo_usina_alvo = a_dados.vetorHidreletrica.att(idHidreletrica_jusante).getAtributo(AttComumHidreletrica_codigo_usina, int());
+
+							break;
 
 						}//if (a_dados.vetorHidreletrica.att(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_usina, int()) == codigo_usina_alvo) {
 
