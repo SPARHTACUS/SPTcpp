@@ -14640,31 +14640,40 @@ void LeituraCEPEL::atualizar_equacionamento_afluencia_natural_x_hidreletrica(Dad
 		//1. Calcula a afluência INCREMENTAL com base na configuração hidráulica
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		//Listas com a informação da afluência natural calculada com configuração hidráulica + regras.dat
-		const SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, SmartEnupla<Periodo, SmartEnupla<int, IdHidreletrica>>>>    aux_lista_idHidreletricas_calculo_ENA_x_hidreletrica_x_cenario_x_periodo = lista_idHidreletricas_calculo_ENA_x_hidreletrica_x_cenario_x_periodo;
-		const SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, SmartEnupla<Periodo, SmartEnupla<int, double>>>>			 aux_lista_coeficiente_idHidreletricas_calculo_ENA_x_hidreletrica_x_cenario_x_periodo = lista_coeficiente_idHidreletricas_calculo_ENA_x_hidreletrica_x_cenario_x_periodo;
-		const SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>							     aux_lista_termo_independente_calculo_ENA_x_hidreletrica_x_cenario_x_periodo = lista_termo_independente_calculo_ENA_x_hidreletrica_x_cenario_x_periodo;
+		for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+			for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
-			if (is_atualizar_afluencia_natural.getElemento(idHidreletrica)) {
+				//Premissa: em aux_lista-> afluência natural calculada até o momento
+				//          em lista -> nova atualização (subtrai a afluência natural a montante)
 
-				for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
+				//Instancia aux_listas com a info da afluência natural de TODAS as usinas de um determinado idCenario e período
+				SmartEnupla<IdHidreletrica, SmartEnupla<int, IdHidreletrica>>    aux_lista_idHidreletricas_calculo_ENA_x_hidreletrica;
+				SmartEnupla<IdHidreletrica, SmartEnupla<int, double>>			 aux_lista_coeficiente_idHidreletricas_calculo_ENA_x_hidreletrica;
+				SmartEnupla<IdHidreletrica, double>							     aux_lista_termo_independente_calculo_ENA_x_hidreletrica;
+						
+				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
 
-					for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_processo_estocastico.incrementarIterador(periodo)) {
+					aux_lista_idHidreletricas_calculo_ENA_x_hidreletrica.addElemento(idHidreletrica, lista_idHidreletricas_calculo_ENA_x_hidreletrica_x_cenario_x_periodo.at(idHidreletrica).at(idCenario).getElemento(periodo));
+					aux_lista_coeficiente_idHidreletricas_calculo_ENA_x_hidreletrica.addElemento(idHidreletrica, lista_coeficiente_idHidreletricas_calculo_ENA_x_hidreletrica_x_cenario_x_periodo.at(idHidreletrica).at(idCenario).getElemento(periodo));
+					aux_lista_termo_independente_calculo_ENA_x_hidreletrica.addElemento(idHidreletrica, lista_termo_independente_calculo_ENA_x_hidreletrica_x_cenario_x_periodo.at(idHidreletrica).at(idCenario).getElemento(periodo));
 
-						//Premissa: em aux_lista-> afluência natural calculada até o momento
-						//          em lista -> nova atualização (subtrai a afluência natural a montante)
+				}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
 
-						//Encontra as usinas a montante e substrai a afluência natural
+				//////////////
+				//Encontra as usinas a montante e substrai a afluência natural
+				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+
+					if (is_atualizar_afluencia_natural.getElemento(idHidreletrica)) {
+						
 						for (IdHidreletrica idHidreletrica_montante = IdHidreletrica_1; idHidreletrica_montante <= maiorIdHidreletrica; idHidreletrica_montante++) {
 
 							if (a_dados.vetorHidreletrica.att(idHidreletrica_montante).getAtributo(AttComumHidreletrica_jusante, IdHidreletrica()) == idHidreletrica) {
 
 								//Afluência natural usina a montante
-								const SmartEnupla<int, IdHidreletrica>	    montante_idHidreletricas_calculo_ENA = aux_lista_idHidreletricas_calculo_ENA_x_hidreletrica_x_cenario_x_periodo.at(idHidreletrica_montante).at(idCenario).getElemento(periodo);
-								const SmartEnupla<int, double>	montante_coeficiente_idHidreletricas_calculo_ENA = aux_lista_coeficiente_idHidreletricas_calculo_ENA_x_hidreletrica_x_cenario_x_periodo.at(idHidreletrica_montante).at(idCenario).getElemento(periodo);
-								const double								 montante_termo_independente_calculo_ENA = aux_lista_termo_independente_calculo_ENA_x_hidreletrica_x_cenario_x_periodo.at(idHidreletrica_montante).at(idCenario).getElemento(periodo);
+								const SmartEnupla<int, IdHidreletrica>	    montante_idHidreletricas_calculo_ENA = aux_lista_idHidreletricas_calculo_ENA_x_hidreletrica.at(idHidreletrica_montante);
+								const SmartEnupla<int, double>	montante_coeficiente_idHidreletricas_calculo_ENA = aux_lista_coeficiente_idHidreletricas_calculo_ENA_x_hidreletrica.at(idHidreletrica_montante);
+								const double						     montante_termo_independente_calculo_ENA = aux_lista_termo_independente_calculo_ENA_x_hidreletrica.at(idHidreletrica_montante);
 
 								//Cálculo afluência incremental
 								SmartEnupla<int, IdHidreletrica>	idHidreletricas_calculo_ENA = lista_idHidreletricas_calculo_ENA_x_hidreletrica_x_cenario_x_periodo.at(idHidreletrica).at(idCenario).getElemento(periodo);
@@ -14687,13 +14696,13 @@ void LeituraCEPEL::atualizar_equacionamento_afluencia_natural_x_hidreletrica(Dad
 
 						}//for (IdHidreletrica idHidreletrica_montante = IdHidreletrica_1; idHidreletrica_montante <= maiorIdHidreletrica; idHidreletrica_montante++) {
 
-					}//for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_processo_estocastico.incrementarIterador(periodo)) {
+					}//if (is_atualizar_afluencia_natural.getElemento(idHidreletrica)) {
 
-				}//for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
+				}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
 
-			}//if (is_atualizar_afluencia_natural.getElemento(idHidreletrica)) {
+			}//for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
-		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		}//for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//2. Calcula a afluência NATURAL com base no caminho JUSENA
