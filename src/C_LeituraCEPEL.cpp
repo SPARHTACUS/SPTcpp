@@ -179,7 +179,7 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 		}//	if (a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getSizeMatriz(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) > 0) {
 
 
-		for (idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//Calcula a defluencia_maxima do polinomio_jusante para obter h_jus > 0 nas usinas com maiorPolinomiojusante = 1
@@ -391,7 +391,7 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 
 			}//if (maiorIdConjunto != IdConjuntoHidraulico_Nenhum){
 
-		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::calculaEngolimentoMaximo(" + getFullString(idHidreletrica) + "): \n" + std::string(erro.what())); }
@@ -446,7 +446,7 @@ double LeituraCEPEL::calculaDefluenciaMinima_para_EngolimentoMaximo(Dados& a_dad
 
 				for (int pos = 0; pos < int(idHidreletricas_calculo_defluencia_minima.size()); pos++) {
 
-					const IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria(idHidreletricas_calculo_defluencia_minima.at(pos));
+					const IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria(lista_hidreletrica_IdVariavelAleatoria.at(idHidreletricas_calculo_defluencia_minima.at(pos)));
 
 					if (a_idEstagio <= a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio()))
 						vazao_defluencia_minima += a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVariavelAleatoria, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario_1, periodo_processo_estocastico, double());
@@ -558,9 +558,9 @@ void LeituraCEPEL::instancia_termeletricas_preConfig(Dados& a_dados, const std::
 			a_dados.vetorTermeletrica.att(idTermeletrica).setAtributo(AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica_sem_producao);
 
 			termeletricasPreConfig_instanciadas = true;
-			lista_codigo_ONS_termeletrica.addElemento(idTermeletrica, a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_codigo_usina, int()));
-			lista_classe_ONS_termeletrica.addElemento(idTermeletrica, 0);
-			lista_termeletrica_com_expansao.addElemento(idTermeletrica, false);
+			lista_codigo_ONS_termeletrica.setElemento(idTermeletrica, a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_codigo_usina, int()));
+			lista_classe_ONS_termeletrica.setElemento(idTermeletrica, 0);
+			lista_termeletrica_com_expansao.setElemento(idTermeletrica, false);
 
 
 		}
@@ -619,17 +619,17 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 			bool tipo_detalhamento_producao_por_conjunto = false;
 			bool tipo_detalhamento_producao_por_unidade = false;
 
-			for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+			for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-				lista_hidreletrica_pre_configuracao.addElemento(idHidreletrica, true);
+				lista_hidreletrica_pre_configuracao.setElemento(idHidreletrica, true);
 
-				lista_codigo_ONS_REE.addElemento(idHidreletrica, 0);
-				lista_codigo_ONS_hidreletrica.addElemento(idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_codigo_usina, int()));
-				lista_hidreletrica_com_expansao.addElemento(idHidreletrica, false);
-				lista_hidreletrica_com_modificacao.addElemento(idHidreletrica, false);
-				lista_hidreletrica_sem_capacidade.addElemento(idHidreletrica, false);
-				lista_hidreletrica_maiorIdConjuntoHidraulico.addElemento(idHidreletrica, IdConjuntoHidraulico_Nenhum); //Logo lendo o HIDR.DAT este parâmetro é atualizado
-				lista_IdSubmercado_hidreletrica.addElemento(idHidreletrica, IdSubmercado_Nenhum); //Logo no HIDR.DAT esta informação é atualizada
+				lista_codigo_ONS_REE.setElemento(idHidreletrica, 0);
+				lista_codigo_ONS_hidreletrica.setElemento(idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_codigo_usina, int()));
+				lista_hidreletrica_com_expansao.setElemento(idHidreletrica, false);
+				lista_hidreletrica_com_modificacao.setElemento(idHidreletrica, false);
+				lista_hidreletrica_sem_capacidade.setElemento(idHidreletrica, false);
+				lista_hidreletrica_maiorIdConjuntoHidraulico.setElemento(idHidreletrica, IdConjuntoHidraulico_Nenhum); //Logo lendo o HIDR.DAT este parâmetro é atualizado
+				lista_IdSubmercado_hidreletrica.setElemento(idHidreletrica, IdSubmercado_Nenhum); //Logo no HIDR.DAT esta informação é atualizada
 
 				if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_bacia, IdBaciaHidrografica()) == IdBaciaHidrografica_Nenhum) {
 					const IdBaciaHidrografica idBaciaHidrografica = atribui_bacia_hidrografica(a_dados, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_codigo_usina, int()));
@@ -668,7 +668,7 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 
 				}
 
-			} // for(IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++)
+			} // for(IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica))
 
 			if (tipo_detalhamento_producao_por_usina)
 				entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", a_dados, TipoAcessoInstancia_membroMembro);
@@ -705,7 +705,7 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 
 				Periodo periodo_final_tendencia = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, IdEstagio_1, Periodo());
 
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 					if (a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.isInstanciado(IdAfluencia_vazao_afluente)) {
 
@@ -722,7 +722,7 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 
 					} // if (a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.isInstanciado(IdAfluencia_vazao_afluente)) {
 
-				} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+				} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 				if (tendencia_natural && tendencia_incremental)
 					throw std::invalid_argument("Apenas um tipo de tendencia deve ser instnciado. Natural ou incremental.");
@@ -845,7 +845,7 @@ void LeituraCEPEL::aplicarModificacoesUHE(Dados& a_dados) {
 
 		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			if (lista_modificacaoUHE.size() <= int(idHidreletrica))
 				return;
@@ -1088,7 +1088,7 @@ void LeituraCEPEL::aplicarModificacoesUHE(Dados& a_dados) {
 
 			} // if (lista_modificacaoUHE.at(idHidreletrica).size() > 0){
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++){
+		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)){
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::aplicarModificacoesUHE(a_dados): \n" + std::string(erro.what())); }
@@ -2925,8 +2925,8 @@ void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_
 
 			a_dados.vetorSubmercado.att(idSubmercado).setAtributo(AttComumSubmercado_nome, nome);
 
-			lista_codigo_ONS_submercado.addElemento(idSubmercado, codigo_IV);
-			lista_submercado_mnemonico.addElemento(idSubmercado, nome);
+			lista_codigo_ONS_submercado.setElemento(idSubmercado, codigo_IV);
+			lista_submercado_mnemonico.setElemento(idSubmercado, nome);
 
 
 			//*******************************************************************
@@ -3171,8 +3171,8 @@ void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_
 
 			a_dados.vetorSubmercado.att(idSubmercado).setAtributo(AttComumSubmercado_nome, nome);
 
-			lista_codigo_ONS_submercado.addElemento(idSubmercado, codigo_ANDE);
-			lista_submercado_mnemonico.addElemento(idSubmercado, nome);
+			lista_codigo_ONS_submercado.setElemento(idSubmercado, codigo_ANDE);
+			lista_submercado_mnemonico.setElemento(idSubmercado, nome);
 
 
 			//************************************************************
@@ -3249,8 +3249,8 @@ void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_
 
 				a_dados.vetorSubmercado.att(idSubmercado).setAtributo(AttComumSubmercado_nome, nome);
 
-				lista_codigo_ONS_submercado.addElemento(idSubmercado, codigo_submercado_ITAIPU);
-				lista_submercado_mnemonico.addElemento(idSubmercado, nome);
+				lista_codigo_ONS_submercado.setElemento(idSubmercado, codigo_submercado_ITAIPU);
+				lista_submercado_mnemonico.setElemento(idSubmercado, nome);
 
 
 				//*******************************************************************
@@ -3353,7 +3353,7 @@ void LeituraCEPEL::adicionaIntercambiosHidraulicosApartirJusanteDesvio(Dados& a_
 
 		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			const IdHidreletrica idHidreletrica_jusante_desvio = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica());
 
@@ -3379,7 +3379,7 @@ void LeituraCEPEL::adicionaIntercambiosHidraulicosApartirJusanteDesvio(Dados& a_
 
 			}//if (idHidreletricajusante_desvio != IdHidreletrica_Nenhum) {
 
-		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::adicionaIntercambiosHidraulicosApartirJusanteDesvio(Dados &a_dados): \n" + std::string(erro.what())); }
@@ -3395,7 +3395,7 @@ void LeituraCEPEL::adicionaLimitesDesvioApartirJusanteDesvio(Dados& a_dados) {
 
 		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			const IdHidreletrica idHidreletrica_jusante_desvio = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica());
 
@@ -3406,7 +3406,7 @@ void LeituraCEPEL::adicionaLimitesDesvioApartirJusanteDesvio(Dados& a_dados) {
 
 			}//if (idHidreletricajusante_desvio != IdHidreletrica_Nenhum) {
 
-		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::adicionaLimitesDesvioApartirJusanteDesvio(Dados &a_dados): \n" + std::string(erro.what())); }

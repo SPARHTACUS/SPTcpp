@@ -82,6 +82,15 @@ friend class LeituraCEPEL;\
 		} \
 		return vetorIdMembro; \
 	};\
+	void incr(Id##Membro &a_id)const{\
+		for (Id##Membro id = Id##Membro(int(a_id) + 1); id <= maiorId; id++) {\
+			if (isInstanciado(id)) {\
+				a_id = id; \
+				return; \
+			} \
+		} \
+		a_id = Id##Membro##_Excedente; \
+	};\
 	template<typename Atributo, typename Valor> \
 	std::vector<Id##Membro> getIdObjetos(const Atributo a_atributo, const Valor a_valor)const{ \
 		if (maiorId == Id##Membro##_Nenhum) \

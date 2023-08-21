@@ -297,50 +297,51 @@ private:
 
 	////////////////////////////////////////////////////////////////
 
-	SmartEnupla<IdHidreletrica, int> lista_codigo_ONS_REE;
-	SmartEnupla<IdBaciaHidrografica, int> lista_codigo_ONS_bacia_REE;
+	SmartEnupla<IdHidreletrica, int> lista_codigo_ONS_REE = SmartEnupla<IdHidreletrica, int>(IdHidreletrica_1, std::vector<int>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), -1));
+	SmartEnupla<IdBaciaHidrografica, int> lista_codigo_ONS_bacia_REE = SmartEnupla<IdBaciaHidrografica, int>(IdBaciaHidrografica_1, std::vector<int>(IdBaciaHidrografica(int(IdBaciaHidrografica_Excedente) - 1), -1));
 
-	SmartEnupla<IdHidreletrica, int> lista_codigo_ONS_hidreletrica;
+	SmartEnupla<IdHidreletrica, int> lista_codigo_ONS_hidreletrica = SmartEnupla<IdHidreletrica, int>(IdHidreletrica_1, std::vector<int>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), -1));
 
-	SmartEnupla<IdHidreletrica, bool> lista_hidreletrica_pre_configuracao;
+	SmartEnupla<IdHidreletrica, bool> lista_hidreletrica_pre_configuracao = SmartEnupla<IdHidreletrica, bool>(IdHidreletrica_1, std::vector<bool>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), false));
 
-	SmartEnupla<IdHidreletrica, bool> lista_hidreletrica_com_expansao;
-	SmartEnupla<IdHidreletrica, bool> lista_hidreletrica_com_modificacao;
-	SmartEnupla<IdHidreletrica, bool> lista_hidreletrica_sem_capacidade;
+	SmartEnupla<IdHidreletrica, bool> lista_hidreletrica_com_expansao = SmartEnupla<IdHidreletrica, bool>(IdHidreletrica_1, std::vector<bool>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), false));
+	SmartEnupla<IdHidreletrica, bool> lista_hidreletrica_com_modificacao = SmartEnupla<IdHidreletrica, bool>(IdHidreletrica_1, std::vector<bool>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), false));
+	SmartEnupla<IdHidreletrica, bool> lista_hidreletrica_sem_capacidade = SmartEnupla<IdHidreletrica, bool>(IdHidreletrica_1, std::vector<bool>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), false));
 
-	SmartEnupla<IdHidreletrica, IdConjuntoHidraulico> lista_hidreletrica_maiorIdConjuntoHidraulico;
+	SmartEnupla<IdHidreletrica, IdVariavelAleatoria> lista_hidreletrica_IdVariavelAleatoria = SmartEnupla<IdHidreletrica, IdVariavelAleatoria>(IdHidreletrica_1, std::vector<IdVariavelAleatoria>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdVariavelAleatoria_Nenhum));
+	SmartEnupla<IdHidreletrica, IdConjuntoHidraulico> lista_hidreletrica_maiorIdConjuntoHidraulico = SmartEnupla<IdHidreletrica, IdConjuntoHidraulico>(IdHidreletrica_1, std::vector<IdConjuntoHidraulico>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdConjuntoHidraulico_Nenhum));
 
-	SmartEnupla<IdTermeletrica, int> lista_codigo_ONS_termeletrica;
-	SmartEnupla<IdTermeletrica, int> lista_classe_ONS_termeletrica;
+	SmartEnupla<IdTermeletrica, int> lista_codigo_ONS_termeletrica = SmartEnupla<IdTermeletrica, int>(IdTermeletrica_1, std::vector<int>(IdTermeletrica(int(IdTermeletrica_Excedente) - 1), -1));
+	SmartEnupla<IdTermeletrica, int> lista_classe_ONS_termeletrica = SmartEnupla<IdTermeletrica, int>(IdTermeletrica_1, std::vector<int>(IdTermeletrica(int(IdTermeletrica_Excedente) - 1), -1));
 
-	SmartEnupla<IdTermeletrica, bool> lista_termeletrica_com_expansao;
+	SmartEnupla<IdTermeletrica, bool> lista_termeletrica_com_expansao = SmartEnupla<IdTermeletrica, bool>(IdTermeletrica_1, std::vector<bool>(IdTermeletrica(int(IdTermeletrica_Excedente) - 1), false));
 
-	SmartEnupla<IdContrato, int> lista_codigo_ONS_contrato;
+	SmartEnupla<IdContrato, int> lista_codigo_ONS_contrato = SmartEnupla<IdContrato, int>(IdContrato_1, std::vector<int>(IdContrato(int(IdContrato_Excedente) - 1), -1));
 
-	SmartEnupla<IdUsinaEolica, int> lista_codigo_ONS_usina_eolica;
+	SmartEnupla<IdUsinaEolica, int> lista_codigo_ONS_usina_eolica = SmartEnupla<IdUsinaEolica, int>(IdUsinaEolica_1, std::vector<int>(IdUsinaEolica(int(IdUsinaEolica_Excedente) - 1), -1));
 
-	SmartEnupla<IdSubmercado, SmartEnupla<IdPatamarDeficit, int>> matriz_codigo_ONS_patamar_deficit;
-
-	SmartEnupla<IdRestricaoEletrica, int> lista_codigo_ONS_restricao_eletrica;
+	SmartEnupla<IdRestricaoEletrica, int> lista_codigo_ONS_restricao_eletrica = SmartEnupla<IdRestricaoEletrica, int>(IdRestricaoEletrica_1, std::vector<int>(IdRestricaoEletrica(int(IdRestricaoEletrica_Excedente) - 1), -1));
 
 	SmartEnupla<Periodo, double> lista_demanda_ANDE;
 
-	SmartEnupla<IdRestricaoEletrica, Periodo> lista_restricao_eletrica_periodo_inicial;
-	SmartEnupla<IdRestricaoEletrica, Periodo> lista_restricao_eletrica_periodo_final;
+	SmartEnupla<IdRestricaoEletrica, Periodo> lista_restricao_eletrica_periodo_inicial = SmartEnupla<IdRestricaoEletrica, Periodo>(IdRestricaoEletrica_1, std::vector<Periodo>(IdRestricaoEletrica(int(IdRestricaoEletrica_Excedente) - 1), Periodo()));
+	SmartEnupla<IdRestricaoEletrica, Periodo> lista_restricao_eletrica_periodo_final = SmartEnupla<IdRestricaoEletrica, Periodo>(IdRestricaoEletrica_1, std::vector<Periodo>(IdRestricaoEletrica(int(IdRestricaoEletrica_Excedente) - 1), Periodo()));
 
-	SmartEnupla<IdAgrupamentoIntercambio, int> lista_codigo_ONS_agrupamento_intercambio;
+	SmartEnupla<IdAgrupamentoIntercambio, int> lista_codigo_ONS_agrupamento_intercambio = SmartEnupla<IdAgrupamentoIntercambio, int>(IdAgrupamentoIntercambio_1, std::vector<int>(IdAgrupamentoIntercambio(int(IdAgrupamentoIntercambio_Excedente) - 1), -1));
 
-	SmartEnupla<IdRestricaoOperativaUHE, int> lista_codigo_ONS_restricao_operativa_UHE_vazao_afluente;
-	SmartEnupla<IdRestricaoOperativaUHE, int> lista_codigo_ONS_restricao_operativa_UHE_volume;
-	SmartEnupla<IdRestricaoOperativaUHE, int> lista_codigo_ONS_restricao_operativa_UHE_vazao_defluente;
+	SmartEnupla<IdRestricaoOperativaUHE, int> lista_codigo_ONS_restricao_operativa_UHE_vazao_afluente = SmartEnupla<IdRestricaoOperativaUHE, int>(IdRestricaoOperativaUHE_1, std::vector<int>(IdRestricaoOperativaUHE(int(IdRestricaoOperativaUHE_Excedente) - 1), -1));
+	SmartEnupla<IdRestricaoOperativaUHE, int> lista_codigo_ONS_restricao_operativa_UHE_volume = SmartEnupla<IdRestricaoOperativaUHE, int>(IdRestricaoOperativaUHE_1, std::vector<int>(IdRestricaoOperativaUHE(int(IdRestricaoOperativaUHE_Excedente) - 1), -1));
+	SmartEnupla<IdRestricaoOperativaUHE, int> lista_codigo_ONS_restricao_operativa_UHE_vazao_defluente = SmartEnupla<IdRestricaoOperativaUHE, int>(IdRestricaoOperativaUHE_1, std::vector<int>(IdRestricaoOperativaUHE(int(IdRestricaoOperativaUHE_Excedente) - 1), -1));
 
-	SmartEnupla<IdUsinaElevatoria, int> lista_codigo_ONS_usina_elevatoria;
+	SmartEnupla<IdUsinaElevatoria, int> lista_codigo_ONS_usina_elevatoria = SmartEnupla<IdUsinaElevatoria, int>(IdUsinaElevatoria_1, std::vector<int>(IdUsinaElevatoria(int(IdUsinaElevatoria_Excedente) - 1), -1));
 
-	SmartEnupla<IdSubmercado, int> lista_codigo_ONS_submercado;
+	SmartEnupla<IdSubmercado, int> lista_codigo_ONS_submercado = SmartEnupla<IdSubmercado, int>(IdSubmercado_1, std::vector<int>(IdSubmercado(int(IdSubmercado_Excedente) - 1), -1));
 
-	SmartEnupla<IdHidreletrica, IdSubmercado> lista_IdSubmercado_hidreletrica;
+	SmartEnupla<IdSubmercado, SmartEnupla<IdPatamarDeficit, int>> matriz_codigo_ONS_patamar_deficit = SmartEnupla<IdSubmercado, SmartEnupla<IdPatamarDeficit, int>>(IdSubmercado_1, std::vector<SmartEnupla<IdPatamarDeficit, int>>(IdSubmercado(int(IdSubmercado_Excedente) - 1), SmartEnupla<IdPatamarDeficit, int>()));
 
-	SmartEnupla<IdSubmercado, std::string> lista_submercado_mnemonico;
+	SmartEnupla<IdHidreletrica, IdSubmercado> lista_IdSubmercado_hidreletrica = SmartEnupla<IdHidreletrica, IdSubmercado>(IdHidreletrica_1, std::vector<IdSubmercado>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdSubmercado_Nenhum));
+
+	SmartEnupla<IdSubmercado, std::string> lista_submercado_mnemonico = SmartEnupla<IdSubmercado, std::string>(IdSubmercado_1, std::vector<std::string>(IdSubmercado(int(IdSubmercado_Excedente) - 1), ""));
 
 	SmartEnupla<int, int> lista_codigo_ONS_hidreletrica_original;
 	SmartEnupla<int, int> lista_codigo_ONS_hidreletrica_jusante_original;
@@ -349,10 +350,10 @@ private:
 	SmartEnupla<int, SmartEnupla<int, int>> lista_codigo_ONS_hidreletricas_desagregadas; //Código das usinas desagregada correspondete à hidreletrica_agregada
 
 	//Listas necessárias para validação das hidrelétricas PreConfig
-	SmartEnupla<IdHidreletrica, IdHidreletrica> lista_jusante_hidreletrica;        //Lista da jusante de cada hidrelétrica -> Somente para validação entre a configuração PD e CP
-	SmartEnupla<IdHidreletrica, IdHidreletrica> lista_jusante_desvio_hidreletrica; //Lista da jusante_desvio de cada hidrelétrica -> Somente para validação entre a configuração PD e CP
+	SmartEnupla<IdHidreletrica, IdHidreletrica> lista_jusante_hidreletrica = SmartEnupla<IdHidreletrica, IdHidreletrica>(IdHidreletrica_1, std::vector<IdHidreletrica>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdHidreletrica_Nenhum));        //Lista da jusante de cada hidrelétrica -> Somente para validação entre a configuração PD e CP
+	SmartEnupla<IdHidreletrica, IdHidreletrica> lista_jusante_desvio_hidreletrica = SmartEnupla<IdHidreletrica, IdHidreletrica>(IdHidreletrica_1, std::vector<IdHidreletrica>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdHidreletrica_Nenhum)); //Lista da jusante_desvio de cada hidrelétrica -> Somente para validação entre a configuração PD e CP
 
-	SmartEnupla<IdHidreletrica, int> lista_hidreletrica_NPOSNW; //Lista que registra se uma usina tem diferença de posto entre DECOMP  e NEWAVE
+	SmartEnupla<IdHidreletrica, int> lista_hidreletrica_NPOSNW = SmartEnupla<IdHidreletrica, int>(IdHidreletrica_1, std::vector<int>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), -1));; //Lista que registra se uma usina tem diferença de posto entre DECOMP  e NEWAVE
 
 	template<typename TipoIterador>
 	TipoIterador getIdFromCodigoONS(const SmartEnupla<TipoIterador, int>& a_lista_codigo_ONS, const int a_codigo_ONS) {

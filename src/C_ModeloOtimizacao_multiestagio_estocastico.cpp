@@ -317,7 +317,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 
 						// RESTRIÇÃO DAS USINAS HIDRELETRICAS 
-						for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+						for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 							// RESTRIÇÃO DE BALANÇO HIDRAULICO 
 							if ((a_dados.getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, periodo_estudo, double()) > 0.0) || (a_dados.getAtributo(AttComumDados_representar_todos_balancos_hidricos_por_volume, bool())) || \
@@ -377,7 +377,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 							criarRestricoesTurbinamentoHidraulico(listaTipoSubproblemaSolver.at(i), a_dados, idEstagio, periodo_estudo, idHidreletrica, idPatamarCarga);
 							tempoCriarVariaveis.restricaoTurbinamentoHidraulico += std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock).count() / 60;
 
-						}// for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+						}// for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 
 						// Restrições: Potencia Termelétrica (Por Produtibilidade), Potencia Termeletrica Relaxada, Potencia Termeletrica Disponível e Potencia Termeletrica Disponível Relaxada
@@ -3739,7 +3739,7 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 
 		// Variaveis Hidreletricas
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			const TipoDetalhamentoProducaoHidreletrica tipo_detalhamento_producao = a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_tipo_detalhamento_producao, a_periodo_estudo, TipoDetalhamentoProducaoHidreletrica());
 
@@ -3797,7 +3797,7 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 				} // for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= a_dados.getMaiorId(idHidreletrica, IdConjuntoHidraulico()); idConjuntoHidraulico++) {
 			} // else if (tipo_detalhamento_producao == TipoDetalhamentoProducaoHidreletrica_por_unidade) {
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 
 		// Variaveis Intercambio
@@ -3952,7 +3952,7 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 		// POTENCIA_HIDRAULICA_DISPONIVEL
 		if (true) {
 
-			for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; idHidreletrica++) {
+			for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 				if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica) {
 
@@ -4016,7 +4016,7 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 				// Variável QVER
 				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), getEquLinear_VAZAO_VERTIDA(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
 
-			} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; idHidreletrica++) {
+			} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 		} // if (true) {
 
@@ -4207,13 +4207,13 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo(const TipoSu
 
 
 		// Variáveis Hidreletricas
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			// Variável QEV_FINF
 			if ((getVarDecisao_QEV_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) > -1))
 				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_evaporacao, double()));
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 		// Variáveis Hidreletricas Folga Afluencia Incremental
 		const SmartEnupla<Periodo, int> horizonte_espaco_amostral_hidrologico = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo(), int());
@@ -4222,7 +4222,7 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo(const TipoSu
 			const double sobreposicao = a_periodo_estudo.sobreposicao(periodo);
 			if (sobreposicao > 0.0) {
 
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; idHidreletrica++) {
+				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 					// Variável YHF
 					if (getVarDecisao_YHFseExistir(a_TSS, a_idEstagio, periodo, idHidreletrica) > -1)
 						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YHF(a_TSS, a_idEstagio, periodo, idHidreletrica), posEquZP, -sobreposicao * a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_afluencia_incremental, double()));
@@ -4327,7 +4327,7 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 		const IdEstagio estagio_acoplamento_pre_estudo = getAtributo(AttComumModeloOtimizacao_estagio_acoplamento_pre_estudo, IdEstagio());
 
 		// Variáveis Hidreletricas
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			// Variável QTUR / QTURDISP (penaliza a variável que está na FPH)
 
@@ -4454,7 +4454,7 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 			} // for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= a_dados.getMaiorId(idHidreletrica, IdConjuntoHidraulico()); idConjuntoHidraulico++) {
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 		// Variáveis Termeletricas
 		for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= a_maiorIdTermeletrica; idTermeletrica++) {
@@ -4786,7 +4786,7 @@ void ModeloOtimizacao::criarVariaveisVolume(const TipoSubproblemaSolver a_TSS, D
 		const Periodo   periodo_otimizacao = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, a_idEstagio, Periodo());
 		const IdEstagio idEstagioAnterior = IdEstagio(a_idEstagio - 1);
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_considerar_usina, bool())) {
 
@@ -4898,7 +4898,7 @@ void ModeloOtimizacao::criarVariaveisVolume(const TipoSubproblemaSolver a_TSS, D
 
 			} // if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_considerar_usina, bool())){
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 	}// try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveisVolume(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_periodo_estudo) + "): \n" + std::string(erro.what())); }
@@ -5099,7 +5099,7 @@ void ModeloOtimizacao::setVolumeMeta(const TipoSubproblemaSolver a_TSS, Dados& a
 		const IdCenario cenario_inicial = getAtributo(AttComumModeloOtimizacao_cenario_inicial, IdCenario());
 		const IdCenario cenario_final = getAtributo(AttComumModeloOtimizacao_cenario_final, IdCenario());
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			if (a_dados.getSize1Matriz(idHidreletrica, IdReservatorio_1, AttMatrizReservatorio_volume_meta) > 0) {
 
@@ -5134,7 +5134,7 @@ void ModeloOtimizacao::setVolumeMeta(const TipoSubproblemaSolver a_TSS, Dados& a
 
 			} // if (a_dados.getSize1Matriz(idHidreletrica, IdReservatorio_1, AttMatrizReservatorio_volume_meta) > 0) {
 
-		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; idHidreletrica++) {
+		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 
 	} // try
@@ -5181,7 +5181,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 
 		const double infinito = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_considerar_usina, bool())) {
 
@@ -5785,7 +5785,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 				} // if (disponivel) {
 
 			} // if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_considerar_usina, bool())){
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 
 		// Restrição Operativa UHE Folgas (RHX_FSUP/RHX_FINF)
@@ -6291,7 +6291,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FI
 
 			if (percentual_inclusao_periodo > 0.0) {
 
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); idHidreletrica++) {
+				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 					if (getVarDecisao_VF_FINFseExistir(a_TSS, a_idEstagio, periodo, idHidreletrica) > -1) {
 
 						if (getVarDecisao_ZP0_VF_FINFseExistir(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao) == -1) {
@@ -6325,7 +6325,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FI
 						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo, idHidreletrica), getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao), -valor_penalidade);
 
 					} // if (getVarDecisao_VF_FINFseExistir(a_TSS, a_idEstagio, periodo, idHidreletrica) > -1) {
-				} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); idHidreletrica++) {
+				} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			} // if (percentual_inclusao_periodo > 0.0) {
 
