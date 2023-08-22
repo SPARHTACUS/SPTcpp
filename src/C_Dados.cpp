@@ -792,7 +792,7 @@ void Dados::validaTermeletrica() {
 
 		const IdTermeletrica maiorIdTermeletrica = getMaiorId(IdTermeletrica());
 
-		for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= maiorIdTermeletrica; idTermeletrica++) {
+		for (IdTermeletrica idTermeletrica = getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
 
 			const bool considerar_usina = getAtributo(idTermeletrica, AttComumTermeletrica_considerar_usina, bool());
 
@@ -881,7 +881,7 @@ void Dados::validaTermeletrica() {
 
 			} // if (considerar_usina){
 
-		} // for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= maiorIdTermeletrica; idTermeletrica++) {
+		} // for (IdTermeletrica idTermeletrica = getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaTermeletrica(): \n" + std::string(erro.what())); }
@@ -916,7 +916,7 @@ void Dados::validaUnidadeUTE() {
 
 		const int numeroPeriodos = getSizeVetor(AttVetorDados_horizonte_estudo);
 
-		for (IdTermeletrica idUTE = IdTermeletrica_1; idUTE <= maiorIdTermeletrica; idUTE++) {
+		for (IdTermeletrica idUTE = getMenorId(IdTermeletrica()); idUTE <= maiorIdTermeletrica; vetorTermeletrica.incr(idUTE)) {
 
 			const bool  considerar_usina = getAtributo(idUTE, AttComumTermeletrica_considerar_usina, bool());
 
@@ -965,7 +965,7 @@ void Dados::validaUnidadeUTE() {
 
 			} // if (considerar_usina) {
 
-		} //for (IdTermeletrica idUTE = IdTermeletrica_1; idUTE <= maiorIdTermeletrica; idUTE++) {
+		} //for (IdTermeletrica idUTE = getMenorId(IdTermeletrica()); idUTE <= maiorIdTermeletrica; vetorTermeletrica.incr(idUTE)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaUnidadeUTE(): \n" + std::string(erro.what())); }
@@ -1846,6 +1846,9 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 		//MAIOR ID TERMELETRICA
 		const IdTermeletrica maiorIdTermeletrica = getMaiorId(IdTermeletrica());
+		const IdTermeletrica menorIdTermeletrica = getMenorId(IdTermeletrica());
+
+		const int numIdTermeletrica = int(maiorIdTermeletrica - menorIdTermeletrica) + 1;
 
 		bool recarregar_AttVetorReservatorio_PorIdMes = false;
 		bool recarregar_AttVetorReservatorio_PorPeriodo = false;
@@ -1868,11 +1871,11 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 		std::vector<bool> impresso_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga(2, false);
 
 		// SMART ENUPLA AUXILIARES
-		SmartEnupla<IdTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>> preencher_AttVetorTermeletrica(IdTermeletrica_1, std::vector<SmartEnupla<AttVetorTermeletrica, PreencherAtributo>>(maiorIdTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>()));
-		SmartEnupla<IdTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>> preencher_AttMatrizTermeletrica(IdTermeletrica_1, std::vector<SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>>(maiorIdTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>()));
+		SmartEnupla<IdTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>> preencher_AttVetorTermeletrica(menorIdTermeletrica, std::vector<SmartEnupla<AttVetorTermeletrica, PreencherAtributo>>(numIdTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>()));
+		SmartEnupla<IdTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>> preencher_AttMatrizTermeletrica(menorIdTermeletrica, std::vector<SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>>(numIdTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>()));
 
-		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>> preencher_AttVetorUnidadeUTE(IdTermeletrica_1, std::vector<SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>>(maiorIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>()));
-		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>> preencher_AttMatrizUnidadeUTE(IdTermeletrica_1, std::vector< SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>>(maiorIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>()));
+		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>> preencher_AttVetorUnidadeUTE(menorIdTermeletrica, std::vector<SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>>(numIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>()));
+		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>> preencher_AttMatrizUnidadeUTE(menorIdTermeletrica, std::vector< SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>>(numIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>()));
 
 		// ID PROCESSO
 		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
@@ -1906,7 +1909,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 		} // for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
 
-		for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= maiorIdTermeletrica; idTermeletrica++) {
+		for (IdTermeletrica idTermeletrica = menorIdTermeletrica; idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
 
 			if (true) {
 				//if (getAtributo(idTermeletrica, AttComumTermeletrica_considerar_usina, bool())) {
@@ -3178,7 +3181,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 			} //if (getAtributo(idTermeletrica, AttComumTermeletrica_considerar_usina, bool())) {
 
 
-		} // for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= maiorIdTermeletrica; idTermeletrica++) {
+		} // for (IdTermeletrica idTermeletrica = getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
 
 
 		// VALIDA AS UNIDADES TERMEL�TRICAS
@@ -3247,9 +3250,10 @@ void Dados::validaHidreletrica() {
 		const Periodo periodo_estudo_inicial = horizonte_estudo.getIteradorInicial();
 		const Periodo periodo_final_estudo = horizonte_estudo.getIteradorFinal();
 
+		const IdHidreletrica menorIdHidreletrica = getMenorId(IdHidreletrica());
 		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 			const TipoDetalhamentoProducaoHidreletrica tipo_detalhamento_producao = getAtributo(idHidreletrica, AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica());
 
@@ -3357,7 +3361,7 @@ void Dados::validaHidreletrica() {
 
 			} // for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaHidreletrica(): \n" + std::string(erro.what())); }
@@ -3371,7 +3375,7 @@ void Dados::validaDefluencia() {
 
 		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 			if (vetorHidreletrica.att(idHidreletrica).vetorDefluencia.isInstanciado(IdDefluencia_passada)) {
 
@@ -3400,7 +3404,7 @@ void Dados::validaDefluencia() {
 
 			}//else if(getAtributo(idHidreletrica, AttComumHidreletrica_tempo_viagem_agua, int()) > 0) {
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaDefluencia(): \n" + std::string(erro.what())); }
@@ -3616,7 +3620,7 @@ void Dados::validaConjuntoHidraulicoEmHidreletrica() {
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
-		for (IdHidreletrica idUHE = IdHidreletrica_1; idUHE <= maiorIdHidreletrica; idUHE++) {
+		for (IdHidreletrica idUHE = getMenorId(IdHidreletrica()); idUHE <= maiorIdHidreletrica; vetorHidreletrica.incr(idUHE)) {
 
 			const bool  considerar_usina = getAtributo(idUHE, AttComumHidreletrica_considerar_usina, bool());
 
@@ -3635,7 +3639,7 @@ void Dados::validaConjuntoHidraulicoEmHidreletrica() {
 				} // for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= maiorIdConjuntoHidraulico; idConjuntoHidraulico++) {
 
 			} // if (considerar_usina) {
-		} // for (IdHidreletrica idUHE = IdHidreletrica_1; idUHE <= maiorIdHidreletrica; idUHE++) {
+		} // for (IdHidreletrica idUHE = getMenorId(IdHidreletrica()); idUHE <= maiorIdHidreletrica; idUHE++) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaConjuntoHidraulicoEmHidreletrica(): \n" + std::string(erro.what())); }
@@ -3658,7 +3662,7 @@ void Dados::validaUnidadeUHE() {
 
 
 
-		for (IdHidreletrica idUHE = IdHidreletrica_1; idUHE <= maiorIdHidreletrica; idUHE++) {
+		for (IdHidreletrica idUHE = getMenorId(IdHidreletrica()); idUHE <= maiorIdHidreletrica; vetorHidreletrica.incr(idUHE)) {
 
 			const bool  considerar_usina = getAtributo(idUHE, AttComumHidreletrica_considerar_usina, bool());
 
@@ -3689,7 +3693,7 @@ void Dados::validaUnidadeUHE() {
 
 			} // if (considerar_usina) {
 
-		} // for (IdHidreletrica idUHE = IdHidreletrica_1; idUHE <= maiorIdHidreletrica; idUHE++) {
+		} // for (IdHidreletrica idUHE = getMenorId(IdHidreletrica()); idUHE <= maiorIdHidreletrica; idUHE++) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaUnidadeUHE(): \n" + std::string(erro.what())); }
@@ -3781,26 +3785,29 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 		bool recarregar_AttMatrizUnidadeUHE_PorPeriodoPorIdPatamarCarga = false;
 
 		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
+		const IdHidreletrica menorIdHidreletrica = getMenorId(IdHidreletrica());
 
-		SmartEnupla<IdHidreletrica, SmartEnupla<AttVetorReservatorio, PreencherAtributo>> preencher_AttVetorReservatorio(IdHidreletrica_1, std::vector<SmartEnupla<AttVetorReservatorio, PreencherAtributo>>(maiorIdHidreletrica, SmartEnupla<AttVetorReservatorio, PreencherAtributo>()));
-		SmartEnupla<IdHidreletrica, SmartEnupla<AttMatrizReservatorio, PreencherAtributo>> preencher_AttMatrizReservatorio(IdHidreletrica_1, std::vector<SmartEnupla<AttMatrizReservatorio, PreencherAtributo>>(maiorIdHidreletrica, SmartEnupla<AttMatrizReservatorio, PreencherAtributo>()));
+		const int numIdHidreletrica = int(maiorIdHidreletrica - menorIdHidreletrica) + 1;
 
-		SmartEnupla<IdHidreletrica, SmartEnupla<AttVetorHidreletrica, PreencherAtributo>> preencher_AttVetorHidreletrica(IdHidreletrica_1, std::vector<SmartEnupla<AttVetorHidreletrica, PreencherAtributo>>(maiorIdHidreletrica, SmartEnupla<AttVetorHidreletrica, PreencherAtributo>()));
-		SmartEnupla<IdHidreletrica, SmartEnupla<AttMatrizHidreletrica, PreencherAtributo>> preencher_AttMatrizHidreletrica(IdHidreletrica_1, std::vector<SmartEnupla<AttMatrizHidreletrica, PreencherAtributo>>(maiorIdHidreletrica, SmartEnupla<AttMatrizHidreletrica, PreencherAtributo>()));
+		SmartEnupla<IdHidreletrica, SmartEnupla<AttVetorReservatorio, PreencherAtributo>> preencher_AttVetorReservatorio(menorIdHidreletrica, std::vector<SmartEnupla<AttVetorReservatorio, PreencherAtributo>>(numIdHidreletrica, SmartEnupla<AttVetorReservatorio, PreencherAtributo>()));
+		SmartEnupla<IdHidreletrica, SmartEnupla<AttMatrizReservatorio, PreencherAtributo>> preencher_AttMatrizReservatorio(menorIdHidreletrica, std::vector<SmartEnupla<AttMatrizReservatorio, PreencherAtributo>>(numIdHidreletrica, SmartEnupla<AttMatrizReservatorio, PreencherAtributo>()));
 
-		SmartEnupla<IdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<AttVetorConjuntoHidraulico, PreencherAtributo>>> preencher_AttVetorConjuntoHidraulico(IdHidreletrica_1, std::vector<SmartEnupla<IdConjuntoHidraulico, SmartEnupla<AttVetorConjuntoHidraulico, PreencherAtributo>>>(maiorIdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<AttVetorConjuntoHidraulico, PreencherAtributo>>()));
-		SmartEnupla<IdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<AttMatrizConjuntoHidraulico, PreencherAtributo>>> preencher_AttMatrizConjuntoHidraulico(IdHidreletrica_1, std::vector<SmartEnupla<IdConjuntoHidraulico, SmartEnupla<AttMatrizConjuntoHidraulico, PreencherAtributo>>>(maiorIdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<AttMatrizConjuntoHidraulico, PreencherAtributo>>()));
+		SmartEnupla<IdHidreletrica, SmartEnupla<AttVetorHidreletrica, PreencherAtributo>> preencher_AttVetorHidreletrica(menorIdHidreletrica, std::vector<SmartEnupla<AttVetorHidreletrica, PreencherAtributo>>(numIdHidreletrica, SmartEnupla<AttVetorHidreletrica, PreencherAtributo>()));
+		SmartEnupla<IdHidreletrica, SmartEnupla<AttMatrizHidreletrica, PreencherAtributo>> preencher_AttMatrizHidreletrica(menorIdHidreletrica, std::vector<SmartEnupla<AttMatrizHidreletrica, PreencherAtributo>>(numIdHidreletrica, SmartEnupla<AttMatrizHidreletrica, PreencherAtributo>()));
 
-		SmartEnupla<IdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttVetorUnidadeUHE, PreencherAtributo>>>> preencher_AttVetorUnidadeUHE(IdHidreletrica_1, std::vector<SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttVetorUnidadeUHE, PreencherAtributo>>>>(maiorIdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttVetorUnidadeUHE, PreencherAtributo>>>()));
-		SmartEnupla<IdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttMatrizUnidadeUHE, PreencherAtributo>>>> preencher_AttMatrizUnidadeUHE(IdHidreletrica_1, std::vector<SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttMatrizUnidadeUHE, PreencherAtributo>>>>(maiorIdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttMatrizUnidadeUHE, PreencherAtributo>>>()));
+		SmartEnupla<IdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<AttVetorConjuntoHidraulico, PreencherAtributo>>> preencher_AttVetorConjuntoHidraulico(menorIdHidreletrica, std::vector<SmartEnupla<IdConjuntoHidraulico, SmartEnupla<AttVetorConjuntoHidraulico, PreencherAtributo>>>(numIdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<AttVetorConjuntoHidraulico, PreencherAtributo>>()));
+		SmartEnupla<IdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<AttMatrizConjuntoHidraulico, PreencherAtributo>>> preencher_AttMatrizConjuntoHidraulico(menorIdHidreletrica, std::vector<SmartEnupla<IdConjuntoHidraulico, SmartEnupla<AttMatrizConjuntoHidraulico, PreencherAtributo>>>(numIdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<AttMatrizConjuntoHidraulico, PreencherAtributo>>()));
 
-		SmartEnupla<IdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttVetorFuncaoProducaoHidreletrica, PreencherAtributo>>>> preencher_AttVetorFuncaoProducaoHidreletrica(IdHidreletrica_1, std::vector<SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttVetorFuncaoProducaoHidreletrica, PreencherAtributo>>>>(maiorIdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttVetorFuncaoProducaoHidreletrica, PreencherAtributo>>>()));
-		SmartEnupla<IdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttMatrizFuncaoProducaoHidreletrica, PreencherAtributo>>>> preencher_AttMatrizFuncaoProducaoHidreletrica(IdHidreletrica_1, std::vector<SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttMatrizFuncaoProducaoHidreletrica, PreencherAtributo>>>>(maiorIdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttMatrizFuncaoProducaoHidreletrica, PreencherAtributo>>>()));
+		SmartEnupla<IdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttVetorUnidadeUHE, PreencherAtributo>>>> preencher_AttVetorUnidadeUHE(menorIdHidreletrica, std::vector<SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttVetorUnidadeUHE, PreencherAtributo>>>>(numIdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttVetorUnidadeUHE, PreencherAtributo>>>()));
+		SmartEnupla<IdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttMatrizUnidadeUHE, PreencherAtributo>>>> preencher_AttMatrizUnidadeUHE(menorIdHidreletrica, std::vector<SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttMatrizUnidadeUHE, PreencherAtributo>>>>(numIdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttMatrizUnidadeUHE, PreencherAtributo>>>()));
 
-		SmartEnupla<IdHidreletrica, SmartEnupla<IdPolinomioJusante, SmartEnupla<AttVetorPolinomioJusante, PreencherAtributo>>> preencher_AttVetorPolinomioJusante(IdHidreletrica_1, std::vector<SmartEnupla<IdPolinomioJusante, SmartEnupla<AttVetorPolinomioJusante, PreencherAtributo>>>(maiorIdHidreletrica, SmartEnupla<IdPolinomioJusante, SmartEnupla<AttVetorPolinomioJusante, PreencherAtributo>>()));
+		SmartEnupla<IdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttVetorFuncaoProducaoHidreletrica, PreencherAtributo>>>> preencher_AttVetorFuncaoProducaoHidreletrica(menorIdHidreletrica, std::vector<SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttVetorFuncaoProducaoHidreletrica, PreencherAtributo>>>>(numIdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttVetorFuncaoProducaoHidreletrica, PreencherAtributo>>>()));
+		SmartEnupla<IdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttMatrizFuncaoProducaoHidreletrica, PreencherAtributo>>>> preencher_AttMatrizFuncaoProducaoHidreletrica(menorIdHidreletrica, std::vector<SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttMatrizFuncaoProducaoHidreletrica, PreencherAtributo>>>>(numIdHidreletrica, SmartEnupla<IdConjuntoHidraulico, SmartEnupla<IdUnidadeUHE, SmartEnupla<AttMatrizFuncaoProducaoHidreletrica, PreencherAtributo>>>()));
+
+		SmartEnupla<IdHidreletrica, SmartEnupla<IdPolinomioJusante, SmartEnupla<AttVetorPolinomioJusante, PreencherAtributo>>> preencher_AttVetorPolinomioJusante(menorIdHidreletrica, std::vector<SmartEnupla<IdPolinomioJusante, SmartEnupla<AttVetorPolinomioJusante, PreencherAtributo>>>(numIdHidreletrica, SmartEnupla<IdPolinomioJusante, SmartEnupla<AttVetorPolinomioJusante, PreencherAtributo>>()));
 
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 			if (getAtributo(idHidreletrica, AttComumHidreletrica_considerar_usina, bool())) {
 
@@ -6687,7 +6694,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 			} // if (getAtributo(idHidreletrica, AttComumHidreletrica_considerar_usina, bool())) {
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 		instanciaCotaJusanteUsinaJusante();
 		validaHidreletrica();
@@ -7028,7 +7035,6 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 					if (attVetorPatamarDeficit_media != AttVetorPatamarDeficit_Nenhum) {
 
 						a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
-
 						a_entradaSaidaDados.setAppendArquivo(impresso);
 						a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_SUBMERCADO_PATAMAR_DEFICIT_AttVetorPremissa_PorPeriodo.csv", IdSubmercado_Nenhum, IdPatamarDeficit_Nenhum, *this, periodo_estudo_inicial, periodo_final_estudo, attVetorPatamarDeficit_media);
 						impresso = true;
@@ -8353,13 +8359,13 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 				a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
 
 				bool impresso_historico = false;
-				if (getSizeVetor(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) > 0) {
+				if (getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) > 0) {
 					a_entradaSaidaDados.setAppendArquivo(impresso_historico);
 					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_vazao_afluente, *this, AttVetorAfluencia_natural_historico);
 					impresso_historico = true;
 				}
 				bool impresso_tendencia = false;
-				if (getSizeVetor(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia) > 0) {
+				if (getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia) > 0) {
 					a_entradaSaidaDados.setAppendArquivo(impresso_tendencia);
 					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorCenarioPorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_vazao_afluente, *this, AttVetorAfluencia_natural_tendencia);
 					impresso_tendencia = true;
@@ -8552,12 +8558,12 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 					IdHidreletrica idHidreletrica_YHF = IdHidreletrica_Nenhum;
 
-					for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+					for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 						if (getFullString(idHidreletrica) == processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).getAtributo(AttComumVariavelAleatoriaInterna_nome, std::string())) {
 							idHidreletrica_YHF = idHidreletrica;
 							break;
 						} // if (getFullString(idHidreletrica) == getAtributo(tipo_processo_estocastico_hidrologico, idVariavelAleatoria, idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_nome, std::string())) {
-					} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+					} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 					if (idHidreletrica_YHF == IdHidreletrica_Nenhum)
 						throw std::invalid_argument("Nao ha hidreletrica compativel com " + getFullString(idVariavelAleatoriaInterna) + " em " + getFullString(idVariavelAleatoria));
@@ -8583,7 +8589,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 			for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+				for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 					for (Periodo periodo = horizonte_afluencia_tendencia.getIteradorInicial(); periodo <= horizonte_afluencia_tendencia.getIteradorFinal(); horizonte_afluencia_tendencia.incrementarIterador(periodo)) {
 
@@ -8606,20 +8612,20 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 					}//for (Periodo periodo = horizonte_afluencia_tendencia.getIteradorInicial(); periodo <= horizonte_afluencia_tendencia.getIteradorFinal(); horizonte_afluencia_tendencia.incrementarIterador(periodo)) {
 
-				}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+				}//for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 			}//for (IdCenario idCenario = IdCenario_1; idCenario <= maiorIdCenario; idCenario++) {
 
 			a_entradaSaidaDados.setDiretorioSaida(a_diretorio_exportacao_pos_estudo);
 
-			if ((getSizeVetor(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) == 0) && (getSizeVetor(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico) > 0)) {
+			if ((getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) == 0) && (getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico) > 0)) {
 
-				const SmartEnupla<Periodo, double> horizonte_historico = SmartEnupla<Periodo, double>(vetorHidreletrica.att(IdHidreletrica_1).vetorAfluencia.att(IdAfluencia_vazao_afluente).getVetor(AttVetorAfluencia_incremental_historico, Periodo(), double()), 0.0);
+				const SmartEnupla<Periodo, double> horizonte_historico = SmartEnupla<Periodo, double>(vetorHidreletrica.att(getMenorId(IdHidreletrica())).vetorAfluencia.att(IdAfluencia_vazao_afluente).getVetor(AttVetorAfluencia_incremental_historico, Periodo(), double()), 0.0);
 
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++)
+				for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica))
 					vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).setVetor_forced(AttVetorAfluencia_natural_historico, horizonte_historico);
 
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+				for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 					for (Periodo periodo = horizonte_historico.getIteradorInicial(); periodo <= horizonte_historico.getIteradorFinal(); horizonte_historico.incrementarIterador(periodo)) {
 
@@ -8642,18 +8648,18 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 					}//for (Periodo periodo = horizonte_historico.getIteradorInicial(); periodo <= horizonte_historico.getIteradorFinal(); horizonte_historico.incrementarIterador(periodo)) {
 
-				}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+				}//for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
-			} // if ((getSizeVetor(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) == 0) && (getSizeVetor(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico) > 0)) {
+			} // if ((getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) == 0) && (getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico) > 0)) {
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			MPI_Barrier(MPI_COMM_WORLD);
 
-			if ((idProcesso == IdProcesso_mestre) && (getSizeVetor(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) > 0))
+			if ((idProcesso == IdProcesso_mestre) && (getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) > 0))
 				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_natural_historico);
 
-			if ((idProcesso == IdProcesso_mestre) && (getSizeVetor(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico) > 0))
+			if ((idProcesso == IdProcesso_mestre) && (getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico) > 0))
 				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_incremental_historico);
 
 			int imprimir_HIDRELETRICA_AFLUENCIA_AttMatrizPremissa = 0;
@@ -8685,7 +8691,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 		// Esvazia Atributos
 		//
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= getMaiorId(IdHidreletrica()); idHidreletrica++)
+		for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica))
 			vetorHidreletrica.att(idHidreletrica).vetorAfluencia.~VetorAfluenciaEmHidreletrica();
 
 	} // try{
@@ -8707,7 +8713,7 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 
 			a_processo_estocastico.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico_hidrologico_hidreletrica);
 
-			for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= getMaiorId(IdHidreletrica()); idHidreletrica++) {
+			for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 
 				const SmartEnupla<int, IdHidreletrica>                variavel_aleatoria_interna(1, std::vector<IdHidreletrica>(1, idHidreletrica));
 				const SmartEnupla<int, SmartEnupla<Periodo, double>>  serie_temporal_variavel_aleatoria_interna(1, std::vector<SmartEnupla<Periodo, double>>(1, getVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico, Periodo(), double())));
@@ -8716,7 +8722,7 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 				a_processo_estocastico.addSeriesTemporais(idHidreletrica, variavel_aleatoria_interna, serie_temporal_variavel_aleatoria_interna);
 				a_processo_estocastico.addTendenciasTemporais(idHidreletrica, variavel_aleatoria_interna, tendencia_temporal_variavel_aleatoria_interna);
 
-			} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= getMaiorId(IdHidreletrica()); idHidreletrica++) {
+			} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 
 		} // if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_hidreletrica) {
 
@@ -8733,7 +8739,7 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 				SmartEnupla<int, SmartEnupla<Periodo, double>> tendencia_temporal_variavel_aleatoria_interna;
 
 				int contador = 1;
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= getMaiorId(IdHidreletrica()); idHidreletrica++) {
+				for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 
 					if (getAtributo(idHidreletrica, AttComumHidreletrica_bacia, IdBaciaHidrografica()) == idBaciaHidrografica) {
 
@@ -8745,7 +8751,7 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 
 					} // if (getAtributo(idHidreletrica, AttComumHidreletrica_bacia, IdBaciaHidrografica()) == idBaciaHidrografica){
 
-				} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= getMaiorId(IdHidreletrica()); idHidreletrica++) {
+				} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 
 				a_processo_estocastico.addSeriesTemporais(idBaciaHidrografica, variavel_aleatoria_interna, serie_temporal_variavel_aleatoria_interna);
 				a_processo_estocastico.addTendenciasTemporais(idBaciaHidrografica, variavel_aleatoria_interna, tendencia_temporal_variavel_aleatoria_interna);
@@ -8829,14 +8835,6 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(cons
 
 		const IdVariavelAleatoria maiorIdVariavelAleatoria = a_processo_estocastico.vetorVariavelAleatoria.getMaiorId();
 
-		if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_hidreletrica) {
-			if (maiorIdVariavelAleatoria != IdVariavelAleatoria(getMaiorId(IdHidreletrica())))
-				return 8;
-		}
-		else if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_bacia) {
-			if (maiorIdVariavelAleatoria != IdVariavelAleatoria(getMaiorId(IdBaciaHidrografica())))
-				return 9;
-		}
 
 		for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++) {
 
@@ -8921,12 +8919,12 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(cons
 					return 30;
 
 				bool hidreletrica_found = false;
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+				for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 					if (getFullString(idHidreletrica) == a_processo_estocastico.getAtributo(idVariavelAleatoria, idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_nome, std::string())) {
 						hidreletrica_found = true;
 						break;
 					} // if (getFullString(idHidreletrica) == a_processo_estocastico.getAtributo(idVariavelAleatoria, idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_nome, std::string())) {
-				} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+				} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 				if (!hidreletrica_found)
 					return 31;
 
@@ -8948,38 +8946,6 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(cons
 
 		} // for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++) {
 
-		if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_hidreletrica) {
-
-			for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
-
-				const IdVariavelAleatoria  idVariavelAleatoria = IdVariavelAleatoria(idHidreletrica);
-
-				const std::vector<IdVariavelAleatoriaInterna> listaVariavelAleatoriaInterna = a_processo_estocastico.getIdObjetos(idVariavelAleatoria, IdVariavelAleatoriaInterna_Nenhum, AttComumVariavelAleatoriaInterna_nome, getFullString(idHidreletrica));
-
-				if (listaVariavelAleatoriaInterna.size() != 1)
-					return 36;
-
-			} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
-
-		} // if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_hidreletrica) {
-
-		else if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_bacia) {
-
-			for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
-
-				const IdBaciaHidrografica idBaciaHidrografica = getAtributo(idHidreletrica, AttComumHidreletrica_bacia, IdBaciaHidrografica());
-
-				const IdVariavelAleatoria  idVariavelAleatoria = IdVariavelAleatoria(idBaciaHidrografica);
-
-				const std::vector<IdVariavelAleatoriaInterna> listaVariavelAleatoriaInterna = a_processo_estocastico.getIdObjetos(idVariavelAleatoria, IdVariavelAleatoriaInterna_Nenhum, AttComumVariavelAleatoriaInterna_nome, getFullString(idHidreletrica));
-
-				if (listaVariavelAleatoriaInterna.size() != 1)
-					return 37;
-
-			} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
-
-		} // else if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_bacia) {
-
 		return 0;
 
 	} // try{
@@ -8997,7 +8963,7 @@ void Dados::validaReservatorioEmHidreletrica() {
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 			const bool  considerar_usina = getAtributo(idHidreletrica, AttComumHidreletrica_considerar_usina, bool());
 
@@ -9018,7 +8984,7 @@ void Dados::validaReservatorioEmHidreletrica() {
 				}//if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_minimo) > 0 && getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo) > 0) {
 
 			} // if (considerar_usina) {
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaReservatorioEmHidreletrica(): \n" + std::string(erro.what())); }
@@ -9733,17 +9699,17 @@ bool Dados::valida_historico_AfluenciaEmHidreletrica(const AttVetorAfluencia a_a
 
 		Periodo periodo_inicial_historico;
 		Periodo periodo_final_historico;
-		if (getSizeVetor(IdHidreletrica_1, IdAfluencia_vazao_afluente, a_attVetorAfluencia) > 0) {
+		if (getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, a_attVetorAfluencia) > 0) {
 			historico_afluencia_carregado = true;
-			periodo_inicial_historico = getIteradorInicial(IdHidreletrica_1, IdAfluencia_vazao_afluente, a_attVetorAfluencia, Periodo());
-			periodo_final_historico = getIteradorFinal(IdHidreletrica_1, IdAfluencia_vazao_afluente, a_attVetorAfluencia, Periodo());
+			periodo_inicial_historico = getIteradorInicial(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, a_attVetorAfluencia, Periodo());
+			periodo_final_historico = getIteradorFinal(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, a_attVetorAfluencia, Periodo());
 			if (periodo_inicial_historico.getTipoPeriodo() != periodo_final_historico.getTipoPeriodo())
 				throw std::invalid_argument("Os periodos inicial e final do atributo " + getFullString(a_attVetorAfluencia) + " devem ser do mesmo tipo.");
 		}
 
 		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_2; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = IdHidreletrica_2; idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 			// Verifica se historico foi carregado
 
@@ -9759,7 +9725,7 @@ bool Dados::valida_historico_AfluenciaEmHidreletrica(const AttVetorAfluencia a_a
 			else
 				throw std::invalid_argument("Os elementos do atributo " + getFullString(a_attVetorAfluencia) + ", quando informados, devem ser informados para " + getFullString(IdAfluencia_vazao_afluente) + " em todas as hidreletricas.");
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_2; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_2; idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 		if (!historico_afluencia_carregado)
 			return false;
@@ -9788,22 +9754,23 @@ void Dados::calcular_historico_afluencia_incremental_com_natural() {
 			adicionaHidreletricasMontante();
 
 			const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
+			const IdHidreletrica menorIdHidreletrica = getMenorId(IdHidreletrica());
 
-			const SmartEnupla<Periodo, double> horizonte_historico = vetorHidreletrica.att(IdHidreletrica_1).vetorAfluencia.att(IdAfluencia_vazao_afluente).getVetor(AttVetorAfluencia_natural_historico, Periodo(), double());
+			const SmartEnupla<Periodo, double> horizonte_historico = vetorHidreletrica.att(menorIdHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).getVetor(AttVetorAfluencia_natural_historico, Periodo(), double());
 
-			const Periodo periodo_inicial_historico = getIteradorInicial(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico, Periodo());
-			const Periodo periodo_final_historico = getIteradorFinal(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico, Periodo());
+			const Periodo periodo_inicial_historico = getIteradorInicial(menorIdHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico, Periodo());
+			const Periodo periodo_final_historico = getIteradorFinal(menorIdHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico, Periodo());
 
 			for (Periodo periodo = periodo_inicial_historico; periodo <= periodo_final_historico; horizonte_historico.incrementarIterador(periodo)) {
 
-				SmartEnupla<IdHidreletrica, double> afluencia(IdHidreletrica_1, std::vector<double>(maiorIdHidreletrica, 0.0));
+				SmartEnupla<IdHidreletrica, double> afluencia(menorIdHidreletrica, std::vector<double>(int (maiorIdHidreletrica - menorIdHidreletrica) +1, 0.0));
 
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++)
+				for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica))
 					afluencia.setElemento(idHidreletrica, getElementoVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico, periodo, double()));
 
 				const SmartEnupla<IdHidreletrica, double> afluencia_incremental = calculaAfluenciaIncremental(afluencia);
 
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++)
+				for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica))
 					vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_incremental_historico, periodo, afluencia_incremental.at(idHidreletrica));
 
 			} // for (Periodo periodo = periodo_inicial_historico; periodo <= periodo_final_historico; horizonte_estudo.incrementarIterador(periodo)) {
@@ -9839,7 +9806,7 @@ bool Dados::valida_tendencia_AfluenciaEmHidreletrica(const AttVetorAfluencia a_a
 		//
 
 		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 			if (getSizeVetor(idHidreletrica, IdAfluencia_vazao_afluente, a_attVetorAfluencia) > 0) {
 
@@ -9855,7 +9822,7 @@ bool Dados::valida_tendencia_AfluenciaEmHidreletrica(const AttVetorAfluencia a_a
 			else
 				alguma_hidreletrica_sem_tendencia = true;
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 		// Calcula afluencia incremental caso a mesma n�o tenha sido carregada e haja afluencia natural.
 
@@ -9890,10 +9857,11 @@ void Dados::calcular_tendencia_afluencia_incremental_com_natural() {
 		if (valida_tendencia_AfluenciaEmHidreletrica(AttVetorAfluencia_natural_tendencia)) {
 
 			const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
+			const IdHidreletrica menorIdHidreletrica = getMaiorId(IdHidreletrica());
 
 			SmartEnupla<Periodo, double> horizonte_tendencia;
 
-			for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+			for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 				if (getSizeVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia) > 0) {
 					horizonte_tendencia = vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).getVetor(AttVetorAfluencia_natural_tendencia, Periodo(), double());
 					break;
@@ -9903,19 +9871,19 @@ void Dados::calcular_tendencia_afluencia_incremental_com_natural() {
 
 			}
 
-			const Periodo   periodo_inicial_tendencia = getIteradorInicial(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia, Periodo());
-			const Periodo   periodo_final_tendencia = getIteradorFinal(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia, Periodo());
+			const Periodo   periodo_inicial_tendencia = getIteradorInicial(menorIdHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia, Periodo());
+			const Periodo   periodo_final_tendencia = getIteradorFinal(menorIdHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia, Periodo());
 
 			for (Periodo periodo = periodo_inicial_tendencia; periodo <= periodo_final_tendencia; horizonte_tendencia.incrementarIterador(periodo)) {
 
-				SmartEnupla<IdHidreletrica, double> afluencia_natural(IdHidreletrica_1, std::vector<double>(int(maiorIdHidreletrica), 0.0));
+				SmartEnupla<IdHidreletrica, double> afluencia_natural(menorIdHidreletrica, std::vector<double>(int(maiorIdHidreletrica - menorIdHidreletrica) + 1, 0.0));
 
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++)
+				for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica))
 					afluencia_natural.setElemento(idHidreletrica, getElementoVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia, periodo, double()));
 
 				const SmartEnupla<IdHidreletrica, double> afluencia_incremental = calculaAfluenciaIncremental(afluencia_natural);
 
-				for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++)
+				for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica))
 					vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_incremental_tendencia, periodo, afluencia_incremental.at(idHidreletrica));
 
 			} // for (Periodo periodo = periodo_inicial_tendencia; periodo <= periodo_final_tendencia; horizonte_estudo.incrementarIterador(periodo)) {
@@ -9942,13 +9910,13 @@ void Dados::adicionarTendenciaHidrologicaNula() {
 
 		SmartEnupla<Periodo, double> tendencia_hidrologica;
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maioridHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maioridHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 			if (getSizeVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_tendencia) == 0) {
 
 				if (idHidreletrica_tendencia_encontrada == IdHidreletrica_Nenhum) {
 
-					for (IdHidreletrica idUHE = IdHidreletrica_1; idUHE <= maioridHidreletrica; idUHE++) {
+					for (IdHidreletrica idUHE = getMenorId(IdHidreletrica()); idUHE <= maioridHidreletrica; vetorHidreletrica.incr(idUHE)) {
 
 						if (getSizeVetor(idUHE, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_tendencia) > 0) {
 
@@ -9960,7 +9928,7 @@ void Dados::adicionarTendenciaHidrologicaNula() {
 
 						} // if (getSize1Matriz(idUHE, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental_tendencia) > 0) {
 
-					} // for (IdHidreletrica idUHE = IdHidreletrica_1; idUHE <= maioridHidreletrica; idUHE++) {
+					} // for (IdHidreletrica idUHE = getMenorId(IdHidreletrica()); idUHE <= maioridHidreletrica; idUHE++) {
 
 					if (idHidreletrica_tendencia_encontrada == IdHidreletrica_Nenhum)
 						throw std::invalid_argument("Nenhuma hidreletrica possui informacao em " + getFullString(AttVetorAfluencia_incremental_tendencia));
@@ -9974,7 +9942,7 @@ void Dados::adicionarTendenciaHidrologicaNula() {
 
 			}// if (getSize1Matriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental_tendencia) == 0) {
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maioridHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maioridHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 
 	} // try{
@@ -9999,7 +9967,7 @@ void Dados::adicionarTendenciaHidrologicaHistorica() {
 
 			const Periodo periodo_tendencia_hidrologica_historica = getAtributo(AttComumDados_periodo_tendencia_hidrologica_historica, Periodo());
 
-			const Periodo periodo_final_historico_afluencia_incremental = getIteradorFinal(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico, Periodo());
+			const Periodo periodo_final_historico_afluencia_incremental = getIteradorFinal(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico, Periodo());
 
 			if (periodo_tendencia_hidrologica_historica.getTipoPeriodo() != periodoInicialHorizonte.getTipoPeriodo())
 				throw std::invalid_argument("O TipoPeriodo de " + getFullString(AttComumDados_periodo_tendencia_hidrologica_historica) + " devem ser o mesmo do inicio do horizonte: " + getString(periodoInicialHorizonte.getTipoPeriodo()) + " .");
@@ -10023,14 +9991,14 @@ void Dados::adicionarTendenciaHidrologicaHistorica() {
 
 			const int numero_estacoes = Periodo::getMaiorEstacao(periodoInicialHorizonte.getTipoPeriodo());
 
-			for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= getMaiorId(IdHidreletrica()); idHidreletrica++) {
+			for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 				SmartEnupla<Periodo, double> incremental_tendencia;
 				for (int p = numero_estacoes; p >= 0; p--) {
 					const double incremental_historico = getElementoVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico, periodo_tendencia_hidrologica_historica - p, double());
 					incremental_tendencia.addElemento(periodoInicialHorizonte - lag_inicial - p, incremental_historico);
 				} // for (int p = numero_estacoes; p >= lag_inicial; p--) {
 				vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).setVetor(AttVetorAfluencia_incremental_tendencia, incremental_tendencia);
-			} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= getMaiorId(IdHidreletrica()); idHidreletrica++) {
+			} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 
 		} // if (getAtributo(AttComumDados_tipo_tendencia_hidrologica, TipoTendenciaEstocastica()) == TipoTendenciaEstocastica_historico) {
 
@@ -10043,13 +10011,13 @@ void Dados::adicionarTendenciaHidrologicaHistorica() {
 
 			SmartEnupla<Periodo, double> tendencia_hidrologica;
 
-			for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maioridHidreletrica; idHidreletrica++) {
+			for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maioridHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 				if (getSizeVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia) == 0) {
 
 					if (idHidreletrica_tendencia_encontrada == IdHidreletrica_Nenhum) {
 
-						for (IdHidreletrica idUHE = IdHidreletrica_1; idUHE <= maioridHidreletrica; idUHE++) {
+						for (IdHidreletrica idUHE = getMenorId(IdHidreletrica()); idUHE <= maioridHidreletrica; vetorHidreletrica.incr(idUHE)) {
 
 							if (getSizeVetor(idUHE, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia) > 0) {
 
@@ -10061,7 +10029,7 @@ void Dados::adicionarTendenciaHidrologicaHistorica() {
 
 							} // if (getSize1Matriz(idUHE, IdAfluencia_vazao_afluente, AttMatrizAfluencia_natural_tendencia) > 0) {
 
-						} // for (IdHidreletrica idUHE = IdHidreletrica_1; idUHE <= maioridHidreletrica; idUHE++) {
+						} // for (IdHidreletrica idUHE = getMenorId(IdHidreletrica()); idUHE <= maioridHidreletrica; idUHE++) {
 
 						if (idHidreletrica_tendencia_encontrada == IdHidreletrica_Nenhum)
 							throw std::invalid_argument("Nenhuma hidreletrica possui informacao em " + getFullString(AttVetorAfluencia_natural_tendencia));
@@ -10102,7 +10070,7 @@ void Dados::adicionarTendenciaHidrologicaHistorica() {
 					vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).setVetor_forced(AttVetorAfluencia_natural_tendencia, tendencia_hidrologica);
 				}// if (getSize1Matriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_natural_tendencia) == 0) {
 
-			} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maioridHidreletrica; idHidreletrica++) {
+			} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maioridHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 		} // else if (getAtributo(AttComumDados_tipo_tendencia_hidrologica, TipoTendenciaEstocastica()) == TipoTendenciaEstocastica_serie_informada) {
 
@@ -10121,20 +10089,20 @@ void Dados::adicionaHidreletricasMontante() {
 
 		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 			if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_montante) == 0) {
 
-				for (IdHidreletrica idUHE_montante = IdHidreletrica_1; idUHE_montante <= maiorIdHidreletrica; idUHE_montante++) {
+				for (IdHidreletrica idUHE_montante = getMenorId(IdHidreletrica()); idUHE_montante <= maiorIdHidreletrica; vetorHidreletrica.incr(idUHE_montante)) {
 
 					if (getAtributo(idUHE_montante, AttComumHidreletrica_jusante, IdHidreletrica()) == idHidreletrica)
 						vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_montante, getSizeVetor(idHidreletrica, AttVetorHidreletrica_montante) + 1, idUHE_montante);
 
-				} // for (IdHidreletrica idUHE_montante = IdHidreletrica_1; idUHE_montante <= maiorIdHidreletrica; idUHE++) {
+				} // for (IdHidreletrica idUHE_montante = getMenorId(IdHidreletrica()); idUHE_montante <= maiorIdHidreletrica; idUHE++) {
 
 			}
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::adicionaHidreletricasMontante(): \n" + std::string(erro.what())); }
@@ -10148,20 +10116,20 @@ void Dados::adicionaHidreletricasMontanteDesvio() {
 
 		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 			if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_montante_desvio) == 0) {
 
-				for (IdHidreletrica idUHE_montante_desvio = IdHidreletrica_1; idUHE_montante_desvio <= maiorIdHidreletrica; idUHE_montante_desvio++) {
+				for (IdHidreletrica idUHE_montante_desvio = getMenorId(IdHidreletrica()); idUHE_montante_desvio <= maiorIdHidreletrica; vetorHidreletrica.incr(idUHE_montante_desvio)) {
 
 					if (getAtributo(idUHE_montante_desvio, AttComumHidreletrica_jusante_desvio, IdHidreletrica()) == idHidreletrica)
 						vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_montante_desvio, getSizeVetor(idHidreletrica, AttVetorHidreletrica_montante_desvio) + 1, idUHE_montante_desvio);
 
-				} // for (IdHidreletrica idUHE_montante_desvio = IdHidreletrica_1; idUHE_montante_desvio <= maiorIdHidreletrica; idUHE_montante_desvio++) {
+				} // for (IdHidreletrica idUHE_montante_desvio = getMenorId(IdHidreletrica()); idUHE_montante_desvio <= maiorIdHidreletrica; idUHE_montante_desvio++) {
 
 			}
 
-		} // for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::adicionaHidreletricasMontanteDesvio(): \n" + std::string(erro.what())); }
@@ -10173,14 +10141,12 @@ SmartEnupla<IdHidreletrica, double> Dados::calculaAfluenciaIncremental(const Sma
 
 	try {
 
+		const IdHidreletrica menorIdUHE = a_afluencia_natural.getIteradorInicial();
 		const IdHidreletrica maiorIdUHE = a_afluencia_natural.getIteradorFinal();
 
-		if (getMaiorId(IdHidreletrica()) != maiorIdUHE)
-			throw std::invalid_argument("Faltam hidreletricas no argumento a_afluenciaNatural");
+		SmartEnupla<IdHidreletrica, double> afluencia_incremental_retorno(IdHidreletrica(1), std::vector<double>(maiorIdUHE, NAN));
 
-		SmartEnupla<IdHidreletrica, double> afluencia_incremental_retorno;
-
-		for (IdHidreletrica idUHE = IdHidreletrica_1; idUHE <= maiorIdUHE; idUHE++) {
+		for (IdHidreletrica idUHE = menorIdUHE; idUHE <= maiorIdUHE; vetorHidreletrica.incr(idUHE)) {
 
 			// Inicializa Aflu�ncia Incremental com a Pr�pria Aflu�ncia Natural.
 			double afluencia_incremental = a_afluencia_natural.getElemento(idUHE);
@@ -10198,9 +10164,9 @@ SmartEnupla<IdHidreletrica, double> Dados::calculaAfluenciaIncremental(const Sma
 
 			} // for (int m = 1; m <= numMontante; m++) {
 
-			afluencia_incremental_retorno.addElemento(idUHE, afluencia_incremental);
+			afluencia_incremental_retorno.setElemento(idUHE, afluencia_incremental);
 
-		} // for (IdHidreletrica idUHE = IdHidreletrica_1; idUHE <= maiorIdUHE; idUHE++) {
+		} // for (IdHidreletrica idUHE = menorIdUHE; idUHE <= maiorIdUHE; idUHE++) {
 
 		return afluencia_incremental_retorno;
 
@@ -10989,8 +10955,8 @@ void Dados::defineCenariosSimulacao() {
 
 			const Periodo periodo_historico = getAtributo(AttComumDados_periodo_historico_geracao_cenario_hidrologico, Periodo());
 
-			const Periodo periodo_inicial_historico = getIteradorInicial(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico, Periodo());
-			const Periodo periodo_final_historico = getIteradorFinal(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico, Periodo());
+			const Periodo periodo_inicial_historico = getIteradorInicial(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico, Periodo());
+			const Periodo periodo_final_historico = getIteradorFinal(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico, Periodo());
 
 			if (periodo_historico.getTipoPeriodo() != periodo_inicial_historico.getTipoPeriodo())
 				throw std::invalid_argument("O tipo de periodo inicial da serie historica - " + getString(periodo_historico.getTipoPeriodo()) + " - a ser simulada nao eh compativel com o tipo de periodo do historico - " + getString(periodo_inicial_historico.getTipoPeriodo()) + ".");
@@ -11012,7 +10978,7 @@ void Dados::defineCenariosSimulacao() {
 		// Quando a simula��o � historico, o n�mero de s�ries hist�ricas a ser simulado � multiplo do n�mero de processadores.
 		else if (tipo_geracao_cenarios == TipoGeracaoCenario_historico) {
 
-			const int numero_anos_historico = getSizeVetor(IdHidreletrica_1, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) / 12;
+			const int numero_anos_historico = getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) / 12;
 
 			numero_cenarios = numero_anos_historico - 1 - int(numero_estagios / 12); // Desconta Ano inicial + Anos Finais em que o Horizonte ultrapassa Hist�rico.
 
@@ -11551,7 +11517,7 @@ void Dados::valida_preconfig_hidraulica(const SmartEnupla<IdHidreletrica, IdHidr
 
 		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 			if (vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_jusante, IdHidreletrica()) != a_lista_jusante_hidreletrica.getElemento(idHidreletrica))
 				throw std::invalid_argument("Inconsistencia na preconfiguracao hidraulica - usina " + vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_nome, std::string()) + " deve ter como jusante " + vetorHidreletrica.att(a_lista_jusante_hidreletrica.getElemento(idHidreletrica)).getAtributo(AttComumHidreletrica_nome, std::string()));
@@ -11559,7 +11525,7 @@ void Dados::valida_preconfig_hidraulica(const SmartEnupla<IdHidreletrica, IdHidr
 			if (vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_jusante_desvio, IdHidreletrica()) != a_lista_jusante_desvio_hidreletrica.getElemento(idHidreletrica))
 				throw std::invalid_argument("Inconsistencia na preconfiguracao hidraulica - usina " + vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_nome, std::string()) + " deve ter como jusante_desvio " + vetorHidreletrica.att(a_lista_jusante_desvio_hidreletrica.getElemento(idHidreletrica)).getAtributo(AttComumHidreletrica_nome, std::string()));
 
-		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		}//for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::valida_preconfig_hidraulica(): \n" + std::string(erro.what())); }
@@ -11573,7 +11539,7 @@ void Dados::instanciaCotaJusanteUsinaJusante() {
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
 
-		for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 			//AttVetorHidreletrica_cota_montante_usina_jusante
 			if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_cota_montante_usina_jusante) > 0) {
@@ -11616,12 +11582,9 @@ void Dados::instanciaCotaJusanteUsinaJusante() {
 				}//if (IdHidreletrica_Nenhum != idHidreletricaJusante) {
 			}//if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_cota_montante_usina_jusante) > 0) {
 
-		}//for (IdHidreletrica idHidreletrica = IdHidreletrica_1; idHidreletrica <= maiorIdHidreletrica; idHidreletrica++) {
+		}//for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::instanciaCotaJusanteUsinaJusante(): \n" + std::string(erro.what())); }
 
 }
-
-
-

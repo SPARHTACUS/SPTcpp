@@ -20,16 +20,19 @@ friend class Dados;\
 friend class LeituraCEPEL;\
 	public:\
 	Vetor##Membro##Em##Classe(){ \
+		menorId = Id##Membro##_Nenhum;\
 		maiorId = Id##Membro##_Nenhum;\
 		vetorObjeto = std::vector<std::vector<Membro>>();\
         numero_objetos = 0; \
 	} \
 	Vetor##Membro##Em##Classe(const Vetor##Membro##Em##Classe &instanciaCopiar){ \
+		menorId = instanciaCopiar.menorId;\
 		maiorId = instanciaCopiar.maiorId;\
 		vetorObjeto = instanciaCopiar.vetorObjeto;\
         numero_objetos = instanciaCopiar.numero_objetos; \
 	} \
 	~Vetor##Membro##Em##Classe(){ \
+		menorId = Id##Membro##_Nenhum;\
 		maiorId = Id##Membro##_Nenhum;\
 		for (int i = 0; i < int(vetorObjeto.size()); i++) {\
 			if (vetorObjeto.at(i).size() > 0) \
@@ -40,6 +43,7 @@ friend class LeituraCEPEL;\
 	} \
 	void esvaziar(){ \
 		try { \
+			menorId = Id##Membro##_Nenhum;\
 			maiorId = Id##Membro##_Nenhum;\
 			for (int i = 0; i < int(vetorObjeto.size()); i++) {\
 				if (vetorObjeto.at(i).size() > 0) \
@@ -64,7 +68,7 @@ friend class LeituraCEPEL;\
 		if (maiorId == Id##Membro##_Nenhum) \
 			return 0; \
 		int numCont = 0; \
-		for (Id##Membro id = Id##Membro(1); id <= maiorId; id++) {\
+		for (Id##Membro id = menorId; id <= maiorId; id++) {\
 			if (isInstanciado(id)) { \
 				if (vetorObjeto.at(id).at(0).getAtributo(a_atributo, Valor()) == a_valor) \
 					numCont++; \
@@ -73,22 +77,37 @@ friend class LeituraCEPEL;\
 		return numCont; \
 	};\
 	Id##Membro getMaiorId()const{ return maiorId; };\
+	Id##Membro getMenorId()const{ return menorId; };\
 	std::vector<Id##Membro> getIdObjetos()const { \
 		std::vector<Id##Membro> vetorIdMembro; \
-		vetorIdMembro.reserve(int(maiorId));\
-		for (Id##Membro id = Id##Membro(1); id <= maiorId; id++) {\
+		if (menorId == Id##Membro##_Nenhum) \
+			return vetorIdMembro; \
+		vetorIdMembro.reserve(int(maiorId) - int(menorId) + 1);\
+		for (Id##Membro id = menorId; id <= maiorId; id++) {\
 			if (isInstanciado(id)) \
 				vetorIdMembro.push_back(id); \
 		} \
 		return vetorIdMembro; \
 	};\
+	void incr(Id##Membro &a_id)const{\
+		Id##Membro idInicial = Id##Membro(int(a_id) + 1); \
+		if (idInicial < menorId) \
+			idInicial = menorId; \
+		for (Id##Membro id = idInicial; id <= maiorId; id++) {\
+			if (isInstanciado(id)) {\
+				a_id = id; \
+				return; \
+			} \
+		} \
+		a_id = Id##Membro##_Excedente; \
+	};\
 	template<typename Atributo, typename Valor> \
 	std::vector<Id##Membro> getIdObjetos(const Atributo a_atributo, const Valor a_valor)const{ \
-		if (maiorId == Id##Membro##_Nenhum) \
+		if (menorId == Id##Membro##_Nenhum) \
 			return std::vector<Id##Membro>(); \
 		std::vector<Id##Membro> vetorIdMembros_filtro; \
 		vetorIdMembros_filtro.reserve(int(maiorId));\
-		for (Id##Membro id = Id##Membro(1); id <= maiorId; id++) {\
+		for (Id##Membro id = menorId; id <= maiorId; id++) {\
 			if (isInstanciado(id)) {\
 				if (vetorObjeto.at(id).at(0).getAtributo(a_atributo, Valor()) == a_valor) \
 					vetorIdMembros_filtro.push_back(id); \
@@ -99,19 +118,24 @@ friend class LeituraCEPEL;\
 	void add(const Membro &a_objeto) {\
 		try { \
 			const Id##Membro idObjeto = a_objeto.getIdObjeto(); \
-			if (idObjeto < Id##Membro(1)) \
+			if (idObjeto <= Id##Membro##_Nenhum) \
 				throw std::invalid_argument("Id invalido de objeto: menor que inicial."); \
 			else if (idObjeto >= Id##Membro##_Excedente) \
 				throw std::invalid_argument("Id invalido de objeto: maior ou igual a Excedente."); \
 			if (idObjeto <= maiorId){ \
 				if (isInstanciado(idObjeto))\
 					throw std::invalid_argument("Objeto ja instanciado."); \
-				else \
+				else {\
 					vetorObjeto.at(idObjeto).push_back(a_objeto); \
+					if (idObjeto < menorId) \
+						menorId = idObjeto;\
+				}\
 			} \
 			else{ \
-				if (vetorObjeto.size() == 0) \
+				if (vetorObjeto.size() == 0) {\
 					vetorObjeto.push_back(std::vector<Membro>()); \
+					menorId = idObjeto;\
+				}\
 				for (Id##Membro id = Id##Membro(vetorObjeto.size()); id <= idObjeto; id++) \
 					vetorObjeto.push_back(std::vector<Membro>()); \
 				vetorObjeto.at(idObjeto).push_back(a_objeto); \
@@ -123,8 +147,21 @@ friend class LeituraCEPEL;\
 	};\
 	void rem(const Id##Membro a_idObjeto){ \
 		try { \
-			if (a_idObjeto == maiorId) { \
-				for (Id##Membro id = maiorId; id >= Id##Membro(1); id--) {\
+			if (!isInstanciado(a_idObjeto)) return;\
+			if ((a_idObjeto == menorId) && (a_idObjeto == maiorId)){\
+				maiorId = Id##Membro##_Nenhum;\
+				menorId = Id##Membro##_Nenhum;\
+			}\
+			else if (a_idObjeto == menorId) { \
+				for (Id##Membro id = menorId; id <= maiorId; id++) {\
+					if (isInstanciado(id)){ \
+						menorId = id; \
+						break; \
+					} \
+				} \
+            } \
+			else if (a_idObjeto == maiorId) { \
+				for (Id##Membro id = maiorId; id >= menorId; id--) {\
 					if (isInstanciado(id)){ \
 						maiorId = id; \
 						break; \
@@ -175,6 +212,7 @@ friend class LeituraCEPEL;\
 	};\
 	std::vector<std::vector<Membro>> vetorObjeto;\
 	Id##Membro maiorId;\
+	Id##Membro menorId;\
 	int numero_objetos; \
 };
 
@@ -597,7 +635,7 @@ std::vector<std::vector<std::string>> getDadosAttVetor##Membro(const bool a_incl
 			std::vector<std::vector<std::string>> dados; \
 			std::vector<std::vector<std::string>> matrizRetorno; \
 			const Id##Membro idMembro  = getId##Membro##FromChar(a_idMembro.c_str()); \
-			std::vector<Id##Membro> vetorIdMembro = vetor##Membro.getIdObjetos(); \
+			std::vector<Id##Membro> vetorIdMembro;\
 			if (idMembro != Id##Membro##_Nenhum) {\
 				if (!vetor##Membro.isInstanciado(idMembro)) \
 					throw std::invalid_argument("Objeto nao instanciado.");\
@@ -638,7 +676,7 @@ std::vector<std::vector<std::string>> getDadosAttVetor##Membro##_Membro(const bo
 			bool primeiroDado = false; \
 			std::vector<std::vector<std::string>> matrizRetorno; \
 			const Id##Membro idMembro  = getId##Membro##FromChar(a_idMembro.c_str()); \
-			std::vector<Id##Membro> vetorIdMembro = vetor##Membro.getIdObjetos(); \
+			std::vector<Id##Membro> vetorIdMembro; \
 			if (idMembro != Id##Membro##_Nenhum) {\
 				if (!vetor##Membro.isInstanciado(idMembro)) \
 					throw std::invalid_argument("Objeto nao instanciado.");\
@@ -686,7 +724,7 @@ std::vector<std::vector<std::string>> getDadosAttVetor##Membro##_MembroMembro(co
 			bool primeiroDado = false; \
 			std::vector<std::vector<std::string>> matrizRetorno; \
 			const Id##Membro idMembro  = getId##Membro##FromChar(a_idMembro.c_str()); \
-			std::vector<Id##Membro> vetorIdMembro = vetor##Membro.getIdObjetos(); \
+			std::vector<Id##Membro> vetorIdMembro; \
 			if (idMembro != Id##Membro##_Nenhum) {\
 				if (!vetor##Membro.isInstanciado(idMembro)) \
 					throw std::invalid_argument("Objeto nao instanciado.");\
@@ -734,7 +772,7 @@ std::vector<std::vector<std::string>> getDadosAttVetor##Membro##_MembroMembroMem
 			bool primeiroDado = false; \
 			std::vector<std::vector<std::string>> matrizRetorno; \
 			const Id##Membro idMembro  = getId##Membro##FromChar(a_idMembro.c_str()); \
-			std::vector<Id##Membro> vetorIdMembro = vetor##Membro.getIdObjetos(); \
+			std::vector<Id##Membro> vetorIdMembro; \
 			if (idMembro != Id##Membro##_Nenhum) {\
 				if (!vetor##Membro.isInstanciado(idMembro)) \
 					throw std::invalid_argument("Objeto nao instanciado.");\
@@ -776,6 +814,10 @@ std::vector<std::vector<std::string>> getDadosAttVetor##Membro##_MembroMembroMem
 	}\
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getDadosAttVetor" + std::string(#Membro) + "_MembroMembroMembro("+ getString(a_incluirCabecalho) + "," + a_membro + "," + a_idMembro + "," + a_membroMembro + "," + a_idMembroMembro + "," + a_membroMembroMembro + "," + a_idMembroMembroMembro + "," + a_membroMembroMembroMembro + "," + a_idMembroMembroMembroMembro + "," + a_iteradorInicial + "," + a_iteradorFinal + ",a_vetorAttVetor):\n" + std::string(erro.what())); } \
 }; \
+Id##Membro getMenorId(const Id##Membro a_membro)const{ \
+	try { return vetor##Membro.getMenorId(); } \
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMenorId(" + getString(a_membro) + "): \n" + std::string(erro.what())); } \
+};\
 Id##Membro getMaiorId(const Id##Membro a_membro)const{ \
 	try { return vetor##Membro.getMaiorId(); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMaiorId(" + getString(a_membro) + "): \n" + std::string(erro.what())); } \
@@ -824,6 +866,11 @@ IdMembroMembro getMaiorId(const Id##Membro a_membro, const IdMembroMembro a_memb
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMaiorId(" + getString(a_membro) + "," + getString(a_membroMembro) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdMembroMembro> \
+IdMembroMembro getMenorId(const Id##Membro a_membro, const IdMembroMembro a_membroMembro){ \
+	try { return vetor##Membro.att(a_membro).getMenorId(a_membroMembro); } \
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMenorId(" + getString(a_membro) + "," + getString(a_membroMembro) + "): \n" + std::string(erro.what())); } \
+};\
+template<typename IdMembroMembro> \
 std::vector<IdMembroMembro> getIdObjetos(const Id##Membro a_membro, const IdMembroMembro a_membroMembro){ \
 	try { return vetor##Membro.att(a_membro).getIdObjetos(a_membroMembro); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIdObjetos(" + getString(a_membro) + "," + getString(a_membroMembro) + "): \n" + std::string(erro.what())); } \
@@ -868,6 +915,11 @@ IdMembroMembroMembro getMaiorId(const Id##Membro a_membro, const IdMembroMembro 
 	try { return vetor##Membro.att(a_membro).getMaiorId(a_membroMembro, a_membroMembroMembro); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMaiorId(" + getString(a_membro) + "," + getString(a_membroMembro) + "," + getString(a_membroMembroMembro) + "): \n" + std::string(erro.what())); } \
 };\
+template<typename IdMembroMembro, typename IdMembroMembroMembro> \
+IdMembroMembroMembro getMenorId(const Id##Membro a_membro, const IdMembroMembro a_membroMembro, const IdMembroMembroMembro a_membroMembroMembro){ \
+	try { return vetor##Membro.att(a_membro).getMenorId(a_membroMembro, a_membroMembroMembro); } \
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMenorId(" + getString(a_membro) + "," + getString(a_membroMembro) + "," + getString(a_membroMembroMembro) + "): \n" + std::string(erro.what())); } \
+};\
 template<typename IdMembroMembro, typename IdMembroMembroMembro, typename AttVetor, typename TipoIterador, typename TipoValor> \
 SmartEnupla<TipoIterador,TipoValor> getVetor(const Id##Membro a_idMembro, const IdMembroMembro a_idMembroMembro, const IdMembroMembroMembro a_idMembroMembroMembro, const AttVetor a_attVetor, const TipoIterador a_iterador, const TipoValor a_tipoValor){ \
 	try { return vetor##Membro.att(a_idMembro).getVetor(a_idMembroMembro, a_idMembroMembroMembro, a_attVetor, a_iterador, a_tipoValor); } \
@@ -902,6 +954,11 @@ template<typename Id##MembroMembro, typename IdMembroMembroMembro, typename IdMe
 IdMembroMembroMembroMembro getMaiorId(const Id##Membro a_membro, const Id##MembroMembro a_membroMembro, const IdMembroMembroMembro a_membroMembroMembro, const IdMembroMembroMembroMembro a_membroMembroMembroMembro){ \
 	try { return vetor##Membro.att(a_membro).getMaiorId(a_membroMembro, a_membroMembroMembro, a_membroMembroMembroMembro); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMaiorId(" + getString(a_membro) + "," + getString(a_membroMembro) + "," + getString(a_membroMembroMembro) + "," + getString(a_membroMembroMembroMembro) + "): \n" + std::string(erro.what())); } \
+};\
+template<typename Id##MembroMembro, typename IdMembroMembroMembro, typename IdMembroMembroMembroMembro> \
+IdMembroMembroMembroMembro getMenorId(const Id##Membro a_membro, const Id##MembroMembro a_membroMembro, const IdMembroMembroMembro a_membroMembroMembro, const IdMembroMembroMembroMembro a_membroMembroMembroMembro){ \
+	try { return vetor##Membro.att(a_membro).getMenorId(a_membroMembro, a_membroMembroMembro, a_membroMembroMembroMembro); } \
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMenorId(" + getString(a_membro) + "," + getString(a_membroMembro) + "," + getString(a_membroMembroMembro) + "," + getString(a_membroMembroMembroMembro) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdMembroMembro, typename IdMembroMembroMembro, typename IdMembroMembroMembroMembro, typename AttVetor, typename TipoIterador, typename TipoValor> \
 SmartEnupla<TipoIterador,TipoValor> getVetor(const Id##Membro a_idMembro, const IdMembroMembro a_idMembroMembro, const IdMembroMembroMembro a_idMembroMembroMembro, const IdMembroMembroMembroMembro a_idMembroMembroMembroMembro, const AttVetor a_attVetor, const TipoIterador a_iterador, const TipoValor a_tipoValor){ \

@@ -340,7 +340,6 @@ public:
 	SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> getHorizonteEspacoAmostralHidrologico(const IdEstagio a_idEstagioInicial, const IdEstagio a_idEstagioFinal, const IdRealizacao a_maiorIdRealizacao)const;
 	SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> getHorizonteEspacoAmostralHidrologico(const IdEstagio a_idEstagioInicial, const IdEstagio a_idEstagioFinal, const IdRealizacao a_maiorIdRealizacao, const bool a_manter_aberturas_estagio_inicial)const;
 
-
 	ProcessoEstocastico processoEstocastico_hidrologico;
 
 };
