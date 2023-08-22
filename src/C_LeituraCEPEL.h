@@ -192,6 +192,8 @@ private:
 	void calcular_produtibilidade_ENA_regras_especiais(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo);
 	void calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados);
 	void calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados);
+	void calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE(Dados& a_dados);
+	void calcular_equacionamento_afluencia_natural_x_REE(Dados& a_dados);
 	void calcular_equacionamento_afluencia_natural_x_hidreletrica(Dados& a_dados);
 	void calcular_equacionamento_afluencia_natural_x_hidreletrica_out_estudo(Dados& a_dados);
 	void atualizar_equacionamento_afluencia_natural_x_hidreletrica(Dados& a_dados);
@@ -399,6 +401,10 @@ private:
 	SmartEnupla<int, SmartEnupla<IdCenario, SmartEnupla<Periodo, SmartEnupla<int, IdHidreletrica>>>>	lista_idHidreletricas_calculo_ENA_x_codigo_usina_x_cenario_x_periodo;
 	SmartEnupla<int, SmartEnupla<IdCenario, SmartEnupla<Periodo, SmartEnupla<int, double>>>>			lista_coeficiente_idHidreletricas_calculo_ENA_x_codigo_usina_x_cenario_x_periodo;
 	SmartEnupla<int, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>								lista_termo_independente_calculo_ENA_x_codigo_usina_x_cenario_x_periodo;
+
+	//Para os REE
+	SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, double>>>>	 lista_coeficiente_idHidreletricas_calculo_ENA_x_REE_x_cenario_x_periodo;
+	SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>							     lista_termo_independente_calculo_ENA_x_REE_x_cenario_x_periodo;
 
 	/////////////////////////////////
 
