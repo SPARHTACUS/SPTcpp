@@ -1854,7 +1854,7 @@ void LeituraCEPEL::leitura_DADGER_201904_DES16(Dados& a_dados, const std::string
 
 					if (idTermeletricaInstanciado == IdTermeletrica_Nenhum) {
 
-						idTermeletrica = IdTermeletrica(a_dados.vetorTermeletrica.getMaiorId() + 1);
+						idTermeletrica = IdTermeletrica(std::stoi(line.substr(4, 3)));
 
 						Termeletrica termeletrica;
 						termeletrica.setAtributo(AttComumTermeletrica_idTermeletrica, idTermeletrica);
@@ -2547,7 +2547,7 @@ void LeituraCEPEL::leitura_CADTERM_201904_DES16(Dados& a_dados, const std::strin
 						IdTermeletrica idTermeletrica = idTermeletrica_inicializado;
 
 						if (idTermeletrica_inicializado == IdTermeletrica_Nenhum) {
-							idTermeletrica = IdTermeletrica(a_dados.vetorTermeletrica.getMaiorId() + 1);
+							idTermeletrica = IdTermeletrica(std::stoi(line.substr(8, 3)));
 
 							Termeletrica termeletrica;
 							termeletrica.setAtributo(AttComumTermeletrica_idTermeletrica, idTermeletrica);

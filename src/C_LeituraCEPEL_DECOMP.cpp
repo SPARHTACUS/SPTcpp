@@ -2433,7 +2433,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								Termeletrica termeletrica;
 
-								const IdTermeletrica idTermeletrica = IdTermeletrica(a_dados.getMaiorId(IdTermeletrica()) + 1);
+								const IdTermeletrica idTermeletrica = IdTermeletrica(codigo_usina);
 
 								termeletrica.setAtributo(AttComumTermeletrica_idTermeletrica, idTermeletrica);
 
@@ -8725,7 +8725,10 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 			std::string line;
 			std::string atributo;
 
-			SmartEnupla<IdTermeletrica, SmartEnupla<Periodo, double>> lista_termeletrica_potencia_pre_comandada(IdTermeletrica_1, std::vector<SmartEnupla<Periodo, double>>(IdTermeletrica_300, SmartEnupla<Periodo, double>()));
+			const IdTermeletrica menorIdTermeletrica = a_dados.getMenorId(IdTermeletrica());
+			const IdTermeletrica maiorIdTermeletrica = a_dados.getMaiorId(IdTermeletrica());
+
+			SmartEnupla<IdTermeletrica, SmartEnupla<Periodo, double>> lista_termeletrica_potencia_pre_comandada(menorIdTermeletrica, std::vector<SmartEnupla<Periodo, double>>(int(maiorIdTermeletrica - menorIdTermeletrica) + 1, SmartEnupla<Periodo, double>()));
 
 			//Informaçao necessária para ler arquivo relgnl.rvX (caso seja necessário)
 			std::vector<int> codigo_gnl;
@@ -8762,7 +8765,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 								idTermeletrica = getIdFromCodigoONS(lista_codigo_ONS_termeletrica, codigo_usina);
 
 								if (idTermeletrica == IdTermeletrica_Nenhum) {
-									idTermeletrica = IdTermeletrica(a_dados.getMaiorId(IdTermeletrica()) + 1);
+									idTermeletrica = IdTermeletrica(codigo_usina);
 									Termeletrica termeletrica;
 									termeletrica.setAtributo(AttComumTermeletrica_idTermeletrica, idTermeletrica);
 									termeletrica.setAtributo(AttComumTermeletrica_codigo_usina, codigo_usina);
@@ -9900,7 +9903,7 @@ void LeituraCEPEL::set_termeletrica_potencia_disponivel_meta(Dados& a_dados)
 
 		//Inicializa todas as termelétricas
 		const IdTermeletrica	maiorIdTermeletrica = a_dados.getMaiorId(IdTermeletrica());
-		for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= maiorIdTermeletrica; idTermeletrica++)
+		for (IdTermeletrica idTermeletrica = a_dados.getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idTermeletrica))
 			a_dados.vetorTermeletrica.att(idTermeletrica).setMatriz(AttMatrizTermeletrica_potencia_disponivel_meta, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>(IdCenario_1, std::vector<SmartEnupla<Periodo, double>>(maiorIdCenarioDC, SmartEnupla<Periodo, double>(horizonte_estudo, getdoubleFromChar("max")))));
 
 		//Set valor na Termeletrica

@@ -792,7 +792,7 @@ void Dados::validaTermeletrica() {
 
 		const IdTermeletrica maiorIdTermeletrica = getMaiorId(IdTermeletrica());
 
-		for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= maiorIdTermeletrica; idTermeletrica++) {
+		for (IdTermeletrica idTermeletrica = getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
 
 			const bool considerar_usina = getAtributo(idTermeletrica, AttComumTermeletrica_considerar_usina, bool());
 
@@ -881,7 +881,7 @@ void Dados::validaTermeletrica() {
 
 			} // if (considerar_usina){
 
-		} // for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= maiorIdTermeletrica; idTermeletrica++) {
+		} // for (IdTermeletrica idTermeletrica = getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaTermeletrica(): \n" + std::string(erro.what())); }
@@ -916,7 +916,7 @@ void Dados::validaUnidadeUTE() {
 
 		const int numeroPeriodos = getSizeVetor(AttVetorDados_horizonte_estudo);
 
-		for (IdTermeletrica idUTE = IdTermeletrica_1; idUTE <= maiorIdTermeletrica; idUTE++) {
+		for (IdTermeletrica idUTE = getMenorId(IdTermeletrica()); idUTE <= maiorIdTermeletrica; vetorTermeletrica.incr(idUTE)) {
 
 			const bool  considerar_usina = getAtributo(idUTE, AttComumTermeletrica_considerar_usina, bool());
 
@@ -965,7 +965,7 @@ void Dados::validaUnidadeUTE() {
 
 			} // if (considerar_usina) {
 
-		} //for (IdTermeletrica idUTE = IdTermeletrica_1; idUTE <= maiorIdTermeletrica; idUTE++) {
+		} //for (IdTermeletrica idUTE = getMenorId(IdTermeletrica()); idUTE <= maiorIdTermeletrica; vetorTermeletrica.incr(idUTE)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaUnidadeUTE(): \n" + std::string(erro.what())); }
@@ -1846,6 +1846,9 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 		//MAIOR ID TERMELETRICA
 		const IdTermeletrica maiorIdTermeletrica = getMaiorId(IdTermeletrica());
+		const IdTermeletrica menorIdTermeletrica = getMenorId(IdTermeletrica());
+
+		const int numIdTermeletrica = int(maiorIdTermeletrica - menorIdTermeletrica) + 1;
 
 		bool recarregar_AttVetorReservatorio_PorIdMes = false;
 		bool recarregar_AttVetorReservatorio_PorPeriodo = false;
@@ -1868,11 +1871,11 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 		std::vector<bool> impresso_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga(2, false);
 
 		// SMART ENUPLA AUXILIARES
-		SmartEnupla<IdTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>> preencher_AttVetorTermeletrica(IdTermeletrica_1, std::vector<SmartEnupla<AttVetorTermeletrica, PreencherAtributo>>(maiorIdTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>()));
-		SmartEnupla<IdTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>> preencher_AttMatrizTermeletrica(IdTermeletrica_1, std::vector<SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>>(maiorIdTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>()));
+		SmartEnupla<IdTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>> preencher_AttVetorTermeletrica(menorIdTermeletrica, std::vector<SmartEnupla<AttVetorTermeletrica, PreencherAtributo>>(numIdTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>()));
+		SmartEnupla<IdTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>> preencher_AttMatrizTermeletrica(menorIdTermeletrica, std::vector<SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>>(numIdTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>()));
 
-		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>> preencher_AttVetorUnidadeUTE(IdTermeletrica_1, std::vector<SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>>(maiorIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>()));
-		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>> preencher_AttMatrizUnidadeUTE(IdTermeletrica_1, std::vector< SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>>(maiorIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>()));
+		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>> preencher_AttVetorUnidadeUTE(menorIdTermeletrica, std::vector<SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>>(numIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>()));
+		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>> preencher_AttMatrizUnidadeUTE(menorIdTermeletrica, std::vector< SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>>(numIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>()));
 
 		// ID PROCESSO
 		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
@@ -1906,7 +1909,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 		} // for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
 
-		for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= maiorIdTermeletrica; idTermeletrica++) {
+		for (IdTermeletrica idTermeletrica = menorIdTermeletrica; idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
 
 			if (true) {
 				//if (getAtributo(idTermeletrica, AttComumTermeletrica_considerar_usina, bool())) {
@@ -3178,7 +3181,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 			} //if (getAtributo(idTermeletrica, AttComumTermeletrica_considerar_usina, bool())) {
 
 
-		} // for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= maiorIdTermeletrica; idTermeletrica++) {
+		} // for (IdTermeletrica idTermeletrica = getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
 
 
 		// VALIDA AS UNIDADES TERMEL�TRICAS

@@ -311,10 +311,10 @@ private:
 	SmartEnupla<IdHidreletrica, IdVariavelAleatoria> lista_hidreletrica_IdVariavelAleatoria = SmartEnupla<IdHidreletrica, IdVariavelAleatoria>(IdHidreletrica(1), std::vector<IdVariavelAleatoria>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdVariavelAleatoria_Nenhum));
 	SmartEnupla<IdHidreletrica, IdConjuntoHidraulico> lista_hidreletrica_maiorIdConjuntoHidraulico = SmartEnupla<IdHidreletrica, IdConjuntoHidraulico>(IdHidreletrica(1), std::vector<IdConjuntoHidraulico>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdConjuntoHidraulico_Nenhum));
 
-	SmartEnupla<IdTermeletrica, int> lista_codigo_ONS_termeletrica = SmartEnupla<IdTermeletrica, int>(IdTermeletrica_1, std::vector<int>(IdTermeletrica(int(IdTermeletrica_Excedente) - 1), -1));
-	SmartEnupla<IdTermeletrica, int> lista_classe_ONS_termeletrica = SmartEnupla<IdTermeletrica, int>(IdTermeletrica_1, std::vector<int>(IdTermeletrica(int(IdTermeletrica_Excedente) - 1), -1));
+	SmartEnupla<IdTermeletrica, int> lista_codigo_ONS_termeletrica = SmartEnupla<IdTermeletrica, int>(IdTermeletrica(1), std::vector<int>(IdTermeletrica(int(IdTermeletrica_Excedente) - 1), -1));
+	SmartEnupla<IdTermeletrica, int> lista_classe_ONS_termeletrica = SmartEnupla<IdTermeletrica, int>(IdTermeletrica(1), std::vector<int>(IdTermeletrica(int(IdTermeletrica_Excedente) - 1), -1));
 
-	SmartEnupla<IdTermeletrica, bool> lista_termeletrica_com_expansao = SmartEnupla<IdTermeletrica, bool>(IdTermeletrica_1, std::vector<bool>(IdTermeletrica(int(IdTermeletrica_Excedente) - 1), false));
+	SmartEnupla<IdTermeletrica, bool> lista_termeletrica_com_expansao = SmartEnupla<IdTermeletrica, bool>(IdTermeletrica(1), std::vector<bool>(IdTermeletrica(int(IdTermeletrica_Excedente) - 1), false));
 
 	SmartEnupla<IdContrato, int> lista_codigo_ONS_contrato = SmartEnupla<IdContrato, int>(IdContrato_1, std::vector<int>(IdContrato(int(IdContrato_Excedente) - 1), -1));
 

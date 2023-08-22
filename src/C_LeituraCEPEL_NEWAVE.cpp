@@ -3530,7 +3530,7 @@ void LeituraCEPEL::leitura_CONFT_201908_NW25(Dados &a_dados, std::string nomeArq
 
 					if (idTermeletrica_inicializado == IdTermeletrica_Nenhum){					
 
-						const IdTermeletrica idTermeletrica = IdTermeletrica(a_dados.getMaiorId(IdTermeletrica()) + 1);
+						const IdTermeletrica idTermeletrica = IdTermeletrica(codigo_usina);
 
 						lista_codigo_ONS_termeletrica.setElemento(idTermeletrica, codigo_usina);
 						lista_classe_ONS_termeletrica.setElemento(idTermeletrica, classe_CEPEL);
@@ -3788,7 +3788,10 @@ void LeituraCEPEL::leitura_CLAST_201908_NW25(Dados& a_dados, std::string nomeArq
 
 		////////////////////////////////////////////////////////
 
-		SmartEnupla<IdTermeletrica, SmartEnupla<Periodo, double>> lista_custo_operacao(IdTermeletrica_1, std::vector<SmartEnupla<Periodo, double>>(a_dados.getMaiorId(IdTermeletrica()), SmartEnupla<Periodo, double>(horizonte_estudo_DECK, 0.0)));
+		const IdTermeletrica menorIdTermeletrica = a_dados.getMenorId(IdTermeletrica());
+		const IdTermeletrica maiorIdTermeletrica = a_dados.getMaiorId(IdTermeletrica());
+
+		SmartEnupla<IdTermeletrica, SmartEnupla<Periodo, double>> lista_custo_operacao(menorIdTermeletrica, std::vector<SmartEnupla<Periodo, double>>(int(maiorIdTermeletrica - menorIdTermeletrica) + 1, SmartEnupla<Periodo, double>(horizonte_estudo_DECK, 0.0)));
 
 		if (leituraArquivo.is_open()) {
 
@@ -3973,7 +3976,7 @@ void LeituraCEPEL::leitura_CLAST_201908_NW25(Dados& a_dados, std::string nomeArq
 			if (desconsiderar_atraso_periodo_estudo_inicial)
 				sobreposicao_atraso_periodo_inicial = horizonte_estudo.getIteradorInicial().atraso(horizonte_estudo_DECK.getIteradorInicial());
 
-			for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= lista_custo_operacao.getIteradorFinal(); idTermeletrica++) {
+			for (IdTermeletrica idTermeletrica = lista_custo_operacao.getIteradorInicial(); idTermeletrica <= lista_custo_operacao.getIteradorFinal(); a_dados.vetorTermeletrica.incr(idTermeletrica)) {
 
 				if (lista_custo_operacao.at(idTermeletrica).size() > 0) {
 
@@ -4004,7 +4007,7 @@ void LeituraCEPEL::leitura_CLAST_201908_NW25(Dados& a_dados, std::string nomeArq
 
 				} // if (lista_custo_operacao.at(idTermeletrica).size() > 0) {
 
-			} // for (IdTermeletrica idTermeletrica = IdTermeletrica_1; idTermeletrica <= lista_custo_operacao.getIteradorFinal(); idTermeletrica++) {
+			} // for (IdTermeletrica idTermeletrica = a_dados.getMenorId(IdTermeletrica()); idTermeletrica <= lista_custo_operacao.getIteradorFinal(); a_dados.vetorTermeletrica.incr(idTermeletrica)) {
 
 
 		}//if (leituraArquivo.is_open()) {
@@ -4389,7 +4392,7 @@ void LeituraCEPEL::leitura_EXPT_201908_NW25(Dados& a_dados, std::string nomeArqu
 						// Inicializa adicao de modificacao na Termeletrica
 						if (lista_modificacaoUTE.size() - 1 < idTermeletrica) {
 
-							IdTermeletrica menorIdTermeletrica = IdTermeletrica_1;
+							IdTermeletrica menorIdTermeletrica = a_dados.getMenorId(IdTermeletrica());
 
 							if (lista_modificacaoUTE.size() > 2)
 								menorIdTermeletrica = IdTermeletrica(lista_modificacaoUTE.size() - 1);
