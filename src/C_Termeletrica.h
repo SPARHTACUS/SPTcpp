@@ -20,7 +20,7 @@
 	  m(Termeletrica,  AttComum,                 fator_de_capacidade,                               double,          0,            1,             1,      nao) \
 	  m(Termeletrica,  AttComum,           indisponibilidade_forcada,                               double,          0,            1,             0,      nao) \
 	  m(Termeletrica,  AttComum,        indisponibilidade_programada,                               double,          0,          1.0,             0,      nao) \
-	  m(Termeletrica,  AttComum, lag_mensal_potencia_disponivel_comandada,                             int,          0,           12,             0,         nao) \
+	  m(Termeletrica,  AttComum,lag_mensal_potencia_disponivel_comandada,                               int,          0,           12,             0,         nao) \
 	  m(Termeletrica,  AttComum,                        codigo_usina,                                  int,          0,          999,             1,         nao) \
       m(Termeletrica,  AttComum,                    entrada_operacao,                              Periodo,     01/1900,     01/2100,       01/1900,         nao) \
       m(Termeletrica,  AttComum,         penalidade_violacao_comando,                               double,          0,          max,             0,      nao) \
@@ -31,9 +31,6 @@
 
 #define ATT_VETOR_TERMELETRICA(m)  \
 	  m(Termeletrica,  AttVetor,            tipo_detalhamento_producao,  TipoDetalhamentoProducaoTermeletrica,         min,              max,           min,        Periodo) \
-	  m(Termeletrica,  AttVetor,     potencia_disponivel_pre_comandada,                                double,           0,              max,             0,        Periodo) \
-	  m(Termeletrica,  AttVetor,  potencia_disponivel_comandada_minima,                                double,           0,              max,             0,        Periodo) \
-	  m(Termeletrica,  AttVetor,  potencia_disponivel_comandada_maxima,                                double,           0,              max,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,                 potencia_minima_media,                                double,           0,              max,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,                 potencia_maxima_media,                                double,           0,              max,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,      potencia_disponivel_minima_media,                                double,           0,              max,             0,        Periodo) \
@@ -54,6 +51,7 @@
 	  m(Termeletrica,  AttMatriz,                potencia_maxima,        double,          0,          max,             0,  Periodo,   IdPatamarCarga) \
 	  m(Termeletrica,  AttMatriz,     potencia_disponivel_minima,        double,          0,          max,             0,  Periodo,   IdPatamarCarga) \
 	  m(Termeletrica,  AttMatriz,     potencia_disponivel_maxima,        double,          0,          max,             0,  Periodo,   IdPatamarCarga) \
+	  m(Termeletrica,  AttMatriz,  potencia_disponivel_comandada,        double,          0,          max,             0,  Periodo,   IdPatamarCarga) \
 	  m(Termeletrica,  AttMatriz,       potencia_disponivel_meta,        double,          0,          max,             0,  IdCenario, Periodo) 
 //          c_classe,    smrtAtt,                   nomeAtributo,          Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 

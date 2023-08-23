@@ -8,6 +8,9 @@
 #include <fstream>
 #include <chrono>
 
+
+// #define LARGE_MODEL
+
 void getInfoProduto(const std::string a_arquivoLicenca) {
 	std::cout << "##########################################################" << std::endl << std::endl;
 	std::cout << "                      Modelo SPARHTACUS - sparhtacus.com " << std::endl;

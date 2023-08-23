@@ -333,7 +333,11 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 		executarPDDE_distribuirRealizacoesEntreProcessos(a_idProcesso, a_maiorIdProcesso, a_idIteracao, a_modeloOtimizacao);
 
-		for (IdEstagio idEstagio = a_estagio_final; idEstagio >= a_estagio_inicial; idEstagio--) {
+		IdEstagio estagio_inicial = a_estagio_inicial;
+		if (estagio_inicial == IdEstagio_1)
+			estagio_inicial++;
+
+		for (IdEstagio idEstagio = a_estagio_final; idEstagio >= estagio_inicial; idEstagio--) {
 
 			const TipoProcessamentoParalelo tipo_processamento_paralelo = a_modeloOtimizacao.getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, idEstagio, TipoProcessamentoParalelo());
 
@@ -579,7 +583,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 		} // for (IdEstagio idEstagio = a_estagio_final; idEstagio >= a_estagio_inicial; idEstagio--) {
 
-		for (IdEstagio idEstagio = a_estagio_final; idEstagio >= a_estagio_inicial; idEstagio--) {
+		for (IdEstagio idEstagio = a_estagio_final; idEstagio >= estagio_inicial; idEstagio--) {
 
 			if (a_idProcesso == IdProcesso_mestre) {
 				if ((a_idIteracao == a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_final, IdIteracao())) || (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_imprimir_corte_por_iteracao, bool()))) {
@@ -2011,10 +2015,17 @@ void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdPro
 
 	try {
 
-		if ((a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental()) == TipoRelaxacaoAfluenciaIncremental_truncamento) || \
-			(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental()) == TipoRelaxacaoAfluenciaIncremental_viabilidade_hidraulica_truncamento) || \
-			(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_relaxacao_afluencia_incremental, TipoRelaxacaoAfluenciaIncremental()) == TipoRelaxacaoAfluenciaIncremental_viabilidade_hidraulica_penalizacao)) {}
-		else
+		const IdEstagio estagio_inicial = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
+		const IdEstagio estagio_final = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
+
+		bool algum_truncamento = false;
+		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
+			if (a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, idEstagio, bool())) {
+				algum_truncamento = true;
+				break;
+			}
+		}
+		if (!algum_truncamento)
 			return;
 
 		const IdProcessoEstocastico idProcessoEstocastico = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
@@ -2027,8 +2038,7 @@ void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdPro
 
 			int numero_periodos = 0;
 
-			const IdEstagio estagio_inicial = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
-			const IdEstagio estagio_final = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
+
 
 			for (Periodo periodo = periodos.getIteradorInicial(); periodo <= periodos.getIteradorFinal(); periodos.incrementarIterador(periodo)) {
 				for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
