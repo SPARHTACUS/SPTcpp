@@ -13015,7 +13015,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 						const int lag_GNL = 2;
 
 						SmartEnupla<IdReservatorioEquivalente, double> coeficiente_EAR(IdReservatorioEquivalente_1, std::vector<double>(IdReservatorioEquivalente(maior_ONS_REE), 0.0));
-						SmartEnupla<IdReservatorioEquivalente, double> coeficiente_EAR(IdReservatorioEquivalente_1, std::vector<double>(IdReservatorioEquivalente(maior_ONS_REE), 0.0));
 						SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, double>> coeficiente_ENA(IdReservatorioEquivalente_1, std::vector<SmartEnupla<int, double>>(IdReservatorioEquivalente(maior_ONS_REE), SmartEnupla<int, double>(1, std::vector<double>(ordem_maxima_PAR, 0.0))));
 						SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, SmartEnupla<int, double>>> coeficiente_GNL(IdReservatorioEquivalente_1, std::vector<SmartEnupla<int, SmartEnupla<int, double>>>(IdReservatorioEquivalente(maior_ONS_REE), SmartEnupla<int, SmartEnupla<int, double>>(1, std::vector<SmartEnupla<int, double>>(numero_patamares, SmartEnupla<int, double>(1, std::vector<double>(lag_GNL, 0.0))))));
 						SmartEnupla<IdReservatorioEquivalente, double> coeficiente_Vminop(IdReservatorioEquivalente_1, std::vector<double>(IdReservatorioEquivalente(maior_ONS_REE), 0.0));
@@ -13983,9 +13982,9 @@ void LeituraCEPEL::calcular_equacionamento_afluencia_natural_x_REE(Dados& a_dado
 		SmartEnupla <Periodo, bool> horizonte_processo_estocastico; //Vai conter nos iteradores os periodos da tendencia_temporal + periodos do mapeamento_espaco_amostral
 
 		//Tendência temporal
-		const SmartEnupla<IdCenario, SmartEnupla <Periodo, double>> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario(), Periodo(), double());
+		const SmartEnupla <Periodo, double> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
-		for (Periodo periodo = tendencia_temporal.at(IdCenario_1).getIteradorInicial(); periodo <= tendencia_temporal.at(IdCenario_1).getIteradorFinal(); tendencia_temporal.at(IdCenario_1).incrementarIterador(periodo))
+		for (Periodo periodo = tendencia_temporal.getIteradorInicial(); periodo <= tendencia_temporal.getIteradorFinal(); tendencia_temporal.incrementarIterador(periodo))
 			horizonte_processo_estocastico.addElemento(periodo, true);
 
 		//Processo estocástico
@@ -14145,9 +14144,9 @@ void LeituraCEPEL::calcular_equacionamento_afluencia_natural_x_hidreletrica(Dado
 		SmartEnupla <Periodo, bool> horizonte_processo_estocastico; //Vai conter nos iteradores os periodos da tendencia_temporal + periodos do mapeamento_espaco_amostral
 
 		//Tendência temporal
-		const SmartEnupla<IdCenario, SmartEnupla <Periodo, double>> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario(), Periodo(), double());
+		const SmartEnupla <Periodo, double> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
-		for (Periodo periodo = tendencia_temporal.at(IdCenario_1).getIteradorInicial(); periodo <= tendencia_temporal.at(IdCenario_1).getIteradorFinal(); tendencia_temporal.at(IdCenario_1).incrementarIterador(periodo))
+		for (Periodo periodo = tendencia_temporal.getIteradorInicial(); periodo <= tendencia_temporal.getIteradorFinal(); tendencia_temporal.incrementarIterador(periodo))
 			horizonte_processo_estocastico.addElemento(periodo, true);
 
 		//Processo estocástico
@@ -14214,9 +14213,9 @@ void LeituraCEPEL::calcular_equacionamento_afluencia_natural_x_hidreletrica_out_
 		SmartEnupla <Periodo, bool> horizonte_processo_estocastico; //Vai conter nos iteradores os periodos da tendencia_temporal + periodos do mapeamento_espaco_amostral
 
 		//Tendência temporal
-		const SmartEnupla<IdCenario, SmartEnupla <Periodo, double>> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario(), Periodo(), double());
+		const SmartEnupla <Periodo, double> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
-		for (Periodo periodo = tendencia_temporal.at(IdCenario_1).getIteradorInicial(); periodo <= tendencia_temporal.at(IdCenario_1).getIteradorFinal(); tendencia_temporal.at(IdCenario_1).incrementarIterador(periodo))
+		for (Periodo periodo = tendencia_temporal.getIteradorInicial(); periodo <= tendencia_temporal.getIteradorFinal(); tendencia_temporal.incrementarIterador(periodo))
 			horizonte_processo_estocastico.addElemento(periodo, true);
 
 		//Processo estocástico
@@ -14348,9 +14347,9 @@ void LeituraCEPEL::atualizar_equacionamento_afluencia_natural_x_hidreletrica(Dad
 		SmartEnupla <Periodo, bool> horizonte_processo_estocastico; //Vai conter nos iteradores os periodos da tendencia_temporal + periodos do mapeamento_espaco_amostral
 
 		//Tendência temporal
-		const SmartEnupla<IdCenario, SmartEnupla <Periodo, double>> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario(), Periodo(), double());
+		const SmartEnupla <Periodo, double> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
-		for (Periodo periodo = tendencia_temporal.at(IdCenario_1).getIteradorInicial(); periodo <= tendencia_temporal.at(IdCenario_1).getIteradorFinal(); tendencia_temporal.at(IdCenario_1).incrementarIterador(periodo))
+		for (Periodo periodo = tendencia_temporal.getIteradorInicial(); periodo <= tendencia_temporal.getIteradorFinal(); tendencia_temporal.incrementarIterador(periodo))
 			horizonte_processo_estocastico.addElemento(periodo, true);
 
 		//Processo estocástico
@@ -14725,9 +14724,9 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 		SmartEnupla <Periodo, bool> horizonte_processo_estocastico; //Vai conter nos iteradores os periodos da tendencia_temporal + periodos do mapeamento_espaco_amostral
 
 		//Tendência temporal
-		const SmartEnupla<IdCenario, SmartEnupla <Periodo, double>> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario(), Periodo(), double());
+		const SmartEnupla <Periodo, double> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
-		for (Periodo periodo = tendencia_temporal.at(IdCenario_1).getIteradorInicial(); periodo <= tendencia_temporal.at(IdCenario_1).getIteradorFinal(); tendencia_temporal.at(IdCenario_1).incrementarIterador(periodo))
+		for (Periodo periodo = tendencia_temporal.getIteradorInicial(); periodo <= tendencia_temporal.getIteradorFinal(); tendencia_temporal.incrementarIterador(periodo))
 			horizonte_processo_estocastico.addElemento(periodo, true);
 		
 		//Processo estocástico
@@ -14783,7 +14782,7 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 						for (int pos = 1; pos <= int(idHidreletricas_calculo_ENA.size()); pos++) {
 
 							if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-								afluencia += coeficiente_idHidreletricas_calculo_ENA.getElemento(pos) * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletricas_calculo_ENA.getElemento(pos))).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								afluencia += coeficiente_idHidreletricas_calculo_ENA.getElemento(pos) * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletricas_calculo_ENA.getElemento(pos))).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double());
 							else {
 								const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
 								afluencia += coeficiente_idHidreletricas_calculo_ENA.getElemento(pos) * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletricas_calculo_ENA.getElemento(pos))).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
@@ -14843,7 +14842,7 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados)
 						for (int pos = 1; pos <= int(idHidreletricas_calculo_ENA.size()); pos++) {
 
 							if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-								afluencia += coeficiente_idHidreletricas_calculo_ENA.getElemento(pos) * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletricas_calculo_ENA.getElemento(pos))).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								afluencia += coeficiente_idHidreletricas_calculo_ENA.getElemento(pos) * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletricas_calculo_ENA.getElemento(pos))).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double());
 							else {
 								const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
 								afluencia += coeficiente_idHidreletricas_calculo_ENA.getElemento(pos) * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletricas_calculo_ENA.getElemento(pos))).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
@@ -14895,9 +14894,9 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE
 		SmartEnupla <Periodo, bool> horizonte_processo_estocastico; //Vai conter nos iteradores os periodos da tendencia_temporal + periodos do mapeamento_espaco_amostral
 
 		//Tendência temporal
-		const SmartEnupla<IdCenario, SmartEnupla <Periodo, double>> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario(), Periodo(), double());
+		const SmartEnupla <Periodo, double> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
-		for (Periodo periodo = tendencia_temporal.at(IdCenario_1).getIteradorInicial(); periodo <= tendencia_temporal.at(IdCenario_1).getIteradorFinal(); tendencia_temporal.at(IdCenario_1).incrementarIterador(periodo))
+		for (Periodo periodo = tendencia_temporal.getIteradorInicial(); periodo <= tendencia_temporal.getIteradorFinal(); tendencia_temporal.incrementarIterador(periodo))
 			horizonte_processo_estocastico.addElemento(periodo, true);
 
 		//Processo estocástico
@@ -14957,7 +14956,7 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE
 						if (coeficiente_idHidreletrica > 0) {
 
 							if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
-								ENA_calculada += coeficiente_idHidreletrica * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, periodo, double());
+								ENA_calculada += coeficiente_idHidreletrica * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica)).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double());
 							else {
 								const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
 								ENA_calculada += coeficiente_idHidreletrica * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
@@ -17168,7 +17167,7 @@ double LeituraCEPEL::get_afluencia_natural_posto(Dados& a_dados, const int a_cod
 							const IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria(idHidreletrica_aux);
 
 							if (a_periodo < mapeamento_espaco_amostral.at(IdCenario_1).getIteradorInicial()) //Valores da tendência
-								afluencia_natural_posto += a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_tendencia_temporal, IdCenario_1, a_periodo, double());
+								afluencia_natural_posto += a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodo, double());
 							else {
 								const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(a_idCenario).getElemento(a_periodo);
 								afluencia_natural_posto += a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, idRealizacao, double());
