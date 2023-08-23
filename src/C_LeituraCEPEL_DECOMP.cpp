@@ -13441,7 +13441,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			//////////////////////////////////////////////////////////////////////////////////
 			defineHidreletricasMontanteNaCascataENA(a_dados);//Define para cada idHidreletrica todas as usinas que estão a montante na cascata
 			
-
 			calcular_equacionamento_afluencia_natural_x_hidreletrica(a_dados);
 			calcular_equacionamento_afluencia_natural_x_hidreletrica_out_estudo(a_dados);
 
@@ -13451,7 +13450,197 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			calcular_equacionamento_afluencia_natural_x_REE(a_dados);
 
 			//////////////////////////////////////////////////////////////////////////////////
-			//Imprime cálculos
+			//4 Leitura dos cortes NW e conversão de formato REE em usina individualizada
+			//////////////////////////////////////////////////////////////////////////////////
+
+			const IdEstagio idEstagio_pos_estudo = IdEstagio(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal() + 1);
+
+			Estagio estagio_pos_estudo;
+
+			estagio_pos_estudo.setAtributo(AttComumEstagio_idEstagio, idEstagio_pos_estudo);
+
+			//Processo estocástico
+			const SmartEnupla<IdCenario, SmartEnupla <Periodo, IdRealizacao>> mapeamento_espaco_amostral = a_dados.processoEstocastico_hidrologico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao());
+
+			const IdCenario idCenario_inicial = mapeamento_espaco_amostral.getIteradorInicial();
+			const IdCenario idCenario_final = mapeamento_espaco_amostral.getIteradorFinal();
+
+			/////////////////////////////////////////
+
+			int numero_simbolo_cabecalho = 0;
+			std::string simbolo_cabecalho = "X---------";
+
+			while (std::getline(leituraArquivo, line)) {
+
+				strNormalizada(line);
+
+				//Leitura dos cortes
+				if (line.size() >= 13) {
+
+					if (numero_simbolo_cabecalho == 2) {
+
+						CorteBenders corteBenders;
+
+						//idCorteBenders
+						atributo = line.substr(3, 10);
+						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+						const IdCorteBenders idCorteBenders = IdCorteBenders(std::atoi(atributo.c_str()));
+
+						if (idCorteBenders == IdCorteBenders_Nenhum)
+							throw std::invalid_argument("idCorteBenders nao identificado");
+
+						corteBenders.setAtributo(AttComumCorteBenders_idCorteBenders, idCorteBenders);
+
+						//RHS
+						atributo = line.substr(13, 12);
+						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+						const double rhs = std::atof(atributo.c_str());
+						
+						//Coeficientes
+
+						const int ordem_maxima_PAR = 6;
+						const int numero_patamares = 3;
+						const int lag_GNL = 2;
+
+						SmartEnupla<IdReservatorioEquivalente, double> coeficiente_EAR(IdReservatorioEquivalente_1, std::vector<double>(IdReservatorioEquivalente(maior_ONS_REE), 0.0));
+						SmartEnupla<IdReservatorioEquivalente, double> coeficiente_EAR(IdReservatorioEquivalente_1, std::vector<double>(IdReservatorioEquivalente(maior_ONS_REE), 0.0));
+						SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, double>> coeficiente_ENA(IdReservatorioEquivalente_1, std::vector<SmartEnupla<int, double>>(IdReservatorioEquivalente(maior_ONS_REE), SmartEnupla<int, double>(1, std::vector<double>(ordem_maxima_PAR, 0.0))));
+						SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, SmartEnupla<int, double>>> coeficiente_GNL(IdReservatorioEquivalente_1, std::vector<SmartEnupla<int, SmartEnupla<int, double>>>(IdReservatorioEquivalente(maior_ONS_REE), SmartEnupla<int, SmartEnupla<int, double>>(1, std::vector<SmartEnupla<int, double>>(numero_patamares, SmartEnupla<int, double>(1, std::vector<double>(lag_GNL, 0.0))))));
+						SmartEnupla<IdReservatorioEquivalente, double> coeficiente_Vminop(IdReservatorioEquivalente_1, std::vector<double>(IdReservatorioEquivalente(maior_ONS_REE), 0.0));
+
+						for (int pos = 0; pos < maior_ONS_REE; pos++) {
+
+							//idREE
+							atributo = line.substr(26, 6);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente(std::atoi(atributo.c_str()));
+
+							///////////////////////////////
+							//Coef.Earm ($/MWh)
+							///////////////////////////////
+							atributo = line.substr(33, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_energia_armazenada = std::atof(atributo.c_str());
+
+							///////////////////////////////
+							//Coeficientes para Eafl ($/MWh)
+							///////////////////////////////
+
+							//lag_1
+							atributo = line.substr(53, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_1 = std::atof(atributo.c_str());
+
+							//lag_2
+							atributo = line.substr(73, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_2 = std::atof(atributo.c_str());
+
+							//lag_3
+							atributo = line.substr(93, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_3 = std::atof(atributo.c_str());
+
+							//lag_4
+							atributo = line.substr(113, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_4 = std::atof(atributo.c_str());
+
+							//lag_5
+							atributo = line.substr(133, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_5 = std::atof(atributo.c_str());
+
+							//lag_6
+							atributo = line.substr(153, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_6 = std::atof(atributo.c_str());
+
+							///////////////////////////////
+							//Coeficientes para GNL ($/MWh)
+							///////////////////////////////
+
+							//pat_1_lag_1
+							atributo = line.substr(294, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_GNL_pat_1_lag_1 = std::atof(atributo.c_str());
+
+							//pat_1_lag_2
+							atributo = line.substr(314, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_GNL_pat_1_lag_2 = std::atof(atributo.c_str());
+
+							//pat_2_lag_1
+							atributo = line.substr(334, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_GNL_pat_2_lag_1 = std::atof(atributo.c_str());
+
+							//pat_2_lag_2
+							atributo = line.substr(354, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_GNL_pat_2_lag_2 = std::atof(atributo.c_str());
+
+							//pat_3_lag_1
+							atributo = line.substr(374, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_GNL_pat_3_lag_1 = std::atof(atributo.c_str());
+
+							//pat_3_lag_2
+							atributo = line.substr(394, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_GNL_pat_3_lag_2 = std::atof(atributo.c_str());
+
+							///////////////////////////////
+							//Coef.Vminop-Max ($/MWh)
+							///////////////////////////////
+							atributo = line.substr(414, 23);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_Vminop = std::atof(atributo.c_str());
+
+							///////
+							coeficiente_EAR.setElemento(idReservatorioEquivalente, coeficiente_energia_armazenada);
+
+
+
+							///////
+
+							if (pos + 1 < maior_ONS_REE)//Evita passar a linha quando é o último REE lido (depois no while vai pegar uma nova linha)
+								std::getline(leituraArquivo, line);//Passa de linha
+						}//for (int pos = 0; pos < 11; pos++) {
+
+
+					}//if (numero_simbolo_cabecalho == 2) {
+
+					///////////////////////////////////////////////////
+					//Chave para saber que está no bloco de informação
+					if (line.substr(3, 10) == simbolo_cabecalho)
+						numero_simbolo_cabecalho += 1;
+					///////////////////////////////////////////////////
+
+				}//if (line.size() >= 13) {
+
+			}//while (std::getline(leituraArquivo, line)) {
+
+
+			//////////////////////////////////////////////////////////////////////////////////
+			//Imprime info de cálculo
 			//////////////////////////////////////////////////////////////////////////////////
 
 			const bool imprimir_info_produtibilidades = true;
@@ -15284,7 +15473,6 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE: \n" + std::string(erro.what())); }
 
 }
-
 
 bool LeituraCEPEL::retorna_is_idHidreletrica_in_calculo_ENA(const int a_codigo_usina) {
 

@@ -2,6 +2,7 @@
 #define LEITURA_CEPEL
 
 #include "C_Dados.h"
+#include "C_EstagioOtimizacao.h"
 
 
 class LeituraCEPEL {
