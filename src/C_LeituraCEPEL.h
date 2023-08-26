@@ -594,6 +594,7 @@ private:
 
 	std::vector<std::vector<ModificacaoUTE>> lista_modificacaoUTE;
 
+
 	// Método para aplicar modificações nas Hidreletricas.
 	void aplicarModificacoesUTE(Dados& a_dados);
 
@@ -662,7 +663,7 @@ private:
 		double valor_5 = NAN;
 	};
 
-	std::vector<std::vector<ModificacaoUHE>> lista_modificacaoUHE;
+	SmartEnupla<IdHidreletrica, std::vector<ModificacaoUHE>> lista_modificacaoUHE = SmartEnupla<IdHidreletrica, std::vector<ModificacaoUHE>>(IdHidreletrica(1), std::vector<std::vector<ModificacaoUHE>>(IdHidreletrica(int(IdHidreletrica_Excedente)-1), std::vector<ModificacaoUHE>()));
 
 	// Método para aplicar modificações nas Hidreletricas.
 	void aplicarModificacoesUHE(Dados& a_dados);

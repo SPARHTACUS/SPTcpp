@@ -9,11 +9,13 @@ LeituraCEPEL::LeituraCEPEL() {
 
 	SPT_avisos = "SPT_avisos.txt";
 
+	/*
 	lista_modificacaoUHE.reserve(500);
 	lista_modificacaoUHE.push_back(std::vector<ModificacaoUHE>());
 
 	lista_modificacaoUTE.reserve(500);
 	lista_modificacaoUTE.push_back(std::vector<ModificacaoUTE>());
+	*/
 
 } // LeituraCEPEL::LeituraCEPEL() { 
 
