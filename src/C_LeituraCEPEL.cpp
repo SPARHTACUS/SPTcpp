@@ -2676,9 +2676,9 @@ bool LeituraCEPEL::aplicarModificacaoJUSENA(Dados& a_dados, const IdHidreletrica
 		if (a_modificacaoUHE.tipo_de_modificacao != TipoModificacaoUHE_JUSENA)
 			throw std::invalid_argument("Modificacao nao compativel com metodo.");
 
-		const int codigo_usina_jusante_EAR = int(a_modificacaoUHE.valor_1);
+		const int codigo_usina_jusante_JUSENA = int(a_modificacaoUHE.valor_1);
 
-		a_dados.vetorHidreletrica.att(a_idHidreletrica).setAtributo(AttComumHidreletrica_codigo_usina_jusante_EAR, codigo_usina_jusante_EAR);
+		a_dados.vetorHidreletrica.att(a_idHidreletrica).setAtributo(AttComumHidreletrica_codigo_usina_jusante_JUSENA, codigo_usina_jusante_JUSENA);
 
 		return true;
 
