@@ -62,7 +62,7 @@
       m(Hidreletrica,  AttComum,                  queda_referencia,                               double,          0,         1000,                  0,         nao) \
       m(Hidreletrica,  AttComum,                 volume_referencia,                               double,          0,       100000,                  0,         nao) \
       m(Hidreletrica,  AttComum,                tipo_regularizacao,                    TipoRegularizacao,     Nenhum,          max,             Nenhum,         nao) \
-      m(Hidreletrica,  AttComum,          codigo_usina_jusante_EAR,                                  int,          0,          500,                  0,         nao) \
+      m(Hidreletrica,  AttComum,          codigo_usina_jusante_JUSENA,                                  int,          0,          500,                  0,         nao) \
       m(Hidreletrica,  AttComum,               produtibilidade_EAR,                               double,          0,       100000,                  0,         nao)
 //          c_classe,   smrtAtt,                      nomeAtributo,                                 tipo, lowerBound,   upperBound,      initialValue, mustRead?
 
