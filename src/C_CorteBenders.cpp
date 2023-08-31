@@ -27,8 +27,12 @@ void CorteBenders::anularVariavelEstado(const IdVariavelEstado a_idVariavelEstad
 
 	try {
 
-		const double valor_estado = getElementoVetor(AttVetorCorteBenders_estado, a_idVariavelEstado, double());
-		setElemento(AttVetorCorteBenders_estado, a_idVariavelEstado, 0.0);
+		double valor_estado = 0.0;
+
+		if (getSizeVetor(AttVetorCorteBenders_estado, a_idVariavelEstado) > 0) {
+			valor_estado = getElementoVetor(AttVetorCorteBenders_estado, a_idVariavelEstado, double());
+			setElemento(AttVetorCorteBenders_estado, a_idVariavelEstado, 0.0);
+		}
 
 		const IdRealizacao menorIdRealizacao = getIterador1Inicial(AttMatrizCorteBenders_coeficiente, IdRealizacao());
 		const IdRealizacao maiorIdRealizacao = getIterador1Final(AttMatrizCorteBenders_coeficiente, IdRealizacao());

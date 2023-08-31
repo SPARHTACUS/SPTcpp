@@ -181,6 +181,8 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, idCenario);
 
+						a_modeloOtimizacao.atualizarProbabilidadesParaCustoFuturoNestedEmEstagioComPosEstudo(tSS, idEstagio, idCenario, IdRealizacao_Nenhum);
+
 						a_modeloOtimizacao.otimizarProblema(tSS, a_idProcesso, a_idIteracao, idEstagio, idCenario, diretorio_pl);
 
 						if (idEstagio == a_estagio_inicial)
@@ -346,7 +348,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 			const int numero_aberturas_estagio = int(a_modeloOtimizacao.getAtributo(idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()));
 
 			int numero_aberturas_efetivas = numero_aberturas_estagio;
-			const int cortes_multiplos = a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_cortes_multiplos, idEstagio, int());
+			const int cortes_multiplos = a_modeloOtimizacao.getAtributo(idEstagio, AttComumEstagio_cortes_multiplos, int());
 			if (cortes_multiplos > 0)
 				numero_aberturas_efetivas = cortes_multiplos;
 
@@ -472,6 +474,8 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 									auto start_clock_realizacao = std::chrono::high_resolution_clock::now();
 
 									a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, IdRealizacao(idAbertura));
+
+									a_modeloOtimizacao.atualizarProbabilidadesParaCustoFuturoNestedEmEstagioComPosEstudo(tSS, idEstagio, idCenario, IdRealizacao(idAbertura));
 
 									const bool otimizacao = a_modeloOtimizacao.otimizarProblema(tSS, idProcesso, a_idIteracao, idEstagio, idCenario, IdRealizacao(idAbertura), sol_inf_var_dinamica, solucao_dual_var_dinamica, limite_inferior_var_dinamica, limite_superior_var_dinamica, sol_dual_var_estado, diretorio_pl);
 
@@ -916,7 +920,7 @@ void MetodoSolucao::executarPDDE_calcularCorteBenders_new(const TipoSubproblemaS
 
 		executarPDDE_mapearSolucaoProxy(a_status_otimizacao, a_custo_total, a_sol_inf_var_dinamica, a_solucao_dual_var_dinamica, a_limite_inferior_var_dinamica, a_limite_superior_var_dinamica, a_sol_dual_var_estado, map_solucao_dual_proxy, a_modeloOtimizacao, busca_abertura_em_todos_processos);
 
-		if (a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_cortes_multiplos, a_idEstagio, int()) == 0) {
+		if (a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_cortes_multiplos, int()) == 0) {
 
 			const TipoAversaoRisco tipo_aversao_a_risco = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_aversao_a_risco, TipoAversaoRisco());
 
@@ -927,7 +931,7 @@ void MetodoSolucao::executarPDDE_calcularCorteBenders_new(const TipoSubproblemaS
 			else
 				throw std::invalid_argument("Tipo de aversao a risco nao implementado.");
 
-		} // if (a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_cortes_multiplos, a_idEstagio, int()) == 0) {
+		} // if (a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_cortes_multiplos, int()) == 0) {
 
 		else
 			executarPDDE_calcularCorteBendersMultiCut_new(a_idIteracao, a_idProcesso, a_maiorIdProcesso, a_idEstagio, a_custo_total, a_sol_dual_var_estado, map_solucao_dual_proxy, a_vlr_var_estado, a_modeloOtimizacao, busca_abertura_em_todos_processos);
@@ -1126,8 +1130,8 @@ void MetodoSolucao::executarPDDE_calcularCorteBendersValorEsperado_new(const IdI
 void MetodoSolucao::executarPDDE_calcularCorteBendersCVaR_new(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<int>& a_map_solucao_dual_proxy, EstruturaResultados<double>& a_vlr_var_estado, ModeloOtimizacao& a_modeloOtimizacao, const bool a_busca_global) {
 	try {
 
-		const double lambda_CVAR = a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_lambda_CVAR, a_idEstagio, double());
-		const double  alpha_CVAR = a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_alpha_CVAR, a_idEstagio, double());
+		const double lambda_CVAR = a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_lambda_CVAR, double());
+		const double  alpha_CVAR = a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_alpha_CVAR, double());
 		const int numero_total_aberturas_estagio = int(a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()));
 
 		const int nr = a_custo_total.bloco;
@@ -1611,8 +1615,8 @@ void MetodoSolucao::executarPDDE_calcularCorteBendersCVaR(const IdIteracao a_idI
 		double* vetor_coeficiente = new double[maior_numero_cenario * numero_estado];
 
 		
-		const double lambda_CVAR = a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_lambda_CVAR, a_idEstagio, double());
-		const double  alpha_CVAR = a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_alpha_CVAR, a_idEstagio, double());
+		const double lambda_CVAR = a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_lambda_CVAR, double());
+		const double  alpha_CVAR = a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_alpha_CVAR, double());
 
 		SmartEnupla<IdRealizacao, double> probabilidade_naoCVAR(IdRealizacao_1, std::vector<double>(maiorIdRealizacao, 0.0));
 		SmartEnupla<IdRealizacao, double> probabilidade_CVAR(IdRealizacao_1, std::vector<double>(maiorIdRealizacao, 0.0));
