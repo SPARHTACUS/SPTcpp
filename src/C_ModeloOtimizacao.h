@@ -74,10 +74,7 @@ class EntradaSaidaDados;
 	  m(ModeloOtimizacao,  AttVetor,        custo_imediato,         double,        0,          max,           0,  IdEstagio) \
 	  m(ModeloOtimizacao,  AttVetor,          custo_futuro,         double,        0,          max,           0,  IdEstagio) \
 	  m(ModeloOtimizacao,  AttVetor,      horizonte_estudo,      IdEstagio,        0,          max,           0,  Periodo) \
-	  m(ModeloOtimizacao,  AttVetor, tratamento_inviabilidade,         int,       -1,          max,           0,  IdEstagio) \
-	  m(ModeloOtimizacao,  AttVetor,      cortes_multiplos,            int,        0,          max,           0,  IdEstagio) \
-	  m(ModeloOtimizacao,  AttVetor,           lambda_CVAR,         double,        0,            1,           0,  IdEstagio) \
-	  m(ModeloOtimizacao,  AttVetor,            alpha_CVAR,         double,        0,            1,           0,  IdEstagio) 
+	  m(ModeloOtimizacao,  AttVetor, tratamento_inviabilidade,         int,       -1,          max,           0,  IdEstagio)
 
 #define ATT_MATRIZ_MODELO_OTIMIZACAO(m)  \
 	  m(ModeloOtimizacao,  AttMatriz,  percentual_duracao_patamar_carga,                               double,          0,            1,             0,    Periodo,   IdPatamarCarga) \
@@ -654,6 +651,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		IdCenario getCenarioInicial(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao);
 		IdCenario getCenarioFinal(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao);
 		int getNumeroCenarios(const IdCenario a_cenario_inicial, const IdCenario a_cenario_final);
+
+		void atualizarProbabilidadesParaCustoFuturoNestedEmEstagioComPosEstudo(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao);
 
 	private:
 

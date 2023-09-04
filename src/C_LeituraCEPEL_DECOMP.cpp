@@ -13002,17 +13002,152 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			//4 Leitura dos cortes NW e conversão de formato REE em usina individualizada
 			//////////////////////////////////////////////////////////////////////////////////
 
+			const IdCenario idCenario_final = a_dados.processoEstocastico_hidrologico.getIterador1Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario());
+
+			const int ordem_maxima_PAR = 11;
+			const int numero_patamares = 3;
+			const int lag_GNL = 2;
+
+			const double numero_horas_estagio_NEWAVE = (365.0 * 24.0) / 12.0;
+
 			const IdEstagio idEstagio_pos_estudo = IdEstagio(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal() + 1);
 
 			Estagio estagio_pos_estudo;
 
 			estagio_pos_estudo.setAtributo(AttComumEstagio_idEstagio, idEstagio_pos_estudo);
+			estagio_pos_estudo.setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, 0);
+			estagio_pos_estudo.setAtributo(AttComumEstagio_cortes_multiplos, -int(idCenario_final));
+
+			const Periodo periodo_pos_estudo = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_estudo.getIteradorFinal() + 1);
+			estagio_pos_estudo.setAtributo(AttComumEstagio_periodo_otimizacao, periodo_pos_estudo);
+
+			estagio_pos_estudo.alocarCorteBenders(8000);
+
+			const std::string strVarDecisaoVIIdEstagioPeriodo = std::string("VarDecisaoVI," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_pos_estudo));
+			const std::string strVarDecisaoYPIdEstagioPeriodoIdProcEstocastico = std::string("VarDecisaoYP," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_pos_estudo) + "," + getString(IdProcessoEstocastico_hidrologico_hidreletrica));
+			const std::string strVarDecisaoPTDISPCOMIdEstagio = std::string("VarDecisaoPTDISPCOM," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())));
 
 			//Processo estocástico
-			const SmartEnupla<IdCenario, SmartEnupla <Periodo, IdRealizacao>> mapeamento_espaco_amostral = a_dados.processoEstocastico_hidrologico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao());
+			const IdTermeletrica menorIdTermeletrica = a_dados.getMenorId(IdTermeletrica());
+			const IdTermeletrica maiorIdTermeletrica = a_dados.getMaiorId(IdTermeletrica());
 
-			const IdCenario idCenario_inicial = mapeamento_espaco_amostral.getIteradorInicial();
-			const IdCenario idCenario_final = mapeamento_espaco_amostral.getIteradorFinal();
+			SmartEnupla<IdVariavelEstado, double> estados;
+			SmartEnupla <IdHidreletrica, IdVariavelEstado> estados_VI(menorIdHidreletrica, std::vector<IdVariavelEstado>(int(maiorIdHidreletrica - menorIdHidreletrica) + 1, IdVariavelEstado_Nenhum));
+			SmartEnupla <IdHidreletrica, SmartEnupla<int, IdVariavelEstado>> estados_YP(menorIdHidreletrica, std::vector<SmartEnupla<int, IdVariavelEstado>>(int(maiorIdHidreletrica - menorIdHidreletrica) + 1, SmartEnupla<int, IdVariavelEstado>()));
+			SmartEnupla <IdTermeletrica, SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>> estados_GNL(menorIdTermeletrica, std::vector<SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>>(int(maiorIdTermeletrica - menorIdTermeletrica) + 1, SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>()));
+
+			SmartEnupla<IdSubmercado, IdReservatorioEquivalente> mapeamentoSubmercadoxREE(IdSubmercado(1), std::vector<IdReservatorioEquivalente>(int(IdSubmercado_Excedente - 1), IdReservatorioEquivalente_Nenhum));
+
+			if (true) {
+				SmartEnupla<IdReservatorioEquivalente, bool> coeficientes_EAR;
+				SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>> coeficiente_ENA;
+
+				leitura_cortes_NEWAVE_para_dimensionamento(coeficientes_EAR, coeficiente_ENA, a_diretorio, a_diretorio_cortes, a_nomeArquivo);
+
+				// Variaveis Estado
+				for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+					// Estados VI
+					if ((a_dados.getSizeVetor(idHidreletrica, AttVetorHidreletrica_produtibilidade_acumulada_EAR) > 0) && (a_dados.getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, horizonte_tendencia_mais_estudo.getIteradorFinal(), double()) > 0.0)) {
+						for (IdReservatorioEquivalente idREE = coeficientes_EAR.getIteradorInicial(); idREE <= coeficientes_EAR.getIteradorFinal(); idREE++) {
+							if ((coeficientes_EAR.getElemento(idREE)) && (a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_produtibilidade_acumulada_EAR, idREE, double()) != 0.0)) {
+								estados_VI.at(idHidreletrica) = estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, std::string(strVarDecisaoVIIdEstagioPeriodo + "," + getString(idHidreletrica) + ",0.0,inf"), -1, -1);
+								estados.addElemento(estados_VI.at(idHidreletrica), 0.0);
+								break;
+							}
+						}
+					}
+
+					// Inicializa Estados YP
+					estados_YP.at(idHidreletrica) = SmartEnupla<int, IdVariavelEstado>(1, std::vector<IdVariavelEstado>(ordem_maxima_PAR, IdVariavelEstado_Nenhum));
+
+					mapeamentoSubmercadoxREE.at(a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado())) = IdReservatorioEquivalente(lista_codigo_ONS_REE.at(idHidreletrica));
+
+				} // for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+				// Estados YP
+				for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
+
+					const Periodo periodo_lag = periodo_pos_estudo - lag;
+
+					bool is_sobreposicao_encontrada = false;
+					for (Periodo periodo = horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= horizonte_tendencia_mais_estudo.getIteradorFinal(); horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
+
+						const double sobreposicao = periodo.sobreposicao(periodo_lag);
+						if (sobreposicao > 0.0) {
+							is_sobreposicao_encontrada = true;
+
+							for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+								if (estados_YP.at(idHidreletrica).at(lag) == IdVariavelEstado_Nenhum) {
+
+									bool estado_criado = false;
+									for (IdReservatorioEquivalente idREE = coeficiente_ENA.getIteradorInicial(); idREE <= coeficiente_ENA.getIteradorFinal(); idREE++) {
+										if (!coeficiente_ENA.at(idREE).getElemento(lag))
+											break;
+										for (IdRealizacao idReal = IdRealizacao_1; idReal <= IdRealizacao(idCenario_final); idReal++) {
+											if (lista_coeficiente_idHidreletricas_calculo_ENA_x_REE_x_cenario_x_periodo.at(idREE).at(IdCenario(idReal)).at(periodo).at(idHidreletrica) != 0.0) {
+												estados_YP.at(idHidreletrica).at(lag) = estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, std::string(strVarDecisaoYPIdEstagioPeriodoIdProcEstocastico + "," + getString(a_dados.processoEstocastico_hidrologico.getIdVariavelAleatoriaFromIdFisico(idHidreletrica)) + "," + getString(periodo_lag) + ",0.0," + getString(idHidreletrica)), -1, -1);
+												estados.addElemento(estados_YP.at(idHidreletrica).at(lag), 0.0);
+												estado_criado = true;
+												break;
+											}
+										}
+										if (estado_criado)
+											break;
+									}
+
+								}
+
+							} // for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						} // if (sobreposicao > 0.0) {
+						else if ((is_sobreposicao_encontrada) && (sobreposicao == 0.0))
+							break;
+					} // for (Periodo periodo = horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= horizonte_tendencia_mais_estudo.getIteradorFinal(); horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
+				} // for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
+			} // if (true) {
+
+			// Estados PTDISPCOM
+			for (IdTermeletrica idUTE = menorIdTermeletrica; idUTE <= maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idUTE)) {
+
+				if (a_dados.getAtributo(idUTE, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int()) > 0) {
+
+					const IdSubmercado idSubmercado = a_dados.getAtributo(idUTE, AttComumTermeletrica_submercado, IdSubmercado());
+
+					estados_GNL.at(idUTE) = SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>(idSubmercado, std::vector<SmartEnupla<int, IdVariavelEstado>>(1, SmartEnupla<int, IdVariavelEstado>(1, std::vector<IdVariavelEstado>(lag_GNL, IdVariavelEstado_Nenhum))));
+
+					double potencia_disponivel_maxima = 0.0;
+					double potencia_disponivel_minima = 0.0;
+					for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_tendencia_mais_estudo.getIteradorFinal(), IdPatamarCarga()); idPat++) {
+						const double percentual_duracao = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_tendencia_mais_estudo.getIteradorFinal(), idPat, double());
+						potencia_disponivel_minima = a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima, horizonte_tendencia_mais_estudo.getIteradorFinal(), idPat, double()) * percentual_duracao;
+						potencia_disponivel_maxima = a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima, horizonte_tendencia_mais_estudo.getIteradorFinal(), idPat, double()) * percentual_duracao;
+					}
+
+					estados_GNL.at(idUTE).at(idSubmercado).at(1) = estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, std::string(strVarDecisaoPTDISPCOMIdEstagio + "," + getString(periodo_pos_estudo + 1) + "," + getString(idUTE) + "," + getString(potencia_disponivel_minima) + "," + getString(potencia_disponivel_maxima)), -1, -1);
+					estados.addElemento(estados_GNL.at(idUTE).at(idSubmercado).at(1), 0.0);
+
+					estados_GNL.at(idUTE).at(idSubmercado).at(2) = estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, std::string(strVarDecisaoPTDISPCOMIdEstagio + "," + getString(periodo_pos_estudo) + "," + getString(idUTE) + "," + getString(potencia_disponivel_minima) + "," + getString(potencia_disponivel_maxima)), -1, -1);
+					estados.addElemento(estados_GNL.at(idUTE).at(idSubmercado).at(2), 0.0);
+
+				}
+			} // for (IdTermeletrica idUTE = menorIdTermeletrica; idUTE <= maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idUTE)) {
+
+			// Estados VMINOP
+			const IdMes mes_referencia_penalizacao_VMINOP = IdMes_11;
+			Periodo periodo_penalizacao_VMINOP = Periodo(TipoPeriodo_minuto, Periodo(mes_referencia_penalizacao_VMINOP, periodo_pos_estudo.getAno()) + 1) - 1;
+			if (periodo_pos_estudo.getMes() > mes_referencia_penalizacao_VMINOP)
+				periodo_penalizacao_VMINOP = Periodo(TipoPeriodo_minuto, Periodo(mes_referencia_penalizacao_VMINOP, IdAno(int(periodo_pos_estudo.getAno()) + 1)) + 1) - 1;
+			const std::string strVarDecisaoZP0_VF_FINFIdEstagio = std::string("VarDecisaoZP0_VF_FINF," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_penalizacao_VMINOP));
+			estados.addElemento(estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, strVarDecisaoZP0_VF_FINFIdEstagio, -1, -1), 0.0);
+
+			const double perc_pat1 = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_tendencia_mais_estudo.getIteradorFinal(), IdPatamarCarga_1, double());
+			const double perc_pat2 = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_tendencia_mais_estudo.getIteradorFinal(), IdPatamarCarga_2, double());
+			const double perc_pat3 = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_tendencia_mais_estudo.getIteradorFinal(), IdPatamarCarga_3, double());
+
+			SmartEnupla<IdRealizacao, double> rhs_corte(IdRealizacao_1, std::vector<double>(int(idCenario_final) + 1, 0.0));
+			SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> coeficientes_corte(IdRealizacao_1, std::vector<SmartEnupla<IdVariavelEstado, double>>(int(idCenario_final) + 1, SmartEnupla<IdVariavelEstado, double>(IdVariavelEstado_1, std::vector<double>(int(estados.getIteradorFinal()), 0.0))));
+
 
 			/////////////////////////////////////////
 
@@ -13026,32 +13161,17 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				//Leitura dos cortes
 				if (line.size() >= 13) {
 
+					double rhs_valor = 0.0;
+
 					if (numero_simbolo_cabecalho == 2) {
-
-						CorteBenders corteBenders;
-
-						//idCorteBenders
-						atributo = line.substr(3, 10);
-						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-						const IdCorteBenders idCorteBenders = IdCorteBenders(std::atoi(atributo.c_str()));
-
-						if (idCorteBenders == IdCorteBenders_Nenhum)
-							throw std::invalid_argument("idCorteBenders nao identificado");
-
-						corteBenders.setAtributo(AttComumCorteBenders_idCorteBenders, idCorteBenders);
 
 						//Leitura RHS
 						atributo = line.substr(13, 12);
 						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-						const double rhs = std::atof(atributo.c_str());
+						rhs_valor = std::atof(atributo.c_str());
 						
 						//Leitura Coeficientes
-
-						const int ordem_maxima_PAR = 6;
-						const int numero_patamares = 3;
-						const int lag_GNL = 2;
 
 						SmartEnupla<IdReservatorioEquivalente, double> coeficientes_EAR(IdReservatorioEquivalente_1, std::vector<double>(IdReservatorioEquivalente(maior_ONS_REE), 0.0));
 						SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, double>> coeficiente_ENA(IdReservatorioEquivalente_1, std::vector<SmartEnupla<int, double>>(IdReservatorioEquivalente(maior_ONS_REE), SmartEnupla<int, double>(1, std::vector<double>(ordem_maxima_PAR, 0.0))));
@@ -13114,6 +13234,36 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 							const double coeficiente_ENA_lag_6 = std::atof(atributo.c_str());
 
+							//lag_7
+							atributo = line.substr(173, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_7 = std::atof(atributo.c_str());
+
+							//lag_8
+							atributo = line.substr(193, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_8 = std::atof(atributo.c_str());
+
+							//lag_9
+							atributo = line.substr(213, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_9 = std::atof(atributo.c_str());
+
+							//lag_10
+							atributo = line.substr(233, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_10 = std::atof(atributo.c_str());
+
+							//lag_11
+							atributo = line.substr(253, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_11 = std::atof(atributo.c_str());
+
 							///////////////////////////////
 							//Coeficientes para GNL ($/MWh)
 							///////////////////////////////
@@ -13173,6 +13323,11 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 							coeficiente_ENA.at(idReservatorioEquivalente).setElemento(4, coeficiente_ENA_lag_4);
 							coeficiente_ENA.at(idReservatorioEquivalente).setElemento(5, coeficiente_ENA_lag_5);
 							coeficiente_ENA.at(idReservatorioEquivalente).setElemento(6, coeficiente_ENA_lag_6);
+							coeficiente_ENA.at(idReservatorioEquivalente).setElemento(7, coeficiente_ENA_lag_7);
+							coeficiente_ENA.at(idReservatorioEquivalente).setElemento(8, coeficiente_ENA_lag_8);
+							coeficiente_ENA.at(idReservatorioEquivalente).setElemento(9, coeficiente_ENA_lag_9);
+							coeficiente_ENA.at(idReservatorioEquivalente).setElemento(10, coeficiente_ENA_lag_10);
+							coeficiente_ENA.at(idReservatorioEquivalente).setElemento(11, coeficiente_ENA_lag_11);
 							coeficiente_GNL.at(idReservatorioEquivalente).at(1).setElemento(1, coeficiente_GNL_pat_1_lag_1);
 							coeficiente_GNL.at(idReservatorioEquivalente).at(1).setElemento(2, coeficiente_GNL_pat_1_lag_2);
 							coeficiente_GNL.at(idReservatorioEquivalente).at(2).setElemento(1, coeficiente_GNL_pat_2_lag_1);
@@ -13191,6 +13346,315 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 						//Construção dos cortes
 						//************************************
 
+						//
+						// Computa Coeficientes Individualizados
+						//
+
+						// Coeficientes VI
+						for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+							const IdVariavelEstado idVariavelEstado = estados_VI.at(idHidreletrica);
+							if (idVariavelEstado > IdVariavelEstado_Nenhum) {
+								coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) = 0.0;
+								for (IdReservatorioEquivalente idREE = coeficientes_EAR.getIteradorInicial(); idREE <= coeficientes_EAR.getIteradorFinal(); idREE++)
+									coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) += coeficientes_EAR.at(idREE) * a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_produtibilidade_acumulada_EAR, idREE, double());
+								coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) *= numero_horas_estagio_NEWAVE;
+
+								for (IdRealizacao idReal = IdRealizacao_2; idReal <= IdRealizacao(idCenario_final); idReal++)
+									coeficientes_corte.at(idReal).at(idVariavelEstado) = coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado);
+
+							} // if (idVariavelEstado > IdVariavelEstado_Nenhum) {
+						} // for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+						// Variaveis YP
+						for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
+
+							const Periodo periodo_lag = periodo_pos_estudo - lag;
+
+							bool is_sobreposicao_encontrada = false;
+							for (Periodo periodo = horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= horizonte_tendencia_mais_estudo.getIteradorFinal(); horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
+
+								const double sobreposicao = periodo.sobreposicao(periodo_lag);
+								if (sobreposicao > 0.0) {
+									is_sobreposicao_encontrada = true;
+
+									for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+										const IdVariavelEstado idVariavelEstado = estados_YP.at(idHidreletrica).at(lag);
+
+										if (idVariavelEstado > IdVariavelEstado_Nenhum) {
+
+											// Coeficientes YP
+											for (IdRealizacao idReal = IdRealizacao_1; idReal <= IdRealizacao(idCenario_final); idReal++) {
+												coeficientes_corte.at(idReal).at(idVariavelEstado) = 0.0;
+												for (IdReservatorioEquivalente idREE = coeficiente_ENA.getIteradorInicial(); idREE <= coeficiente_ENA.getIteradorFinal(); idREE++)
+													coeficientes_corte.at(idReal).at(idVariavelEstado) += sobreposicao * coeficiente_ENA.at(idREE).at(lag) * lista_coeficiente_idHidreletricas_calculo_ENA_x_REE_x_cenario_x_periodo.at(idREE).at(IdCenario(idReal)).at(periodo).at(idHidreletrica);
+												coeficientes_corte.at(idReal).at(idVariavelEstado) *= numero_horas_estagio_NEWAVE;
+											} // for (IdRealizacao idReal = IdRealizacao_1; idReal <= IdRealizacao(idCenario_final); idReal++) {
+										} // if (idVariavelEstado > IdVariavelEstado_Nenhum) {
+									} // for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+								} // if (sobreposicao > 0.0) {
+								else if ((is_sobreposicao_encontrada) && (sobreposicao == 0.0))
+									break;
+							} // for (Periodo periodo = horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= horizonte_tendencia_mais_estudo.getIteradorFinal(); horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
+						} // for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
+
+						// Variaveis PTDISPCOM 
+						for (IdTermeletrica idUTE = menorIdTermeletrica; idUTE <= maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idUTE)) {
+
+							if (estados_GNL.at(idUTE).size() > 0) {
+
+								const IdSubmercado idSubmercado = a_dados.getAtributo(idUTE, AttComumTermeletrica_submercado, IdSubmercado());
+
+								const IdVariavelEstado idVariavelEstado1 = estados_GNL.at(idUTE).at(idSubmercado).at(1);
+								const IdVariavelEstado idVariavelEstado2 = estados_GNL.at(idUTE).at(idSubmercado).at(2);
+
+								coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado1) = numero_horas_estagio_NEWAVE * (perc_pat1 * coeficiente_GNL.at(mapeamentoSubmercadoxREE.at(idSubmercado)).at(1).at(1) + perc_pat2 * coeficiente_GNL.at(mapeamentoSubmercadoxREE.at(idSubmercado)).at(2).at(1) + perc_pat3 * coeficiente_GNL.at(mapeamentoSubmercadoxREE.at(idSubmercado)).at(3).at(1));
+								coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado2) = numero_horas_estagio_NEWAVE * (perc_pat1 * coeficiente_GNL.at(mapeamentoSubmercadoxREE.at(idSubmercado)).at(1).at(2) + perc_pat2 * coeficiente_GNL.at(mapeamentoSubmercadoxREE.at(idSubmercado)).at(2).at(2) + perc_pat3 * coeficiente_GNL.at(mapeamentoSubmercadoxREE.at(idSubmercado)).at(3).at(2));
+
+								for (IdRealizacao idReal = IdRealizacao_2; idReal <= IdRealizacao(idCenario_final); idReal++) {
+									coeficientes_corte.at(idReal).at(idVariavelEstado1) = coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado1);
+									coeficientes_corte.at(idReal).at(idVariavelEstado2) = coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado2);
+								}
+
+							} // if (estados_GNL.at(idUTE).size() > 0) {
+						} // for (IdTermeletrica idUTE = menorIdTermeletrica; idUTE <= maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idUTE)) {
+
+						// Variavel ZP0_VF_FINF					
+						if (true) {
+							const IdVariavelEstado idVariavelEstado_VMINOP = estados.getIteradorFinal();
+							coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado_VMINOP) = 0.0;
+							for (IdReservatorioEquivalente idREE = coeficientes_Vminop.getIteradorInicial(); idREE <= coeficientes_Vminop.getIteradorFinal(); idREE++)
+								coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado_VMINOP) += coeficientes_Vminop.at(idREE);
+							coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado_VMINOP) *= numero_horas_estagio_NEWAVE;
+
+							for (IdRealizacao idReal = IdRealizacao_2; idReal <= IdRealizacao(idCenario_final); idReal++)
+								coeficientes_corte.at(idReal).at(idVariavelEstado_VMINOP) = coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado_VMINOP);
+						}
+
+						// RHS
+						if (true) {
+
+							for (IdRealizacao idReal = IdRealizacao_1; idReal <= IdRealizacao(idCenario_final); idReal++)
+								rhs_corte.at(idReal) = rhs_valor;
+
+							for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
+
+								const Periodo periodo_lag = periodo_pos_estudo - lag;
+
+								bool is_sobreposicao_encontrada = false;
+								for (Periodo periodo = horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= horizonte_tendencia_mais_estudo.getIteradorFinal(); horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
+
+									const double sobreposicao = periodo.sobreposicao(periodo_lag);
+									if (sobreposicao > 0.0) {
+										is_sobreposicao_encontrada = true;
+
+										// Coeficientes independentes
+										for (IdRealizacao idReal = IdRealizacao_1; idReal <= IdRealizacao(idCenario_final); idReal++) {
+											for (IdReservatorioEquivalente idREE = coeficiente_ENA.getIteradorInicial(); idREE <= coeficiente_ENA.getIteradorFinal(); idREE++)
+												rhs_corte.at(idReal) += sobreposicao * coeficiente_ENA.at(idREE).at(lag) * lista_termo_independente_calculo_ENA_x_REE_x_cenario_x_periodo.at(idREE).at(IdCenario(idReal)).at(periodo);
+										} // for (IdRealizacao idReal = IdRealizacao_1; idReal <= IdRealizacao(idCenario_final); idReal++) {
+
+									} // if (sobreposicao > 0.0) {
+									else if ((is_sobreposicao_encontrada) && (sobreposicao == 0.0))
+										break;
+								} // for (Periodo periodo = horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= horizonte_tendencia_mais_estudo.getIteradorFinal(); horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
+							} // for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
+
+							for (IdRealizacao idReal = IdRealizacao_1; idReal <= IdRealizacao(idCenario_final); idReal++)
+								rhs_corte.at(idReal) *= numero_horas_estagio_NEWAVE;
+						}
+
+						SmartEnupla<IdVariavelEstado, double> estados_vazios;
+
+						estagio_pos_estudo.instanciarCorteBenders(rhs_corte, coeficientes_corte, estados_vazios);
+
+					}//if (numero_simbolo_cabecalho == 2) {
+
+					///////////////////////////////////////////////////
+					//Chave para saber que está no bloco de informação
+					if (line.substr(3, 10) == simbolo_cabecalho)
+						numero_simbolo_cabecalho += 1;
+					///////////////////////////////////////////////////
+
+				}//if (line.size() >= 13) {
+
+			}//while (std::getline(leituraArquivo, line)) {
+			
+			EntradaSaidaDados entradaSaidaDados;
+
+			entradaSaidaDados.setSeparadorCSV(";");
+			entradaSaidaDados.setDiretorioSaida(a_dados.getAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string()));
+
+			entradaSaidaDados.imprimirArquivoCSV_AttComum("estagio.csv", estagio_pos_estudo, std::vector<AttComumEstagio>{ AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao, AttComumEstagio_selecao_cortes_nivel_dominancia, AttComumEstagio_cortes_multiplos, AttComumEstagio_alpha_CVAR, AttComumEstagio_lambda_CVAR});
+			entradaSaidaDados.imprimirArquivoCSV_AttComum("estado.csv", IdVariavelEstado_Nenhum, estagio_pos_estudo);
+			entradaSaidaDados.imprimirArquivoCSV_AttVetor("corteBenders_rhs.csv", IdCorteBenders_Nenhum, estagio_pos_estudo, AttVetorCorteBenders_rhs);
+			entradaSaidaDados.imprimirArquivoCSV_AttMatriz("corteBenders_coeficientes.csv", IdCorteBenders_Nenhum, estagio_pos_estudo, AttMatrizCorteBenders_coeficiente);
+
+		}//if (leituraArquivo.is_open()) {
+
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::leitura_cortes_NEWAVE(): \n" + std::string(erro.what())); }
+
+}
+
+void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(SmartEnupla<IdReservatorioEquivalente, bool> &a_coeficientes_EAR, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>> & a_coeficiente_ENA, std::string a_diretorio, std::string a_diretorio_cortes, std::string a_nomeArquivo){
+
+	try {
+
+		std::string line;
+		std::string atributo;
+
+		std::ifstream leituraArquivo(a_diretorio + a_diretorio_cortes + a_nomeArquivo);
+
+		if (leituraArquivo.is_open()) {
+
+			a_coeficientes_EAR = SmartEnupla<IdReservatorioEquivalente, bool>(IdReservatorioEquivalente_1, std::vector<bool>(IdReservatorioEquivalente(maior_ONS_REE), false));
+			a_coeficiente_ENA = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>>(IdReservatorioEquivalente_1, std::vector<SmartEnupla<int, bool>>(IdReservatorioEquivalente(maior_ONS_REE), SmartEnupla<int, bool>(1, std::vector<bool>(11, false))));
+
+			/////////////////////////////////////////
+
+			int numero_simbolo_cabecalho = 0;
+			std::string simbolo_cabecalho = "X---------";
+
+			while (std::getline(leituraArquivo, line)) {
+
+				strNormalizada(line);
+
+				//Leitura dos cortes
+				if (line.size() >= 13) {
+
+					if (numero_simbolo_cabecalho == 2) {
+
+						for (int pos = 0; pos < maior_ONS_REE; pos++) {
+
+							//idREE
+							atributo = line.substr(26, 6);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente(std::atoi(atributo.c_str()));
+
+							///////////////////////////////
+							//Coef.Earm ($/MWh)
+							///////////////////////////////
+							atributo = line.substr(33, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_energia_armazenada = std::atof(atributo.c_str());
+
+							///////////////////////////////
+							//Coeficientes para Eafl ($/MWh)
+							///////////////////////////////
+
+							//lag_1
+							atributo = line.substr(53, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_1 = std::atof(atributo.c_str());
+
+							//lag_2
+							atributo = line.substr(73, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_2 = std::atof(atributo.c_str());
+
+							//lag_3
+							atributo = line.substr(93, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_3 = std::atof(atributo.c_str());
+
+							//lag_4
+							atributo = line.substr(113, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_4 = std::atof(atributo.c_str());
+
+							//lag_5
+							atributo = line.substr(133, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_5 = std::atof(atributo.c_str());
+
+							//lag_6
+							atributo = line.substr(153, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_6 = std::atof(atributo.c_str());
+
+							//lag_7
+							atributo = line.substr(173, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_7 = std::atof(atributo.c_str());
+
+							//lag_8
+							atributo = line.substr(193, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_8 = std::atof(atributo.c_str());
+
+							//lag_9
+							atributo = line.substr(213, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_9 = std::atof(atributo.c_str());
+
+							//lag_10
+							atributo = line.substr(233, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_10 = std::atof(atributo.c_str());
+
+							//lag_11
+							atributo = line.substr(253, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_11 = std::atof(atributo.c_str());
+
+							/////////////////////////////////
+							//Armazena info em SmartEnuplas
+							/////////////////////////////////
+
+							if (coeficiente_energia_armazenada != 0.0)
+								a_coeficientes_EAR.setElemento(idReservatorioEquivalente, true);
+
+							if (coeficiente_ENA_lag_1 != 0.0)
+								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(1, true);
+
+							if (coeficiente_ENA_lag_2 != 0.0)
+								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(2, true);
+
+							if (coeficiente_ENA_lag_3 != 0.0)
+								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(3, true);
+
+							if (coeficiente_ENA_lag_4 != 0.0)
+								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(4, true);
+
+							if (coeficiente_ENA_lag_5 != 0.0)
+								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(5, true);
+
+							if (coeficiente_ENA_lag_6 != 0.0)
+								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(6, true);
+
+							if (coeficiente_ENA_lag_7 != 0.0)
+								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(7, true);
+
+							if (coeficiente_ENA_lag_8 != 0.0)
+								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(8, true);
+
+							if (coeficiente_ENA_lag_9 != 0.0)
+								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(9, true);
+
+							if (coeficiente_ENA_lag_10 != 0.0)
+								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(10, true);
+
+							if (coeficiente_ENA_lag_11 != 0.0)
+								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(11, true);
+
+							///////
+
+							if (pos + 1 < maior_ONS_REE)//Evita passar a linha quando é o último REE lido (depois no while vai pegar uma nova linha)
+								std::getline(leituraArquivo, line);//Passa de linha
+						}//for (int pos = 0; pos < 11; pos++) {
 
 					}//if (numero_simbolo_cabecalho == 2) {
 
