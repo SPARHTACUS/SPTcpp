@@ -12982,7 +12982,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			calcular_equacionamento_afluencia_natural_x_REE(a_dados, horizonte_tendencia_mais_estudo);
 
 			if (a_dados.getAtributo(AttComumDados_imprimir_cortes_NW_com_reducao_estados, bool()))//Realiza o cálculo do equacionamento (coef * afluência_usina) deixando todo no termo independente (o qual vai ser abatido do corte)				
-				reducao_estados_equacionamento_afluencia_natural_x_hidreletrica(a_dados, horizonte_tendencia_mais_estudo, a_horizonte_estudo.getIteradorInicial());
+				reducao_estados_equacionamento_afluencia_natural_x_REE(a_dados, horizonte_tendencia_mais_estudo, a_horizonte_estudo.getIteradorInicial());
 
 			
 			//////////////////////////////////////////////////////////////////////////////////
@@ -14817,7 +14817,7 @@ void LeituraCEPEL::calcular_equacionamento_afluencia_natural_x_hidreletrica_out_
 
 }
 
-void LeituraCEPEL::reducao_estados_equacionamento_afluencia_natural_x_hidreletrica(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo, const Periodo a_periodo_inicial_horizonte_estudo)
+void LeituraCEPEL::reducao_estados_equacionamento_afluencia_natural_x_REE(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo, const Periodo a_periodo_inicial_horizonte_estudo)
 {
 	try {
 
@@ -14900,7 +14900,7 @@ void LeituraCEPEL::reducao_estados_equacionamento_afluencia_natural_x_hidreletri
 		}//for (IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente_1; idReservatorioEquivalente <= IdReservatorioEquivalente(maior_ONS_REE); idReservatorioEquivalente++) {
 
 	}//	try {
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::reducao_estados_equacionamento_afluencia_natural_x_hidreletrica: \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::reducao_estados_equacionamento_afluencia_natural_x_REE: \n" + std::string(erro.what())); }
 
 }
 
