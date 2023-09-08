@@ -13010,11 +13010,13 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 				const IdCenario idCenario_final = a_dados.processoEstocastico_hidrologico.getIterador1Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario());
 
-				const int ordem_maxima_PAR = 11;
+				const int ordem_maxima_PAR = 12;
 				const int numero_patamares = 3;
 				const int lag_GNL = 2;
 
-				const double numero_horas_estagio_NEWAVE = (365.0 * 24.0) / 12.0;
+				const double numero_horas_estagio_NEWAVE = 730.5;
+
+				const double conversao_MWporVazao_em_MWhporVolume = 1e6 / 3600.0;
 
 				const IdEstagio idEstagio_pos_estudo = IdEstagio(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal() + 1);
 
@@ -13151,8 +13153,8 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				const double perc_pat2 = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_tendencia_mais_estudo.getIteradorFinal(), IdPatamarCarga_2, double());
 				const double perc_pat3 = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_tendencia_mais_estudo.getIteradorFinal(), IdPatamarCarga_3, double());
 
-				SmartEnupla<IdRealizacao, double> rhs_corte(IdRealizacao_1, std::vector<double>(int(idCenario_final) + 1, 0.0));
-				SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> coeficientes_corte(IdRealizacao_1, std::vector<SmartEnupla<IdVariavelEstado, double>>(int(idCenario_final) + 1, SmartEnupla<IdVariavelEstado, double>(IdVariavelEstado_1, std::vector<double>(int(estados.getIteradorFinal()), 0.0))));
+				SmartEnupla<IdRealizacao, double> rhs_corte(IdRealizacao_1, std::vector<double>(int(idCenario_final), 0.0));
+				SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> coeficientes_corte(IdRealizacao_1, std::vector<SmartEnupla<IdVariavelEstado, double>>(int(idCenario_final), SmartEnupla<IdVariavelEstado, double>(IdVariavelEstado_1, std::vector<double>(int(estados.getIteradorFinal()), 0.0))));
 
 
 				/////////////////////////////////////////
@@ -13270,6 +13272,12 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 								const double coeficiente_ENA_lag_11 = std::atof(atributo.c_str());
 
+								//lag_12
+								atributo = line.substr(273, 20);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								const double coeficiente_ENA_lag_12 = std::atof(atributo.c_str());
+
 								///////////////////////////////
 								//Coeficientes para GNL ($/MWh)
 								///////////////////////////////
@@ -13334,6 +13342,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 								coeficiente_ENA.at(idReservatorioEquivalente).setElemento(9, coeficiente_ENA_lag_9);
 								coeficiente_ENA.at(idReservatorioEquivalente).setElemento(10, coeficiente_ENA_lag_10);
 								coeficiente_ENA.at(idReservatorioEquivalente).setElemento(11, coeficiente_ENA_lag_11);
+								coeficiente_ENA.at(idReservatorioEquivalente).setElemento(12, coeficiente_ENA_lag_12);
 								coeficiente_GNL.at(idReservatorioEquivalente).at(1).setElemento(1, coeficiente_GNL_pat_1_lag_1);
 								coeficiente_GNL.at(idReservatorioEquivalente).at(1).setElemento(2, coeficiente_GNL_pat_1_lag_2);
 								coeficiente_GNL.at(idReservatorioEquivalente).at(2).setElemento(1, coeficiente_GNL_pat_2_lag_1);
@@ -13363,7 +13372,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 									coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) = 0.0;
 									for (IdReservatorioEquivalente idREE = coeficientes_EAR.getIteradorInicial(); idREE <= coeficientes_EAR.getIteradorFinal(); idREE++)
 										coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) += coeficientes_EAR.at(idREE) * a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_produtibilidade_acumulada_EAR, idREE, double());
-									coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) *= numero_horas_estagio_NEWAVE;
+									coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) *= conversao_MWporVazao_em_MWhporVolume * numero_horas_estagio_NEWAVE;
 
 									for (IdRealizacao idReal = IdRealizacao_2; idReal <= IdRealizacao(idCenario_final); idReal++)
 										coeficientes_corte.at(idReal).at(idVariavelEstado) = coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado);
@@ -13516,7 +13525,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(SmartEnupla<IdRese
 		if (leituraArquivo.is_open()) {
 
 			a_coeficientes_EAR = SmartEnupla<IdReservatorioEquivalente, bool>(IdReservatorioEquivalente_1, std::vector<bool>(IdReservatorioEquivalente(maior_ONS_REE), false));
-			a_coeficiente_ENA = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>>(IdReservatorioEquivalente_1, std::vector<SmartEnupla<int, bool>>(IdReservatorioEquivalente(maior_ONS_REE), SmartEnupla<int, bool>(1, std::vector<bool>(11, false))));
+			a_coeficiente_ENA = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>>(IdReservatorioEquivalente_1, std::vector<SmartEnupla<int, bool>>(IdReservatorioEquivalente(maior_ONS_REE), SmartEnupla<int, bool>(1, std::vector<bool>(12, false))));
 
 			/////////////////////////////////////////
 
@@ -13618,6 +13627,12 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(SmartEnupla<IdRese
 
 							const double coeficiente_ENA_lag_11 = std::atof(atributo.c_str());
 
+							//lag_12
+							atributo = line.substr(273, 20);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double coeficiente_ENA_lag_12 = std::atof(atributo.c_str());
+
 							/////////////////////////////////
 							//Armazena info em SmartEnuplas
 							/////////////////////////////////
@@ -13657,6 +13672,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(SmartEnupla<IdRese
 
 							if (coeficiente_ENA_lag_11 != 0.0)
 								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(11, true);
+
+							if (coeficiente_ENA_lag_12 != 0.0)
+								a_coeficiente_ENA.at(idReservatorioEquivalente).setElemento(12, true);
 
 							///////
 
@@ -17753,7 +17771,7 @@ void LeituraCEPEL::imprime_produtibilidade_EAR_acumulada(Dados& a_dados, std::st
 			fp_out << getString(a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int())) << ";";
 
 			for (IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente_1; idReservatorioEquivalente <= IdReservatorioEquivalente(maior_ONS_REE); idReservatorioEquivalente++) {
-				const double produtibilidade_acumulada_EAR = a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR, idReservatorioEquivalente, double()) * 1000 / 3600;
+				const double produtibilidade_acumulada_EAR = a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR, idReservatorioEquivalente, double());
 				fp_out << produtibilidade_acumulada_EAR << ";";
 
 			}

@@ -1040,6 +1040,208 @@ void Estagio::exportarVersaoAlternativaCorteBenders(Estagio& a_estagio, const st
 } // void Estagio::exportarVersaoAlternativaCorteBenders(Estagio& a_estagio, const SmartEnupla<IdVariavelAleatoria, std::vector<std::string>>& a_lista_var){
 
 
+bool Estagio::carregarRHSCortesBenders(const std::string a_nomeArquivo){
+
+	try {
+
+		const int numCaract = 300000;
+		const int numLinhas = 950000;
+
+		const std::string fimDeArquivo = "";
+
+		std::ifstream leituraArquivo;
+
+		leituraArquivo.open(a_nomeArquivo.c_str(), std::ios_base::in);
+
+		if (!leituraArquivo.is_open())
+			return false;
+
+		char linhaChar[numCaract];
+
+		std::string   linha; // Linha de dados lida do arquivo.
+		std::string   valor; // Valor retirado da linha de dados do arquivo.
+
+		int lin; // Posição da linha da informação ao longo do arquivo de dados.
+		size_t pos; // Posição da coluna da informação ao longo da linha de dados.
+
+		std::vector<std::string> cabecalho;
+
+		// Leitura do Cabeçalho
+		leituraArquivo.getline(linhaChar, numCaract);
+		linha = linhaChar;
+
+		strNormalizada(linha);
+
+		pos = 0;
+		while (pos != std::string::npos) {
+
+			pos = linha.find(";");
+
+			valor = linha.substr(0, pos).c_str();
+
+			cabecalho.push_back(valor);
+
+			linha = linha.substr(pos + 1, linha.length());
+
+			if (linha == "")
+				break;
+
+		} // while (pos != string::npos) {
+
+		if (cabecalho.size() < 3)
+			throw std::invalid_argument("O cabecalho do arquivo deve possuir pelo menos 3 colunas.");
+
+		const IdRealizacao maiorIdRealizacao = IdRealizacao(cabecalho.size() - 2);
+
+		std::string membro = cabecalho.at(0);
+
+		if (membro.size() > 2) {
+			if (membro.substr(0, 2) == "id")
+				membro = membro.substr(2, membro.size() - 2);
+		} // if (membro.size() > 2) {
+
+
+		if (getMaiorId(IdCorteBenders()) == IdCorteBenders_Nenhum) {
+
+			int numero_cortes = 0;
+
+			// Leitura para alocação dos cortes
+			lin = 2;
+			while (lin < numLinhas) {
+
+				SmartEnupla<IdRealizacao, double> vetorValores(IdRealizacao_1, std::vector<double>(maiorIdRealizacao, NAN));
+
+				leituraArquivo.getline(linhaChar, numCaract);
+				linha = linhaChar;
+
+				strNormalizada(linha);
+
+				valor = linha;
+
+				pos = valor.find(";");
+
+				if (pos == std::string::npos) {
+					if (fimDeArquivo != "") {
+						if (!strCompara(valor, fimDeArquivo))
+							std::cout << "Aviso! Arquivo " + a_nomeArquivo + " nao finalizado com FIM" << std::endl;
+					} // if (fimDeArquivo != "") {
+					break;
+				} // if (pos != string::npos) {
+
+				valor = linha.substr(0, pos).c_str();
+
+				if (fimDeArquivo != "") {
+					if (strCompara(valor, fimDeArquivo))
+						break;
+				} // if (fimDeArquivo != "") {
+
+				numero_cortes++;
+
+				lin++;
+
+			} // while (lin < numLinhas) {
+			alocarCorteBenders(numero_cortes);
+
+			leituraArquivo.close();
+			leituraArquivo.clear();
+
+			leituraArquivo.open(a_nomeArquivo.c_str(), std::ios_base::in);
+
+			leituraArquivo.getline(linhaChar, numCaract);
+
+		} // 		if (getMaiorId(IdCorteBenders()) == IdCorteBenders_Nenhum) {
+
+		// Leitura dados do arquivo
+		lin = 2;
+		while (lin < numLinhas) {
+
+			SmartEnupla<IdRealizacao, double> vetorValores(IdRealizacao_1, std::vector<double>(maiorIdRealizacao, NAN));
+
+			leituraArquivo.getline(linhaChar, numCaract);
+			linha = linhaChar;
+
+			strNormalizada(linha);
+
+			valor = linha;
+
+			pos = valor.find(";");
+
+			if (pos == std::string::npos) {
+				if (fimDeArquivo != "") {
+					if (!strCompara(valor, fimDeArquivo))
+						std::cout << "Aviso! Arquivo " + a_nomeArquivo + " nao finalizado com FIM" << std::endl;
+				} // if (fimDeArquivo != "") {
+				break;
+			} // if (pos != string::npos) {
+
+			valor = linha.substr(0, pos).c_str();
+
+			if (fimDeArquivo != "") {
+				if (strCompara(valor, fimDeArquivo))
+					break;
+			} // if (fimDeArquivo != "") {
+
+			const IdCorteBenders idCorteBenders = getIdCorteBendersFromChar(valor.c_str());
+
+			if (getMaiorId(IdCorteBenders()) < idCorteBenders) {
+				CorteBenders corte;
+				corte.setAtributo(AttComumCorteBenders_idCorteBenders, idCorteBenders);
+				vetorCorteBenders.add(corte);
+			}
+
+			pos = linha.find(";");
+			linha = linha.substr(pos + 1, linha.length());
+
+			pos = linha.find(";");
+			valor = linha.substr(0, pos).c_str();
+
+			const std::string attVetor = valor;
+
+			if (attVetor != "rhs")
+				throw std::invalid_argument("Metodo exclusivo para leitura de rhs de Cortes de Benders.");
+
+			pos = linha.find(";");
+			linha = linha.substr(pos + 1, linha.length());
+
+			IdRealizacao idRealizacao = IdRealizacao_1;
+
+			pos = 0;
+			while (pos != std::string::npos) {
+
+				pos = linha.find(";");
+
+				valor = linha.substr(0, pos).c_str();
+
+				if (valor != "")
+					vetorValores.at(idRealizacao) = atof(valor.c_str());
+
+				linha = linha.substr(pos + 1, linha.length());
+
+				if (linha == "")
+					break;
+
+				idRealizacao++;
+
+			} // while (pos != string::npos) {		
+
+			vetorCorteBenders.att(idCorteBenders).setVetor_forced(AttVetorCorteBenders_rhs, vetorValores);
+
+			lin++;
+
+		} // while (lin < numLinhas) {
+
+		leituraArquivo.close();
+		leituraArquivo.clear();
+
+		return true;
+
+	} // try
+
+	catch (const std::ifstream::failure& erro) { throw std::invalid_argument("Estagio::carregarRHSCortesBenders(" + a_nomeArquivo + ",a_objetoDados): \nErro de Integridade do Arquivo." + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("Estagio::carregarRHSCortesBenders(" + a_nomeArquivo + ",a_objetoDados): \n" + std::string(erro.what())); }
+
+}
+
 bool Estagio::carregarCoeficientesCortesBenders(const std::string a_nomeArquivo){
 
 	try {
