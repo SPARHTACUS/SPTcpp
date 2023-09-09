@@ -107,8 +107,8 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 		} // if ((a_idIteracao == iteracao_inicial) && (a_idProcesso == IdProcesso_mestre)) {
 
-		if (a_idIteracao == IdIteracao_0)
-			a_modeloOtimizacao.importarCorteBenders_AcoplamentoPosEstudo(tSS, a_idProcesso, a_idIteracao, diretorio_selecao_corte, a_entradaSaidaDados);
+		if (a_idIteracao == iteracao_inicial)
+			a_modeloOtimizacao.importarCorteBenders_AcoplamentoPosEstudo(tSS, a_idProcesso, IdIteracao_Nenhum, diretorio_selecao_corte, a_entradaSaidaDados);
 
 		const IdCenario cenario_inicial = a_modeloOtimizacao.getCenarioInicial(a_idProcesso, a_idIteracao);
 		const IdCenario cenario_final = a_modeloOtimizacao.getCenarioFinal(a_idProcesso, a_idIteracao);

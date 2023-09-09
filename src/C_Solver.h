@@ -108,6 +108,7 @@ public:
     virtual int addConstrIgual(const std::string a_nome) = 0;
 
     virtual int addConstrMaior(const std::string a_nome) = 0;
+    virtual int addConstrsMaior(const std::vector<std::string> &a_nomes) = 0;
 
     virtual int addConstrMenor(const std::string a_nome) = 0;
 
@@ -614,6 +615,22 @@ public:
             throw std::invalid_argument("SolverGRB::addConstrMaior(" + a_nome + "): \n" + std::string(erro.what()));
         }
     }; // bool addConstrMaior(std::string a_nome) {
+
+    int addConstrsMaior(const std::vector<std::string> &a_nomes) {
+        try {
+            throw std::invalid_argument("Nao implementado");
+            return int(vetorGRBConstr.size()) - 1;
+        }
+        catch (const GRBException erro) {
+            throw std::invalid_argument(
+                "SolverGRB::addConstrMaior(): \n" + std::string(erro.getMessage()) + " " +
+                std::to_string(erro.getErrorCode()));
+        }
+        catch (const std::exception& erro) {
+            throw std::invalid_argument("SolverGRB::addConstrMaior(): \n" + std::string(erro.what()));
+        }
+    }; // bool addConstrMaior(std::string a_nome) {
+
 
     int addConstrMenor(const std::string a_nome) {
         try {
@@ -1553,8 +1570,16 @@ private:
     }
 
     void realocaMemMatriz() {
+        realocaMemMatriz(1);
+    }
+
+    void realocaMemMatriz(const int a_numConstrs) {
         const int capAntiga = capBufferRows;
-        capBufferRows = (std::max)(CAP_INI_CONSTR, (int) ceil(capAntiga * 1.5));
+
+        if (a_numConstrs == 1)
+            capBufferRows = (std::max)(CAP_INI_CONSTR, (int)ceil(capAntiga * 1.5));
+        else
+            capBufferRows += a_numConstrs;
 
         matrizIdxs = (int **) xrealloc(matrizIdxs, sizeof(int *) * capBufferRows);
         matrizCoefs = (double **) xrealloc(matrizCoefs, sizeof(double *) * capBufferRows);
@@ -2279,6 +2304,57 @@ public:
 
         catch (const std::exception &erro) {
             throw std::invalid_argument("SolverCLP::addConstrMaior(" + a_nome + "): \n" + std::string(erro.what()));
+        }
+    }
+
+    int addConstrsMaior(const std::vector<std::string> &a_nomes) {
+        try {
+
+            const int numNewConstrs = a_nomes.size();
+
+            if (sizeBufferRows + numNewConstrs > capBufferRows) {
+                realocaMemMatriz(numNewConstrs);
+            }
+
+            for (int i = 0; i < numNewConstrs; i++) {
+
+                std::string nomeRestricao = a_nomes.at(i);
+                remCharsInvalidos(nomeRestricao);
+
+                assert(sizeRow[sizeBufferRows] == 0);
+
+                if (capRow[sizeBufferRows] == 0) {
+                    capRow[sizeBufferRows] = CAP_INI_POR_CONSTR;
+                    matrizIdxs[sizeBufferRows] = (int*)xmalloc(sizeof(int) * capRow[sizeBufferRows]);
+                    matrizCoefs[sizeBufferRows] = (double*)xmalloc(sizeof(double) * capRow[sizeBufferRows]);
+                }
+
+                if (nomeRow[sizeBufferRows] == nullptr) {
+                    nomeRow[sizeBufferRows] = (char*)xmalloc(sizeof(char) * (nomeRestricao.size() + 1));
+                }
+                else if (strlen(nomeRow[sizeBufferRows]) < nomeRestricao.size() + 1) {
+                    free(nomeRow[sizeBufferRows]);
+                    nomeRow[sizeBufferRows] = (char*)xmalloc(sizeof(char) * (nomeRestricao.size() + 1));
+                }
+
+                strncpy(nomeRow[sizeBufferRows], nomeRestricao.c_str(), nomeRestricao.size());
+                nomeRow[sizeBufferRows][nomeRestricao.size()] = '\0';
+                sinalRow[sizeBufferRows] = '>';
+                fakeIdxRow[sizeBufferRows] = fakeNumRows;
+                rhsRow[sizeBufferRows] = 0.0;
+                sizeBufferRows++;
+                origRowIdx.push_back(realNumRows);
+                origRowSense.push_back('>');
+                fakeNumRows++;
+                realNumRows++;
+
+            }
+
+            return (fakeNumRows - 1);
+        }
+
+        catch (const std::exception& erro) {
+            throw std::invalid_argument("SolverCLP::addConstrsMaior(): \n" + std::string(erro.what()));
         }
     }
 
