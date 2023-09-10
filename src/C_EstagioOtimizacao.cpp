@@ -560,6 +560,19 @@ void Estagio::anularVariavelEstadoCorteBenders(const IdVariavelEstado a_idVariav
 
 } // void Estagio::anularVariavelEstadoCorteBenders(const IdVariavelEstado a_idVariavelEstado){
 
+void Estagio::anularVariavelEstadoCorteBenders(const IdVariavelEstado a_idVariavelEstado, const IdCorteBenders a_idCorteBenders) {
+
+	try {
+
+			if (vetorCorteBenders.isInstanciado(a_idCorteBenders))
+				vetorCorteBenders.att(a_idCorteBenders).anularVariavelEstado(a_idVariavelEstado);
+
+	} // try
+	catch (const std::exception& erro) { throw std::invalid_argument("Estagio::anularVariavelEstadoCorteBenders(" + getFullString(a_idVariavelEstado) +  "," + getFullString(a_idCorteBenders) + "): \n" + std::string(erro.what())); }
+
+} // void Estagio::anularVariavelEstadoCorteBenders(const IdVariavelEstado a_idVariavelEstado){
+
+
 void Estagio::alocarCorteBenders(const int a_numero_objetos){
 	try{
 		vetorCorteBenders.alocar(a_numero_objetos);
@@ -1293,6 +1306,13 @@ bool Estagio::carregarCoeficientesCortesBenders(const std::string a_nomeArquivo)
 		if (cabecalho.size() < 4)
 			throw std::invalid_argument("O cabecalho do arquivo deve possuir pelo menos 4 colunas.");
 
+		const IdVariavelEstado maiorIdVariavelEstado = IdVariavelEstado(cabecalho.size() - 3);
+
+		const IdRealizacao maiorIdRealizacao = getIteradorFinal(getMenorId(IdCorteBenders()), AttVetorCorteBenders_rhs, IdRealizacao());
+
+		const SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> enupla_inicializacao(IdRealizacao_1, std::vector<SmartEnupla<IdVariavelEstado, double>>(maiorIdRealizacao, SmartEnupla<IdVariavelEstado, double>(\
+			IdVariavelEstado_1, std::vector <double>(maiorIdVariavelEstado, NAN))));
+
 		std::string membro = cabecalho.at(0);
 
 		if (membro.size() > 2) {
@@ -1303,8 +1323,6 @@ bool Estagio::carregarCoeficientesCortesBenders(const std::string a_nomeArquivo)
 		// Leitura dados do arquivo
 		lin = 2;
 		while (lin < numLinhas) {
-
-			std::vector<double> vetorValores;
 
 			leituraArquivo.getline(linhaChar, numCaract);
 			linha = linhaChar;
@@ -1332,6 +1350,9 @@ bool Estagio::carregarCoeficientesCortesBenders(const std::string a_nomeArquivo)
 
 			const IdCorteBenders idCorteBenders = getIdCorteBendersFromChar(valor.c_str());
 
+			if (getSize1Matriz(idCorteBenders, AttMatrizCorteBenders_coeficiente) == 0)
+				vetorCorteBenders.att(idCorteBenders).setMatriz_forced(AttMatrizCorteBenders_coeficiente, enupla_inicializacao);
+
 			pos = linha.find(";");
 			linha = linha.substr(pos + 1, linha.length());
 
@@ -1354,6 +1375,8 @@ bool Estagio::carregarCoeficientesCortesBenders(const std::string a_nomeArquivo)
 			pos = linha.find(";");
 			linha = linha.substr(pos + 1, linha.length());
 
+			IdVariavelEstado idVariavelEstado = IdVariavelEstado_1;
+
 			pos = 0;
 			while (pos != std::string::npos) {
 
@@ -1362,18 +1385,17 @@ bool Estagio::carregarCoeficientesCortesBenders(const std::string a_nomeArquivo)
 				valor = linha.substr(0, pos).c_str();
 
 				if (valor != "")
-					vetorValores.push_back(atof(valor.c_str()));
+					vetorCorteBenders.att(idCorteBenders).setElemento(AttMatrizCorteBenders_coeficiente, idRealizacao, idVariavelEstado, atof(valor.c_str()));
 
 				linha = linha.substr(pos + 1, linha.length());
 
 				if (linha == "")
 					break;
 
+				idVariavelEstado++;
+
 			} // while (pos != string::npos) {		
 			
-			for (int i = 0; i < int(vetorValores.size()); i++)
-				vetorCorteBenders.att(idCorteBenders).addElemento(AttMatrizCorteBenders_coeficiente, idRealizacao, IdVariavelEstado(i + 1), vetorValores.at(i));
-
 			lin++;
 
 		} // while (lin < numLinhas) {

@@ -88,6 +88,8 @@ public:
 
 	void anularVariavelEstadoCorteBenders(const IdVariavelEstado a_idVariavelEstado);
 
+	void anularVariavelEstadoCorteBenders(const IdVariavelEstado a_idVariavelEstado, const IdCorteBenders a_idCorteBenders);
+
 	void alocarCorteBenders(const int a_numero_objetos);
 
 	void instanciarSolver(const TipoSubproblemaSolver a_tipoSubproblemaSolver, TipoSolver &a_tipoSolver);

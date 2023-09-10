@@ -390,7 +390,7 @@ public:
 
     std::string str() { return "GUROBI"; };
 
-    bool isNomeSimplificado() { return false; };
+    bool isNomeSimplificado() { return true; };
 
     int addVar(const double a_lb, const double a_ub, const double a_obj, const std::string a_nome) {
         try {
@@ -618,16 +618,17 @@ public:
 
     int addConstrsMaior(const std::vector<std::string> &a_nomes) {
         try {
-            throw std::invalid_argument("Nao implementado");
+            for (int i = 0; i < int(a_nomes.size()); i++)
+                addConstrMaior(a_nomes.at(i));
             return int(vetorGRBConstr.size()) - 1;
         }
         catch (const GRBException erro) {
             throw std::invalid_argument(
-                "SolverGRB::addConstrMaior(): \n" + std::string(erro.getMessage()) + " " +
+                "SolverGRB::addConstrsMaior(): \n" + std::string(erro.getMessage()) + " " +
                 std::to_string(erro.getErrorCode()));
         }
         catch (const std::exception& erro) {
-            throw std::invalid_argument("SolverGRB::addConstrMaior(): \n" + std::string(erro.what()));
+            throw std::invalid_argument("SolverGRB::addConstrsMaior(): \n" + std::string(erro.what()));
         }
     }; // bool addConstrMaior(std::string a_nome) {
 
