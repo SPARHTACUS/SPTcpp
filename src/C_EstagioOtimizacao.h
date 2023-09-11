@@ -88,6 +88,8 @@ public:
 
 	void anularVariavelEstadoCorteBenders(const IdVariavelEstado a_idVariavelEstado);
 
+	void anularVariavelEstadoCorteBenders(const IdVariavelEstado a_idVariavelEstado, const IdCorteBenders a_idCorteBenders);
+
 	void alocarCorteBenders(const int a_numero_objetos);
 
 	void instanciarSolver(const TipoSubproblemaSolver a_tipoSubproblemaSolver, TipoSolver &a_tipoSolver);
@@ -112,6 +114,7 @@ public:
 
 	void exportarVersaoAlternativaCorteBenders(Estagio &a_estagio, const std::string a_idProcessoEstocasticoNovo, const std::string a_idProcessoEstocasticoNovo_compacto, const SmartEnupla<IdVariavelAleatoria, std::vector<std::string>> &a_lista_nome_compacto_idVariavelAleatoriaNova, const SmartEnupla<IdVariavelAleatoria, std::vector<std::string>>& a_lista_nome_idVariavelAleatoriaNova, const SmartEnupla<IdVariavelAleatoria, std::vector<double>> &a_lista_participacao_idVariavelAleatoriaNova);
 
+	bool carregarRHSCortesBenders(const std::string a_nome_arquivo);
 	bool carregarCoeficientesCortesBenders(const std::string a_nome_arquivo);
 	bool carregarEstadosCortesBenders(const std::string a_nome_arquivo);
 

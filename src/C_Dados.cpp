@@ -10899,13 +10899,9 @@ void Dados::defineCenariosOtimizacao(const IdIteracao a_iteracao_inicial, const 
 						mapeamento_cenario_inicial_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = menor_cenario_do_processo_otimizacao;
 						mapeamento_cenario_final_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = maior_cenario_do_processo_otimizacao;
 					}
-					else if (idProcesso == IdProcesso_mestre) {
-						mapeamento_cenario_inicial_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = IdCenario_1;
-						mapeamento_cenario_final_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = IdCenario_1;
-					}
 					else {
-						mapeamento_cenario_inicial_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = IdCenario_Nenhum;
-						mapeamento_cenario_final_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = IdCenario_Nenhum;
+						mapeamento_cenario_inicial_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = menor_cenario_do_processo_otimizacao;
+						mapeamento_cenario_final_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = menor_cenario_do_processo_otimizacao;
 					}
 
 				} // for (IdIteracao idIteracao = a_iteracao_inicial; idIteracao <= a_iteracao_final; idIteracao++) {
