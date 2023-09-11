@@ -256,14 +256,15 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 			tempo_medio_otimizacao_solver /= double(numero_cenarios * numero_estagios * int(a_maiorIdProcesso));
 
-		} // if (numero_cenarios > 0) {
 
-		for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-			if (custo_superior_via_mestre.at(idCenario) > custo_superior.at(idCenario))
-				custo_superior.at(idCenario) = custo_superior_via_mestre.at(idCenario);
-			if (custo_inferior_via_mestre.at(idCenario) > custo_inferior.at(idCenario))
-				custo_inferior.at(idCenario) = custo_inferior_via_mestre.at(idCenario);
-		}
+			for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
+				if (custo_superior_via_mestre.at(idCenario) > custo_superior.at(idCenario))
+					custo_superior.at(idCenario) = custo_superior_via_mestre.at(idCenario);
+				if (custo_inferior_via_mestre.at(idCenario) > custo_inferior.at(idCenario))
+					custo_inferior.at(idCenario) = custo_inferior_via_mestre.at(idCenario);
+			}
+
+		} // if (numero_cenarios > 0) {
 
 		executarPDDE_atualizarCustoInferior(a_idIteracao, a_idProcesso, a_maiorIdProcesso, custo_inferior, a_modeloOtimizacao);
 		executarPDDE_atualizarCustoSuperior(a_idIteracao, a_idProcesso, a_maiorIdProcesso, custo_superior, probabilidade_cenario, a_modeloOtimizacao);
@@ -1932,9 +1933,7 @@ void MetodoSolucao::executarPDDE_distribuirEstadosEntreProcessos(const IdProcess
 			const IdCenario cenario_inicial = a_modeloOtimizacao.getCenarioInicial(idProcesso, a_idIteracao);
 			const IdCenario cenario_final = a_modeloOtimizacao.getCenarioFinal(idProcesso, a_idIteracao);
 
-			int numero_cenarios = int(cenario_final - cenario_inicial) + 1;
-			if ((cenario_inicial == IdCenario_Nenhum) && (cenario_final == IdCenario_Nenhum))
-				numero_cenarios = 0;
+			int numero_cenarios = a_modeloOtimizacao.getNumeroCenarios(cenario_inicial, cenario_final);
 
 			estados_all.setSize(rank, numero_total_estados, numero_cenarios);
 
@@ -1973,7 +1972,7 @@ void MetodoSolucao::executarPDDE_distribuirEstadosEntreProcessos(const IdProcess
 				const IdCenario cenario_inicial = a_modeloOtimizacao.getCenarioInicial(idProcesso, a_idIteracao);
 				const IdCenario cenario_final = a_modeloOtimizacao.getCenarioFinal(idProcesso, a_idIteracao);
 
-				const int numero_cenarios = a_modeloOtimizacao.getNumeroCenarios(cenario_inicial, cenario_final);
+				int numero_cenarios = a_modeloOtimizacao.getNumeroCenarios(cenario_inicial, cenario_final);
 
 				if (numero_cenarios > 0) {
 
@@ -2074,9 +2073,7 @@ void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdPro
 			const IdCenario cenario_inicial = a_modeloOtimizacao.getCenarioInicial(idProcesso, a_idIteracao);
 			const IdCenario cenario_final = a_modeloOtimizacao.getCenarioFinal(idProcesso, a_idIteracao);
 
-			int numero_cenarios = int(cenario_final - cenario_inicial) + 1;
-			if ((cenario_inicial == IdCenario_Nenhum) && (cenario_final == IdCenario_Nenhum))
-				numero_cenarios = 0;
+			int numero_cenarios = a_modeloOtimizacao.getNumeroCenarios(cenario_inicial, cenario_final);
 
 			realizacoes_all.setSize(rank, numero_variaveis, numero_cenarios, numero_periodos);
 
@@ -2112,9 +2109,7 @@ void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdPro
 				const IdCenario cenario_inicial = a_modeloOtimizacao.getCenarioInicial(idProcesso, a_idIteracao);
 				const IdCenario cenario_final = a_modeloOtimizacao.getCenarioFinal(idProcesso, a_idIteracao);
 
-				int numero_cenarios = int(cenario_final - cenario_inicial) + 1;
-				if ((cenario_inicial == IdCenario_Nenhum) && (cenario_final == IdCenario_Nenhum))
-					numero_cenarios = 0;
+				int numero_cenarios = a_modeloOtimizacao.getNumeroCenarios(cenario_inicial, cenario_final);
 
 				if (numero_cenarios > 0) {
 

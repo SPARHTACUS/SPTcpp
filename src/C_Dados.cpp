@@ -10864,6 +10864,8 @@ void Dados::defineCenariosOtimizacao(const IdIteracao a_iteracao_inicial, const 
 		SmartEnupla<IdProcesso, SmartEnupla<IdIteracao, IdCenario>> mapeamento_cenario_inicial_por_iteracao_por_processo(IdProcesso_mestre, std::vector<SmartEnupla<IdIteracao, IdCenario>>(numero_processos_paralelos, SmartEnupla<IdIteracao, IdCenario>(a_iteracao_inicial, std::vector<IdCenario>(int(a_iteracao_final - a_iteracao_inicial) + 1, IdCenario_Nenhum))));
 		SmartEnupla<IdProcesso, SmartEnupla<IdIteracao, IdCenario>>   mapeamento_cenario_final_por_iteracao_por_processo(IdProcesso_mestre, std::vector<SmartEnupla<IdIteracao, IdCenario>>(numero_processos_paralelos, SmartEnupla<IdIteracao, IdCenario>(a_iteracao_inicial, std::vector<IdCenario>(int(a_iteracao_final - a_iteracao_inicial) + 1, IdCenario_Nenhum))));
 
+
+
 		const bool mapear_processos_com_um_unico_cenario = getAtributo(AttComumDados_mapear_processos_com_um_unico_cenario, bool());
 
 		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= maior_processo; idProcesso++) {
@@ -10899,9 +10901,13 @@ void Dados::defineCenariosOtimizacao(const IdIteracao a_iteracao_inicial, const 
 						mapeamento_cenario_inicial_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = menor_cenario_do_processo_otimizacao;
 						mapeamento_cenario_final_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = maior_cenario_do_processo_otimizacao;
 					}
+					else if (idProcesso == IdProcesso_mestre) {
+						mapeamento_cenario_inicial_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = IdCenario_1;
+						mapeamento_cenario_final_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = IdCenario_1;
+					}
 					else {
-						mapeamento_cenario_inicial_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = menor_cenario_do_processo_otimizacao;
-						mapeamento_cenario_final_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = menor_cenario_do_processo_otimizacao;
+						mapeamento_cenario_inicial_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = IdCenario_void;
+						mapeamento_cenario_final_por_iteracao_por_processo.at(idProcesso).at(idIteracao) = IdCenario_void;
 					}
 
 				} // for (IdIteracao idIteracao = a_iteracao_inicial; idIteracao <= a_iteracao_final; idIteracao++) {

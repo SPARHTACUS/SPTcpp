@@ -4,7 +4,9 @@
 #include "C_SmartElemento.h"
 
 #define ATT_COMUM_PROCESSO(m)  \
-	  m(Processo,  AttComum,    idProcesso,     IdProcesso,         min,         max,           min,      sim)
+	  m(Processo,  AttComum,    idProcesso,     IdProcesso,         min,         max,           min,      sim) \
+	  m(Processo,  AttComum, menor_cenario,      IdCenario,         min,         max,           min,      sim) \
+	  m(Processo,  AttComum, maior_cenario,      IdCenario,         min,         max,           min,      sim) 
 //     c_classe,   smrtAtt,     nomeAtributo,          tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
 

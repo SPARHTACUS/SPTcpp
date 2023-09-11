@@ -3335,10 +3335,6 @@ int ModeloOtimizacao::getMenorNumeroAberturasEstagio(const IdProcesso a_maiorIdP
 			const IdCenario cenario_inicial = getCenarioInicial(idProcesso, a_idIteracao);
 			const IdCenario cenario_final = getCenarioFinal(idProcesso, a_idIteracao);
 
-			const int numero_cenarios = getNumeroCenarios(cenario_inicial, cenario_final);
-
-			if (numero_cenarios > 0) {
-
 				for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
 					const IdAbertura abertura_inicial = getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
@@ -3352,8 +3348,6 @@ int ModeloOtimizacao::getMenorNumeroAberturasEstagio(const IdProcesso a_maiorIdP
 						menor_numero_aberturas = numero_aberturas;
 
 				} // for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-
-			} // if (numero_cenarios > 0) {
 
 		} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) {
 
@@ -3373,10 +3367,6 @@ int ModeloOtimizacao::getMaiorNumeroAberturasEstagio(const IdProcesso a_maiorIdP
 			const IdCenario cenario_inicial = getCenarioInicial(idProcesso, a_idIteracao);
 			const IdCenario cenario_final = getCenarioFinal(idProcesso, a_idIteracao);
 
-			const int numero_cenarios = getNumeroCenarios(cenario_inicial, cenario_final);
-
-			if (numero_cenarios > 0) {
-
 				for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
 					const IdAbertura abertura_inicial = getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
@@ -3390,8 +3380,6 @@ int ModeloOtimizacao::getMaiorNumeroAberturasEstagio(const IdProcesso a_maiorIdP
 						maior_numero_aberturas = numero_aberturas;
 
 				} // for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-
-			} // if (numero_cenarios > 0) {
 
 		} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) {
 
@@ -3410,10 +3398,6 @@ int ModeloOtimizacao::getMenorNumeroAberturasProcessoEstagio(const IdProcesso a_
 		const IdCenario cenario_inicial = getCenarioInicial(a_idProcesso, a_idIteracao);
 		const IdCenario cenario_final = getCenarioFinal(a_idProcesso, a_idIteracao);
 
-		const int numero_cenarios = getNumeroCenarios(cenario_inicial, cenario_final);
-
-		if (numero_cenarios > 0) {
-
 			for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
 				const IdAbertura abertura_inicial = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
@@ -3427,8 +3411,6 @@ int ModeloOtimizacao::getMenorNumeroAberturasProcessoEstagio(const IdProcesso a_
 					menor_numero_aberturas = numero_aberturas;
 
 			} // for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-
-		} // if (numero_cenarios > 0) {
 
 		return menor_numero_aberturas;
 
@@ -3445,10 +3427,6 @@ int ModeloOtimizacao::getMaiorNumeroAberturasProcessoEstagio(const IdProcesso a_
 		const IdCenario cenario_inicial = getCenarioInicial(a_idProcesso, a_idIteracao);
 		const IdCenario cenario_final = getCenarioFinal(a_idProcesso, a_idIteracao);
 
-		const int numero_cenarios = getNumeroCenarios(cenario_inicial, cenario_final);
-
-		if (numero_cenarios > 0) {
-
 			for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
 				const IdAbertura abertura_inicial = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
@@ -3462,8 +3440,6 @@ int ModeloOtimizacao::getMaiorNumeroAberturasProcessoEstagio(const IdProcesso a_
 					maior_numero_aberturas = numero_aberturas;
 
 			} // for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-
-		} // if (numero_cenarios > 0) {
 
 		return maior_numero_aberturas;
 
@@ -3504,7 +3480,7 @@ IdCenario ModeloOtimizacao::getCenarioInicial(const IdProcesso a_idProcesso, con
 
 		if (getSize1Matriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio) > 0)
 			return getIterador1Inicial(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, IdCenario());
-
+			
 		return IdCenario_Nenhum;
 
 	} // try
@@ -3530,13 +3506,14 @@ int ModeloOtimizacao::getNumeroCenarios(const IdCenario a_cenario_inicial, const
 		if ((a_cenario_inicial == IdCenario_Nenhum) || (a_cenario_final == IdCenario_Nenhum))
 			return 0;
 
+		else if ((a_cenario_inicial == IdCenario_void) || (a_cenario_final == IdCenario_void))
+			return 0;
+
 		return int(a_cenario_final - a_cenario_inicial) + 1;
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::getNumeroCenarios(" + getFullString(a_cenario_inicial) + "," + getFullString(a_cenario_final) + "): \n" + std::string(erro.what())); }
 }
-
-
 
 
 void ModeloOtimizacao::criarModeloOtimizacao(Dados &a_dados, EntradaSaidaDados a_entradaSaidaDados) {
