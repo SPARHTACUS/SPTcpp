@@ -398,18 +398,18 @@ private:
 	//Informação com o equacionamento do cálculo das ENAs x usina em termos das afluências incrementais x cenário x período (Regras.dat não lineares, precisa de um equacionamento por realização de afluência)
 
 	//Para usinas instanciadas no estudo CP
-	SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, SmartEnupla<Periodo, SmartEnupla<int, IdHidreletrica>>>> lista_idHidreletricas_calculo_ENA_x_hidreletrica_x_cenario_x_periodo;
-	SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, SmartEnupla<Periodo, SmartEnupla<int, double>>>>			lista_coeficiente_idHidreletricas_calculo_ENA_x_hidreletrica_x_cenario_x_periodo;
-	SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>							lista_termo_independente_calculo_ENA_x_hidreletrica_x_cenario_x_periodo;
+	SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, SmartEnupla<int, IdHidreletrica>>>> lista_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario;
+	SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, SmartEnupla<int, double>>>>			lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario;
+	SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, double>>>							lista_termo_independente_calculo_ENA_x_periodo_x_hidreletrica_x_cenario;
 
 	//Para usinas NÃO instanciadas no estudo CP (e.g. COMP-MOX-PAFONSO): a chave vai ser um int com o código da usina
-	SmartEnupla<int, SmartEnupla<IdCenario, SmartEnupla<Periodo, SmartEnupla<int, IdHidreletrica>>>>	lista_idHidreletricas_calculo_ENA_x_codigo_usina_x_cenario_x_periodo;
-	SmartEnupla<int, SmartEnupla<IdCenario, SmartEnupla<Periodo, SmartEnupla<int, double>>>>			lista_coeficiente_idHidreletricas_calculo_ENA_x_codigo_usina_x_cenario_x_periodo;
-	SmartEnupla<int, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>								lista_termo_independente_calculo_ENA_x_codigo_usina_x_cenario_x_periodo;
+	SmartEnupla<Periodo, SmartEnupla<           int, SmartEnupla<IdCenario, SmartEnupla<int, IdHidreletrica>>>>	lista_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario;
+	SmartEnupla<Periodo, SmartEnupla<           int, SmartEnupla<IdCenario, SmartEnupla<int, double>>>>			lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario;
+	SmartEnupla<Periodo, SmartEnupla<           int, SmartEnupla<IdCenario, double>>>							lista_termo_independente_calculo_ENA_x_periodo_x_codigo_usina_x_cenario;
 
 	//Para os REE
-	SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, double>>>>	 lista_coeficiente_idHidreletricas_calculo_ENA_x_REE_x_cenario_x_periodo;
-	SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>							     lista_termo_independente_calculo_ENA_x_REE_x_cenario_x_periodo;
+	SmartEnupla<Periodo, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, SmartEnupla<IdHidreletrica, double>>>>	 lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario;
+	SmartEnupla<Periodo, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>>							     lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario;
 
 	/////////////////////////////////
 
