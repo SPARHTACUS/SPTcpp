@@ -136,6 +136,8 @@ friend class LeituraCEPEL;\
 					vetorObjeto.push_back(std::vector<Membro>()); \
 					menorId = idObjeto;\
 				}\
+				else if (menorId == Id##Membro##_Nenhum)\
+					menorId = idObjeto;\
 				for (Id##Membro id = Id##Membro(vetorObjeto.size()); id <= idObjeto; id++) \
 					vetorObjeto.push_back(std::vector<Membro>()); \
 				vetorObjeto.at(idObjeto).push_back(a_objeto); \

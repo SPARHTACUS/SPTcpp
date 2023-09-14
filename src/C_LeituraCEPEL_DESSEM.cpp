@@ -694,6 +694,8 @@ void LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16(Dados& a_dados, const 
 					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_canal_fuga_medio, double(uhe.canalMed));
 					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_vertimento_influencia_fcj, bool(uhe.vertInfCanalFuga));
 					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_vazao_defluente_minima_historica, double(uhe.vazMinHistorica));
+					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_fator_de_producao, double(uhe.produtibilidade));
+
 
 					switch (int(uhe.tipoTurb)) {
 					case 0: a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_turbina, TipoTurbina_sem_turbina);;  break;
@@ -708,6 +710,7 @@ void LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16(Dados& a_dados, const 
 						reservatorio.setAtributo(AttComumReservatorio_idReservatorio, IdReservatorio_1);
 						a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.add(reservatorio);
 					}
+
 
 					// CARREGA OS DADOS DOS RESERVATÓRIOS 
 					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setAtributo(AttComumReservatorio_nome_usina, nomeUHE);
@@ -3988,7 +3991,7 @@ void LeituraCEPEL::validacoes_DESSEM(Dados& a_dados, const std::string a_diretor
 
 		a_dados.validacao_operacional_Dados(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
-		leitura_vRef_from_CadUsH_csv(a_dados, a_diretorio + "//CadUsH.csv");
+		leitura_volume_referencia_e_regularizacao_from_CadUsH_csv(a_dados, a_diretorio + "//CadUsH.csv");
 		calculaEngolimentoMaximo(a_dados, horizonte_estudo, Periodo(horizonte_estudo.getIteradorFinal() + 1), false);
 
 		a_dados.validacao_operacional_Submercado(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);

@@ -115,7 +115,8 @@
       m(Dados,  AttComum,                  custo_acumulado_penalizacao_volume_util_minimo,            double,           0,         max,             0,      nao) \
       m(Dados,  AttComum,               taxa_considerar_tempo_viagem_agua,                            double,           0,           1,           0.2,      nao) \
       m(Dados,  AttComum,                mapear_processos_com_um_unico_cenario,                        bool,         min,         max,         nao,      nao) \
-      m(Dados,  AttComum,                     tipo_processamento_paralelo,         TipoProcessamentoParalelo,         min,         max,   por_cenario,      nao) 
+      m(Dados,  AttComum,                     tipo_processamento_paralelo,         TipoProcessamentoParalelo,         min,         max,   por_cenario,      nao) \
+      m(Dados,  AttComum,              imprimir_cortes_NW_com_reducao_estados,                          bool,         min,         max,           sim,      nao)
 
 
 //   c_classe,   smrtAtt,                                    nomeAtributo,                              tipo,  lowerBound,  upperBound,         initialValue, mustRead?
@@ -322,7 +323,6 @@ public:
 
 	SmartEnupla<IdHidreletrica, double> calculaAfluenciaIncremental(const SmartEnupla<IdHidreletrica, double>& a_afluenciaNatural);
 
-
 	void defineCenariosOtimizacao(const IdIteracao a_iteracao_inicial, const IdIteracao a_iteracao_final);
 	void defineCenariosSimulacao();
 
@@ -339,6 +339,11 @@ public:
 	SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> getHorizonteEspacoAmostralHidrologico(const IdEstagio a_idEstagioInicial, const IdEstagio a_idEstagioFinal)const;
 	SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> getHorizonteEspacoAmostralHidrologico(const IdEstagio a_idEstagioInicial, const IdEstagio a_idEstagioFinal, const IdRealizacao a_maiorIdRealizacao)const;
 	SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> getHorizonteEspacoAmostralHidrologico(const IdEstagio a_idEstagioInicial, const IdEstagio a_idEstagioFinal, const IdRealizacao a_maiorIdRealizacao, const bool a_manter_aberturas_estagio_inicial)const;
+
+	IdHidreletrica getIdHidreletricaFromIdProcessoEstocasticoIdVariavelAleatoriaIdVariavelAleatoriaInterna(const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna);
+	IdVariavelAleatoriaInterna getIdVariavelAleatoriaInternaFromIdVariavelAleatoriaIdHidreletrica(const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdHidreletrica a_hidreletrica);
+	void getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdHidreletrica(const IdProcessoEstocastico a_idProcessoEstocastico, IdVariavelAleatoria& a_idVariavelAleatoria, IdVariavelAleatoriaInterna& a_idVariavelAleatoriaInterna, const IdHidreletrica a_hidreletrica);
+
 
 	ProcessoEstocastico processoEstocastico_hidrologico;
 

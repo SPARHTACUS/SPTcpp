@@ -9,11 +9,13 @@ LeituraCEPEL::LeituraCEPEL() {
 
 	SPT_avisos = "SPT_avisos.txt";
 
+	/*
 	lista_modificacaoUHE.reserve(500);
 	lista_modificacaoUHE.push_back(std::vector<ModificacaoUHE>());
 
 	lista_modificacaoUTE.reserve(500);
 	lista_modificacaoUTE.push_back(std::vector<ModificacaoUTE>());
+	*/
 
 } // LeituraCEPEL::LeituraCEPEL() { 
 
@@ -304,7 +306,7 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 						//Se a usina for fio d'àgua utiliza o volume_referencia do Hidr.dat (pode ser maior do que o volume_máximo: verificado em consulta ao Cepel)
 						if (!bool(a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_regularizacao, periodo, bool()))) {
 							volume_minimo = volume_maximo;
-							volume = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_volume_referencia_calculo_turbinamento_maximo, double());
+							volume = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_volume_referencia, double());
 						}//if (!bool(a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_regularizacao, periodo, bool()))) {
 
 						const double h_mont = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getCota(periodo, volume);
@@ -1046,6 +1048,9 @@ void LeituraCEPEL::aplicarModificacoesUHE(Dados& a_dados) {
 
 					else if (tipoModificacao == TipoModificacaoUHE_VERTJU)
 						aplicarModificacaoVERTJU(a_dados, idHidreletrica, modificacaoUHE);
+
+					else if (tipoModificacao == TipoModificacaoUHE_JUSENA)
+						aplicarModificacaoJUSENA(a_dados, idHidreletrica, modificacaoUHE);
 
 				} // for (int idModificacaoUHE = 0; idModificacaoUHE < lista_modificacaoUHE.at(idHidreletrica).size(); idModificacaoUHE++) {
 
@@ -2664,6 +2669,22 @@ bool LeituraCEPEL::aplicarModificacaoVERTJU(Dados& a_dados, const IdHidreletrica
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::aplicarModificacaoVERTJU(a_dados, " + getFullString(a_idHidreletrica) + ",a_modificacaoUHE,a_horizonte_estudo): \n" + std::string(erro.what())); }
 } // bool LeituraCEPEL::aplicarModificacaoVERTJU(Dados &a_dados, const IdHidreletrica a_idHidreletrica, const ModificacaoUHE &a_modificacaoUHE, const SmartEnupla<Periodo, IdEstagio>& a_horizonte_estudo){
+
+bool LeituraCEPEL::aplicarModificacaoJUSENA(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const ModificacaoUHE& a_modificacaoUHE) {
+	try {
+
+		if (a_modificacaoUHE.tipo_de_modificacao != TipoModificacaoUHE_JUSENA)
+			throw std::invalid_argument("Modificacao nao compativel com metodo.");
+
+		const int codigo_usina_jusante_JUSENA = int(a_modificacaoUHE.valor_1);
+
+		a_dados.vetorHidreletrica.att(a_idHidreletrica).setAtributo(AttComumHidreletrica_codigo_usina_jusante_JUSENA, codigo_usina_jusante_JUSENA);
+
+		return true;
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::aplicarModificacaoJUSENA(a_dados, " + getFullString(a_idHidreletrica) + ",a_modificacaoUHE,a_horizonte_estudo): \n" + std::string(erro.what())); }
+} // bool LeituraCEPEL::aplicarModificacaoJUSENA(Dados &a_dados, const IdHidreletrica a_idHidreletrica, const ModificacaoUHE &a_modificacaoUHE, const SmartEnupla<Periodo, IdEstagio>& a_horizonte_estudo){
 
 
 void LeituraCEPEL::aplicarModificacoesUTE(Dados& a_dados) {

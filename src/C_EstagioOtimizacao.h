@@ -14,9 +14,11 @@
 	  m(Estagio,  AttComum,                       idEstagio,    IdEstagio,         min,          max,           min,      sim) \
 	  m(Estagio,  AttComum,                     tipo_solver,   TipoSolver,         min,          max,           min,      nao) \
 	  m(Estagio,  AttComum,              periodo_otimizacao,      Periodo,         min,          max,           min,      sim) \
+	  m(Estagio,  AttComum,                     lambda_CVAR,       double,           0,            1,             0,      sim) \
+	  m(Estagio,  AttComum,                      alpha_CVAR,       double,           0,            1,             0,      sim) \
 	  m(Estagio,  AttComum,               maiorIdRealizacao, IdRealizacao,         min,          max,           min,      nao) \
-	  m(Estagio,  AttComum,                cortes_multiplos,          int,           0,          max,             0,      nao) \
-	  m(Estagio,  AttComum, selecao_cortes_nivel_dominancia,          int,           0,           10,             1,      nao) 
+	  m(Estagio,  AttComum,                cortes_multiplos,          int,         min,          max,             0,      sim) \
+	  m(Estagio,  AttComum, selecao_cortes_nivel_dominancia,          int,           0,           10,             1,      sim) 
 
 //     c_classe,   smrtAtt,                           nomeAtributo,                      tipo,  lowerBound,   upperBound,  initialValue, mustRead?
 
@@ -86,6 +88,10 @@ public:
 
 	void anularVariavelEstadoCorteBenders(const IdVariavelEstado a_idVariavelEstado);
 
+	void anularVariavelEstadoCorteBenders(const IdVariavelEstado a_idVariavelEstado, const IdCorteBenders a_idCorteBenders);
+
+	void alocarCorteBenders(const int a_numero_objetos);
+
 	void instanciarSolver(const TipoSubproblemaSolver a_tipoSubproblemaSolver, TipoSolver &a_tipoSolver);
 
 	Solver* getSolver(const TipoSubproblemaSolver a_tipoSubproblemaSolver);
@@ -108,8 +114,11 @@ public:
 
 	void exportarVersaoAlternativaCorteBenders(Estagio &a_estagio, const std::string a_idProcessoEstocasticoNovo, const std::string a_idProcessoEstocasticoNovo_compacto, const SmartEnupla<IdVariavelAleatoria, std::vector<std::string>> &a_lista_nome_compacto_idVariavelAleatoriaNova, const SmartEnupla<IdVariavelAleatoria, std::vector<std::string>>& a_lista_nome_idVariavelAleatoriaNova, const SmartEnupla<IdVariavelAleatoria, std::vector<double>> &a_lista_participacao_idVariavelAleatoriaNova);
 
+	bool carregarRHSCortesBenders(const std::string a_nome_arquivo);
 	bool carregarCoeficientesCortesBenders(const std::string a_nome_arquivo);
 	bool carregarEstadosCortesBenders(const std::string a_nome_arquivo);
+
+	void removerTodosCorteBenders();
 
 private:
 

@@ -106,6 +106,69 @@ public:
 	void mapearTipoPeriodoEspacoAmostral();
 	std::vector<TipoPeriodo> getTipoPeriodoEspacoAmostral();
 
+	template<typename IdFisico>
+	IdFisico getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdFisico a_IdFisico) {
+		try { 
+			std::string idFisico = getAtributo(a_idVariavelAleatoria, a_idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_nome, std::string());
+			const size_t pos_ = idFisico.find("_");
+			if (pos_ != std::string::npos)
+				idFisico = idFisico.substr(pos_ + 1, idFisico.length());
+			return getFromChar(a_IdFisico, idFisico.c_str());
+		}
+		catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(" + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idVariavelAleatoriaInterna) + "): \n" + std::string(erro.what())); }
+	};
+
+	template<typename IdFisico>
+	IdVariavelAleatoriaInterna getIdVariavelAleatoriaInternaFromIdVariavelAleatoriaIdFisico(const IdVariavelAleatoria a_idVariavelAleatoria, const IdFisico a_idFisico) {
+		try {
+			for (IdVariavelAleatoriaInterna idVarInterna = IdVariavelAleatoriaInterna_1; idVarInterna <= getMaiorId(a_idVariavelAleatoria, IdVariavelAleatoriaInterna()); idVarInterna++) {
+				if (getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(a_idVariavelAleatoria, idVarInterna, a_idFisico) == a_idFisico)
+					return idVarInterna;
+			}
+			throw std::invalid_argument(getFullString(a_idFisico) + " nao encontrado.");
+		}
+		catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getIdVariavelAleatoriaInternaFromIdVariavelAleatoriaIdFisico(" + "," + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idFisico) + "): \n" + std::string(erro.what())); }
+	};
+
+	template<typename IdFisico>
+	IdVariavelAleatoria getIdVariavelAleatoriaFromIdFisico(const IdFisico a_idFisico) {
+		try {
+			for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= getMaiorId(IdVariavelAleatoria()); idVar++) {
+
+				const IdVariavelAleatoriaInterna maiorIdVariavelAleatoriaInterna = getMaiorId(idVar, IdVariavelAleatoriaInterna());
+
+				for (IdVariavelAleatoriaInterna idVarInterna = IdVariavelAleatoriaInterna_1; idVarInterna <= maiorIdVariavelAleatoriaInterna; idVarInterna++) {
+					if (getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(idVar, idVarInterna, a_idFisico) == a_idFisico)
+						return idVar;
+				}
+			}
+			throw std::invalid_argument(getFullString(a_idFisico) + " nao encontrado.");
+
+		}
+		catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(" + "," + getFullString(a_idFisico) + "): \n" + std::string(erro.what())); }
+	};
+
+	template<typename IdFisico>
+	void getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(IdVariavelAleatoria& a_idVariavelAleatoria, IdVariavelAleatoriaInterna& a_idVariavelAleatoriaInterna, const IdFisico a_idFisico) {
+		try {
+			for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= getMaiorId(IdVariavelAleatoria()); idVar++) {
+
+				const IdVariavelAleatoriaInterna maiorIdVariavelAleatoriaInterna = getMaiorId(idVar, IdVariavelAleatoriaInterna());
+
+				for (IdVariavelAleatoriaInterna idVarInterna = IdVariavelAleatoriaInterna_1; idVarInterna <= maiorIdVariavelAleatoriaInterna; idVarInterna++) {
+					if (getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(idVar, idVarInterna, a_idFisico) == a_idFisico) {
+						a_idVariavelAleatoria = idVar;
+						a_idVariavelAleatoriaInterna = idVarInterna;
+						return;
+					}
+				}
+			}
+			throw std::invalid_argument(getFullString(a_idFisico) + " nao encontrado.");
+
+		}
+		catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(" + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idVariavelAleatoriaInterna) + "," + getFullString(a_idFisico) + "): \n" + std::string(erro.what())); }
+	};
+
 private:
 
 	std::vector<TipoPeriodo> tipo_periodo_espaco_amostral;

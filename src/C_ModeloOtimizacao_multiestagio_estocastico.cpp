@@ -71,7 +71,13 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 				vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_periodo_otimizacao, periodo_otimizacao);
 
 				vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_maiorIdRealizacao, IdRealizacao(a_dados.getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int())));
+
 				vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_cortes_multiplos, a_dados.getElementoVetor(AttVetorDados_cortes_multiplos, idEstagio, int()));
+
+				if (getAtributo(AttComumModeloOtimizacao_tipo_aversao_a_risco, TipoAversaoRisco()) == TipoAversaoRisco_CVAR) {
+					vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_lambda_CVAR, a_dados.getElementoVetor(AttVetorDados_lambda_CVAR, idEstagio, double()));
+					vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_alpha_CVAR, a_dados.getElementoVetor(AttVetorDados_alpha_CVAR, idEstagio, double()));
+				}
 
 				vetorEstagio.att(idEstagio).selecaoSolucaoProxy(a_dados.getElementoVetor(AttVetorDados_numero_aberturas_solucao_proxy, idEstagio, int()));
 
@@ -161,8 +167,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 			setMatriz(AttMatrizModeloOtimizacao_horizonte_estudo, horizonte_estudo_por_estagio);
 			setMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, horizonte_processo_estocastico_hidrologico_por_estagio);
-
-			setVetor(AttVetorModeloOtimizacao_cortes_multiplos, a_dados.getVetor(AttVetorDados_cortes_multiplos, IdEstagio(), int()));
 
 			setVetor(AttVetorModeloOtimizacao_custo_total, SmartEnupla<IdEstagio, double>(estagio_inicial, std::vector<double>(int(estagio_final) - int(estagio_inicial) + 1, NAN)));
 			setVetor(AttVetorModeloOtimizacao_custo_imediato, SmartEnupla<IdEstagio, double>(estagio_inicial, std::vector<double>(int(estagio_final) - int(estagio_inicial) + 1, NAN)));
@@ -1126,6 +1130,50 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarRestricoesEletricas(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
 }
 
+void ModeloOtimizacao::atualizarProbabilidadesParaCustoFuturoNestedEmEstagioComPosEstudo(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao) {
+
+	try {
+
+		if (a_TSS == TipoSubproblemaSolver_mestre)
+			return;
+
+		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+			return;
+
+
+		const IdEstagio idEstagio_pos_estudo = getMaiorId(IdEstagio());
+
+		if (getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()) == idEstagio_pos_estudo)
+			return;
+
+		if ((a_idEstagio + 1) < idEstagio_pos_estudo)
+			return;
+
+		const int multiplicidade_corte = getAtributo(idEstagio_pos_estudo, AttComumEstagio_cortes_multiplos, int());
+
+		if (multiplicidade_corte >= 0)
+			return;
+
+		IdRealizacao realizacao_atual = a_idRealizacao;
+
+		if (realizacao_atual == IdRealizacao_Nenhum)
+			realizacao_atual = getElementoMatriz(getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()), AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, getIterador2Final(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo()), IdRealizacao());
+
+		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
+
+		const int posEquZF = getEquLinear_CUSTO_FUTURO(a_TSS, a_idEstagio, periodo_otimizacao);
+
+		for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= IdRealizacao(-multiplicidade_corte); idRealizacao++) {
+			if (idRealizacao != realizacao_atual)
+				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao), posEquZF,  0.0);
+			else
+				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao), posEquZF, -1.0);
+		}
+
+	} // try
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarProbabilidadesParaCustoFuturoNestedEmEstagioComPosEstudo(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
+
+}
 
 void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoFuturo(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio) {
 
@@ -1139,7 +1187,7 @@ void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoFuturo(const TipoSubpro
 
 		const IdEstagio idEstagio_seguinte = IdEstagio(a_idEstagio + 1);
 
-		const int multiplicidade_corte = getElementoVetor(AttVetorModeloOtimizacao_cortes_multiplos, idEstagio_seguinte, int());
+		const int multiplicidade_corte = getAtributo(idEstagio_seguinte, AttComumEstagio_cortes_multiplos, int());
 
 		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
 
@@ -1183,7 +1231,7 @@ void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoTotal(const TipoSubprob
 		if (a_TSS != TipoSubproblemaSolver_mestre)
 			return;
 
-		const int multiplicidade_corte = getElementoVetor(AttVetorModeloOtimizacao_cortes_multiplos, IdEstagio(a_idEstagio), int());
+		const int multiplicidade_corte = getAtributo(a_idEstagio, AttComumEstagio_cortes_multiplos, int());
 
 		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
 
@@ -6747,7 +6795,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 
 			if (varPTDISPCOM > -1)
 				return varPTDISPCOM;
-			else if ((periodo_comando_minuto.sobreposicao(periodo_otimizacao) == 0.0) && (periodo_otimizacao < periodo_comando_minuto))
+			else if ((periodo_comando_minuto.sobreposicao(periodo_otimizacao) == 0.0) && ((periodo_otimizacao < periodo_comando_minuto) && (periodo_comando_minuto < (Periodo(TipoPeriodo_minuto, getAtributo(getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()), AttComumEstagio_periodo_otimizacao, Periodo()) + 1) - 1))))
 				return -1;
 
 			varPTDISPCOM = addVarDecisao_PTDISPCOM(a_TSS, a_idEstagio, a_periodo, a_idTermeletrica, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
@@ -6905,7 +6953,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 } // int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdHidreletrica a_idHidreletrica) {
 
 
-void ModeloOtimizacao::addCorteBendersToZF(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_anterior, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders, const double a_rhs, const SmartEnupla<IdVariavelEstado, double>& a_coeficiente) {
+void ModeloOtimizacao::addCorteBendersToZF(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_anterior, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders) {
 
 	try {
 
@@ -6923,15 +6971,15 @@ void ModeloOtimizacao::addCorteBendersToZF(const TipoSubproblemaSolver a_TSS, co
 
 		vetorEstagio.att(a_idEstagio_anterior).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio_anterior, periodo_otimizacao_anterior, a_idRealizacao), posIneZF, 1.0);
 
-		setCorteBendersToZF(a_TSS, a_idEstagio, a_idEstagio_anterior, a_idRealizacao, a_idCorteBenders, a_rhs, a_coeficiente);
+		setCorteBendersToZF(a_TSS, a_idEstagio, a_idEstagio_anterior, a_idRealizacao, a_idCorteBenders);
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::addCorteBendersToZF(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idEstagio_anterior) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "," + getString(a_rhs) + ",a_coeficiente,a_estado): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::addCorteBendersToZF(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idEstagio_anterior) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::addCorteBenders(const IdEstagio a_idEstagio, const IdCorteBenders a_idCorteBenders, const double a_rhs, const SmartEnupla<IdVariavelEstado, double>& a_coeficiente){
 
 
-void ModeloOtimizacao::setCorteBendersToZF(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_anterior, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders, const double a_rhs, const SmartEnupla<IdVariavelEstado, double>& a_coeficiente) {
+void ModeloOtimizacao::setCorteBendersToZF(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_anterior, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders) {
 
 	try {
 
@@ -6942,7 +6990,7 @@ void ModeloOtimizacao::setCorteBendersToZF(const TipoSubproblemaSolver a_TSS, co
 
 		const int posIneZF = getIneLinear_CB_ZF(a_TSS, a_idEstagio_anterior, periodo_otimizacao_anterior, a_idRealizacao, a_idCorteBenders);
 
-		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_coeficiente.getIteradorFinal(); idVariavelEstado++) {
+		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(a_idEstagio, IdVariavelEstado()); idVariavelEstado++) {
 
 			if (vetorEstagio.att(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
@@ -6951,19 +6999,19 @@ void ModeloOtimizacao::setCorteBendersToZF(const TipoSubproblemaSolver a_TSS, co
 				if (idVariavelDecisaoEstagioAnterior < 0)
 					vetorEstagio.att(a_idEstagio).anularVariavelEstadoCorteBenders(idVariavelEstado);
 				else
-					vetorEstagio.att(a_idEstagio_anterior).getSolver(a_TSS)->setCofRestricao(idVariavelDecisaoEstagioAnterior, posIneZF, -a_coeficiente.at(idVariavelEstado));
+					vetorEstagio.att(a_idEstagio_anterior).getSolver(a_TSS)->setCofRestricao(idVariavelDecisaoEstagioAnterior, posIneZF, -getElementoMatriz(a_idEstagio, a_idCorteBenders, AttMatrizCorteBenders_coeficiente, a_idRealizacao, idVariavelEstado, double()));
 
 			} // if (vetorEstagio.att(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
 			else
 				vetorEstagio.att(a_idEstagio).anularVariavelEstadoCorteBenders(idVariavelEstado);
 
-		} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_coeficiente.getIteradorFinal(); idVariavelEstado++) {
+		} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(a_idEstagio, IdVariavelEstado()); idVariavelEstado++) {
 
-		vetorEstagio.att(a_idEstagio_anterior).getSolver(a_TSS)->setRHSRestricao(posIneZF, a_rhs);
+		vetorEstagio.att(a_idEstagio_anterior).getSolver(a_TSS)->setRHSRestricao(posIneZF, getElementoVetor(a_idEstagio, a_idCorteBenders, AttVetorCorteBenders_rhs, a_idRealizacao, double()));
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::setCorteBendersToZF(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idEstagio_anterior) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "," + getString(a_rhs) + ",a_coeficiente,a_estado): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::setCorteBendersToZF(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idEstagio_anterior) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::setCorteBendersToZF(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders, const int a_posicao_corte, const double a_rhs, const SmartEnupla<IdVariavelEstado, double>& a_coeficiente){
 
@@ -6993,7 +7041,7 @@ void ModeloOtimizacao::remCorteBendersFromZF(const TipoSubproblemaSolver a_TSS, 
 
 
 
-void ModeloOtimizacao::addCorteBendersToZT(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders, const double a_rhs, const SmartEnupla<IdVariavelEstado, double>& a_coeficiente){
+void ModeloOtimizacao::addCorteBendersToZT(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders){
 
 	try {
 
@@ -7008,14 +7056,14 @@ void ModeloOtimizacao::addCorteBendersToZT(const TipoSubproblemaSolver a_TSS, co
 
 		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, periodo_otimizacao, a_idRealizacao), posIneZT, 1.0);
 
-		setCorteBendersToZT(a_TSS, a_idEstagio, a_idRealizacao, a_idCorteBenders, a_rhs, a_coeficiente);
+		setCorteBendersToZT(a_TSS, a_idEstagio, a_idRealizacao, a_idCorteBenders);
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::addCorteBendersToZT(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "," + getString(a_rhs) + ",a_coeficiente,a_estado): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::addCorteBendersToZT(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::addCorteBendersToZT(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders, const double a_rhs, const SmartEnupla<IdVariavelEstado, double>& a_coeficiente){
 
-void ModeloOtimizacao::setCorteBendersToZT(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders, const double a_rhs, const SmartEnupla<IdVariavelEstado, double>& a_coeficiente){
+void ModeloOtimizacao::setCorteBendersToZT(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders){
 
 	try {
 
@@ -7023,7 +7071,7 @@ void ModeloOtimizacao::setCorteBendersToZT(const TipoSubproblemaSolver a_TSS, co
 
 		const int posIneZT = getIneLinear_CB_ZT(a_TSS, a_idEstagio, periodo_otimizacao, a_idRealizacao, a_idCorteBenders);
 
-		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_coeficiente.getIteradorFinal(); idVariavelEstado++) {
+		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(a_idEstagio, IdVariavelEstado()); idVariavelEstado++) {
 
 			if (vetorEstagio.att(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
@@ -7032,7 +7080,7 @@ void ModeloOtimizacao::setCorteBendersToZT(const TipoSubproblemaSolver a_TSS, co
 				if (idVariavelDecisao < 0)
 					vetorEstagio.att(a_idEstagio).anularVariavelEstadoCorteBenders(idVariavelEstado);
 				else
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(idVariavelDecisao, posIneZT, -a_coeficiente.at(idVariavelEstado));
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(idVariavelDecisao, posIneZT, -getElementoMatriz(a_idEstagio, a_idCorteBenders, AttMatrizCorteBenders_coeficiente, a_idRealizacao, idVariavelEstado, double()));
 
 			} // if (vetorEstagio.att(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
@@ -7041,10 +7089,10 @@ void ModeloOtimizacao::setCorteBendersToZT(const TipoSubproblemaSolver a_TSS, co
 
 		} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_coeficiente.getIteradorFinal(); idVariavelEstado++) {
 
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneZT, a_rhs);
+		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneZT, getElementoVetor(a_idEstagio, a_idCorteBenders, AttVetorCorteBenders_rhs, a_idRealizacao, double()));
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::setCorteBendersToZT(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "," + getString(a_rhs) + ",a_coeficiente,a_estado): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::setCorteBendersToZT(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::setCorteBendersToZT(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders, const double a_rhs, const SmartEnupla<IdVariavelEstado, double>& a_coeficiente){
 

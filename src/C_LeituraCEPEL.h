@@ -2,6 +2,7 @@
 #define LEITURA_CEPEL
 
 #include "C_Dados.h"
+#include "C_EstagioOtimizacao.h"
 
 
 class LeituraCEPEL {
@@ -178,7 +179,41 @@ private:
 	void set_hidreletrica_vazao_turbinada_disponivel_meta(Dados& a_dados);
 	void set_hidreletrica_potencia_disponivel_meta_from_dec_oper_usih_DC(Dados& a_dados, std::string a_nomeArquivo);
 	void set_termeletrica_potencia_disponivel_meta(Dados& a_dados);
-	void leitura_vRef_from_CadUsH_csv(Dados& a_dados, std::string a_nomeArquivo);
+	void leitura_potencia_comandada_from_relgnl(Dados& a_dados, const std::string a_nomeArquivo_pastaRaiz_relgnl, const std::string a_nomeArquivo_pastaAdicionais_relgnl, const std::vector<int> a_codigo_gnl, const std::vector<std::string> a_nome_gnl, SmartEnupla<IdTermeletrica, SmartEnupla<Periodo, double>>& a_lista_termeletrica_potencia_pre_comandada);
+	void leitura_volume_referencia_e_regularizacao_from_CadUsH_csv(Dados& a_dados, std::string a_nomeArquivo);
+	
+	void leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, std::string a_diretorio, std::string a_diretorio_cortes, std::string a_nomeArquivo);
+	void leitura_cortes_NEWAVE_para_dimensionamento(SmartEnupla<IdReservatorioEquivalente, bool>& a_coeficientes_EAR, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>>& a_coeficiente_ENA, std::string a_diretorio, std::string a_diretorio_cortes, std::string a_nomeArquivo);
+
+
+	double get_cota_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidreletrica, const Periodo a_periodo, const Periodo a_periodo_inicial_horizonte_estudo, const double a_percentual_volume_util, const bool a_is_calculo_para_ENA);
+	double get_produtibilidade_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidreletrica, const double a_cota);
+	void instanciar_codigo_usina_jusante_JUSENA(Dados& a_dados);
+	void instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_JUSENA(Dados& a_dados, std::string a_nomeArquivo);
+	void instancia_atributos_hidreletrica_out_from_CadUsH_csv(Dados& a_dados, Hidreletrica& a_hidreletrica, std::string a_nomeArquivo);
+	void calcular_produtibilidade_ENA_regras_especiais(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
+	void calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados);
+	void calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados);
+	void calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE(Dados& a_dados);
+	void calcular_equacionamento_afluencia_natural_x_REE(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
+	void calcular_equacionamento_afluencia_natural_x_hidreletrica(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo, const Periodo a_periodo_inicial_horizonte_estudo);
+	void calcular_equacionamento_afluencia_natural_x_hidreletrica_out_estudo(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo, const Periodo a_periodo_inicial_horizonte_estudo);
+	void reducao_estados_equacionamento_afluencia_natural_x_REE(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo, const Periodo a_periodo_inicial_horizonte_estudo);//Deixa o equacionamento das ENAs somente no termo independente
+	void retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(Dados& a_dados, const int a_codigo_posto_acoplamento_NW, const IdHidreletrica a_idHidreletrica, const IdCenario a_idCenario, const Periodo a_periodo_inicial, const Periodo a_periodo, SmartEnupla<int, IdHidreletrica>& a_idHidreletricas_calculo_ENA, SmartEnupla<int, double>& a_coeficiente_idHidreletricas_calculo_ENA, double& a_termo_independente_calculo_ENA);
+	void retorna_equacionamento_afluencia_natural_x_posto(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const int a_codigo_posto, const double a_coeficiente, SmartEnupla<int, IdHidreletrica>& a_idHidreletricas_calculo_ENA, SmartEnupla<int, double>& a_coeficiente_idHidreletricas_calculo_ENA);
+	void retorna_equacionamento_afluencia_incremental_x_posto_169(Dados& a_dados, const IdCenario a_idCenario, const Periodo a_periodo, double& a_termo_independente_calculo_ENA);
+	bool retorna_is_idHidreletrica_in_calculo_ENA(const int a_codigo_usina);
+	IdMes get_IdMes_operativo(const Periodo a_periodo, const bool is_periodo_inicial);
+	double get_afluencia_natural_posto(Dados& a_dados, const int a_codigo_posto, const IdCenario a_idCenario, const Periodo a_periodo);//Regras do hidrograma de Belo Monte
+
+	void atualiza_lista_hidreletrica_NPOSNW_regras_especiais(Dados& a_dados);
+	void defineHidreletricasMontanteNaCascataENA(Dados& a_dados);
+
+	void imprime_produtibilidade_EAR_acumulada(Dados& a_dados, std::string nomeArquivo);
+	void imprime_produtibilidade_EAR(Dados& a_dados, std::string nomeArquivo);
+	void imprime_produtibilidade_ENA(Dados& a_dados, std::string nomeArquivo, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
+	void imprime_afluencia_natural_x_idHidreletrica_x_cenario_x_periodo(Dados& a_dados, std::string nomeArquivo, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
+	void imprime_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados, std::string nomeArquivo);
 
 	//Validações
 	void validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao);
@@ -354,6 +389,29 @@ private:
 	SmartEnupla<IdHidreletrica, IdHidreletrica> lista_jusante_desvio_hidreletrica = SmartEnupla<IdHidreletrica, IdHidreletrica>(IdHidreletrica(1), std::vector<IdHidreletrica>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdHidreletrica_Nenhum)); //Lista da jusante_desvio de cada hidrelétrica -> Somente para validação entre a configuração PD e CP
 
 	SmartEnupla<IdHidreletrica, int> lista_hidreletrica_NPOSNW = SmartEnupla<IdHidreletrica, int>(IdHidreletrica(1), std::vector<int>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), -1));; //Lista que registra se uma usina tem diferença de posto entre DECOMP  e NEWAVE
+
+	SmartEnupla<int, Hidreletrica> lista_hidreletrica_out_estudo; //Lista que registra usinas que não fazem parte do estudo mas são necessárias para desacoplar o corte NEWAVE (p.ex COMP PAF-MOX indicado no registro JUSENA para calcular a EAR do REE NE)
+
+	SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> lista_ENA_calculada_x_REE_x_cenario_x_periodo;
+
+	/////////////////////////////////
+	//Informação com o equacionamento do cálculo das ENAs x usina em termos das afluências incrementais x cenário x período (Regras.dat não lineares, precisa de um equacionamento por realização de afluência)
+
+	//Para usinas instanciadas no estudo CP
+	SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, SmartEnupla<int, IdHidreletrica>>>> lista_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario;
+	SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, SmartEnupla<int, double>>>>			lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario;
+	SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, double>>>							lista_termo_independente_calculo_ENA_x_periodo_x_hidreletrica_x_cenario;
+
+	//Para usinas NÃO instanciadas no estudo CP (e.g. COMP-MOX-PAFONSO): a chave vai ser um int com o código da usina
+	SmartEnupla<Periodo, SmartEnupla<           int, SmartEnupla<IdCenario, SmartEnupla<int, IdHidreletrica>>>>	lista_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario;
+	SmartEnupla<Periodo, SmartEnupla<           int, SmartEnupla<IdCenario, SmartEnupla<int, double>>>>			lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario;
+	SmartEnupla<Periodo, SmartEnupla<           int, SmartEnupla<IdCenario, double>>>							lista_termo_independente_calculo_ENA_x_periodo_x_codigo_usina_x_cenario;
+
+	//Para os REE
+	SmartEnupla<Periodo, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, SmartEnupla<IdHidreletrica, double>>>>	 lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario;
+	SmartEnupla<Periodo, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>>							     lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario;
+
+	/////////////////////////////////
 
 	template<typename TipoIterador>
 	TipoIterador getIdFromCodigoONS(const SmartEnupla<TipoIterador, int>& a_lista_codigo_ONS, const int a_codigo_ONS) {
@@ -541,6 +599,7 @@ private:
 
 	std::vector<std::vector<ModificacaoUTE>> lista_modificacaoUTE;
 
+
 	// Método para aplicar modificações nas Hidreletricas.
 	void aplicarModificacoesUTE(Dados& a_dados);
 
@@ -609,7 +668,7 @@ private:
 		double valor_5 = NAN;
 	};
 
-	std::vector<std::vector<ModificacaoUHE>> lista_modificacaoUHE;
+	SmartEnupla<IdHidreletrica, std::vector<ModificacaoUHE>> lista_modificacaoUHE = SmartEnupla<IdHidreletrica, std::vector<ModificacaoUHE>>(IdHidreletrica(1), std::vector<std::vector<ModificacaoUHE>>(IdHidreletrica(int(IdHidreletrica_Excedente)-1), std::vector<ModificacaoUHE>()));
 
 	// Método para aplicar modificações nas Hidreletricas.
 	void aplicarModificacoesUHE(Dados& a_dados);
@@ -684,6 +743,8 @@ private:
 	bool aplicarModificacaoCOTVAZ(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const ModificacaoUHE& a_modificacaoUHE);
 
 	bool aplicarModificacaoVERTJU(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const ModificacaoUHE& a_modificacaoUHE);
+	
+	bool aplicarModificacaoJUSENA(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const ModificacaoUHE& a_modificacaoUHE);
 
 	//Cria os intercâmbios hidráulicos correspondentes à jusante desvio 
 

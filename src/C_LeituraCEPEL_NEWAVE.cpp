@@ -2452,11 +2452,14 @@ void LeituraCEPEL::leitura_MODIF_201908_NW25(Dados &a_dados, std::string nomeArq
 
 					if (lista_idHidreletrica.size() > 0) {
 
+						/*
 						for (int i = 0; i < int(lista_idHidreletrica.size()); i++) {
 
+							
 							if (lista_hidreletrica_com_modificacao.getElemento(lista_idHidreletrica.at(i))) {
 
 								// Inicializa adicao de modificacao na hidreletrica
+								
 								if (lista_modificacaoUHE.size() - 1 < lista_idHidreletrica.at(i)) {
 
 									IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
@@ -2472,7 +2475,7 @@ void LeituraCEPEL::leitura_MODIF_201908_NW25(Dados &a_dados, std::string nomeArq
 							}
 
 						}
-
+						*/
 
 						ModificacaoUHE modificacaoUHE;
 
@@ -4150,6 +4153,7 @@ void LeituraCEPEL::leitura_EXPH_201908_NW25(Dados& a_dados, std::string nomeArqu
 								//******************************************************************************
 
 								// Inicializa adicao de modificacao na hidreletrica
+								/*
 								if (lista_modificacaoUHE.size() - 1 < idHidreletrica) {
 
 									IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
@@ -4161,7 +4165,7 @@ void LeituraCEPEL::leitura_EXPH_201908_NW25(Dados& a_dados, std::string nomeArqu
 										lista_modificacaoUHE.push_back(std::vector< ModificacaoUHE>());
 
 								} // if (lista_modificacaoUHE.size() - 1 < idHidreletrica) {
-
+								*/
 								ModificacaoUHE modificacaoUHE;
 
 								modificacaoUHE.tipo_de_modificacao = TipoModificacaoUHE_VMORTO;
@@ -4231,6 +4235,7 @@ void LeituraCEPEL::leitura_EXPH_201908_NW25(Dados& a_dados, std::string nomeArqu
 								//******************************************************************************
 
 								// Inicializa adicao de modificacao na hidreletrica
+								/*
 								if (lista_modificacaoUHE.size() - 1 < idHidreletrica) {
 
 									IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
@@ -4242,6 +4247,7 @@ void LeituraCEPEL::leitura_EXPH_201908_NW25(Dados& a_dados, std::string nomeArqu
 										lista_modificacaoUHE.push_back(std::vector< ModificacaoUHE>());
 
 								} // if (lista_modificacaoUHE.size() - 1 < idHidreletrica) {
+								*/
 
 								ModificacaoUHE modificacaoUHE;
 
