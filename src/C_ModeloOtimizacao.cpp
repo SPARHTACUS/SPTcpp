@@ -542,6 +542,72 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacao(const IdEs
 } // void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao){
 
 
+
+void ModeloOtimizacao::atualizarModeloOtimizacaoComEquacaoRealizacao(const IdEstagio a_idEstagio, const IdCenario a_idCenario) {
+
+	try {
+
+		const Periodo periodo_horizonte_processo_estocastico = getIterador2Final(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo());
+
+		const IdProcessoEstocastico idProcessoEstocastico = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
+
+		const IdRealizacao idRealizacao = getElementoMatriz(idProcessoEstocastico, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, periodo_horizonte_processo_estocastico, IdRealizacao());
+
+		atualizarModeloOtimizacaoComEquacaoRealizacao(a_idEstagio, idRealizacao);
+
+	} // try
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarModeloOtimizacaoComEquacaoRealizacao(" + getFullString(a_idEstagio) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+
+} // void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao){
+
+
+
+void ModeloOtimizacao::atualizarModeloOtimizacaoComEquacaoRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao) {
+
+	try {
+
+		const IdEquacaoRealizacao maiorIdEquacaoRealizacao = getMaiorId(a_idEstagio, IdEquacaoRealizacao());
+
+		for (IdEquacaoRealizacao idEquacaoRealizacao = IdEquacaoRealizacao_1; idEquacaoRealizacao <= maiorIdEquacaoRealizacao; idEquacaoRealizacao++) {
+
+			for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++) {
+
+				const int idEquacao = getElementoVetor(a_idEstagio, idEquacaoRealizacao, AttVetorEquacaoRealizacao_idEquacao, tSS, int());
+
+				if (idEquacao > -1) {
+
+					if (getSizeVetor(a_idEstagio, idEquacaoRealizacao, AttVetorEquacaoRealizacao_rhs) > 0)
+						vetorEstagio.att(a_idEstagio).getSolver(tSS)->setRHSRestricao(idEquacao, getElementoVetor(a_idEstagio, idEquacaoRealizacao, AttVetorEquacaoRealizacao_rhs, a_idRealizacao, double()));
+
+					if (getSize1Matriz(a_idEstagio, idEquacaoRealizacao, AttMatrizEquacaoRealizacao_coeficiente) > 0) {
+
+						const int menorVar = getIterador1Inicial(a_idEstagio, idEquacaoRealizacao, AttMatrizEquacaoRealizacao_coeficiente, int());
+						const int maiorVar = getIterador1Final(a_idEstagio, idEquacaoRealizacao, AttMatrizEquacaoRealizacao_coeficiente, int());
+
+						for (int var = menorVar; var <= maiorVar; var++) {
+
+							if (getSize2Matriz(a_idEstagio, idEquacaoRealizacao, AttMatrizEquacaoRealizacao_coeficiente, var) > 0)
+								vetorEstagio.att(a_idEstagio).getSolver(tSS)->setCofRestricao(var, idEquacao,  getElementoMatriz(a_idEstagio, idEquacaoRealizacao, AttMatrizEquacaoRealizacao_coeficiente, var, a_idRealizacao, double()));
+
+						} // for (int var = menorVar; var <= maiorVar; var++) {
+
+					} // if (getSize1Matriz(a_idEstagio, idEquacaoRealizacao, AttMatrizEquacaoRealizacao_coeficiente) > 0) {
+
+					if (idEquacaoRealizacao == maiorIdEquacaoRealizacao)
+						vetorEstagio.att(a_idEstagio).getSolver(tSS)->atualizar();
+
+				} // if (idEquacao > -1) {
+
+			} // for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++) {
+
+		} // for (IdEquacaoRealizacao idEquacaoRealizacao = IdEquacaoRealizacao_1; idEquacaoRealizacao <= maiorIdEquacaoRealizacao; idEquacaoRealizacao++) {
+
+	} // try
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarModeloOtimizacaoComEquacaoRealizacao(" + getFullString(a_idEstagio) + "," + getFullString(a_idRealizacao) + "): \n" + std::string(erro.what())); }
+
+} // void ModeloOtimizacao::atualizarModeloOtimizacaoComEquacaoRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao){
+
+
 bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS_destino, const TipoSubproblemaSolver a_TSS, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const std::string a_diretorio) {
 	try {
 
@@ -1938,6 +2004,8 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 			SmartEnupla<IdVariavelAleatoria, std::vector<IdHidreletrica>> isIdHidreletricaNosEstadosYP(IdVariavelAleatoria_1, std::vector<std::vector<IdHidreletrica>>(IdVariavelAleatoria(IdVariavelAleatoria_Excedente - 1), std::vector<IdHidreletrica>()));
 
+			bool is_conversao_ENA_carregado = false;
+
 			// Validar se estados possuem variáveis de decisão no modelo e ajustar cortes se necessário.
 			for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= estagio.getMaiorId(IdVariavelEstado()); idVariavelEstado++) {
 
@@ -2053,6 +2121,96 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					}
 				} // else if (nome.at(0) == "VarDecisaoYP") {
 
+				//
+				// Energia Natural Afluente Acoplamento
+				//
+
+				else if (nome.at(0) == "VarDecisaoENA") {
+
+					try {
+
+						const Periodo periodo = Periodo(nome.at(2));
+
+						const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
+
+						if (!a_dados.vetorHidreletrica.isInstanciado(idHidreletrica))
+							throw std::invalid_argument(getFullString(idVariavelEstado) + " nao instanciada em " + getFullString(idVariavelEstado) + ".");
+
+						const IdReservatorioEquivalente idREE = getIdReservatorioEquivalenteFromChar(nome.at(4).c_str());
+
+						const Periodo periodo_lag = Periodo(nome.at(5));
+
+						const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, periodo, IdProcessoEstocastico_hidrologico_hidreletrica, IdVariavelAleatoria(idHidreletrica), periodo_lag, 0.0, std::vector<IdHidreletrica>{idHidreletrica});
+						if (varYP == -1)
+							throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
+
+						const int varENA = addVarDecisao_ENA(a_TSS, idEstagio, periodo, idHidreletrica, idREE, periodo_lag, -vetorEstagio.att(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.att(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+
+						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varENA);
+
+						bool carregar_conversao_ENA = false;
+						if ((!is_conversao_ENA_carregado) && (a_dados.getMaiorId(idHidreletrica, IdReservatorioEquivalente()) == IdReservatorioEquivalente_Nenhum))
+							carregar_conversao_ENA = true;
+						else if ((!is_conversao_ENA_carregado) && (a_dados.getSize1Matriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1) == 0))
+							carregar_conversao_ENA = true;
+
+						if (carregar_conversao_ENA) {
+							if (!a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_REE_conversao_ENA_acoplamento.csv", a_dados, TipoAcessoInstancia_membroMembro))
+								throw std::invalid_argument("Nao foi possivel carregar arquivo HIDRELETRICA_REE_conversao_ENA_acoplamento.csv necessario para conversao de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
+							is_conversao_ENA_carregado = true;
+						}
+
+						bool is_valores_0 = false;
+						bool is_valores_1 = false;
+
+						IdCenario cenarioInicial = IdCenario_Nenhum;
+						IdCenario cenarioFinal = IdCenario_Nenhum;
+
+						if (a_dados.getSize1Matriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0) > 0)
+							is_valores_0 = true;
+						if (a_dados.getSize1Matriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1) > 0)
+							is_valores_1 = true;
+
+						if (is_valores_0) {
+							cenarioInicial = a_dados.getIterador1Inicial(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, IdCenario());
+							cenarioFinal = a_dados.getIterador1Final(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, IdCenario());
+						}
+						else if (is_valores_1) {
+							cenarioInicial = a_dados.getIterador1Inicial(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, IdCenario());
+							cenarioFinal = a_dados.getIterador1Final(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, IdCenario());
+						}
+						else
+							throw std::invalid_argument("Nao foram encontrados dados necessarios para conversao de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
+
+						SmartEnupla<IdRealizacao, double> valores_0;
+						SmartEnupla<int, SmartEnupla<IdRealizacao, double>> valores_1;
+
+						for (IdCenario idCenario = cenarioInicial; idCenario <= cenarioFinal; idCenario++) {
+
+							if (is_valores_0) {
+								if (valores_0.size() == 0)
+									valores_0 = SmartEnupla<IdRealizacao, double>(IdRealizacao(cenarioInicial), std::vector<double>(int(cenarioFinal - cenarioInicial) + 1, 0.0));
+								valores_0.at(IdRealizacao(idCenario)) = a_dados.getElementoMatriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, idCenario, periodo_lag, double());
+							}
+
+							if (is_valores_1) {
+								if (valores_1.size() == 0)
+									valores_1 = SmartEnupla<int, SmartEnupla<IdRealizacao, double>>(varYP, std::vector<SmartEnupla<IdRealizacao, double>>(1, SmartEnupla<IdRealizacao, double>(IdRealizacao(cenarioInicial), std::vector<double>(int(cenarioFinal - cenarioInicial) + 1, 0.0))));
+								valores_1.at(varYP).at(IdRealizacao(idCenario)) = -a_dados.getElementoMatriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, idCenario, periodo_lag, double());
+							}
+
+						} // for (IdCenario idCenario = cenarioInicial; idCenario <= cenarioFinal; idCenario++) {
+
+						const int equENA = addEquLinear_ENA(a_TSS, idEstagio, periodo, idHidreletrica, idREE, periodo_lag);
+
+						vetorEstagio.att(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA, equENA, 1.0);
+
+						vetorEstagio.att(idEstagio).addEquacaoRealizacao(a_TSS, getNomeVarDecisao_ENA(a_TSS, idEstagio, periodo, idHidreletrica, idREE, periodo_lag), equENA, valores_0, valores_1);
+
+					}
+					catch (const std::exception& erro) { throw std::invalid_argument("VarDecisaoENA " + getFullString(idVariavelEstado) + " : \n" + std::string(erro.what())); }
+
+				} // else if (nome.at(0) == "VarDecisaoENA") {
 
 				//
 				// Defluencia viajante

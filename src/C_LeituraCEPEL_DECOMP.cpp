@@ -13022,7 +13022,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 				estagio_pos_estudo.setAtributo(AttComumEstagio_idEstagio, idEstagio_pos_estudo);
 				estagio_pos_estudo.setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, 0);
-				estagio_pos_estudo.setAtributo(AttComumEstagio_cortes_multiplos, -int(idCenario_final));
+				estagio_pos_estudo.setAtributo(AttComumEstagio_cortes_multiplos, 0);
 
 				const Periodo periodo_pos_estudo = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_estudo.getIteradorFinal() + 1);
 				estagio_pos_estudo.setAtributo(AttComumEstagio_periodo_otimizacao, periodo_pos_estudo);
@@ -13527,10 +13527,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 						}
 					}
 				}
-
-				//entradaSaidaDados.imprimirArquivoCSV_AttMatriz("HIDRELETRICA_REE_conversao_ENA_acoplamento.csv", IdHidreletrica_Nenhum, IdReservatorioEquivalente_Nenhum, a_dados, IdCenario_1, idCenario_final, periodos_acoplamento.getIteradorInicial(), periodos_acoplamento.getIteradorFinal(), AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0);
-				//entradaSaidaDados.setAppendArquivo(true);
-				//entradaSaidaDados.imprimirArquivoCSV_AttMatriz("HIDRELETRICA_REE_conversao_ENA_acoplamento.csv", IdHidreletrica_Nenhum, IdReservatorioEquivalente_Nenhum, a_dados, IdCenario_1, idCenario_final, periodos_acoplamento.getIteradorInicial(), periodos_acoplamento.getIteradorFinal(), AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1);
 
 				entradaSaidaDados.setAppendArquivo(false);
 				entradaSaidaDados.imprimirArquivoCSV_AttComum("estagio.csv", estagio_pos_estudo, std::vector<AttComumEstagio>{ AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao, AttComumEstagio_selecao_cortes_nivel_dominancia, AttComumEstagio_cortes_multiplos, AttComumEstagio_alpha_CVAR, AttComumEstagio_lambda_CVAR});

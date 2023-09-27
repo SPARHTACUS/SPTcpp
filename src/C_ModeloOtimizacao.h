@@ -373,6 +373,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 // ITERADORES 5
 //
 
+#define ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_REE_PERIODO(m)                        m(1, IdEstagio) m(2, Periodo) m(3, IdHidreletrica) m(4, IdReservatorioEquivalente) m(5, Periodo)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_USINANAOSIMULADA(m)        m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado) m(5, IdUsinaNaoSimulada)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_PATAMARDEFICIT(m)          m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado) m(5, IdPatamarDeficit)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_INT(m)                   m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, int)
@@ -384,6 +385,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO(m)   m(1, IdEstagio) m(2, Periodo) m(3, IdProcessoEstocastico) m(4, IdVariavelAleatoria) m(5, Periodo)
 
 #define VARIAVEL_DECISAO_5(m)\
+	m(  VarDecisao,    ENA,         5,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_REE_PERIODO,                         sim,          sim)  \
 	m(  VarDecisao,    PH,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao)  \
 	m(  VarDecisao,    PH_REL,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao)  \
 	m(  VarDecisao,    PH_FINF,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao)  \
@@ -418,6 +420,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 
 #define EQUACAO_LINEAR_5(m)\
+	m(  EquLinear,    ENA,                                         5,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_REE_PERIODO,                      nao,        sim)      \
 	m(  EquLinear,    AFLUENCIA_PROCESSO_ESTOCASTICO,              5,     ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO, nao,        nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA,                             5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA_RELAXADA,                    5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao)      \
@@ -584,6 +587,9 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		void atualizarModeloOtimizacaoComVariavelRealizacao(const IdEstagio a_idEstagio, const IdCenario    a_idCenario);
 		void atualizarModeloOtimizacaoComVariavelRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao);
 
+		void atualizarModeloOtimizacaoComEquacaoRealizacao(const IdEstagio a_idEstagio, const IdCenario    a_idCenario);
+		void atualizarModeloOtimizacaoComEquacaoRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao);
+
 		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const TipoSubproblemaSolver a_TSS_origem, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const std::string a_diretorio);
 
 		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao);
@@ -651,8 +657,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		IdCenario getCenarioInicial(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao);
 		IdCenario getCenarioFinal(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao);
 		int getNumeroCenarios(const IdCenario a_cenario_inicial, const IdCenario a_cenario_final);
-
-		void atualizarProbabilidadesParaCustoFuturoNestedEmEstagioComPosEstudo(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao);
 
 	private:
 

@@ -1130,51 +1130,6 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarRestricoesEletricas(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
 }
 
-void ModeloOtimizacao::atualizarProbabilidadesParaCustoFuturoNestedEmEstagioComPosEstudo(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao) {
-
-	try {
-
-		if (a_TSS == TipoSubproblemaSolver_mestre)
-			return;
-
-		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
-			return;
-
-
-		const IdEstagio idEstagio_pos_estudo = getMaiorId(IdEstagio());
-
-		if (getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()) == idEstagio_pos_estudo)
-			return;
-
-		if ((a_idEstagio + 1) < idEstagio_pos_estudo)
-			return;
-
-		const int multiplicidade_corte = getAtributo(idEstagio_pos_estudo, AttComumEstagio_cortes_multiplos, int());
-
-		if (multiplicidade_corte >= 0)
-			return;
-
-		IdRealizacao realizacao_atual = a_idRealizacao;
-
-		if (realizacao_atual == IdRealizacao_Nenhum)
-			realizacao_atual = getElementoMatriz(getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()), AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, getIterador2Final(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo()), IdRealizacao());
-
-		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
-
-		const int posEquZF = getEquLinear_CUSTO_FUTURO(a_TSS, a_idEstagio, periodo_otimizacao);
-
-		for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= IdRealizacao(-multiplicidade_corte); idRealizacao++) {
-			if (idRealizacao != realizacao_atual)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao), posEquZF,  0.0);
-			else
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao), posEquZF, -1.0);
-		}
-
-	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarProbabilidadesParaCustoFuturoNestedEmEstagioComPosEstudo(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
-
-}
-
 void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoFuturo(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio) {
 
 	try {
@@ -6686,16 +6641,15 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 						int varYH = getVarDecisao_YHseExistir(a_TSS, a_idEstagio, periodo, idHidreletrica);
 
 						if (varYH == -1) {
-							varYH = addVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica, -infinito, infinito, 0.0);
-							const IdVariavelEstado idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica), varYH, -1);
 							if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica) {
 								const double tendencia = getElementoVetor(idProcessoEstocastico_modelo, idVar, idVarInt, AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double());
-								for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++)
-									vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, false, a_dados.getAtributo(AttComumDados_idProcesso, IdProcesso()), a_dados.getAtributo(AttComumDados_maior_processo, IdProcesso()), idCenario, tendencia);
+								varYH = addVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica, tendencia, tendencia, 0.0);
 							}
+							else
+								varYH = addVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica, -infinito, infinito, 0.0);
 						}
 
-						int equYP = getEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICOseExistir(a_TSS, a_idEstagio, a_periodo, a_idProcessoEstocastico, a_idVariavelAleatoria, a_periodo_lag);
+						equYP = getEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICOseExistir(a_TSS, a_idEstagio, a_periodo, a_idProcessoEstocastico, a_idVariavelAleatoria, a_periodo_lag);
 
 						if (equYP == -1) {
 							equYP = addEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICO(a_TSS, a_idEstagio, a_periodo, a_idProcessoEstocastico, a_idVariavelAleatoria, a_periodo_lag);
