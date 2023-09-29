@@ -202,7 +202,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/Bv /bigobj %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
-      <DebugInformationFormat>None</DebugInformationFormat>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <PreprocessToFile>false</PreprocessToFile>
       <LanguageStandard_C>Default</LanguageStandard_C>
       <UseStandardPreprocessor>false</UseStandardPreprocessor>

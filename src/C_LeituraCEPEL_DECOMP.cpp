@@ -12987,7 +12987,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			//Imprime info de cálculo
 			//////////////////////////////////////////////////////////////////////////////////
 
-			const bool imprimir_info_calculo_ENA = false;
+			const bool imprimir_info_calculo_ENA = true;
 
 			if (imprimir_info_calculo_ENA) {//Somente para teste
 				imprime_produtibilidade_EAR_acumulada(a_dados, a_diretorio + a_diretorio_cortes + "//_info_HIDRELETRICA_AttVetor_produtibilidade_EAR_acumulada.csv");
@@ -15236,11 +15236,19 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE
 
 					for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-						const double termo_independente_calculo_ENA = lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo).at(idHidreletrica).at(idReservatorioEquivalente).at(idCenario);
+						double termo_independente_calculo_ENA = 0.0;
+						
+						if (lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo).at(idHidreletrica).size() > 0)
+							if (lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo).at(idHidreletrica).at(idReservatorioEquivalente).size() > 0)
+								termo_independente_calculo_ENA = lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo).at(idHidreletrica).at(idReservatorioEquivalente).at(idCenario);
 
-						const double coeficiente_idHidreletrica = lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo).at(idHidreletrica).at(idReservatorioEquivalente).at(idCenario);
+						double coeficiente_idHidreletrica = 0.0;
+						
+						if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo).at(idHidreletrica).size() > 0)
+							if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo).at(idHidreletrica).at(idReservatorioEquivalente).size() > 0)
+								coeficiente_idHidreletrica = lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo).at(idHidreletrica).at(idReservatorioEquivalente).at(idCenario);
 
-						if (coeficiente_idHidreletrica > 0) {
+						if ((coeficiente_idHidreletrica > 0) || (termo_independente_calculo_ENA > 0)) {
 
 							IdVariavelAleatoria        idVariavelAleatoria = IdVariavelAleatoria_Nenhum;
 							IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_Nenhum;

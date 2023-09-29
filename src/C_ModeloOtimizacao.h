@@ -548,6 +548,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		void imprimirVariaveisEstado(EntradaSaidaDados a_entradaSaidaDados);
 
 		void imprimirVariaveisRealizacao(EntradaSaidaDados a_entradaSaidaDados);
+		void imprimirEquacoesRealizacao(EntradaSaidaDados a_entradaSaidaDados);
 
 		void imprimirVariaveisRealizacaoInterna(EntradaSaidaDados a_entradaSaidaDados);
 

@@ -977,10 +977,11 @@ void ModeloOtimizacao::imprimirVariaveisEstado(EntradaSaidaDados a_entradaSaidaD
 	const IdEstagio estagio_inicial = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
 	const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
 
-	for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
+	for (IdEstagio idEstagio = estagio_inicial; idEstagio <= getMaiorId(IdEstagio()); idEstagio++) {
 		if (getMaiorId(idEstagio, IdVariavelEstado()) > IdVariavelEstado_Nenhum) {
 			a_entradaSaidaDados.imprimirArquivoCSV_AttComum(getFullString(idEstagio) + "_estado.csv", IdVariavelEstado_Nenhum, vetorEstagio.att(idEstagio));
-			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(idEstagio) + "_estado_variaveis.csv", IdVariavelEstado_Nenhum, vetorEstagio.att(idEstagio), AttVetorVariavelEstado_idVariavelDecisao);
+			if (idEstagio <= estagio_final)
+				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(idEstagio) + "_estado_variaveis.csv", IdVariavelEstado_Nenhum, vetorEstagio.att(idEstagio), AttVetorVariavelEstado_idVariavelDecisao);
 		}
 	}
 
@@ -994,13 +995,28 @@ void ModeloOtimizacao::imprimirVariaveisRealizacao(EntradaSaidaDados a_entradaSa
 
 	for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 		if (getMaiorId(idEstagio, IdVariavelRealizacao()) > IdVariavelRealizacao_Nenhum) {
-			a_entradaSaidaDados.imprimirArquivoCSV_AttComum(getFullString(idEstagio) + "_realizacao.csv", IdVariavelRealizacao_Nenhum, vetorEstagio.att(idEstagio));
-			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(idEstagio) + "_realizacao_variaveis.csv", IdVariavelRealizacao_Nenhum, vetorEstagio.att(idEstagio), AttVetorVariavelRealizacao_idVariavelDecisao);
+			a_entradaSaidaDados.imprimirArquivoCSV_AttComum(getFullString(idEstagio) + "_variavel_realizacao.csv", IdVariavelRealizacao_Nenhum, vetorEstagio.att(idEstagio));
+			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(idEstagio) + "_variavel_realizacao_variaveis.csv", IdVariavelRealizacao_Nenhum, vetorEstagio.att(idEstagio), AttVetorVariavelRealizacao_idVariavelDecisao);
 		}
 	}
 
 } // void ModeloOtimizacao::imprimirVariaveisRealizacao(EntradaSaidaDados a_entradaSaidaDados){
 
+void ModeloOtimizacao::imprimirEquacoesRealizacao(EntradaSaidaDados a_entradaSaidaDados) {
+
+	const IdEstagio estagio_inicial = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
+	const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
+
+	for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
+		if (getMaiorId(idEstagio, IdEquacaoRealizacao()) > IdEquacaoRealizacao_Nenhum) {
+			a_entradaSaidaDados.imprimirArquivoCSV_AttComum(getFullString(idEstagio) + "_equacao_realizacao.csv", IdEquacaoRealizacao_Nenhum, vetorEstagio.att(idEstagio));
+			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(idEstagio) + "_equacao_realizacao_equacoes.csv", IdEquacaoRealizacao_Nenhum, vetorEstagio.att(idEstagio), AttVetorEquacaoRealizacao_idEquacao);
+			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(idEstagio) + "_equacao_realizacao_rhs.csv", IdEquacaoRealizacao_Nenhum, vetorEstagio.att(idEstagio), AttVetorEquacaoRealizacao_rhs);
+			a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz(getFullString(idEstagio) + "_equacao_realizacao_coeficiente.csv", IdEquacaoRealizacao_Nenhum, vetorEstagio.att(idEstagio), AttMatrizEquacaoRealizacao_coeficiente);
+		}
+	}
+
+} // void ModeloOtimizacao::imprimirVariaveisRealizacao(EntradaSaidaDados a_entradaSaidaDados){
 
 void ModeloOtimizacao::imprimirVariaveisRealizacaoInterna(EntradaSaidaDados a_entradaSaidaDados) {
 
@@ -1009,8 +1025,8 @@ void ModeloOtimizacao::imprimirVariaveisRealizacaoInterna(EntradaSaidaDados a_en
 
 	for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 		if (getMaiorId(idEstagio, IdVariavelRealizacaoInterna()) > IdVariavelRealizacaoInterna_Nenhum) {
-			a_entradaSaidaDados.imprimirArquivoCSV_AttComum(getFullString(idEstagio) + "_realizacao_interna.csv", IdVariavelRealizacaoInterna_Nenhum, vetorEstagio.att(idEstagio));
-			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(idEstagio) + "_realizacao_interna_variaveis.csv", IdVariavelRealizacaoInterna_Nenhum, vetorEstagio.att(idEstagio), AttVetorVariavelRealizacaoInterna_idVariavelDecisao);
+			a_entradaSaidaDados.imprimirArquivoCSV_AttComum(getFullString(idEstagio) + "_variavel_realizacao_interna.csv", IdVariavelRealizacaoInterna_Nenhum, vetorEstagio.att(idEstagio));
+			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(idEstagio) + "_variavel_realizacao_interna_variaveis.csv", IdVariavelRealizacaoInterna_Nenhum, vetorEstagio.att(idEstagio), AttVetorVariavelRealizacaoInterna_idVariavelDecisao);
 		}
 	}
 

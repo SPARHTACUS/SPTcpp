@@ -101,6 +101,8 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 			a_modeloOtimizacao.imprimirVariaveisRealizacao(a_entradaSaidaDados);
 
+			a_modeloOtimizacao.imprimirEquacoesRealizacao(a_entradaSaidaDados);
+
 			a_modeloOtimizacao.imprimirVariaveisRealizacaoInterna(a_entradaSaidaDados);
 
 			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getString(AttVetorEstagio_selecao_solucao_proxy) + ".csv", IdEstagio_Nenhum, a_modeloOtimizacao, AttVetorEstagio_selecao_solucao_proxy);
