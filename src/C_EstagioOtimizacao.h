@@ -7,7 +7,7 @@
 
 #include "C_VariavelEstado.h"
 #include "C_VariavelRealizacao.h"
-#include "C_EquacaoRealizacao.h"
+#include "C_RestricaoRealizacao.h"
 #include "C_VariavelRealizacaoInterna.h"
 #include "C_CorteBenders.h"
 
@@ -35,7 +35,7 @@
 #define MEMBRO_ESTAGIO_OTIMIZACAO(m)  \
 	m(Estagio, CorteBenders) \
 	m(Estagio, VariavelEstado) \
-	m(Estagio, EquacaoRealizacao) \
+	m(Estagio, RestricaoRealizacao) \
 	m(Estagio, VariavelRealizacao) \
 	m(Estagio, VariavelRealizacaoInterna) 
 
@@ -63,7 +63,7 @@ public:
 
 	IdVariavelEstado            addVariavelEstado           (const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const int a_idVariavelDecisaoEstagioAnterior);
 	IdVariavelRealizacao        addVariavelRealizacao       (const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo, const double a_fator);
-	IdEquacaoRealizacao         addEquacaoRealizacao        (const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idRestricao, const SmartEnupla<IdRealizacao, double>& a_rhs, const SmartEnupla<int, SmartEnupla<IdRealizacao, double>> &a_coeficiente);
+	IdRestricaoRealizacao         addRestricaoRealizacao        (const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idRestricao, const SmartEnupla<IdRealizacao, double>& a_rhs, const SmartEnupla<int, SmartEnupla<IdRealizacao, double>> &a_coeficiente);
 	IdVariavelRealizacaoInterna addVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const Periodo a_periodo, const double a_fator, const TipoValor a_tipo_valor, const double percentual_inicial, const double percentual_passo);
 
 	void addValorVariavelEstado(const IdVariavelEstado a_idVariavelEstado, const bool a_resetar, const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdCenario a_idCenario, const double a_valor);

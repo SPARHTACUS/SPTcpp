@@ -238,6 +238,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 // ITERADORES 4
 //
 
+#define ITERADORES_4_ESTAGIO_PERIODO_REE_PERIODO(m)                           m(1, IdEstagio) m(2, Periodo) m(3, IdReservatorioEquivalente) m(4, Periodo)
 #define ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO(m)                  m(1, IdEstagio) m(2, Periodo) m(3, IdHidreletrica) m(4, Periodo)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO(m)               m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica)
@@ -258,6 +259,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 
 #define VARIAVEL_DECISAO_4(m)\
+	m(  VarDecisao,    ENA,                    4,    ITERADORES_4_ESTAGIO_PERIODO_REE_PERIODO,                           sim,          sim)  \
 	m(  VarDecisao,    PH,                     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
 	m(  VarDecisao,    PH_REL,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
 	m(  VarDecisao,    PH_FINF,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao)  \
@@ -317,6 +319,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
    //   Elemento,      Nome,             NroIter,    Iteradores,                                                 Impr.Primal,     Impr.Dual
 
 #define EQUACAO_LINEAR_4(m)\
+	m(  EquLinear,    ENA,                                               4,    ITERADORES_4_ESTAGIO_PERIODO_REE_PERIODO,                           nao,         nao)  \
 	m(  EquLinear,    ATENDIMENTO_DEMANDA,                               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO,               nao,         nao)  \
 	m(  EquLinear,    BALANCO_HIDRAULICO_VOL,                            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
 	m(  EquLinear,    BALANCO_HIDRAULICO_VAZ,                            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao)  \
@@ -420,7 +423,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 
 #define EQUACAO_LINEAR_5(m)\
-	m(  EquLinear,    ENA,                                         5,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_REE_PERIODO,                      nao,        sim)      \
+	m(  EquLinear,    ENA,                                         5,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_REE_PERIODO,                      nao,        nao)      \
 	m(  EquLinear,    AFLUENCIA_PROCESSO_ESTOCASTICO,              5,     ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO, nao,        nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA,                             5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA_RELAXADA,                    5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao)      \
@@ -548,7 +551,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		void imprimirVariaveisEstado(EntradaSaidaDados a_entradaSaidaDados);
 
 		void imprimirVariaveisRealizacao(EntradaSaidaDados a_entradaSaidaDados);
-		void imprimirEquacoesRealizacao(EntradaSaidaDados a_entradaSaidaDados);
+		void imprimirRestricoesRealizacao(EntradaSaidaDados a_entradaSaidaDados);
 
 		void imprimirVariaveisRealizacaoInterna(EntradaSaidaDados a_entradaSaidaDados);
 
@@ -588,8 +591,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		void atualizarModeloOtimizacaoComVariavelRealizacao(const IdEstagio a_idEstagio, const IdCenario    a_idCenario);
 		void atualizarModeloOtimizacaoComVariavelRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao);
 
-		void atualizarModeloOtimizacaoComEquacaoRealizacao(const IdEstagio a_idEstagio, const IdCenario    a_idCenario);
-		void atualizarModeloOtimizacaoComEquacaoRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao);
+		void atualizarModeloOtimizacaoComRestricaoRealizacao(const IdEstagio a_idEstagio, const IdCenario    a_idCenario);
+		void atualizarModeloOtimizacaoComRestricaoRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao);
 
 		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const TipoSubproblemaSolver a_TSS_origem, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const std::string a_diretorio);
 

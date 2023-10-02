@@ -543,7 +543,7 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacao(const IdEs
 
 
 
-void ModeloOtimizacao::atualizarModeloOtimizacaoComEquacaoRealizacao(const IdEstagio a_idEstagio, const IdCenario a_idCenario) {
+void ModeloOtimizacao::atualizarModeloOtimizacaoComRestricaoRealizacao(const IdEstagio a_idEstagio, const IdCenario a_idCenario) {
 
 	try {
 
@@ -553,59 +553,59 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComEquacaoRealizacao(const IdEst
 
 		const IdRealizacao idRealizacao = getElementoMatriz(idProcessoEstocastico, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, periodo_horizonte_processo_estocastico, IdRealizacao());
 
-		atualizarModeloOtimizacaoComEquacaoRealizacao(a_idEstagio, idRealizacao);
+		atualizarModeloOtimizacaoComRestricaoRealizacao(a_idEstagio, idRealizacao);
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarModeloOtimizacaoComEquacaoRealizacao(" + getFullString(a_idEstagio) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarModeloOtimizacaoComRestricaoRealizacao(" + getFullString(a_idEstagio) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao){
 
 
 
-void ModeloOtimizacao::atualizarModeloOtimizacaoComEquacaoRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao) {
+void ModeloOtimizacao::atualizarModeloOtimizacaoComRestricaoRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao) {
 
 	try {
 
-		const IdEquacaoRealizacao maiorIdEquacaoRealizacao = getMaiorId(a_idEstagio, IdEquacaoRealizacao());
+		const IdRestricaoRealizacao maiorIdRestricaoRealizacao = getMaiorId(a_idEstagio, IdRestricaoRealizacao());
 
-		for (IdEquacaoRealizacao idEquacaoRealizacao = IdEquacaoRealizacao_1; idEquacaoRealizacao <= maiorIdEquacaoRealizacao; idEquacaoRealizacao++) {
+		for (IdRestricaoRealizacao idRestricaoRealizacao = IdRestricaoRealizacao_1; idRestricaoRealizacao <= maiorIdRestricaoRealizacao; idRestricaoRealizacao++) {
 
 			for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++) {
 
-				const int idEquacao = getElementoVetor(a_idEstagio, idEquacaoRealizacao, AttVetorEquacaoRealizacao_idEquacao, tSS, int());
+				const int idEquacao = getElementoVetor(a_idEstagio, idRestricaoRealizacao, AttVetorRestricaoRealizacao_idRestricao, tSS, int());
 
 				if (idEquacao > -1) {
 
-					if (getSizeVetor(a_idEstagio, idEquacaoRealizacao, AttVetorEquacaoRealizacao_rhs) > 0)
-						vetorEstagio.att(a_idEstagio).getSolver(tSS)->setRHSRestricao(idEquacao, getElementoVetor(a_idEstagio, idEquacaoRealizacao, AttVetorEquacaoRealizacao_rhs, a_idRealizacao, double()));
+					if (getSizeVetor(a_idEstagio, idRestricaoRealizacao, AttVetorRestricaoRealizacao_rhs) > 0)
+						vetorEstagio.att(a_idEstagio).getSolver(tSS)->setRHSRestricao(idEquacao, getElementoVetor(a_idEstagio, idRestricaoRealizacao, AttVetorRestricaoRealizacao_rhs, a_idRealizacao, double()));
 
-					if (getSize1Matriz(a_idEstagio, idEquacaoRealizacao, AttMatrizEquacaoRealizacao_coeficiente) > 0) {
+					if (getSize1Matriz(a_idEstagio, idRestricaoRealizacao, AttMatrizRestricaoRealizacao_coeficiente) > 0) {
 
-						const int menorVar = getIterador1Inicial(a_idEstagio, idEquacaoRealizacao, AttMatrizEquacaoRealizacao_coeficiente, int());
-						const int maiorVar = getIterador1Final(a_idEstagio, idEquacaoRealizacao, AttMatrizEquacaoRealizacao_coeficiente, int());
+						const int menorVar = getIterador1Inicial(a_idEstagio, idRestricaoRealizacao, AttMatrizRestricaoRealizacao_coeficiente, int());
+						const int maiorVar = getIterador1Final(a_idEstagio, idRestricaoRealizacao, AttMatrizRestricaoRealizacao_coeficiente, int());
 
 						for (int var = menorVar; var <= maiorVar; var++) {
 
-							if (getSize2Matriz(a_idEstagio, idEquacaoRealizacao, AttMatrizEquacaoRealizacao_coeficiente, var) > 0)
-								vetorEstagio.att(a_idEstagio).getSolver(tSS)->setCofRestricao(var, idEquacao,  getElementoMatriz(a_idEstagio, idEquacaoRealizacao, AttMatrizEquacaoRealizacao_coeficiente, var, a_idRealizacao, double()));
+							if (getSize2Matriz(a_idEstagio, idRestricaoRealizacao, AttMatrizRestricaoRealizacao_coeficiente, var) > 0)
+								vetorEstagio.att(a_idEstagio).getSolver(tSS)->setCofRestricao(var, idEquacao,  getElementoMatriz(a_idEstagio, idRestricaoRealizacao, AttMatrizRestricaoRealizacao_coeficiente, var, a_idRealizacao, double()));
 
 						} // for (int var = menorVar; var <= maiorVar; var++) {
 
-					} // if (getSize1Matriz(a_idEstagio, idEquacaoRealizacao, AttMatrizEquacaoRealizacao_coeficiente) > 0) {
+					} // if (getSize1Matriz(a_idEstagio, idRestricaoRealizacao, AttMatrizRestricaoRealizacao_coeficiente) > 0) {
 
-					if (idEquacaoRealizacao == maiorIdEquacaoRealizacao)
+					if (idRestricaoRealizacao == maiorIdRestricaoRealizacao)
 						vetorEstagio.att(a_idEstagio).getSolver(tSS)->atualizar();
 
 				} // if (idEquacao > -1) {
 
 			} // for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++) {
 
-		} // for (IdEquacaoRealizacao idEquacaoRealizacao = IdEquacaoRealizacao_1; idEquacaoRealizacao <= maiorIdEquacaoRealizacao; idEquacaoRealizacao++) {
+		} // for (IdRestricaoRealizacao idRestricaoRealizacao = IdRestricaoRealizacao_1; idRestricaoRealizacao <= maiorIdRestricaoRealizacao; idRestricaoRealizacao++) {
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarModeloOtimizacaoComEquacaoRealizacao(" + getFullString(a_idEstagio) + "," + getFullString(a_idRealizacao) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarModeloOtimizacaoComRestricaoRealizacao(" + getFullString(a_idEstagio) + "," + getFullString(a_idRealizacao) + "): \n" + std::string(erro.what())); }
 
-} // void ModeloOtimizacao::atualizarModeloOtimizacaoComEquacaoRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao){
+} // void ModeloOtimizacao::atualizarModeloOtimizacaoComRestricaoRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao){
 
 
 bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS_destino, const TipoSubproblemaSolver a_TSS, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const std::string a_diretorio) {
@@ -1002,17 +1002,17 @@ void ModeloOtimizacao::imprimirVariaveisRealizacao(EntradaSaidaDados a_entradaSa
 
 } // void ModeloOtimizacao::imprimirVariaveisRealizacao(EntradaSaidaDados a_entradaSaidaDados){
 
-void ModeloOtimizacao::imprimirEquacoesRealizacao(EntradaSaidaDados a_entradaSaidaDados) {
+void ModeloOtimizacao::imprimirRestricoesRealizacao(EntradaSaidaDados a_entradaSaidaDados) {
 
 	const IdEstagio estagio_inicial = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
 	const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
 
 	for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
-		if (getMaiorId(idEstagio, IdEquacaoRealizacao()) > IdEquacaoRealizacao_Nenhum) {
-			a_entradaSaidaDados.imprimirArquivoCSV_AttComum(getFullString(idEstagio) + "_equacao_realizacao.csv", IdEquacaoRealizacao_Nenhum, vetorEstagio.att(idEstagio));
-			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(idEstagio) + "_equacao_realizacao_equacoes.csv", IdEquacaoRealizacao_Nenhum, vetorEstagio.att(idEstagio), AttVetorEquacaoRealizacao_idEquacao);
-			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(idEstagio) + "_equacao_realizacao_rhs.csv", IdEquacaoRealizacao_Nenhum, vetorEstagio.att(idEstagio), AttVetorEquacaoRealizacao_rhs);
-			a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz(getFullString(idEstagio) + "_equacao_realizacao_coeficiente.csv", IdEquacaoRealizacao_Nenhum, vetorEstagio.att(idEstagio), AttMatrizEquacaoRealizacao_coeficiente);
+		if (getMaiorId(idEstagio, IdRestricaoRealizacao()) > IdRestricaoRealizacao_Nenhum) {
+			a_entradaSaidaDados.imprimirArquivoCSV_AttComum(getFullString(idEstagio) + "_restricao_realizacao.csv", IdRestricaoRealizacao_Nenhum, vetorEstagio.att(idEstagio));
+			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(idEstagio) + "_restricao_realizacao_equacoes.csv", IdRestricaoRealizacao_Nenhum, vetorEstagio.att(idEstagio), AttVetorRestricaoRealizacao_idRestricao);
+			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(idEstagio) + "_restricao_realizacao_rhs.csv", IdRestricaoRealizacao_Nenhum, vetorEstagio.att(idEstagio), AttVetorRestricaoRealizacao_rhs);
+			a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz(getFullString(idEstagio) + "_restricao_realizacao_coeficiente.csv", IdRestricaoRealizacao_Nenhum, vetorEstagio.att(idEstagio), AttMatrizRestricaoRealizacao_coeficiente);
 		}
 	}
 
@@ -2221,7 +2221,18 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 						vetorEstagio.att(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA, equENA, 1.0);
 
-						vetorEstagio.att(idEstagio).addEquacaoRealizacao(a_TSS, getNomeVarDecisao_ENA(a_TSS, idEstagio, periodo, idHidreletrica, idREE, periodo_lag), equENA, valores_0, valores_1);
+						vetorEstagio.att(idEstagio).addRestricaoRealizacao(a_TSS, getNomeVarDecisao_ENA(a_TSS, idEstagio, periodo, idHidreletrica, idREE, periodo_lag), equENA, valores_0, valores_1);
+
+						int varENA_REE = getVarDecisao_ENAseExistir(a_TSS, idEstagio, periodo, idREE, periodo_lag);
+						int equENA_REE = getEquLinear_ENAseExistir(a_TSS, idEstagio, periodo, idREE, periodo_lag);
+
+						if (varENA_REE == -1) {
+							equENA_REE = addEquLinear_ENA(a_TSS, idEstagio, periodo, idREE, periodo_lag);
+							varENA_REE = addVarDecisao_ENA(a_TSS, idEstagio, periodo, idREE, periodo_lag, 0.0, vetorEstagio.att(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+							vetorEstagio.att(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA_REE, equENA_REE, 1.0);
+						}
+
+						vetorEstagio.att(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA, equENA_REE, -1.0);
 
 					}
 					catch (const std::exception& erro) { throw std::invalid_argument("VarDecisaoENA " + getFullString(idVariavelEstado) + " : \n" + std::string(erro.what())); }
