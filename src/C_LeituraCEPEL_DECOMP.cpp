@@ -13043,14 +13043,8 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				SmartEnupla <IdTermeletrica, SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>> estados_GNL(menorIdTermeletrica, std::vector<SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>>(int(maiorIdTermeletrica - menorIdTermeletrica) + 1, SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>()));
 
 				SmartEnupla<IdSubmercado, IdReservatorioEquivalente> mapeamentoSubmercadoxREE(IdSubmercado(1), std::vector<IdReservatorioEquivalente>(int(IdSubmercado_Excedente - 1), IdReservatorioEquivalente_Nenhum));
-
-				SmartEnupla<Periodo, double> periodos_acoplamento;
-				for (int lag = ordem_maxima_PAR; lag >= 1; lag--) {
-					const Periodo periodo_lag = periodo_pos_estudo - lag;
-					periodos_acoplamento.addElemento(periodo_lag, 0.0);
-				}
-				
-				const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>> inicializacao_conversao_ENA_acoplamento(IdCenario_1, std::vector<SmartEnupla<Periodo, double>>(idCenario_final, periodos_acoplamento));
+	
+				const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>> inicializacao_conversao_ENA_acoplamento(IdCenario_1, std::vector<SmartEnupla<Periodo, double>>(idCenario_final, SmartEnupla<Periodo, double>(lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario, 0.0)));
 
 				if (true) {
 					SmartEnupla<IdReservatorioEquivalente, bool> coeficientes_EAR;
@@ -13114,10 +13108,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 														if (a_dados.getSize1Matriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0) == 0)
 															a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorioEquivalente.att(idREE).setMatriz_forced(AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, inicializacao_conversao_ENA_acoplamento);
 
-														double conversao_ENA_acoplamento_0 = a_dados.getElementoMatriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, IdCenario(idReal), periodo_lag, double());
-														conversao_ENA_acoplamento_0 += sobreposicao * lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo).at(idHidreletrica).at(idREE).at(IdCenario(idReal));
+														const double conversao_ENA_acoplamento_0 = lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo).at(idHidreletrica).at(idREE).at(IdCenario(idReal));												
 
-														a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorioEquivalente.att(idREE).setElemento(AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, IdCenario(idReal), periodo_lag, conversao_ENA_acoplamento_0);
+														a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorioEquivalente.att(idREE).setElemento(AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, IdCenario(idReal), periodo, conversao_ENA_acoplamento_0);
 
 														termo_0 = true;
 
@@ -13140,10 +13133,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 														if (a_dados.getSize1Matriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1) == 0)
 															a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorioEquivalente.att(idREE).setMatriz_forced(AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, inicializacao_conversao_ENA_acoplamento);
 
-														double conversao_ENA_acoplamento_1 = a_dados.getElementoMatriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, IdCenario(idReal), periodo_lag, double());
-														conversao_ENA_acoplamento_1 += sobreposicao * lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo).at(idHidreletrica).at(idREE).at(IdCenario(idReal));
+														const double conversao_ENA_acoplamento_1 = lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo).at(idHidreletrica).at(idREE).at(IdCenario(idReal));
 
-														a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorioEquivalente.att(idREE).setElemento(AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, IdCenario(idReal), periodo_lag, conversao_ENA_acoplamento_1);
+														a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorioEquivalente.att(idREE).setElemento(AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, IdCenario(idReal), periodo, conversao_ENA_acoplamento_1);
 
 														termo_1 = true;
 
