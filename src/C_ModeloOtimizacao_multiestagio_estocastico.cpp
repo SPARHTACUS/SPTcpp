@@ -5010,6 +5010,9 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 							if (a_dados.getElementoMatriz(idSubmercado, AttMatrizSubmercado_demanda, a_periodo_estudo, idPatamarCarga, double()) > 0.0) {
 
 								addVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idSubmercado, a_dados.getElementoMatriz(idSubmercado, AttMatrizSubmercado_demanda, a_periodo_estudo, idPatamarCarga, double()), a_dados.getElementoMatriz(idSubmercado, AttMatrizSubmercado_demanda, a_periodo_estudo, idPatamarCarga, double()), 0.0);
+
+								setNormalizacaoDualVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idSubmercado, 1.0 / (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double()) * double(a_periodo_estudo.getHoras())));
+
 								if (getVarDecisao_PLseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado) < 0)
 									addVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado, 0.0, infinito, 0.0);
 
