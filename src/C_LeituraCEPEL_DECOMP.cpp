@@ -1904,7 +1904,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							atributo = line.substr(4, 2);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-							const int codigo_usina = std::atoi(atributo.c_str());
+							const int codigo_submercado = std::atoi(atributo.c_str());
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Campo 3 -  Mnemônico de identificação para o subsistema.   
@@ -1918,20 +1918,20 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							//Set infromação na classe Submercado
 							//*******************************************************************************************************************
 
-							//Testa se algum subsistema foi inicializado com o id_Cepel
+							//Testa se algum subsistema foi inicializado com o id_Cepel		
 
-							const IdSubmercado idSubmercado_inicializado = getIdFromCodigoONS(lista_codigo_ONS_submercado, codigo_usina);
+							const IdSubmercado idSubmercado_inicializado = getIdFromCodigoONS(lista_codigo_ONS_submercado, codigo_submercado);
 
 							if (idSubmercado_inicializado == IdSubmercado_Nenhum) {
 
-								const IdSubmercado idSubmercado = IdSubmercado(a_dados.getMaiorId(IdSubmercado()) + 1);
+								const IdSubmercado idSubmercado = getIdSubmercadoFromMnemonico(mnemonico);
 
 								Submercado submercado;
 
 								submercado.setAtributo(AttComumSubmercado_idSubmercado, idSubmercado);
 								submercado.setAtributo(AttComumSubmercado_nome, mnemonico);
 
-								lista_codigo_ONS_submercado.setElemento(idSubmercado, codigo_usina);
+								lista_codigo_ONS_submercado.setElemento(idSubmercado, codigo_submercado);
 
 								lista_submercado_mnemonico.setElemento(idSubmercado, mnemonico);
 
@@ -2944,14 +2944,14 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								a_dados.vetorSubmercado.att(idSubmercado).setMatriz(AttMatrizSubmercado_demanda, matriz_demanda_patamar);
 
-								if (idSubmercado == IdSubmercado_1) {
+								if (idSubmercado == a_dados.vetorSubmercado.getMenorId()) {
 
 									const SmartEnupla<IdPatamarCarga, double> vetor_percentual_duracao_patamar(IdPatamarCarga_1, vetor_zero);
 									const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_percentual_duracao_patamar(horizonte_estudo, vetor_percentual_duracao_patamar);
 
 									a_dados.setMatriz(AttMatrizDados_percentual_duracao_patamar_carga, matriz_percentual_duracao_patamar);
 
-								}//if (idSubmercado == IdSubmercado_1) {
+								}// if (idSubmercado == a_dados.vetorSubmercado.getMenorId()) {
 
 							}//if (idEstagio_demanda == IdEstagio_1) {
 
@@ -3280,8 +3280,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								SmartEnupla <Periodo, int> vetor_zero(horizonte_estudo, 0);
 
-								for (int submercado = 0; submercado < numero_submercados; submercado++)
-									conteio_numero_usina_nao_simulado_por_submercado.addElemento(IdSubmercado(submercado + 1), vetor_zero);
+								for (IdSubmercado idSubmercado = IdSubmercado(0); idSubmercado < IdSubmercado(IdSubmercado_Excedente); idSubmercado++)
+									conteio_numero_usina_nao_simulado_por_submercado.addElemento(idSubmercado, vetor_zero);
 
 								inicializar_conteio_numero_usina_nao_simulado_por_submercado = false;
 
@@ -3465,8 +3465,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								SmartEnupla <Periodo, int> vetor_zero(horizonte_estudo, 0);
 
-								for (int submercado = 0; submercado < numero_submercados; submercado++)
-									conteio_numero_usina_nao_simulado_por_submercado.addElemento(IdSubmercado(submercado + 1), vetor_zero);
+								for (IdSubmercado idSubmercado = IdSubmercado(1); idSubmercado < IdSubmercado(IdSubmercado_Excedente); idSubmercado++)
+									conteio_numero_usina_nao_simulado_por_submercado.addElemento(idSubmercado, vetor_zero);
 
 								inicializar_conteio_numero_usina_nao_simulado_por_submercado = false;
 
@@ -10237,7 +10237,7 @@ void LeituraCEPEL::set_hidreletrica_potencia_disponivel_meta_from_dec_oper_usih_
 
 										double potencia_disponivel_meta = getdoubleFromChar("max");
 
-										//if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_4 || a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_1 || a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_2 || a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_8)
+										//if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_4 || a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == a_dados.vetorSubmercado.getMenorId() || a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_2 || a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_8)
 											potencia_disponivel_meta = potencia_disponivel_meta_patamar * a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, double()) + a_dados.vetorHidreletrica.att(idHidreletrica).getElementoMatriz(AttMatrizHidreletrica_potencia_disponivel_meta, idCenario, periodo, double());
 
 										a_dados.vetorHidreletrica.att(idHidreletrica).setElemento(AttMatrizHidreletrica_potencia_disponivel_meta, idCenario, periodo, potencia_disponivel_meta);
@@ -10248,7 +10248,7 @@ void LeituraCEPEL::set_hidreletrica_potencia_disponivel_meta_from_dec_oper_usih_
 
 									double potencia_disponivel_meta = getdoubleFromChar("max");
 
-									//if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_4 || a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_1 || a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_2 || a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_8)
+									//if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_4 || a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == a_dados.vetorSubmercado.getMenorId() || a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_2 || a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == IdSubmercado_8)
 										potencia_disponivel_meta = potencia_disponivel_meta_patamar * a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, double()) + a_dados.vetorHidreletrica.att(idHidreletrica).getElementoMatriz(AttMatrizHidreletrica_potencia_disponivel_meta, idCenario_DC, periodo, double());
 
 									a_dados.vetorHidreletrica.att(idHidreletrica).setElemento(AttMatrizHidreletrica_potencia_disponivel_meta, idCenario_DC, periodo, potencia_disponivel_meta);

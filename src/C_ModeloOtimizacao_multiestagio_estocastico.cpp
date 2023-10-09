@@ -409,7 +409,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 						for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= maiorIdIntercambio; idIntercambio++)
 							criarRestricoesIntercambioRelaxado(listaTipoSubproblemaSolver.at(i), a_dados, idEstagio, periodo_estudo, idIntercambio, idPatamarCarga);
 
-						for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= maiorIdSubmercado; idSubmercado++) {
+						for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 							//RESTIÇÃO DE PRODUÇÃO MÉDIA
 							start_clock = std::chrono::high_resolution_clock::now();
@@ -423,7 +423,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 							criarRestricoesAtendimentoDemanda(listaTipoSubproblemaSolver.at(i), a_dados, idEstagio, periodo_estudo, maiorIdUsinaEolica, maiorIdContrato, idSubmercado, maiorIdIntercambio, maiorIdTermeletrica, maiorIdHidreletrica, maiorIdUsinaElevatoria, idPatamarCarga);
 							tempoCriarVariaveis.restricaoAtendimentoDemanda += std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock).count() / 60;
 
-						}//for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= maiorIdSubmercado; idSubmercado++) {
+						}//for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 						//RESTRIÇÕES DO INTERCÂMBIO HIDRÁULICO RETIRADAS QOUT
 						start_clock = std::chrono::high_resolution_clock::now();
@@ -4153,7 +4153,7 @@ void ModeloOtimizacao::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(c
 		} // for (IdTermeletrica idTermeletrica = a_dados.getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idTermeletrica)) {
 
 		// Variáveis Déficit
-		for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_maiorIdSubmercado; idSubmercado++) {
+		for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 			const IdPatamarDeficit maiorIdPatamarDeficit = a_dados.getMaiorId(idSubmercado, IdPatamarDeficit());
 			for (IdPatamarDeficit idPatamarDeficit = IdPatamarDeficit_1; idPatamarDeficit <= maiorIdPatamarDeficit; idPatamarDeficit++) {
@@ -4164,7 +4164,7 @@ void ModeloOtimizacao::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(c
 
 			} // for (IdPatamarDeficit idPatamarDeficit = IdPatamarDeficit_1; idPatamarDeficit <= maiorIdPatamarDeficit; idPatamarDeficit++) {
 
-		} // for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= maiorIdSubmercado; idSubmercado++){
+		} // for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)){
 
 	}// try {
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_periodo_estudo) + "): \n" + std::string(erro.what())); }
@@ -4918,14 +4918,14 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 			return;
 
-		SmartEnupla<IdSubmercado, SmartEnupla<int, IdUsinaNaoSimulada>> usinaNaoSimulada_total(IdSubmercado_1, std::vector<SmartEnupla<int, IdUsinaNaoSimulada>>(a_maiorIdSubmercado, SmartEnupla<int, IdUsinaNaoSimulada>()));
+		SmartEnupla<IdSubmercado, SmartEnupla<int, IdUsinaNaoSimulada>> usinaNaoSimulada_total(a_dados.getMenorId(IdSubmercado()), std::vector<SmartEnupla<int, IdUsinaNaoSimulada>>(a_maiorIdSubmercado, SmartEnupla<int, IdUsinaNaoSimulada>()));
 
-		for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_maiorIdSubmercado; idSubmercado++) {
+		for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 			if (a_dados.getMaiorId(idSubmercado, IdUsinaNaoSimulada()) > IdUsinaNaoSimulada_Nenhum)
 				usinaNaoSimulada_total.at(idSubmercado) = SmartEnupla<int, IdUsinaNaoSimulada>(1, a_dados.getIdObjetos(idSubmercado, IdUsinaNaoSimulada()));
 
-		}//for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_maiorIdSubmercado; idSubmercado++) {
+		}//for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 		auto start_clock = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> tempo;
@@ -4980,7 +4980,7 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 				a_tempoCriarVariaveis.variaveisTermeletrica += tempo.count() / 60;
 
 
-				for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_maiorIdSubmercado; idSubmercado++) {
+				for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 					// VARIAVEIS POÊNCIA DEFICIT (PD)
 					start_clock = std::chrono::high_resolution_clock::now();
@@ -5031,12 +5031,12 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 					tempo = std::chrono::high_resolution_clock::now() - start_clock;
 					a_tempoCriarVariaveis.variaveisUsinaNSimulada += tempo.count() / 60;
 
-				} // for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_maiorIdSubmercado; idSubmercado++) {
+				} // for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 
 				// Potência Intercambios (PI)
 				start_clock = std::chrono::high_resolution_clock::now();
-				SmartEnupla<IdSubmercado, bool> criar_variavel_PI(SmartEnupla<IdSubmercado, bool>(IdSubmercado_1, std::vector< bool>(a_maiorIdSubmercado, false)));
+				SmartEnupla<IdSubmercado, bool> criar_variavel_PI(SmartEnupla<IdSubmercado, bool>(a_dados.getMenorId(IdSubmercado()), std::vector< bool>(a_maiorIdSubmercado, false)));
 
 				for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= a_maiorIdIntercambio; idIntercambio++) {
 					
@@ -5051,7 +5051,7 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 						criar_variavel_PI.setElemento(a_dados.getAtributo(idIntercambio, AttComumIntercambio_submercado_origem, IdSubmercado()), true);
 				} // for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= a_maiorIdIntercambio; idIntercambio++) {
 
-				for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_maiorIdSubmercado; idSubmercado++) {
+				for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 					if (criar_variavel_PI.getElemento(idSubmercado))
 						addVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado, -infinito, infinito, 0.0);
 				}
