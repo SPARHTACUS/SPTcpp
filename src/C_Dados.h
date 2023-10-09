@@ -116,7 +116,8 @@
       m(Dados,  AttComum,               taxa_considerar_tempo_viagem_agua,                            double,           0,           1,           0.2,      nao) \
       m(Dados,  AttComum,                mapear_processos_com_um_unico_cenario,                        bool,         min,         max,         nao,      nao) \
       m(Dados,  AttComum,                     tipo_processamento_paralelo,         TipoProcessamentoParalelo,         min,         max,   por_cenario,      nao) \
-      m(Dados,  AttComum,              imprimir_cortes_NW_com_reducao_estados,                          bool,         min,         max,           nao,      nao)
+      m(Dados,  AttComum,              imprimir_cortes_NW_com_reducao_estados,                          bool,         min,         max,           nao,      nao) \
+      m(Dados,  AttComum,                          considerar_variaveis_folga,                          bool,         min,         max,           sim,      nao)
 
 
 //   c_classe,   smrtAtt,                                    nomeAtributo,                              tipo,  lowerBound,  upperBound,         initialValue, mustRead?

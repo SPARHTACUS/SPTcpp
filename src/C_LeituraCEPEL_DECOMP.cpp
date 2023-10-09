@@ -13425,7 +13425,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 									coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) = 0.0;
 									for (IdReservatorioEquivalente idREE = coeficientes_EAR.getIteradorInicial(); idREE <= coeficientes_EAR.getIteradorFinal(); idREE++)
 										coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) += coeficientes_EAR.at(idREE) * a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_produtibilidade_acumulada_EAR, idREE, double());
-									coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) *= conversao_MWporVazao_em_MWhporVolume * numero_horas_estagio_NEWAVE;
+									coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) *= conversao_MWporVazao_em_MWhporVolume;
 
 								} // if (idVariavelEstado > IdVariavelEstado_Nenhum) {
 							} // for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
