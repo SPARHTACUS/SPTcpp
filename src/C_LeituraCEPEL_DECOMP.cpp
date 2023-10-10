@@ -1379,8 +1379,8 @@ void LeituraCEPEL::definir_horizonte_otimizacao_DC_from_VAZOES_201906_DC29(Dados
 
 					IdDiaSemana diaSemana = data_execucao.getDiaSemana();
 
-					if (diaSemana != IdDiaSemana_SEX)
-						throw std::invalid_argument("Data de execucao diferente a uma sexta-feira");
+					//if (diaSemana != IdDiaSemana_SEX)
+						//throw std::invalid_argument("Data de execucao diferente a uma sexta-feira");
 
 					//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					//Determina o vetor horizonte_otimizacao_DC (somente serve para a mapear na leitura de dados a data para o horizonte_estudo do SPT
@@ -4709,8 +4709,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							Periodo data_reportada_DADGER(dia, mes, ano);
 
-							if (data_reportada_DADGER != Periodo(TipoPeriodo_diario, horizonte_estudo.getIteradorInicial()))
-								throw std::invalid_argument("Registro DT - Data nao coincidente com os estagios gerados a partir do arquivo VAZOES.RVX");
+							//if (data_reportada_DADGER != Periodo(TipoPeriodo_diario, horizonte_estudo.getIteradorInicial()))
+								//throw std::invalid_argument("Registro DT - Data nao coincidente com os estagios gerados a partir do arquivo VAZOES.RVX");
 
 						}//try {
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro DT: \n" + std::string(erro.what())); }
@@ -18271,6 +18271,23 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			diretorio_exportacao_pos_estudo = "nenhum";
 
 		const bool imprimir_att_operacionais_sem_recarregar = true;
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Instancia parâmetros do CVaR no CP
+
+		a_dados.setAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco_CVAR);
+
+		SmartEnupla<IdEstagio, double> vetor_lambda_CVAR(IdEstagio_1, std::vector<double>(int(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()), 0.0));
+		vetor_lambda_CVAR.setElemento(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), 0.35);
+		
+		a_dados.setVetor(AttVetorDados_lambda_CVAR, vetor_lambda_CVAR);
+
+		////
+		SmartEnupla<IdEstagio, double> vetor_alpha_CVAR(IdEstagio_1, std::vector<double>(int(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()), 0.0));
+		vetor_alpha_CVAR.setElemento(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), 0.25);
+
+		a_dados.setVetor(AttVetorDados_alpha_CVAR, vetor_alpha_CVAR);
+
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
