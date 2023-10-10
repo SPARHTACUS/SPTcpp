@@ -198,7 +198,6 @@ private:
 	void calcular_equacionamento_afluencia_natural_x_REE(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
 	void calcular_equacionamento_afluencia_natural_x_hidreletrica(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo, const Periodo a_periodo_inicial_horizonte_estudo);
 	void calcular_equacionamento_afluencia_natural_x_hidreletrica_out_estudo(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo, const Periodo a_periodo_inicial_horizonte_estudo);
-	void reducao_estados_equacionamento_afluencia_natural_x_REE(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo, const Periodo a_periodo_inicial_horizonte_estudo);//Deixa o equacionamento das ENAs somente no termo independente
 	void retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(Dados& a_dados, const int a_codigo_posto_acoplamento_NW, const IdHidreletrica a_idHidreletrica, const IdCenario a_idCenario, const Periodo a_periodo_inicial, const Periodo a_periodo, SmartEnupla<int, IdHidreletrica>& a_idHidreletricas_calculo_ENA, SmartEnupla<int, double>& a_coeficiente_idHidreletricas_calculo_ENA, double& a_termo_independente_calculo_ENA);
 	void retorna_equacionamento_afluencia_natural_x_posto(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const int a_codigo_posto, const double a_coeficiente, SmartEnupla<int, IdHidreletrica>& a_idHidreletricas_calculo_ENA, SmartEnupla<int, double>& a_coeficiente_idHidreletricas_calculo_ENA);
 	void retorna_equacionamento_afluencia_incremental_x_posto_169(Dados& a_dados, const IdCenario a_idCenario, const Periodo a_periodo, double& a_termo_independente_calculo_ENA);
@@ -370,13 +369,13 @@ private:
 
 	SmartEnupla<IdUsinaElevatoria, int> lista_codigo_ONS_usina_elevatoria = SmartEnupla<IdUsinaElevatoria, int>(IdUsinaElevatoria_1, std::vector<int>(IdUsinaElevatoria(int(IdUsinaElevatoria_Excedente) - 1), -1));
 
-	SmartEnupla<IdSubmercado, int> lista_codigo_ONS_submercado = SmartEnupla<IdSubmercado, int>(IdSubmercado_1, std::vector<int>(IdSubmercado(int(IdSubmercado_Excedente) - 1), -1));
+	SmartEnupla<IdSubmercado, int> lista_codigo_ONS_submercado = SmartEnupla<IdSubmercado, int>(IdSubmercado(1), std::vector<int>(IdSubmercado(int(IdSubmercado_Excedente) - 1), -1));
 
-	SmartEnupla<IdSubmercado, SmartEnupla<IdPatamarDeficit, int>> matriz_codigo_ONS_patamar_deficit = SmartEnupla<IdSubmercado, SmartEnupla<IdPatamarDeficit, int>>(IdSubmercado_1, std::vector<SmartEnupla<IdPatamarDeficit, int>>(IdSubmercado(int(IdSubmercado_Excedente) - 1), SmartEnupla<IdPatamarDeficit, int>()));
+	SmartEnupla<IdSubmercado, SmartEnupla<IdPatamarDeficit, int>> matriz_codigo_ONS_patamar_deficit = SmartEnupla<IdSubmercado, SmartEnupla<IdPatamarDeficit, int>>(IdSubmercado(1), std::vector<SmartEnupla<IdPatamarDeficit, int>>(IdSubmercado(int(IdSubmercado_Excedente) - 1), SmartEnupla<IdPatamarDeficit, int>()));
 
 	SmartEnupla<IdHidreletrica, IdSubmercado> lista_IdSubmercado_hidreletrica = SmartEnupla<IdHidreletrica, IdSubmercado>(IdHidreletrica(1), std::vector<IdSubmercado>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdSubmercado_Nenhum));
 
-	SmartEnupla<IdSubmercado, std::string> lista_submercado_mnemonico = SmartEnupla<IdSubmercado, std::string>(IdSubmercado_1, std::vector<std::string>(IdSubmercado(int(IdSubmercado_Excedente) - 1), ""));
+	SmartEnupla<IdSubmercado, std::string> lista_submercado_mnemonico = SmartEnupla<IdSubmercado, std::string>(IdSubmercado(1), std::vector<std::string>(IdSubmercado(int(IdSubmercado_Excedente) - 1), ""));
 
 	SmartEnupla<int, int> lista_codigo_ONS_hidreletrica_original;
 	SmartEnupla<int, int> lista_codigo_ONS_hidreletrica_jusante_original;
@@ -408,8 +407,8 @@ private:
 	SmartEnupla<Periodo, SmartEnupla<           int, SmartEnupla<IdCenario, double>>>							lista_termo_independente_calculo_ENA_x_periodo_x_codigo_usina_x_cenario;
 
 	//Para os REE
-	SmartEnupla<Periodo, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, SmartEnupla<IdHidreletrica, double>>>>	 lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario;
-	SmartEnupla<Periodo, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>>							     lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario;
+	SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>>>	 lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario;
+	SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>>>	 lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario;
 
 	/////////////////////////////////
 
@@ -508,8 +507,36 @@ private:
 	IdSubmercado getIdSubmercadoFromMnemonico(const std::string a_menemonico) {
 		try {
 
-			for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= lista_submercado_mnemonico.getIteradorFinal(); idSubmercado++) {
-				if (strCompara(a_menemonico, lista_submercado_mnemonico.getElemento(idSubmercado)))
+			std::string menemonico_baixo = a_menemonico;
+			for (int i = 0; i < a_menemonico.size(); i++)
+				menemonico_baixo.at(i) = tolower(menemonico_baixo.at(i));
+
+			if ((menemonico_baixo.find("sud") != std::string::npos) || strCompara(menemonico_baixo, "se") || strCompara(menemonico_baixo, "se/co"))
+				return IdSubmercado_SUDESTE;
+
+			else if ((menemonico_baixo.find("sul") != std::string::npos) || strCompara(menemonico_baixo, "s"))
+				return IdSubmercado_SUL;
+
+			else if ((menemonico_baixo.find("nord") != std::string::npos) || strCompara(menemonico_baixo, "ne"))
+				return IdSubmercado_NORDESTE;
+
+			else if ((menemonico_baixo.find("nort") != std::string::npos) || strCompara(menemonico_baixo, "n"))
+				return IdSubmercado_NORTE;
+
+			else if ((menemonico_baixo.find("fc") != std::string::npos) || (menemonico_baixo.find("imp") != std::string::npos) || (menemonico_baixo.find("fic") != std::string::npos) || strCompara(menemonico_baixo, "f"))
+				return IdSubmercado_IMPERATRIZ;
+
+			else if ((menemonico_baixo.find("an") != std::string::npos))
+				return IdSubmercado_ANDE;
+
+			else if ((menemonico_baixo.find("iv") != std::string::npos))
+				return IdSubmercado_IVAIPORA;
+
+			else if ((menemonico_baixo.find("it") != std::string::npos))
+				return IdSubmercado_ITAIPU;
+
+			for (IdSubmercado idSubmercado = lista_submercado_mnemonico.getIteradorInicial(); idSubmercado <= lista_submercado_mnemonico.getIteradorFinal(); idSubmercado++) {
+				if (strCompara(menemonico_baixo, lista_submercado_mnemonico.getElemento(idSubmercado)))
 					return idSubmercado;
 			}
 

@@ -2934,7 +2934,7 @@ void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_
 			//Inicializa Submercado
 			//************************************************************
 
-			const IdSubmercado idSubmercado = IdSubmercado(a_dados.getMaiorId(IdSubmercado()) + 1);
+			const IdSubmercado idSubmercado = IdSubmercado_IVAIPORA;
 
 			Submercado submercado;
 
@@ -3180,7 +3180,7 @@ void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_
 			//Inicializa Submercado
 			//************************************************************
 
-			const IdSubmercado idSubmercado = IdSubmercado(a_dados.getMaiorId(IdSubmercado()) + 1);
+			const IdSubmercado idSubmercado = IdSubmercado_ANDE;
 
 			Submercado submercado;
 
@@ -3256,7 +3256,7 @@ void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_
 				//Inicializa Submercado
 				//************************************************************
 
-				const IdSubmercado idSubmercado = IdSubmercado(a_dados.getMaiorId(IdSubmercado()) + 1);
+				const IdSubmercado idSubmercado = IdSubmercado_ITAIPU;
 
 				idSubmercado_inicializado = idSubmercado;
 

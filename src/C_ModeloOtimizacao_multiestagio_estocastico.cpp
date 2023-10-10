@@ -409,7 +409,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 						for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= maiorIdIntercambio; idIntercambio++)
 							criarRestricoesIntercambioRelaxado(listaTipoSubproblemaSolver.at(i), a_dados, idEstagio, periodo_estudo, idIntercambio, idPatamarCarga);
 
-						for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= maiorIdSubmercado; idSubmercado++) {
+						for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 							//RESTIÇÃO DE PRODUÇÃO MÉDIA
 							start_clock = std::chrono::high_resolution_clock::now();
@@ -423,7 +423,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 							criarRestricoesAtendimentoDemanda(listaTipoSubproblemaSolver.at(i), a_dados, idEstagio, periodo_estudo, maiorIdUsinaEolica, maiorIdContrato, idSubmercado, maiorIdIntercambio, maiorIdTermeletrica, maiorIdHidreletrica, maiorIdUsinaElevatoria, idPatamarCarga);
 							tempoCriarVariaveis.restricaoAtendimentoDemanda += std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock).count() / 60;
 
-						}//for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= maiorIdSubmercado; idSubmercado++) {
+						}//for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 						//RESTRIÇÕES DO INTERCÂMBIO HIDRÁULICO RETIRADAS QOUT
 						start_clock = std::chrono::high_resolution_clock::now();
@@ -458,6 +458,11 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 				tempoCriarVariaveis.restricaoCortebendersEmCustoFuturo += std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock).count() / 60;
 
 				criarRestricoesCorteBendersEmCustoTotal(listaTipoSubproblemaSolver.at(i), idEstagio);
+
+				//VARIÁVEIS DE FOLGA = 0 (se considerar_variaveis_folga = false)
+				if (!a_dados.getAtributo(AttComumDados_considerar_variaveis_folga, bool()))
+					zerarVariaveisFolga(listaTipoSubproblemaSolver.at(i), a_dados, idEstagio, maiorIdIntercambio, maiorIdRestricaoEletrica, maiorIdTermeletrica, maiorIdRestricaoOperativaUHE, maiorIdIntercambioHidraulico, maiorIdUsinaElevatoria, horizonte_estudo_estagio);
+
 
 			} // for (int i = 0; i < int(listaTipoSubproblemaSolver.size()); i++){
 
@@ -1128,51 +1133,6 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 
 	}
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarRestricoesEletricas(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
-}
-
-void ModeloOtimizacao::atualizarProbabilidadesParaCustoFuturoNestedEmEstagioComPosEstudo(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao) {
-
-	try {
-
-		if (a_TSS == TipoSubproblemaSolver_mestre)
-			return;
-
-		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
-			return;
-
-
-		const IdEstagio idEstagio_pos_estudo = getMaiorId(IdEstagio());
-
-		if (getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()) == idEstagio_pos_estudo)
-			return;
-
-		if ((a_idEstagio + 1) < idEstagio_pos_estudo)
-			return;
-
-		const int multiplicidade_corte = getAtributo(idEstagio_pos_estudo, AttComumEstagio_cortes_multiplos, int());
-
-		if (multiplicidade_corte >= 0)
-			return;
-
-		IdRealizacao realizacao_atual = a_idRealizacao;
-
-		if (realizacao_atual == IdRealizacao_Nenhum)
-			realizacao_atual = getElementoMatriz(getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()), AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, getIterador2Final(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo()), IdRealizacao());
-
-		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
-
-		const int posEquZF = getEquLinear_CUSTO_FUTURO(a_TSS, a_idEstagio, periodo_otimizacao);
-
-		for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= IdRealizacao(-multiplicidade_corte); idRealizacao++) {
-			if (idRealizacao != realizacao_atual)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao), posEquZF,  0.0);
-			else
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao), posEquZF, -1.0);
-		}
-
-	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarProbabilidadesParaCustoFuturoNestedEmEstagioComPosEstudo(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
-
 }
 
 void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoFuturo(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio) {
@@ -4198,7 +4158,7 @@ void ModeloOtimizacao::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(c
 		} // for (IdTermeletrica idTermeletrica = a_dados.getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idTermeletrica)) {
 
 		// Variáveis Déficit
-		for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_maiorIdSubmercado; idSubmercado++) {
+		for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 			const IdPatamarDeficit maiorIdPatamarDeficit = a_dados.getMaiorId(idSubmercado, IdPatamarDeficit());
 			for (IdPatamarDeficit idPatamarDeficit = IdPatamarDeficit_1; idPatamarDeficit <= maiorIdPatamarDeficit; idPatamarDeficit++) {
@@ -4209,7 +4169,7 @@ void ModeloOtimizacao::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(c
 
 			} // for (IdPatamarDeficit idPatamarDeficit = IdPatamarDeficit_1; idPatamarDeficit <= maiorIdPatamarDeficit; idPatamarDeficit++) {
 
-		} // for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= maiorIdSubmercado; idSubmercado++){
+		} // for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)){
 
 	}// try {
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_periodo_estudo) + "): \n" + std::string(erro.what())); }
@@ -4963,14 +4923,14 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 			return;
 
-		SmartEnupla<IdSubmercado, SmartEnupla<int, IdUsinaNaoSimulada>> usinaNaoSimulada_total(IdSubmercado_1, std::vector<SmartEnupla<int, IdUsinaNaoSimulada>>(a_maiorIdSubmercado, SmartEnupla<int, IdUsinaNaoSimulada>()));
+		SmartEnupla<IdSubmercado, SmartEnupla<int, IdUsinaNaoSimulada>> usinaNaoSimulada_total(a_dados.getMenorId(IdSubmercado()), std::vector<SmartEnupla<int, IdUsinaNaoSimulada>>(a_maiorIdSubmercado, SmartEnupla<int, IdUsinaNaoSimulada>()));
 
-		for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_maiorIdSubmercado; idSubmercado++) {
+		for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 			if (a_dados.getMaiorId(idSubmercado, IdUsinaNaoSimulada()) > IdUsinaNaoSimulada_Nenhum)
 				usinaNaoSimulada_total.at(idSubmercado) = SmartEnupla<int, IdUsinaNaoSimulada>(1, a_dados.getIdObjetos(idSubmercado, IdUsinaNaoSimulada()));
 
-		}//for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_maiorIdSubmercado; idSubmercado++) {
+		}//for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 		auto start_clock = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> tempo;
@@ -5025,7 +4985,7 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 				a_tempoCriarVariaveis.variaveisTermeletrica += tempo.count() / 60;
 
 
-				for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_maiorIdSubmercado; idSubmercado++) {
+				for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 					// VARIAVEIS POÊNCIA DEFICIT (PD)
 					start_clock = std::chrono::high_resolution_clock::now();
@@ -5050,6 +5010,9 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 							if (a_dados.getElementoMatriz(idSubmercado, AttMatrizSubmercado_demanda, a_periodo_estudo, idPatamarCarga, double()) > 0.0) {
 
 								addVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idSubmercado, a_dados.getElementoMatriz(idSubmercado, AttMatrizSubmercado_demanda, a_periodo_estudo, idPatamarCarga, double()), a_dados.getElementoMatriz(idSubmercado, AttMatrizSubmercado_demanda, a_periodo_estudo, idPatamarCarga, double()), 0.0);
+
+								setNormalizacaoDualVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idSubmercado, 1.0 / (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double()) * double(a_periodo_estudo.getHoras())));
+
 								if (getVarDecisao_PLseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado) < 0)
 									addVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado, 0.0, infinito, 0.0);
 
@@ -5073,12 +5036,12 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 					tempo = std::chrono::high_resolution_clock::now() - start_clock;
 					a_tempoCriarVariaveis.variaveisUsinaNSimulada += tempo.count() / 60;
 
-				} // for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_maiorIdSubmercado; idSubmercado++) {
+				} // for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 
 				// Potência Intercambios (PI)
 				start_clock = std::chrono::high_resolution_clock::now();
-				SmartEnupla<IdSubmercado, bool> criar_variavel_PI(SmartEnupla<IdSubmercado, bool>(IdSubmercado_1, std::vector< bool>(a_maiorIdSubmercado, false)));
+				SmartEnupla<IdSubmercado, bool> criar_variavel_PI(SmartEnupla<IdSubmercado, bool>(a_dados.getMenorId(IdSubmercado()), std::vector< bool>(a_maiorIdSubmercado, false)));
 
 				for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= a_maiorIdIntercambio; idIntercambio++) {
 					
@@ -5093,7 +5056,7 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 						criar_variavel_PI.setElemento(a_dados.getAtributo(idIntercambio, AttComumIntercambio_submercado_origem, IdSubmercado()), true);
 				} // for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= a_maiorIdIntercambio; idIntercambio++) {
 
-				for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_maiorIdSubmercado; idSubmercado++) {
+				for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 					if (criar_variavel_PI.getElemento(idSubmercado))
 						addVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado, -infinito, infinito, 0.0);
 				}
@@ -6686,16 +6649,15 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 						int varYH = getVarDecisao_YHseExistir(a_TSS, a_idEstagio, periodo, idHidreletrica);
 
 						if (varYH == -1) {
-							varYH = addVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica, -infinito, infinito, 0.0);
-							const IdVariavelEstado idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica), varYH, -1);
 							if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica) {
 								const double tendencia = getElementoVetor(idProcessoEstocastico_modelo, idVar, idVarInt, AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double());
-								for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++)
-									vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, false, a_dados.getAtributo(AttComumDados_idProcesso, IdProcesso()), a_dados.getAtributo(AttComumDados_maior_processo, IdProcesso()), idCenario, tendencia);
+								varYH = addVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica, tendencia, tendencia, 0.0);
 							}
+							else
+								varYH = addVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica, -infinito, infinito, 0.0);
 						}
 
-						int equYP = getEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICOseExistir(a_TSS, a_idEstagio, a_periodo, a_idProcessoEstocastico, a_idVariavelAleatoria, a_periodo_lag);
+						equYP = getEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICOseExistir(a_TSS, a_idEstagio, a_periodo, a_idProcessoEstocastico, a_idVariavelAleatoria, a_periodo_lag);
 
 						if (equYP == -1) {
 							equYP = addEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICO(a_TSS, a_idEstagio, a_periodo, a_idProcessoEstocastico, a_idVariavelAleatoria, a_periodo_lag);
@@ -8091,3 +8053,327 @@ void ModeloOtimizacao::criarRestricoesIntercambioHidraulicooRetiradaRelaxada(con
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarRestricoesIntercambioHidraulicooRetiradaRelaxada(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_periodo_estudo) + "," + getFullString(a_idIntercambioHidraulico) + "): \n" + std::string(erro.what())); }
 
 }//void ModeloOtimizacao::criarRestricoesIntercambioHidraulicooRetiradaRelaxada(Dados& a_dados, const IdEstagio a_idEstagio, const IdIntercambioHidraulico a_idIntercambioHidraulico, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga){
+
+void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdIntercambio a_maiorIdIntercambio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const IdTermeletrica a_maiorIdTermeletrica, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const SmartEnupla<Periodo, double>a_horizonte_estudo_estagio) {
+
+	try {
+
+		if (a_TSS == TipoSubproblemaSolver_mestre)
+			return;
+
+		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+			return;
+
+		for (Periodo periodo_estudo = a_horizonte_estudo_estagio.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo_estagio.getIteradorFinal(); a_horizonte_estudo_estagio.incrementarIterador(periodo_estudo)) {
+
+			//Variáveis de folga associadas às hidrelétricas
+			for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+				//*********************
+				//VARIAVEL_DECISAO_3
+				//*********************
+
+				
+				if (getVarDecisao_QEV_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+				}//if (getVarDecisao_QEV_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
+				
+				////////////
+
+				if (getVarDecisao_QDEF_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+				}//if (getVarDecisao_QDEF_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
+
+				if (getVarDecisao_QDEF_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+				}//if (getVarDecisao_QDEF_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
+
+				////////////
+
+				if (getVarDecisao_VF_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+				}//if (getVarDecisao_VF_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
+
+				if (getVarDecisao_VMORTO_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+				}//if (getVarDecisao_VMORTO_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
+
+				//*********************
+				//VARIAVEL_DECISAO_4
+				//*********************
+
+				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+					if (getVarDecisao_PH_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+					}//if (getVarDecisao_PH_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+
+					////////////
+
+					if (getVarDecisao_PHDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+					}//if (getVarDecisao_PHDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+
+					////////////
+
+					if (getVarDecisao_QTURDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QTURDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QTURDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+					}//if (getVarDecisao_QTURDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+
+					////////////
+
+					if (getVarDecisao_QTUR_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+					}//if (getVarDecisao_QTUR_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+
+					////////////
+
+					if (getVarDecisao_QDEF_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+					}//if (getVarDecisao_QDEF_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+
+					if (getVarDecisao_QDEF_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+					}//if (getVarDecisao_QDEF_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+
+					////////////
+
+					if (getVarDecisao_QOUT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+					}//if (getVarDecisao_QOUT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+
+
+					//*********************
+					//VARIAVEL_DECISAO_5
+					//*********************
+
+					for (IdHidreletrica idHidreletrica_aux = a_dados.getMenorId(IdHidreletrica()); idHidreletrica_aux <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica_aux)) {
+
+						if (getVarDecisao_QDES_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, idHidreletrica_aux) > -1) {
+							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDES_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, idHidreletrica_aux), 0.0);
+							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDES_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, idHidreletrica_aux), 0.0);
+						}//if (getVarDecisao_QOUT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+
+					}//for (IdHidreletrica idHidreletrica_aux = a_dados.getMenorId(IdHidreletrica()); idHidreletrica_aux <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica_aux)) {
+
+
+				}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+
+			}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+			//Variáveis de folga associadas às termelétricas
+			for (IdTermeletrica idTermeletrica = a_dados.getMenorId(IdTermeletrica()); idTermeletrica <= a_maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idTermeletrica)) {
+
+				//*********************
+				//VARIAVEL_DECISAO_4
+				//*********************
+
+				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+					if (getVarDecisao_PT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+					}//if (getVarDecisao_PT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
+
+					if (getVarDecisao_PT_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PT_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+					}//if (getVarDecisao_PT_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
+
+					//////////////
+
+					if (getVarDecisao_PTDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+					}//if (getVarDecisao_PTDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
+
+					if (getVarDecisao_PTDISP_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISP_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISP_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+					}//if (getVarDecisao_PTDISP_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
+
+					//////////////
+
+					if (getVarDecisao_PTDISPCOM_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+					}//if (getVarDecisao_PTDISPCOM_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
+
+					if (getVarDecisao_PTDISPCOM_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+					}//if (getVarDecisao_PTDISPCOM_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
+
+				}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+			}//for (IdTermeletrica idTermeletrica = a_dados.getMenorId(IdTermeletrica()); idTermeletrica <= a_maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idTermeletrica)) {
+
+			//Variáveis de folga associadas às usinas elevatórias
+			for (IdUsinaElevatoria idUsinaElevatoria = IdUsinaElevatoria_1; idUsinaElevatoria <= a_maiorIdUsinaElevatoria; idUsinaElevatoria++) {
+
+				//*********************
+				//VARIAVEL_DECISAO_4
+				//*********************
+
+				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+					if (getVarDecisao_QBOM_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QBOM_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QBOM_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria), 0.0);
+					}//if (getVarDecisao_QBOM_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria) > -1) {
+
+					/////////////
+
+					if (getVarDecisao_QBOMDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QBOMDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QBOMDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria), 0.0);
+					}//if (getVarDecisao_QBOMDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria) > -1) {
+
+				}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+			}//for (IdUsinaElevatoria idUsinaElevatoria = IdUsinaElevatoria_1; idUsinaElevatoria <= a_dados.getMaiorId(IdUsinaElevatoria()); idUsinaElevatoria++) {
+
+			//Variáveis de folga associadas às restrições hidráulicas
+			for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= a_maiorIdRestricaoOperativaUHE; idRestricaoOperativaUHE++) {
+
+				//*********************
+				//VARIAVEL_DECISAO_3
+				//*********************
+
+				if (getVarDecisao_RHA_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHA_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHA_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+				}//if (getVarDecisao_RHA_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
+
+				if (getVarDecisao_RHA_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+				}//if (getVarDecisao_RHA_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
+
+				/////////////
+
+				if (getVarDecisao_RHV_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+				}//if (getVarDecisao_RHV_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
+
+				if (getVarDecisao_RHV_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+				}//if (getVarDecisao_RHV_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
+
+				//*********************
+				//VARIAVEL_DECISAO_4
+				//*********************
+
+				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+					if (getVarDecisao_RHQ_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE), 0.0);
+					}//if (getVarDecisao_RHQ_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica) > -1) {
+
+					if (getVarDecisao_RHQ_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE), 0.0);
+					}//if (getVarDecisao_RHQ_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica) > -1) {
+
+				}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+			} // for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE; idRestricaoOperativaUHE++) {
+
+			//Variáveis de folga associadas às restrições elétricas
+			for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= a_maiorIdRestricaoEletrica; idRestricaoEletrica++) {
+
+				//*********************
+				//VARIAVEL_DECISAO_4
+				//*********************
+
+				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+					if (getVarDecisao_RE_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RE_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RE_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica), 0.0);
+					}//if (getVarDecisao_RE_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica) > -1) {
+
+					if (getVarDecisao_RE_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RE_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RE_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica), 0.0);
+					}//if (getVarDecisao_RE_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica) > -1) {
+
+					////////////
+
+				}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+
+			}//for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= a_maiorIdRestricaoEletrica; idRestricaoEletrica++) {
+
+			//Variáveis de folga associadas a intercambios
+			for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= a_maiorIdIntercambio; idIntercambio++) {
+
+				//*********************
+				//VARIAVEL_DECISAO_4
+				//*********************
+
+				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+					if (getVarDecisao_PI_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambio) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PI_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambio), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PI_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambio), 0.0);
+					}//if (getVarDecisao_PI_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
+
+				}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+			}//for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= a_maiorIdIntercambio; idIntercambio++) {
+
+			//Variáveis de folga associadas a intercambios hidráulicos
+			for (IdIntercambioHidraulico idIntercambioHidraulico = IdIntercambioHidraulico_1; idIntercambioHidraulico <= a_maiorIdIntercambioHidraulico; idIntercambioHidraulico++) {
+
+				//*********************
+				//VARIAVEL_DECISAO_4
+				//*********************
+
+				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+					if (getVarDecisao_QILS_TRI_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico) > -1) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QILS_TRI_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico), 0.0);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QILS_TRI_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico), 0.0);
+					}//if (getVarDecisao_QILS_TRI_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico) > -1) {
+
+					//*********************
+					//VARIAVEL_DECISAO_5
+					//*********************
+
+					for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+						if (getVarDecisao_QOUT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico, idHidreletrica) > -1) {
+							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico, idHidreletrica), 0.0);
+							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico, idHidreletrica), 0.0);
+						}//if (getVarDecisao_QOUT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico, idHidreletrica) > -1) {
+
+					}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+				}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+
+			}//for (IdIntercambioHidraulico idIntercambioHidraulico = IdIntercambioHidraulico_1; idIntercambioHidraulico <= a_maiorIdIntercambioHidraulico; idIntercambioHidraulico++) {
+
+		}//for (Periodo a_periodo_estudo = a_horizonte_estudo_estagio.getIteradorInicial(); a_periodo_estudo <= a_horizonte_estudo_estagio.getIteradorFinal(); a_horizonte_estudo_estagio.incrementarIterador(a_periodo_estudo)) {
+
+	}// try
+
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::zerarVariaveisFolga(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
+}
+

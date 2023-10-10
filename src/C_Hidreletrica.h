@@ -8,6 +8,7 @@
 #include "C_Afluencia.h"
 #include "C_RestricaoOperativaUHE.h"
 #include "C_Defluencia.h"
+#include "C_ReservatorioEquivalente.h"
 #include "C_SmartElemento.h"
 
 #define ATT_COMUM_HIDRELETRICA(m)  \
@@ -125,6 +126,7 @@
 	m(Hidreletrica, PolinomioJusante)           \
 	m(Hidreletrica, Defluencia)                 \
 	m(Hidreletrica, Reservatorio)               \
+	m(Hidreletrica, ReservatorioEquivalente)    \
 	m(Hidreletrica, Afluencia)                  
 
 #define SMART_ELEMENTO_HIDRELETRICA(m) \

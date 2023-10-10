@@ -18,7 +18,7 @@
 	  m(RestricaoOperativaUHE,  AttComum,            periodo_final,                 Periodo,         min,         max,           min,       nao) \
       m(RestricaoOperativaUHE,  AttComum,            num_restricao,                     int,           0,      100000,             0,       nao) \
       m(RestricaoOperativaUHE,  AttComum,  tipoRestricaoHidraulica,  TipoRestricaoHidraulica,        min,         max,           min,       sim) \
-      m(RestricaoOperativaUHE,  AttComum, penalidade_restricao_operativa_UHE,         double,           0,        max,          5000,       sim) 
+      m(RestricaoOperativaUHE,  AttComum, penalidade_restricao_operativa_UHE,         double,           0,        max,        100000,       sim) 
 //     c_classe,             smrtAtt,                 nomeAtributo,                  tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
 #define ATT_VETOR_REST_OPER_LIMITE_UHE(m)  \

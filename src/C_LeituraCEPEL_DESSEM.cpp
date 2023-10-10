@@ -1975,9 +1975,7 @@ void LeituraCEPEL::leitura_DADGER_201904_DES16(Dados& a_dados, const std::string
 				if (lerRegistro("SIST", line.substr(0, 4), a_registro)) {
 					std::string mnemonico = line.substr(10, 2);	mnemonico.erase(std::remove(mnemonico.begin(), mnemonico.end(), ' '), mnemonico.end());
 
-					IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMaiorId();
-					if (idSubmercado == IdSubmercado_Nenhum) { idSubmercado = IdSubmercado_1; }
-					else { idSubmercado++; }
+					IdSubmercado idSubmercado = getIdSubmercadoFromMnemonico(mnemonico);
 
 					lista_codigo_ONS_submercado.setElemento(idSubmercado, std::stoi(line.substr(7, 2)));
 					lista_submercado_mnemonico.setElemento(idSubmercado, mnemonico);

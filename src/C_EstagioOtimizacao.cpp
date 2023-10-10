@@ -136,6 +136,35 @@ IdVariavelRealizacao Estagio::addVariavelRealizacao(const TipoSubproblemaSolver 
 
 } // IdVariavelRealizacao Estagio::adicionarVariavelRealizacao(const string a_nome, const IdEstagio a_idEstagio, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria){
 
+IdRestricaoRealizacao Estagio::addRestricaoRealizacao(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idRestricao, const SmartEnupla<IdRealizacao, double>& a_rhs, const SmartEnupla<int, SmartEnupla<IdRealizacao, double>> &a_coeficiente) {
+	
+	try{
+
+		const IdRestricaoRealizacao maiorIdRestricaoRealizacao = getMaiorId(IdRestricaoRealizacao());
+
+		const IdRestricaoRealizacao idRestricaoRealizacao = IdRestricaoRealizacao(maiorIdRestricaoRealizacao + 1);
+
+		RestricaoRealizacao variavelRealizacao;
+		variavelRealizacao.setAtributo(AttComumRestricaoRealizacao_idRestricaoRealizacao, idRestricaoRealizacao);
+
+		vetorRestricaoRealizacao.add(variavelRealizacao);
+
+		vetorRestricaoRealizacao.att(idRestricaoRealizacao).setAtributo(AttComumRestricaoRealizacao_nome, a_nome);
+
+		vetorRestricaoRealizacao.att(idRestricaoRealizacao).setVetor_forced(AttVetorRestricaoRealizacao_idRestricao, SmartEnupla<TipoSubproblemaSolver, int>(TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1), std::vector<int>(TipoSubproblemaSolver(TipoSubproblemaSolver_Excedente - 1), -1)));
+
+		vetorRestricaoRealizacao.att(idRestricaoRealizacao).setElemento(AttVetorRestricaoRealizacao_idRestricao, a_TSS, a_idRestricao);
+
+		vetorRestricaoRealizacao.att(idRestricaoRealizacao).setVetor_forced(AttVetorRestricaoRealizacao_rhs, a_rhs);
+		vetorRestricaoRealizacao.att(idRestricaoRealizacao).setMatriz_forced(AttMatrizRestricaoRealizacao_coeficiente, a_coeficiente);
+
+		return idRestricaoRealizacao;
+
+	} // try
+	catch (const std::exception& erro) { throw std::invalid_argument("Estagio(" + getString(getIdObjeto()) + ")::addVariavelRealizacao(" + getString(a_TSS) + "," + a_nome + "," + getString(a_idRestricao) + "): \n" + std::string(erro.what())); }
+
+}
+
 
 IdVariavelRealizacaoInterna Estagio::addVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const Periodo a_periodo, const double a_fator, const TipoValor a_tipo_valor, const double a_percentual_inicial, const double a_percentual_passo){
 

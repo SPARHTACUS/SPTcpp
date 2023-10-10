@@ -4645,7 +4645,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 				//para todos os submercados inicializados
 				///////////////////////////////////////////////////////////////
 
-				for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++)
+				for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado))
 					a_dados.vetorSubmercado.att(idSubmercado).setMatriz(AttMatrizSubmercado_percentual_variacao_patamar_carga, matriz_periodo_patamar_zero);
 
 				////////////////
@@ -5003,7 +5003,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 					const IdSubmercado idSubmercado_Maior = a_dados.vetorSubmercado.getMaiorId();
 
-					for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++) {
+					for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 						if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
@@ -5014,7 +5014,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 						}//if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
-					}//for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++) {
+					}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 				}//if (leitura_bloco_5 == false) {
 				else if (leitura_bloco_5 == true) {
@@ -5037,7 +5037,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 						const IdSubmercado idSubmercado_Maior = a_dados.vetorSubmercado.getMaiorId();
 
-						for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++) {
+						for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 							if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
@@ -5048,7 +5048,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 							}//if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
-						}//for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++) {
+						}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 					}//if (int(line.length()) == 0) {
 					else {
@@ -5063,14 +5063,14 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 						//para todos os submercados inicializados
 						///////////////////////////////////////////////////////////////
 
-						for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++) {
+						for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
 
 							for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada_1; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; idUsinaNaoSimulada++)
 								a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_periodo_patamar_zero);
 
-						}//for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++) {
+						}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 						////////////////
 
@@ -5348,7 +5348,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 				//para todos os submercados inicializados
 				///////////////////////////////////////////////////////////////
 
-				for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++)
+				for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado))
 					a_dados.vetorSubmercado.att(idSubmercado).setMatriz(AttMatrizSubmercado_percentual_variacao_patamar_carga, matriz_periodo_patamar_zero);
 
 				////////////////
@@ -5615,7 +5615,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 					const IdSubmercado idSubmercado_Maior = a_dados.vetorSubmercado.getMaiorId();
 
-					for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++) {
+					for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 						if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
@@ -5626,7 +5626,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 						}//if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
-					}//for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++) {
+					}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 				}//if (leitura_bloco_5 == false) {
 				else if (leitura_bloco_5 == true) {
@@ -5649,7 +5649,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 						const IdSubmercado idSubmercado_Maior = a_dados.vetorSubmercado.getMaiorId();
 
-						for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++) {
+						for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 							if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
@@ -5660,7 +5660,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 							}//if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
-						}//for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++) {
+						}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 					}//if (int(line.length()) == 0) {
 					else {
@@ -5675,14 +5675,14 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 						//para todos os submercados inicializados
 						///////////////////////////////////////////////////////////////
 
-						for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++) {
+						for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
 
 							for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada_1; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; idUsinaNaoSimulada++)
 								a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_periodo_patamar_zero);
 
-						}//for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= idSubmercado_Maior; idSubmercado++) {
+						}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
 						////////////////
 
 						while (true) {
@@ -5796,6 +5796,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 		else  throw std::invalid_argument("Nao foi possivel abrir o arquivo " + nomeArquivo + ".");
 
 	}//try {
+
 	catch (const std::exception & erro) { throw std::invalid_argument("LeituraCEPEL::leitura_NEWAVE_26_PATAMAR: \n" + std::string(erro.what())); }
 
 }
@@ -6142,7 +6143,7 @@ void LeituraCEPEL::leitura_C_ADIC_201908_NW25(Dados& a_dados, std::string nomeAr
 			if (desconsiderar_atraso_periodo_estudo_inicial)
 				sobreposicao_atraso_periodo_inicial = horizonte_estudo.getIteradorInicial().atraso(horizonte_estudo_DECK.getIteradorInicial());
 
-			SmartEnupla<IdSubmercado, SmartEnupla<Periodo, double>> lista_C_ADIC(IdSubmercado_1, std::vector<SmartEnupla<Periodo, double>>(a_dados.getMaiorId(IdSubmercado()), SmartEnupla<Periodo, double>()));
+			SmartEnupla<IdSubmercado, SmartEnupla<Periodo, double>> lista_C_ADIC(IdSubmercado(1), std::vector<SmartEnupla<Periodo, double>>(a_dados.getMaiorId(IdSubmercado()), SmartEnupla<Periodo, double>()));
 
 			if (leituraArquivo.is_open()) {
 
@@ -6244,7 +6245,7 @@ void LeituraCEPEL::leitura_C_ADIC_201908_NW25(Dados& a_dados, std::string nomeAr
 
 				leituraArquivo.close();
 
-				for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_dados.getMaiorId(IdSubmercado()); idSubmercado++) {
+				for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 					if (lista_C_ADIC.at(idSubmercado).size() > 0) {
 
@@ -6259,7 +6260,7 @@ void LeituraCEPEL::leitura_C_ADIC_201908_NW25(Dados& a_dados, std::string nomeAr
 						} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 					} // if (lista_C_ADIC.at(idSubmercado).size() > 0) {
-				} // for (IdSubmercado idSubmercado = IdSubmercado_1; idSubmercado <= a_dados.getMaiorId(IdSubmercado()); idSubmercado++) {
+				} // for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.getMaiorId(IdSubmercado()); a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 			}//if (leituraArquivo.is_open()) {
 			else  throw std::invalid_argument("Nao foi possivel abrir o arquivo " + nomeArquivo + ".");

@@ -101,6 +101,8 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 			a_modeloOtimizacao.imprimirVariaveisRealizacao(a_entradaSaidaDados);
 
+			a_modeloOtimizacao.imprimirRestricoesRealizacao(a_entradaSaidaDados);
+
 			a_modeloOtimizacao.imprimirVariaveisRealizacaoInterna(a_entradaSaidaDados);
 
 			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getString(AttVetorEstagio_selecao_solucao_proxy) + ".csv", IdEstagio_Nenhum, a_modeloOtimizacao, AttVetorEstagio_selecao_solucao_proxy);
@@ -181,7 +183,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, idCenario);
 
-						a_modeloOtimizacao.atualizarProbabilidadesParaCustoFuturoNestedEmEstagioComPosEstudo(tSS, idEstagio, idCenario, IdRealizacao_Nenhum);
+						a_modeloOtimizacao.atualizarModeloOtimizacaoComRestricaoRealizacao(idEstagio, idCenario);
 
 						a_modeloOtimizacao.otimizarProblema(tSS, a_idProcesso, a_idIteracao, idEstagio, idCenario, diretorio_pl);
 
@@ -476,7 +478,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 									a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, IdRealizacao(idAbertura));
 
-									a_modeloOtimizacao.atualizarProbabilidadesParaCustoFuturoNestedEmEstagioComPosEstudo(tSS, idEstagio, idCenario, IdRealizacao(idAbertura));
+									a_modeloOtimizacao.atualizarModeloOtimizacaoComRestricaoRealizacao(idEstagio, IdRealizacao(idAbertura));
 
 									const bool otimizacao = a_modeloOtimizacao.otimizarProblema(tSS, idProcesso, a_idIteracao, idEstagio, idCenario, IdRealizacao(idAbertura), sol_inf_var_dinamica, solucao_dual_var_dinamica, limite_inferior_var_dinamica, limite_superior_var_dinamica, sol_dual_var_estado, diretorio_pl);
 
