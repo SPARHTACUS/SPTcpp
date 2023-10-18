@@ -57,6 +57,8 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 		//////////////////////////
 		//Dados
 		///////////////////////
+
+		instancia_horizonte_preConfig(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG");
 		instancia_dados_preConfig(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG");
 
 		a_dados.setAtributo(AttComumDados_tipo_geracao_cenario_hidrologico, TipoGeracaoCenario_serie_informada);
@@ -1379,8 +1381,8 @@ void LeituraCEPEL::definir_horizonte_otimizacao_DC_from_VAZOES_201906_DC29(Dados
 
 					IdDiaSemana diaSemana = data_execucao.getDiaSemana();
 
-					if (diaSemana != IdDiaSemana_SEX)
-						throw std::invalid_argument("Data de execucao diferente a uma sexta-feira");
+					//if (diaSemana != IdDiaSemana_SEX)
+						//throw std::invalid_argument("Data de execucao diferente a uma sexta-feira");
 
 					//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					//Determina o vetor horizonte_otimizacao_DC (somente serve para a mapear na leitura de dados a data para o horizonte_estudo do SPT
@@ -2656,9 +2658,9 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 						try {
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Campo 2 -  Número da estação de bombeamento. 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//codigo_usina
+							//Campo 2 -  Número da estação de bombeamento. 
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//codigo_usina
 							atributo = line.substr(4, 3);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
@@ -2756,8 +2758,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 						try {
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Campo 2 -  Número de identificação do estágio (em ordem crescente, máximo igual a 24).
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 2 -  Número de identificação do estágio (em ordem crescente, máximo igual a 24).
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 							atributo = line.substr(4, 2);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
@@ -3029,8 +3031,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 						try {
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Campo 2 -  Número da curva de deficit 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 2 -  Número da curva de deficit 
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							atributo = line.substr(4, 2);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
@@ -4709,8 +4711,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							Periodo data_reportada_DADGER(dia, mes, ano);
 
-							if (data_reportada_DADGER != Periodo(TipoPeriodo_diario, horizonte_estudo.getIteradorInicial()))
-								throw std::invalid_argument("Registro DT - Data nao coincidente com os estagios gerados a partir do arquivo VAZOES.RVX");
+							//if (data_reportada_DADGER != Periodo(TipoPeriodo_diario, horizonte_estudo.getIteradorInicial()))
+								//throw std::invalid_argument("Registro DT - Data nao coincidente com os estagios gerados a partir do arquivo VAZOES.RVX");
 
 						}//try {
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro DT: \n" + std::string(erro.what())); }
@@ -6668,6 +6670,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 											const Periodo periodo_DC = horizonte_otimizacao_DC.getElemento(idEstagio_DC);
 
+											
 											const Periodo periodo_inicial = horizonte_estudo.getIteradorInicial();
 											const Periodo periodo_final = horizonte_estudo.getIteradorFinal();
 
@@ -6679,6 +6682,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 												}//if (periodo >= periodo_DC) {
 
 											}//for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_estudo.incrementarIterador(periodo)) {
+											
 
 										}//if (line_size >= 72) {
 										else
@@ -11625,8 +11629,33 @@ void LeituraCEPEL::defineHorizontes_CP(Dados& a_dados)
 {
 	try {
 
-		define_horizonte_otimizacao_CP(a_dados);
-		define_horizonte_estudo_CP(a_dados);
+
+
+		if(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).size() == 0)
+			define_horizonte_otimizacao_CP(a_dados);
+		
+		if (a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).size() == 0)
+			define_horizonte_estudo_CP(a_dados);
+
+		valida_horizonte_estudo_CP_respeito_horizonte_otimizacao_DC(a_dados);
+
+		if (!dadosPreConfig_instanciados) {
+
+			a_dados.setAtributo(AttComumDados_estagio_final, a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal());
+			a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, estagio_acoplamento_pre_estudo);
+
+		}//if (!dadosPreConfig_instanciados) {
+
+
+		//////////////////////////////////////////////////////////////////////////////
+		//Instancia horizonte_estudo_DECK com os periodos do horizonte_otimizacao_DC
+		//////////////////////////////////////////////////////////////////////////////
+		
+		const IdEstagio idEstagio_inicial = horizonte_otimizacao_DC.getIteradorInicial();
+		const IdEstagio idEstagio_final = horizonte_otimizacao_DC.getIteradorFinal();
+
+		for (IdEstagio idEstagio_DC = idEstagio_inicial; idEstagio_DC <= idEstagio_final; idEstagio_DC++)
+			horizonte_estudo_DECK.addElemento(horizonte_otimizacao_DC.at(idEstagio_DC), true);
 
 	}//try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::defineHorizontes_CP(): \n" + std::string(erro.what())); }
@@ -11816,13 +11845,6 @@ void LeituraCEPEL::define_horizonte_otimizacao_CP(Dados& a_dados) {
 
 
 		a_dados.setVetor(AttVetorDados_horizonte_otimizacao, horizonte_otimizacao);
-
-		if (!dadosPreConfig_instanciados) {
-
-			a_dados.setAtributo(AttComumDados_estagio_final, horizonte_otimizacao.getIteradorFinal());
-			a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, estagio_acoplamento_pre_estudo);
-
-		}//if (!dadosPreConfig_instanciados) {
 
 	}//try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::define_horizonte_otimizacao_CP(Dados &a_dados): \n" + std::string(erro.what())); }
@@ -12031,15 +12053,44 @@ void LeituraCEPEL::define_horizonte_estudo_CP(Dados& a_dados) {
 
 		a_dados.setVetor(AttVetorDados_horizonte_estudo, horizonte_estudo);
 
-		for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo))
-			horizonte_estudo_DECK.addElemento(periodo, true);
-
 		if (!dadosPreConfig_instanciados)
 			a_dados.setAtributo(AttComumDados_periodo_referencia, horizonte_estudo.getIteradorInicial());
 
 	}//try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::define_horizonte_estudo_CP(Dados &a_dados): \n" + std::string(erro.what())); }
 }
+
+void LeituraCEPEL::valida_horizonte_estudo_CP_respeito_horizonte_otimizacao_DC(Dados& a_dados) {
+	try {
+
+		//*****************************************
+		// Verifica que os tipos de períodos do horizonte_estudo sejam menores ou iguais ao tipos de períodos do horizonte_otimizacao_DC
+		//*****************************************
+
+		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+
+		const IdEstagio idEstagio_inicial = horizonte_otimizacao_DC.getIteradorInicial();
+		const IdEstagio idEstagio_final = horizonte_otimizacao_DC.getIteradorFinal();
+
+		for (IdEstagio idEstagio_DC = idEstagio_inicial; idEstagio_DC <= idEstagio_final; idEstagio_DC++) {
+
+			const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_DC);
+
+			for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+				const double sobreposicao = periodo.sobreposicao(periodo_DC); //Quanto o periodo_DC preenche o periodo
+
+				if (sobreposicao > 0 && sobreposicao != 1.0) //Significa que um período de estudo tem um tipo maior que o período DC
+					throw std::invalid_argument("Periodo no horizonte de estudo com tipo maior ao periodo do modelo DECOMP");
+
+			}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+				
+		}//for (IdEstagio idEstagio_DC = idEstagio_inicial; idEstagio_DC <= idEstagio_final; idEstagio_DC++) {
+
+	}//try{
+	catch (const std::exception& erro) { throw std::invalid_argument("Dados::valida_horizonte_estudo_CP_respeito_horizonte_otimizacao_DC(Dados &a_dados): \n" + std::string(erro.what())); }
+}
+
 
 SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> LeituraCEPEL::define_mapeamento_espaco_amostral_arvore_simetrica_CP(Dados& a_dados, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final)
 {
@@ -12875,9 +12926,12 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				horizonte_tendencia_mais_estudo.addElemento(periodo, true);
 
 			//Horizonte de estudo
-			for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo))
-				horizonte_tendencia_mais_estudo.addElemento(periodo, true);
+			//for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo))
+				//horizonte_tendencia_mais_estudo.addElemento(periodo, true);
 
+			//A variável aleatória realiza com os tipos de periodos do horizonte_estudo_DECK
+			for (Periodo periodo = horizonte_estudo_DECK.getIteradorInicial(); periodo <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo))
+				horizonte_tendencia_mais_estudo.addElemento(periodo, true);
 
 			///////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//Calcula produtibilidade_equivalente (cota_media(Vmax, Vmin), canal_fuga_medio) 
@@ -12915,7 +12969,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 						const double percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
 						const Periodo periodo_canal_fuga_medio = a_horizonte_estudo.getIteradorInicial();
 						//const Periodo periodo_canal_fuga_medio = a_horizonte_estudo.getIteradorFinal();
-						a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), periodo_canal_fuga_medio, a_horizonte_estudo.getIteradorInicial(), percentual_volume_util, false)));
+						a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_horizonte_estudo, a_dados.vetorHidreletrica.att(idHidreletrica), periodo_canal_fuga_medio, a_horizonte_estudo.getIteradorInicial(), percentual_volume_util, false)));
 					}//if (true) {
 
 
@@ -12925,7 +12979,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 					if (true) {
 						const double percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
 						for (Periodo periodo = horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= horizonte_tendencia_mais_estudo.getIteradorFinal(); horizonte_tendencia_mais_estudo.incrementarIterador(periodo))
-							a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), periodo, a_horizonte_estudo.getIteradorInicial(), percentual_volume_util, true)));
+							a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_horizonte_estudo, a_dados.vetorHidreletrica.att(idHidreletrica), periodo, a_horizonte_estudo.getIteradorInicial(), percentual_volume_util, true)));
 					}//if (true) {
 
 				}//else {
@@ -12948,13 +13002,13 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				if (true) {
 					const double percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
 					const Periodo periodo_canal_fuga_medio = a_horizonte_estudo.getIteradorInicial();
-					lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo_canal_fuga_medio, a_horizonte_estudo.getIteradorInicial(), percentual_volume_util, false)));
+					lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(a_horizonte_estudo, lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo_canal_fuga_medio, a_horizonte_estudo.getIteradorInicial(), percentual_volume_util, false)));
 				}//if (true) {
 
 				if (true) {
 					const double percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
 					for (Periodo periodo = horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= horizonte_tendencia_mais_estudo.getIteradorFinal(); horizonte_tendencia_mais_estudo.incrementarIterador(periodo))
-						lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo, a_horizonte_estudo.getIteradorInicial(), percentual_volume_util, true)));
+						lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(a_horizonte_estudo, lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo, a_horizonte_estudo.getIteradorInicial(), percentual_volume_util, true)));
 				}//if (true) {
 
 			}//for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); lista_hidreletrica_out_estudo.incrementarIterador(pos_lista_hidreletrica_out_estudo)) {
@@ -13748,7 +13802,7 @@ void LeituraCEPEL::instanciar_codigo_usina_jusante_JUSENA(Dados& a_dados)
 
 }
 
-double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidreletrica, const Periodo a_periodo, const Periodo a_periodo_inicial_horizonte_estudo, const double a_percentual_volume_util, const bool a_is_calculo_para_ENA)
+double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, Hidreletrica& a_hidreletrica, const Periodo a_periodo, const Periodo a_periodo_inicial_horizonte_estudo, const double a_percentual_volume_util, const bool a_is_calculo_para_ENA)
 {
 	try {
 
@@ -13781,27 +13835,93 @@ double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidre
 		//Premissa 2: Para calcular a produtibilidade do cálculo das ENAs da tendência (períodos anteriores ao horizonte_estudo
 		//            são consideradas as modificações de cotas e canal de fuga médio do periodo_inicial_horizonte_estudo
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+		
 		double canal_fuga_medio = a_hidreletrica.getAtributo(AttComumHidreletrica_canal_fuga_medio, double());
 
 		if (a_hidreletrica.getSizeVetor(AttVetorHidreletrica_canal_fuga_medio) > 0) {//Para quem teve registro JUSENA e o período está dentro do horizonte de estudo pega o valor do canal_fuga_medio do AttVetor
 			
-			if (a_periodo >= a_periodo_inicial_horizonte_estudo)
-				canal_fuga_medio = a_hidreletrica.getElementoVetor(AttVetorHidreletrica_canal_fuga_medio, a_periodo, double());
-			else
-				canal_fuga_medio = a_hidreletrica.getElementoVetor(AttVetorHidreletrica_canal_fuga_medio, a_periodo_inicial_horizonte_estudo, double());
+			if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
+				
+				canal_fuga_medio = 0.0;
+				bool is_sobreposicao_encontrada = false;
+				for (Periodo periodo_estudo = a_horizonte_estudo.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo_estudo)) {
 
-		}
+					const double sobreposicao = a_periodo.sobreposicao(periodo_estudo);
+
+					if (sobreposicao > 0.0) {
+						is_sobreposicao_encontrada = true;
+						canal_fuga_medio += a_hidreletrica.getElementoVetor(AttVetorHidreletrica_canal_fuga_medio, periodo_estudo, double()) * sobreposicao;
+					}// if (sobreposicao > 0.0) {
+
+					if (sobreposicao == 0.0 && is_sobreposicao_encontrada)
+						break;
+
+				}//for (Periodo periodo_estudo = a_horizonte_estudo.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo_estudo)) {
+
+			}//if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
+			else {
+
+				canal_fuga_medio = 0.0;
+				bool is_sobreposicao_encontrada = false;
+				for (Periodo periodo_estudo = a_horizonte_estudo.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo_estudo)) {
+
+					const double sobreposicao = a_periodo_inicial_horizonte_estudo.sobreposicao(periodo_estudo);
+
+					if (sobreposicao > 0.0) {
+						is_sobreposicao_encontrada = true;
+						canal_fuga_medio += a_hidreletrica.getElementoVetor(AttVetorHidreletrica_canal_fuga_medio, periodo_estudo, double()) * sobreposicao;
+					}// if (sobreposicao > 0.0) {
+
+					if (sobreposicao == 0.0 && is_sobreposicao_encontrada)
+						break;
+
+				}//for (Periodo periodo_estudo = a_horizonte_estudo.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo_estudo)) {
+			}//else {				
+		}//if (a_hidreletrica.getSizeVetor(AttVetorHidreletrica_canal_fuga_medio) > 0) {
 		
 		double cotaMedia = -1.0;
 
 		if (a_periodo < a_periodo_inicial_horizonte_estudo) {//Periodos da tendência (necessários para o cálculo das ENAs
-			//cotaMedia = a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getCotaMedia(volume_minimo, volume_maximo);
-			cotaMedia = a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getCotaMedia(a_periodo_inicial_horizonte_estudo, volume_minimo, volume_maximo);
+
+			cotaMedia = 0.0;
+			bool is_sobreposicao_encontrada = false;
+			for (Periodo periodo_estudo = a_horizonte_estudo.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo_estudo)) {
+
+				const double sobreposicao = a_periodo_inicial_horizonte_estudo.sobreposicao(periodo_estudo);
+
+				if (sobreposicao > 0.0) {
+					is_sobreposicao_encontrada = true;
+					cotaMedia += a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getCotaMedia(periodo_estudo, volume_minimo, volume_maximo) * sobreposicao;
+				}// if (sobreposicao > 0.0) {
+
+				if (sobreposicao == 0.0 && is_sobreposicao_encontrada)
+					break;
+
+			}//for (Periodo periodo_estudo = a_horizonte_estudo.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo_estudo)) {
+
 
 		}
-		else
-			cotaMedia = a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getCotaMedia(a_periodo, volume_minimo, volume_maximo);
+		else {
+
+			cotaMedia = 0.0;
+			bool is_sobreposicao_encontrada = false;
+			for (Periodo periodo_estudo = a_horizonte_estudo.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo_estudo)) {
+
+				const double sobreposicao = a_periodo.sobreposicao(periodo_estudo);
+
+				if (sobreposicao > 0.0) {
+					is_sobreposicao_encontrada = true;
+					cotaMedia += a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getCotaMedia(periodo_estudo, volume_minimo, volume_maximo) * sobreposicao;
+				}// if (sobreposicao > 0.0) {
+
+				if (sobreposicao == 0.0 && is_sobreposicao_encontrada)
+					break;
+
+			}//for (Periodo periodo_estudo = a_horizonte_estudo.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo_estudo)) {
+
+
+		}
+
 		
 		const double cota = cotaMedia - canal_fuga_medio;
 
@@ -18229,7 +18349,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		const bool imprimir_att_operacionais_sem_recarregar = true;
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 		a_dados.validacaoDadosAttComum();
 
