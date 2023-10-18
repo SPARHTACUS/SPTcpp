@@ -108,11 +108,14 @@
 //  Chamada Geral Declaracao
 //
 
-#define DECLARAR_METODOS_ELEMENTO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)\
+#define DECLARAR_METODOS_ELEMENTO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual)\
 std::vector<int> is_##Elem##_##Nome##_##Nro##_instanciada = std::vector<int>(TipoSubproblemaSolver_Excedente, 0); \
 std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<int, int>>>>>>>>>>>> idx_##Elem##_##Nome##_##Nro = \
 std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<int, int>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
              Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<int, int>>>>>>>>>>>()); \
+std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<int, double>>>>>>>>>>>> normD_##Elem##_##Nome##_##Nro = \
+std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<int, double>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
+             Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<int, double>>>>>>>>>>>()); \
 std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>> vlrP_e_c_##Elem##_##Nome##_##Nro = \
 std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
              Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdCenario, double>>>>>>>>>>>());\
@@ -170,6 +173,23 @@ int add##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) DEC
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("add" + std::string(#Elem) + "_" + std::string(#Nome) + "(" Valores(GET_FULL_STRING_ELEMENTO) DECLARAR_ADD_ELEMENTO_##Elem##_3 + "): \n" + std::string(erro.what())); } \
 }; \
+void setNormalizacaoDual##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) , const double a_normMultiplicacao){ \
+	try{ \
+		if (!getboolFromChar(#NormDual)) throw std::invalid_argument("Elemento nao passivel de normalizacao dual."); \
+		if (get##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS)) == -1) throw std::invalid_argument("Elemento nao existente."); \
+		addConteudoIters_11(normD_##Elem##_##Nome##_##Nro.at(a_TSS), a_normMultiplicacao Valores(ARGS_ITERS) ARGS_CONST_##Nro##_11); \
+	} \
+	catch (const std::exception& erro) { throw std::invalid_argument("setNormalizacaoDual" + std::string(#Elem) + "_" + std::string(#Nome) + "(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
+}; \
+double getNormalizacaoDual##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
+	try{ \
+		if (!getboolFromChar(#NormDual)) return 1.0; \
+		double conteudo = 1.0; \
+		getConteudoIters_11(normD_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(ARGS_ITERS) ARGS_CONST_##Nro##_11); \
+		return conteudo; \
+	} \
+	catch (const std::exception& erro) { throw std::invalid_argument("getNormalizacaoDual" + std::string(#Elem) + "_" + std::string(#Nome) + "(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
+}; \
 void armazenarValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEstagio a_IdEstagio_1, const IdCenario a_idCenario) { \
 	try{ \
 		if (!getboolFromChar(#ImprimirPrimal)) return; \
@@ -180,7 +200,7 @@ void armazenarValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoS
 		_IdEstagio_1 = a_IdEstagio_1;\
 		std::vector<int> estados(10, -1); estados.at(0) = 0; bool parada = false;\
 		for (int i = 0; i <= 1000000; i++){ \
-			if (varredurasIters_10(std::string(std::string(#Nome) + "_" + std::string(#Nro)), idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
+			if (varredurasIters_10(idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
 				double conteudo = vetorEstagio.att(a_IdEstagio_1).getSolver(a_TSS)->getValorPrimal(idx_##Elem##_##Nome##_##Nro.at(a_TSS) Valores(AT_ITERS) AT_INT_##Nro##_10.at(1)); \
 				addConteudoIters_11(vlrP_e_c_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(_ITERS) INT_ARG_##Nro##_10 , a_idCenario); \
 			} \
@@ -200,8 +220,12 @@ void armazenarValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSub
 		_IdEstagio_1 = a_IdEstagio_1;\
 		std::vector<int> estados(10, -1); estados.at(0) = 0; bool parada = false;\
 		for (int i = 0; i <= 1000000; i++){ \
-			if (varredurasIters_10(std::string(std::string(#Nome) + "_" + std::string(#Nro)), idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
+			if (varredurasIters_10(idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
 				double conteudo = vetorEstagio.att(a_IdEstagio_1).getSolver(a_TSS)->DECLARAR_ARMAZENAR_VALOR_DUAL_##Elem(idx_##Elem##_##Nome##_##Nro.at(a_TSS)Valores(AT_ITERS)AT_INT_##Nro##_10.at(1)); \
+				double normalizacao = 1.0; \
+				if ((normD_##Elem##_##Nome##_##Nro.at(a_TSS).size() > 0))\
+					normalizacao = normD_##Elem##_##Nome##_##Nro.at(a_TSS)Valores(AT_ITERS)AT_INT_##Nro##_10.at(1); \
+                conteudo = conteudo * normalizacao;\
 				addConteudoIters_11(vlrD_e_c_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(_ITERS) INT_ARG_##Nro##_10 , a_idCenario); \
 			} \
 			if (parada) break; \
@@ -220,7 +244,7 @@ void armazenarValorPrimalPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nr
 		_IdEstagio_1 = a_IdEstagio_1;\
 		std::vector<int> estados(10, -1); estados.at(0) = 0; bool parada = false;\
 		for (int i = 0; i <= 1000000; i++){ \
-			if (varredurasIters_10(std::string(std::string(#Nome) + "_" + std::string(#Nro)), idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
+			if (varredurasIters_10(idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
 				double conteudo = vetorEstagio.att(a_IdEstagio_1).getSolver(a_TSS)->getValorPrimal(idx_##Elem##_##Nome##_##Nro.at(a_TSS)Valores(AT_ITERS)AT_INT_##Nro##_10.at(1)); \
 				addConteudoIters_12(vlrP_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(_ITERS) INT_ARG_##Nro##_10 , a_idRealizacao, a_idCenario); \
 			} \
@@ -240,8 +264,12 @@ void armazenarValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(
 		_IdEstagio_1 = a_IdEstagio_1;\
 		std::vector<int> estados(10, -1); estados.at(0) = 0; bool parada = false;\
 		for (int i = 0; i <= 1000000; i++){ \
-			if (varredurasIters_10(std::string(std::string(#Nome) + "_" + std::string(#Nro)), idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
+			if (varredurasIters_10(idx_##Elem##_##Nome##_##Nro.at(a_TSS), estados, 1, parada Valores(_ITERS) INT_ARG_##Nro##_10)){\
 				double conteudo = vetorEstagio.att(a_IdEstagio_1).getSolver(a_TSS)->DECLARAR_ARMAZENAR_VALOR_DUAL_##Elem(idx_##Elem##_##Nome##_##Nro.at(a_TSS)Valores(AT_ITERS)AT_INT_##Nro##_10.at(1)); \
+				double normalizacao = 1.0; \
+				if ((normD_##Elem##_##Nome##_##Nro.at(a_TSS).size() > 0))\
+					normalizacao = normD_##Elem##_##Nome##_##Nro.at(a_TSS)Valores(AT_ITERS)AT_INT_##Nro##_10.at(1); \
+                conteudo = conteudo * normalizacao;\
 				addConteudoIters_12(vlrD_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(_ITERS) INT_ARG_##Nro##_10 , a_idRealizacao, a_idCenario); \
 			} \
 			if (parada) break; \
@@ -256,7 +284,7 @@ void consolidarResultados##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_T
 // ARMAZENAR VALOR POR ESTAGIO POR CENARIO
 //
 
-#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
+#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual) \
 armazenarValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio, a_idCenario);\
 armazenarValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio, a_idCenario);
 
@@ -264,7 +292,7 @@ armazenarValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio
 // ARMAZENAR VALOR POR ESTAGIO POR CENARIO POR REALIZACAO
 //
 
-#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
+#define ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual) \
 armazenarValorPrimalPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio, a_idCenario, a_idRealizacao);\
 armazenarValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(a_TSS, a_idEstagio, a_idCenario, a_idRealizacao);
 
@@ -272,7 +300,7 @@ armazenarValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(a_TSS
 // IMPRIMIR VALOR PRIMAL POR ESTAGIO POR CENARIO
 //
 
-#define DECLARAR_IMPRIMIR_VALOR(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
+#define DECLARAR_IMPRIMIR_VALOR(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual) \
 void ModeloOtimizacao::imprimirValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados){ \
 	try{ \
 		if (!getboolFromChar(#ImprimirPrimal)) \
@@ -322,11 +350,11 @@ void ModeloOtimizacao::imprimirValorDualPorEstagioPorCenarioPorRealizacao##Elem#
 	catch (const std::exception& erro) { throw std::invalid_argument("imprimirValorDualPorEstagioPorCenarioPorRealizacao" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
 };\
 
-#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
+#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual) \
 imprimirValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(TSS, getFullString(a_idProcesso), a_entradaSaidaDados); \
 imprimirValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(TSS, getFullString(a_idProcesso), a_entradaSaidaDados);
 
-#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) \
+#define IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual) \
 imprimirValorPrimalPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(TSS, getFullString(a_idProcesso), a_entradaSaidaDados); \
 imprimirValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(TSS, getFullString(a_idProcesso), a_entradaSaidaDados);
 
@@ -334,7 +362,7 @@ imprimirValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(TSS, g
 // CONSOLIDAR RESULTADOS
 //
 
-#define DECLARAR_CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual)  \
+#define DECLARAR_CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual)  \
 void ModeloOtimizacao::consolidarResultados##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_variavel, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados) {	\
 	try{ \
 		if (std::string(std::string(#Nome) + "_" + std::string(#Nro)) != a_variavel) \
@@ -361,7 +389,7 @@ void ModeloOtimizacao::consolidarResultados##Elem##_##Nome##_##Nro(const TipoSub
 };\
 
 
-#define CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual) consolidarResultados##Elem##_##Nome##_##Nro(a_TSS, Elem##_str, a_maiorIdProcesso, a_entradaSaidaDados);
+#define CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual) consolidarResultados##Elem##_##Nome##_##Nro(a_TSS, Elem##_str, a_maiorIdProcesso, a_entradaSaidaDados);
 
 
 
