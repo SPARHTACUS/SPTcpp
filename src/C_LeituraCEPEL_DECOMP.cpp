@@ -13149,7 +13149,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 												break;
 
 											if (((termo_0) || (termo_1)) && (estados_ENA.at(idHidreletrica).at(idREE).at(lag) == IdVariavelEstado_Nenhum)) {
-												estados_ENA.at(idHidreletrica).at(idREE).at(lag) = estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, std::string(strVarDecisaoENAIdEstagioPeriodo + "," + getString(idHidreletrica) + "," + getString(idREE) + "," + getString(periodo_lag)), -1, -1);
+												estados_ENA.at(idHidreletrica).at(idREE).at(lag) = estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, std::string(strVarDecisaoENAIdEstagioPeriodo + "," + getString(periodo_lag) + "," + getString(idHidreletrica) + "," + getString(idREE)), -1, -1);
 												estados.addElemento(estados_ENA.at(idHidreletrica).at(idREE).at(lag), 0.0);
 											}
 
