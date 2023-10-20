@@ -2311,7 +2311,7 @@ public:
     int addConstrsMaior(const std::vector<std::string> &a_nomes) {
         try {
 
-            const int numNewConstrs = a_nomes.size();
+            const int numNewConstrs = int(a_nomes.size());
 
             if (sizeBufferRows + numNewConstrs > capBufferRows) {
                 realocaMemMatriz(numNewConstrs);

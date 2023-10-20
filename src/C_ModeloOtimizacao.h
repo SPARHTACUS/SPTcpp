@@ -238,8 +238,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 // ITERADORES 4
 //
 
-#define ITERADORES_4_ESTAGIO_PERIODO_REE_PERIODO(m)                           m(1, IdEstagio) m(2, Periodo) m(3, IdReservatorioEquivalente) m(4, Periodo)
-#define ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO(m)                  m(1, IdEstagio) m(2, Periodo) m(3, IdHidreletrica) m(4, Periodo)
+#define ITERADORES_4_ESTAGIO_PERIODO_PERIODO_REE(m)                           m(1, IdEstagio) m(2, Periodo) m(3, Periodo) m(4, IdReservatorioEquivalente)
+#define ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA(m)                  m(1, IdEstagio) m(2, Periodo) m(3, Periodo) m(4, IdHidreletrica)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO(m)               m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdTermeletrica)
@@ -259,7 +259,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 
 #define VARIAVEL_DECISAO_4(m)\
-	m(  VarDecisao,    ENA,                    4,    ITERADORES_4_ESTAGIO_PERIODO_REE_PERIODO,                           sim,          sim,                nao)  \
+	m(  VarDecisao,    ENA,                    4,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_REE,                           sim,          nao,                nao)  \
 	m(  VarDecisao,    PH,                     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao,                nao)  \
 	m(  VarDecisao,    PH_REL,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao,                nao)  \
 	m(  VarDecisao,    PH_FINF,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao,                nao)  \
@@ -276,8 +276,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
     m(  VarDecisao,    QTUR_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao,                nao)  \
 	m(  VarDecisao,    QVER,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao,                nao)  \
 	m(  VarDecisao,    QMON,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao,                nao)  \
-    m(  VarDecisao,    QDEFLAG,                4,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO,                  sim,          nao,                nao)  \
-    m(  VarDecisao,    QDEFLAG_ADD,            4,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO,                  sim,          nao,                nao)  \
+    m(  VarDecisao,    QDEFLAG,                4,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA,                  sim,          nao,                nao)  \
+    m(  VarDecisao,    QDEFLAG_ADD,            4,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA,                  sim,          nao,                nao)  \
     m(  VarDecisao,    QDEF,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao,                nao)  \
     m(  VarDecisao,    QDEF_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao,                nao)  \
     m(  VarDecisao,    QDEF_FSUP,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             sim,          nao,                nao)  \
@@ -319,13 +319,13 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
    //   Elemento,      Nome,             NroIter,    Iteradores,                                                 Impr.Primal,     Impr.Dual              NormDual
 
 #define EQUACAO_LINEAR_4(m)\
-	m(  EquLinear,    ENA,                                               4,    ITERADORES_4_ESTAGIO_PERIODO_REE_PERIODO,                           nao,         nao,                nao)  \
+	m(  EquLinear,    ENA,                                               4,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_REE,                           nao,         nao,                nao)  \
 	m(  EquLinear,    ATENDIMENTO_DEMANDA,                               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO,               nao,         nao,                nao)  \
 	m(  EquLinear,    BALANCO_HIDRAULICO_VOL,                            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao,                nao)  \
 	m(  EquLinear,    BALANCO_HIDRAULICO_VAZ,                            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao,                nao)  \
 	m(  EquLinear,    VAZAO_MONTANTE,                                    4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao,                nao)  \
     m(  EquLinear,    VAZAO_DEFLUENTE,                                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao,                nao)  \
-    m(  EquLinear,    VAZAO_DEFLUENTE_LAG,                               4,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_PERIODO,                  nao,         nao,                nao)  \
+    m(  EquLinear,    VAZAO_DEFLUENTE_LAG,                               4,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA,                  nao,         nao,                nao)  \
 	m(  EquLinear,    VAZAO_TURBINADA,                                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao,                nao)  \
 	m(  EquLinear,    VAZAO_TURBINADA_DISPONIVEL,                        4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao,                nao)  \
 	m(  EquLinear,    POTENCIA_TERMICA_RELAXADA,                         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA,             nao,         nao,                nao)  \
@@ -346,8 +346,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
    //   Elemento,     Nome,                                        NroIter,    Iteradores,                                                 Impr.Primal,    Impr.Dual              NormDual
 
 #define INEQUACAO_LINEAR_4(m)\
-	m(  IneLinear,    CB_ZF,                                               4,    ITERADORES_4_ESTAGIO_PERIODO_REALIZACAO_CORTEBENDERS,             nao,         sim,                nao)  \
-	m(  IneLinear,    CB_ZT,                                               4,    ITERADORES_4_ESTAGIO_PERIODO_REALIZACAO_CORTEBENDERS,             nao,         sim,                nao)  \
+	m(  IneLinear,    CB_ZF,                                               4,    ITERADORES_4_ESTAGIO_PERIODO_REALIZACAO_CORTEBENDERS,             nao,         nao,                nao)  \
+	m(  IneLinear,    CB_ZT,                                               4,    ITERADORES_4_ESTAGIO_PERIODO_REALIZACAO_CORTEBENDERS,             nao,         nao,                nao)  \
 	m(  IneLinear,    RESTRICAO_ELETRICA_LIMITE_INFERIOR,                  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA,      nao,         nao,                nao)  \
     m(  IneLinear,    RESTRICAO_ELETRICA_LIMITE_SUPERIOR,                  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA,      nao,         nao,                nao)  \
 	m(  IneLinear,    AGRUPAMENTO_INTERCAMBIO,                             4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_AGRUPAMENTOINTERCAMBIO, nao,         nao,                nao)  \
@@ -376,7 +376,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 // ITERADORES 5
 //
 
-#define ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_REE_PERIODO(m)                        m(1, IdEstagio) m(2, Periodo) m(3, IdHidreletrica) m(4, IdReservatorioEquivalente) m(5, Periodo)
+#define ITERADORES_5_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA_REE(m)                        m(1, IdEstagio) m(2, Periodo) m(3, Periodo) m(4, IdHidreletrica) m(5, IdReservatorioEquivalente) 
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_USINANAOSIMULADA(m)        m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado) m(5, IdUsinaNaoSimulada)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_PATAMARDEFICIT(m)          m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado) m(5, IdPatamarDeficit)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_INT(m)                   m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, int)
@@ -384,11 +384,10 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO(m)    m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, IdConjuntoHidraulico)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE(m)            m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdTermeletrica) m(5, IdUnidadeUTE)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO_HIDRELETRICA(m) m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdIntercambioHidraulico) m(5, IdHidreletrica)
-#define ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_INT(m)       m(1, IdEstagio) m(2, Periodo) m(3, IdProcessoEstocastico) m(4, IdVariavelAleatoria) m(5, int)
-#define ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO(m)   m(1, IdEstagio) m(2, Periodo) m(3, IdProcessoEstocastico) m(4, IdVariavelAleatoria) m(5, Periodo)
+#define ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA(m)   m(1, IdEstagio) m(2, Periodo) m(3, Periodo) m(4, IdProcessoEstocastico) m(5, IdVariavelAleatoria)
 
 #define VARIAVEL_DECISAO_5(m)\
-	m(  VarDecisao,    ENA,         5,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_REE_PERIODO,                         sim,          sim,                nao)  \
+	m(  VarDecisao,    ENA,         5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA_REE,                         sim,          sim,                nao)  \
 	m(  VarDecisao,    PH,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao,                nao)  \
 	m(  VarDecisao,    PH_REL,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao,                nao)  \
 	m(  VarDecisao,    PH_FINF,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao,                nao)  \
@@ -410,9 +409,9 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,    PT_REL,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao,                nao)  \
 	m(  VarDecisao,    PT_FINF,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao,                nao)  \
 	m(  VarDecisao,    PTDISP,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao,                nao)  \
-	m(  VarDecisao,    RP,          5,     ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO,    sim,          nao,                nao)  \
-	m(  VarDecisao,    YP,          5,     ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO,    sim,          nao,                nao)  \
-	m(  VarDecisao,    YP_ADD,      5,     ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO,    sim,          nao,                nao)  \
+	m(  VarDecisao,    RP,          5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA,    sim,          nao,                nao)  \
+	m(  VarDecisao,    YP,          5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA,    sim,          nao,                nao)  \
+	m(  VarDecisao,    YP_ADD,      5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA,    sim,          nao,                nao)  \
 	m(  VarDecisao,    PD,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_PATAMARDEFICIT,           sim,          nao,                nao)  \
     m(  VarDecisao,    QOUT,        5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO_HIDRELETRICA,  sim,          nao,                nao)  \
     m(  VarDecisao,    QOUT_FINF,   5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO_HIDRELETRICA,  sim,          nao,                nao)  \
@@ -423,8 +422,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 
 #define EQUACAO_LINEAR_5(m)\
-	m(  EquLinear,    ENA,                                         5,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_REE_PERIODO,                      nao,        nao,                nao)      \
-	m(  EquLinear,    AFLUENCIA_PROCESSO_ESTOCASTICO,              5,     ITERADORES_5_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO, nao,        nao,                nao)      \
+	m(  EquLinear,    ENA,                                         5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA_REE,                      nao,        nao,                nao)      \
+	m(  EquLinear,    AFLUENCIA_PROCESSO_ESTOCASTICO,              5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA, nao,        nao,                nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA,                             5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao,                nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA_RELAXADA,                    5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao,                nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA_DISPONIVEL,                  5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao,                nao)      \
@@ -844,162 +843,61 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_12(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "," + getFullString(a_it12) + "): \n" + std::string(erro.what())); }
 		};
 
-		template<typename TListasIdxElem, typename TIt>
-		void varreduraIter(TListasIdxElem& a_listasIdxElem, TIt &a_it, int &a_estado) {
-			try {
-				
-				// Estado: 
-				//
-				// 
-				//  -1: Varredura parada 
-				// 
-				//   0: Não realizar varredura                            
-				// 
-				//   1: Varredura iniciada
-				//					           
-
-				
-				if ((a_estado < -1) || (a_estado > 1))
-					throw std::invalid_argument("Erro - Estado nao viavel.");
-
-				if (a_estado == 0)
-					return;
-
-				// Não existe iteradores
-				if (a_listasIdxElem.size() == 0) {
-					if (a_estado == -1) {
-						return;
-					}
-					else if (a_estado == 1)
-						throw std::invalid_argument("Erro - Condicao nao viavel A.");
-					return;
-				}
-
-				if (a_estado == -1) {
-					a_estado = 1;
-					a_it = a_listasIdxElem.getIteradorInicial();
-					return;
-				}
-				else if (a_estado == 1) {
-					if (a_it == a_listasIdxElem.getIteradorFinal()) {
-						a_estado = -1;
-						return;
-					}
-					a_listasIdxElem.incrementarIterador(a_it);
-					return;
-				}
-
-				throw std::invalid_argument("Erro - Condicao nao viavel B.");
-
-			}
-			catch (const std::exception& erro) { throw std::invalid_argument("iteraInterno(varreduraIter," + getFullString(a_it) + "," + getFullString(a_estado) + "): \n" + std::string(erro.what())); }
-		};
-
-		template<typename TListasIdxElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_10(TListasIdxElem& a_listasIdxElem, std::vector<int>& a_estados, const int a_indice_parada, bool &a_parada, TIt1 &a_it1, TIt2 &a_it2, TIt3 &a_it3, TIt4 &a_it4, TIt5 &a_it5, TIt6 &a_it6, TIt7 &a_it7, TIt8 &a_it8, TIt9 &a_it9, TIt10 &a_it10) {
+		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool varredurasIters_10(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
-				if (a_estados.size() != 10)
-					throw std::invalid_argument("O numero de estados deve ser compatível com o número de iteradores.");
-
-				int estado_parada = a_estados.at(a_indice_parada);
-
-				if (a_estados.at(8) != -1)
-					varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10, a_estados.at(9));
-
-				if (a_estados.at(9) != 1) {
-					if (a_estados.at(7) != -1)
-						varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9, a_estados.at(8));
-
-					if (a_estados.at(8) != 1) {
-						if (a_estados.at(6) != -1)
-							varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8, a_estados.at(7));
-
-						if (a_estados.at(7) != 1) {
-							if (a_estados.at(5) != -1)
-								varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7, a_estados.at(6));
-
-							if (a_estados.at(6) != 1) {
-								if (a_estados.at(4) != -1)
-									varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6, a_estados.at(5));
-
-								if (a_estados.at(5) != 1) {
-									if (a_estados.at(3) != -1)
-										varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5, a_estados.at(4));
-
-									if (a_estados.at(4) != 1) {
-										if (a_estados.at(2) != -1)
-											varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4, a_estados.at(3));
-
-										if (a_estados.at(3) != 1) {
-											if (a_estados.at(1) != -1)
-												varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3, a_estados.at(2));
-
-											if (a_estados.at(2) != 1) {
-												if (a_estados.at(0) != -1)
-													varreduraIter(a_listasIdxElem.at(a_it1), a_it2, a_estados.at(1));
-
-												if (a_estados.at(1) != 1) {
-													varreduraIter(a_listasIdxElem, a_it1, a_estados.at(0));
-												} // if (a_estados.at(1) != 0) {
-
-											} // if (a_estados.at(3) != 0) {
-										} // if (a_estados.at(4) != 0) {
-									} // if (a_estados.at(4) != 0) {
-								} // if (a_estados.at(5) != 0) {
-							} // if (a_estados.at(6) != 0) {
-						} // if (a_estados.at(7) != 0) {
-					} // if (a_estados.at(8) != 0) {
-				} // if (a_estados.at(9) != 0) {
-
-				if ((estado_parada == 1) && (a_estados.at(a_indice_parada) == -1)) {
-					a_parada = true;
+				if ((!a_isVar) && (a_isPrimal))
 					return false;
-				}
 
-				if ((a_estados.at(9) == -1) || (a_estados.at(8) == -1) || (a_estados.at(7) == -1) || (a_estados.at(6) == -1) || (a_estados.at(5) == -1) || (a_estados.at(4) == -1) || (a_estados.at(3) == -1) || (a_estados.at(2) == -1) || (a_estados.at(1) == -1) || (a_estados.at(0) == -1)) {
+				if (a_lIdx.size() == 0)
+					return false;
 
-					if (a_estados.at(0) != -1) {
-						if (a_estados.at(1) == -1)
-							varreduraIter(a_listasIdxElem.at(a_it1), a_it2, a_estados.at(1));
+				const TIt1 it1 = a_idEstagio;
 
-						if (a_estados.at(1) != -1) {
-							if (a_estados.at(2) == -1)
-								varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3, a_estados.at(2));
+				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
-							if (a_estados.at(2) != -1) {
-								if (a_estados.at(3) == -1)
-									varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4, a_estados.at(3));
+					if (a_lArmz.size() == 0)
+						a_lArmz.addElemento(it1, a_lIdx.at(it1));
 
-								if (a_estados.at(3) != -1) {
-									if (a_estados.at(4) == -1)
-										varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5, a_estados.at(4));
+					if (a_lArmz.at(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at(it1).at(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
+													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
+															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
+																for (TIt7 it7 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorInicial(); it7 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).incrementarIterador(it7)) {
+																	if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).size() > 0) {
+																		for (TIt8 it8 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorInicial(); it8 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).incrementarIterador(it8)) {
+																			if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).size() > 0) {
+																				for (TIt9 it9 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).getIteradorInicial(); it9 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).incrementarIterador(it9)) {
+																					if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).size() > 0) {
+																						for (TIt10 it10 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).getIteradorInicial(); it10 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).incrementarIterador(it10)) {
+																							if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10).size() > 0) {
 
-									if (a_estados.at(4) != -1) {
-										if (a_estados.at(5) == -1)
-											varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6, a_estados.at(5));
+																								double vlrNorm = 1.0;
 
-										if (a_estados.at(5) != -1) {
-											if (a_estados.at(6) == -1)
-												varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7, a_estados.at(6));
+																								if ((!a_isPrimal) && (a_lNorm.size() > 0))
+																									vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10).at(IdRealizacao_1).at(IdCenario_1);
+																								
+																								varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), vlrNorm, a_TSS, a_idEstagio, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 
-											if (a_estados.at(6) != -1) {
-												if (a_estados.at(7) == -1)
-													varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8, a_estados.at(7));
-
-												if (a_estados.at(7) != -1) {
-													if (a_estados.at(8) == -1)
-														varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9, a_estados.at(8));
-
-													if (a_estados.at(8) != -1) {
-														if (a_estados.at(9) == -1)
-															varreduraIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10, a_estados.at(9));
-
-														if ((a_estados.at(9) == -1) || (a_estados.at(8) == -1) || (a_estados.at(7) == -1) || (a_estados.at(6) == -1) || (a_estados.at(5) == -1) || (a_estados.at(4) == -1) || (a_estados.at(3) == -1) || (a_estados.at(2) == -1) || (a_estados.at(1) == -1) || (a_estados.at(0) == -1))
-															return false;
-														else
-															return true;
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
 													}
 												}
 											}
@@ -1011,16 +909,69 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 					}
 				}
 
-				if ((a_estados.at(9) == -1) || (a_estados.at(8) == -1) || (a_estados.at(7) == -1) || (a_estados.at(6) == -1) || (a_estados.at(5) == -1) || (a_estados.at(4) == -1) || (a_estados.at(3) == -1) || (a_estados.at(2) == -1) || (a_estados.at(1) == -1) || (a_estados.at(0) == -1))
-					return false;
-				else
-					return true;
+
+				return true;
 
 			}
-			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what())); }
+			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_10(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
 
-		};
+		} // bool varredurasIters_10(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
+		template<typename TListasArmzElem, typename TListasIdxElem>
+		void varredurasIters(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const double a_VlrNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+			try {
+
+				double conteudo = NAN;
+
+				if ((a_isVar) && (a_isPrimal))
+					conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getValorPrimal(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1)));
+
+				else if ((a_isVar) && (!a_isPrimal))
+					conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getReducedCost(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1))) * a_VlrNorm;
+
+				else if ((!a_isVar) && (!a_isPrimal))
+					conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getMultiplicador(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1))) * a_VlrNorm;
+
+			
+				if (a_idRealizacao == IdRealizacao_Nenhum) {
+					if (a_lArmz.at(IdRealizacao_1).size() == 1) {
+						const IdCenario cIni = getAtributo(AttComumModeloOtimizacao_cenario_inicial, IdCenario());
+						const int numero_cenarios = int(getAtributo(AttComumModeloOtimizacao_cenario_final, IdCenario())) - int(cIni) + 1;
+						a_lArmz.at(IdRealizacao_1) = SmartEnupla<IdCenario, double>(cIni, std::vector<double>(numero_cenarios, NAN));
+					}
+
+					a_lArmz.at(IdRealizacao_1).at(a_idCenario) = conteudo;
+
+				} // if (a_idRealizacao == IdRealizacao_Nenhum) {
+
+				else {
+
+					if (a_lArmz.size() == 1) {
+						IdRealizacao rBase = a_lArmz.getIteradorInicial();
+						if (a_lArmz.at(rBase).size() == 1) {
+							const IdRealizacao maiorIdRealizacao = getAtributo(a_idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao());
+							a_lArmz = SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>(IdRealizacao_1, std::vector<SmartEnupla<IdCenario, double>>(int(rBase - IdRealizacao_1) + 1, SmartEnupla<IdCenario, double>()));
+						}
+					} // if (a_lArmz.size() == 1) {
+
+					if (a_lArmz.at(a_idRealizacao).size() == 0) {
+
+						const IdCenario cIni = getAtributo(AttComumModeloOtimizacao_cenario_inicial, IdCenario());
+						const int numero_cenarios = int(getAtributo(AttComumModeloOtimizacao_cenario_final, IdCenario())) - int(cIni) + 1;
+
+						a_lArmz.at(a_idRealizacao) = SmartEnupla<IdCenario, double>(cIni, std::vector<double>(numero_cenarios, NAN));
+
+					} // if (a_lArmz.at(a_idRealizacao).size() == 1) {
+
+					a_lArmz.at(a_idRealizacao).at(a_idCenario) = conteudo;
+
+				} // else {
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+
+		}
 
 		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
 		bool getConteudoIters_10(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10) {
