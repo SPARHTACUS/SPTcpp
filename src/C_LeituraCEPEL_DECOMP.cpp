@@ -48,6 +48,14 @@ int maior_ONS_REE = 0;
 bool inicializa_vetor_porcentagem_vazao_minima_historica_REE = true;
 ////////////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////////////
+//Restrições RHV (energia armazenada)
+
+SmartEnupla<int, int> codigo_restricao_energia_armazenada;
+SmartEnupla<int, IdReservatorioEquivalente> idReservatorioEquivalente_restricao_energia_armazenada;
+
+////////////////////////////////////////////////////////////////////////////////////////
+
 void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio) {
 
 	try {
@@ -144,9 +152,6 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 		instanciar_membros_das_hidreletricas_instanciadas(a_dados);
 
 		leitura_DADGER_201906_DC29(a_dados, a_diretorio + "//DADGER." + revisao);
-
-		sequenciarRestricoesEletricas(a_dados);
-		sequenciarRestricoesHidraulicas(a_dados);
 
 		leitura_DADGNL_201906_DC29_A(a_dados, a_diretorio + "//DADGNL." + revisao, a_diretorio + "//relgnl." + revisao, a_diretorio + "//DadosAdicionais//relgnl." + revisao);// Ajustar que a geração comandada pode estar fora do horizonte_estudo
 		leitura_DADGNL_201906_DC29_B(a_dados, a_diretorio, "DADGNL." + revisao);// Ajustar que a geração comandada pode estar fora do horizonte_estudo
@@ -8673,6 +8678,215 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 					}//if (menemonico == "RQ") {
 
+					if (menemonico == "HE") {//Identificação das restrições RHE: Restrições de energia armazenada
+
+						try {
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 2 -  Número de identificação da restrição RHE
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							atributo = line.substr(4, 3);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const string nome = atributo;
+
+							const int codigo_restricao_operativa_RHE_energia = atoi(atributo.c_str());
+
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 3 -  Flag para identificação do tipo de limite para a restrição:
+							//           = 1 – em valor absoluto(MWmes).
+							//	         = 2 – em valor percentual da Energia Armazenada Máxima do REE(%).
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							atributo = line.substr(9, 1);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const int tipo_limite_restricao = atoi(atributo.c_str());
+
+							TipoUnidadeRestricaoHidraulica tipoUnidadeRestricaoHidraulica = TipoUnidadeRestricaoHidraulica_percentual;
+
+							if (tipo_limite_restricao == 1)
+								tipoUnidadeRestricaoHidraulica = TipoUnidadeRestricaoHidraulica_MW;
+
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 4 -  Limite inferior para a Energia Armazenada pela restrição RHE.
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							atributo = line.substr(14, 10);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double limite_inferior = atof(atributo.c_str());
+
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 5 -  Estágio da restrição. 
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							atributo = line.substr(25, 2);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const IdEstagio idEstagio = getIdEstagioFromChar(atributo.c_str());
+
+							const Periodo periodo_DECK = horizonte_otimizacao_DC.at(idEstagio);
+
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 6 -  Valor de penalidade para a restrição (R$/MWh) (se for deixado em branco, considera - se a penalidade default utilizada para as demais restrições)
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							atributo = line.substr(28, 10);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							double penalidade = 10000; //default atribuido
+
+							if(atributo != "")
+								penalidade = atof(atributo.c_str());
+
+							//Nota: Alguns decks repetem por erro o mesmo registro, portanto, é verificado que a restriçao nao tenha sido inicializada.
+							//Caso contrário, verifica que o periodo_inicial e periodo_final do registro duplicado seja igual à restriçao instanciada
+							IdRestricaoOperativaUHE idRestricaoOperativaUHE = getIdFromCodigoONS(lista_codigo_ONS_restricao_operativa_UHE_energia_armazenada, codigo_restricao_operativa_RHE_energia);
+
+							if (idRestricaoOperativaUHE == IdRestricaoOperativaUHE_Nenhum) {
+
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								//Guarda informação nos Smart Elementos
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+								RestricaoOperativaUHE restricaoOperativaUHE;
+
+								idRestricaoOperativaUHE = a_dados.getMaiorId(IdRestricaoOperativaUHE());
+
+								if (idRestricaoOperativaUHE == IdRestricaoOperativaUHE_Nenhum)
+									idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1;
+								else
+									idRestricaoOperativaUHE++;
+
+								restricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_idRestricaoOperativaUHE, idRestricaoOperativaUHE);
+								restricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_nome, nome);
+
+								restricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica_energia_armazenada);
+								restricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_tipoUnidadeRestricaoHidraulica, tipoUnidadeRestricaoHidraulica);
+
+								lista_codigo_ONS_restricao_operativa_UHE_energia_armazenada.setElemento(idRestricaoOperativaUHE, codigo_restricao_operativa_RHE_energia);
+
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								//Inicializa matrizes minimo e maximo
+								// Nota: É instanciada as matrizes com min/max e depois atualizado só nos períodos com sobreposição com periodo_DECK 
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+								IdPatamarCarga maiorIdPatamarCarga = IdPatamarCarga_1;
+
+								for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+									if (maiorIdPatamarCarga < a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()))
+										maiorIdPatamarCarga = a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
+								}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+								////
+								//Instancia as matrizes
+								restricaoOperativaUHE.setMatriz(AttMatrizRestricaoOperativaUHE_limite_inferior, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("min")))));
+								restricaoOperativaUHE.setMatriz(AttMatrizRestricaoOperativaUHE_limite_superior, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("max")))));
+
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								//Carrega restrição
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+								a_dados.vetorRestricaoOperativaUHE.add(restricaoOperativaUHE);
+
+							}//if (idRestricaoOperativaUHE == IdRestricaoOperativaUHE_Nenhum)
+
+							//////////////////////////////////////////////////
+							//Validação tipoUnidadeRestricaoHidraulica
+							//////////////////////////////////////////////////
+							if (tipoUnidadeRestricaoHidraulica != a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).getAtributo(AttComumRestricaoOperativaUHE_tipoUnidadeRestricaoHidraulica, TipoUnidadeRestricaoHidraulica()))
+								throw std::invalid_argument("tipoUnidadeRestricaoHidraulica nao consistente entre registros HE na restricao hidrualica numero: " + nome);
+
+							//////////////////////////////////////////////////
+							//Atualiza o limite_inferior no periodo indicado
+							//////////////////////////////////////////////////
+
+							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+								const double sobreposicao = periodo.sobreposicao(periodo_DECK);
+
+								if (sobreposicao > 0.0) {
+
+									const IdPatamarCarga maiorIdPatamarCarga = a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
+
+									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++)
+										a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, limite_inferior);
+
+								}//if (sobreposicao > 0.0) {
+
+							}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+						}//try {
+						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro HV: \n" + std::string(erro.what())); }
+
+					}//if (menemonico == "HE") {
+
+					if (menemonico == "CM") {//Coeficientes das restrições RHV
+
+						try {
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 2 -  Número de identificação da restrição RHE
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+							atributo = line.substr(4, 3);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const int codigo_restricao_operativa_RHE_energia = atoi(atributo.c_str());
+
+							const IdRestricaoOperativaUHE idRestricaoOperativaUHE = getIdFromCodigoONS(lista_codigo_ONS_restricao_operativa_UHE_energia_armazenada, codigo_restricao_operativa_RHE_energia);
+
+							if (idRestricaoOperativaUHE == IdRestricaoOperativaUHE_Nenhum)
+								throw std::invalid_argument("Nao inicializada idRestricaoOperativaUHE  com codigo_restricao_operativa_UHE_energia_armazenada_" + atributo);
+
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 3 -  Índice do Reservatório Equivalente de Energia (REE)
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							atributo = line.substr(9, 3);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente(atoi(atributo.c_str()));
+
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 4 -  Coeficiente de participação do REE definido no campo 3 na restrição definida no campo 2
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							atributo = line.substr(14, 10);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							const double fator_participacao = atof(atributo.c_str());
+
+							if (fator_participacao != 1.0)
+								throw std::invalid_argument("fator_participacao != 1.0 para restricao_operativa_UHE_energia_armazenada");
+
+							/////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Set o idReservatorioEquivalente da restrição, depois vão ser atualizados os elementos da restrição 
+							// quando as probabilidades_aculadas_EAR sejam calculadas
+							/////////////////////////////////////////////////////////////////////////////////////////////////////
+							
+							int aux_pos_codigo_restricao_energia_armazenada = -1;
+
+							for (int pos_codigo_restricao_energia_armazenada = 1; pos_codigo_restricao_energia_armazenada <= int(codigo_restricao_energia_armazenada.size()); pos_codigo_restricao_energia_armazenada++) {
+
+								if (codigo_restricao_energia_armazenada.getElemento(pos_codigo_restricao_energia_armazenada) == codigo_restricao_operativa_RHE_energia) {
+									aux_pos_codigo_restricao_energia_armazenada = pos_codigo_restricao_energia_armazenada;
+									break;
+
+								}//if (codigo_restricao_energia_armazenada.getElemento(pos_codigo_restricao_energia_armazenada) == codigo_restricao_operativa_RHE_energia) {
+
+							}//for (int pos_codigo_restricao_energia_armazenada = 1; pos_codigo_restricao_energia_armazenada <= int(codigo_restricao_energia_armazenada.size()); pos_codigo_restricao_energia_armazenada++) {
+
+
+							if (aux_pos_codigo_restricao_energia_armazenada == -1) {
+								codigo_restricao_energia_armazenada.addElemento(int(codigo_restricao_energia_armazenada.size()) + 1, codigo_restricao_operativa_RHE_energia);
+								idReservatorioEquivalente_restricao_energia_armazenada.addElemento(int(idReservatorioEquivalente_restricao_energia_armazenada.size()) + 1, idReservatorioEquivalente);
+
+							}
+							else {
+
+								if (idReservatorioEquivalente_restricao_energia_armazenada.getElemento(aux_pos_codigo_restricao_energia_armazenada) != idReservatorioEquivalente)
+									throw std::invalid_argument("idReservatorioEquivalente diferente para restricao_operativa_UHE_energia_armazenada registro: " + line);
+
+							}
+
+						}//try {
+						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro CM: \n" + std::string(erro.what())); }
+
+					}//if (menemonico == "CM") {
 
 				}//if (teste_comentario != COMENTARIO) {
 
@@ -12902,7 +13116,6 @@ void LeituraCEPEL::atualiza_volume_util_maximo_com_percentual_volume_util_maximo
 
 }
 
-
 void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, std::string a_diretorio, std::string a_diretorio_cortes, std::string a_nomeArquivo)
 {
 	try {
@@ -12914,6 +13127,8 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 		if (leituraArquivo.is_open()) {
 
+			const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
+			const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 
 			/////////////////////////////////////////////////////
 			//Define horizonte tendencia + horizonte estudo
@@ -12934,95 +13149,17 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			for (Periodo periodo = horizonte_estudo_DECK.getIteradorInicial(); periodo <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo))
 				horizonte_tendencia_mais_estudo.addElemento(periodo, true);
 
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//Calcula produtibilidade_equivalente (cota_media(Vmax, Vmin), canal_fuga_medio) 
-			//Premissa: Usinas com regularização mensal utiliza o Vmax, Vmin (hidr.dat + modificações dadger)
-			//          Usinas com regularização semanal/diária utiliza VRef do hidr.dat
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			//////////////////////////////////////////////////////////////////////////////////
-			//1.1 Cálculo da produtibilidade média para as usinas instanciadas no CP, 
-			//seguindo a metodologia ONS - Submódulo 23.5: Critérios para estudos hidrológicos
-			// Premissa: Utiliza os atributos do hidr.dat (sem modificações do deck!) -> i.e. a produtibilidade_EAR é estática (AttComum)
-			//////////////////////////////////////////////////////////////////////////////////
-
-			const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
-			const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
-
-			//Para as usinas com registro JUSMED no DADGER.dat (p.ex Tucurui, Sto Antonio, Jirau), o cálculo da produtibilidade é realizado com o canal de fuga médio 
-			//Ajustar:indicado no JUSMED mas do primeiro período semanal (deveria ser o JUSMED reportado para o período de acoplamento?). Premissa validada com o arquivo de saída energia_acopla.csv do deck DC 01/2023
-
-			for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-
-				if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
-
-					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, 0.0);
-					a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_produtibilidade_ENA, SmartEnupla<Periodo, double>(horizonte_tendencia_mais_estudo, 0.0));
-
-				}//if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
-				else {
-
-
-					//////////////////////
-					//produtibilidade_EAR
-					//////////////////////
-					if (true) {
-						const double percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
-						const Periodo periodo_canal_fuga_medio = a_horizonte_estudo.getIteradorInicial();
-						//const Periodo periodo_canal_fuga_medio = a_horizonte_estudo.getIteradorFinal();
-						a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_horizonte_estudo, a_dados.vetorHidreletrica.att(idHidreletrica), periodo_canal_fuga_medio, a_horizonte_estudo.getIteradorInicial(), percentual_volume_util, false)));
-					}//if (true) {
-
-
-					//////////////////////
-					//produtibilidade_ENA
-					//////////////////////
-					if (true) {
-						const double percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
-						for (Periodo periodo = horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= horizonte_tendencia_mais_estudo.getIteradorFinal(); horizonte_tendencia_mais_estudo.incrementarIterador(periodo))
-							a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_horizonte_estudo, a_dados.vetorHidreletrica.att(idHidreletrica), periodo, a_horizonte_estudo.getIteradorInicial(), percentual_volume_util, true)));
-					}//if (true) {
-
-				}//else {
-
-
-			}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-
-			//////////////////////////////////////////////////////////////////////////////////
-			//1.2 Cálculo da produtibilidade média para as usinas NÃO instanciadas no CP 
-			//e indicadas no registro JUSENA (p.ex. COMP PAF-MOX)
-			// Precisa-se ler o hidr.dat/CadUsH.csv para obter info de vMax, vMin, polinômios, canal_fuga_medio, perdas etc
-			//////////////////////////////////////////////////////////////////////////////////
 			instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_JUSENA(a_dados, a_diretorio + "//CadUsH.csv");
-
-			for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); pos_lista_hidreletrica_out_estudo++) {
-
-				//////////////////////
-				//produtibilidade_EAR
-				//////////////////////
-				if (true) {
-					const double percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
-					const Periodo periodo_canal_fuga_medio = a_horizonte_estudo.getIteradorInicial();
-					lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(a_horizonte_estudo, lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo_canal_fuga_medio, a_horizonte_estudo.getIteradorInicial(), percentual_volume_util, false)));
-				}//if (true) {
-
-				if (true) {
-					const double percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
-					for (Periodo periodo = horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= horizonte_tendencia_mais_estudo.getIteradorFinal(); horizonte_tendencia_mais_estudo.incrementarIterador(periodo))
-						lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(a_horizonte_estudo, lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo, a_horizonte_estudo.getIteradorInicial(), percentual_volume_util, true)));
-				}//if (true) {
-
-			}//for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); lista_hidreletrica_out_estudo.incrementarIterador(pos_lista_hidreletrica_out_estudo)) {
-
-			//////////////////////////////////////////////////////////////////////////////////
-			//1.3 Para a valoração das ENAs para as seguintes usinas deve ser somada a produtibilidade_ENA de Itaipu:
-			//Ilha Solteira / Três Marias / Capivara
-			calcular_produtibilidade_ENA_regras_especiais(a_dados, horizonte_tendencia_mais_estudo);
 
 			//////////////////////////////////////////////////////////////////////////////////
 			//2 Cálculo da produtibilidade_EAR acumulada por usina (aporte em cada REE)
 			//////////////////////////////////////////////////////////////////////////////////
-			calcular_produtibilidade_EAR_acumulada_por_usina(a_dados);
+
+			if (a_dados.vetorHidreletrica.att(a_dados.getMenorId(IdHidreletrica())).getSizeVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR) == 0)//Pode ter sido instanciado para o cálculo das produtibilidade_acumulada_EAR em restrições de energia armazenada RHV
+				calcular_produtibilidade_EAR_acumulada_por_usina(a_dados);
+			
+			
+			calcular_produtibilidade_ENA_por_usina_por_periodo(a_dados, horizonte_tendencia_mais_estudo);
 
 			//////////////////////////////////////////////////////////////////////////////////
 			//3 Cálculo da ENA x REE x cenário x período
@@ -13591,7 +13728,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 }
 
-
 void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(SmartEnupla<IdReservatorioEquivalente, bool> &a_coeficientes_EAR, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>> & a_coeficiente_ENA, std::string a_diretorio, std::string a_diretorio_cortes, std::string a_nomeArquivo){
 
 	try {
@@ -13979,6 +14115,8 @@ void LeituraCEPEL::instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jus
 {
 	try {
 
+		lista_hidreletrica_out_estudo = SmartEnupla<int, Hidreletrica>();//Inicializa
+
 		const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
 		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 
@@ -14288,6 +14426,65 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 {
 	try {
 
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Calcula produtibilidade_equivalente (cota_media(Vmax, Vmin), canal_fuga_medio) 
+		//Premissa: Usinas com regularização mensal utiliza o Vmax, Vmin (hidr.dat + modificações dadger)
+		//          Usinas com regularização semanal/diária utiliza VRef do hidr.dat
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		//////////////////////////////////////////////////////////////////////////////////
+		//1.1 Cálculo da produtibilidade média para as usinas instanciadas no CP, 
+		//seguindo a metodologia ONS - Submódulo 23.5: Critérios para estudos hidrológicos
+		// Premissa: Utiliza os atributos do hidr.dat (sem modificações do deck!) -> i.e. a produtibilidade_EAR é estática (AttComum)
+		//////////////////////////////////////////////////////////////////////////////////
+
+		const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
+		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
+
+		//Para as usinas com registro JUSMED no DADGER.dat (p.ex Tucurui, Sto Antonio, Jirau), o cálculo da produtibilidade é realizado com o canal de fuga médio 
+		//Ajustar:indicado no JUSMED mas do primeiro período semanal (deveria ser o JUSMED reportado para o período de acoplamento?). Premissa validada com o arquivo de saída energia_acopla.csv do deck DC 01/2023
+
+		for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+			if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
+				a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, 0.0);
+			}//if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
+			else {
+
+				//////////////////////
+				//produtibilidade_EAR
+				//////////////////////
+				if (true) {
+					const double percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
+					const Periodo periodo_canal_fuga_medio = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial();//Premissa validada com dados do DC
+					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()), a_dados.vetorHidreletrica.att(idHidreletrica), periodo_canal_fuga_medio, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial(), percentual_volume_util, false)));
+				}//if (true) {
+
+			}//else {
+
+
+		}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+		//////////////////////////////////////////////////////////////////////////////////
+		//1.2 Cálculo da produtibilidade média para as usinas NÃO instanciadas no CP 
+		//e indicadas no registro JUSENA (p.ex. COMP PAF-MOX)
+		// Precisa-se ler o hidr.dat/CadUsH.csv para obter info de vMax, vMin, polinômios, canal_fuga_medio, perdas etc
+		//////////////////////////////////////////////////////////////////////////////////
+
+		for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); pos_lista_hidreletrica_out_estudo++) {
+
+			//////////////////////
+			//produtibilidade_EAR
+			//////////////////////
+			if (true) {
+				const double percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
+				const Periodo periodo_canal_fuga_medio = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial();//Premissa validada com dados do DC
+				lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()), lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo_canal_fuga_medio, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial(), percentual_volume_util, false)));
+			}//if (true) {
+
+		}//for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); lista_hidreletrica_out_estudo.incrementarIterador(pos_lista_hidreletrica_out_estudo)) {
+
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Informação das hidrelétricas onde é valorado o volume armazenado em diferentes REEs
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14351,8 +14548,6 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 		//////////////////////////////
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
-		const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
-		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 
 		for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
@@ -14510,6 +14705,55 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina: \n" + std::string(erro.what())); }
+
+}
+
+void LeituraCEPEL::calcular_produtibilidade_ENA_por_usina_por_periodo(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo)
+{
+	try {
+
+		const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
+		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
+
+		//Para as usinas com registro JUSMED no DADGER.dat (p.ex Tucurui, Sto Antonio, Jirau), o cálculo da produtibilidade é realizado com o canal de fuga médio 
+		//Ajustar:indicado no JUSMED mas do primeiro período semanal (deveria ser o JUSMED reportado para o período de acoplamento?). Premissa validada com o arquivo de saída energia_acopla.csv do deck DC 01/2023
+
+		for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+			if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
+				a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_produtibilidade_ENA, SmartEnupla<Periodo, double>(a_horizonte_tendencia_mais_estudo, 0.0));
+
+			}//if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
+			else {
+
+				//////////////////////
+				//produtibilidade_ENA
+				//////////////////////
+				const double percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
+				for (Periodo periodo = a_horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= a_horizonte_tendencia_mais_estudo.getIteradorFinal(); a_horizonte_tendencia_mais_estudo.incrementarIterador(periodo))
+					a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()), a_dados.vetorHidreletrica.att(idHidreletrica), periodo, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial(), percentual_volume_util, true)));
+
+			}//else {
+
+		}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+		////////
+
+		for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); pos_lista_hidreletrica_out_estudo++) {
+
+			const double percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
+			for (Periodo periodo = a_horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= a_horizonte_tendencia_mais_estudo.getIteradorFinal(); a_horizonte_tendencia_mais_estudo.incrementarIterador(periodo))
+				lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), get_cota_para_conversao_cortes_NEWAVE(a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()), lista_hidreletrica_out_estudo.at(pos_lista_hidreletrica_out_estudo), periodo, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial(), percentual_volume_util, true)));
+
+		}//for (int pos_lista_hidreletrica_out_estudo = lista_hidreletrica_out_estudo.getIteradorInicial(); pos_lista_hidreletrica_out_estudo <= lista_hidreletrica_out_estudo.getIteradorFinal(); lista_hidreletrica_out_estudo.incrementarIterador(pos_lista_hidreletrica_out_estudo)) {
+
+		//////////////////////////////////////////////////////////////////////////////////
+		//Para a valoração das ENAs para as seguintes usinas deve ser somada a produtibilidade_ENA de Itaipu:
+		//Ilha Solteira / Três Marias / Capivara
+		calcular_produtibilidade_ENA_regras_especiais(a_dados, a_horizonte_tendencia_mais_estudo);
+
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::calcular_produtibilidade_ENA_por_usina_por_periodo: \n" + std::string(erro.what())); }
 
 }
 
@@ -18281,6 +18525,137 @@ void LeituraCEPEL::imprime_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados, std::st
 
 }
 
+void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_energia_armazenada(Dados& a_dados, std::string a_diretorio) {
+
+	try {
+
+		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+
+		const IdRestricaoOperativaUHE maiorIdRestricaoOperativaUHE = a_dados.getMaiorId(IdRestricaoOperativaUHE());
+
+		for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE; idRestricaoOperativaUHE++) {
+
+			if (a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).getAtributo(AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_energia_armazenada) {
+
+				////////////////////////////////////////////
+				//Calcula as produtibilidade_acumulada_EAR
+				////////////////////////////////////////////
+
+				if (a_dados.vetorHidreletrica.att(a_dados.getMenorId(IdHidreletrica())).getSizeVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR) == 0) {
+					instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_JUSENA(a_dados, a_diretorio + "//CadUsH.csv");
+					calcular_produtibilidade_EAR_acumulada_por_usina(a_dados);
+				}//if (a_dados.vetorHidreletrica.att(idHidreletrica).getSizeVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR) == 0) {
+
+				SmartEnupla<Periodo, double> energia_maxima_REE (horizonte_estudo, 0.0); //Calcula com base no volume_util_maximo * produtibilidade_acumulada_EAR das hidrelétricas que aportam no REE
+
+				///////////////////////////////////
+
+				const int codigo_restricao_operativa_RHE_energia = lista_codigo_ONS_restricao_operativa_UHE_energia_armazenada.getElemento(idRestricaoOperativaUHE);
+
+				int aux_pos_codigo_restricao_energia_armazenada = -1;
+
+				for (int pos_codigo_restricao_energia_armazenada = 1; pos_codigo_restricao_energia_armazenada <= int(codigo_restricao_energia_armazenada.size()); pos_codigo_restricao_energia_armazenada++) {
+
+					if (codigo_restricao_energia_armazenada.getElemento(pos_codigo_restricao_energia_armazenada) == codigo_restricao_operativa_RHE_energia) {
+						aux_pos_codigo_restricao_energia_armazenada = pos_codigo_restricao_energia_armazenada;
+						break;
+
+					}//if (codigo_restricao_energia_armazenada.getElemento(pos_codigo_restricao_energia_armazenada) == codigo_restricao_operativa_RHE_energia) {
+
+				}//for (int pos_codigo_restricao_energia_armazenada = 1; pos_codigo_restricao_energia_armazenada <= int(codigo_restricao_energia_armazenada.size()); pos_codigo_restricao_energia_armazenada++) {
+
+
+				const IdReservatorioEquivalente idReservatorioEquivalente = idReservatorioEquivalente_restricao_energia_armazenada.getElemento(aux_pos_codigo_restricao_energia_armazenada);
+
+				///////////////////////////////////
+
+
+				const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
+				const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
+
+				for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+					const double produtibilidade_acumulada_EAR = a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR, idReservatorioEquivalente, double());
+
+					if (produtibilidade_acumulada_EAR > 0) {
+
+						IdElementoSistema idElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
+
+						if (idElementoSistema == IdElementoSistema_Nenhum) { idElementoSistema = IdElementoSistema_1; }
+						else { idElementoSistema++; }
+
+						ElementoSistema elementoSistema;
+						elementoSistema.setAtributo(AttComumElementoSistema_idElementoSistema, idElementoSistema);
+						elementoSistema.setAtributo(AttComumElementoSistema_tipo_elemento, TipoElementoSistema_hidreletrica);
+						elementoSistema.setAtributo(AttComumElementoSistema_hidreletrica, idHidreletrica);
+						elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_volume_util);
+
+						const double fator_participacao = produtibilidade_acumulada_EAR;
+
+						elementoSistema.setVetor(AttVetorElementoSistema_fator_participacao, SmartEnupla<Periodo, double>(horizonte_estudo, fator_participacao));
+
+						a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).vetorElementoSistema.add(elementoSistema);
+
+						///////////////////////////////////
+						//Cálculo da energia_maxima_REE
+						///////////////////////////////////
+
+						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+							const double volume_util_minimo = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_util_minimo, periodo, double());
+							const double volume_util_maximo = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_util_maximo, periodo, double());
+
+							double energia_maxima_periodo_anterior = energia_maxima_REE.getElemento(periodo);
+							double energia_maxima_periodo_nova = energia_maxima_periodo_anterior + (volume_util_maximo - volume_util_minimo) * produtibilidade_acumulada_EAR;
+
+							energia_maxima_REE.setElemento(periodo, energia_maxima_periodo_nova);
+
+						}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+					}//if (produtibilidade_acumulada_EAR > 0) {
+
+				}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+				/////////////////////////////////////////////////////////////////
+				//Atualiza limite_inferior da restrição caso esteja em percentual
+				/////////////////////////////////////////////////////////////////
+
+				if (a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).getAtributo(AttComumRestricaoOperativaUHE_tipoUnidadeRestricaoHidraulica, TipoUnidadeRestricaoHidraulica()) == TipoUnidadeRestricaoHidraulica_percentual) {
+
+					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+						const IdPatamarCarga maiorIdPatamarCarga = a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
+
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+							const double limite_inferior_percentual = a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).getElementoMatriz(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, double());
+							
+							if (limite_inferior_percentual != getdoubleFromChar("min")) {
+
+								const double limite_inferior_MW = limite_inferior_percentual * energia_maxima_REE.getElemento(periodo) / 100;
+
+								a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, limite_inferior_MW);
+
+							}//if (limite_inferior_percentual != getdoubleFromChar("min")) {
+
+						}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+							
+					}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+					a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setAtributo(AttComumRestricaoOperativaUHE_tipoUnidadeRestricaoHidraulica, TipoUnidadeRestricaoHidraulica_MW);
+
+				}//if (a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).getAtributo(AttComumRestricaoOperativaUHE_tipoUnidadeRestricaoHidraulica, TipoUnidadeRestricaoHidraulica()) == TipoUnidadeRestricaoHidraulica_percentual) {
+
+			}//if (a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).getAtributo(AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_energia_armazenada) {
+
+		}//for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE; idRestricaoOperativaUHE++) {
+
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_energia_armazenada: \n" + std::string(erro.what())); }
+
+}
+
+
 void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao) {
 
 	try {
@@ -18296,7 +18671,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		modifica_lista_jusante_hidreletrica_com_casos_validados_CP(a_dados);
 
 		instanciar_codigo_usina_jusante_JUSENA(a_dados); //Para desacoplamento do corte NEWAVE (caso necessário)-> Atributo que foi atualizado em aplicarModificacoesUHE(a_dados) para usinas com registro JUSENA
-					
+		
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Lê volumes metas (se existir relato.rvX e relato2.rvX) e turbinamento_maximo (se existir relato.rvX)
 
@@ -18465,9 +18840,18 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		a_dados.validacao_operacional_BaciaHidrografica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
+		sequenciarRestricoesEletricas(a_dados);
+
 		a_dados.validacao_operacional_RestricaoEletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
+		////////////////
+		atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_energia_armazenada(a_dados, a_diretorio); //Para criar as restrições por energia é necessário calcular a produtibilidade_acumulada_EAR (que dependia de aplicar das modificações)
+		
+		sequenciarRestricoesHidraulicas(a_dados);
+
 		a_dados.validacao_operacional_RestricaoOperativaUHE(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+
+		////////////////
 
 		if (hidreletricasPreConfig_instanciadas)
 			a_dados.valida_preconfig_hidraulica(lista_jusante_hidreletrica, lista_jusante_desvio_hidreletrica);

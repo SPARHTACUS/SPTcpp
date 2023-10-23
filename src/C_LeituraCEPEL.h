@@ -192,6 +192,7 @@ private:
 	void instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_JUSENA(Dados& a_dados, std::string a_nomeArquivo);
 	void instancia_atributos_hidreletrica_out_from_CadUsH_csv(Dados& a_dados, Hidreletrica& a_hidreletrica, std::string a_nomeArquivo);
 	void calcular_produtibilidade_ENA_regras_especiais(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
+	void calcular_produtibilidade_ENA_por_usina_por_periodo(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
 	void calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados);
 	void calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados);
 	void calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE(Dados& a_dados);
@@ -236,6 +237,8 @@ private:
 	void valida_bacia_sao_francisco(Dados& a_dados);
 
 	void imprime_na_tela_avisos_de_possiveis_inviabilidades_fph(Dados& a_dados);
+
+	void atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_energia_armazenada(Dados& a_dados, std::string a_diretorio);
 
 	/////////////////////////////////////////
 	//NEWAVE
@@ -367,6 +370,7 @@ private:
 	SmartEnupla<IdRestricaoOperativaUHE, int> lista_codigo_ONS_restricao_operativa_UHE_vazao_afluente = SmartEnupla<IdRestricaoOperativaUHE, int>(IdRestricaoOperativaUHE_1, std::vector<int>(IdRestricaoOperativaUHE(int(IdRestricaoOperativaUHE_Excedente) - 1), -1));
 	SmartEnupla<IdRestricaoOperativaUHE, int> lista_codigo_ONS_restricao_operativa_UHE_volume = SmartEnupla<IdRestricaoOperativaUHE, int>(IdRestricaoOperativaUHE_1, std::vector<int>(IdRestricaoOperativaUHE(int(IdRestricaoOperativaUHE_Excedente) - 1), -1));
 	SmartEnupla<IdRestricaoOperativaUHE, int> lista_codigo_ONS_restricao_operativa_UHE_vazao_defluente = SmartEnupla<IdRestricaoOperativaUHE, int>(IdRestricaoOperativaUHE_1, std::vector<int>(IdRestricaoOperativaUHE(int(IdRestricaoOperativaUHE_Excedente) - 1), -1));
+	SmartEnupla<IdRestricaoOperativaUHE, int> lista_codigo_ONS_restricao_operativa_UHE_energia_armazenada = SmartEnupla<IdRestricaoOperativaUHE, int>(IdRestricaoOperativaUHE_1, std::vector<int>(IdRestricaoOperativaUHE(int(IdRestricaoOperativaUHE_Excedente) - 1), -1));
 
 	SmartEnupla<IdUsinaElevatoria, int> lista_codigo_ONS_usina_elevatoria = SmartEnupla<IdUsinaElevatoria, int>(IdUsinaElevatoria_1, std::vector<int>(IdUsinaElevatoria(int(IdUsinaElevatoria_Excedente) - 1), -1));
 

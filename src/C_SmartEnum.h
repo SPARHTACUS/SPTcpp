@@ -1467,6 +1467,11 @@ DEFINE_SMART_ENUM(TipoStatusUnidadeUTE, TIPO_STATUS_UNIDADE_UTE)
 	m(TipoUnidadeRestricaoContrato,  MW) 
 DEFINE_SMART_ENUM(TipoUnidadeRestricaoContrato, TIPO_UNIDADE_RESTRICAO_CONTRATO)
 
+#define TIPO_UNIDADE_RESTRICAO_HIDRAULICA(m)       \
+	m(TipoUnidadeRestricaoHidraulica,  percentual) \
+	m(TipoUnidadeRestricaoHidraulica,  MW) 
+DEFINE_SMART_ENUM(TipoUnidadeRestricaoHidraulica, TIPO_UNIDADE_RESTRICAO_HIDRAULICA)
+
 #define TIPO_ESTAGIO(m)\
 	m(TipoEstagio, deterministico)  \
 	m(TipoEstagio, estocastico) 
@@ -1684,7 +1689,8 @@ DEFINE_SMART_ENUM(TipoIntercambioHidraulico, TIPO_INTERCAMBIOHIDRAULICO)
     m(TipoRestricaoHidraulica, vazao_defluente)           \
     m(TipoRestricaoHidraulica, variacao_percentual)      \
     m(TipoRestricaoHidraulica, variacao_absoluta)        \
-    m(TipoRestricaoHidraulica, limite)
+    m(TipoRestricaoHidraulica, limite)                   \
+    m(TipoRestricaoHidraulica, energia_armazenada)
 DEFINE_SMART_ENUM(TipoRestricaoHidraulica, TIPO_RESTRICAO_HIDRAULICA)
 
 #define TIPO_REGULARIZACAO(m)\
@@ -1747,6 +1753,7 @@ m(TipoTendenciaEstocastica)          \
 m(TipoTermeletrica)                  \
 m(TipoTurbina)                       \
 m(TipoUnidadeRestricaoContrato)      \
+m(TipoUnidadeRestricaoHidraulica)      \
 m(TipoValor)                         \
 m(TipoVariavelRestricaoOperativa)   \
 

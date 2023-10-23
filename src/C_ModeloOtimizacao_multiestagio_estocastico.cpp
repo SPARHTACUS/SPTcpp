@@ -295,6 +295,11 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 					criarRestricoesHidraulicaEspecial_volume_armazenado(listaTipoSubproblemaSolver.at(i), a_dados, idEstagio, periodo_estudo, horizonte_estudo_estagio);
 					tempoCriarVariaveis.restricaoHidraulicaEspecial_volume_armazenado += std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock).count() / 60;
 
+					//RESTRIÇÕES HIDRAULICA ESPECIAL ENERGIA ARMAZENADA
+					start_clock = std::chrono::high_resolution_clock::now();
+					criarRestricoesHidraulicaEspecial_energia_armazenada(listaTipoSubproblemaSolver.at(i), a_dados, idEstagio, periodo_estudo, horizonte_estudo_estagio);
+					tempoCriarVariaveis.restricaoHidraulicaEspecial_volume_armazenado += std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock).count() / 60;
+
 					const IdPatamarCarga maiorIdPatamarCarga = a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga());
 
 					//  Restrição Custo Penalidade (ZP) Por PeriodoEstudo (penalidade de variáveis que não dependem do patamar de carga)
@@ -8019,6 +8024,160 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 	catch (const std::exception& erro) { throw std::invalid_argument("criarRestricoesHidraulicaEspecial_volume_armazenado(" + getFullString(a_TSS) + ",Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados): \n" + std::string(erro.what())); }
 
 }//void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados)
+
+void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const SmartEnupla<Periodo, double>a_horizonte_estudo_estagio) {
+
+	try {
+
+		if (a_TSS == TipoSubproblemaSolver_mestre)
+			return;
+
+		const std::vector<IdRestricaoOperativaUHE> idRestricaoOperativaUHE_energia_armazenada = a_dados.vetorRestricaoOperativaUHE.getIdObjetos(AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica_energia_armazenada);
+
+		const int numero_restricoes = int(idRestricaoOperativaUHE_energia_armazenada.size());
+
+		for (int pos = 0; pos < numero_restricoes; pos++) {
+
+			const IdRestricaoOperativaUHE idRestricaoOperativaUHE = idRestricaoOperativaUHE_energia_armazenada.at(pos);
+
+			Periodo periodo_inicial_dos_dados = a_horizonte_estudo_estagio.getIteradorInicial();
+
+			if (periodo_inicial_dos_dados < a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_periodo_inicio, Periodo())) //Condição caso a restrição comece em um periodo "intermediário" do estágio SPT 
+				periodo_inicial_dos_dados = a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_periodo_inicio, Periodo());
+
+
+			/////////////////////////////////////////////////////////////////////
+			//Restrição Hidráulica de Volume Armazenado (RHE)
+			// %EAR_REE_max <= produtibilidade_acumulada_EAR * Volume
+			// 
+			// Nota: produtibilidade_acumulada_EAR é calculada com base nas regras de cálculo da conversão dos cortes
+			/////////////////////////////////////////////////////////////////////
+			//******************************************
+			//Restrição <=
+			//******************************************
+
+			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_periodo_estudo, IdPatamarCarga_1, double()) != getdoubleFromChar("min")) {
+
+				if (getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE) > -1) {
+
+					const int posIneRHV = addIneLinear_RESTRICAO_HIDRAULICA_VOLUME_LIMITE_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE);
+
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_periodo_estudo, IdPatamarCarga_1, double()));
+
+					//Variável RHV_FINF				
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHV, 1.0);
+
+					const IdElementoSistema maiorElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
+					for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorElementoSistema; idElementoSistema++) {
+
+						const IdHidreletrica       idHidreletrica = a_dados.getAtributo(idRestricaoOperativaUHE, idElementoSistema, AttComumElementoSistema_hidreletrica, IdHidreletrica());
+						const IdUsinaElevatoria idUsinaElevatoria = a_dados.getAtributo(idRestricaoOperativaUHE, idElementoSistema, AttComumElementoSistema_usina_elevatoria, IdUsinaElevatoria());
+
+						const TipoVariavelRestricaoOperativa tipoVariavelRestricaoOperativa = a_dados.getAtributo(idRestricaoOperativaUHE, idElementoSistema, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa());
+
+						if (idHidreletrica != IdHidreletrica_Nenhum) {
+
+							// Variável VI ou VF (Volume armazenado nos reservatórios)
+							if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_util) {
+
+								if (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorFinal()) {
+
+									if (getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) > -1)
+										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+
+								}//if (a_periodo_estudo == a_horizonte_estudo.getIteradorFinal()) {
+								else {
+
+									Periodo periodo_seguinte = a_periodo_estudo;
+
+									a_horizonte_estudo_estagio.incrementarIterador(periodo_seguinte); //O volume final do estágio t é igual ao volume inicial de t+1
+
+									if (getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica) > -1)
+										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica), posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+
+								}//else {
+
+							}//if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_util) {
+
+						} // if (idHidreletrica != IdHidreletrica_Nenhum) {
+						else
+							throw std::invalid_argument(getFullString(idElementoSistema) + " nao possui atributo valido para " + getFullString(idRestricaoOperativaUHE));
+
+					} // for (IdElementoSistema idElementoSistema; idElementoSistema <= maiorElementoSistema; idElementoSistema++){
+
+				} // if (getVarDecisao_RHVseExistir(a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE) > -1) {
+
+			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_periodo_estudo, IdPatamarCarga_1, double()) > 0) {
+
+			//******************************************
+			//Restrição >=
+			//******************************************
+
+			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_periodo_estudo, IdPatamarCarga_1, double()) != getdoubleFromChar("max")) {
+
+				if (getVarDecisao_RHV_FSUPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE) > -1) {
+
+					const int posIneRHV = addIneLinear_RESTRICAO_HIDRAULICA_VOLUME_LIMITE_SUPERIOR(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE);
+
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_periodo_estudo, IdPatamarCarga_1, double()));
+
+					// Variável RHV
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHV, 1.0);
+
+					const IdElementoSistema maiorElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
+					for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorElementoSistema; idElementoSistema++) {
+
+						const IdHidreletrica       idHidreletrica = a_dados.getAtributo(idRestricaoOperativaUHE, idElementoSistema, AttComumElementoSistema_hidreletrica, IdHidreletrica());
+						const IdUsinaElevatoria idUsinaElevatoria = a_dados.getAtributo(idRestricaoOperativaUHE, idElementoSistema, AttComumElementoSistema_usina_elevatoria, IdUsinaElevatoria());
+
+						const TipoVariavelRestricaoOperativa tipoVariavelRestricaoOperativa = a_dados.getAtributo(idRestricaoOperativaUHE, idElementoSistema, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa());
+
+						if (idHidreletrica != IdHidreletrica_Nenhum) {
+
+							// Variável VF ou VI (Volume armazenado nos reservatórios)
+							if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_util) {
+
+								if (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorFinal()) {
+
+									if (getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) > -1)
+										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+
+								}//if (a_periodo_estudo == a_horizonte_estudo.getIteradorFinal()) {
+								else {
+
+									Periodo periodo_seguinte = a_periodo_estudo;
+
+									a_horizonte_estudo_estagio.incrementarIterador(periodo_seguinte); //O volume final do estágio t é igual ao volume inicial de t+1
+
+									if (getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica) > -1)
+										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica), posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+
+								}//else {
+							}//if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_util) {
+
+						} // if (idHidreletrica != IdHidreletrica_Nenhum) {
+						else
+							throw std::invalid_argument(getFullString(idElementoSistema) + " nao possui atributo valido para " + getFullString(idRestricaoOperativaUHE));
+
+					} // for (IdElementoSistema idElementoSistema; idElementoSistema <= maiorElementoSistema; idElementoSistema++){
+
+				} // if (getVarDecisao_RHVseExistir(a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE) > -1) {
+
+			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_periodo_estudo, IdPatamarCarga_1, double()) < getdoubleFromChar("max")) {
+
+			//Atualiza o periodo onde começa o estágio da leitura dos dados
+			if (a_periodo_estudo < a_horizonte_estudo_estagio.getIteradorFinal()) {//Signica um periodo que corresponde a o fim de um estagio_DC mas não do estagio_SPT
+				periodo_inicial_dos_dados = a_periodo_estudo;
+				a_horizonte_estudo_estagio.incrementarIterador(periodo_inicial_dos_dados);
+			}//if (a_periodo_estudo < a_horizonte_estudo.getIteradorFinal()) {	
+
+		}// for (int pos = 0; pos < numero_restricoes; pos++) {
+
+	} // try{
+
+	catch (const std::exception& erro) { throw std::invalid_argument("criarRestricoesHidraulicaEspecial_energia_armazenada(" + getFullString(a_TSS) + ",Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados): \n" + std::string(erro.what())); }
+
+}//void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados)
 
 
 void ModeloOtimizacao::criarRestricoesIntercambioHidraulicooRetiradaRelaxada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga, const IdIntercambioHidraulico a_idIntercambioHidraulico) {
