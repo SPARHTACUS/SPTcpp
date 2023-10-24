@@ -18616,11 +18616,37 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 				}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-				/////////////////////////////////////////////////////////////////
-				//Atualiza limite_inferior da restrição caso esteja em percentual
-				/////////////////////////////////////////////////////////////////
+				/////////////////////
 
 				if (a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).getAtributo(AttComumRestricaoOperativaUHE_tipoUnidadeRestricaoHidraulica, TipoUnidadeRestricaoHidraulica()) == TipoUnidadeRestricaoHidraulica_percentual) {
+
+					////////////////////////////
+					//Determina os tipos de períodos do hosrizonte_estudo_DECK
+
+					std::vector<TipoPeriodo> tipo_periodos_horizonte_DECK;
+
+					for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+						bool is_tipo_periodo_encontrado = false;
+
+						const TipoPeriodo tipo_periodo = periodo_deck.getTipoPeriodo();
+
+						for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
+
+							if (tipo_periodo == tipo_periodos_horizonte_DECK.at(pos)) {
+								is_tipo_periodo_encontrado = true;
+								break;
+							}//if (tipo_periodo == tipo_periodos_horizonte_DECK.at(pos)) {
+
+						}//for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
+
+						/////
+						if (!is_tipo_periodo_encontrado)
+							tipo_periodos_horizonte_DECK.push_back(tipo_periodo);
+
+					}//for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+					////////////////////////////
 
 					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -18632,9 +18658,46 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 							
 							if (limite_inferior_percentual != getdoubleFromChar("min")) {
 
-								const double limite_inferior_MW = limite_inferior_percentual * energia_maxima_REE.getElemento(periodo) / 100;
 
-								a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, limite_inferior_MW);
+								///////////////////////////////////////////////////////
+								//Verifica se é um período final do período semanal
+								///////////////////////////////////////////////////////
+
+								bool is_periodo_um_periodo_final_deck = false;
+
+								if (periodo == horizonte_estudo.getIteradorFinal())
+									is_periodo_um_periodo_final_deck = true;
+								else {
+
+									for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
+
+										const TipoPeriodo tipo_periodo = tipo_periodos_horizonte_DECK.at(pos);
+										const Periodo periodo_seguinte = Periodo(tipo_periodo, periodo + 1);
+
+										for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+											if (periodo_seguinte == periodo_deck) {
+												is_periodo_um_periodo_final_deck = true;
+												break;
+											}//if (periodo_seguinte == periodo_deck) {
+
+										}//for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+									}//for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
+
+								}//else {
+								
+								///////////////////////////////////////////////////////
+							
+								if (is_periodo_um_periodo_final_deck) {
+
+									const double limite_inferior_MW = limite_inferior_percentual * energia_maxima_REE.getElemento(periodo) / 100;
+
+									a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, limite_inferior_MW);
+
+								}//if (is_periodo_um_periodo_final_deck) {
+								else if(!is_periodo_um_periodo_final_deck)
+									a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, getdoubleFromChar("min"));//Na leitura é instanciado com o valor percentual do registro, e.g., 20% -> se coloca -inf caso não seja um período final de estágio DC 
 
 							}//if (limite_inferior_percentual != getdoubleFromChar("min")) {
 
@@ -18654,7 +18717,6 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_energia_armazenada: \n" + std::string(erro.what())); }
 
 }
-
 
 void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao) {
 
