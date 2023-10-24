@@ -13230,7 +13230,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 				SmartEnupla<IdVariavelEstado, double> estados;
 				SmartEnupla <IdHidreletrica, IdVariavelEstado> estados_VI(menorIdHidreletrica, std::vector<IdVariavelEstado>(int(maiorIdHidreletrica - menorIdHidreletrica) + 1, IdVariavelEstado_Nenhum));
-				SmartEnupla <IdHidreletrica, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, IdVariavelEstado>>> estados_ENA(menorIdHidreletrica, std::vector<SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, IdVariavelEstado>>>(int(maiorIdHidreletrica - menorIdHidreletrica) + 1, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, IdVariavelEstado>>()));
+				SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, IdVariavelEstado>> estados_ENA(IdReservatorioEquivalente(1), std::vector<SmartEnupla<int, IdVariavelEstado>>(maior_ONS_REE, SmartEnupla < int, IdVariavelEstado>(1, std::vector<IdVariavelEstado>(ordem_maxima_PAR, IdVariavelEstado_Nenhum))));
 				SmartEnupla <IdTermeletrica, SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>> estados_GNL(menorIdTermeletrica, std::vector<SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>>(int(maiorIdTermeletrica - menorIdTermeletrica) + 1, SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>()));
 
 				SmartEnupla<IdSubmercado, IdReservatorioEquivalente> mapeamentoSubmercadoxREE(IdSubmercado(1), std::vector<IdReservatorioEquivalente>(int(IdSubmercado_Excedente - 1), IdReservatorioEquivalente_Nenhum));
@@ -13242,6 +13242,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 					SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>> coeficiente_ENA;
 
 					leitura_cortes_NEWAVE_para_dimensionamento(coeficientes_EAR, coeficiente_ENA, a_diretorio, a_diretorio_cortes, a_nomeArquivo);
+
 
 					// Variaveis Estado
 					for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
@@ -13256,9 +13257,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 								}
 							}
 						}
-
-						// Inicializa Estados YP
-						estados_ENA.at(idHidreletrica) = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, IdVariavelEstado>>(IdReservatorioEquivalente(1), std::vector<SmartEnupla<int, IdVariavelEstado>>(coeficiente_ENA.getIteradorFinal(), SmartEnupla < int, IdVariavelEstado>( 1, std::vector<IdVariavelEstado>(ordem_maxima_PAR, IdVariavelEstado_Nenhum))));
 
 						mapeamentoSubmercadoxREE.at(a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado())) = IdReservatorioEquivalente(lista_codigo_ONS_REE.at(idHidreletrica));
 
@@ -13339,9 +13337,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 											if (vazio_0 && vazio_1)
 												break;
 
-											if (((termo_0) || (termo_1)) && (estados_ENA.at(idHidreletrica).at(idREE).at(lag) == IdVariavelEstado_Nenhum)) {
-												estados_ENA.at(idHidreletrica).at(idREE).at(lag) = estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, std::string(strVarDecisaoENAIdEstagioPeriodo + "," + getString(idHidreletrica) + "," + getString(idREE) + "," + getString(periodo_lag)), -1, -1);
-												estados.addElemento(estados_ENA.at(idHidreletrica).at(idREE).at(lag), 0.0);
+											if (((termo_0) || (termo_1)) && (estados_ENA.at(idREE).at(lag) == IdVariavelEstado_Nenhum)) {
+												estados_ENA.at(idREE).at(lag) = estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, std::string(strVarDecisaoENAIdEstagioPeriodo + "," + getString(periodo_lag) + "," + getString(idREE)), -1, -1);
+												estados.addElemento(estados_ENA.at(idREE).at(lag), 0.0);
 											}
 
 										} // for (IdRealizacao idReal = IdRealizacao_1; idReal <= IdRealizacao(idCenario_final); idReal++) {
@@ -13621,20 +13619,17 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 								} // if (idVariavelEstado > IdVariavelEstado_Nenhum) {
 							} // for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-							// Variaveis YP
+							// Variaveis ENA REE
 							for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
 
-								for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+								for (IdReservatorioEquivalente idREE = coeficiente_ENA.getIteradorInicial(); idREE <= coeficiente_ENA.getIteradorFinal(); idREE++) {
 
-									for (IdReservatorioEquivalente idREE = coeficiente_ENA.getIteradorInicial(); idREE <= coeficiente_ENA.getIteradorFinal(); idREE++) {
-
-										const IdVariavelEstado idVariavelEstado = estados_ENA.at(idHidreletrica).at(idREE).at(lag);
+										const IdVariavelEstado idVariavelEstado = estados_ENA.at(idREE).at(lag);
 
 										if (idVariavelEstado > IdVariavelEstado_Nenhum)
 											coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) = coeficiente_ENA.at(idREE).at(lag) * numero_horas_estagio_NEWAVE;
 									}
-								} // for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-
+								
 							} // for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
 
 							// Variaveis PTDISPCOM 

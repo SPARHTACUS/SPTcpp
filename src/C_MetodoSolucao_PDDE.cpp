@@ -117,6 +117,8 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 		const int numero_cenarios = a_modeloOtimizacao.getNumeroCenarios(cenario_inicial, cenario_final);
 
+		IdCenario idCenario_unico_simulacao = IdCenario_Nenhum;
+
 		double tempo_medio_otimizacao_solver = 0.0;
 
 		SmartEnupla<IdCenario, double> custo_inferior_via_mestre;
@@ -179,7 +181,10 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 						auto start_clock_cenario = std::chrono::high_resolution_clock::now();
 
-						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, a_idProcesso, a_maiorIdProcesso, idCenario);
+						if ((a_simulacao) && (idCenario_unico_simulacao != IdCenario_Nenhum))
+							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, a_idProcesso, a_maiorIdProcesso, idCenario_unico_simulacao);
+						else
+							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, a_idProcesso, a_maiorIdProcesso, idCenario);
 
 						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, idCenario);
 
@@ -210,8 +215,10 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 							
 						}
 
+						const double probabiliade_abertura = a_modeloOtimizacao.getProbabilidadeAbertura(idEstagio, idCenario);
+
 						//Probabilidade acumulada do cenário					
-						probabilidade_cenario.at(idCenario) *= a_modeloOtimizacao.getProbabilidadeAbertura(idEstagio, idCenario);
+						probabilidade_cenario.at(idCenario) *= probabiliade_abertura;
 
 						if ((idEstagio < a_estagio_final) || (IdEstagio(a_estagio_final + 1) <= a_modeloOtimizacao.getMaiorId(IdEstagio()))) {
 							bool resetar = false;
@@ -233,6 +240,14 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 							valores_tempo_otimizacao.at(1).push_back(getString(tempo_otimizacao));
 							valores_tratamento.at(1).push_back(getString(a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_tratamento_inviabilidade, idEstagio, int())));
 						} // if (imprimir_tempos) {
+
+						if ((a_simulacao) && (probabiliade_abertura == 1.0)) {
+							idCenario_unico_simulacao = idCenario;
+							break;
+						}
+
+						else if ((a_simulacao) && (probabiliade_abertura == 1.0) && (idCenario == cenario_final))
+							idCenario_unico_simulacao = IdCenario_Nenhum;
 
 					} // try {
 					catch (const std::exception& erro) { throw std::invalid_argument("Erro no problema de " + getFullString(idEstagio) + " " + getFullString(idCenario) + ". \n" + std::string(erro.what())); }
@@ -288,6 +303,9 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 		a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao);
 		executarPDDE_imprimirEstados(a_entradaSaidaDados, a_idIteracao, a_idProcesso, a_modeloOtimizacao);
+
+		if (a_simulacao)
+			return;
 
 		a_entradaSaidaDados.setDiretorioSaida(diretorio);
 

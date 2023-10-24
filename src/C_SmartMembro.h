@@ -824,6 +824,10 @@ Id##Membro getMaiorId(const Id##Membro a_membro)const{ \
 	try { return vetor##Membro.getMaiorId(); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMaiorId(" + getString(a_membro) + "): \n" + std::string(erro.what())); } \
 };\
+bool isInstanciado(const Id##Membro a_membro)const{ \
+	try { return vetor##Membro.isInstanciado(a_membro); } \
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::isIstanciado(" + getString(a_membro) + "): \n" + std::string(erro.what())); } \
+};\
 std::vector<Id##Membro> getIdObjetos(const Id##Membro a_membro)const{ \
 	try { return vetor##Membro.getIdObjetos(); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIdObjetos(" + getString(a_membro) + "): \n" + std::string(erro.what())); } \
@@ -871,6 +875,11 @@ template<typename IdMembroMembro> \
 IdMembroMembro getMenorId(const Id##Membro a_membro, const IdMembroMembro a_membroMembro){ \
 	try { return vetor##Membro.att(a_membro).getMenorId(a_membroMembro); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMenorId(" + getString(a_membro) + "," + getString(a_membroMembro) + "): \n" + std::string(erro.what())); } \
+};\
+template<typename IdMembroMembro> \
+bool isInstanciado(const Id##Membro a_membro, const IdMembroMembro a_membroMembro){ \
+	try { return vetor##Membro.att(a_membro).isInstanciado(a_membroMembro); } \
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::isInstanciado(" + getString(a_membro) + "," + getString(a_membroMembro) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdMembroMembro> \
 std::vector<IdMembroMembro> getIdObjetos(const Id##Membro a_membro, const IdMembroMembro a_membroMembro){ \
