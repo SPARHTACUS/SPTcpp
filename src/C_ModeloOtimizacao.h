@@ -195,7 +195,9 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
     m(  VarDecisao,   RHA_FSUP,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao,                nao)  \
     m(  VarDecisao,   RHV,              3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao,                nao)  \
     m(  VarDecisao,   RHV_FINF,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao,                nao)  \
-    m(  VarDecisao,   RHV_FSUP,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao,                nao)
+    m(  VarDecisao,   RHV_FSUP,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao,                nao)  \
+    m(  VarDecisao,   RHE_FINF,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao,                nao)  \
+    m(  VarDecisao,   RHE_FSUP,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     sim,          nao,                nao)
    //   Elemento,     Nome,       NroIter,         Iteradores,                                     Impr.Primal,     Impr.Dual              NormDual
 
 #define EQUACAO_LINEAR_3(m)\
@@ -226,6 +228,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
     m(  IneLinear,   RESTRICAO_HIDRAULICA_VOLUME,                    3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao,                nao)  \
     m(  IneLinear,   RESTRICAO_HIDRAULICA_VOLUME_LIMITE_INFERIOR,    3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao,                nao)  \
     m(  IneLinear,   RESTRICAO_HIDRAULICA_VOLUME_LIMITE_SUPERIOR,    3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao,                nao)  \
+    m(  IneLinear,   RESTRICAO_HIDRAULICA_ENERGIA_LIMITE_INFERIOR,   3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao,                nao)  \
+    m(  IneLinear,   RESTRICAO_HIDRAULICA_ENERGIA_LIMITE_SUPERIOR,   3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao,                nao)  \
     m(  IneLinear,   RESTRICAO_HIDRAULICA_AFLUENTE_LIMITE_INFERIOR,  3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao,                nao)  \
     m(  IneLinear,   RESTRICAO_HIDRAULICA_AFLUENTE_LIMITE_SUPERIOR,  3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao,                nao)  \
     m(  IneLinear,   RESTRICAO_HIDRAULICA_AFLUENTE,                  3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE,     nao,  nao,                nao)  \
