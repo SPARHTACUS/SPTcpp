@@ -11854,7 +11854,7 @@ void LeituraCEPEL::defineHorizontes_CP(Dados& a_dados)
 		valida_horizonte_estudo_CP_respeito_horizonte_otimizacao_DC(a_dados);
 
 		if (!dadosPreConfig_instanciados) {
-
+			a_dados.setAtributo(AttComumDados_periodo_referencia, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial());
 			a_dados.setAtributo(AttComumDados_estagio_final, a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal());
 			a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, estagio_acoplamento_pre_estudo);
 
@@ -12267,8 +12267,6 @@ void LeituraCEPEL::define_horizonte_estudo_CP(Dados& a_dados) {
 
 		a_dados.setVetor(AttVetorDados_horizonte_estudo, horizonte_estudo);
 
-		if (!dadosPreConfig_instanciados)
-			a_dados.setAtributo(AttComumDados_periodo_referencia, horizonte_estudo.getIteradorInicial());
 
 	}//try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::define_horizonte_estudo_CP(Dados &a_dados): \n" + std::string(erro.what())); }
