@@ -68,6 +68,7 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 
 		instancia_horizonte_preConfig(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG");
 		instancia_dados_preConfig(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG");
+		instancia_dados_matriz_preConfig(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG");
 
 		a_dados.setAtributo(AttComumDados_tipo_geracao_cenario_hidrologico, TipoGeracaoCenario_serie_informada);
 		a_dados.setAtributo(AttComumDados_mes_penalizacao_volume_util_minimo, IdMes_Nenhum);
@@ -1804,6 +1805,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 	try {
 
 		std::ifstream leituraArquivo(nomeArquivo);
+		std::ifstream leituraArquivo_aux(nomeArquivo);
 		std::string line;
 
 		std::string atributo;
@@ -1824,6 +1826,267 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 		bool leitura_registro_CD = false;
 
 		if (leituraArquivo.is_open()) {
+
+			/////////////////////////////////////////////////
+			//1.Instancia percentual_duracao_patamar_carga
+			/////////////////////////////////////////////////
+
+			if (a_dados.getSizeMatriz(AttMatrizDados_percentual_duracao_patamar_carga) == 0) {
+
+				bool is_registro_DP_encontrado = false;
+
+				while (std::getline(leituraArquivo_aux, line)) {
+
+					strNormalizada(line);
+
+					std::string teste_comentario = line.substr(0, 1);
+
+					if (teste_comentario != "&") {
+
+						std::string menemonico = line.substr(0, 2);
+
+						if (is_registro_DP_encontrado && menemonico != "DP")//Teste para ler só o bloco DP
+							break;
+
+						if (menemonico == "DP") {//Carga dos subsistemas					
+
+							try {
+
+								is_registro_DP_encontrado = true;
+
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								//Campo 2 -  Número de identificação do estágio (em ordem crescente, máximo igual a 24).
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+								atributo = line.substr(4, 2);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								const IdEstagio idEstagio_demanda = getIdEstagioFromChar(atributo.c_str());
+
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								//Filosofia: Verifica o tamanho da linha se existem dados de demanda e duração para determinar um novo patamar de carga
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+								int numero_patamares = 0;
+
+								double valor;
+
+								std::vector<double> demanda_patamar;
+								std::vector<double> duracao_horas_patamar;
+
+								const int line_size = int(line.length());
+
+								if (line_size >= 39) {
+
+									numero_patamares++;
+
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									//Campo 4 - Carga do patamar 1,em MWmed. 
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									atributo = line.substr(19, 10);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+									if (atributo == "")
+										valor = 0;
+									else
+										valor = atof(atributo.c_str());
+
+									demanda_patamar.push_back(valor);
+
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									//Campo 5 - Duração do patamar 1, em horas.  
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									atributo = line.substr(29, 10);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+									duracao_horas_patamar.push_back(atof(atributo.c_str()));
+
+								}//if (line_size >= 39) {
+
+								if (line_size >= 59) {
+
+									numero_patamares++;
+
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									//Campo 6 - Carga do patamar 2,em MWmed. 
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									atributo = line.substr(39, 10);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+									if (atributo == "")
+										valor = 0;
+									else
+										valor = atof(atributo.c_str());
+
+									demanda_patamar.push_back(valor);
+
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									//Campo 7 - Duração do patamar 2, em horas.  
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									atributo = line.substr(49, 10);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+									duracao_horas_patamar.push_back(atof(atributo.c_str()));
+
+								}//if (line_size >= 59) {
+
+								if (line_size >= 79) {
+
+									numero_patamares++;
+
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									//Campo 8 - Carga do patamar 3,em MWmed. 
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									atributo = line.substr(59, 10);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+									if (atributo == "")
+										valor = 0;
+									else
+										valor = atof(atributo.c_str());
+
+									demanda_patamar.push_back(valor);
+
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									//Campo 9 - Duração do patamar 3, em horas.  
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									atributo = line.substr(69, 10);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+									duracao_horas_patamar.push_back(atof(atributo.c_str()));
+
+								}//if (line_size >= 79) {
+
+								if (line_size >= 99) {
+
+									numero_patamares++;
+
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									//Campo 10 - Carga do patamar 4,em MWmed. 
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									atributo = line.substr(79, 10);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+									if (atributo == "")
+										valor = 0;
+									else
+										valor = atof(atributo.c_str());
+
+									demanda_patamar.push_back(valor);
+
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									//Campo 11 - Duração do patamar 4, em horas.  
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									atributo = line.substr(89, 10);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+									duracao_horas_patamar.push_back(atof(atributo.c_str()));
+
+								}//if (line_size >= 99) {
+
+								if (line_size >= 119) {
+
+									numero_patamares++;
+
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									//Campo 10 - Carga do patamar 5,em MWmed. 
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									atributo = line.substr(99, 10);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+									if (atributo == "")
+										valor = 0;
+									else
+										valor = atof(atributo.c_str());
+
+									demanda_patamar.push_back(valor);
+
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									//Campo 11 - Duração do patamar 5, em horas.  
+									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+									atributo = line.substr(109, 10);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+									duracao_horas_patamar.push_back(atof(atributo.c_str()));
+
+								}//if (line_size >= 119) {
+
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								//Guarda informação nos Smart Elementos
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+								if (a_dados.getSizeMatriz(AttMatrizDados_percentual_duracao_patamar_carga) == 0)
+									a_dados.setMatriz(AttMatrizDados_percentual_duracao_patamar_carga, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga(numero_patamares), 0.0))));
+
+								///////////////////////////////////////////////////////////////////////////
+								//Atualiza informação de cada estágio 
+								///////////////////////////////////////////////////////////////////////////	
+
+								const int size_duracao_horas_patamar = int(duracao_horas_patamar.size());
+
+								std::vector<double> percentual_duracao_patamar;
+
+								double horasTotais = 0;
+
+								for (int pos = 0; pos < size_duracao_horas_patamar; pos++)
+									horasTotais += duracao_horas_patamar.at(pos);
+
+								for (int pos = 0; pos < size_duracao_horas_patamar; pos++)
+									percentual_duracao_patamar.push_back(duracao_horas_patamar.at(pos) * std::pow(horasTotais, -1));
+
+								for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+									//Atualiza a informação unicamente para o estágio DC indicado
+
+									if (horizonte_otimizacao_DC.getIteradorFinal() == idEstagio_demanda) {
+
+										//Se é último estágio DC, o periodo deve ser maior ou igual ao estágio DC
+
+										if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda)) {
+
+											for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIdPatamarCargaFromChar(getString(numero_patamares).c_str()); idPatamarCarga++)
+												a_dados.setElemento(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, percentual_duracao_patamar.at(getintFromChar(getString(idPatamarCarga).c_str()) - 1));
+
+										}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda)) {
+
+									}//if (horizonte_otimizacao_DC.getIteradorFinal() == idEstagio_demanda) {
+									else {
+
+										//Se não é último estágio DC, o periodo deve ser entre dois estágios DC consecutivos
+
+										const IdEstagio idEstagio_demanda_seguinte = IdEstagio(idEstagio_demanda + 1);
+
+										if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda) && periodo < horizonte_otimizacao_DC.at(idEstagio_demanda_seguinte)) {
+
+											for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIdPatamarCargaFromChar(getString(numero_patamares).c_str()); idPatamarCarga++)
+												a_dados.setElemento(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, percentual_duracao_patamar.at(getintFromChar(getString(idPatamarCarga).c_str()) - 1));
+
+										}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda) && periodo < horizonte_otimizacao_DC.at(idEstagio_demanda_seguinte)) {
+
+										else if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda_seguinte))
+											break; //Evita percorrer todo o horizonte_estudo
+
+									}//else {
+
+								}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {					
+
+							}//try {
+							catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro DP: \n" + std::string(erro.what())); }
+
+						}//if (menemonico == "DP") {
+
+					}//if (teste_comentario != "&") {
+
+				}//while (std::getline(leituraArquivo, line)) {
+
+				leituraArquivo_aux.clear();
+				leituraArquivo_aux.close();
+
+			}//if (a_dados.getSizeMatriz(AttMatrizDados_percentual_duracao_patamar_carga) == 0) {
+
+			/////////////////////////////////////////////////
+			//2.Leitura completa
+			/////////////////////////////////////////////////
 
 			while (std::getline(leituraArquivo, line)) {
 
@@ -1883,7 +2146,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 					}//if(menemonico == "PT"){
 
-					else if (menemonico == "FP") {
+					if (menemonico == "FP") {
 						const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 						if (std::stoi(line.substr(4, 3)) == 999) {
 							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
@@ -2190,6 +2453,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro UH: \n" + std::string(erro.what())); }
 
 					}//if (menemonico == "UH") {
+					
 					if (menemonico == "CT") {//Usinas térmicas
 
 						try {
@@ -2499,6 +2763,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro CT: \n" + std::string(erro.what())); }
 
 					}//if (menemonico == "CT") {
+					
 					if (menemonico == "UE") {//Estações de bombeamento 
 
 						try {
@@ -2658,6 +2923,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro UE: \n" + std::string(erro.what())); }
 
 					}//if (menemonico == "UE") {
+					
 					if (menemonico == "ME") {//Dados de manutenção das estações de bombeamento
 
 						try {
@@ -2942,85 +3208,60 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							//Para o estágio 1 - Inicializa matrizes com valor 0 para todos os estágios
 							///////////////////////////////////////////////////////////////////////////
 
-							if (idEstagio_demanda == IdEstagio_1) {
-
-								std::vector<double> vetor_zero(numero_patamares, 0.0);
-
-								const SmartEnupla<IdPatamarCarga, double> vetor_demanda_patamar(IdPatamarCarga_1, vetor_zero);
-								const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_demanda_patamar(horizonte_estudo, vetor_demanda_patamar);
-
-								a_dados.vetorSubmercado.att(idSubmercado).setMatriz(AttMatrizSubmercado_demanda, matriz_demanda_patamar);
-
-								if (idSubmercado == a_dados.vetorSubmercado.getMenorId()) {
-
-									const SmartEnupla<IdPatamarCarga, double> vetor_percentual_duracao_patamar(IdPatamarCarga_1, vetor_zero);
-									const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_percentual_duracao_patamar(horizonte_estudo, vetor_percentual_duracao_patamar);
-
-									a_dados.setMatriz(AttMatrizDados_percentual_duracao_patamar_carga, matriz_percentual_duracao_patamar);
-
-								}// if (idSubmercado == a_dados.vetorSubmercado.getMenorId()) {
-
-							}//if (idEstagio_demanda == IdEstagio_1) {
+							if (idEstagio_demanda == IdEstagio_1)
+								a_dados.vetorSubmercado.att(idSubmercado).setMatriz(AttMatrizSubmercado_demanda, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> (horizonte_estudo, SmartEnupla<IdPatamarCarga, double>()));
 
 							///////////////////////////////////////////////////////////////////////////
 							//Atualiza informação de cada estágio 
 							///////////////////////////////////////////////////////////////////////////	
 
-							const int size_duracao_horas_patamar = int(duracao_horas_patamar.size());
-
-							std::vector<double> percentual_duracao_patamar;
-
-							double horasTotais = 0;
-
-							for (int pos = 0; pos < size_duracao_horas_patamar; pos++)
-								horasTotais += duracao_horas_patamar.at(pos);
-
-							for (int pos = 0; pos < size_duracao_horas_patamar; pos++)
-								percentual_duracao_patamar.push_back(duracao_horas_patamar.at(pos) * std::pow(horasTotais, -1));
-
 							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-								//Atualiza a informação unicamente para o estágio DC indicado
+								//////////////////////////////////////////////////////////////////////////////
+								//Inicializa o numero de patamares com percentual_duracao_patamar_carga > 0
+								//////////////////////////////////////////////////////////////////////////////
 
-								if (horizonte_otimizacao_DC.getIteradorFinal() == idEstagio_demanda) {
+								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
-									//Se é último estágio DC, o periodo deve ser maior ou igual ao estágio DC
+								if (a_dados.vetorSubmercado.att(idSubmercado).getElementosMatriz(AttMatrizSubmercado_demanda, periodo, IdPatamarCarga(), double()).size() == 0)
+									a_dados.vetorSubmercado.att(idSubmercado).setElementos(AttMatrizSubmercado_demanda, periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
 
-									if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda)) {
+								//////////////////////////////////////////////////////////////////////////////
 
-										for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIdPatamarCargaFromChar(getString(numero_patamares).c_str()); idPatamarCarga++) {
+								int numero_patamares_x_periodo = 0;
 
-											a_dados.vetorSubmercado.att(idSubmercado).setElemento(AttMatrizSubmercado_demanda, periodo, idPatamarCarga, demanda_patamar.at(getintFromChar(getString(idPatamarCarga).c_str()) - 1));
+								for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
 
-											a_dados.setElemento(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, percentual_duracao_patamar.at(getintFromChar(getString(idPatamarCarga).c_str()) - 1));
+									if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
+										numero_patamares_x_periodo++;
 
-										}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIdPatamarCargaFromChar(getString(numero_patamares).c_str()); idPatamarCarga++) {
+										const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo);
 
-									}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda)) {
+										//Atualiza a informação unicamente para o estágio DC indicado
+										if (horizonte_otimizacao_DC.getIteradorFinal() == idEstagio_demanda) {
 
-								}//if (horizonte_otimizacao_DC.getIteradorFinal() == idEstagio_demanda) {
-								else {
+											//Se é último estágio DC, o periodo deve ser maior ou igual ao estágio DC
 
-									//Se não é último estágio DC, o periodo deve ser entre dois estágios DC consecutivos
+											if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda))
+												a_dados.vetorSubmercado.att(idSubmercado).setElemento(AttMatrizSubmercado_demanda, periodo, idPatamarCarga, demanda_patamar.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
 
-									const IdEstagio idEstagio_demanda_seguinte = IdEstagio(idEstagio_demanda + 1);
+										}//if (horizonte_otimizacao_DC.getIteradorFinal() == idEstagio_demanda) {
+										else {
 
-									if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda) && periodo < horizonte_otimizacao_DC.at(idEstagio_demanda_seguinte)) {
+											//Se não é último estágio DC, o periodo deve ser entre dois estágios DC consecutivos
 
-										for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIdPatamarCargaFromChar(getString(numero_patamares).c_str()); idPatamarCarga++) {
+											const IdEstagio idEstagio_demanda_seguinte = IdEstagio(idEstagio_demanda + 1);
 
-											a_dados.vetorSubmercado.att(idSubmercado).setElemento(AttMatrizSubmercado_demanda, periodo, idPatamarCarga, demanda_patamar.at(getintFromChar(getString(idPatamarCarga).c_str()) - 1));
+											if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda) && periodo < horizonte_otimizacao_DC.at(idEstagio_demanda_seguinte))
+												a_dados.vetorSubmercado.att(idSubmercado).setElemento(AttMatrizSubmercado_demanda, periodo, idPatamarCarga, demanda_patamar.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));												
+											else if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda_seguinte))
+												break; //Evita percorrer todo o horizonte_estudo
 
-											a_dados.setElemento(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, percentual_duracao_patamar.at(getintFromChar(getString(idPatamarCarga).c_str()) - 1));
+										}//else {
 
-										}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIdPatamarCargaFromChar(getString(numero_patamares).c_str()); idPatamarCarga++) {
+									}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, double()) > 0.0) {
 
-									}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda) && periodo < horizonte_otimizacao_DC.at(idEstagio_demanda_seguinte)) {
-
-									else if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda_seguinte))
-										break; //Evita percorrer todo o horizonte_estudo
-
-								}//else {
+								}//for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
 
 							}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {					
 
@@ -3221,44 +3462,61 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 									matriz_codigo_ONS_patamar_deficit.at(idSubmercado).addElemento(idPatamarDeficit, codigo_usina);
 
 
-								const SmartEnupla<IdPatamarCarga, double> vetor_patamarDeficit_percentual_da_demanda(IdPatamarCarga_1, patamarDeficit_percentual_da_demanda);
-								const SmartEnupla<IdPatamarCarga, double> vetor_patamarDeficit_custo(IdPatamarCarga_1, patamarDeficit_custo);
+								/////////////////////////////////////
 
-								const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_patamarDeficit_percentual_da_demanda(horizonte_estudo, vetor_patamarDeficit_percentual_da_demanda);
-								const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_patamarDeficit_custo(horizonte_estudo, vetor_patamarDeficit_custo);
+								SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_patamarDeficit_percentual_da_demanda(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+								SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_patamarDeficit_custo(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+
+								for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+									const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+									matriz_patamarDeficit_percentual_da_demanda.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+									matriz_patamarDeficit_custo.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+
+								}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+								/////////////////////////////////////
 
 								patamarDeficit.setMatriz(AttMatrizPatamarDeficit_percentual, matriz_patamarDeficit_percentual_da_demanda);
 								patamarDeficit.setMatriz(AttMatrizPatamarDeficit_custo, matriz_patamarDeficit_custo);
 
 								a_dados.vetorSubmercado.att(idSubmercado).vetorPatamarDeficit.add(patamarDeficit);
 
-							}//if (int(idPatamarDeficit_inicializado.size()) == 1) {
-							else {
+							}//if (idEstagio_patamar_deficit == IdEstagio_1) {
 
-								//Identifica o PatamarDeficit inicializado com codigo_usina
-								const IdPatamarDeficit idPatamarDeficit_inicializado = getIdFromCodigoONS(matriz_codigo_ONS_patamar_deficit, idSubmercado, codigo_usina);
 
-								if (idPatamarDeficit_inicializado == IdPatamarDeficit_Nenhum)
-									throw std::invalid_argument("Nao inicializada idContrato com codigo_usina_" + getString(codigo_usina));
+							//Identifica o PatamarDeficit inicializado com codigo_usina
+							const IdPatamarDeficit idPatamarDeficit_inicializado = getIdFromCodigoONS(matriz_codigo_ONS_patamar_deficit, idSubmercado, codigo_usina);
 
-								const IdPatamarDeficit  idPatamarDeficit = idPatamarDeficit_inicializado;
+							if (idPatamarDeficit_inicializado == IdPatamarDeficit_Nenhum)
+								throw std::invalid_argument("Nao inicializada idContrato com codigo_usina_" + getString(codigo_usina));
 
-								for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+							const IdPatamarDeficit  idPatamarDeficit = idPatamarDeficit_inicializado;
 
-									if (periodo >= horizonte_otimizacao_DC.at(idEstagio_patamar_deficit)) {
+							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-										for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIdPatamarCargaFromChar(getString(numero_patamares).c_str()); idPatamarCarga++) {
+								int numero_patamares_x_periodo = 0;
 
-											a_dados.vetorSubmercado.att(idSubmercado).vetorPatamarDeficit.att(idPatamarDeficit).setElemento(AttMatrizPatamarDeficit_percentual, periodo, idPatamarCarga, patamarDeficit_percentual_da_demanda.at(getintFromChar(getString(idPatamarCarga).c_str()) - 1));
-											a_dados.vetorSubmercado.att(idSubmercado).vetorPatamarDeficit.att(idPatamarDeficit).setElemento(AttMatrizPatamarDeficit_custo, periodo, idPatamarCarga, patamarDeficit_custo.at(getintFromChar(getString(idPatamarCarga).c_str()) - 1));
+								for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
 
-										}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIdPatamarCargaFromChar(getString(numero_patamares).c_str()); idPatamarCarga++) {
+									if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
+										numero_patamares_x_periodo++;
 
-									}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_patamar_deficit)) {
+										const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo);
 
-								}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+										if (periodo >= horizonte_otimizacao_DC.at(idEstagio_patamar_deficit)) {
 
-							}//else {
+											a_dados.vetorSubmercado.att(idSubmercado).vetorPatamarDeficit.att(idPatamarDeficit).setElemento(AttMatrizPatamarDeficit_percentual, periodo, idPatamarCarga, patamarDeficit_percentual_da_demanda.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+											a_dados.vetorSubmercado.att(idSubmercado).vetorPatamarDeficit.att(idPatamarDeficit).setElemento(AttMatrizPatamarDeficit_custo, periodo, idPatamarCarga, patamarDeficit_custo.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+
+										}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_patamar_deficit)) {
+
+									}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
+
+								}//for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
+
+							}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
 
 							leitura_registro_CD = true;
 
@@ -3462,7 +3720,6 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 					}//if (menemonico == "BE") {
 
-
 					if (menemonico == "PQ") {//Geração em pequenas usinas
 
 						try {
@@ -3644,7 +3901,6 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 					}//if (menemonico == "PQ") {
 
-
 					// RESTRIÇÃO DE GERAÇÃO ITAIPU (50/60 HZ)
 					if (menemonico == "RI") {
 
@@ -3816,14 +4072,13 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 					}//if (menemonico == "RI") 
 
-
 					if (menemonico == "IT") {// Restrição de geração de Itaipu_50 Hz e carga da ANDE
 
 						try {
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Campo 2 -  Identificação do estágio. 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 2 -  Identificação do estágio. 
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							atributo = line.substr(4, 2);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
@@ -4136,8 +4391,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 						try {
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Campo 2 -  Identificação do estágio.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 2 -  Identificação do estágio.
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							atributo = line.substr(4, 2);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
@@ -6169,8 +6424,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 						try {
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Campo 2 -  Número de identificação da restrição elétrica conforme campo 2 do registro RE. 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 2 -  Número de identificação da restrição elétrica conforme campo 2 do registro RE. 
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							atributo = line.substr(4, 4);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
@@ -7011,7 +7266,6 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro TI: \n" + std::string(erro.what())); }
 
 					}//if (menemonico == "TI") {
-
 
 					if (menemonico == "HA") {//Identificação das restrições RHA					
 
@@ -11853,12 +12107,10 @@ void LeituraCEPEL::defineHorizontes_CP(Dados& a_dados)
 
 		valida_horizonte_estudo_CP_respeito_horizonte_otimizacao_DC(a_dados);
 
-		if (!dadosPreConfig_instanciados) {
-			a_dados.setAtributo(AttComumDados_periodo_referencia, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial());
-			a_dados.setAtributo(AttComumDados_estagio_final, a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal());
-			a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, estagio_acoplamento_pre_estudo);
 
-		}//if (!dadosPreConfig_instanciados) {
+		a_dados.setAtributo(AttComumDados_periodo_referencia, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial());
+		a_dados.setAtributo(AttComumDados_estagio_final, a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal());
+		a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, estagio_acoplamento_pre_estudo);
 
 
 		//////////////////////////////////////////////////////////////////////////////
@@ -18712,6 +18964,31 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 }
 
+IdPatamarCarga LeituraCEPEL::get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(Dados& a_dados, const Periodo a_periodo) {
+
+	try {
+
+		int numero_patamares_carga = 0;
+
+		//Premissa: um patamar tem percentual_duracao_patamar > 0 
+		const IdPatamarCarga maiorIdPatamarCarga = a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo, IdPatamarCarga());
+
+		for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+			if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo, idPatamarCarga, double()) > 0.0)
+				numero_patamares_carga++;
+
+		}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+
+		return IdPatamarCarga(numero_patamares_carga);
+
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga: \n" + std::string(erro.what())); }
+
+}
+
+
 void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao) {
 
 	try {
@@ -18839,6 +19116,32 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		a_dados.setVetor(AttVetorDados_alpha_CVAR, vetor_alpha_CVAR);
 
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Atualiza AttMatrizDados_percentual_duracao_patamar_carga
+		//Premissa: só instancia idPatamarCarga se o percentual_duracao_patamar_carga > 0
+		
+		SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> percentual_duracao_patamar_carga(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+
+		for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+			const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+
+			percentual_duracao_patamar_carga.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+
+			int numero_patamares_x_periodo = 0;
+
+			for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
+
+				if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
+					numero_patamares_x_periodo++;
+					const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo);
+					percentual_duracao_patamar_carga.at(periodo).setElemento(idPatamarCarga, a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()));
+				}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
+			}//for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
+
+		}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+		a_dados.setMatriz_forced(AttMatrizDados_percentual_duracao_patamar_carga, percentual_duracao_patamar_carga);
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

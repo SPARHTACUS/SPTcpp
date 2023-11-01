@@ -37,6 +37,8 @@ private:
 	void instancia_horizonte_preConfig(Dados& a_dados, const std::string a_diretorio);
 
 	void instancia_dados_preConfig(Dados& a_dados, const std::string a_diretorio);
+	
+	void instancia_dados_matriz_preConfig(Dados& a_dados, const std::string a_diretorio);
 
 	void sequenciarRestricoesEletricas(Dados& a_dados);
 	void sequenciarRestricoesHidraulicas(Dados& a_dados);
@@ -239,6 +241,8 @@ private:
 	void imprime_na_tela_avisos_de_possiveis_inviabilidades_fph(Dados& a_dados);
 
 	void atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_energia_armazenada(Dados& a_dados, std::string a_diretorio);
+
+	IdPatamarCarga get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(Dados& a_dados, const Periodo a_periodo);
 
 	/////////////////////////////////////////
 	//NEWAVE

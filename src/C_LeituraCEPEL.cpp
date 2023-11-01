@@ -818,6 +818,33 @@ void LeituraCEPEL::instancia_dados_preConfig(Dados& a_dados, const std::string a
 
 } // void LeituraCEPEL::instancia_dados_preConfig(Dados& a_dados, const std::string a_diretorio){
 
+void LeituraCEPEL::instancia_dados_matriz_preConfig(Dados& a_dados, const std::string a_diretorio) {
+
+	try {
+
+		EntradaSaidaDados entradaSaidaDados;
+
+		entradaSaidaDados.setDiretorioEntrada(a_diretorio);
+		dadosPreConfig_instanciados = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("DADOS_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", a_dados, TipoAcessoInstancia_direto);
+
+		if (dadosPreConfig_instanciados) {
+			
+			if ((a_dados.getSizeVetor(AttVetorDados_horizonte_estudo) == 0))
+				throw std::invalid_argument("Para validar " + getFullString(AttMatrizDados_percentual_duracao_patamar_carga) + " deve ser instanciado na pre-config o " + getFullString(AttVetorDados_horizonte_estudo));
+
+			const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+
+			//Tenta dar um get varrendo o horizonte_estudo
+			for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo))
+				const double percentual_duracao_patamar_carga = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga_1, double());
+
+		} // if ((a_dados.getSizeVetor(AttVetorDados_horizonte_estudo) > 0) && (dadosPreConfig_instanciados)) {
+
+	}// try
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instancia_dados_matriz_preConfig(): \n" + std::string(erro.what())); }
+
+} // void LeituraCEPEL::instancia_dados_preConfig(Dados& a_dados, const std::string a_diretorio){
+
 
 void LeituraCEPEL::inicializa_arquivo_avisos() {
 
