@@ -14,7 +14,7 @@ set(CMAKE_CXX_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/COIN/dist/inclu
 
 #set(LINK_FLAGS "-L/opt/gurobi912/linux64/lib -lgurobi_c++ -lgurobi91 -L${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/COIN/dist/lib -lCbcSolver -lCbc -lCgl -lOsiClp -lClpSolver -lClp -lOsi -lCoinUtils -lcoinlapack -lcoinblas -lbz2 -lz -lgfortran -lgomp -lquadmath -ldl -lpthread")
 
-set(LINK_FLAGS "-L${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/COIN/dist/lib -lCbc -lCgl -lOsiClp -lClp -lOsi -lCoinUtils -lcoinlapack -lcoinblas -lbz2 -lz -lgfortran -lgomp -lquadmath -ldl -lpthread")
+set(LINK_FLAGS "-L${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/COIN/dist/lib -lCbc -lCgl -lOsiClp -lClp -lOsi -lCoinUtils -lcoinlapack -lcoinblas -lbz2 -lz -lgfortran -lgomp -lquadmath -ldl -lpthread -lreadline")
 
 set(SPT_SOURCES ../src/SPT_main.cpp
                 ../src/C_Afluencia.cpp
