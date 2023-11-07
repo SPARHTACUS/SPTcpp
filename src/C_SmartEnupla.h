@@ -1210,8 +1210,10 @@ public:
 
 				// Remove estruturas dos periodos que sairao
 				const int nro_estruturas_a_remover = indice_estrutura_posterior - indice_estrutura_anterior - 1;
-				for (int i = 0; i < nro_estruturas_a_remover; i++)
+				for (int i = 0; i < nro_estruturas_a_remover; i++) {
 					lista_estrutura_copia.erase(lista_estrutura_copia.begin() + indice_estrutura_anterior + 1);
+					indice_estrutura_posterior--;
+				}
 
 				// Realiza adequacoes na estrutura anterior
 				if (lista_estrutura_copia.at(indice_estrutura_anterior).tipo_iterador_inicial > tipo_periodo_anterior) {
