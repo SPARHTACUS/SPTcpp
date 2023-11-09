@@ -9909,7 +9909,7 @@ void Dados::calcular_tendencia_afluencia_incremental_com_natural() {
 		if (valida_tendencia_AfluenciaEmHidreletrica(AttVetorAfluencia_natural_tendencia)) {
 
 			const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
-			const IdHidreletrica menorIdHidreletrica = getMaiorId(IdHidreletrica());
+			const IdHidreletrica menorIdHidreletrica = getMenorId(IdHidreletrica());
 
 			SmartEnupla<Periodo, double> horizonte_tendencia;
 
@@ -10195,7 +10195,7 @@ SmartEnupla<IdHidreletrica, double> Dados::calculaAfluenciaIncremental(const Sma
 		const IdHidreletrica menorIdUHE = a_afluencia_natural.getIteradorInicial();
 		const IdHidreletrica maiorIdUHE = a_afluencia_natural.getIteradorFinal();
 
-		SmartEnupla<IdHidreletrica, double> afluencia_incremental_retorno(IdHidreletrica(1), std::vector<double>(maiorIdUHE, NAN));
+		SmartEnupla<IdHidreletrica, double> afluencia_incremental_retorno(menorIdUHE, std::vector<double>(int(maiorIdUHE - menorIdUHE) + 1, NAN));
 
 		for (IdHidreletrica idUHE = menorIdUHE; idUHE <= maiorIdUHE; vetorHidreletrica.incr(idUHE)) {
 
