@@ -72,6 +72,28 @@
 	m(TipoPeriodo, 3dias)     \
 	m(TipoPeriodo, 2dias)     \
 	m(TipoPeriodo, diario)    \
+	m(TipoPeriodo, 23horas)   \
+	m(TipoPeriodo, 22horas)   \
+	m(TipoPeriodo, 21horas)   \
+	m(TipoPeriodo, 20horas)   \
+	m(TipoPeriodo, 19horas)   \
+	m(TipoPeriodo, 18horas)   \
+	m(TipoPeriodo, 17horas)   \
+	m(TipoPeriodo, 16horas)   \
+	m(TipoPeriodo, 15horas)   \
+	m(TipoPeriodo, 14horas)   \
+	m(TipoPeriodo, 13horas)   \
+	m(TipoPeriodo, 12horas)   \
+	m(TipoPeriodo, 11horas)   \
+	m(TipoPeriodo, 10horas)   \
+	m(TipoPeriodo, 9horas)   \
+	m(TipoPeriodo, 8horas)   \
+	m(TipoPeriodo, 7horas)   \
+	m(TipoPeriodo, 6horas)   \
+	m(TipoPeriodo, 5horas)   \
+	m(TipoPeriodo, 4horas)   \
+	m(TipoPeriodo, 3horas)   \
+	m(TipoPeriodo, 2horas)   \
 	m(TipoPeriodo, horario)   \
 	m(TipoPeriodo, meia_hora) \
 	m(TipoPeriodo, minuto) 

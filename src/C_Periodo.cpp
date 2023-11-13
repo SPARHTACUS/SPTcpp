@@ -844,6 +844,50 @@ int Periodo::getHoras() const {
 		return getDias() * 24;
 	else if (tipoPeriodo == TipoPeriodo_horario)
 		return 1;
+	else if (tipoPeriodo == TipoPeriodo_2horas)
+		return 2;
+	else if (tipoPeriodo == TipoPeriodo_3horas)
+		return 3;
+	else if (tipoPeriodo == TipoPeriodo_4horas)
+		return 4;
+	else if (tipoPeriodo == TipoPeriodo_5horas)
+		return 5;
+	else if (tipoPeriodo == TipoPeriodo_6horas)
+		return 6;
+	else if (tipoPeriodo == TipoPeriodo_7horas)
+		return 7;
+	else if (tipoPeriodo == TipoPeriodo_8horas)
+		return 8;
+	else if (tipoPeriodo == TipoPeriodo_9horas)
+		return 9;
+	else if (tipoPeriodo == TipoPeriodo_10horas)
+		return 10;
+	else if (tipoPeriodo == TipoPeriodo_11horas)
+		return 11;
+	else if (tipoPeriodo == TipoPeriodo_12horas)
+		return 12;
+	else if (tipoPeriodo == TipoPeriodo_13horas)
+		return 13;
+	else if (tipoPeriodo == TipoPeriodo_14horas)
+		return 14;
+	else if (tipoPeriodo == TipoPeriodo_15horas)
+		return 15;
+	else if (tipoPeriodo == TipoPeriodo_16horas)
+		return 16;
+	else if (tipoPeriodo == TipoPeriodo_17horas)
+		return 17;
+	else if (tipoPeriodo == TipoPeriodo_18horas)
+		return 18;
+	else if (tipoPeriodo == TipoPeriodo_19horas)
+		return 19;
+	else if (tipoPeriodo == TipoPeriodo_20horas)
+		return 20;
+	else if (tipoPeriodo == TipoPeriodo_21horas)
+		return 21;
+	else if (tipoPeriodo == TipoPeriodo_22horas)
+		return 22;
+	else if (tipoPeriodo == TipoPeriodo_23horas)
+		return 23;
 	else
 		return 0;
 
@@ -1129,6 +1173,72 @@ Periodo operator+(const Periodo& a_periodo, const int a_iterador) {
 
 		else if (tipoPeriodoArg == TipoPeriodo_diario)
 			Periodo::iteraDia(a_periodo, a_iterador, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_23horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 23, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_22horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 22, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_21horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 21, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_20horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 20, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_19horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 19, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_18horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 18, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_17horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 17, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_16horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 16, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_15horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 15, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_14horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 14, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_13horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 13, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_12horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 12, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_11horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 11, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_10horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 10, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_9horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 9, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_8horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 8, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_7horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 7, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_6horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 6, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_5horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 5, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_4horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 4, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_3horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 3, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_2horas)
+			Periodo::iteraHora(a_periodo, a_iterador * 2, anoIter, mesIter, diaIter, horIter, minIter);
 
 		else if (tipoPeriodoArg == TipoPeriodo_horario)
 			Periodo::iteraHora(a_periodo, a_iterador, anoIter, mesIter, diaIter, horIter, minIter);
