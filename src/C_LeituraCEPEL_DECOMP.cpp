@@ -117,22 +117,103 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 		//Set numero_aberturas (vai mudar com a estrutura árvore)
 		//////////////////////////////////////////////////////////////////////////
 
-		SmartEnupla<IdEstagio, int> vetor_numero_realizacoes(IdEstagio_1, std::vector<int>(int(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()), 1));
-		vetor_numero_realizacoes.setElemento(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), numero_realizacoes_por_periodo.getElemento(numero_realizacoes_por_periodo.getIteradorFinal()));
-		a_dados.setVetor(AttVetorDados_numero_aberturas, vetor_numero_realizacoes);
+
+		if (a_dados.getSizeVetor(AttVetorDados_numero_aberturas) == 0) {
+
+			SmartEnupla<IdEstagio, int> vetor_numero_realizacoes(IdEstagio_1, std::vector<int>(int(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()), 1));
+			vetor_numero_realizacoes.setElemento(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), numero_realizacoes_por_periodo.getElemento(numero_realizacoes_por_periodo.getIteradorFinal()));
+			a_dados.setVetor(AttVetorDados_numero_aberturas, vetor_numero_realizacoes);
+
+		}//if (a_dados.getSizeVetor(AttVetorDados_numero_aberturas) == 0) {
 
 		////////
 
 		//Cria o horizonte_processo_estocastico
 
-		for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(); idEstagio++) {
+		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
+		SmartEnupla<Periodo, int> numero_realizacoes_por_periodo_atualizado;
 
-			std::vector<Periodo> periodos_processo_estocastico = numero_realizacoes_por_periodo.getIteradores(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getElemento(idEstagio));
+		for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
 
-			for (int pos = 0; pos < int(periodos_processo_estocastico.size()); pos++)
-				horizonte_processo_estocastico.addElemento(periodos_processo_estocastico.at(pos), true);
+			const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_DC);
+			 
+			double soma_sobreposicao = 0.0;
 
-		}//for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= horizonte_otimizacao.getIteradorFinal(); idEstagio++) {
+			bool is_encontrada_sobreposicao = false;
+
+			for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
+
+				const Periodo periodo_otimizacao = horizonte_otimizacao.getElemento(idEstagio_otimizacao);
+
+				const double sobreposicao = periodo_DC.sobreposicao(periodo_otimizacao);
+
+				if (sobreposicao > 0.0) {
+
+					is_encontrada_sobreposicao = true;
+
+					///////////////////////////////////////////////////////
+					//Determina o periodo do processo estocástico (pega a menor granularidade entre o periodo_DC e o periodo_otimizacao)
+					// E identifica se é o primeiro período com sobreposição
+					///////////////////////////////////////////////////////
+
+					Periodo periodo_processo_estocastico = periodo_DC;
+					bool is_first_sobreposicao = false;
+
+					if (periodo_DC.getTipoPeriodo() <= periodo_otimizacao.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
+
+						if (periodo_DC.getTipoPeriodo() < periodo_otimizacao.getTipoPeriodo()) {
+							a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_tipo_lag_autocorrelacao, TipoLagAutocorrelacao_semanal_sab);
+							a_dados.setAtributo(AttComumDados_mapear_processos_com_um_unico_cenario, false);
+						}
+						else
+							a_dados.setAtributo(AttComumDados_mapear_processos_com_um_unico_cenario, true);
+
+						periodo_processo_estocastico = periodo_otimizacao;
+
+						if (periodo_otimizacao.sobreposicao(periodo_DC) == 1.0)//Garante que o periodo_otimizacao esteja "dentro" do periodo_DC
+							soma_sobreposicao += sobreposicao;
+
+						//////////////
+						const Periodo periodo_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo_DC);
+
+						if (periodo_teste == periodo_otimizacao)
+							is_first_sobreposicao = true;
+
+
+					}//if (periodo_DC.getTipoPeriodo() < periodo_otimizacao.getTipoPeriodo()) {
+					else { //Granularidade do periodo_otimizacao > periodo_DC
+						soma_sobreposicao += sobreposicao;
+						is_first_sobreposicao = true;
+
+					}//else {
+
+					//////////////////////////////////////////////////////
+					horizonte_processo_estocastico.addElemento(periodo_processo_estocastico, true);
+
+					if(is_first_sobreposicao)
+						numero_realizacoes_por_periodo_atualizado.addElemento(periodo_processo_estocastico, numero_realizacoes_por_periodo.at(periodo_DC));
+					else
+						numero_realizacoes_por_periodo_atualizado.addElemento(periodo_processo_estocastico, 1);
+
+				}//if (sobreposicao_preenche_periodo_DC > 0 ) {
+
+				if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
+
+					if (soma_sobreposicao != 1.0)
+						throw std::invalid_argument("Periodo do processo estocastico nao subsituido por uma decomposicao equivalente");
+
+					break;
+
+				}//if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
+
+			}//for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
+			
+
+		}//for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+
+		//Atualiza o numero_realizacoes_por_periodo (pode ter novos periodos do processo estocástico dependendo do horizonte_otimizacao
+		numero_realizacoes_por_periodo = numero_realizacoes_por_periodo_atualizado;
+
 
 		define_numero_cenarios_CP(a_dados);
 
@@ -667,6 +748,8 @@ void LeituraCEPEL::ler_vazao_probabilidade_estrutura_arvore_cenarios_from_VAZOES
 
 	try {
 
+		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
+
 		int mesInicial_PMO;
 		int anoInicial_PMO;
 		int diasNoSeguinteMes;
@@ -805,11 +888,11 @@ void LeituraCEPEL::ler_vazao_probabilidade_estrutura_arvore_cenarios_from_VAZOES
 								const IdRealizacao idRealizacao = IdRealizacao(conteio_realizacoes);
 								probabilidade_abertura.setElemento(idRealizacao, prob);
 
-								a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, horizonte_otimizacao_DC.getElemento(horizonte_otimizacao_DC.getIteradorFinal()), IdNo(conteio_realizacoes + 1), prob);
+								//a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, horizonte_otimizacao_DC.getElemento(horizonte_otimizacao_DC.getIteradorFinal()), IdNo(conteio_realizacoes + 1), prob);
 
 							}//if (pos + 1 >= int(horizonte_otimizacao_DC.size())) {
-							else
-								a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, horizonte_otimizacao_DC.getElemento(IdEstagio(conteio_estagio)), IdNo_1, prob);
+							//else
+								//a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, horizonte_otimizacao_DC.getElemento(IdEstagio(conteio_estagio)), IdNo_1, prob);
 
 						}//if (registro == 4) {
 						else {
@@ -819,7 +902,7 @@ void LeituraCEPEL::ler_vazao_probabilidade_estrutura_arvore_cenarios_from_VAZOES
 							const IdRealizacao idRealizacao = IdRealizacao(conteio_realizacoes);
 							probabilidade_abertura.setElemento(idRealizacao, prob);
 
-							a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, horizonte_otimizacao_DC.getElemento(horizonte_otimizacao_DC.getIteradorFinal()), IdNo(conteio_realizacoes + 1), prob);
+							//a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, horizonte_otimizacao_DC.getElemento(horizonte_otimizacao_DC.getIteradorFinal()), IdNo(conteio_realizacoes + 1), prob);
 
 						}//else {
 
@@ -854,10 +937,10 @@ void LeituraCEPEL::ler_vazao_probabilidade_estrutura_arvore_cenarios_from_VAZOES
 
 							numero_nos *= numero_realizacoes_por_periodo.getElemento(horizonte_otimizacao_DC.getElemento(idEstagio));
 
-							const double prob = 1 / numero_realizacoes_por_periodo.getElemento(horizonte_otimizacao_DC.getElemento(idEstagio));
+							const double prob = 1.0 / numero_realizacoes_por_periodo.getElemento(horizonte_otimizacao_DC.getElemento(idEstagio));
 
-							for (int no = 0; no < numero_nos; no++)
-								a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, horizonte_otimizacao_DC.getElemento(idEstagio), IdNo(no + 2), prob);
+							//for (int no = 0; no < numero_nos; no++)
+								//a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, horizonte_otimizacao_DC.getElemento(idEstagio), IdNo(no + 2), prob);
 
 						}//for (IdEstagio idEstagio = idEstagio_inicial; idEstagio <= idEstagio_final; idEstagio++) {
 
@@ -877,9 +960,40 @@ void LeituraCEPEL::ler_vazao_probabilidade_estrutura_arvore_cenarios_from_VAZOES
 						//////////////////////////////////////////////////////////////////////////
 
 						SmartEnupla <Periodo, SmartEnupla <IdRealizacao, double>> matriz_probabilidade_abertura;
-						matriz_probabilidade_abertura.addElemento(a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), Periodo()), probabilidade_abertura);
 
-						a_dados.processoEstocastico_hidrologico.setMatriz_forced(AttMatrizProcessoEstocastico_probabilidade_realizacao, matriz_probabilidade_abertura);
+						bool is_encontrada_sobreposicao = false;
+
+							
+						for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
+
+							const Periodo periodo_otimizacao = horizonte_otimizacao.getElemento(idEstagio_otimizacao);
+							const Periodo periodo_DC = horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal());
+
+							const double sobreposicao = periodo_DC.sobreposicao(periodo_otimizacao);//Identifica o primeiro periodo que tenha sobreposicao com o último periodo do horizonte_otimizacao_DC
+
+							if (sobreposicao > 0.0) {
+
+								is_encontrada_sobreposicao = true;
+
+								///////////////////////////////////////////////////////
+								//Determina o periodo do processo estocástico (pega a menor granularidade entre o periodo_DC e o periodo_otimizacao)
+								// E identifica se é o primeiro período com sobreposição
+								///////////////////////////////////////////////////////
+
+								Periodo periodo_processo_estocastico = periodo_DC;
+
+								if (periodo_DC.getTipoPeriodo() <= periodo_otimizacao.getTipoPeriodo()) //Granularidade do periodo_otimizacao <= periodo_DC
+									periodo_processo_estocastico = periodo_otimizacao;
+
+								matriz_probabilidade_abertura.addElemento(periodo_processo_estocastico, probabilidade_abertura);
+								a_dados.processoEstocastico_hidrologico.setMatriz_forced(AttMatrizProcessoEstocastico_probabilidade_realizacao, matriz_probabilidade_abertura);
+								break;
+
+
+							}//if (sobreposicao > 0.0) {
+
+						}//for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
+
 						a_dados.processoEstocastico_hidrologico.validar_probabilidade_realizacao();
 
 					}//if (NPROB == registroProbabilidade_controle || arvoreEquiprovavel) {
@@ -1783,14 +1897,30 @@ void LeituraCEPEL::instanciar_no_probabilidade_arvore_simetrica(Dados& a_dados)
 
 		int numero_nos = 1;
 
+		bool is_first_periodo_sobreposicao_encontrado = false;
+
 		for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
 			numero_nos *= numero_realizacoes_por_periodo.getElemento(periodo);
 
-			const double prob = 1 / numero_realizacoes_por_periodo.getElemento(periodo);
+			double prob = 0.0;
 
-			for (int no = 0; no < numero_nos; no++)
+			for (int no = 0; no < numero_nos; no++) {
+
+				if (periodo.sobreposicao(horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal())) && !is_first_periodo_sobreposicao_encontrado) {
+					
+					if(no == numero_nos-1)
+						is_first_periodo_sobreposicao_encontrado = true;
+					
+					prob = a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao, periodo, IdRealizacao(no + 1), double()); //Pega as probabilidades lidas das aberturas do DC
+				}//if (periodo.sobreposicao(horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal()))) {
+				else
+					prob = 1.0 / numero_realizacoes_por_periodo.getElemento(periodo);
+
 				a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, periodo, IdNo(no + 2), prob);
+
+			}
+				
 
 		}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
@@ -12900,7 +13030,6 @@ void LeituraCEPEL::valida_horizonte_estudo_CP_respeito_horizonte_otimizacao_DC(D
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::valida_horizonte_estudo_CP_respeito_horizonte_otimizacao_DC(Dados &a_dados): \n" + std::string(erro.what())); }
 }
 
-
 SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> LeituraCEPEL::define_mapeamento_espaco_amostral_arvore_simetrica_CP(Dados& a_dados, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final)
 {
 	try {
@@ -12920,19 +13049,16 @@ SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> LeituraCEPEL::define_
 		//Cria vetor com o número de "sub-cenários" em cada nó da árvore
 		////////////////////////////////////////////////////////////////
 
-		const IdEstagio idEstagio_inicial = horizonte_otimizacao_DC.getIteradorInicial();
-		const IdEstagio idEstagio_final = horizonte_otimizacao_DC.getIteradorFinal();
-
 		SmartEnupla<Periodo, int> numero_sub_cenarios;
 
-		int sub_cenarios = numero_cenarios;
+		for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
-		for (IdEstagio idEstagio = idEstagio_inicial; idEstagio <= idEstagio_final; idEstagio++) {
+			int sub_cenarios = numero_cenarios;
 
-			sub_cenarios /= numero_realizacoes_por_periodo.getElemento(horizonte_otimizacao_DC.getElemento(idEstagio));
-			numero_sub_cenarios.addElemento(horizonte_otimizacao_DC.at(idEstagio), sub_cenarios);
+			sub_cenarios /= numero_realizacoes_por_periodo.getElemento(periodo);
+			numero_sub_cenarios.addElemento(periodo, sub_cenarios);
 
-		}//for (IdEstagio idEstagio = idEstagio_inicial; idEstagio <= idEstagio_final; idEstagio++) {
+		}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
 		////////////////////////////////////////////////////////////////
 
@@ -12948,9 +13074,7 @@ SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> LeituraCEPEL::define_
 
 			SmartEnupla<Periodo, IdRealizacao> mapeamento_espaco_amostral_arvore_simetrica_cenario;
 
-			for (IdEstagio idEstagio = idEstagio_inicial; idEstagio <= idEstagio_final; idEstagio++) {
-
-				const Periodo periodo = horizonte_otimizacao_DC.at(idEstagio);
+			for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
 				const int sub_cenarios = numero_sub_cenarios.getElemento(periodo);
 
@@ -12972,7 +13096,7 @@ SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> LeituraCEPEL::define_
 				const int aumento_sub_cenarios = conteio_sub_cenarios.getElemento(periodo) + 1;
 				conteio_sub_cenarios.setElemento(periodo, aumento_sub_cenarios);
 
-			}//for (IdEstagio idEstagio = estagio_acoplamento_pre_estudo; idEstagio <= idEstagio_final; idEstagio++) {
+			}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
 			/////////////////////////////////////////////////////////////////
 
@@ -13058,6 +13182,9 @@ void LeituraCEPEL::define_numero_cenarios_CP(Dados& a_dados) {
 
 	try {
 
+		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
+		const SmartEnupla<IdEstagio, int> numero_aberturas = a_dados.getVetor(AttVetorDados_numero_aberturas, IdEstagio(), int());
+
 		/////////////////////////////////////////////////
 		//Determina o número de cenários da árvore
 		/////////////////////////////////////////////////
@@ -13090,27 +13217,108 @@ void LeituraCEPEL::instanciar_variavelAleatoria_realizacao_from_vazoes_DC(Dados&
 
 	try {
 
+		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
 		const IdHidreletrica  maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 
 		const int numero_nos = int(vazao_no_posto.size());
+		IdRealizacao idRealizacao = IdRealizacao_1;
 
 		for (int no = 0; no < numero_nos; no++) {
 
 			/////////////////////////////////////////////////////////////////////////////////////
 			//Identifica o estágio do registro
 			//Filosofia: Devido à estrutura da árvore DECOMP  o arquivo de VAZOES.DAT
-			//o idRealizacao = idNo
+			//o idNo = idEstagio para t < T
+			// 
+			//Períodos no horizonte de otimização diferentes ao horizonte do processo estocástico:
+			// 1. Vai ter só aberturas no primeiro período de otimização com sobreposição com o períoodo do horizonte do processo estocástico
+			// 2. O valor do residuo vai ser alocado no primeiro período de otimização com sobreposição com o períoodo do horizonte do processo estocástico, caso contrário, afluencia = 0
+			// 3. Por meio da estrutura do modelo PAR colocasse 100 % de autocorreção com o período anterior
 			/////////////////////////////////////////////////////////////////////////////////////
 
-			for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+			IdEstagio idEstagio_DC = IdEstagio_Nenhum;
 
-				const int posto = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_posto, int());
+			const int numero_estagios_DC = int(horizonte_otimizacao_DC.size());
 
-				const double afluencia = vazao_no_posto.at(no).at(posto - 1);
+			if (no + 1 < numero_estagios_DC)
+				idEstagio_DC = IdEstagio(no + 1);
+			else
+				idEstagio_DC = horizonte_otimizacao_DC.getIteradorFinal();
 
-				a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_variavelAleatoria_realizacao, IdRealizacao(no + 1), lista_hidreletrica_IdVariavelAleatoria.at(idHidreletrica), afluencia);
+			///////////////////
 
-			}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+			const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_DC);
+
+			double soma_sobreposicao = 0.0;
+
+			bool is_encontrada_sobreposicao = false;
+
+			for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
+
+				const Periodo periodo_otimizacao = horizonte_otimizacao.getElemento(idEstagio_otimizacao);
+
+				const double sobreposicao = periodo_DC.sobreposicao(periodo_otimizacao);
+
+				if (sobreposicao > 0.0) {
+
+					is_encontrada_sobreposicao = true;
+
+					///////////////////////////////////////////////////////
+					//Determina o periodo do processo estocástico (pega a menor granularidade entre o periodo_DC e o periodo_otimizacao)
+					// E identifica se é o primeiro período com sobreposição
+					///////////////////////////////////////////////////////
+
+					Periodo periodo_processo_estocastico = periodo_DC;
+					bool is_first_sobreposicao = false;
+
+					if (periodo_DC.getTipoPeriodo() <= periodo_otimizacao.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
+						periodo_processo_estocastico = periodo_otimizacao;
+
+						if (periodo_otimizacao.sobreposicao(periodo_DC) == 1.0)//Garante que o periodo_otimizacao esteja "dentro" do periodo_DC
+							soma_sobreposicao += sobreposicao;
+
+						//////////////
+						const Periodo periodo_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo_DC);
+
+						if (periodo_teste == periodo_otimizacao)
+							is_first_sobreposicao = true;
+
+					}//if (periodo_DC.getTipoPeriodo() < periodo_otimizacao.getTipoPeriodo()) {
+					else { //Granularidade do periodo_otimizacao > periodo_DC
+						soma_sobreposicao += sobreposicao;
+						is_first_sobreposicao = true;
+
+					}//else {
+
+					//////////////////////////////////////////////////////
+
+					for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+						const int posto = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_posto, int());
+
+						double afluencia = vazao_no_posto.at(no).at(posto - 1);
+
+						if (!is_first_sobreposicao)
+							afluencia = 0.0;
+				
+						a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_variavelAleatoria_realizacao, idRealizacao, lista_hidreletrica_IdVariavelAleatoria.at(idHidreletrica), afluencia);
+
+					}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+					idRealizacao++;
+
+				}//if (sobreposicao_preenche_periodo_DC > 0 ) {
+
+				if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
+
+					if (soma_sobreposicao != 1.0)
+						throw std::invalid_argument("Periodo do processo estocastico nao subsituido por uma decomposicao equivalente");
+
+					break;
+
+				}//if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
+
+			}//for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
 
 		}//for (int no = 0; no < numero_nos; no++) {
 
@@ -13123,6 +13331,7 @@ void LeituraCEPEL::define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados)
 
 	try {
 
+		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
 		const IdHidreletrica  maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 
 		const int numero_nos = int(vazao_no_posto.size());
@@ -13133,6 +13342,11 @@ void LeituraCEPEL::define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados)
 			//Identifica o estágio do registro
 			//Filosofia: Devido à estrutura da árvore DECOMP  o arquivo de VAZOES.DAT
 			//o idNo = idEstagio para t < T
+			// 
+			//Períodos no horizonte de otimização diferentes ao horizonte do processo estocástico:
+			// 1. Vai ter só aberturas no primeiro período de otimização com sobreposição com o períoodo do horizonte do processo estocástico
+			// 2. O valor do residuo vai ser alocado no primeiro período de otimização com sobreposição com o períoodo do horizonte do processo estocástico, caso contrário, afluencia = 0
+			// 3. Por meio da estrutura do modelo PAR colocasse 100 % de autocorreção com o período anterior
 			/////////////////////////////////////////////////////////////////////////////////////
 
 			IdEstagio idEstagio_DC = IdEstagio_Nenhum;
@@ -13144,33 +13358,85 @@ void LeituraCEPEL::define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados)
 			else
 				idEstagio_DC = horizonte_otimizacao_DC.getIteradorFinal();
 
+			///////////////////
 
-			for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+			const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_DC);
 
-				const int posto = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_posto, int());
+			double soma_sobreposicao = 0.0;
 
-				const double afluencia = vazao_no_posto.at(no).at(posto - 1);
+			bool is_encontrada_sobreposicao = false;
 
-				//if (estagio_acoplamento_pre_estudo <= idEstagio_DC) {
+			for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
 
-					IdRealizacao idRealizacao;
+				const Periodo periodo_otimizacao = horizonte_otimizacao.getElemento(idEstagio_otimizacao);
 
-					if (idEstagio_DC == horizonte_otimizacao_DC.getIteradorFinal())
-						idRealizacao = IdRealizacao(no - numero_estagios_DC + 2); //Cada registro do último estágio é uma realização
-					else
-						idRealizacao = IdRealizacao_1;
+				const double sobreposicao = periodo_DC.sobreposicao(periodo_otimizacao);
+				
+				if (sobreposicao > 0.0) {
 
-					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(lista_hidreletrica_IdVariavelAleatoria.at(idHidreletrica)).addElemento(AttMatrizVariavelAleatoria_residuo_espaco_amostral, horizonte_otimizacao_DC.at(idEstagio_DC), idRealizacao, afluencia);
+					is_encontrada_sobreposicao = true;
 
-				//}//if (estagio_acoplamento_pre_estudo <= idEstagio_DC) {
-				//else {
+					///////////////////////////////////////////////////////
+					//Determina o periodo do processo estocástico (pega a menor granularidade entre o periodo_DC e o periodo_otimizacao)
+					// E identifica se é o primeiro período com sobreposição
+					///////////////////////////////////////////////////////
 
-					//Para t<estagio_acoplamento_pre_estudo, esta informação é guardada em valor_afluencia_estagios_DC_anteriores_estagio_acoplamento_pre_estudo e logo em VARIAVEL_ALEATORIA_INTERNA_cenarios_realizacao_espaco_amostral
-					//valor_afluencia_estagios_DC_anteriores_estagio_acoplamento_pre_estudo.at(idVariavelAleatoria).addElemento(horizonte_otimizacao_DC.at(idEstagio_DC), afluencia);
+					Periodo periodo_processo_estocastico = periodo_DC;
+					bool is_first_sobreposicao = false;
 
-				//}//else {
+					if (periodo_DC.getTipoPeriodo() <= periodo_otimizacao.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
+						periodo_processo_estocastico = periodo_otimizacao;
 
-			}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						if(periodo_otimizacao.sobreposicao(periodo_DC) == 1.0)//Garante que o periodo_otimizacao esteja "dentro" do periodo_DC
+							soma_sobreposicao += sobreposicao;
+
+						//////////////
+						const Periodo periodo_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo_DC);
+
+						if (periodo_teste == periodo_otimizacao)
+							is_first_sobreposicao = true;
+
+					}//if (periodo_DC.getTipoPeriodo() < periodo_otimizacao.getTipoPeriodo()) {
+					else { //Granularidade do periodo_otimizacao > periodo_DC
+						soma_sobreposicao += sobreposicao;
+						is_first_sobreposicao = true;
+
+					}//else {
+
+					//////////////////////////////////////////////////////
+
+					for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+						const int posto = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_posto, int());
+
+						double afluencia = vazao_no_posto.at(no).at(posto - 1);
+
+						if (!is_first_sobreposicao)
+							afluencia = 0.0;
+
+						IdRealizacao idRealizacao = IdRealizacao_1;
+
+						if (idEstagio_DC == horizonte_otimizacao_DC.getIteradorFinal() && is_first_sobreposicao)
+							idRealizacao = IdRealizacao(no - numero_estagios_DC + 2); //Cada registro do último estágio é uma realização
+
+
+						if(is_first_sobreposicao || (!is_first_sobreposicao && (no - numero_estagios_DC + 1 == 0)))
+							a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(lista_hidreletrica_IdVariavelAleatoria.at(idHidreletrica)).addElemento(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_processo_estocastico, idRealizacao, afluencia);
+
+					}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+				}//if (sobreposicao_preenche_periodo_DC > 0 ) {
+
+				if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
+
+					if (soma_sobreposicao != 1.0)
+						throw std::invalid_argument("Periodo do processo estocastico nao subsituido por uma decomposicao equivalente");
+
+					break;
+
+				}//if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
+
+			}//for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
 
 		}//for (int no = 0; no < numero_nos; no++) {
 
@@ -13310,12 +13576,56 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados, const Id
 
 			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).setAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, 0.0);
 
+			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).setVetor(AttVetorVariavelAleatoria_tipo_relaxacao, SmartEnupla<Periodo, TipoRelaxacaoVariavelAleatoria>(horizonte_processo_estocastico, TipoRelaxacaoVariavelAleatoria_sem_relaxacao));
+			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).setVetor(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, SmartEnupla<Periodo, double>(horizonte_processo_estocastico, 1.0));
 
 			for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
-					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).addElemento(AttVetorVariavelAleatoria_tipo_relaxacao, periodo, TipoRelaxacaoVariavelAleatoria_sem_relaxacao);
-					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).addElemento(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo, 1, 0.0);
-					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodo, 1.0);
+				bool is_encontrada_sobreposicao = false;
+
+				for (IdEstagio idEstagio_DC = horizonte_otimizacao_DC.getIteradorInicial(); idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+
+					const double sobreposicao = horizonte_otimizacao_DC.at(idEstagio_DC).sobreposicao(periodo);
+
+					if (sobreposicao > 0.0) {
+
+						is_encontrada_sobreposicao = true;
+
+						///////////////////////////////////////////////////////
+						//Identifica se é o primeiro período com sobreposição
+						///////////////////////////////////////////////////////
+
+						bool is_first_sobreposicao = false;
+
+						if (horizonte_otimizacao_DC.at(idEstagio_DC).getTipoPeriodo() <= periodo.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
+
+							const Periodo periodo_teste = Periodo(periodo.getTipoPeriodo(), horizonte_otimizacao_DC.at(idEstagio_DC));
+
+							if (periodo_teste == periodo)
+								is_first_sobreposicao = true;
+
+						}//if (periodo_DC.getTipoPeriodo() < periodo_otimizacao.getTipoPeriodo()) {
+						else { //Granularidade do periodo_otimizacao > periodo_DC
+							is_first_sobreposicao = true;
+
+						}//else {
+
+						//////////////////////////////////////////////////////
+
+						double coeficiente_linear_auto_correlacao = 0.0;
+
+						if(!is_first_sobreposicao)
+							coeficiente_linear_auto_correlacao = 1.0;
+
+						a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).addElemento(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo, 1, coeficiente_linear_auto_correlacao);
+
+
+					}//if (sobreposicao == 1.0) {
+
+					if (is_encontrada_sobreposicao && sobreposicao == 0.0)
+						break;
+
+				}//for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
 
 			}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
@@ -13621,7 +13931,8 @@ void LeituraCEPEL::imprime_na_tela_avisos_de_possiveis_inviabilidades_fph(Dados&
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			const Periodo periodo_final = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorFinal();
-			const Periodo periodo_final_DECK = horizonte_estudo_DECK.getIteradorFinal();
+			//const Periodo periodo_final_DECK = horizonte_estudo_DECK.getIteradorFinal();
+			const Periodo periodo_final_DECK = horizonte_processo_estocastico.getIteradorFinal();
 
 			const int size_vetor_hidreletrica_aislada = int(vetor_hidreletrica_aislada.size());
 
@@ -13774,7 +14085,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			//Imprime info de cálculo
 			//////////////////////////////////////////////////////////////////////////////////
 
-			const bool imprimir_info_calculo_ENA = true;
+			const bool imprimir_info_calculo_ENA = false;
 
 			if (imprimir_info_calculo_ENA) {//Somente para teste
 				imprime_produtibilidade_EAR_acumulada(a_dados, a_diretorio + a_diretorio_cortes + "//_info_HIDRELETRICA_AttVetor_produtibilidade_EAR_acumulada.csv");
@@ -18729,8 +19040,35 @@ double LeituraCEPEL::get_afluencia_natural_posto(Dados& a_dados, const int a_cod
 							if (a_periodo < mapeamento_espaco_amostral.at(IdCenario_1).getIteradorInicial()) //Valores da tendência
 								afluencia_natural_posto += a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).getElementoVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodo, double());
 							else {
-								const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(a_idCenario).getElemento(a_periodo);
-								afluencia_natural_posto += a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, idRealizacao, double());
+
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								//O processo estocástico pode ter sido "quebrado" em mais períodos. 
+								// Portanto é procurado o primeiro período com sobreposição com o período do processo estocástico (o qual tem os valores das realizações)
+								// a_periodo -> realiza como o DC
+								// periodo_horizonte_processo_estocastico -> pode realizar com uma discretização menor ao DC
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+								bool is_sobreposicao_encontrada = false;
+
+								for (Periodo periodo_horizonte_processo_estocastico = horizonte_processo_estocastico.getIteradorInicial(); periodo_horizonte_processo_estocastico <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo_horizonte_processo_estocastico)) {
+
+									double sobreposicao = periodo_horizonte_processo_estocastico.sobreposicao(a_periodo);
+
+									if (sobreposicao > 0) {
+										is_sobreposicao_encontrada = true;
+
+										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(a_idCenario).getElemento(periodo_horizonte_processo_estocastico);
+										afluencia_natural_posto += a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_horizonte_processo_estocastico, idRealizacao, double());
+
+										break;
+
+									}//if (sobreposicao > 0) {
+
+								}//for (Periodo periodo_horizonte_processo_estocastico = horizonte_processo_estocastico.getIteradorInicial(); periodo_horizonte_processo_estocastico <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo_horizonte_processo_estocastico)) {
+
+								if (!is_sobreposicao_encontrada)
+									throw std::invalid_argument("Nao encontrado sobreposicao em horizonte_processo_estocastico para o periodo: " + getString(a_periodo));
+
 							}//else {
 						}
 
@@ -19370,7 +19708,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		a_dados.setAtributo(AttComumDados_tipo_correlacao_geracao_cenario_hidrologico, TipoCorrelacaoVariaveisAleatorias_sem_correlacao);
 
 		a_dados.setAtributo(AttComumDados_tipo_processamento_paralelo, TipoProcessamentoParalelo_por_abertura);
-		a_dados.setAtributo(AttComumDados_mapear_processos_com_um_unico_cenario, true);
 		a_dados.setAtributo(AttComumDados_numero_maximo_iteracoes, 20);
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19421,16 +19758,23 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		a_dados.setAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco_CVAR);
 
-		SmartEnupla<IdEstagio, double> vetor_lambda_CVAR(IdEstagio_1, std::vector<double>(int(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()), 0.0));
-		vetor_lambda_CVAR.setElemento(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), 0.35);
-		
-		a_dados.setVetor(AttVetorDados_lambda_CVAR, vetor_lambda_CVAR);
+
+		if (a_dados.getSizeVetor(AttVetorDados_lambda_CVAR) == 0) {
+
+			SmartEnupla<IdEstagio, double> vetor_lambda_CVAR(IdEstagio_1, std::vector<double>(int(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()), 0.0));
+			vetor_lambda_CVAR.setElemento(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), 0.35);
+
+			a_dados.setVetor(AttVetorDados_lambda_CVAR, vetor_lambda_CVAR);
+		}//if (a_dados.getSizeVetor(AttVetorDados_lambda_CVAR) == 0) {
 
 		////
-		SmartEnupla<IdEstagio, double> vetor_alpha_CVAR(IdEstagio_1, std::vector<double>(int(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()), 0.0));
-		vetor_alpha_CVAR.setElemento(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), 0.25);
+		if (a_dados.getSizeVetor(AttVetorDados_alpha_CVAR) == 0) {
+			SmartEnupla<IdEstagio, double> vetor_alpha_CVAR(IdEstagio_1, std::vector<double>(int(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()), 0.0));
+			vetor_alpha_CVAR.setElemento(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), 0.25);
 
-		a_dados.setVetor(AttVetorDados_alpha_CVAR, vetor_alpha_CVAR);
+			a_dados.setVetor(AttVetorDados_alpha_CVAR, vetor_alpha_CVAR);
+
+		}//if (a_dados.getSizeVetor(AttVetorDados_alpha_CVAR) == 0) {
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Atualiza AttMatrizDados_percentual_duracao_patamar_carga
