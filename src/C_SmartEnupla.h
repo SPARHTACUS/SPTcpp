@@ -760,16 +760,6 @@ public:
 
 			const TipoPeriodo tipo = a_periodo.getTipoPeriodo();
 
-			if (true) {
-
-				const Periodo periodo_final = getIteradorFinal();
-
-				if ((periodo_final.getTipoPeriodo() == tipo) && (periodo_final <= a_periodo)) {
-					a_periodo++;
-					return;
-				}
-
-			} // if (true) {
 
 			//////////////////////////////////////////////////
 			//Identifica a estrutura a qual pertence o periodo
@@ -834,8 +824,16 @@ public:
 				}//else if (lista_estrutura.at(indiceEstrutura).tipoEstruturaPeriodo == TipoEstruturaPeriodo_decrescente) {
 			
 			} // else if (a_periodo == iteradores_finais.at(tipo).at(0)) {
-			else
+			else {
+				const Periodo periodo_final = getIteradorFinal();
+
+				if ((periodo_final.getTipoPeriodo() == tipo) && (periodo_final <= a_periodo)) {
+					a_periodo++;
+					return;
+				}
 				throw std::invalid_argument("Iterador invalido.");
+			}
+
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::incrementaIterador(" + getString(a_periodo) + "): \n" + std::string(erro.what())); }
 	} // void operator++(Periodo &a_periodo) const {
@@ -1648,48 +1646,44 @@ private:
 		try {
 
 			bool procurar_em_todas_as_estruturas = true;
-			/*
-			if (a_periodo.estrutura > 0) {
 
-				if (lista_estrutura.size() > a_periodo.estrutura) {
-					if (lista_estrutura.at(a_periodo.estrutura - 1).iteradores_iniciais.at(lista_estrutura.at(a_periodo.estrutura - 1).tipo_iterador_inicial).at(0) <= a_periodo \
-						&& lista_estrutura.at(a_periodo.estrutura - 1).iteradores_finais.at(lista_estrutura.at(a_periodo.estrutura - 1).tipo_iterador_final).at(0) >= a_periodo) {
-						return a_periodo.estrutura - 1;
+			const TipoPeriodo tipo_periodo_iterador = a_periodo.getTipoPeriodo();
+
+			if ((a_periodo.estrutura > 0) && (lista_estrutura.size() > a_periodo.estrutura)) {
+
+				const int pos_periodo = a_periodo.estrutura - 1;
+				if (lista_estrutura.at(pos_periodo).iteradores_iniciais.at(tipo_periodo_iterador).size() > 0) {
+					if (lista_estrutura.at(pos_periodo).iteradores_iniciais.at(tipo_periodo_iterador).at(0) <= a_periodo \
+						&& lista_estrutura.at(pos_periodo).iteradores_finais.at(tipo_periodo_iterador).at(0) >= a_periodo) {
+						return pos_periodo;
 					}
-					else
-						procurar_em_todas_as_estruturas = true;
 				}
 
-				else
-					procurar_em_todas_as_estruturas = true;
+			}// if ((a_periodo.estrutura > 0) && (lista_estrutura.size() > a_periodo.estrutura)) {
 
-			}//if (a_periodo.estrutura > 0) {
-			*/
-			if (a_periodo.estrutura == 0 || procurar_em_todas_as_estruturas) {//Procura em todas as estruturas até encontrar
 
-				const int numero_estruturas = int(lista_estrutura.size());
-				
-				const TipoPeriodo tipo_periodo_iterador = a_periodo.getTipoPeriodo();
+			const int pos_max = int(lista_estrutura.size()) - 1;
 
-				for (int pos = 0; pos < numero_estruturas; pos++) {
+			if ((lista_estrutura.at(pos_max).iteradores_finais.at(lista_estrutura.at(pos_max).tipo_iterador_final).at(0) < a_periodo) ||
+				(lista_estrutura.at(0).iteradores_iniciais.at(lista_estrutura.at(0).tipo_iterador_inicial).at(0) > a_periodo))
+				return -1;
 
-					if (lista_estrutura.at(pos).iteradores_iniciais.at(tipo_periodo_iterador).size() > 0) {
+			for (int pos = 0; pos <= pos_max; pos++) {
 
-						if ((lista_estrutura.at(pos).iteradores_iniciais.at(tipo_periodo_iterador).at(0) <= a_periodo) && \
-						   (a_periodo <= lista_estrutura.at(pos).iteradores_finais.at(tipo_periodo_iterador).at(0))){
-							return pos;
-						}
+				if (lista_estrutura.at(pos).iteradores_iniciais.at(tipo_periodo_iterador).size() > 0) {
 
+					if ((lista_estrutura.at(pos).iteradores_iniciais.at(tipo_periodo_iterador).at(0) <= a_periodo) && \
+						(a_periodo <= lista_estrutura.at(pos).iteradores_finais.at(tipo_periodo_iterador).at(0))) {
+						return pos;
 					}
 
-				}//for (int estrutura = 0; estrutura < int(lista_estrutura.size()); estrutura++) {
-				
-				
+				}
 
-			}//if (a_periodo.estrutura == 0 || procurar_em_todas_as_estruturas) {
+			}//for (int estrutura = 0; estrutura < int(lista_estrutura.size()); estrutura++) {
+
 
 			return -1;
-			
+
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::getIndiceEstruturaSeExistir(" + getString(a_periodo) + "): \n" + std::string(erro.what())); }
 	}; // int getIndice(Periodo a_iterador, const int a_estrutura) const {
