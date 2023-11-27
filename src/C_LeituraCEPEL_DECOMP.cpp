@@ -55,6 +55,7 @@ SmartEnupla<int, int> codigo_restricao_energia_armazenada;
 SmartEnupla<int, IdReservatorioEquivalente> idReservatorioEquivalente_restricao_energia_armazenada;
 
 ////////////////////////////////////////////////////////////////////////////////////////
+SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> percentual_duracao_patamar_carga_original; //Necessário para a donversão da parcela do corte das GNLs
 
 void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio) {
 
@@ -1961,7 +1962,13 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 			//1.Instancia percentual_duracao_patamar_carga
 			/////////////////////////////////////////////////
 
-			if (a_dados.getSizeMatriz(AttMatrizDados_percentual_duracao_patamar_carga) == 0) {
+			if (true) {
+
+				bool is_carregar_percentual_duaracao_patamar_carga = false;
+
+				if (a_dados.getSizeMatriz(AttMatrizDados_percentual_duracao_patamar_carga) == 0) //Pode ter sido instanciada na pre-config e não deve ser recarregada
+					is_carregar_percentual_duaracao_patamar_carga = true;
+
 
 				bool is_registro_DP_encontrado = false;
 
@@ -1992,6 +1999,15 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const IdEstagio idEstagio_demanda = getIdEstagioFromChar(atributo.c_str());
+
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								//Campo 3 -  Índice do subsistema .
+								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+								atributo = line.substr(9, 2);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								const int codigo_subsistema = atoi(atributo.c_str());
 
 								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 								//Filosofia: Verifica o tamanho da linha se existem dados de demanda e duração para determinar um novo patamar de carga
@@ -2145,7 +2161,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								//Guarda informação nos Smart Elementos
 								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-								if (a_dados.getSizeMatriz(AttMatrizDados_percentual_duracao_patamar_carga) == 0)
+								if (is_carregar_percentual_duaracao_patamar_carga && a_dados.getSizeMatriz(AttMatrizDados_percentual_duracao_patamar_carga) == 0)
 									a_dados.setMatriz(AttMatrizDados_percentual_duracao_patamar_carga, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga(numero_patamares), 0.0))));
 
 								///////////////////////////////////////////////////////////////////////////
@@ -2174,8 +2190,16 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 										if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda)) {
 
-											for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIdPatamarCargaFromChar(getString(numero_patamares).c_str()); idPatamarCarga++)
-												a_dados.setElemento(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, percentual_duracao_patamar.at(getintFromChar(getString(idPatamarCarga).c_str()) - 1));
+											for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIdPatamarCargaFromChar(getString(numero_patamares).c_str()); idPatamarCarga++) {
+
+												if(is_carregar_percentual_duaracao_patamar_carga)
+													a_dados.setElemento(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, percentual_duracao_patamar.at(getintFromChar(getString(idPatamarCarga).c_str()) - 1));
+
+												
+											}
+
+											if(codigo_subsistema == 1)
+												percentual_duracao_patamar_carga_original.addElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, percentual_duracao_patamar));
 
 										}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda)) {
 
@@ -2188,8 +2212,14 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 										if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda) && periodo < horizonte_otimizacao_DC.at(idEstagio_demanda_seguinte)) {
 
-											for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIdPatamarCargaFromChar(getString(numero_patamares).c_str()); idPatamarCarga++)
-												a_dados.setElemento(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, percentual_duracao_patamar.at(getintFromChar(getString(idPatamarCarga).c_str()) - 1));
+											for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIdPatamarCargaFromChar(getString(numero_patamares).c_str()); idPatamarCarga++) {
+												if (is_carregar_percentual_duaracao_patamar_carga)
+													a_dados.setElemento(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, percentual_duracao_patamar.at(getintFromChar(getString(idPatamarCarga).c_str()) - 1));
+
+											}
+
+											if (codigo_subsistema == 1)
+												percentual_duracao_patamar_carga_original.addElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, percentual_duracao_patamar));
 
 										}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_demanda) && periodo < horizonte_otimizacao_DC.at(idEstagio_demanda_seguinte)) {
 
@@ -2212,7 +2242,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 				leituraArquivo_aux.clear();
 				leituraArquivo_aux.close();
 
-			}//if (a_dados.getSizeMatriz(AttMatrizDados_percentual_duracao_patamar_carga) == 0) {
+			}//if (true) {
 
 			/////////////////////////////////////////////////
 			//2.Leitura completa
@@ -14298,9 +14328,15 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				const std::string strVarDecisaoZP0_VF_FINFIdEstagio = std::string("VarDecisaoZP0_VF_FINF," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_penalizacao_VMINOP));
 				estados.addElemento(estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, strVarDecisaoZP0_VF_FINFIdEstagio, -1, -1), 0.0);
 
-				const double perc_pat1 = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_horizonte_estudo.getIteradorFinal(), IdPatamarCarga_1, double());
-				const double perc_pat2 = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_horizonte_estudo.getIteradorFinal(), IdPatamarCarga_2, double());
-				const double perc_pat3 = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_horizonte_estudo.getIteradorFinal(), IdPatamarCarga_3, double());
+
+				const double perc_pat1 = percentual_duracao_patamar_carga_original.at(a_horizonte_estudo.getIteradorFinal()).at(IdPatamarCarga_1);
+				const double perc_pat2 = percentual_duracao_patamar_carga_original.at(a_horizonte_estudo.getIteradorFinal()).at(IdPatamarCarga_2);
+				const double perc_pat3 = percentual_duracao_patamar_carga_original.at(a_horizonte_estudo.getIteradorFinal()).at(IdPatamarCarga_3);
+
+
+				//const double perc_pat1 = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_horizonte_estudo.getIteradorFinal(), IdPatamarCarga_1, double());
+				//const double perc_pat2 = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_horizonte_estudo.getIteradorFinal(), IdPatamarCarga_2, double());
+				//const double perc_pat3 = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_horizonte_estudo.getIteradorFinal(), IdPatamarCarga_3, double());
 
 				SmartEnupla<IdRealizacao, double> rhs_corte(IdRealizacao_1, std::vector<double>(1, 0.0));
 				SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> coeficientes_corte(IdRealizacao_1, std::vector<SmartEnupla<IdVariavelEstado, double>>(1, SmartEnupla<IdVariavelEstado, double>(IdVariavelEstado_1, std::vector<double>(int(estados.getIteradorFinal()), 0.0))));
