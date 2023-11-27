@@ -1565,7 +1565,7 @@ private:
     void realocaMemRestricao(int pos) {
         assert(pos >= 0 && pos < sizeBufferRows);
         const int capAntiga = capRow[pos];
-        capRow[pos] = (std::max)(CAP_INI_POR_CONSTR, (int) ceil(capAntiga * 1.5));
+        capRow[pos] = (std::max)(CAP_INI_POR_CONSTR, (int) ceil(capAntiga * 2));
         matrizIdxs[pos] = (int *) xrealloc(matrizIdxs[pos], sizeof(int) * capRow[pos]);
         matrizCoefs[pos] = (double *) xrealloc(matrizCoefs[pos], sizeof(double) * capRow[pos]);
     }
@@ -1578,7 +1578,7 @@ private:
         const int capAntiga = capBufferRows;
 
         if (a_numConstrs == 1)
-            capBufferRows = (std::max)(CAP_INI_CONSTR, (int)ceil(capAntiga * 1.5));
+            capBufferRows = (std::max)(CAP_INI_CONSTR, (int)ceil(capAntiga * 2));
         else
             capBufferRows += a_numConstrs;
 
