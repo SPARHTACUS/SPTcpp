@@ -19828,6 +19828,9 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		a_dados.adicionaHidreletricasMontante();
 		inicializa_vazao_defluente_CP(a_dados);
+
+		a_dados.defineCenariosSimulacao();
+
 		//Define variavel_aleatoria_interna para cada Processo (é realizado logo de estabelecer os cenários resolvidos por cada processo) e das modificaçõesUHE dos postos
 		define_variavel_aleatoria_interna_CP(a_dados, a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario()));
 

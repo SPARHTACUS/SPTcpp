@@ -1858,31 +1858,17 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 
 				// Variável do Processo Estocástico Hidrológico YP lag = 0 ... lag = np
 				if (getSize1Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) > 0) {
+
+					SmartEnupla<Periodo, SmartEnupla<int, double>> coeficiente_linear_auto_correlacao = getMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, Periodo(), int(), double());
+
+					Periodo periodo_lag = periodo_processo_estocastico;
+
 					for (int lag = 1; lag <= getSize2Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_processo_estocastico); lag++) {
+
+						coeficiente_linear_auto_correlacao.decrementarIterador(periodo_lag);
+
 						if (getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_processo_estocastico, lag, double()) > 0.0) {
-
-							Periodo periodo_lag;
-
-							if ((tipo_lag_autocorrelacao == TipoLagAutocorrelacao_mensal_1) && (lag > 0))
-								periodo_lag = Periodo(periodo_lag.getMes(), periodo_lag.getAno()) - lag;
-
-							if ((tipo_lag_autocorrelacao == TipoLagAutocorrelacao_semanal_sab) && (lag > 0)) {
-
-								TipoPeriodo tipoPeriodo_periodo_processo_estocastico = periodo_processo_estocastico.getTipoPeriodo();
-
-								if (tipoPeriodo_periodo_processo_estocastico != TipoPeriodo_semanal && tipoPeriodo_periodo_processo_estocastico != TipoPeriodo_6dias && tipoPeriodo_periodo_processo_estocastico != TipoPeriodo_5dias && tipoPeriodo_periodo_processo_estocastico != TipoPeriodo_4dias && tipoPeriodo_periodo_processo_estocastico != TipoPeriodo_3dias && tipoPeriodo_periodo_processo_estocastico != TipoPeriodo_2dias && tipoPeriodo_periodo_processo_estocastico != TipoPeriodo_diario)
-									throw std::invalid_argument("TipoLagAutocorrelacao_semanal_sab nao compativel com tipo_periodo: " + getString(periodo_processo_estocastico.getTipoPeriodo()));
-								
-								Periodo periodo_aux = Periodo(TipoPeriodo_diario, periodo_processo_estocastico);
-
-								for (int aux = 0; aux < 7; aux++)//Substrai 7 dias
-									periodo_aux--;
-								
-								periodo_lag = Periodo(TipoPeriodo_semanal, periodo_aux);
-
-							}//if ((tipo_lag_autocorrelacao == TipoLagAutocorrelacao_semanal_sab) && (lag > 0)) {
-								
-
+				
 							int var_YP_LAG = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, a_idEstagio, periodo_otimizacao, idProcEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade_var_aleatoria);
 							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(var_YP_LAG, posEquYP, -getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_processo_estocastico, lag, double()));
 
