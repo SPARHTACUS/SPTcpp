@@ -8592,7 +8592,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 			} // if (calcular_att_operacionais_processo_estocastico_hidrologico == 0) {
 
 			//const IdCenario maiorIdCenario = processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getMatriz(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario(), Periodo(), double()).getIteradorFinal();
-			const SmartEnupla <Periodo, double> horizonte_afluencia_tendencia = processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getMatriz(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario(), Periodo(), double()).getElemento(cenario_inicial);
+			const SmartEnupla <Periodo, double> horizonte_afluencia = processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getMatriz(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario(), Periodo(), double()).getElemento(cenario_inicial);
 
 			const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
 
@@ -8619,11 +8619,14 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 						vetorHidreletrica.att(idHidreletrica_YHF).vetorAfluencia.add(afluencia);
 					}
 
+
+					SmartEnupla<IdCenario, SmartEnupla<Periodo, double>> cenarios_realizacao_espaco_amostral = processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).getMatriz(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario(), Periodo(), double());
+
 					//Inicializa AttMatrizAfluencia_incremental_tendencia	
-					vetorHidreletrica.att(idHidreletrica_YHF).vetorAfluencia.att(IdAfluencia_vazao_afluente).setMatriz_forced(AttMatrizAfluencia_incremental, processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).getMatriz(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario(), Periodo(), double()));
+					vetorHidreletrica.att(idHidreletrica_YHF).vetorAfluencia.att(IdAfluencia_vazao_afluente).setMatriz_forced(AttMatrizAfluencia_incremental, cenarios_realizacao_espaco_amostral);
 
 					//Inicializa AttMatrizAfluencia_natural_tendencia			
-					vetorHidreletrica.att(idHidreletrica_YHF).vetorAfluencia.att(IdAfluencia_vazao_afluente).setMatriz_forced(AttMatrizAfluencia_natural, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>(cenario_inicial, std::vector <SmartEnupla<Periodo, double>>(int(cenario_final - cenario_inicial) + 1, SmartEnupla<Periodo, double>(horizonte_afluencia_tendencia, 0.0))));
+					vetorHidreletrica.att(idHidreletrica_YHF).vetorAfluencia.att(IdAfluencia_vazao_afluente).setMatriz_forced(AttMatrizAfluencia_natural, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>(cenario_inicial, std::vector <SmartEnupla<Periodo, double>>(int(cenario_final - cenario_inicial) + 1, SmartEnupla<Periodo, double>(horizonte_afluencia, 0.0))));
 
 				}//	for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
 
@@ -8682,9 +8685,9 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 						for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
-							for (Periodo periodo = horizonte_afluencia_tendencia.getIteradorInicial(); periodo <= horizonte_afluencia_tendencia.getIteradorFinal(); horizonte_afluencia_tendencia.incrementarIterador(periodo)) {
+							for (Periodo periodo = horizonte_afluencia.getIteradorInicial(); periodo <= horizonte_afluencia.getIteradorFinal(); horizonte_afluencia.incrementarIterador(periodo)) {
 
-								const double afluencia_incremental = vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).getElementoMatriz(AttMatrizAfluencia_incremental, idCenario, periodo, double());
+								const double afluencia_incremental = getElementoMatriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental, idCenario, periodo, double());
 
 								//Atualiza afluencia_natural para a pr�pria usina e para todas as usinas a jusante da idHidreletrica
 
@@ -8692,7 +8695,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 								while (idhidreletrica_jusante != IdHidreletrica_Nenhum) {
 
-									double afluencia_natural = vetorHidreletrica.att(idhidreletrica_jusante).vetorAfluencia.att(IdAfluencia_vazao_afluente).getElementoMatriz(AttMatrizAfluencia_natural, idCenario, periodo, double());
+									double afluencia_natural = getElementoMatriz(idhidreletrica_jusante, IdAfluencia_vazao_afluente, AttMatrizAfluencia_natural, idCenario, periodo, double());
 									afluencia_natural += afluencia_incremental;
 
 									vetorHidreletrica.att(idhidreletrica_jusante).vetorAfluencia.att(IdAfluencia_vazao_afluente).setElemento(AttMatrizAfluencia_natural, idCenario, periodo, afluencia_natural);
@@ -9952,7 +9955,7 @@ void Dados::calcular_tendencia_afluencia_incremental_com_natural() {
 		if (valida_tendencia_AfluenciaEmHidreletrica(AttVetorAfluencia_natural_tendencia)) {
 
 			const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
-			const IdHidreletrica menorIdHidreletrica = getMaiorId(IdHidreletrica());
+			const IdHidreletrica menorIdHidreletrica = getMenorId(IdHidreletrica());
 
 			SmartEnupla<Periodo, double> horizonte_tendencia;
 
@@ -10238,7 +10241,7 @@ SmartEnupla<IdHidreletrica, double> Dados::calculaAfluenciaIncremental(const Sma
 		const IdHidreletrica menorIdUHE = a_afluencia_natural.getIteradorInicial();
 		const IdHidreletrica maiorIdUHE = a_afluencia_natural.getIteradorFinal();
 
-		SmartEnupla<IdHidreletrica, double> afluencia_incremental_retorno(IdHidreletrica(1), std::vector<double>(maiorIdUHE, NAN));
+		SmartEnupla<IdHidreletrica, double> afluencia_incremental_retorno(menorIdUHE, std::vector<double>(int(maiorIdUHE - menorIdUHE) + 1, NAN));
 
 		for (IdHidreletrica idUHE = menorIdUHE; idUHE <= maiorIdUHE; vetorHidreletrica.incr(idUHE)) {
 
