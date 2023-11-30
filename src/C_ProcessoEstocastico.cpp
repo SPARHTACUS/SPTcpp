@@ -188,7 +188,26 @@ void ProcessoEstocastico::gerarEspacoAmostralPorSorteio(const EntradaSaidaDados 
 
 } // void ProcessoEstocastico::gerarEspacoAmostralComSorteio(const SmartEnupla<Periodo, IdRealizacao> &a_horizonte_amostra, const TipoSorteio a_tipo_sorteio, int &a_semente){
 
-void ProcessoEstocastico::validar_probabilidade_realizacao() {
+void ProcessoEstocastico::validar_probabilidade_realizacao(const Periodo a_periodo)const {
+	try {
+
+		if (getSizeMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
+
+				double probabilidade_acumulada = 0.0;
+
+				for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getIterador2Final(AttMatrizProcessoEstocastico_probabilidade_realizacao, a_periodo, IdRealizacao()); idRealizacao++)
+					probabilidade_acumulada += getElementoMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao, a_periodo, idRealizacao, double());
+
+				if (probabilidade_acumulada > 1.00001 || probabilidade_acumulada < 0.99995)
+					throw std::invalid_argument("Atributo " + getFullString(AttMatrizProcessoEstocastico_probabilidade_realizacao) + " com somatoria de valores diferente de 1.0 em " + getFullString(a_periodo));
+
+		} // if (getSizeMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
+
+	} // try{
+	catch (const std::exception & erro) { throw std::invalid_argument("ProcessoEstocastico::validar_probabilidade_realizacao(): \n" + std::string(erro.what())); }
+} // void ProcessoEstocastico::validar_probabilidade_realizacao() {
+
+void ProcessoEstocastico::validar_probabilidade_realizacao() const{
 	try {
 
 		if (getSizeMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
@@ -197,24 +216,15 @@ void ProcessoEstocastico::validar_probabilidade_realizacao() {
 
 			for (Periodo periodo = probabilidade_realizacao.getIteradorInicial(); periodo <= probabilidade_realizacao.getIteradorFinal(); probabilidade_realizacao.incrementarIterador(periodo)) {
 
-				const IdRealizacao maiorIdRealizacao = probabilidade_realizacao.at(periodo).getIteradorFinal();
-
-				double probabilidade_acumulada = 0.0;
-
-				for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao; idRealizacao++)
-					probabilidade_acumulada += probabilidade_realizacao.at(periodo).at(idRealizacao);
-
-				if (probabilidade_acumulada > 1.00001 || probabilidade_acumulada < 0.99995)
-					throw std::invalid_argument("Atributo " + getFullString(AttMatrizProcessoEstocastico_probabilidade_realizacao) + " com somatoria de valores diferente de 1.0 em " + getFullString(periodo));
+				validar_probabilidade_realizacao(periodo);
 
 			} // for (Periodo periodo = probabilidade_realizacao.getIteradorInicial(); periodo <= probabilidade_realizacao.getIteradorFinal(); probabilidade_realizacao.incrementarIterador(periodo)) {
 
 		} // if (getSizeMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
 
 	} // try{
-	catch (const std::exception & erro) { throw std::invalid_argument("ProcessoEstocastico::validar_probabilidade_realizacao(): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico::validar_probabilidade_realizacao(): \n" + std::string(erro.what())); }
 } // void ProcessoEstocastico::validar_probabilidade_realizacao() {
-
 
 void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente){
 
