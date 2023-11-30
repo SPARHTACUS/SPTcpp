@@ -316,6 +316,24 @@ template<typename IdM, typename Id##MM, typename IdMMM, typename IdMMMM> \
 IdMMMM getMaiorId(const Id##M a_m, const Id##MM a_mM, const IdMMM a_mMM, const IdMMMM a_mMMM){ return IdMMMM(); };\
 \
 template<typename IdM> \
+IdM getMenorId(const IdM a_m)const{ return IdM(); }; \
+template<typename IdM, typename IdMM> \
+IdMM getMenorId(const Id##M a_m, const IdMM a_mM){ return IdMM(); };\
+template<typename IdM, typename IdMM, typename IdMMM> \
+IdMMM getMenorId(const Id##M a_m, const IdMM a_mM, const IdMMM a_mMM){ return IdMMM(); };\
+template<typename IdM, typename Id##MM, typename IdMMM, typename IdMMMM> \
+IdMMMM getMenorId(const Id##M a_m, const Id##MM a_mM, const IdMMM a_mMM, const IdMMMM a_mMMM){ return IdMMMM(); };\
+\
+template<typename IdM> \
+bool isInstanciado(const IdM a_m)const{ return IdM(); }; \
+template<typename IdM, typename IdMM> \
+bool isInstanciado(const Id##M a_m, const IdMM a_mM){ return IdMM(); };\
+template<typename IdM, typename IdMM, typename IdMMM> \
+bool isInstanciado(const Id##M a_m, const IdMM a_mM, const IdMMM a_mMM){ return IdMMM(); };\
+template<typename IdM, typename Id##MM, typename IdMMM, typename IdMMMM> \
+bool isInstanciado(const Id##M a_m, const Id##MM a_mM, const IdMMM a_mMM, const IdMMMM a_mMMM){ return IdMMMM(); };\
+\
+template<typename IdM> \
 std::vector<IdM> getIdObjetos(const IdM a_m)const{ return std::vector<IdM>(); }; \
 template<typename IdM, typename IdMM> \
 std::vector<IdMM> getIdObjetos(const Id##M a_m, const IdMM a_mM){ return std::vector<IdMM>(); };\

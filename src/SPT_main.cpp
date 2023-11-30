@@ -289,6 +289,7 @@ int main(int argc, char *argv[]) {
 		std::cout << std::endl;
 		std::cout << std::endl;
 		std::cout << ":~(  Excecao encontrada na execucao do modelo!" << std::endl << std::endl;
+		std::cout << erro.what() << std::endl;
 
 		try {
 			std::ofstream escritaStream;
