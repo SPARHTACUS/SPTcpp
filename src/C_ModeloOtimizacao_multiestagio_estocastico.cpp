@@ -1860,12 +1860,18 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 				if (getSize1Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) > 0) {
 
 					SmartEnupla<Periodo, SmartEnupla<int, double>> coeficiente_linear_auto_correlacao = getMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, Periodo(), int(), double());
+					SmartEnupla<Periodo,double> tendencia_temporal = getVetor(idProcEstocastico, idVariavelAleatoria, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoria_tendencia_temporal, Periodo(), double());
 
 					Periodo periodo_lag = periodo_processo_estocastico;
 
 					for (int lag = 1; lag <= getSize2Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_processo_estocastico); lag++) {
 
-						coeficiente_linear_auto_correlacao.decrementarIterador(periodo_lag);
+						if (periodo_lag > coeficiente_linear_auto_correlacao.getIteradorInicial())
+							coeficiente_linear_auto_correlacao.decrementarIterador(periodo_lag);
+						else if (periodo_lag == coeficiente_linear_auto_correlacao.getIteradorInicial())
+							periodo_lag = tendencia_temporal.getIteradorFinal();
+						else
+							tendencia_temporal.decrementarIterador(periodo_lag);					
 
 						if (getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_processo_estocastico, lag, double()) > 0.0) {
 				
