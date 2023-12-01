@@ -1860,7 +1860,7 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 				if (getSize1Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) > 0) {
 
 					SmartEnupla<Periodo, SmartEnupla<int, double>> coeficiente_linear_auto_correlacao = getMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, Periodo(), int(), double());
-					SmartEnupla<Periodo,double> tendencia_temporal = getVetor(idProcEstocastico, idVariavelAleatoria, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoria_tendencia_temporal, Periodo(), double());
+					SmartEnupla<Periodo,double> tendencia_temporal = getVetor(idProcEstocastico, idVariavelAleatoria, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
 					Periodo periodo_lag = periodo_processo_estocastico;
 

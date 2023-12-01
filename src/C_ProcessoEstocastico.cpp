@@ -96,7 +96,16 @@ void ProcessoEstocastico::avaliarModeloViaSerieSintetica(const EntradaSaidaDados
 		if (a_horizonte_espaco_amostral.size() == 0)
 			return;
 
-		const Periodo periodo_inicial_serie = a_horizonte_espaco_amostral.getIteradorInicial();
+		Periodo periodo_inicial_serie = a_horizonte_espaco_amostral.getIteradorInicial();
+
+		for (int i = 0; i < a_horizonte_espaco_amostral.size(); i++) {
+
+			if (periodo_inicial_serie.getTipoPeriodo() == getIteradorFinal(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_serie_temporal, Periodo()).getTipoPeriodo())
+				break;
+
+			a_horizonte_espaco_amostral.incrementarIterador(periodo_inicial_serie);
+
+		}
 
 		SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> horizonte_amostra_comum(periodo_inicial_serie, std::vector<SmartEnupla<IdRealizacao, double>>(a_numero_periodos_avaliacao_sintetica, SmartEnupla<IdRealizacao, double>(IdRealizacao_1, std::vector<double>(1, NAN))));
 
@@ -141,30 +150,46 @@ void ProcessoEstocastico::gerarEspacoAmostralPorSorteio(const EntradaSaidaDados 
 		if (a_horizonte_espaco_amostral.size() == 0)
 			return;
 
+
+		SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> horizonte_espaco_amostral;
+
+		if (getSize1Matriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral) > 0) {
+
+			Periodo periodo_inicial = getIterador1Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo());
+
+			a_horizonte_espaco_amostral.incrementarIterador(periodo_inicial);
+
+			for (Periodo periodo = periodo_inicial; periodo <= a_horizonte_espaco_amostral.getIteradorFinal(); a_horizonte_espaco_amostral.incrementarIterador(periodo))
+				horizonte_espaco_amostral.addElemento(periodo, a_horizonte_espaco_amostral.at(periodo));
+
+		}
+		else
+			horizonte_espaco_amostral = a_horizonte_espaco_amostral;
+
 		const IdVariavelAleatoria maiorVariavelAleatoria = getMaiorIdVariavelAleatoria();
 
 		for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= maiorVariavelAleatoria; idVar++) {
-			if (numero_maximo_periodos_espaco_amostral < a_horizonte_espaco_amostral.size())
-				vetorVariavelAleatoria.att(idVar).gerarRuidoBrancoEspacoAmostral(a_horizonte_espaco_amostral, a_tipo_sorteio, numero_maximo_periodos_espaco_amostral, a_semente);
+			if (numero_maximo_periodos_espaco_amostral < horizonte_espaco_amostral.size())
+				vetorVariavelAleatoria.att(idVar).gerarRuidoBrancoEspacoAmostral(horizonte_espaco_amostral, a_tipo_sorteio, numero_maximo_periodos_espaco_amostral, a_semente);
 			else
-				vetorVariavelAleatoria.att(idVar).gerarRuidoBrancoEspacoAmostral(a_horizonte_espaco_amostral, a_tipo_sorteio, a_semente);
+				vetorVariavelAleatoria.att(idVar).gerarRuidoBrancoEspacoAmostral(horizonte_espaco_amostral, a_tipo_sorteio, a_semente);
 		}
 
 		calcularRuidoCorrelacionadoEspacoAmostral();
 
 		for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= maiorVariavelAleatoria; idVar++) {
-			vetorVariavelAleatoria.att(idVar).expandirParametrosEspacoAmostral(a_horizonte_espaco_amostral);
-			vetorVariavelAleatoria.att(idVar).gerarEspacoAmostralFromRuido(a_horizonte_espaco_amostral);
+			vetorVariavelAleatoria.att(idVar).expandirParametrosEspacoAmostral(horizonte_espaco_amostral);
+			vetorVariavelAleatoria.att(idVar).gerarEspacoAmostralFromRuido(horizonte_espaco_amostral);
 		}
 
 		tipo_periodo_espaco_amostral = std::vector<TipoPeriodo>();
 		getTipoPeriodoEspacoAmostral();
 
 		SmartEnupla<Periodo, TipoRelaxacaoVariavelAleatoria> tipo_relaxacao;
-		SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> probabilidade_realizacao = a_horizonte_espaco_amostral;
-		for (Periodo periodo = a_horizonte_espaco_amostral.getIteradorInicial(); periodo <= a_horizonte_espaco_amostral.getIteradorFinal(); a_horizonte_espaco_amostral.incrementarIterador(periodo)) {
+		SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> probabilidade_realizacao = horizonte_espaco_amostral;
+		for (Periodo periodo = horizonte_espaco_amostral.getIteradorInicial(); periodo <= horizonte_espaco_amostral.getIteradorFinal(); horizonte_espaco_amostral.incrementarIterador(periodo)) {
 			tipo_relaxacao.addElemento(periodo, a_tipo_relaxacao);
-			const IdRealizacao maiorIdRealizacao = a_horizonte_espaco_amostral.at(periodo).getIteradorFinal();
+			const IdRealizacao maiorIdRealizacao = horizonte_espaco_amostral.at(periodo).getIteradorFinal();
 			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao; idRealizacao++)
 				probabilidade_realizacao.at(periodo).at(idRealizacao) = 1.0 / double(maiorIdRealizacao);
 		} // for (Periodo periodo = a_horizonte_espaco_amostral.getIteradorInicial(); periodo <= a_horizonte_espaco_amostral.getIteradorFinal(); a_horizonte_espaco_amostral.incrementarIterador(periodo)) {

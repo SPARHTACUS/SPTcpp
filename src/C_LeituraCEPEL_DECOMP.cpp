@@ -111,7 +111,7 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 
 		//Leitura da árvore de cenários
 
-		if (a_dados.processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_variavelAleatoria_realizacao) == 0 && a_dados.processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_no_probabilidade) == 0 && int(numero_realizacoes_por_periodo.size()) == 0)
+		if (int(numero_realizacoes_por_periodo.size()) == 0)
 			ler_vazao_probabilidade_estrutura_arvore_cenarios_from_VAZOES_201906_DC29(a_dados, a_diretorio + "//VAZOES." + revisao);//Lê árvore DC
 
 		//////////////////////////////////////////////////////////////////////////
@@ -218,17 +218,6 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 
 		define_numero_cenarios_CP(a_dados);
 
-		if (a_dados.processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_arvore_cenarios) == 0)
-			instanciar_mapeamento_arvore_cenarios_simetrica(a_dados);
-
-		if (a_dados.processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_no_antecessor) == 0)
-			instanciar_no_antecessor_arvore_simetrica(a_dados);
-
-		if (a_dados.processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_no_realizacao) == 0)
-			instanciar_no_realizacao_arvore_simetrica(a_dados);
-
-		if (a_dados.processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_no_probabilidade) == 0)
-			instanciar_no_probabilidade_arvore_simetrica(a_dados);
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1703,232 +1692,6 @@ void LeituraCEPEL::instanciar_processo_estocastico_CP(Dados& a_dados) {
 
 }
 
-void LeituraCEPEL::instanciar_mapeamento_arvore_cenarios_simetrica(Dados& a_dados)
-{
-
-	try {
-
-		//Filosofia: Somente serve se a árvore de cenários for simêtrica
-
-		if (int(numero_realizacoes_por_periodo.size()) == 0)
-			throw std::invalid_argument("Informar na pre-configuracao o numero_realizacoes_por_periodo_processo_estocastico");
-
-		const int numero_cenarios = a_dados.getAtributo(AttComumDados_numero_cenarios, int());
-
-		const IdCenario maiorIdCenario = IdCenario(numero_cenarios);
-
-		SmartEnupla<IdCenario, SmartEnupla<Periodo, IdNo>> mapeamento_arvore_cenario_simetrica;
-
-		////////////////////////////////////////////////////////////////
-		//Cria vetor com o número de "sub-cenários" em cada nó da árvore
-		////////////////////////////////////////////////////////////////
-
-		SmartEnupla<Periodo, int> numero_sub_cenarios;
-
-		int sub_cenarios = numero_cenarios;
-
-		for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-			sub_cenarios /= numero_realizacoes_por_periodo.getElemento(periodo);
-			numero_sub_cenarios.addElemento(periodo, sub_cenarios);
-
-		}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-		////////////////////////////////////////////////////////////////
-
-		/////////////////////////////////////////////////
-		//Realiza mapeamento espaço amostral
-		/////////////////////////////////////////////////
-
-		SmartEnupla<Periodo, int> conteio_sub_cenarios(numero_sub_cenarios, 0);
-		SmartEnupla<Periodo, int> no(numero_sub_cenarios, 1);
-
-		for (IdCenario idCenario = IdCenario_1; idCenario <= maiorIdCenario; idCenario++) {
-
-			SmartEnupla<Periodo, IdNo> mapeamento_arvore_cenario_simetrica_cenario;
-
-			//for (IdEstagio idEstagio = estagio_acoplamento_pre_estudo; idEstagio <= idEstagio_final; idEstagio++) {
-			for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-				const int sub_cenarios = numero_sub_cenarios.getElemento(periodo);
-
-				if (conteio_sub_cenarios.getElemento(periodo) >= sub_cenarios) {
-
-					const int aumento_no = no.getElemento(periodo) + 1;
-					no.setElemento(periodo, aumento_no);
-
-					conteio_sub_cenarios.setElemento(periodo, 0);
-
-				}//if (conteio_sub_cenarios.getElemento(periodo) > sub_cenarios) {
-
-				const IdNo idNo = IdNo(no.getElemento(periodo) + 1);
-
-				mapeamento_arvore_cenario_simetrica_cenario.addElemento(periodo, idNo);
-
-				///////////
-
-				const int aumento_sub_cenarios = conteio_sub_cenarios.getElemento(periodo) + 1;
-				conteio_sub_cenarios.setElemento(periodo, aumento_sub_cenarios);
-
-			}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-			/////////////////////////////////////////////////////////////////
-
-			mapeamento_arvore_cenario_simetrica.addElemento(idCenario, mapeamento_arvore_cenario_simetrica_cenario);
-
-		}//for (IdCenario idCenario = a_cenario_inicial; idCenario <= a_cenario_final; idCenario++) {
-
-		a_dados.processoEstocastico_hidrologico.setMatriz(AttMatrizProcessoEstocastico_mapeamento_arvore_cenarios, mapeamento_arvore_cenario_simetrica);
-
-	}//	try {
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_mapeamento_arvore_cenarios_simetrica: \n" + std::string(erro.what())); }
-
-}
-
-void LeituraCEPEL::instanciar_no_antecessor_arvore_simetrica(Dados& a_dados)
-{
-
-	try {
-
-		if (int(numero_realizacoes_por_periodo.size()) == 0)
-			throw std::invalid_argument("Informar na pre-configuracao o numero_realizacoes_por_periodo_processo_estocastico");
-
-		/////////////////////////////////////////////
-		//Inicializa no_antecessor
-		/////////////////////////////////////////////
-
-		int numero_nos_por_periodo = 1;
-
-		for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-			numero_nos_por_periodo *= numero_realizacoes_por_periodo.getElemento(periodo);
-			const IdNo maiorIdNo_periodo = IdNo(numero_nos_por_periodo + 1); //+1 porque existe o IdNo_0
-
-			for (IdNo idNo = IdNo_1; idNo <= maiorIdNo_periodo; idNo++)
-				a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_antecessor, periodo, idNo, IdNo_0);
-
-		}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-		/////////////////////////////////////////////
-		//Atualiza no_antecessor
-		/////////////////////////////////////////////
-
-		const IdCenario maiorIdCenario = a_dados.processoEstocastico_hidrologico.getIterador1Final(AttMatrizProcessoEstocastico_mapeamento_arvore_cenarios, IdCenario());
-
-		for (IdCenario idCenario = IdCenario_1; idCenario <= maiorIdCenario; idCenario++) {
-
-			for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-				if (periodo > horizonte_processo_estocastico.getIteradorInicial()) {
-
-					Periodo periodo_anterior = periodo;
-					horizonte_processo_estocastico.decrementarIterador(periodo_anterior);
-
-					const IdNo idNo = a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_arvore_cenarios, idCenario, periodo, IdNo());
-					const IdNo idNo_antecessor = a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_arvore_cenarios, idCenario, periodo_anterior, IdNo());
-
-					a_dados.processoEstocastico_hidrologico.setElemento(AttMatrizProcessoEstocastico_no_antecessor, periodo, idNo, idNo_antecessor);
-
-				}//if (periodo > horizonte_processo_estocastico.getIteradorInicial()) {
-
-			}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-		}//for (IdCenario idCenario = IdCenario_1; idCenario <= maiorIdCenario; idCenario++) {
-
-	}//	try {
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_no_antecessor_arvore_simetrica: \n" + std::string(erro.what())); }
-
-}
-
-void LeituraCEPEL::instanciar_no_realizacao_arvore_simetrica(Dados& a_dados)
-{
-
-	try {
-
-		if (int(numero_realizacoes_por_periodo.size()) == 0)
-			throw std::invalid_argument("Informar na pre-configuracao o numero_realizacoes_por_periodo_processo_estocastico");
-
-		//Este vetor pode ser alterado para gerar para um determinado periodo com amostras comuns
-		SmartEnupla<Periodo, bool> periodo_amostra_comum(horizonte_processo_estocastico, false);
-
-		/////////////////////////////////////////////
-		//Atualiza no_antecessor
-		/////////////////////////////////////////////
-
-		IdRealizacao idRealizacao = IdRealizacao_1;
-
-		for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-			const SmartEnupla<IdNo, IdNo> no_antecessor_periodo = a_dados.processoEstocastico_hidrologico.getElementosMatriz(AttMatrizProcessoEstocastico_no_antecessor, periodo, IdNo(), IdNo());
-
-			const IdNo maiorIdNo = no_antecessor_periodo.getIteradorFinal();
-
-			int conteio_aberturas = 0;
-
-			const IdRealizacao idRealizacao_referencia = idRealizacao;
-
-			for (IdNo idNo = IdNo_1; idNo <= maiorIdNo; idNo++) {
-
-				if (periodo_amostra_comum.getElemento(periodo) && conteio_aberturas == numero_realizacoes_por_periodo.getElemento(periodo)) {
-					idRealizacao = idRealizacao_referencia;
-					conteio_aberturas = 0;
-				}//if (periodo_amostra_comum.getElemento(periodo) && conteio_aberturas == numero_realizacoes_por_periodo.getElemento(periodo)) {
-
-				conteio_aberturas++;
-
-				a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_realizacao, periodo, idNo, idRealizacao);
-
-				idRealizacao++;
-
-			}//for (IdNo idNo = IdNo_1; idNo <= maiorIdNo; idNo++) {
-
-		}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-	}//	try {
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_no_realizacao_arvore_simetrica: \n" + std::string(erro.what())); }
-
-}
-
-void LeituraCEPEL::instanciar_no_probabilidade_arvore_simetrica(Dados& a_dados)
-{
-
-	try {
-
-		if (int(numero_realizacoes_por_periodo.size()) == 0)
-			throw std::invalid_argument("Informar na pre-configuracao o numero_realizacoes_por_periodo_processo_estocastico");
-
-		int numero_nos = 1;
-
-		bool is_first_periodo_sobreposicao_encontrado = false;
-
-		for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-			numero_nos *= numero_realizacoes_por_periodo.getElemento(periodo);
-
-			double prob = 0.0;
-
-			for (int no = 0; no < numero_nos; no++) {
-
-				if (periodo.sobreposicao(horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal())) && !is_first_periodo_sobreposicao_encontrado) {
-					
-					if(no == numero_nos-1)
-						is_first_periodo_sobreposicao_encontrado = true;
-					
-					prob = a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao, periodo, IdRealizacao(no + 1), double()); //Pega as probabilidades lidas das aberturas do DC
-				}//if (periodo.sobreposicao(horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal()))) {
-				else
-					prob = 1.0 / numero_realizacoes_por_periodo.getElemento(periodo);
-
-				a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, periodo, IdNo(no + 2), prob);
-
-			}
-				
-
-		}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-	}//	try {
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_no_probabilidade_arvore_simetrica: \n" + std::string(erro.what())); }
-
-}
 
 void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeArquivo)
 {
@@ -9801,7 +9564,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 
 
 							/////////////////////////////////////////////////////////////////////////////
-							SmartEnupla<Periodo, int> numero_patamares_x_periodo(horizonte_estudo, 0.0);
+							SmartEnupla<Periodo, int> numero_patamares_x_periodo(horizonte_estudo, 0);
 
 							for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= maiorIdPatamarCarga; idPatamarCarga_DECK++) {
 
@@ -13219,9 +12982,7 @@ void LeituraCEPEL::define_numero_cenarios_CP(Dados& a_dados) {
 		//Determina o número de cenários da árvore
 		/////////////////////////////////////////////////
 
-		if (a_dados.processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_arvore_cenarios) > 0)
-			a_dados.setAtributo(AttComumDados_numero_cenarios, a_dados.processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_arvore_cenarios));
-		else if (int(numero_realizacoes_por_periodo.size())) {
+		if (int(numero_realizacoes_por_periodo.size())) {
 
 			//Assume-se que a árvore é simêtrica
 
@@ -13242,120 +13003,6 @@ void LeituraCEPEL::define_numero_cenarios_CP(Dados& a_dados) {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::define_numero_cenarios_CP(Dados& a_dados): \n" + std::string(erro.what())); }
 
 }
-
-void LeituraCEPEL::instanciar_variavelAleatoria_realizacao_from_vazoes_DC(Dados& a_dados) {
-
-	try {
-
-		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
-		const IdHidreletrica  maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
-
-		const int numero_nos = int(vazao_no_posto.size());
-		IdRealizacao idRealizacao = IdRealizacao_1;
-
-		for (int no = 0; no < numero_nos; no++) {
-
-			/////////////////////////////////////////////////////////////////////////////////////
-			//Identifica o estágio do registro
-			//Filosofia: Devido à estrutura da árvore DECOMP  o arquivo de VAZOES.DAT
-			//o idNo = idEstagio para t < T
-			// 
-			//Períodos no horizonte de otimização diferentes ao horizonte do processo estocástico:
-			// 1. Vai ter só aberturas no primeiro período de otimização com sobreposição com o períoodo do horizonte do processo estocástico
-			// 2. O valor do residuo vai ser alocado no primeiro período de otimização com sobreposição com o períoodo do horizonte do processo estocástico, caso contrário, afluencia = 0
-			// 3. Por meio da estrutura do modelo PAR colocasse 100 % de autocorreção com o período anterior
-			/////////////////////////////////////////////////////////////////////////////////////
-
-			IdEstagio idEstagio_DC = IdEstagio_Nenhum;
-
-			const int numero_estagios_DC = int(horizonte_otimizacao_DC.size());
-
-			if (no + 1 < numero_estagios_DC)
-				idEstagio_DC = IdEstagio(no + 1);
-			else
-				idEstagio_DC = horizonte_otimizacao_DC.getIteradorFinal();
-
-			///////////////////
-
-			const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_DC);
-
-			double soma_sobreposicao = 0.0;
-
-			bool is_encontrada_sobreposicao = false;
-
-			for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
-
-				const Periodo periodo_otimizacao = horizonte_otimizacao.getElemento(idEstagio_otimizacao);
-
-				const double sobreposicao = periodo_DC.sobreposicao(periodo_otimizacao);
-
-				if (sobreposicao > 0.0) {
-
-					is_encontrada_sobreposicao = true;
-
-					///////////////////////////////////////////////////////
-					//Determina o periodo do processo estocástico (pega a menor granularidade entre o periodo_DC e o periodo_otimizacao)
-					// E identifica se é o primeiro período com sobreposição
-					///////////////////////////////////////////////////////
-
-					Periodo periodo_processo_estocastico = periodo_DC;
-					bool is_first_sobreposicao = false;
-
-					if (periodo_DC.getTipoPeriodo() <= periodo_otimizacao.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
-						periodo_processo_estocastico = periodo_otimizacao;
-
-						if (periodo_otimizacao.sobreposicao(periodo_DC) == 1.0)//Garante que o periodo_otimizacao esteja "dentro" do periodo_DC
-							soma_sobreposicao += sobreposicao;
-
-						//////////////
-						const Periodo periodo_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo_DC);
-
-						if (periodo_teste == periodo_otimizacao)
-							is_first_sobreposicao = true;
-
-					}//if (periodo_DC.getTipoPeriodo() < periodo_otimizacao.getTipoPeriodo()) {
-					else { //Granularidade do periodo_otimizacao > periodo_DC
-						soma_sobreposicao += sobreposicao;
-						is_first_sobreposicao = true;
-
-					}//else {
-
-					//////////////////////////////////////////////////////
-
-					for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-
-						const int posto = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_posto, int());
-
-						double afluencia = vazao_no_posto.at(no).at(posto - 1);
-
-						if (!is_first_sobreposicao)
-							afluencia = 0.0;
-				
-						a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_variavelAleatoria_realizacao, idRealizacao, lista_hidreletrica_IdVariavelAleatoria.at(idHidreletrica), afluencia);
-
-					}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-
-					idRealizacao++;
-
-				}//if (sobreposicao_preenche_periodo_DC > 0 ) {
-
-				if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
-
-					if (soma_sobreposicao != 1.0)
-						throw std::invalid_argument("Periodo do processo estocastico nao subsituido por uma decomposicao equivalente");
-
-					break;
-
-				}//if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
-
-			}//for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
-
-		}//for (int no = 0; no < numero_nos; no++) {
-
-	}//try {
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_variavelAleatoria_realizacao_from_vazoes_DC: \n" + std::string(erro.what())); }
-
-} // void LeituraCEPEL::define_afluencia_postos_CP(Dados& a_dados) {
 
 void LeituraCEPEL::define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados) {
 
@@ -13588,6 +13235,8 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados, const Id
 
 		for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
+			SmartEnupla<Periodo, double> tendencia_temporal;
+
 			const int posto = a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_posto, int());
 
 			const IdVariavelAleatoria idVariavelAleatoria = lista_hidreletrica_IdVariavelAleatoria.at(idHidreletrica);
@@ -13659,7 +13308,6 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados, const Id
 
 			}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
-			for (IdCenario idCenario = a_cenario_inicial; idCenario <= a_cenario_final; idCenario++) {
 
 				///////////////////////////////////////////////
 				//1. Afluências passadas
@@ -13684,10 +13332,7 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados, const Id
 						//else if (lista_hidreletrica_NPOSNW.getElemento(idHidreletrica) == -1)
 							//afluencia_incremental = valor_afluencia_passadas_DECOMP.at(posto - 1).getElemento(periodo);
 
-						a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, idCenario, periodo, afluencia_incremental);
-
-						if (idCenario == a_cenario_inicial)
-							a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, afluencia_incremental);
+						tendencia_temporal.addElemento(periodo, afluencia_incremental);
 
 					}//for (Periodo periodo = periodo_inicial_historico; periodo <= periodo_final_historico; valor_afluencia_passadas.at(posto-1).incrementarIterador(periodo)) {
 
@@ -13697,7 +13342,7 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados, const Id
 				//2. Afluências histórico
 				///////////////////////////////////////////////
 
-				if ((int(valor_afluencia_historica.size()) > 0) && (idCenario == IdCenario_1) ) { //Somente reporta a o histórico das afluências se são incluídos os arquivos GEVAZP: VAZOES.DAT
+				if (int(valor_afluencia_historica.size()) > 0) { //Somente reporta a o histórico das afluências se são incluídos os arquivos GEVAZP: VAZOES.DAT
 
 					const Periodo periodo_inicial_historico = valor_afluencia_historica.at(posto - 1).getIteradorInicial();
 					const Periodo periodo_final_historico = valor_afluencia_historica.at(posto - 1).getIteradorFinal();
@@ -13724,22 +13369,7 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados, const Id
 
 				}//if (int(valor_afluencia_passadas.size()) > 0) {
 
-				////////////////////////////////////////////////////////
-				//3. Afluências da árvore de cenários
-				////////////////////////////////////////////////////////
-
-				for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-					const IdNo idNo = a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_arvore_cenarios, idCenario, periodo, IdNo());
-					const IdRealizacao idRealizacao = a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_no_realizacao, periodo, idNo, IdRealizacao());
-
-					const double afluencia = a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_variavelAleatoria_realizacao, idRealizacao, idVariavelAleatoria, double());
-
-					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, idCenario, periodo, afluencia);
-
-				}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-
-			}//for (IdCenario idCenario = a_cenario_inicial; idCenario <= a_cenario_final; idCenario++) {
+				a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).addTendenciaTemporalVariavelAleatoriaInterna(IdVariavelAleatoriaInterna_1, tendencia_temporal);
 
 		}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
@@ -19849,12 +19479,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		a_dados.validacao_operacional_Dados(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		/////////////////
-
-		if (a_dados.processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_variavelAleatoria_realizacao) == 0)//Utiliza as realizaçoes do DC
-			instanciar_variavelAleatoria_realizacao_from_vazoes_DC(a_dados);
-
-		//////////////////////////////////////////////////////////////
-		//Métodos que logo vai ser apagados -> nao necessários na estrutura árvore:
 
 		//Define mapeamento_espaco_amostral para cada Processo (é realizado logo de estabelecer os cenários resolvidos por cada processo)
 		//a_dados.processoEstocastico_hidrologico.setMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, define_mapeamento_espaco_amostral_arvore_simetrica_CP(a_dados, a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario())));

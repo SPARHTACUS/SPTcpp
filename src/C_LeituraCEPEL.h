@@ -137,12 +137,6 @@ private:
 	void instanciar_membros_das_hidreletricas_instanciadas(Dados& a_dados);
 	void instanciar_processo_estocastico_CP(Dados& a_dados);
 
-	void instanciar_mapeamento_arvore_cenarios_simetrica(Dados& a_dados);
-	void instanciar_no_antecessor_arvore_simetrica(Dados& a_dados);
-	void instanciar_no_realizacao_arvore_simetrica(Dados& a_dados);
-	void instanciar_no_probabilidade_arvore_simetrica(Dados& a_dados);
-	void instanciar_variavelAleatoria_realizacao_from_vazoes_DC(Dados& a_dados);
-
 	bool criar_tendencia_temporal_com_vazoes_observadas_CP(const std::string a_diretorio, const std::string a_revisao);
 
 	void leitura_TENDENCIA_VAZOES_MENSAIS_GEVAZP(Dados& a_dados, const std::string nomeArquivo);
