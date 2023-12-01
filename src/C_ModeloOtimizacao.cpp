@@ -1798,6 +1798,9 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 
 		vetorEstagio.att(idEstagio_futuro).removerTodosCorteBenders();
 
+		if (a_idProcesso == IdProcesso_mestre)
+			std::cout << "Cortes de Benders pos-estudo carregados. " << std::endl;
+
 	} // try
 	catch (const std::exception & erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::importarCorteBenders_AcoplamentoPosEstudo(" + getFullString(a_TSS) + "," + a_diretorio_impressao_selecao_cortes + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
 

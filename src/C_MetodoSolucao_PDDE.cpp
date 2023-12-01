@@ -18,6 +18,11 @@ void MetodoSolucao::executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const Id
 		const IdIteracao iteracao_inicial  = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_inicial,  IdIteracao());
 		IdIteracao iteracao_final    = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_final,    IdIteracao());
 		
+		if (a_idProcesso == IdProcesso_mestre) {
+			std::cout << std::endl;
+			std::cout << "Metodo Solucao Iniciado" << std::endl;
+		}
+
 		IdIteracao iteracao_simulacao_final = IdIteracao_Nenhum;
 		if (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_realizar_simulacao_final, bool())) {
 			iteracao_simulacao_final = IdIteracao(iteracao_final + 1);
