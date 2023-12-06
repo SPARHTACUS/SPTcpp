@@ -19571,6 +19571,12 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		leitura_cortes_NEWAVE(a_dados, horizonte_estudo, a_diretorio, "//DadosAdicionais//Cortes_NEWAVE", "//fcfnwn." + a_revisao);
 
+		//
+		// Esvazia Atributos Processo Estocástico Hidrológico
+		//
+
+		a_dados.processoEstocastico_hidrologico = ProcessoEstocastico();
+
 	}//try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::validacoes_DC: \n" + std::string(erro.what())); }
 
