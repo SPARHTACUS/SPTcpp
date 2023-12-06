@@ -33,6 +33,7 @@ DEFINE_SMART_ELEMENTO(ProcessoEstocastico, SMART_ELEMENTO_PROCESSO_ESTOCASTICO)
 class EntradaSaidaDados;
 
 class ProcessoEstocastico : public SmartDados {
+
 public:
 
 	ProcessoEstocastico();
@@ -165,13 +166,17 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(" + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idVariavelAleatoriaInterna) + "," + getFullString(a_idFisico) + "): \n" + std::string(erro.what())); }
 	};
 
+
+	bool mapearCenariosEspacoAmostralCompletoPorPeriodo(const Periodo a_periodo_final, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);
+
+
 private:
 
 	std::vector<TipoPeriodo> tipo_periodo_espaco_amostral;
 
 	void mapearCenariosEspacoAmostralPorSorteio  (const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int &a_semente);
 	bool mapearCenariosEspacoAmostralCompleto    (const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);
-
+	
 	void calcularCorrelacaoSazonalVariaveisAleatorias();
 
 	void calcularCorrelacaoSazonalResiduoVariaveisAleatorias();

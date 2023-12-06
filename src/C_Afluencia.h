@@ -19,9 +19,9 @@
 
 
 #define ATT_MATRIZ_AFLUENCIA(m)  \
-	  m(Afluencia,  AttMatriz,                   natural,     double,          0,          max,             0,  IdCenario, Periodo) \
-	  m(Afluencia,  AttMatriz,               incremental,     double,          0,          max,             0,  IdCenario, Periodo) \
-	  m(Afluencia,  AttMatriz,              regularizada,     double,          0,          max,             0,  IdCenario, Periodo) 
+	  m(Afluencia,  AttMatriz,                   natural,     double,       min,          max,             0,  IdCenario, Periodo) \
+	  m(Afluencia,  AttMatriz,               incremental,     double,       min,          max,             0,  IdCenario, Periodo) \
+	  m(Afluencia,  AttMatriz,              regularizada,     double,       min,          max,             0,  IdCenario, Periodo) 
 //       c_classe,   smrtAtt,               nomeAtributo,       Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 

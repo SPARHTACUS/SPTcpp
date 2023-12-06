@@ -223,7 +223,7 @@ private:
 	//Define mapeamento_espaco_amostral
 	SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> define_mapeamento_espaco_amostral_arvore_simetrica_CP(Dados& a_dados, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final);
 	void define_realizacao_transformada_espaco_amostral_arvore_completa_CP(Dados& a_dados);
-	void define_variavel_aleatoria_interna_CP(Dados& a_dados, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final);
+	void define_variavel_aleatoria_interna_CP(Dados& a_dados);
 	void define_numero_cenarios_CP(Dados& a_dados);
 	void define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados);
 

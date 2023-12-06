@@ -516,8 +516,6 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_direto);
 
-		//a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("VARIAVEL_ALEATORIA_AttComumOperacional.csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
-
 		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_" + getString(AttVetorVariavelAleatoria_tipo_relaxacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_residuo_espaco_amostral) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
@@ -559,8 +557,7 @@ SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> Dados::getHorizonteEspac
 		SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> horizonte_amostra;
 		for (IdEstagio idEstagio = a_idEstagioInicial; idEstagio <= a_idEstagioFinal; idEstagio++) {
 			const Periodo periodo = getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
-			if (idEstagio >= getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio()))
-				horizonte_amostra.addElemento(periodo, SmartEnupla<IdRealizacao, double>(IdRealizacao_1, std::vector<double>(IdRealizacao(getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int())), NAN)));
+			horizonte_amostra.addElemento(periodo, SmartEnupla<IdRealizacao, double>(IdRealizacao_1, std::vector<double>(IdRealizacao(getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int())), NAN)));
 		}
 
 		return horizonte_amostra;
@@ -581,8 +578,7 @@ SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> Dados::getHorizonteEspac
 		SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> horizonte_amostra;
 		for (IdEstagio idEstagio = a_idEstagioInicial; idEstagio <= a_idEstagioFinal; idEstagio++) {
 			const Periodo periodo = getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
-			if (idEstagio >= getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio()))
-				horizonte_amostra.addElemento(periodo, SmartEnupla<IdRealizacao, double>(IdRealizacao_1, std::vector<double>(a_maiorIdRealizacao, NAN)));
+			horizonte_amostra.addElemento(periodo, SmartEnupla<IdRealizacao, double>(IdRealizacao_1, std::vector<double>(a_maiorIdRealizacao, NAN)));
 		}
 
 		return horizonte_amostra;
@@ -8189,7 +8185,7 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 			return 4;
 
 		Periodo periodo_inicial_espaco_amostral = mapeamento_espaco_amostral.at(IdCenario_1).getIteradorInicial();
-		Periodo periodo_final_espaco_amostral = mapeamento_espaco_amostral.at(IdCenario_1).getIteradorInicial();
+		Periodo periodo_final_espaco_amostral = mapeamento_espaco_amostral.at(IdCenario_1).getIteradorFinal();
 
 		for (IdCenario idCenario = IdCenario_2; idCenario <= mapeamento_espaco_amostral.getIteradorFinal(); idCenario++) {
 
@@ -8212,28 +8208,31 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 
 		Periodo periodo_prob_realizacao = probabilidade_realizacao.getIteradorInicial();
 
-		IdEstagio idEstagio = estagio_inicial;
-		for (Periodo periodo_espaco_amostral = periodo_inicial_espaco_amostral; periodo_espaco_amostral <= periodo_final_espaco_amostral; mapeamento_espaco_amostral.at(IdCenario_1).incrementarIterador(periodo_espaco_amostral)) {
+		Periodo periodo_espaco_amostral = periodo_inicial_espaco_amostral;
+		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
 			const Periodo periodo_otimizacao = horizonte_otimizacao.getElemento(idEstagio);
 
-			if (periodo_espaco_amostral != periodo_otimizacao)
+			const double sobreposicao = periodo_espaco_amostral.sobreposicao(periodo_otimizacao);
+
+			if ((0.0 < sobreposicao) && (sobreposicao < 1.0))
 				return 91;
 
+			else if (sobreposicao == 1.0) {
 
-			if (periodo_prob_realizacao.sobreposicao(periodo_espaco_amostral) > 0) {
-				if (periodo_prob_realizacao != periodo_espaco_amostral)
-					return 92;
-				if (periodo_prob_realizacao < probabilidade_realizacao.getIteradorFinal())
-					probabilidade_realizacao.incrementarIterador(periodo_prob_realizacao);
+				if (periodo_prob_realizacao.sobreposicao(periodo_espaco_amostral) > 0) {
+
+					if (periodo_prob_realizacao != periodo_espaco_amostral)
+						return 92;
+					if (periodo_prob_realizacao < probabilidade_realizacao.getIteradorFinal())
+						probabilidade_realizacao.incrementarIterador(periodo_prob_realizacao);
+				}
+
+				mapeamento_espaco_amostral.at(IdCenario_1).incrementarIterador(periodo_espaco_amostral);
+
 			}
 
-			if (idEstagio < estagio_final)
-				idEstagio++;
-			else if (idEstagio == estagio_final)
-				break;
-
-		}
+		} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
 		bool isHorizontePEmenor = false;
 
@@ -8286,25 +8285,32 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 					if (residuo_espaco_amostral.at(periodo_residuo).size() == 0)
 						return 123;
 
+					if (residuo_espaco_amostral.at(periodo_residuo).getIteradorInicial() != IdRealizacao_1)
+						return 124;
+
+
 					if (residuo_espaco_amostral.at(periodo_residuo).size() == 1) {
-						if (probabilidade_realizacao.at(periodo_residuo).size() > 1)
-							return 124;
-						else if (probabilidade_realizacao.at(periodo_residuo).size() == 1) {
-							if (probabilidade_realizacao.at(periodo_residuo).getIteradorInicial() != IdRealizacao_1)
+						if ((probabilidade_realizacao.getIteradorInicial() <= periodo_residuo) && (periodo_residuo <= probabilidade_realizacao.getIteradorFinal())) {
+							if (probabilidade_realizacao.at(periodo_residuo).size() > 1)
 								return 125;
+							else if (probabilidade_realizacao.at(periodo_residuo).size() == 1) {
+								if (probabilidade_realizacao.at(periodo_residuo).getIteradorInicial() != IdRealizacao_1)
+									return 126;
+							}
 						}
 					}
 
-					if (residuo_espaco_amostral.at(periodo_residuo).getIteradorInicial() != IdRealizacao_1)
-						return 126;
-
-					if (residuo_espaco_amostral.at(periodo_residuo).size() > 1) {
+					else if (residuo_espaco_amostral.at(periodo_residuo).size() > 1) {
 						if (probabilidade_realizacao.at(periodo_residuo).getIteradorInicial() != IdRealizacao_1)
 							return 127;
 						if (residuo_espaco_amostral.at(periodo_residuo).size() != probabilidade_realizacao.at(periodo_residuo).size())
 							return 128;
 
 						a_processo_estocastico.validar_probabilidade_realizacao(periodo_residuo);
+					}
+
+					if (periodo_prob_realizacao.sobreposicao(periodo_residuo) > 0.0) {
+						probabilidade_realizacao.incrementarIterador(periodo_prob_realizacao); //refazer
 					}
 
 					coeficiente_linear_auto_correlacao.incrementarIterador(periodo_coef_linear);
@@ -8324,8 +8330,6 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 
 			} // if (true) {
 
-			double coef_part_acumulado = 0.0;
-
 			for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= a_processo_estocastico.getMaiorId(idVariavelAleatoria, IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++) {
 
 				if ((a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_hidreletrica) || (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_bacia)) {
@@ -8344,7 +8348,6 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 					if (periodo_coef_part != periodo_espaco_amostral)
 						return 151;
 
-					coef_part_acumulado += coeficiente_participacao.at(periodo_coef_part);
 				
 					coeficiente_participacao.incrementarIterador(periodo_coef_part);
 
@@ -8363,17 +8366,30 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 					if (periodo_final_tendencia_minuto_ref != Periodo(TipoPeriodo_minuto, tendencia_temporal.getIteradorFinal() + 1) - 1)
 						return 17;
 
-					Periodo periodo_minimo_tendencia = periodo_inicial_espaco_amostral - int(coeficiente_linear_auto_correlacao.at(periodo_inicial_espaco_amostral).at(coeficiente_linear_auto_correlacao.at(periodo_inicial_espaco_amostral).getIteradorFinal()));
+					int lag = 0;
+					for (lag = coeficiente_linear_auto_correlacao.at(periodo_inicial_espaco_amostral).size(); lag > 1; lag--) {
+						if (coeficiente_linear_auto_correlacao.at(periodo_inicial_espaco_amostral).at(lag) > 0.0)
+							break;
+					}
 
-					if (tendencia_temporal.getIteradorInicial() < periodo_minimo_tendencia)
+					const Periodo periodo_minimo_tendencia = periodo_inicial_espaco_amostral -lag;
+
+					if (tendencia_temporal.getIteradorInicial() > periodo_minimo_tendencia)
 						return 18;
 
 				}
 			
 			} // for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
 
-			if (coef_part_acumulado > 1.0)
-				return 19;
+			for (Periodo periodo_espaco_amostral = periodo_inicial_espaco_amostral; periodo_espaco_amostral <= periodo_final_espaco_amostral; mapeamento_espaco_amostral.at(IdCenario_1).incrementarIterador(periodo_espaco_amostral)) {
+				double coef_part_acumulado = 0.0;
+				for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= a_processo_estocastico.getMaiorId(idVariavelAleatoria, IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++) {
+					coef_part_acumulado += a_processo_estocastico.getElementoVetor(idVariavelAleatoria, idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodo_espaco_amostral, double());
+				}
+				if (coef_part_acumulado > 1.0)
+					return 19;
+			}
+
 
 		} // for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++) {
 
@@ -8427,6 +8443,9 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 				MPI_Recv(&calcular_att_operacionais_processo_estocastico_hidrologico_rank, 1, MPI_INT, getRank(idProcesso), 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 				if ((calcular_att_operacionais_processo_estocastico_hidrologico == 0) && (calcular_att_operacionais_processo_estocastico_hidrologico_rank > 0))
+					calcular_att_operacionais_processo_estocastico_hidrologico = calcular_att_operacionais_processo_estocastico_hidrologico_rank;
+
+				else if ((calcular_att_operacionais_processo_estocastico_hidrologico == 0) && (calcular_att_operacionais_processo_estocastico_hidrologico_rank < 0))
 					calcular_att_operacionais_processo_estocastico_hidrologico = calcular_att_operacionais_processo_estocastico_hidrologico_rank;
 
 			} // for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++) {
@@ -8483,6 +8502,12 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 			}
 
 		} // if (calcular_att_operacionais_processo_estocastico_hidrologico > 0) {
+		else if (calcular_att_operacionais_processo_estocastico_hidrologico < 0) {
+
+			if (idProcesso == IdProcesso_mestre)
+				std::cout << "Novo Processo Estocastico Instanciado e Anexado ao Anterior." << std::endl;
+
+		}
 
 
 		//
@@ -8533,9 +8558,10 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 			bool realizar_reducao_espaco_amostral = false;
 
+			
 			for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 				if (idEstagio != estagio_inicial && getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int()) < getAtributo(AttComumDados_numero_aberturas, int())) {
-					//realizar_reducao_espaco_amostral = true;
+					realizar_reducao_espaco_amostral = true;
 					break;
 				}//if (idEstagio != estagio_inicial && getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int()) < getAtributo(AttComumDados_numero_aberturas, int())) {
 			}//for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
@@ -8600,7 +8626,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 
 
-		if ((calcular_att_operacionais_processo_estocastico_hidrologico > 0) || (a_imprimir_atributos_sem_recarregar)) {
+		if ((calcular_att_operacionais_processo_estocastico_hidrologico != 0) || (a_imprimir_atributos_sem_recarregar)) {
 
 
 			//
@@ -8889,6 +8915,10 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 		bool isSerieTemporalAdicionadaEmVarExistente = false;
 		bool isTendenciaTemporalAdicionadaEmVarExistente = false;
 
+		bool isProcEstocasticoJaInstanciado = false;
+		if (a_processo_estocastico.getMaiorId(IdVariavelAleatoria()) != IdVariavelAleatoria_Nenhum)
+			isProcEstocasticoJaInstanciado = true;
+
 		if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_hidreletrica) {
 
 			a_processo_estocastico.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico_hidrologico_hidreletrica);
@@ -8896,7 +8926,7 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 			for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 
 				// Instancia variaveis aleatórias e variaveis aleatórias internas
-				if (a_processo_estocastico.getMaiorId(IdVariavelAleatoria()) != IdVariavelAleatoria_Nenhum) {
+				if (!isProcEstocasticoJaInstanciado) {
 
 					const SmartEnupla<int, IdHidreletrica>                variavel_aleatoria_interna(1, std::vector<IdHidreletrica>(1, idHidreletrica));
 					const SmartEnupla<int, SmartEnupla<Periodo, double>>  serie_temporal_variavel_aleatoria_interna(1, std::vector<SmartEnupla<Periodo, double>>(1, getVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico, Periodo(), double())));
@@ -8913,6 +8943,9 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 					IdVariavelAleatoriaInterna idVarInterna = IdVariavelAleatoriaInterna_Nenhum;
 
 					a_processo_estocastico.getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(idVar, idVarInterna, idHidreletrica);
+
+					if (strCompara(a_processo_estocastico.getAtributo(idVar, AttComumVariavelAleatoria_nome, std::string()), "nenhum"))
+						a_processo_estocastico.vetorVariavelAleatoria.att(idVar).setAtributo(AttComumVariavelAleatoria_nome, getFullString(idHidreletrica));
 
 					if (a_processo_estocastico.getSizeVetor(idVar, idVarInterna, AttVetorVariavelAleatoriaInterna_serie_temporal) == 0) {
 						a_processo_estocastico.vetorVariavelAleatoria.att(idVar).addSerieTemporalVariavelAleatoriaInterna(idVarInterna, getVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico, Periodo(), double()));
@@ -8949,7 +8982,7 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 					if (getAtributo(idHidreletrica, AttComumHidreletrica_bacia, IdBaciaHidrografica()) == idBaciaHidrografica) {
 
 						// Instancia variaveis aleatórias e variaveis aleatórias internas
-						if (a_processo_estocastico.getMenorId(IdVariavelAleatoria()) != IdVariavelAleatoria_Nenhum) {
+						if (!isProcEstocasticoJaInstanciado) {
 
 							variavel_aleatoria_interna.addElemento(contador, idHidreletrica);
 							serie_temporal_variavel_aleatoria_interna.addElemento(contador, getVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico, Periodo(), double()));
@@ -8963,6 +8996,9 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 							IdVariavelAleatoriaInterna idVarInterna = IdVariavelAleatoriaInterna_Nenhum;
 
 							a_processo_estocastico.getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(idVar, idVarInterna, idHidreletrica);
+
+							if (strCompara(a_processo_estocastico.getAtributo(idVar, AttComumVariavelAleatoria_nome, std::string()), "nenhum"))
+								a_processo_estocastico.vetorVariavelAleatoria.att(idVar).setAtributo(AttComumVariavelAleatoria_nome, getFullString(idBaciaHidrografica));
 
 							if (a_processo_estocastico.getSizeVetor(idVar, idVarInterna, AttVetorVariavelAleatoriaInterna_serie_temporal) == 0) {
 								a_processo_estocastico.vetorVariavelAleatoria.att(idVar).addSerieTemporalVariavelAleatoriaInterna(idVarInterna, getVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico, Periodo(), double()));
@@ -8990,21 +9026,21 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 
 			} // for (IdBaciaHidrografica idBaciaHidrografica = IdBaciaHidrografica_1; idBaciaHidrografica <= maiorIdBaciaHidrografica; idBaciaHidrografica++) {
 
-			if (isSerieTemporalAdicionadaEmVarExistente || isTendenciaTemporalAdicionadaEmVarExistente) {
-
-				for (IdVariavelAleatoria idVar = a_processo_estocastico.getMenorId(IdVariavelAleatoria()); idVar <= a_processo_estocastico.getMaiorId(IdVariavelAleatoria()); idVar++) {
-
-					if (isSerieTemporalAdicionadaEmVarExistente)
-						a_processo_estocastico.vetorVariavelAleatoria.att(idVar).calcularSerieTemporal();
-
-					if (isTendenciaTemporalAdicionadaEmVarExistente)
-						a_processo_estocastico.vetorVariavelAleatoria.att(idVar).calcularTendenciaTemporal();
-
-				} // for (IdVariavelAleatoria idVar = a_processo_estocastico.getMenorId(IdVariavelAleatoria()); idVar <= a_processo_estocastico.getMaiorId(IdVariavelAleatoria()); idVar++) {
-
-			} // if (isSerieTemporalAdicionadaEmVarExistente || isTendenciaTemporalAdicionadaEmVarExistente) {
-
 		} // else if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_bacia) {
+
+		if (isSerieTemporalAdicionadaEmVarExistente || isTendenciaTemporalAdicionadaEmVarExistente) {
+
+			for (IdVariavelAleatoria idVar = a_processo_estocastico.getMenorId(IdVariavelAleatoria()); idVar <= a_processo_estocastico.getMaiorId(IdVariavelAleatoria()); idVar++) {
+
+				if (isSerieTemporalAdicionadaEmVarExistente)
+					a_processo_estocastico.vetorVariavelAleatoria.att(idVar).calcularSerieTemporal();
+
+				if (isTendenciaTemporalAdicionadaEmVarExistente)
+					a_processo_estocastico.vetorVariavelAleatoria.att(idVar).calcularTendenciaTemporal();
+
+			} // for (IdVariavelAleatoria idVar = a_processo_estocastico.getMenorId(IdVariavelAleatoria()); idVar <= a_processo_estocastico.getMaiorId(IdVariavelAleatoria()); idVar++) {
+
+		} // if (isSerieTemporalAdicionadaEmVarExistente || isTendenciaTemporalAdicionadaEmVarExistente) {
 
 
 	} // try{

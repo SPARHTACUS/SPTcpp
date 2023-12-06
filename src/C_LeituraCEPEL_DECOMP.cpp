@@ -13122,8 +13122,7 @@ void LeituraCEPEL::define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados)
 
 } // void LeituraCEPEL::define_afluencia_postos_CP(Dados& a_dados) {
 
-void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final)
-{
+void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 	try {
 
 		//Nota: A VariavelAleatoriaInterna armazena os valores de afluência passadas + tendência (afluências menores ao periodo de acoplamento) + residuo_espaco_amostral (processo estocástico)
@@ -13626,7 +13625,14 @@ void LeituraCEPEL::imprime_na_tela_avisos_de_possiveis_inviabilidades_fph(Dados&
 
 				for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
-					if (afluencia_minima_para_viabilidade > a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(lista_hidreletrica_IdVariavelAleatoria.at(idHidreletrica)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_final_DECK, IdRealizacao(idCenario), double())) {
+					IdVariavelAleatoria idVar;
+					IdVariavelAleatoriaInterna idVarInterna;
+
+					a_dados.processoEstocastico_hidrologico.getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(idVar, idVarInterna, idHidreletrica);
+
+					const double afluencia = a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVar, idVarInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, idCenario, periodo_final_DECK, double());
+
+					if (afluencia_minima_para_viabilidade > afluencia) {
 						std::cout << getFullString(idProcesso) << " -Possivel inviabilidade na FPH da usina_ " << a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_nome, std::string()) << " " << getFullString(idHidreletrica) << " -Valor de afluencia no periodo_mensal inferior a " << afluencia_minima_para_viabilidade << std::endl;
 						break;
 					}//if (afluencia_minima_para_viabilidade > a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria(idHidreletrica)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, IdRealizacao(idCenario), double())) {
@@ -19480,23 +19486,46 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		/////////////////
 
-		//Define mapeamento_espaco_amostral para cada Processo (é realizado logo de estabelecer os cenários resolvidos por cada processo)
-		//a_dados.processoEstocastico_hidrologico.setMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, define_mapeamento_espaco_amostral_arvore_simetrica_CP(a_dados, a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario())));
-		a_dados.processoEstocastico_hidrologico.setMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, define_mapeamento_espaco_amostral_arvore_simetrica_CP(a_dados, IdCenario_1, IdCenario(a_dados.getAtributo(AttComumDados_numero_cenarios, int()))));
-
 		define_afluencia_arvore_de_cenarios_postos_CP(a_dados);
 
 		a_dados.adicionaHidreletricasMontante();
 		inicializa_vazao_defluente_CP(a_dados);
 
-		a_dados.defineCenariosSimulacao();
-
 		//Define variavel_aleatoria_interna para cada Processo (é realizado logo de estabelecer os cenários resolvidos por cada processo) e das modificaçõesUHE dos postos
-		define_variavel_aleatoria_interna_CP(a_dados, a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario()));
+		define_variavel_aleatoria_interna_CP(a_dados);
 
-		const int numero_cenarios = int(a_dados.processoEstocastico_hidrologico.getIterador1Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario()));
+		// TESTE
 
-		////////////////////////
+		const IdEstagio maior_estagio = a_dados.getIteradorFinal(AttVetorDados_horizonte_otimizacao, IdEstagio());
+		const IdEstagio estagio_extra = IdEstagio(maior_estagio + 1);
+
+		const Periodo maior_periodo = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, maior_estagio, Periodo());
+		const Periodo periodo_extra = Periodo(TipoPeriodo_mensal, maior_periodo + 1);
+
+		a_dados.addElemento(AttVetorDados_horizonte_otimizacao, estagio_extra, periodo_extra);
+		a_dados.addElemento(AttVetorDados_numero_aberturas, estagio_extra, 20);
+
+		a_dados.setAtributo(AttComumDados_estagio_final, estagio_extra);
+
+		const int numero_cenarios = a_dados.getAtributo(AttComumDados_numero_cenarios, int());
+		const int numero_iteracoes = a_dados.getAtributo(AttComumDados_numero_maximo_iteracoes, int());
+
+		a_dados.setAtributo(AttComumDados_numero_cenarios, int(numero_cenarios * numero_iteracoes));
+		a_dados.setAtributo(AttComumDados_numero_cenarios, int(numero_cenarios * 2));
+
+		// TESTE
+		bool a_mapeamento_cenarios_e_aberturas_carregado = false;
+		a_dados.validacao_mapeamento_cenarios(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar, a_mapeamento_cenarios_e_aberturas_carregado);
+
+		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(maior_periodo, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario()));
+
+
+		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
+
+
+
+
+		a_dados.setAtributo(AttComumDados_estagio_final, maior_estagio);
 
 		leitura_volume_referencia_e_regularizacao_from_CadUsH_csv(a_dados, a_diretorio + "//CadUsH.csv");
 		calculaEngolimentoMaximo(a_dados, horizonte_estudo, horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal()), lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC);
@@ -19539,8 +19568,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			a_dados.valida_preconfig_hidraulica(lista_jusante_hidreletrica, lista_jusante_desvio_hidreletrica);
 
 		imprime_na_tela_avisos_de_possiveis_inviabilidades_fph(a_dados);
-
-		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 
 		leitura_cortes_NEWAVE(a_dados, horizonte_estudo, a_diretorio, "//DadosAdicionais//Cortes_NEWAVE", "//fcfnwn." + a_revisao);
 
