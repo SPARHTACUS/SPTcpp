@@ -19494,7 +19494,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		//Define variavel_aleatoria_interna para cada Processo (é realizado logo de estabelecer os cenários resolvidos por cada processo) e das modificaçõesUHE dos postos
 		define_variavel_aleatoria_interna_CP(a_dados);
 
-		// TESTE
+		// INICIO DEV NOVO PROC ESTOCASTICO
 
 		const IdEstagio maior_estagio = a_dados.getIteradorFinal(AttVetorDados_horizonte_otimizacao, IdEstagio());
 		const IdEstagio estagio_extra = IdEstagio(maior_estagio + 1);
@@ -19513,19 +19513,45 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		a_dados.setAtributo(AttComumDados_numero_cenarios, int(numero_cenarios * numero_iteracoes));
 		a_dados.setAtributo(AttComumDados_numero_cenarios, int(numero_cenarios * 2));
 
-		// TESTE
 		bool a_mapeamento_cenarios_e_aberturas_carregado = false;
 		a_dados.validacao_mapeamento_cenarios(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar, a_mapeamento_cenarios_e_aberturas_carregado);
+
+	
+		a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("nenhum")); // temporario para agilizar processo
+		a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false); // temporario par aagilizar processo
 
 		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(maior_periodo, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario()));
 
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 
+		// Esvazia todos atributos do proc. estocástico hidrolófico exceto AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral
+		if (true) {
+			ProcessoEstocastico processoEstocastico_hidrologico_buffer;
+			processoEstocastico_hidrologico_buffer.vetorVariavelAleatoria.alocar(a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.numObjetos());
+			for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= a_dados.processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria()); idVar++) {
+				VariavelAleatoria var;
+				var.setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria, idVar);
+				var.setAtributo(AttComumVariavelAleatoria_nome, a_dados.processoEstocastico_hidrologico.getAtributo(idVar, AttComumVariavelAleatoria_nome, std::string()));
+				processoEstocastico_hidrologico_buffer.vetorVariavelAleatoria.add(var);
+				for (IdVariavelAleatoriaInterna idVarInterna = IdVariavelAleatoriaInterna_1; idVarInterna <= a_dados.processoEstocastico_hidrologico.getMaiorId(idVar, IdVariavelAleatoriaInterna()); idVarInterna++) {
+					VariavelAleatoriaInterna varInterna;
+					varInterna.setAtributo(AttComumVariavelAleatoriaInterna_idVariavelAleatoriaInterna, idVarInterna);
+					varInterna.setAtributo(AttComumVariavelAleatoriaInterna_nome, a_dados.processoEstocastico_hidrologico.getAtributo(idVar, idVarInterna, AttComumVariavelAleatoriaInterna_nome, std::string()));
+					processoEstocastico_hidrologico_buffer.vetorVariavelAleatoria.att(idVar).vetorVariavelAleatoriaInterna.add(varInterna);
+					processoEstocastico_hidrologico_buffer.vetorVariavelAleatoria.att(idVar).vetorVariavelAleatoriaInterna.att(idVarInterna).setMatriz_forced(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_dados.processoEstocastico_hidrologico.getMatriz(idVar, idVarInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario(), Periodo(), double()));
 
-
+				}
+			}
+			a_dados.processoEstocastico_hidrologico.esvaziar();
+			a_dados.processoEstocastico_hidrologico = ProcessoEstocastico();
+			a_dados.processoEstocastico_hidrologico = processoEstocastico_hidrologico_buffer;
+		}
 
 		a_dados.setAtributo(AttComumDados_estagio_final, maior_estagio);
+
+
+		// FINAL DEV NOVO PROC ESTOCASTICO
 
 		leitura_volume_referencia_e_regularizacao_from_CadUsH_csv(a_dados, a_diretorio + "//CadUsH.csv");
 		calculaEngolimentoMaximo(a_dados, horizonte_estudo, horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal()), lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC);
