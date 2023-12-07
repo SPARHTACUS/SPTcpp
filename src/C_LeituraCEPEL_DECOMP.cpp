@@ -20965,12 +20965,12 @@ void LeituraCEPEL::atualizar_valores_periodos_horizonte_expandido_com_DadosEntra
 
 }
 
-
 void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao) {
 
 	try {
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////				
 		aplicarModificacoesUHE(a_dados);
@@ -21149,17 +21149,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		// INICIO DEV NOVO PROC ESTOCASTICO
 
-		const IdEstagio maior_estagio = a_dados.getIteradorFinal(AttVetorDados_horizonte_otimizacao, IdEstagio());
-		const IdEstagio estagio_extra = IdEstagio(maior_estagio + 1);
-
-		const Periodo maior_periodo = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, maior_estagio, Periodo());
-		const Periodo periodo_extra = Periodo(TipoPeriodo_mensal, maior_periodo + 1);
-
-		a_dados.addElemento(AttVetorDados_horizonte_otimizacao, estagio_extra, periodo_extra);
-		a_dados.addElemento(AttVetorDados_numero_aberturas, estagio_extra, 20);
-
-		a_dados.setAtributo(AttComumDados_estagio_final, estagio_extra);
-
 		const int numero_cenarios = a_dados.getAtributo(AttComumDados_numero_cenarios, int());
 		const int numero_iteracoes = a_dados.getAtributo(AttComumDados_numero_maximo_iteracoes, int());
 
@@ -21173,7 +21162,8 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("nenhum")); // temporario para agilizar processo
 		a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false); // temporario par aagilizar processo
 
-		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(maior_periodo, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario()));
+		const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
+		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_ultimo_sobreposicao, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario()));
 
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
@@ -21201,7 +21191,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			a_dados.processoEstocastico_hidrologico = processoEstocastico_hidrologico_buffer;
 		}
 
-		a_dados.setAtributo(AttComumDados_estagio_final, maior_estagio);
+		//a_dados.setAtributo(AttComumDados_estagio_final, maior_estagio);
 
 
 		// FINAL DEV NOVO PROC ESTOCASTICO
