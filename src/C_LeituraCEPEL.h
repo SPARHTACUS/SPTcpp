@@ -209,14 +209,16 @@ private:
 	double get_afluencia_natural_posto(Dados& a_dados, const int a_codigo_posto, const IdCenario a_idCenario, const Periodo a_periodo);//Regras do hidrograma de Belo Monte
 
 	Periodo get_periodo_ultimo_sobreposicao_com_horizonte_DC(Dados& a_dados);
-	void atualizar_valores_ultimo_periodo_expansao_horizonte(Dados& a_dados);
-	void atualizar_valores_ultimo_periodo_expansao_horizonte_hidreletrica(Dados& a_dados);
-	void atualizar_valores_ultimo_periodo_expansao_horizonte_termeletrica(Dados& a_dados);
-	void atualizar_valores_ultimo_periodo_expansao_horizonte_submercado(Dados& a_dados);
-	void atualizar_valores_ultimo_periodo_expansao_horizonte_intercambio(Dados& a_dados);
-	void atualizar_valores_ultimo_periodo_expansao_horizonte_usina_elevatoria(Dados& a_dados);
-	void atualizar_valores_ultimo_periodo_expansao_horizonte_restricao_eletrica(Dados& a_dados);
-	void atualizar_valores_ultimo_periodo_expansao_horizonte_restricao_operativa_UHE(Dados& a_dados);
+	void atualizar_valores_periodos_horizonte_expandido(Dados& a_dados);
+	void atualizar_valores_periodos_horizonte_expandido_hidreletrica(Dados& a_dados);
+	void atualizar_valores_periodos_horizonte_expandido_termeletrica(Dados& a_dados);
+	void atualizar_valores_periodos_horizonte_expandido_submercado(Dados& a_dados);
+	void atualizar_valores_periodos_horizonte_expandido_intercambio(Dados& a_dados);
+	void atualizar_valores_periodos_horizonte_expandido_usina_elevatoria(Dados& a_dados);
+	void atualizar_valores_periodos_horizonte_expandido_restricao_eletrica(Dados& a_dados);
+	void atualizar_valores_periodos_horizonte_expandido_restricao_operativa_UHE(Dados& a_dados);
+
+	void atualizar_valores_periodos_horizonte_expandido_com_DadosEntradaMP_PRECONFIG(Dados& a_dados, std::string a_diretorio);
 	
 	void atualiza_lista_hidreletrica_NPOSNW_regras_especiais(Dados& a_dados);
 	void defineHidreletricasMontanteNaCascataENA(Dados& a_dados);
@@ -329,7 +331,7 @@ private:
 	const int codigo_ANDE = 2222; //Código dado na Norus ao submercado ANDE 
 	const int codigo_submercado_ITAIPU = 3333; //Código dado na Norus ao submercado ANDE 
 
-	void inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_dados);
+	void inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo);
 
 	////////////////////////////////////////////////////////////////
 	//PreConfig Hidrelétricas

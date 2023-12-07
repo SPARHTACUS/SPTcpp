@@ -49,7 +49,7 @@ void LeituraCEPEL::leitura_NEWAVE(Dados& a_dados, const std::string a_diretorio,
 
 			leitura_CONFHD_201908_NW25(a_dados, a_diretorio + "//CONFHD.DAT");
 
-			inicializa_Submercados_Intercambios_Nao_Registrados(a_dados);
+			inicializa_Submercados_Intercambios_Nao_Registrados(a_dados, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()));
 
 			leitura_CADUSIH_201904_NW25_DC29_DES16(a_dados, a_diretorio + "//HIDR.DAT", false, readPoliJusHidr_dat);
 

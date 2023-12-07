@@ -46,7 +46,7 @@ void LeituraCEPEL::leitura_DESSEM(Dados& a_dados, const std::string a_nomeArquiv
 
 				//  LEITURA DO ARQUIVO DE DADOS DE CADASTRO DAS USINAS HIDROELETRICAS (hidr.dat) 				
 				else if (mnemonico == "CADUSIH") {
-					inicializa_Submercados_Intercambios_Nao_Registrados(a_dados);
+					inicializa_Submercados_Intercambios_Nao_Registrados(a_dados, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()));
 					leitura_CADUSIH_201904_NW25_DC29_DES16(a_dados, a_nomePasta + "//" + arquivo, false, readPoliJusHidr_dat);
 				}
 
