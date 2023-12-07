@@ -17,12 +17,7 @@
 
 #define ATT_MATRIZ_PROCESSO_ESTOCASTICO(m)  \
 	  m(ProcessoEstocastico,  AttMatriz,      mapeamento_espaco_amostral, IdRealizacao,          min,          max,             1,  IdCenario,      Periodo)  \
-	  m(ProcessoEstocastico,  AttMatriz,        probabilidade_realizacao,       double,          min,          max,             1,  Periodo,   IdRealizacao)  \
-      m(ProcessoEstocastico,  AttMatriz,      mapeamento_arvore_cenarios,         IdNo,          min,          max,             1,  IdCenario,      Periodo)  \
-	  m(ProcessoEstocastico,  AttMatriz,                   no_realizacao, IdRealizacao,          min,          max,             1,  Periodo,           IdNo)  \
-      m(ProcessoEstocastico,  AttMatriz,                   no_antecessor,         IdNo,          min,          max,             1,  Periodo,           IdNo)  \
-      m(ProcessoEstocastico,  AttMatriz,                no_probabilidade,       double,          min,          max,             1,  Periodo,           IdNo)  \
-	  m(ProcessoEstocastico,  AttMatriz,    variavelAleatoria_realizacao,       double,          min,          max,             1,  IdRealizacao,  IdVariavelAleatoria)
+	  m(ProcessoEstocastico,  AttMatriz,        probabilidade_realizacao,       double,          min,          max,             1,  Periodo,   IdRealizacao)  
 //                 c_classe,    smrtAtt,                    nomeAtributo,         Tipo,   lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define MEMBRO_PROCESSO_ESTOCASTICO(m)           \
@@ -38,6 +33,7 @@ DEFINE_SMART_ELEMENTO(ProcessoEstocastico, SMART_ELEMENTO_PROCESSO_ESTOCASTICO)
 class EntradaSaidaDados;
 
 class ProcessoEstocastico : public SmartDados {
+
 public:
 
 	ProcessoEstocastico();
@@ -63,7 +59,8 @@ public:
 
 	void gerarEspacoAmostralPorSorteio(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_amostra, const TipoRelaxacaoVariavelAleatoria a_tipo_relaxacao, const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> &a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, int &a_semente);
 	
-	void validar_probabilidade_realizacao();
+	void validar_probabilidade_realizacao()const;
+	void validar_probabilidade_realizacao(const Periodo a_periodo)const;
 
 	void gerarCenariosPorSorteio(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente);
 	SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> gerarCenariosPorSorteioRetorno(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente);
@@ -169,13 +166,17 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(" + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idVariavelAleatoriaInterna) + "," + getFullString(a_idFisico) + "): \n" + std::string(erro.what())); }
 	};
 
+
+	bool mapearCenariosEspacoAmostralCompletoPorPeriodo(const Periodo a_periodo_final, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);
+
+
 private:
 
 	std::vector<TipoPeriodo> tipo_periodo_espaco_amostral;
 
 	void mapearCenariosEspacoAmostralPorSorteio  (const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int &a_semente);
 	bool mapearCenariosEspacoAmostralCompleto    (const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);
-
+	
 	void calcularCorrelacaoSazonalVariaveisAleatorias();
 
 	void calcularCorrelacaoSazonalResiduoVariaveisAleatorias();

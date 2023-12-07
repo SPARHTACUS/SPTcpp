@@ -924,6 +924,16 @@ public:
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::decrementarIterador(" + getString(a_periodo) + "): \n" + std::string(erro.what())); }
 	} // void operator++(Periodo &a_periodo) const {
 
+	void decrementarIterador(Periodo& a_periodo, const int a_inteiro) const {
+		try {
+			if (a_inteiro < 0)
+				throw std::invalid_argument("Inteiro invalido.");
+			for (int i = 1; i <= a_inteiro; i++)
+				decrementarIterador(a_periodo);
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::decrementarIterador(" + getString(a_periodo) + "," + getString(a_inteiro) + "): \n" + std::string(erro.what())); }
+	} // void incrementarIterador(Periodo &a_periodo, const int a_inteiro) const {
+
 	bool isProximoIterador(const Periodo a_iterador) const {
 		try {
 			if (Periodo(a_iterador.getTipoPeriodo(), getIteradorFinal() + 1) == a_iterador)

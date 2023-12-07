@@ -1068,11 +1068,11 @@ void VariavelAleatoria::gerarRuidoBrancoEspacoAmostral(const SmartEnupla<Periodo
 		if ((periodo_inicial.getTipoPeriodo() != periodo_final.getTipoPeriodo()) || (periodo_inicial.getTipoPeriodo() != tipoPeriodo_serie))
 			throw std::invalid_argument("O mesmo tipo de periodo deve constar no argumento a_horizonte_amostra e na serie temporal da variavel aleatoria.");
 
-		setMatriz_forced(AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, a_horizonte_espaco_amostral);
+		//setMatriz_forced(AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, a_horizonte_espaco_amostral);
 
 		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
 			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= a_horizonte_espaco_amostral.at(periodo).getIteradorFinal(); idRealizacao++)
-				setElemento(AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, periodo, idRealizacao, getRuidoBranco(a_tipo_sorteio, 1, a_semente).at(0));
+				addElemento(AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, periodo, idRealizacao, getRuidoBranco(a_tipo_sorteio, 1, a_semente).at(0));
 		} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
 
 	} // try{
@@ -1094,7 +1094,7 @@ void VariavelAleatoria::gerarRuidoBrancoEspacoAmostral(const SmartEnupla<Periodo
 		if ((periodo_inicial.getTipoPeriodo() != periodo_final.getTipoPeriodo()) || (periodo_inicial.getTipoPeriodo() != tipoPeriodo_serie))
 			throw std::invalid_argument("O mesmo tipo de periodo deve constar no argumento a_horizonte_amostra e na serie temporal da variavel aleatoria.");
 
-		setMatriz_forced(AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, a_horizonte_espaco_amostral);
+		//setMatriz_forced(AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, a_horizonte_espaco_amostral);
 
 		Periodo periodo = periodo_inicial;
 		for (int p = 1; p <= a_numero_maximo_periodos; p++){
@@ -1103,7 +1103,7 @@ void VariavelAleatoria::gerarRuidoBrancoEspacoAmostral(const SmartEnupla<Periodo
 
 				if (periodo.isValido()) {
 					if (idRealizacao <= a_horizonte_espaco_amostral.getElemento(periodo).getIteradorFinal())
-						setElemento(AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, periodo, idRealizacao, getRuidoBranco(a_tipo_sorteio, 1, a_semente).at(0));
+						addElemento(AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, periodo, idRealizacao, getRuidoBranco(a_tipo_sorteio, 1, a_semente).at(0));
 					else
 						getRuidoBranco(a_tipo_sorteio, 1, a_semente);
 				}
@@ -1139,8 +1139,6 @@ void VariavelAleatoria::gerarEspacoAmostralFromRuido(const SmartEnupla<Periodo, 
 		if (tipoPeriodo != periodo_inicial.getTipoPeriodo())
 			throw std::invalid_argument("Tipo de periodo no horizonte nao compativel com tipo de periodo da serie temporal.");
 
-		setMatriz_forced(AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_horizonte_espaco_amostral);
-
 		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_espaco_amostral.incrementarIterador(periodo)) {
 
 			const IdRealizacao realizacao_final = getIterador2Final(AttMatrizVariavelAleatoria_ruido_correlacionado_espaco_amostral, periodo, IdRealizacao());
@@ -1151,7 +1149,7 @@ void VariavelAleatoria::gerarEspacoAmostralFromRuido(const SmartEnupla<Periodo, 
 
 				const double residuo = calcularResiduo(ruido_correlacionado, periodo);
 
-				setElemento(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, residuo);
+				addElemento(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, residuo);
 
 			} // for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= maiorVariavelAleatoria; idVar++) {
 
@@ -1236,10 +1234,6 @@ void VariavelAleatoria::expandirParametrosEspacoAmostral(const SmartEnupla<Perio
 
 	try {
 
-		SmartEnupla<Periodo, SmartEnupla<int, double>> coeficiente_linear_auto_correlacao(a_horizonte_espaco_amostral, SmartEnupla<int, double>());
-
-		SmartEnupla<Periodo, double> coeficiente_participacao(a_horizonte_espaco_amostral, 0.0);
-
 		for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= getMaiorId(IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++) {
 
 			for (Periodo periodo = a_horizonte_espaco_amostral.getIteradorInicial(); periodo <= a_horizonte_espaco_amostral.getIteradorFinal(); a_horizonte_espaco_amostral.incrementarIterador(periodo)) {
@@ -1248,17 +1242,13 @@ void VariavelAleatoria::expandirParametrosEspacoAmostral(const SmartEnupla<Perio
 
 				if (idVariavelAleatoriaInterna == IdVariavelAleatoriaInterna_1) {
 					for (int lag = 1; lag <= getIterador2Final(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, int()); lag++)
-						coeficiente_linear_auto_correlacao.at(periodo).addElemento(lag, getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, lag, double()));
+						addElemento(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo, lag, getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, lag, double()));
+						//coeficiente_linear_auto_correlacao.at(periodo).addElemento(lag, getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, lag, double()));
 				} // if (idVariavelAleatoriaInterna == IdVariavelAleatoriaInterna_1) {
 
-				coeficiente_participacao.at(periodo) = getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_coeficiente_participacao_sazonal, idEstacao, double());
+				vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).addElemento(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodo, getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_coeficiente_participacao_sazonal, idEstacao, double()));
 
 			} // for (Periodo periodo = a_horizonte_espaco_amostral.getIteradorInicial(); periodo <= a_horizonte_espaco_amostral.getIteradorFinal(); a_horizonte_espaco_amostral.incrementarIterador(periodo)) {
-
-			if (idVariavelAleatoriaInterna == IdVariavelAleatoriaInterna_1)
-				setMatriz_forced(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, coeficiente_linear_auto_correlacao);
-
-			vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).setVetor_forced(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, coeficiente_participacao);
 
 		} // for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= getMaiorId(IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++) {
 
