@@ -56,7 +56,7 @@
 	  m(Hidreletrica,  AttComum,  penalidade_afluencia_incremental,                               double,          0,          max,               5000,         sim) \
       m(Hidreletrica,  AttComum,         penalidade_vazao_retirada,                               double,          0,          max,              10000,         sim) \
 	  m(Hidreletrica,  AttComum,          penalidade_volume_minimo,                               double,          0,          max,              10000,         sim) \
-	  m(Hidreletrica,  AttComum,     penalidade_volume_util_minimo,                               double,          0,          max,                600,         não) \
+	  m(Hidreletrica,  AttComum,     penalidade_volume_util_minimo,                               double,          0,          max,                600,         nao) \
 	  m(Hidreletrica,  AttComum,             penalidade_evaporacao,                               double,          0,          max,              10000,         sim) \
       m(Hidreletrica,  AttComum,        penalidade_potencia_minima,                               double,          0,          max,               5000,         sim) \
       m(Hidreletrica,  AttComum,      considerar_tempo_viagem_agua,                               bool,        false,         true,              false,         nao) \
