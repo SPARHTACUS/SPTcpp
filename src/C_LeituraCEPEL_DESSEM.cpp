@@ -869,7 +869,8 @@ void LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16(Dados& a_dados, const 
 					}//for (int conjunto = 0; conjunto < uhe.numConjuntos; conjunto++) {
 
 					//Calcula a queda_referencia_usina como a ponderaçao da queda_referencia por conjunto de acordo ao número de máquinas de cada conjunto dividido pelo numero total de máquinas
-					queda_referencia_usina /= numero_unidades_usina;
+					if( numero_unidades_usina > 0 )
+						queda_referencia_usina /= numero_unidades_usina;
 					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_queda_referencia, queda_referencia_usina);
 
 					// TRATAMENTO CONJUNTO HIDRAULICO 60 HZ ITAIPU QUE ESTÁ CONECTADO NO NÓ IVAIPORÃ 
