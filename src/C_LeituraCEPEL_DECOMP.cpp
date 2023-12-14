@@ -127,9 +127,13 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 
 		}//if (a_dados.getSizeVetor(AttVetorDados_numero_aberturas) == 0) {
 
-		////////
-
+		//*******************************************************************************
 		//Cria o horizonte_processo_estocastico
+		//***************************************************
+
+		////////////////////////////////////////////////////
+		//1.Periodos que pertencem ao horizonte SEM extensão
+		////////////////////////////////////////////////////
 
 		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
 		SmartEnupla<Periodo, int> numero_realizacoes_por_periodo_atualizado;
@@ -211,6 +215,27 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 			
 
 		}//for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+
+		////////////////////////////////////////////////////
+		//2.Periodos que pertencem ao horizonte COM extensão
+		////////////////////////////////////////////////////
+
+		const Periodo periodo_final_DC = horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal());
+
+		for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
+
+			const Periodo periodo_otimizacao = horizonte_otimizacao.getElemento(idEstagio_otimizacao);
+
+			if (periodo_otimizacao > periodo_final_DC) {
+				horizonte_processo_estocastico.addElemento(periodo_otimizacao, true);
+				numero_realizacoes_por_periodo_atualizado.addElemento(periodo_otimizacao, a_dados.getElementoVetor(AttVetorDados_numero_aberturas, idEstagio_otimizacao, int()));
+
+			}//if (periodo_otimizacao > periodo_final_DC) {
+
+		}//for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
+		
+		//*******************************************************************************
+
 
 		//Atualiza o numero_realizacoes_por_periodo (pode ter novos periodos do processo estocástico dependendo do horizonte_otimizacao
 		numero_realizacoes_por_periodo = numero_realizacoes_por_periodo_atualizado;
@@ -13308,12 +13333,25 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 			// XXX DECOMP
 
-			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).setAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, 0.0);
+			SmartEnupla<Periodo, bool> horizonte_processo_estocastico_sem_extencao;
 
-			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).setVetor(AttVetorVariavelAleatoria_tipo_relaxacao, SmartEnupla<Periodo, TipoRelaxacaoVariavelAleatoria>(horizonte_processo_estocastico, TipoRelaxacaoVariavelAleatoria_sem_relaxacao));
-			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).setVetor(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, SmartEnupla<Periodo, double>(horizonte_processo_estocastico, 1.0));
+			const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
 
 			for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
+
+				if (periodo <= periodo_ultimo_sobreposicao)
+					horizonte_processo_estocastico_sem_extencao.addElemento(periodo, true);
+
+			}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
+
+			///////////////
+
+			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).setAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, 0.0);
+
+			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).setVetor(AttVetorVariavelAleatoria_tipo_relaxacao, SmartEnupla<Periodo, TipoRelaxacaoVariavelAleatoria>(horizonte_processo_estocastico_sem_extencao, TipoRelaxacaoVariavelAleatoria_sem_relaxacao));
+			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).setVetor(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, SmartEnupla<Periodo, double>(horizonte_processo_estocastico_sem_extencao, 1.0));
+
+			for (Periodo periodo = horizonte_processo_estocastico_sem_extencao.getIteradorInicial(); periodo <= horizonte_processo_estocastico_sem_extencao.getIteradorFinal(); horizonte_processo_estocastico_sem_extencao.incrementarIterador(periodo)) {
 
 				bool is_encontrada_sobreposicao = false;
 
@@ -13361,7 +13399,7 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 				}//for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
 
-			}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
+			}//for (Periodo periodo = horizonte_processo_estocastico_sem_extencao.getIteradorInicial(); periodo <= horizonte_processo_estocastico_sem_extencao.getIteradorFinal(); horizonte_processo_estocastico_sem_extencao.incrementarIterador(periodo)) {
 
 
 				///////////////////////////////////////////////
@@ -13777,6 +13815,15 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			//A variável aleatória realiza com os tipos de periodos do horizonte_estudo_DECK
 			for (Periodo periodo = horizonte_estudo_DECK.getIteradorInicial(); periodo <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo))
 				horizonte_tendencia_mais_estudo.addElemento(periodo, true);
+
+			//Adiciona os periodos da extensão do horizonte
+			const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
+
+			for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
+				if(periodo > periodo_ultimo_sobreposicao)
+					horizonte_tendencia_mais_estudo.addElemento(periodo, true);
+			}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
+				
 
 			instancia_lista_hidreletrica_out_estudo_from_codigo_usina_jusante_JUSENA(a_dados, a_diretorio + "//CadUsH.csv");
 
@@ -16341,6 +16388,7 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 		else if (codigo_posto_acoplamento_NW >= 0) {//Posto com regra específica para acoplamento com o NW
 
 			const IdHidreletrica  maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
+			const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados); //Necessário para as premissas da cascata do Rio São Francisco
 
 			//Ver arquivo REGRAS.DAT do modelo GEVAZP
 			//Posto 169 (Sobradinho natural) é uma propagação das vazões de Três Marias e Queimado + Incremental de Sobradinho
@@ -18316,59 +18364,71 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 			}//else if (codigo_posto_acoplamento_NW == 292) {//BELO MONTE						
 			else if (codigo_posto_acoplamento_NW == 169) {//SOBRADINHO - Posto para acoplamento com a FCF
 
-				const int posto = 169;
-
 				if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
 
-					//******************************
-					//Árvore de cenários
-					//******************************
-					//Pega a afluência da estrutura árvore DC (por construção está informação vem em afluência incremental: por isso soma a natural de Três Marias e Queimado)
+					const int posto = 169;
 
-					/////////////
-					// VAZ(156) //Três Marias
-					/////////////
-					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 156, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+					if (a_periodo <= periodo_ultimo_sobreposicao) {//Periodos dentro do horizonte DC -> Pega a info do posto 169 do computado pelo DC
 
-					/////////////
-					// VAZ(158) //Queimado
-					/////////////
-					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 158, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+						/////////////
+						// VAZ(156) //Três Marias
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 156, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
 
-					/////////////
-					// 169- Vazão incremental de acoplamento de Sobradinho
-					/////////////
-					
-					//////////////////////////////////////////
-					//Estrutura árvore DC
-					//////////////////////////////////////////
+						/////////////
+						// VAZ(158) //Queimado
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 158, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
 
-					IdEstagio idEstagio_DC_alvo = IdEstagio_Nenhum;
+						/////////////
+						// 169- Vazão incremental de acoplamento de Sobradinho
+						// //Pega a afluência da estrutura árvore DC (por construção está informação vem em afluência incremental: por isso soma a natural de Três Marias e Queimado)
+						/////////////
 
-					for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+						//////////////////////////////////////////
+						//Estrutura árvore DC
+						//////////////////////////////////////////
 
-						if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == a_periodo) {
-							idEstagio_DC_alvo = idEstagio_DC;
-							break;
-						}//if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == periodo) {
+						IdEstagio idEstagio_DC_alvo = IdEstagio_Nenhum;
 
-					}//for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+						for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
 
-					if (idEstagio_DC_alvo == IdEstagio_Nenhum) { throw std::invalid_argument("Nao encontrado idEstagio_DC do periodo: " + getString(a_periodo) + "\n"); }
+							if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == a_periodo) {
+								idEstagio_DC_alvo = idEstagio_DC;
+								break;
+							}//if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == periodo) {
 
-					///////////////////////////////////////////
+						}//for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
 
-					int no = -1;
+						if (idEstagio_DC_alvo == IdEstagio_Nenhum) { throw std::invalid_argument("Nao encontrado idEstagio_DC do periodo: " + getString(a_periodo) + "\n"); }
 
-					if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal())
-						no = int(idEstagio_DC_alvo) + int(a_idCenario) - 2;
-					else
-						no = int(idEstagio_DC_alvo) - 1;
+						///////////////////////////////////////////
 
-					a_termo_independente_calculo_ENA += vazao_no_posto.at(no).at(posto - 1);
+						int no = -1;
+
+						if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal()) {
+							const IdRealizacao idRealizacao = a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, a_periodo, IdRealizacao());
+							no = int(idEstagio_DC_alvo) + int(idRealizacao) - 2;
+						}//if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal()) {						
+						else
+							no = int(idEstagio_DC_alvo) - 1;
+
+						a_termo_independente_calculo_ENA += vazao_no_posto.at(no).at(posto - 1);
+
+					}//if (a_periodo <= periodo_ultimo_sobreposicao) {
+					else if (a_periodo > periodo_ultimo_sobreposicao) {//Extensão do horizonte
+
+						/////////////
+						// VAZ(168) //Sobradinho
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 168, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+
+					}//else if (a_periodo > periodo_ultimo_sobreposicao) {
 
 				}//if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
 				else if (a_periodo < a_periodo_inicial_horizonte_estudo) {
+
+					const int posto = 169;
 
 					//******************************
 					//Tendência
@@ -18386,52 +18446,66 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 
 				if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
 
-					//******************************
-					//Árvore de cenários
-					//******************************
-					//Pega a afluência da estrutura árvore DC (por construção está informação vem em afluência incremental: por isso soma a natural de Três Marias e Queimado)
+					if (a_periodo <= periodo_ultimo_sobreposicao) {//Periodos dentro do horizonte DC -> Pega a info do posto 169 do computado pelo DC
 
-					/////////////
-					// VAZ(156) //Três Marias
-					/////////////
-					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 156, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+						//******************************
+						//Árvore de cenários
+						//******************************
+						//Pega a afluência da estrutura árvore DC (por construção está informação vem em afluência incremental: por isso soma a natural de Três Marias e Queimado)
 
-					/////////////
-					// VAZ(158) //Queimado
-					/////////////
-					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 158, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+						/////////////
+						// VAZ(156) //Três Marias
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 156, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
 
-					/////////////
-					// 169- Vazão incremental de acoplamento de Sobradinho
-					/////////////
-					const int posto = 169;
-					//////////////////////////////////////////
-					//Estrutura árvore DC
-					//////////////////////////////////////////
+						/////////////
+						// VAZ(158) //Queimado
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 158, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
 
-					IdEstagio idEstagio_DC_alvo = IdEstagio_Nenhum;
+						/////////////
+						// 169- Vazão incremental de acoplamento de Sobradinho
+						/////////////
+						const int posto = 169;
+						//////////////////////////////////////////
+						//Estrutura árvore DC
+						//////////////////////////////////////////
 
-					for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+						IdEstagio idEstagio_DC_alvo = IdEstagio_Nenhum;
 
-						if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == a_periodo) {
-							idEstagio_DC_alvo = idEstagio_DC;
-							break;
-						}//if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == periodo) {
+						for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
 
-					}//for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+							if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == a_periodo) {
+								idEstagio_DC_alvo = idEstagio_DC;
+								break;
+							}//if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == periodo) {
 
-					if (idEstagio_DC_alvo == IdEstagio_Nenhum) { throw std::invalid_argument("Nao encontrado idEstagio_DC do periodo: " + getString(a_periodo) + "\n"); }
+						}//for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
 
-					///////////////////////////////////////////
+						if (idEstagio_DC_alvo == IdEstagio_Nenhum) { throw std::invalid_argument("Nao encontrado idEstagio_DC do periodo: " + getString(a_periodo) + "\n"); }
 
-					int no = -1;
+						///////////////////////////////////////////
 
-					if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal())
-						no = int(idEstagio_DC_alvo) + int(a_idCenario) - 2;
-					else
-						no = int(idEstagio_DC_alvo) - 1;
+						int no = -1;
 
-					a_termo_independente_calculo_ENA += vazao_no_posto.at(no).at(posto - 1);
+						if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal()) {
+							const IdRealizacao idRealizacao = a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, a_periodo, IdRealizacao());
+							no = int(idEstagio_DC_alvo) + int(idRealizacao) - 2;
+						}//if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal()) {
+						else
+							no = int(idEstagio_DC_alvo) - 1;
+
+						a_termo_independente_calculo_ENA += vazao_no_posto.at(no).at(posto - 1);
+
+					}//if (a_periodo <= periodo_ultimo_sobreposicao) {//Periodos dentro do horizonte DC -> Pega a info do posto 169 do computado pelo DC
+					else if (a_periodo > periodo_ultimo_sobreposicao) {//Extensão do horizonte
+
+						/////////////
+						// VAZ(168) //Sobradinho
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 168, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+
+					}//else if (a_periodo > periodo_ultimo_sobreposicao) {
 
 				}//if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
 				else if (a_periodo < a_periodo_inicial_horizonte_estudo) {
@@ -18452,52 +18526,65 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 
 				if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
 
-					//******************************
-					//Árvore de cenários
-					//******************************
-					//Pega a afluência da estrutura árvore DC (por construção está informação vem em afluência incremental: por isso soma a natural de Três Marias e Queimado)
+					if (a_periodo <= periodo_ultimo_sobreposicao) {//Periodos dentro do horizonte DC -> Pega a info do posto 169 do computado pelo DC
+						//******************************
+						//Árvore de cenários
+						//******************************
+						//Pega a afluência da estrutura árvore DC (por construção está informação vem em afluência incremental: por isso soma a natural de Três Marias e Queimado)
 
-					/////////////
-					// VAZ(156) //Três Marias
-					/////////////
-					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 156, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+						/////////////
+						// VAZ(156) //Três Marias
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 156, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
 
-					/////////////
-					// VAZ(158) //Queimado
-					/////////////
-					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 158, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+						/////////////
+						// VAZ(158) //Queimado
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 158, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
 
-					/////////////
-					// 169- Vazão incremental de acoplamento de Sobradinho
-					/////////////
-					const int posto = 169;
-					//////////////////////////////////////////
-					//Estrutura árvore DC
-					//////////////////////////////////////////
+						/////////////
+						// 169- Vazão incremental de acoplamento de Sobradinho
+						/////////////
+						const int posto = 169;
+						//////////////////////////////////////////
+						//Estrutura árvore DC
+						//////////////////////////////////////////
 
-					IdEstagio idEstagio_DC_alvo = IdEstagio_Nenhum;
+						IdEstagio idEstagio_DC_alvo = IdEstagio_Nenhum;
 
-					for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+						for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
 
-						if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == a_periodo) {
-							idEstagio_DC_alvo = idEstagio_DC;
-							break;
-						}//if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == periodo) {
+							if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == a_periodo) {
+								idEstagio_DC_alvo = idEstagio_DC;
+								break;
+							}//if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == periodo) {
 
-					}//for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+						}//for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
 
-					if (idEstagio_DC_alvo == IdEstagio_Nenhum) { throw std::invalid_argument("Nao encontrado idEstagio_DC do periodo: " + getString(a_periodo) + "\n"); }
+						if (idEstagio_DC_alvo == IdEstagio_Nenhum) { throw std::invalid_argument("Nao encontrado idEstagio_DC do periodo: " + getString(a_periodo) + "\n"); }
 
-					///////////////////////////////////////////
+						///////////////////////////////////////////
 
-					int no = -1;
+						int no = -1;
 
-					if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal())
-						no = int(idEstagio_DC_alvo) + int(a_idCenario) - 2;
-					else
-						no = int(idEstagio_DC_alvo) - 1;
+						if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal()) {
+							const IdRealizacao idRealizacao = a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, a_periodo, IdRealizacao());
+							no = int(idEstagio_DC_alvo) + int(idRealizacao) - 2;
+						}//if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal()) {
+						else
+							no = int(idEstagio_DC_alvo) - 1;
 
-					a_termo_independente_calculo_ENA += vazao_no_posto.at(no).at(posto - 1);
+						a_termo_independente_calculo_ENA += vazao_no_posto.at(no).at(posto - 1);
+
+					}//if (a_periodo <= periodo_ultimo_sobreposicao) {//Periodos dentro do horizonte DC -> Pega a info do posto 169 do computado pelo DC
+					else if (a_periodo > periodo_ultimo_sobreposicao) {//Extensão do horizonte
+
+						/////////////
+						// VAZ(168) //Sobradinho
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 168, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+
+					}//else if (a_periodo > periodo_ultimo_sobreposicao) {
 
 				}//if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
 				else if (a_periodo < a_periodo_inicial_horizonte_estudo) {
@@ -18515,52 +18602,65 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 				
 				if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
 
-					//******************************
-					//Árvore de cenários
-					//******************************
-					//Pega a afluência da estrutura árvore DC (por construção está informação vem em afluência incremental: por isso soma a natural de Três Marias e Queimado)
+					if (a_periodo <= periodo_ultimo_sobreposicao) {//Periodos dentro do horizonte DC -> Pega a info do posto 169 do computado pelo DC
+						//******************************
+						//Árvore de cenários
+						//******************************
+						//Pega a afluência da estrutura árvore DC (por construção está informação vem em afluência incremental: por isso soma a natural de Três Marias e Queimado)
 
-					/////////////
-					// VAZ(156) //Três Marias
-					/////////////
-					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 156, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+						/////////////
+						// VAZ(156) //Três Marias
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 156, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
 
-					/////////////
-					// VAZ(158) //Queimado
-					/////////////
-					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 158, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+						/////////////
+						// VAZ(158) //Queimado
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 158, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
 
-					/////////////
-					// 169- Vazão incremental de acoplamento de Sobradinho
-					/////////////
-					const int posto = 169;
-					//////////////////////////////////////////
-					//Estrutura árvore DC
-					//////////////////////////////////////////
+						/////////////
+						// 169- Vazão incremental de acoplamento de Sobradinho
+						/////////////
+						const int posto = 169;
+						//////////////////////////////////////////
+						//Estrutura árvore DC
+						//////////////////////////////////////////
 
-					IdEstagio idEstagio_DC_alvo = IdEstagio_Nenhum;
+						IdEstagio idEstagio_DC_alvo = IdEstagio_Nenhum;
 
-					for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+						for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
 
-						if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == a_periodo) {
-							idEstagio_DC_alvo = idEstagio_DC;
-							break;
-						}//if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == periodo) {
+							if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == a_periodo) {
+								idEstagio_DC_alvo = idEstagio_DC;
+								break;
+							}//if (horizonte_otimizacao_DC.getElemento(idEstagio_DC) == periodo) {
 
-					}//for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
+						}//for (IdEstagio idEstagio_DC = IdEstagio_1; idEstagio_DC <= horizonte_otimizacao_DC.getIteradorFinal(); idEstagio_DC++) {
 
-					if (idEstagio_DC_alvo == IdEstagio_Nenhum) { throw std::invalid_argument("Nao encontrado idEstagio_DC do periodo: " + getString(a_periodo) + "\n"); }
+						if (idEstagio_DC_alvo == IdEstagio_Nenhum) { throw std::invalid_argument("Nao encontrado idEstagio_DC do periodo: " + getString(a_periodo) + "\n"); }
 
-					///////////////////////////////////////////
+						///////////////////////////////////////////
 
-					int no = -1;
+						int no = -1;
 
-					if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal())
-						no = int(idEstagio_DC_alvo) + int(a_idCenario) - 2;
-					else
-						no = int(idEstagio_DC_alvo) - 1;
+						if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal()) {
+							const IdRealizacao idRealizacao = a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, a_periodo, IdRealizacao());
+							no = int(idEstagio_DC_alvo) + int(idRealizacao) - 2;
+						}//if (idEstagio_DC_alvo == horizonte_otimizacao_DC.getIteradorFinal()) {
+						else
+							no = int(idEstagio_DC_alvo) - 1;
 
-					a_termo_independente_calculo_ENA += vazao_no_posto.at(no).at(posto - 1);
+						a_termo_independente_calculo_ENA += vazao_no_posto.at(no).at(posto - 1);
+
+					}//if (a_periodo <= periodo_ultimo_sobreposicao) {//Periodos dentro do horizonte DC -> Pega a info do posto 169 do computado pelo DC
+					else if (a_periodo > periodo_ultimo_sobreposicao) {//Extensão do horizonte
+
+						/////////////
+						// VAZ(168) //Sobradinho
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 168, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+
+					}//else if (a_periodo > periodo_ultimo_sobreposicao) {
 
 				}//if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
 				else if (a_periodo < a_periodo_inicial_horizonte_estudo) {
@@ -18785,8 +18885,10 @@ double LeituraCEPEL::get_afluencia_natural_posto(Dados& a_dados, const int a_cod
 									if (sobreposicao > 0) {
 										is_sobreposicao_encontrada = true;
 
-										const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(a_idCenario).getElemento(periodo_horizonte_processo_estocastico);
-										afluencia_natural_posto += a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_horizonte_processo_estocastico, idRealizacao, double());
+										//const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(a_idCenario).getElemento(periodo_horizonte_processo_estocastico);
+										//afluencia_natural_posto += a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_horizonte_processo_estocastico, idRealizacao, double());
+										
+										afluencia_natural_posto += a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getElementoMatriz(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, periodo_horizonte_processo_estocastico, double());
 
 										break;
 
@@ -21149,7 +21251,11 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		// INICIO DEV NOVO PROC ESTOCASTICO
 
-		const int numero_cenarios = a_dados.getAtributo(AttComumDados_numero_cenarios, int());
+		const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
+
+		const int numero_cenarios = numero_realizacoes_por_periodo.at(periodo_ultimo_sobreposicao);
+		//const int numero_cenarios = a_dados.getAtributo(AttComumDados_numero_cenarios, int());
+		
 		const int numero_iteracoes = a_dados.getAtributo(AttComumDados_numero_maximo_iteracoes, int());
 
 		a_dados.setAtributo(AttComumDados_numero_cenarios, int(numero_cenarios * numero_iteracoes));
@@ -21162,16 +21268,17 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("nenhum")); // temporario para agilizar processo
 		a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false); // temporario par aagilizar processo
 
-		const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
+		
 		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_ultimo_sobreposicao, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario()));
 
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 
-		// Esvazia todos atributos do proc. estocástico hidrolófico exceto AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral
+		// Esvazia todos atributos do proc. estocástico hidrológico exceto AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral
 		if (true) {
 			ProcessoEstocastico processoEstocastico_hidrologico_buffer;
 			processoEstocastico_hidrologico_buffer.vetorVariavelAleatoria.alocar(a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.numObjetos());
+			processoEstocastico_hidrologico_buffer.setMatriz_forced(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_dados.processoEstocastico_hidrologico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao()));
 			for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= a_dados.processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria()); idVar++) {
 				VariavelAleatoria var;
 				var.setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria, idVar);
@@ -21183,6 +21290,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 					varInterna.setAtributo(AttComumVariavelAleatoriaInterna_nome, a_dados.processoEstocastico_hidrologico.getAtributo(idVar, idVarInterna, AttComumVariavelAleatoriaInterna_nome, std::string()));
 					processoEstocastico_hidrologico_buffer.vetorVariavelAleatoria.att(idVar).vetorVariavelAleatoriaInterna.add(varInterna);
 					processoEstocastico_hidrologico_buffer.vetorVariavelAleatoria.att(idVar).vetorVariavelAleatoriaInterna.att(idVarInterna).setMatriz_forced(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_dados.processoEstocastico_hidrologico.getMatriz(idVar, idVarInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario(), Periodo(), double()));
+					processoEstocastico_hidrologico_buffer.vetorVariavelAleatoria.att(idVar).vetorVariavelAleatoriaInterna.att(idVarInterna).setVetor_forced(AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_dados.processoEstocastico_hidrologico.getVetor(idVar, idVarInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double()));
 
 				}
 			}
