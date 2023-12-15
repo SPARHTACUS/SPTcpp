@@ -9144,6 +9144,21 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							if(atributo != "")
 								penalidade = atof(atributo.c_str());
 
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 9 -  Flag para indicar o tratamento dado ao não atendimento da restrição:
+							//= 0 (ou branco) – não atendimento tratado como inviabilidade
+							//= 1 – não atendimento tratado como utilização de um recurso e não produzem inviabilidades
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							atributo = line.substr(43, 1);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							double limite_superior_folga_inferior = getdoubleFromChar("max");
+
+							if (atributo == "")							
+								limite_superior_folga_inferior = 0.0;						
+							else if (atoi(atributo.c_str()) == 0)
+								limite_superior_folga_inferior = 0.0;
+
 							//Nota: Alguns decks repetem por erro o mesmo registro, portanto, é verificado que a restriçao nao tenha sido inicializada.
 							//Caso contrário, verifica que o periodo_inicial e periodo_final do registro duplicado seja igual à restriçao instanciada
 							IdRestricaoOperativaUHE idRestricaoOperativaUHE = getIdFromCodigoONS(lista_codigo_ONS_restricao_operativa_UHE_energia_armazenada, codigo_restricao_operativa_RHE_energia);
@@ -9194,7 +9209,11 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								//Instancia as matrizes
 								restricaoOperativaUHE.setMatriz(AttMatrizRestricaoOperativaUHE_limite_inferior, matriz_limite_inferior);
 								restricaoOperativaUHE.setMatriz(AttMatrizRestricaoOperativaUHE_limite_superior, matriz_limite_superior);
-
+								/////////////////////////////////////
+								//Instancia as vetores
+								// 
+								restricaoOperativaUHE.setVetor(AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
+								
 								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 								//Carrega restrição
 								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9232,6 +9251,25 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 									}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
 
 								}//for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
+
+							}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+							//////////////////////////////////////////////////
+							//Atualiza vetor limite_superior_folga_inferior no periodo indicado
+							//////////////////////////////////////////////////
+							bool is_sobreposicao_encontrado = false;
+
+							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+								const double sobreposicao = periodo.sobreposicao(periodo_DECK);
+
+								if (sobreposicao > 0.0) {
+									is_sobreposicao_encontrado = true;
+									a_dados.vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setElemento(AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior, periodo, limite_superior_folga_inferior);
+								}//if (sobreposicao > 0.0) {
+
+								if (is_sobreposicao_encontrado && sobreposicao == 0.0)
+									break;
 
 							}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -21253,13 +21291,16 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
 
-		const int numero_cenarios = numero_realizacoes_por_periodo.at(periodo_ultimo_sobreposicao);
-		//const int numero_cenarios = a_dados.getAtributo(AttComumDados_numero_cenarios, int());
-		
-		const int numero_iteracoes = a_dados.getAtributo(AttComumDados_numero_maximo_iteracoes, int());
+		if (horizonte_estudo.getIteradorFinal() > periodo_ultimo_sobreposicao) {//Significa que existe extensão do horizonte
 
-		a_dados.setAtributo(AttComumDados_numero_cenarios, int(numero_cenarios * numero_iteracoes));
-		a_dados.setAtributo(AttComumDados_numero_cenarios, int(numero_cenarios * 2));
+			const int numero_cenarios = numero_realizacoes_por_periodo.at(periodo_ultimo_sobreposicao);
+			//const int numero_cenarios = a_dados.getAtributo(AttComumDados_numero_cenarios, int());
+
+			const int numero_iteracoes = a_dados.getAtributo(AttComumDados_numero_maximo_iteracoes, int());
+
+			a_dados.setAtributo(AttComumDados_numero_cenarios, int(numero_cenarios * numero_iteracoes));
+			a_dados.setAtributo(AttComumDados_numero_cenarios, int(numero_cenarios * 2));
+		}//if (horizonte_estudo.getIteradorFinal() > periodo_ultimo_sobreposicao) {
 
 		bool a_mapeamento_cenarios_e_aberturas_carregado = false;
 		a_dados.validacao_mapeamento_cenarios(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar, a_mapeamento_cenarios_e_aberturas_carregado);
