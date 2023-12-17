@@ -29,7 +29,7 @@
 	  m(Reservatorio,  AttComum,                poli_cota_area_2,            double,        min,          max,             0,      nao) \
 	  m(Reservatorio,  AttComum,                poli_cota_area_3,            double,        min,          max,             0,      nao) \
 	  m(Reservatorio,  AttComum,                poli_cota_area_4,            double,        min,          max,             0,      nao) \
-	  m(Reservatorio,  AttComum,           enchendo_volume_morto,              bool,        min,          max,             0,      nao) \
+	  m(Reservatorio,  AttComum,           enchendo_volume_morto,              int,          0,            1,             0,      nao) \
 	  m(Reservatorio,  AttComum,                    volume_morto,            double,          0,          max,             0,      nao) \
 	  m(Reservatorio,  AttComum,                      evaporacao,            double,          0,          max,             0,      nao) \
       m(Reservatorio,  AttComum,              volume_util_minimo,            double,          0,       100000,             0,      nao) \
@@ -41,8 +41,8 @@
 	  m(Reservatorio,  AttVetor,                              evaporacao,            double,        min,          max,             0,          IdMes) \
 	  m(Reservatorio,  AttVetor,                coef_linear_evaporacao_0,            double,        min,          max,             0,        Periodo) \
 	  m(Reservatorio,  AttVetor,                coef_linear_evaporacao_1,            double,        min,          max,             0,        Periodo) \
-	  m(Reservatorio,  AttVetor,                   volume_morto_completo,              bool,        min,          max,           min,        Periodo) \
-	  m(Reservatorio,  AttVetor,                   enchendo_volume_morto,              bool,        min,          max,           min,        Periodo) \
+	  m(Reservatorio,  AttVetor,                   volume_morto_completo,              int,          0,            1,             0,        Periodo) \
+	  m(Reservatorio,  AttVetor,                   enchendo_volume_morto,              int,          0,            1,             0,        Periodo) \
 	  m(Reservatorio,  AttVetor,                         cota_referencia,            double,          0,        10000,             0,        Periodo) \
 	  m(Reservatorio,  AttVetor,                           volume_minimo,            double,          0,        50000,             0,        Periodo) \
 	  m(Reservatorio,  AttVetor,                           volume_maximo,            double,          0,       100000,             0,        Periodo) \

@@ -13618,8 +13618,9 @@ void LeituraCEPEL::imprime_na_tela_avisos_de_possiveis_inviabilidades_fph(Dados&
 
 				//Compara a afluencia_minima_para_viabilidade com as afluencias da árvore de cenários
 
-				const IdCenario cenario_inicial = a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario());
-				const IdCenario cenario_final = a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario());
+
+				const IdCenario cenario_inicial = a_dados.arranjoResolucao.getAtributo(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()), AttComumProcesso_menor_cenario, IdCenario());
+				const IdCenario cenario_final = a_dados.arranjoResolucao.getAtributo(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()), AttComumProcesso_maior_cenario, IdCenario());
 
 				const IdProcesso idProcesso = a_dados.getAtributo(AttComumDados_idProcesso, IdProcesso());
 
@@ -19497,31 +19498,17 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		// INICIO DEV NOVO PROC ESTOCASTICO
 
 		const IdEstagio maior_estagio = a_dados.getIteradorFinal(AttVetorDados_horizonte_otimizacao, IdEstagio());
-		const IdEstagio estagio_extra = IdEstagio(maior_estagio + 1);
-
 		const Periodo maior_periodo = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, maior_estagio, Periodo());
-		const Periodo periodo_extra = Periodo(TipoPeriodo_mensal, maior_periodo + 1);
 
-		a_dados.addElemento(AttVetorDados_horizonte_otimizacao, estagio_extra, periodo_extra);
-		a_dados.addElemento(AttVetorDados_numero_aberturas, estagio_extra, 20);
-
-		a_dados.setAtributo(AttComumDados_estagio_final, estagio_extra);
-
-		const int numero_cenarios = a_dados.getAtributo(AttComumDados_numero_cenarios, int());
-		const int numero_iteracoes = a_dados.getAtributo(AttComumDados_numero_maximo_iteracoes, int());
-
-		a_dados.setAtributo(AttComumDados_numero_cenarios, int(numero_cenarios * numero_iteracoes));
-		a_dados.setAtributo(AttComumDados_numero_cenarios, int(numero_cenarios * 2));
-
-		bool a_mapeamento_cenarios_e_aberturas_carregado = false;
-		a_dados.validacao_mapeamento_cenarios(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar, a_mapeamento_cenarios_e_aberturas_carregado);
-
+		a_dados.definirCenariosPorProcessosEmArranjoResolucao();
 	
 		a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("nenhum")); // temporario para agilizar processo
 		a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false); // temporario par aagilizar processo
 
-		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(maior_periodo, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario()));
+		const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()), AttComumProcesso_menor_cenario, IdCenario());
+		const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()), AttComumProcesso_maior_cenario, IdCenario());
 
+		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(maior_periodo, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario);
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 
@@ -19547,8 +19534,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			a_dados.processoEstocastico_hidrologico = ProcessoEstocastico();
 			a_dados.processoEstocastico_hidrologico = processoEstocastico_hidrologico_buffer;
 		}
-
-		a_dados.setAtributo(AttComumDados_estagio_final, maior_estagio);
 
 
 		// FINAL DEV NOVO PROC ESTOCASTICO

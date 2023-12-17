@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\C_Afluencia.cpp" />
     <ClCompile Include="..\src\C_AgrupamentoIntercambio.cpp" />
+    <ClCompile Include="..\src\C_ArranjoResolucao.cpp" />
     <ClCompile Include="..\src\C_BaciaHidrografica.cpp" />
     <ClCompile Include="..\src\C_ConjuntoHidraulico.cpp" />
     <ClCompile Include="..\src\C_Contrato.cpp" />
@@ -69,6 +70,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\C_Afluencia.h" />
     <ClInclude Include="..\src\C_AgrupamentoIntercambio.h" />
+    <ClInclude Include="..\src\C_ArranjoResolucao.h" />
     <ClInclude Include="..\src\C_Auxiliar.h" />
     <ClInclude Include="..\src\C_BaciaHidrografica.h" />
     <ClInclude Include="..\src\C_ConjuntoHidraulico.h" />
@@ -201,7 +203,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/Bv /bigobj %(AdditionalOptions)</AdditionalOptions>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <PreprocessToFile>false</PreprocessToFile>
       <LanguageStandard_C>Default</LanguageStandard_C>

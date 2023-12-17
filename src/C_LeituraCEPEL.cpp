@@ -273,7 +273,7 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 							if (a_dados.getSizeVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_percentual_volume_util_maximo) > 0)
 								percentual_volume_util_maximo = a_dados.getElementoVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_percentual_volume_util_maximo, periodo, double());
 
-							if (!bool(a_dados.getElementoVetor(idHidreletrica_jusante, AttVetorHidreletrica_regularizacao, periodo, bool())))
+							if (a_dados.getElementoVetor(idHidreletrica_jusante, AttVetorHidreletrica_regularizacao, periodo, int()) != 1)
 								volume_minimo = volume_maximo;
 
 							double volume = volume_minimo + percentual_volume_inicial_jusante * (volume_maximo - volume_minimo) * percentual_volume_util_maximo;
@@ -304,7 +304,7 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 						double volume = volume_minimo + percentual_volume_inicial * (volume_maximo - volume_minimo);
 
 						//Se a usina for fio d'àgua utiliza o volume_referencia do Hidr.dat (pode ser maior do que o volume_máximo: verificado em consulta ao Cepel)
-						if (!bool(a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_regularizacao, periodo, bool()))) {
+						if (a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_regularizacao, periodo, int()) != 1) {
 							volume_minimo = volume_maximo;
 							volume = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_volume_referencia, double());
 						}//if (!bool(a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_regularizacao, periodo, bool()))) {
@@ -420,7 +420,7 @@ double LeituraCEPEL::calculaDefluenciaMinima_para_EngolimentoMaximo(Dados& a_dad
 				break;
 
 			//Teste usina com regularizacao a montante encontrada
-			if (!a_dados.vetorHidreletrica.att(idHidreletricas_montante.at(0)).getElementoVetor(AttVetorHidreletrica_regularizacao, a_periodo, bool())) {
+			if (a_dados.vetorHidreletrica.att(idHidreletricas_montante.at(0)).getElementoVetor(AttVetorHidreletrica_regularizacao, a_periodo, int()) != 1) {
 
 				idHidreletricas_calculo_defluencia_minima.push_back(idHidreletricas_montante.at(0));
 
@@ -465,7 +465,7 @@ double LeituraCEPEL::calculaDefluenciaMinima_para_EngolimentoMaximo(Dados& a_dad
 
 		//3. Desconta a vazao que a usina consegue armazenar no periodo
 
-		if (a_dados.vetorHidreletrica.att(a_idHidreletrica).getElementoVetor(AttVetorHidreletrica_regularizacao, a_periodo, bool())) {
+		if (a_dados.vetorHidreletrica.att(a_idHidreletrica).getElementoVetor(AttVetorHidreletrica_regularizacao, a_periodo, int()) == 1) {
 
 			const double percentual_volume_inicial = a_dados.getAtributo(a_idHidreletrica, IdReservatorio_1, AttComumReservatorio_percentual_volume_util_inicial, double());
 			const double conversor_vazao_volume = a_dados.getElementoVetor(AttVetorDados_conversor_vazao_volume, a_periodo, double());
@@ -2303,23 +2303,23 @@ bool LeituraCEPEL::aplicarModificacaoVMORTO(Dados& a_dados, const IdHidreletrica
 		for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 			if (periodo.sobreposicao(periodo_enchendo_volume_morto)) {
-				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_morto_completo, periodo, false);
-				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_enchendo_volume_morto, periodo, true);
+				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_morto_completo, periodo, 0);
+				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_enchendo_volume_morto, periodo, 1);
 			}
 
 			else if (periodo < periodo_enchendo_volume_morto) {
-				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_morto_completo, periodo, false);
-				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_enchendo_volume_morto, periodo, false);
+				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_morto_completo, periodo, 0);
+				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_enchendo_volume_morto, periodo, 0);
 			} // if (periodo < periodo_enchendo_volume_morto) {
 
 			else if (periodo < periodo_volume_morto_completo) {
-				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_morto_completo, periodo, false);
-				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_enchendo_volume_morto, periodo, true);
+				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_morto_completo, periodo, 0);
+				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_enchendo_volume_morto, periodo, 1);
 			} // else if ((periodo_enchendo_volume_morto <= periodo) && (periodo < periodo_volume_morto_completo)) {
 
 			else {
-				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_morto_completo, periodo, true);
-				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_enchendo_volume_morto, periodo, false);
+				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_morto_completo, periodo, 1);
+				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(AttVetorReservatorio_enchendo_volume_morto, periodo, 0);
 			} // else {
 
 		} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
@@ -3509,7 +3509,7 @@ void LeituraCEPEL::set_zero_vazao_defluente_minima_historica_usina_fio_sem_reser
 
 		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).incrementarIterador(periodo)) {
 
-			if (!a_dados.vetorHidreletrica.att(a_idHidreletrica).getElementoVetor(AttVetorHidreletrica_regularizacao, periodo, bool())) {
+			if (a_dados.vetorHidreletrica.att(a_idHidreletrica).getElementoVetor(AttVetorHidreletrica_regularizacao, periodo, int()) != 1) {
 
 				bool usina_sem_regularizacao_sem_reservatorio_montante = true;
 
@@ -3527,7 +3527,7 @@ void LeituraCEPEL::set_zero_vazao_defluente_minima_historica_usina_fio_sem_reser
 						break;
 
 					//Teste usina com regularizacao a montante encontrada
-					if (a_dados.vetorHidreletrica.att(idHidreletricas_montante.at(0)).getElementoVetor(AttVetorHidreletrica_regularizacao, periodo, bool())) {
+					if (a_dados.vetorHidreletrica.att(idHidreletricas_montante.at(0)).getElementoVetor(AttVetorHidreletrica_regularizacao, periodo, int()) == 1) {
 						usina_sem_regularizacao_sem_reservatorio_montante = false;
 						break;
 					}//if (vetorHidreletrica.att(idHidreletricas_montante.at(0)).getElementoVetor(AttVetorHidreletrica_regularizacao, periodo, bool())) {

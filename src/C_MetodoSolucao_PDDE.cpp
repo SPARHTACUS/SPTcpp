@@ -96,7 +96,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 		const TipoSubproblemaSolver tSS = TipoSubproblemaSolver_geral;
 
-		const IdIteracao iteracao_inicial = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_inicial, IdIteracao());
+		const IdIteracao iteracao_inicial = a_modeloOtimizacao.arranjoResolucao.getMenorId(IdIteracao());
 
 		if ((a_idIteracao == iteracao_inicial) && (a_idProcesso == IdProcesso_mestre)) {
 
@@ -117,52 +117,52 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 		if (a_idIteracao == iteracao_inicial)
 			a_modeloOtimizacao.importarCorteBenders_AcoplamentoPosEstudo(tSS, a_idProcesso, IdIteracao_Nenhum, diretorio_selecao_corte, a_entradaSaidaDados);
 
-		const IdCenario cenario_inicial = a_modeloOtimizacao.getCenarioInicial(a_idProcesso, a_idIteracao);
-		const IdCenario cenario_final = a_modeloOtimizacao.getCenarioFinal(a_idProcesso, a_idIteracao);
+		const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_menor_cenario, IdCenario());
+		const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_maior_cenario, IdCenario());
 
-		const int numero_cenarios = a_modeloOtimizacao.getNumeroCenarios(cenario_inicial, cenario_final);
+		int numero_cenarios = 0;
+		if (menor_cenario != IdCenario_Nenhum)
+			numero_cenarios = int(maior_cenario - menor_cenario) + 1;
 
-		IdCenario idCenario_unico_simulacao = IdCenario_Nenhum;
+		SmartEnupla<IdEstagio, std::vector<double>> custo_inferior(a_estagio_inicial, std::vector<std::vector<double>>(1, std::vector<double>()));
+		SmartEnupla<IdEstagio, std::vector<double>> custo_inferior_problema_mestre(a_estagio_inicial, std::vector<std::vector<double>>(1, std::vector<double>()));
+		custo_inferior.at(a_estagio_inicial).reserve(numero_cenarios);
+		custo_inferior_problema_mestre.at(a_estagio_inicial).reserve(numero_cenarios);
 
-		double tempo_medio_otimizacao_solver = 0.0;
+		SmartEnupla<IdEstagio, std::vector<double>> custo_superior(a_estagio_inicial, std::vector<std::vector<double>>(int(a_estagio_final - a_estagio_inicial) + 1, std::vector<double>()));
+		SmartEnupla<IdEstagio, std::vector<double>> custo_superior_problema_mestre(a_estagio_inicial, std::vector<std::vector<double>>(int(a_estagio_final - a_estagio_inicial) + 1, std::vector<double>()));
 
-		SmartEnupla<IdCenario, double> custo_inferior_via_mestre;
-		SmartEnupla<IdCenario, double> custo_inferior;
-		SmartEnupla<IdCenario, double> custo_superior_via_mestre;
-		SmartEnupla<IdCenario, double> custo_superior;
-		SmartEnupla<IdCenario, double> probabilidade_cenario;
+		const double multiplicador_tempo_limite_resolucao = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_multiplicador_tempo_limite_resolucao, double());
 
-		if (numero_cenarios > 0) {
+		double tempo_medio_solver_bw = 1000;
+		if ((a_idIteracao > IdIteracao(iteracao_inicial + 1)) || ((a_idIteracao > iteracao_inicial) && iteracao_inicial > IdIteracao_0))
+			tempo_medio_solver_bw = getElementoVetor(AttVetorMetodoSolucao_tempo_medio_solver_bw, IdIteracao(a_idIteracao - 1), double());
 
-			custo_inferior_via_mestre = SmartEnupla<IdCenario, double>(cenario_inicial, std::vector<double>(numero_cenarios, 0.0));
-			custo_inferior = SmartEnupla<IdCenario, double>(cenario_inicial, std::vector<double>(numero_cenarios, 0.0));
-			custo_superior_via_mestre = SmartEnupla<IdCenario, double>(cenario_inicial, std::vector<double>(numero_cenarios, 0.0));
-			custo_superior = SmartEnupla<IdCenario, double>(cenario_inicial, std::vector<double>(numero_cenarios, 0.0));
-			probabilidade_cenario = SmartEnupla<IdCenario, double>(cenario_inicial, std::vector<double>(numero_cenarios, 1.0));
+		const double tempo_limite = multiplicador_tempo_limite_resolucao * tempo_medio_solver_bw;
 
-			const int numero_estagios = int(a_estagio_final - a_estagio_inicial) + 1;
+		a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao);
+		a_modeloOtimizacao.gerarRealizacoes(a_idProcesso, a_maiorIdProcesso, menor_cenario, maior_cenario, a_entradaSaidaDados);
+		a_entradaSaidaDados.setDiretorioSaida(diretorio);
 
-			const double multiplicador_tempo_limite_resolucao = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_multiplicador_tempo_limite_resolucao, double());
+		double cont_tempo_otimizacao = 0.0;
+		int cont_numero_otimizacao = 0;
+		for (IdEstagio idEstagio = a_estagio_inicial; idEstagio <= a_estagio_final; idEstagio++) {
 
-			double tempo_medio_solver_bw = 1000;
+			const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromCenarios(a_idProcesso, a_idIteracao, idEstagio);
+			const int numero_cenarios_estados = int(cenarios_estados.size());
 
-			if ((a_idIteracao > IdIteracao(iteracao_inicial + 1)) || ((a_idIteracao > iteracao_inicial) && iteracao_inicial > IdIteracao_0))
-				tempo_medio_solver_bw = getElementoVetor(AttVetorMetodoSolucao_tempo_medio_solver_bw, IdIteracao(a_idIteracao - 1), double());
+			custo_superior.at(idEstagio).reserve(numero_cenarios);
+			custo_superior_problema_mestre.at(idEstagio).reserve(numero_cenarios);
 
-			const double tempo_limite = multiplicador_tempo_limite_resolucao * tempo_medio_solver_bw;
+			for (int c = 0; c < numero_cenarios_estados; c++){
 
-			a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao);
-			a_modeloOtimizacao.gerarRealizacoes(a_idProcesso, a_maiorIdProcesso, cenario_inicial, cenario_final, a_entradaSaidaDados);
-			a_entradaSaidaDados.setDiretorioSaida(diretorio);
+				const IdCenario idCenario_estado = cenarios_estados.at(c);
 
-			for (IdEstagio idEstagio = a_estagio_inicial; idEstagio <= a_estagio_final; idEstagio++) {
+				const IdCenario menor_cenario_em_cenario_estado = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_cenario, idCenario_estado, idEstagio, IdCenario());
+				const IdCenario maior_cenario_em_cenario_estado = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_maior_cenario, idCenario_estado, idEstagio, IdCenario());
 
-				if ((idEstagio == a_estagio_inicial) && (a_estagio_inicial == a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_acoplamento_pre_estudo, IdEstagio()))) {
-					if (a_idIteracao < a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_final, IdIteracao()))
-						a_modeloOtimizacao.importarVariaveisEstado_AcoplamentoPreEstudo(a_idProcesso, a_maiorIdProcesso, a_idIteracao, cenario_inicial, cenario_final, a_entradaSaidaDados);
-					else
-						a_modeloOtimizacao.importarVariaveisEstado_AcoplamentoPreEstudo(a_idProcesso, a_maiorIdProcesso, a_idIteracao, a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_cenario_inicial, IdCenario()), a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_cenario_final, IdCenario()), a_entradaSaidaDados);
-				}
+				//if ((idEstagio == a_estagio_inicial) && (a_estagio_inicial > IdEstagio_1))
+					//a_modeloOtimizacao.importarVariaveisEstado_AcoplamentoPreEstudo(a_idProcesso, a_maiorIdProcesso, a_idIteracao, menor_cenario, maior_cenario, a_entradaSaidaDados);
 
 				a_modeloOtimizacao.setTempoLimiteOtimizacao(tSS, idEstagio, -1.0);
 
@@ -171,25 +171,23 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 				std::vector<std::vector<std::string>> valores_tratamento(2, std::vector<std::string>());
 
 				if (imprimir_tempos) {
-					valores_tempo.at(1).reserve(int(cenario_final - cenario_inicial) + 2);
+					valores_tempo.at(1).reserve(numero_cenarios_estados + 1);
 					valores_tempo.at(1).push_back(getFullString(idEstagio) + ";" + getFullString(a_idProcesso) + ";");
 
-					valores_tempo_otimizacao.at(1).reserve(int(cenario_final - cenario_inicial) + 2);
+					valores_tempo_otimizacao.at(1).reserve(numero_cenarios_estados + 1);
 					valores_tempo_otimizacao.at(1).push_back(getFullString(idEstagio) + ";" + getFullString(a_idProcesso) + ";");
 
-					valores_tratamento.at(1).reserve(int(cenario_final - cenario_inicial) + 2);
+					valores_tratamento.at(1).reserve(numero_cenarios_estados + 1);
 					valores_tratamento.at(1).push_back(getFullString(idEstagio) + ";" + getFullString(a_idProcesso) + ";");
 				} // if (imprimir_tempos) {
-				for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
+
+				for (IdCenario idCenario = menor_cenario_em_cenario_estado; idCenario <= maior_cenario_em_cenario_estado; idCenario++) {
 
 					try {
 
 						auto start_clock_cenario = std::chrono::high_resolution_clock::now();
 
-						if ((a_simulacao) && (idCenario_unico_simulacao != IdCenario_Nenhum))
-							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, a_idProcesso, a_maiorIdProcesso, idCenario_unico_simulacao);
-						else
-							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, a_idProcesso, a_maiorIdProcesso, idCenario);
+						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, idCenario_estado);
 
 						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, idCenario);
 
@@ -198,12 +196,12 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 						a_modeloOtimizacao.otimizarProblema(tSS, a_idProcesso, a_idIteracao, idEstagio, idCenario, diretorio_pl);
 
 						if (idEstagio == a_estagio_inicial)
-							custo_inferior.at(idCenario) = a_modeloOtimizacao.getCustoTotal(idEstagio);
+							custo_inferior.at(idEstagio).push_back(a_modeloOtimizacao.getCustoTotal(idEstagio));
 
 						if (idEstagio < a_estagio_final)
-							custo_superior.at(idCenario) += a_modeloOtimizacao.getCustoImediato(idEstagio);
+							custo_superior.at(idEstagio).push_back(a_modeloOtimizacao.getCustoImediato(idEstagio));
 						else
-							custo_superior.at(idCenario) += a_modeloOtimizacao.getCustoTotal(idEstagio);
+							custo_superior.at(idEstagio).push_back(a_modeloOtimizacao.getCustoTotal(idEstagio));
 
 						if (true) {
 							double custo_geral = 0.0;
@@ -211,25 +209,20 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 							a_modeloOtimizacao.calcularCustoPrimalViaSubproblemaMestre(TipoSubproblemaSolver_mestre, idEstagio, idCenario, diretorio_pl, custo_geral, custo_individual);
 
 							if (idEstagio == a_estagio_inicial)
-								custo_inferior_via_mestre.at(idCenario) = custo_individual;
+								custo_inferior_problema_mestre.at(idEstagio).push_back(custo_individual);
+
+							custo_superior_problema_mestre.at(idEstagio).push_back(custo_individual);
 
 							if (idEstagio > a_estagio_inicial)
-								custo_superior_via_mestre.at(idCenario) -= custo_geral;
+								custo_superior_problema_mestre.at(idEstagio).at(c) -= custo_geral;					
 
-							custo_superior_via_mestre.at(idCenario) += custo_individual;
-							
 						}
 
-						const double probabiliade_abertura = a_modeloOtimizacao.getProbabilidadeAbertura(idEstagio, idCenario);
-
-						//Probabilidade acumulada do cenário					
-						probabilidade_cenario.at(idCenario) *= probabiliade_abertura;
-
 						if ((idEstagio < a_estagio_final) || (IdEstagio(a_estagio_final + 1) <= a_modeloOtimizacao.getMaiorId(IdEstagio()))) {
-							bool resetar = false;
-							if (idCenario == cenario_inicial)
-								resetar = true;
-							a_modeloOtimizacao.atualizarVariavelEstadoComSolucaoPrimal(resetar, a_idIteracao, a_idProcesso, a_maiorIdProcesso, IdEstagio(idEstagio + 1), idCenario);
+							if ((idCenario == menor_cenario_em_cenario_estado) && (idCenario_estado == cenarios_estados.at(0)))
+								a_modeloOtimizacao.atualizarVariavelEstadoComSolucaoPrimal(true, a_idIteracao, IdEstagio(idEstagio + 1), idCenario);
+							else
+								a_modeloOtimizacao.atualizarVariavelEstadoComSolucaoPrimal(false, a_idIteracao, IdEstagio(idEstagio + 1), idCenario);
 						} // if ((idEstagio < a_estagio_final) || (IdEstagio(a_estagio_final + 1) <= a_modeloOtimizacao.getMaiorId(IdEstagio()))) {
 
 						auto stop_clock_cenario = std::chrono::high_resolution_clock::now();
@@ -238,7 +231,9 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 						const double tempo_otimizacao = a_modeloOtimizacao.getTempoOtimizacao(tSS, idEstagio);
 
-						tempo_medio_otimizacao_solver += tempo_otimizacao;
+						cont_tempo_otimizacao += tempo_otimizacao;
+
+						cont_numero_otimizacao++;
 
 						if (imprimir_tempos) {
 							valores_tempo.at(1).push_back(getString(tempo_cenario.count()));
@@ -246,18 +241,17 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 							valores_tratamento.at(1).push_back(getString(a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_tratamento_inviabilidade, idEstagio, int())));
 						} // if (imprimir_tempos) {
 
-						if ((a_simulacao) && (probabiliade_abertura == 1.0)) {
-							idCenario_unico_simulacao = idCenario;
-							break;
-						}
-
-						else if ((a_simulacao) && (probabiliade_abertura == 1.0) && (idCenario == cenario_final))
-							idCenario_unico_simulacao = IdCenario_Nenhum;
-
 					} // try {
 					catch (const std::exception& erro) { throw std::invalid_argument("Erro no problema de " + getFullString(idEstagio) + " " + getFullString(idCenario) + ". \n" + std::string(erro.what())); }
 
-				} // for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
+					if (idEstagio == a_estagio_inicial) {
+						if (custo_inferior_problema_mestre.at(idEstagio).at(c) > custo_inferior.at(idEstagio).at(c))
+							custo_inferior.at(idEstagio).at(c) = custo_inferior_problema_mestre.at(idEstagio).at(c);
+					}
+					if (custo_superior_problema_mestre.at(idEstagio).at(c) > custo_superior.at(idEstagio).at(c))
+						custo_superior.at(idEstagio).at(c) = custo_superior_problema_mestre.at(idEstagio).at(c);
+
+				} // for (IdCenario idCenario = menor_cenario_em_cenario_estado; idCenario <= maior_cenario_em_cenario_estado; idCenario++) {
 
 				if (idEstagio == a_estagio_inicial)
 					a_entradaSaidaDados.setAppendArquivo(false);
@@ -274,30 +268,27 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 				a_entradaSaidaDados.setDiretorioSaida(diretorio_resultado);
 				a_modeloOtimizacao.imprimirSolucaoPorEstagioPorCenario_porEstagio(a_idProcesso, "", a_entradaSaidaDados);
 
-			} // for (IdEstagio idEstagio = a_estagio_inicial; idEstagio <= a_estagio_final; idEstagio++) {
+			} // for (int c = 0; c < int(cenarios_estados.size()); c++){
 
-			tempo_medio_otimizacao_solver /= double(numero_cenarios * numero_estagios * int(a_maiorIdProcesso));
+			if ((idEstagio < a_estagio_final) || (IdEstagio(a_estagio_final + 1) <= a_modeloOtimizacao.getMaiorId(IdEstagio())))
+				executarPDDE_distribuirEstadosEntreProcessos(a_idIteracao, IdEstagio(idEstagio + 1), a_modeloOtimizacao);
+
+		} // for (IdEstagio idEstagio = a_estagio_inicial; idEstagio <= a_estagio_final; idEstagio++) {
 
 
-			for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-				if (custo_superior_via_mestre.at(idCenario) > custo_superior.at(idCenario))
-					custo_superior.at(idCenario) = custo_superior_via_mestre.at(idCenario);
-				if (custo_inferior_via_mestre.at(idCenario) > custo_inferior.at(idCenario))
-					custo_inferior.at(idCenario) = custo_inferior_via_mestre.at(idCenario);
-			}
-
-		} // if (numero_cenarios > 0) {
-
-		executarPDDE_atualizarCustoInferior(a_idIteracao, a_idProcesso, a_maiorIdProcesso, custo_inferior, a_modeloOtimizacao);
-		executarPDDE_atualizarCustoSuperior(a_idIteracao, a_idProcesso, a_maiorIdProcesso, custo_superior, probabilidade_cenario, a_modeloOtimizacao);
+		executarPDDE_atualizarCustoInferior(a_idIteracao, custo_inferior, a_modeloOtimizacao);
+		executarPDDE_atualizarCustoSuperior(a_idIteracao, custo_superior, a_modeloOtimizacao);
 
 		a_entradaSaidaDados.setAppendArquivo(false);
 		a_entradaSaidaDados.setDiretorioSaida(diretorio_resultado);
 
-		double tempo_solver_fw_global;
-		MPI_Allreduce(&tempo_medio_otimizacao_solver, &tempo_solver_fw_global, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		int cont_numero_otimizacao_global;
+		MPI_Allreduce(&cont_numero_otimizacao, &cont_numero_otimizacao_global, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
-		addElemento(AttVetorMetodoSolucao_tempo_medio_solver_fw, a_idIteracao, tempo_solver_fw_global);
+		double cont_tempo_otimizacao_global;
+		MPI_Allreduce(&cont_tempo_otimizacao, &cont_tempo_otimizacao_global, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+		addElemento(AttVetorMetodoSolucao_tempo_medio_solver_fw, a_idIteracao, cont_tempo_otimizacao_global / cont_numero_otimizacao_global);
 
 		auto stop_clock = std::chrono::high_resolution_clock::now();
 
@@ -314,11 +305,8 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 		a_entradaSaidaDados.setDiretorioSaida(diretorio);
 
-		if ((!a_simulacao) || (!strCompara(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_diretorio_importacao_pos_estudo, std::string()), "nenhum")))
-			executarPDDE_distribuirEstadosEntreProcessos(a_idProcesso, a_maiorIdProcesso, a_idIteracao, a_modeloOtimizacao);
-
 		if (a_idProcesso == IdProcesso_mestre)
-			a_modeloOtimizacao.exportarVariaveisEstado_AcoplamentoPosEstudo(a_idProcesso, a_maiorIdProcesso, a_idIteracao, a_entradaSaidaDados);
+			a_modeloOtimizacao.exportarVariaveisEstado_AcoplamentoPosEstudo(a_idIteracao, a_entradaSaidaDados);
 
 	} // try {
 	catch (const std::exception&erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_forward(a_entradaSaidaDados," + getFullString(a_estagio_inicial) + "," + getFullString(a_estagio_final) + "," + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_modeloOtimizacao): \n" + std::string(erro.what())); }
@@ -342,11 +330,6 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 		const std::string diretorio_selecao_corte = diretorio_iteracao + "//Selecao_Cortes";
 		const std::string diretorio_tempos = diretorio_iteracao + "//Tempos";
 
-		const int numero_estagios = int(a_estagio_final - a_estagio_inicial) + 1;
-
-		double tempo_medio_otimizacao_solver = 0.0;
-		   int     numero_otimizacoes_solver = 0;
-
 		const double multiplicador_tempo_limite_resolucao = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_multiplicador_tempo_limite_resolucao, double());
 
 		const double tempo_medio_solver_fw = getElementoVetor(AttVetorMetodoSolucao_tempo_medio_solver_fw, a_idIteracao, double());
@@ -365,201 +348,163 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 		if (estagio_inicial == IdEstagio_1)
 			estagio_inicial++;
 
+		double cont_tempo_otimizacao = 0.0;
+		int cont_numero_otimizacao = 0;
 		for (IdEstagio idEstagio = a_estagio_final; idEstagio >= estagio_inicial; idEstagio--) {
 
-			const TipoProcessamentoParalelo tipo_processamento_paralelo = a_modeloOtimizacao.getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, idEstagio, TipoProcessamentoParalelo());
+			const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(a_idProcesso, a_idIteracao, idEstagio);
+			const int numero_cenarios_estados = int(cenarios_estados.size());
 
-			const IdAbertura abertura_final_estagio = IdAbertura(a_modeloOtimizacao.getAtributo(idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()));
-
-			const int numero_aberturas_estagio = int(a_modeloOtimizacao.getAtributo(idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()));
-
-			int numero_aberturas_efetivas = numero_aberturas_estagio;
-			const int cortes_multiplos = a_modeloOtimizacao.getAtributo(idEstagio, AttComumEstagio_cortes_multiplos, int());
-			if (cortes_multiplos > 0)
-				numero_aberturas_efetivas = cortes_multiplos;
-
-			const int menor_numero_aberturas_estagio = a_modeloOtimizacao.getMenorNumeroAberturasEstagio(a_maiorIdProcesso, idEstagio, a_idIteracao);
-			const int maior_numero_aberturas_estagio = a_modeloOtimizacao.getMaiorNumeroAberturasEstagio(a_maiorIdProcesso, idEstagio, a_idIteracao);
-			const int maior_numero_aberturas_processo_estagio = a_modeloOtimizacao.getMaiorNumeroAberturasProcessoEstagio(a_idProcesso, idEstagio, a_idIteracao);
+			const int numero_aberturas = a_modeloOtimizacao.arranjoResolucao.getNumeroAberturas(a_idProcesso, a_idIteracao, idEstagio);
 
 			const int numero_estados = int(a_modeloOtimizacao.getMaiorId(idEstagio, IdVariavelEstado()));
-			const int numero_total_cenarios = a_modeloOtimizacao.getNumeroTotalCenariosEmEstados(a_idProcesso, a_maiorIdProcesso, idEstagio, a_idIteracao);
+
 			const int numero_variaveis_dinamicas = a_modeloOtimizacao.getNumeroVariavelDinamica(tSS, idEstagio);
 
 			const int numero_processos = int(a_maiorIdProcesso);
 
-			EstruturaResultados<double> soma_custo_abertura(1);
-			soma_custo_abertura.setSize(0, numero_aberturas_estagio);
-			for (int a = 0; a < numero_aberturas_estagio; a++)
-				soma_custo_abertura.vetor[a] = 0.0;
-
 			EstruturaResultados<int> numero_soma_custo_abertura(1);
-			numero_soma_custo_abertura.setSize(0, numero_aberturas_estagio);
-			for (int a = 0; a < numero_aberturas_estagio; a++)
+			numero_soma_custo_abertura.setSize(0, numero_aberturas);
+			EstruturaResultados<double> soma_custo_abertura(1);
+			soma_custo_abertura.setSize(0, numero_aberturas);
+			for (int a = 0; a < numero_aberturas; a++) {
+				soma_custo_abertura.vetor[a] = 0.0;
 				numero_soma_custo_abertura.vetor[a] = 0;
+			}
 
 			EstruturaResultados<int> status_otimizacao(1);
-			status_otimizacao.setSize(0, numero_total_cenarios, maior_numero_aberturas_processo_estagio);
+			status_otimizacao.setSize(0, numero_cenarios_estados, numero_aberturas);
 
 			EstruturaResultados<double> custo_total(1);
-			custo_total.setSize(0, numero_total_cenarios, maior_numero_aberturas_processo_estagio);
+			custo_total.setSize(0, numero_cenarios_estados, numero_aberturas);
 
 			EstruturaResultados<double> sol_inf_var_dinamica(1);
-			sol_inf_var_dinamica.setSize(0, numero_total_cenarios, maior_numero_aberturas_processo_estagio);
+			sol_inf_var_dinamica.setSize(0, numero_cenarios_estados, numero_aberturas);
 
 			EstruturaResultados<double> solucao_dual_var_dinamica(1);
-			solucao_dual_var_dinamica.setSize(0, numero_total_cenarios, maior_numero_aberturas_processo_estagio, numero_variaveis_dinamicas);
+			solucao_dual_var_dinamica.setSize(0, numero_cenarios_estados, numero_aberturas, numero_variaveis_dinamicas);
 
 			EstruturaResultados<double> limite_inferior_var_dinamica(1);
-			limite_inferior_var_dinamica.setSize(0, numero_total_cenarios, maior_numero_aberturas_processo_estagio, numero_variaveis_dinamicas);
+			limite_inferior_var_dinamica.setSize(0, numero_cenarios_estados, numero_aberturas, numero_variaveis_dinamicas);
 
 			EstruturaResultados<double> limite_superior_var_dinamica(1);
-			limite_superior_var_dinamica.setSize(0, numero_total_cenarios, maior_numero_aberturas_processo_estagio, numero_variaveis_dinamicas);
+			limite_superior_var_dinamica.setSize(0, numero_cenarios_estados, numero_aberturas, numero_variaveis_dinamicas);
 
 			EstruturaResultados<double> vlr_var_estado(1);
-			vlr_var_estado.setSize(0, numero_total_cenarios, numero_estados);
+			vlr_var_estado.setSize(0, numero_cenarios_estados, numero_estados);
 
 			EstruturaResultados<double> sol_dual_var_estado(1);
-			sol_dual_var_estado.setSize(0, numero_total_cenarios, maior_numero_aberturas_processo_estagio, numero_estados);
+			sol_dual_var_estado.setSize(0, numero_cenarios_estados, numero_aberturas, numero_estados);
 
 			// Identificação das aberturas com solução proxy a partir do custo médio do estágio
 			if (true) {
 				SmartEnupla<IdRealizacao, int> realizacao_solucao_proxy(IdRealizacao_1, std::vector<int>(a_modeloOtimizacao.getAtributo(idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()), 0));
 				const std::vector<int> odernacao_custo_medio = getOrdenacaoMaiorParaMenor(a_modeloOtimizacao.getElementosMatriz(AttMatrizModeloOtimizacao_custo_medio, idEstagio, IdRealizacao(), double()).getElementos());
 				for (int i = int(odernacao_custo_medio.size()); i > 0; i--) {
-					if (a_modeloOtimizacao.getElementoVetor(idEstagio, AttVetorEstagio_selecao_solucao_proxy, i, bool()))
+					if (a_modeloOtimizacao.getElementoVetor(idEstagio, AttVetorEstagio_selecao_solucao_proxy, i, int()) == 1)
 						realizacao_solucao_proxy.setElemento(IdRealizacao(odernacao_custo_medio.at(i - 1) + 1), 1);
 				}
 				a_modeloOtimizacao.setElementos(AttMatrizModeloOtimizacao_realizacao_solucao_proxy, idEstagio, realizacao_solucao_proxy);
 			} // if (true) {
 
-			for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) {
+			for (int c = 0; c < int(cenarios_estados.size()); c++) {
 
-				if ((a_modeloOtimizacao.getSize2Matriz(idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso) > 0) && ((idProcesso == a_idProcesso) || (tipo_processamento_paralelo == TipoProcessamentoParalelo_por_abertura))) {
+				const IdCenario idCenario_estado = cenarios_estados.at(c);
 
-					const IdCenario cenario_inicial = a_modeloOtimizacao.getCenarioInicial(idProcesso, a_idIteracao);
-					const IdCenario cenario_final = a_modeloOtimizacao.getCenarioFinal(idProcesso, a_idIteracao);
-					const int numero_cenarios = a_modeloOtimizacao.getNumeroCenarios(cenario_inicial, cenario_final);
+				const IdAbertura menor_abertura_em_cenario_estado = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura, idCenario_estado, idEstagio, IdAbertura());
+				const IdAbertura maior_abertura_em_cenario_estado = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_maior_abertura, idCenario_estado, idEstagio, IdAbertura());
 
-					if (numero_cenarios > 0) {
+				if (tempo_limite > 0)
+					a_modeloOtimizacao.setTempoLimiteOtimizacao(tSS, idEstagio, tempo_limite);
 
-						if (tempo_limite > 0)
-							a_modeloOtimizacao.setTempoLimiteOtimizacao(tSS, idEstagio, tempo_limite);
+				try {
 
-						for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
+					if ((idEstagio == a_estagio_final) && (idCenario_estado == cenarios_estados.at(0)))
+						a_entradaSaidaDados.setAppendArquivo(false);
+					else
+						a_entradaSaidaDados.setAppendArquivo(true);
 
-							try {
+					std::vector<std::vector<std::string>> valores_tempo(2, std::vector<std::string>());
+					std::vector<std::vector<std::string>> valores_tempo_otimizacao(2, std::vector<std::string>());
+					std::vector<std::vector<std::string>> valores_tratamento(2, std::vector<std::string>());
 
-								IdAbertura abertura_inicial_cenario = IdAbertura_Nenhum;
-								IdAbertura abertura_final_cenario = IdAbertura_Nenhum;
+					if (imprimir_tempos) {
+						valores_tempo.at(1).reserve(int(numero_aberturas) + 1);
+						valores_tempo.at(1).push_back(getFullString(idEstagio) + ";" + getFullString(a_idProcesso) + ";" + getFullString(idCenario_estado) + ";");
 
-								if (menor_numero_aberturas_estagio < numero_aberturas_efetivas) {
-									abertura_inicial_cenario = a_modeloOtimizacao.getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, a_modeloOtimizacao.getCenarioInicial(a_idProcesso, a_idIteracao), idEstagio, IdAbertura());
-									abertura_final_cenario = a_modeloOtimizacao.getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_final_por_cenario_por_estagio, a_modeloOtimizacao.getCenarioInicial(a_idProcesso, a_idIteracao), idEstagio, IdAbertura());
-								} // if (menor_numero_aberturas_estagio < numero_aberturas_efetivas) {
+						valores_tempo_otimizacao.at(1).reserve(int(numero_aberturas) + 1);
+						valores_tempo_otimizacao.at(1).push_back(getFullString(idEstagio) + ";" + getFullString(a_idProcesso) + ";" + getFullString(idCenario_estado) + ";");
 
-								else if (menor_numero_aberturas_estagio == numero_aberturas_efetivas) {
-									abertura_inicial_cenario = a_modeloOtimizacao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, idEstagio, IdAbertura());
-									abertura_final_cenario = a_modeloOtimizacao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_mapeamento_abertura_final_por_cenario_por_estagio, idCenario, idEstagio, IdAbertura());
-								} // else if (menor_numero_aberturas_estagio == numero_aberturas_efetivas) {
+						valores_tratamento.at(1).reserve(int(numero_aberturas));
+						valores_tratamento.at(1).push_back(getFullString(idEstagio) + ";" + getFullString(a_idProcesso) + ";" + getFullString(idCenario_estado) + ";");
+					} // if (imprimir_tempos) {
 
-								int numero_aberturas_cenario = 0;
-								if ((abertura_inicial_cenario != IdAbertura_Nenhum) && (abertura_final_cenario != IdAbertura_Nenhum))
-									numero_aberturas_cenario = int(abertura_final_cenario - abertura_inicial_cenario) + 1;
+					auto start_clock_cenario = std::chrono::high_resolution_clock::now();
 
-								if ((idEstagio == a_estagio_final) && (idCenario == cenario_inicial))
-									a_entradaSaidaDados.setAppendArquivo(false);
+					a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, idCenario_estado, vlr_var_estado);
 
-								else
-									a_entradaSaidaDados.setAppendArquivo(true);
+					for (IdAbertura idAbertura = menor_abertura_em_cenario_estado; idAbertura <= maior_abertura_em_cenario_estado; idAbertura++) {
 
-								std::vector<std::vector<std::string>> valores_tempo(2, std::vector<std::string>());
-								std::vector<std::vector<std::string>> valores_tempo_otimizacao(2, std::vector<std::string>());
-								std::vector<std::vector<std::string>> valores_tratamento(2, std::vector<std::string>());
+						auto start_clock_realizacao = std::chrono::high_resolution_clock::now();
 
-								if (imprimir_tempos) {
-									valores_tempo.at(1).reserve(int(numero_aberturas_cenario) + 1);
-									valores_tempo.at(1).push_back(getFullString(idEstagio) + ";" + getFullString(a_idProcesso) + ";" + getFullString(idCenario) + ";");
+						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, IdRealizacao(idAbertura));
 
-									valores_tempo_otimizacao.at(1).reserve(int(numero_aberturas_cenario) + 1);
-									valores_tempo_otimizacao.at(1).push_back(getFullString(idEstagio) + ";" + getFullString(a_idProcesso) + ";" + getFullString(idCenario) + ";");
+						a_modeloOtimizacao.atualizarModeloOtimizacaoComRestricaoRealizacao(idEstagio, IdRealizacao(idAbertura));
 
-									valores_tratamento.at(1).reserve(int(numero_aberturas_cenario));
-									valores_tratamento.at(1).push_back(getFullString(idEstagio) + ";" + getFullString(a_idProcesso) + ";" + getFullString(idCenario) + ";");
-								} // if (imprimir_tempos) {
+						const bool otimizacao = a_modeloOtimizacao.otimizarProblema(tSS, a_idProcesso, a_idIteracao, idEstagio, idCenario_estado, IdRealizacao(idAbertura), sol_inf_var_dinamica, solucao_dual_var_dinamica, limite_inferior_var_dinamica, limite_superior_var_dinamica, sol_dual_var_estado, diretorio_pl);
 
-								auto start_clock_cenario = std::chrono::high_resolution_clock::now();
+						const double custo_total_otimizacao = a_modeloOtimizacao.getCustoTotal(idEstagio);
 
-								if (numero_aberturas_cenario > 0)
-									a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, idProcesso, a_maiorIdProcesso, idCenario, vlr_var_estado);
+						soma_custo_abertura.vetor[int(idAbertura) - 1] += custo_total_otimizacao;
+						numero_soma_custo_abertura.vetor[int(idAbertura) - 1]++;
 
-								for (int a = 0; a < numero_aberturas_cenario; a++) {
+						const double tempo_otimizacao = a_modeloOtimizacao.getTempoOtimizacao(tSS, idEstagio);
 
-									const IdAbertura idAbertura = IdAbertura(abertura_inicial_cenario + a);
+						custo_total.add(custo_total_otimizacao);
 
-									auto start_clock_realizacao = std::chrono::high_resolution_clock::now();
+						if (otimizacao) {
+							cont_tempo_otimizacao += tempo_otimizacao;
+							cont_numero_otimizacao++;
+							status_otimizacao.add(1);
+						}
+						else
+							status_otimizacao.add(0);
 
-									a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, IdRealizacao(idAbertura));
+						if (imprimir_tempos) {
+							auto stop_clock_realizacao = std::chrono::high_resolution_clock::now();
+							std::chrono::duration<double> tempo_realizacao = stop_clock_realizacao - start_clock_realizacao;
 
-									a_modeloOtimizacao.atualizarModeloOtimizacaoComRestricaoRealizacao(idEstagio, IdRealizacao(idAbertura));
+							valores_tempo.at(1).push_back(getString(tempo_realizacao.count()));
+							valores_tempo_otimizacao.at(1).push_back(getString(tempo_otimizacao));
+							valores_tratamento.at(1).push_back(getString(a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_tratamento_inviabilidade, idEstagio, int())));
+						} // if (imprimir_tempos) {
 
-									const bool otimizacao = a_modeloOtimizacao.otimizarProblema(tSS, idProcesso, a_idIteracao, idEstagio, idCenario, IdRealizacao(idAbertura), sol_inf_var_dinamica, solucao_dual_var_dinamica, limite_inferior_var_dinamica, limite_superior_var_dinamica, sol_dual_var_estado, diretorio_pl);
+					} // for (IdAbertura idAbertura = menor_abertura_em_cenario_estado; idAbertura <= maior_abertura_em_cenario_estado; idAbertura++) {
 
-									const double custo_total_otimizacao = a_modeloOtimizacao.getCustoTotal(idEstagio);
+					if (imprimir_tempos) {
 
-									soma_custo_abertura.vetor[int(idAbertura) - 1] += custo_total_otimizacao;
-									numero_soma_custo_abertura.vetor[int(idAbertura) - 1]++;
+						auto stop_clock_cenario = std::chrono::high_resolution_clock::now();
 
-									const double tempo_otimizacao = a_modeloOtimizacao.getTempoOtimizacao(tSS, idEstagio);
+						std::chrono::duration<double> tempo_cenario = stop_clock_cenario - start_clock_cenario;
 
-									custo_total.add(custo_total_otimizacao);
+						valores_tempo.at(1).push_back(";" + getString(tempo_cenario.count()));
 
-									if (otimizacao) {
-										tempo_medio_otimizacao_solver += tempo_otimizacao;
-										numero_otimizacoes_solver++;
-										status_otimizacao.add(1);
-									}
-									else
-										status_otimizacao.add(0);
+						a_entradaSaidaDados.setDiretorioSaida(diretorio_tempos);
+						a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(getFullString(a_idProcesso) + "_tempos_cenario.csv", valores_tempo);
+						a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(getFullString(a_idProcesso) + "_tempos_otimizacao_cenario.csv", valores_tempo_otimizacao);
+						a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(getFullString(a_idProcesso) + "_tratamento_inviabilidade.csv", valores_tratamento);
 
-									if (imprimir_tempos) {
-										auto stop_clock_realizacao = std::chrono::high_resolution_clock::now();
-										std::chrono::duration<double> tempo_realizacao = stop_clock_realizacao - start_clock_realizacao;
+					} // if (imprimir_tempos) {
 
-										valores_tempo.at(1).push_back(getString(tempo_realizacao.count()));
-										valores_tempo_otimizacao.at(1).push_back(getString(tempo_otimizacao));
-										valores_tratamento.at(1).push_back(getString(a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_tratamento_inviabilidade, idEstagio, int())));
-									} // if (imprimir_tempos) {
+				} // try {
+				catch (const std::exception& erro) { throw std::invalid_argument("Erro no problema de " + getFullString(idEstagio) + " " + getFullString(idCenario_estado) + ". \n" + std::string(erro.what())); }
 
-								} // for (int a = 0; a < numero_aberturas_processo; a++) {
-
-								if (imprimir_tempos) {
-
-									auto stop_clock_cenario = std::chrono::high_resolution_clock::now();
-
-									std::chrono::duration<double> tempo_cenario = stop_clock_cenario - start_clock_cenario;
-
-									valores_tempo.at(1).push_back(";" + getString(tempo_cenario.count()));
-
-									a_entradaSaidaDados.setDiretorioSaida(diretorio_tempos);
-									a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(getFullString(a_idProcesso) + "_tempos_cenario.csv", valores_tempo);
-									a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(getFullString(a_idProcesso) + "_tempos_otimizacao_cenario.csv", valores_tempo_otimizacao);
-									a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(getFullString(a_idProcesso) + "_tratamento_inviabilidade.csv", valores_tratamento);
-
-								} // if (imprimir_tempos) {
-
-							} // try {
-							catch (const std::exception& erro) { throw std::invalid_argument("Erro no problema de " + getFullString(idEstagio) + " " + getFullString(idCenario) + ". \n" + std::string(erro.what())); }
-
-						} // for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-					} // if (numero_cenarios > 0)
-				} // if (a_modeloOtimizacao.getSize2Matriz(idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso) > 0) {
-			} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) {
+			} // for (int c = 0; c < int(cenarios_estados.size()); c++) {
 
 			auto start_clock_corte = std::chrono::high_resolution_clock::now();
 
 			if ((idEstagio > IdEstagio_1) || (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_calcular_custo_primal_via_subproblema_mestre, bool())))
-				executarPDDE_calcularCorteBenders_new(tSS, a_idIteracao, a_idProcesso, a_maiorIdProcesso, idEstagio, status_otimizacao, custo_total, sol_inf_var_dinamica, solucao_dual_var_dinamica, limite_inferior_var_dinamica, limite_superior_var_dinamica, sol_dual_var_estado, vlr_var_estado, a_modeloOtimizacao);
+				executarPDDE_calcularCorteBenders_new(tSS, a_idIteracao, idEstagio, status_otimizacao, custo_total, sol_inf_var_dinamica, solucao_dual_var_dinamica, limite_inferior_var_dinamica, limite_superior_var_dinamica, sol_dual_var_estado, vlr_var_estado, a_modeloOtimizacao);
 
 			auto stop_clock_corte = std::chrono::high_resolution_clock::now();
 
@@ -582,14 +527,14 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 			} // if (imprimir_tempos) {
 
 			EstruturaResultados<double> soma_custo_abertura_all(1);
-			soma_custo_abertura_all.setSize(0, numero_aberturas_estagio);
+			soma_custo_abertura_all.setSize(0, numero_aberturas);
 			MPI_Allreduce(soma_custo_abertura.vetor, soma_custo_abertura_all.vetor, soma_custo_abertura.total, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
 			EstruturaResultados<int> numero_soma_custo_abertura_all(1);
-			numero_soma_custo_abertura_all.setSize(0, numero_aberturas_estagio);
+			numero_soma_custo_abertura_all.setSize(0, numero_aberturas);
 			MPI_Allreduce(numero_soma_custo_abertura.vetor, numero_soma_custo_abertura_all.vetor, numero_soma_custo_abertura.total, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
-			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= IdRealizacao(numero_aberturas_estagio); idRealizacao++)
+			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= IdRealizacao(numero_aberturas); idRealizacao++)
 				a_modeloOtimizacao.setElemento(AttMatrizModeloOtimizacao_custo_medio, idEstagio, idRealizacao, soma_custo_abertura_all.vetor[int(idRealizacao) - 1] / double(numero_soma_custo_abertura_all.vetor[int(idRealizacao) - 1]));
 
 			if (idEstagio == a_estagio_final)
@@ -640,12 +585,13 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 		} // for (IdEstagio idEstagio = a_estagio_final; idEstagio >= a_estagio_inicial; idEstagio--) {
 
-		tempo_medio_otimizacao_solver /= double(numero_otimizacoes_solver);
+		int cont_numero_otimizacao_global;
+		MPI_Allreduce(&cont_numero_otimizacao, &cont_numero_otimizacao_global, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
-		double tempo_solver_bw_global;
-		MPI_Allreduce(&tempo_medio_otimizacao_solver, &tempo_solver_bw_global, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+		double cont_tempo_otimizacao_global;
+		MPI_Allreduce(&cont_tempo_otimizacao, &cont_tempo_otimizacao_global, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
-		addElemento(AttVetorMetodoSolucao_tempo_medio_solver_bw, a_idIteracao, tempo_solver_bw_global / int(a_maiorIdProcesso));
+		addElemento(AttVetorMetodoSolucao_tempo_medio_solver_bw, a_idIteracao, cont_tempo_otimizacao_global / cont_numero_otimizacao_global);
 
 		a_entradaSaidaDados.setAppendArquivo(false);
 		a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao);
@@ -666,162 +612,212 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 } // void MetodoSolucao::executarPDDE_backward(const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const IdIteracao a_idIteracao, EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, ModeloOtimizacao & a_modeloOtimizacao){
 
 
-void MetodoSolucao::executarPDDE_atualizarCustoSuperior(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const SmartEnupla<IdCenario, double>& a_custo_superior, const SmartEnupla<IdCenario, double>& a_probabilidade_cenario, ModeloOtimizacao &a_modeloOtimizacao) {
-	
+void MetodoSolucao::executarPDDE_atualizarCustoSuperior(const IdIteracao a_idIteracao, const SmartEnupla<IdEstagio, std::vector<double>>& a_custo_superior, ModeloOtimizacao& a_modeloOtimizacao) {
+
 	try {
 
-		if (a_idProcesso == IdProcesso_mestre) {
+		const IdEstagio menor_estagio = a_custo_superior.getIteradorInicial();
+		const IdEstagio maior_estagio = a_custo_superior.getIteradorFinal();
+
+		const IdProcesso idProcesso_local = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+
+		if (idProcesso_local == IdProcesso_mestre) {
 
 			if (getSizeMatriz(AttMatrizMetodoSolucao_custo_superior) == 0)
-				setMatriz_forced(AttMatrizMetodoSolucao_custo_superior, SmartEnupla<IdIteracao, SmartEnupla<IdCenario, double>>(a_idIteracao, std::vector<SmartEnupla<IdCenario, double>>(1, SmartEnupla<IdCenario, double>(IdCenario_1, std::vector<double>(IdCenario(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_numero_cenarios, int())), NAN)))));
+				setMatriz_forced(AttMatrizMetodoSolucao_custo_superior, SmartEnupla<IdIteracao, SmartEnupla<IdCenario, double>>(a_idIteracao, std::vector<SmartEnupla<IdCenario, double>>(1, SmartEnupla<IdCenario, double>(IdCenario_1, std::vector<double>(IdCenario(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_numero_cenarios, int())), 0.0)))));
 
-			if (getSizeMatriz(AttMatrizMetodoSolucao_probabilidade_cenario) == 0)
-				setMatriz_forced(AttMatrizMetodoSolucao_probabilidade_cenario, SmartEnupla<IdIteracao, SmartEnupla<IdCenario, double>>(a_idIteracao, std::vector<SmartEnupla<IdCenario, double>>(1, SmartEnupla<IdCenario, double>(IdCenario_1, std::vector<double>(IdCenario(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_numero_cenarios, int())), NAN)))));
+			const IdCenario menor_cenario_iteracao = a_modeloOtimizacao.arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_menor_cenario, IdCenario());
+			const IdCenario maior_cenario_iteracao = a_modeloOtimizacao.arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_maior_cenario, IdCenario());
+			SmartEnupla<IdEstagio, SmartEnupla<IdCenario, double>> compilacao_custo_superior(menor_estagio, std::vector<SmartEnupla<IdCenario, double>>(int(maior_estagio - menor_estagio) + 1, SmartEnupla<IdCenario, double>()));
 
-			if (a_custo_superior.size() != a_probabilidade_cenario.size())
-				throw std::invalid_argument("Os vetores de custo e probabilidade devem possuir as mesmas dimensoes.");
+			for (IdEstagio idEstagio = menor_estagio; idEstagio <= maior_estagio; idEstagio++) {
 
-			if (a_custo_superior.size() > 0) {
+				compilacao_custo_superior.at(idEstagio) = SmartEnupla<IdCenario, double>(menor_cenario_iteracao, std::vector<double>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, NAN));
 
-				if (a_custo_superior.getIteradorInicial() != a_probabilidade_cenario.getIteradorInicial())
-					throw std::invalid_argument("Os vetores de custo e probabilidade devem possuir os mesmos cenarios.");
+				if (a_custo_superior.size() > 0) {
+					if (a_custo_superior.at(idEstagio).size() > 0){
+						const std::vector<IdCenario> cenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromCenarios(idProcesso_local, a_idIteracao, idEstagio);
+						for (int c = 0; c < int(cenarios_estado.size()); c++) {
+							const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_cenario, cenarios_estado.at(c), idEstagio, IdCenario());
+							const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_maior_cenario, cenarios_estado.at(c), idEstagio, IdCenario());
+							for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
+								compilacao_custo_superior.at(idEstagio).at(idCenario) = a_custo_superior.at(idEstagio).at(c);
+						}
+					}
+				} // if (a_custo_superior.size() > 0) {
 
-				for (IdCenario idCenario = a_custo_superior.getIteradorInicial(); idCenario <= a_custo_superior.getIteradorFinal(); idCenario++) {
-					setElemento(AttMatrizMetodoSolucao_custo_superior,        a_idIteracao, idCenario, a_custo_superior.at(idCenario));
-					setElemento(AttMatrizMetodoSolucao_probabilidade_cenario, a_idIteracao, idCenario, a_probabilidade_cenario.at(idCenario));
+				for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
+
+					int numero_cenarios_outro = 0;
+					MPI_Recv(&numero_cenarios_outro, 1, MPI_INT, getRank(idProcesso), getRank(idProcesso), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+					if (numero_cenarios_outro > 0) {
+						double* custo_superior_outro = new double[numero_cenarios_outro];
+
+						MPI_Recv(custo_superior_outro, numero_cenarios_outro, MPI_DOUBLE, getRank(idProcesso), getRank(idProcesso), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+						const std::vector<IdCenario> cenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromCenarios(idProcesso, a_idIteracao, idEstagio);
+						for (int c = 0; c < int(cenarios_estado.size()); c++) {
+							const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_menor_cenario, cenarios_estado.at(c), idEstagio, IdCenario());
+							const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_maior_cenario, cenarios_estado.at(c), idEstagio, IdCenario());
+							for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
+								compilacao_custo_superior.at(idEstagio).at(idCenario) = custo_superior_outro[c];
+						}
+
+						delete[] custo_superior_outro;
+					}
+				} // for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_maiorIdProcesso; idProcesso++) {
+
+			} // for (IdEstagio idEstagio = menor_estagio; idEstagio <= maior_estagio; idEstagio++) {
+
+			for (IdEstagio idEstagio = maior_estagio; idEstagio > menor_estagio; idEstagio--) {
+
+				const IdEstagio idEstagio_anterior = IdEstagio(idEstagio - 1);
+
+				for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
+
+					const std::vector<IdCenario> cenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromCenarios(idProcesso, a_idIteracao, idEstagio);
+
+					for (int c = 0; c < int(cenarios_estado.size()); c++) {
+						if (a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_menor_cenario, cenarios_estado.at(c), idEstagio_anterior, IdCenario()) == IdCenario_Nenhum) {
+							const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_menor_cenario, cenarios_estado.at(c), idEstagio, IdCenario());
+							const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_maior_cenario, cenarios_estado.at(c), idEstagio, IdCenario());
+							for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
+								if (isnan(compilacao_custo_superior.at(idEstagio_anterior).at(idCenario))) {
+									if (!isnan(compilacao_custo_superior.at(idEstagio_anterior).at(cenarios_estado.at(c))))
+										compilacao_custo_superior.at(idEstagio_anterior).at(idCenario) = compilacao_custo_superior.at(idEstagio_anterior).at(cenarios_estado.at(c));
+									else
+										throw std::invalid_argument("Cenario estado sem valor.");
+								}
+								else
+									throw std::invalid_argument("Cenario estado sem valor.");
+							}
+						}
+					}
+				} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
+			} // for (IdEstagio idEstagio = maior_estagio; idEstagio > menor_estagio; idEstagio--) {
+
+			SmartEnupla<IdCenario, double> custo_superior(menor_cenario_iteracao, std::vector<double>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, 0.0));
+
+			for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= menor_cenario_iteracao; idCenario++) {
+
+				bool is_todos_nan = true;
+				for (IdEstagio idEstagio = menor_estagio; idEstagio <= maior_estagio; idEstagio++) {
+					custo_superior.at(idCenario) += compilacao_custo_superior.at(idEstagio).at(idCenario);
+					if (!isnan(compilacao_custo_superior.at(idEstagio).at(idCenario)))
+						is_todos_nan = false;
 				}
 
-			} // if (a_custo_superior.size() > 0) {
+				if (!isnan(custo_superior.at(idCenario)))
+					setElemento(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, custo_superior.at(idCenario));
+				else if (!is_todos_nan)
+					throw std::invalid_argument("Erro na compilacao do custo superior do cenario.");
 
-			for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_maiorIdProcesso; idProcesso++) {
+			}
 
-				int* numero_cenarios_cenario_inicial_outro = new int[2];
-
-				MPI_Recv(numero_cenarios_cenario_inicial_outro, 2, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-				if (numero_cenarios_cenario_inicial_outro[0] > 0) {
-
-					double* custo_superior_outro        = new double[numero_cenarios_cenario_inicial_outro[0]];
-					double* probabilidade_cenario_outro = new double[numero_cenarios_cenario_inicial_outro[0]];
-
-					MPI_Recv(custo_superior_outro,        numero_cenarios_cenario_inicial_outro[0], MPI_DOUBLE, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-					MPI_Recv(probabilidade_cenario_outro, numero_cenarios_cenario_inicial_outro[0], MPI_DOUBLE, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-					for (int i = 0; i < numero_cenarios_cenario_inicial_outro[0]; i++) {
-						setElemento(AttMatrizMetodoSolucao_custo_superior,        a_idIteracao, IdCenario(i + numero_cenarios_cenario_inicial_outro[1]),        custo_superior_outro[i]);
-						setElemento(AttMatrizMetodoSolucao_probabilidade_cenario, a_idIteracao, IdCenario(i + numero_cenarios_cenario_inicial_outro[1]), probabilidade_cenario_outro[i]);
-					} // for (int i = 0; i < numero_cenarios_cenario_inicial_outro[0]; i++) {
-
-					delete[] custo_superior_outro;
-					delete[] probabilidade_cenario_outro;
-
-				} // if (numero_cenarios_cenario_inicial_outro[0] > 0) {
-
-				delete[] numero_cenarios_cenario_inicial_outro;
-
-			} // for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_maiorIdProcesso; idProcesso++) {
+			const double custo_superior_medio = getMedia_noNAN(custo_superior);
+			addElemento(AttVetorMetodoSolucao_custo_superior, a_idIteracao, custo_superior_medio);
 
 		} // if (a_idProcesso == IdProcesso_mestre) {
 
 		else {
 
-			if (a_custo_superior.size() != a_probabilidade_cenario.size())
-				throw std::invalid_argument("Os vetores de custo e probabilidade devem possuir as mesmas dimensoes.");
+			for (IdEstagio idEstagio = menor_estagio; idEstagio <= maior_estagio; idEstagio++) {
 
-			int* numero_cenarios_cenario_inicial = new int[2];
+				int numero_cenarios = 0;
+				if (a_custo_superior.size() > 0)
+					numero_cenarios = int(a_custo_superior.at(idEstagio).size());
 
-			const int numero_cenarios = a_custo_superior.size();
+				MPI_Send(&numero_cenarios, 1, MPI_INT, getRank(IdProcesso_mestre), getRank(idProcesso_local), MPI_COMM_WORLD);
 
-			numero_cenarios_cenario_inicial[0] = numero_cenarios;
+				if (numero_cenarios > 0)
+					MPI_Send(&a_custo_superior.at(idEstagio)[0], numero_cenarios, MPI_DOUBLE, getRank(IdProcesso_mestre), getRank(idProcesso_local), MPI_COMM_WORLD);
 
-			if (numero_cenarios > 0)
-				numero_cenarios_cenario_inicial[1] = int(a_custo_superior.getIteradorInicial());
-
-			MPI_Send(numero_cenarios_cenario_inicial, 2, MPI_INT, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD);
-
-			delete[] numero_cenarios_cenario_inicial;
-
-			if (numero_cenarios > 0) {
-
-				if (a_custo_superior.getIteradorInicial() != a_probabilidade_cenario.getIteradorInicial())
-					throw std::invalid_argument("Os vetores de custo e probabilidade devem possuir os mesmos cenarios.");
-
-				MPI_Send(&a_custo_superior.getElementos()[0],        numero_cenarios, MPI_DOUBLE, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD);
-				MPI_Send(&a_probabilidade_cenario.getElementos()[0], numero_cenarios, MPI_DOUBLE, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD);
-
-			} // if (numero_cenarios > 0) {
+			} // for (IdEstagio idEstagio = menor_estagio; idEstagio <= maior_estagio; idEstagio++) {
 
 		} // else {
 
 	} // try {
-	catch (const std::exception & erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_atualizarCustoInferior(" + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_custo_superior,a_probabilidade_cenario,a_modeloOtimizacao): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_atualizarCustoInferior(" + getFullString(a_idIteracao) + ",a_custo_superior,a_probabilidade_cenario,a_modeloOtimizacao): \n" + std::string(erro.what())); }
 
 } // void MetodoSolucao::executarPDDE_atualizarCustoSuperior(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso) {
 
 
-void MetodoSolucao::executarPDDE_atualizarCustoInferior(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const SmartEnupla<IdCenario, double> &a_custo_inferior, ModeloOtimizacao& a_modeloOtimizacao){
+void MetodoSolucao::executarPDDE_atualizarCustoInferior(const IdIteracao a_idIteracao, const SmartEnupla<IdEstagio, std::vector<double>>& a_custo_inferior, ModeloOtimizacao& a_modeloOtimizacao){
 
 	try{
 
-		if (a_idProcesso == IdProcesso_mestre) {   
+		const IdEstagio menor_estagio = a_custo_inferior.getIteradorInicial();
+
+		const IdProcesso idProcesso_local = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+
+		if (idProcesso_local == IdProcesso_mestre) {
 
 			if (getSizeMatriz(AttMatrizMetodoSolucao_custo_inferior) == 0)
-				setMatriz_forced(AttMatrizMetodoSolucao_custo_inferior, SmartEnupla<IdIteracao, SmartEnupla<IdCenario, double>>(a_idIteracao, std::vector<SmartEnupla<IdCenario, double>>(1, SmartEnupla<IdCenario, double>(IdCenario_1, std::vector<double>(IdCenario(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_numero_cenarios, int())), NAN)))));
-		
+				setMatriz_forced(AttMatrizMetodoSolucao_custo_inferior, SmartEnupla<IdIteracao, SmartEnupla<IdCenario, double>>(a_idIteracao, std::vector<SmartEnupla<IdCenario, double>>(1, SmartEnupla<IdCenario, double>(IdCenario_1, std::vector<double>(a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_maior_cenario, IdCenario()), 0.0)))));
+
+			const IdCenario menor_cenario_iteracao = a_modeloOtimizacao.arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_menor_cenario, IdCenario());
+			const IdCenario maior_cenario_iteracao = a_modeloOtimizacao.arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_maior_cenario, IdCenario());
+
+			SmartEnupla<IdCenario, double> custo_inferior(menor_cenario_iteracao, std::vector<double>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, NAN));
+
 			if (a_custo_inferior.size() > 0) {
 
-				for (IdCenario idCenario = a_custo_inferior.getIteradorInicial(); idCenario <= a_custo_inferior.getIteradorFinal(); idCenario++)
-					setElemento(AttMatrizMetodoSolucao_custo_inferior, a_idIteracao, idCenario, a_custo_inferior.at(idCenario));
+				const std::vector<IdCenario> cenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromCenarios(idProcesso_local, a_idIteracao, menor_estagio);
+				for (int c = 0; c < int(cenarios_estado.size()); c++) {
+					const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_cenario, cenarios_estado.at(c), menor_estagio, IdCenario());
+					const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_maior_cenario, cenarios_estado.at(c), menor_estagio, IdCenario());
+					for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
+						setElemento(AttMatrizMetodoSolucao_custo_inferior, a_idIteracao, idCenario, a_custo_inferior.at(menor_estagio).at(c));
+						custo_inferior.at(idCenario) = a_custo_inferior.at(menor_estagio).at(c);
+					}
+				}
 
 			} // if (a_custo_inferior.size() > 0) {
 
-			for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_maiorIdProcesso; idProcesso++) {
+			for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
 
-				int* numero_cenarios_cenario_inicial_outro = new int[2];
+				int numero_cenarios_outro = 0;
+				MPI_Recv(&numero_cenarios_outro, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-				MPI_Recv(numero_cenarios_cenario_inicial_outro, 2, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				if (numero_cenarios_outro > 0) {
+					double* custo_inferior_outro = new double[numero_cenarios_outro];
 
-				if (numero_cenarios_cenario_inicial_outro[0] > 0) {
+					MPI_Recv(custo_inferior_outro, numero_cenarios_outro, MPI_DOUBLE, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-					double* custo_inferior_outro = new double[numero_cenarios_cenario_inicial_outro[0]];
-
-					MPI_Recv(custo_inferior_outro, numero_cenarios_cenario_inicial_outro[0], MPI_DOUBLE, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-					for (int i = 0; i < numero_cenarios_cenario_inicial_outro[0]; i++)
-						setElemento(AttMatrizMetodoSolucao_custo_inferior, a_idIteracao, IdCenario(i + numero_cenarios_cenario_inicial_outro[1]), custo_inferior_outro[i]);
+					const std::vector<IdCenario> cenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromCenarios(idProcesso, a_idIteracao, menor_estagio);
+					for (int c = 0; c < int(cenarios_estado.size()); c++) {
+						const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_menor_cenario, cenarios_estado.at(c), menor_estagio, IdCenario());
+						const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_maior_cenario, cenarios_estado.at(c), menor_estagio, IdCenario());
+						for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
+							setElemento(AttMatrizMetodoSolucao_custo_inferior, a_idIteracao, idCenario, custo_inferior_outro[c]);
+							custo_inferior.at(idCenario) = custo_inferior_outro[c];
+						}
+					}
 
 					delete[] custo_inferior_outro;
-
-				} // if (numero_cenarios_cenario_inicial_outro[0] > 0) {
-
-				delete[] numero_cenarios_cenario_inicial_outro;
+				}
 
 			} // for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_maiorIdProcesso; idProcesso++) {
+
+			const double custo_inferior_medio = getMedia_noNAN(custo_inferior);
+			addElemento(AttVetorMetodoSolucao_custo_inferior, a_idIteracao, custo_inferior_medio);
 
 		} // if (a_idProcesso == IdProcesso_mestre) {
 
 		else {
 
-			int* numero_cenarios_cenario_inicial = new int[2];
+			int numero_cenarios = int(a_custo_inferior.at(menor_estagio).size());
 
-			const int numero_cenarios = a_custo_inferior.size();
-
-			numero_cenarios_cenario_inicial[0] = numero_cenarios;
+			MPI_Send(&numero_cenarios, 1, MPI_INT, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD);
 
 			if (numero_cenarios > 0)
-				numero_cenarios_cenario_inicial[1] = int(a_custo_inferior.getIteradorInicial());
-
-			MPI_Send(numero_cenarios_cenario_inicial, 2, MPI_INT, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD);
-
-			delete[] numero_cenarios_cenario_inicial;
-
-			if (numero_cenarios > 0)
-				MPI_Send(&a_custo_inferior.getElementos()[0], numero_cenarios, MPI_DOUBLE, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD);
+				MPI_Send(&a_custo_inferior.at(menor_estagio)[0], numero_cenarios, MPI_DOUBLE, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD);
 
 		} // else {
 
 	} // try {
-	catch (const std::exception&erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_atualizarCustoInferior(" + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_custo_inferior,a_modeloOtimizacao): \n" + std::string(erro.what())); }
+	catch (const std::exception&erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_atualizarCustoInferior(" + getFullString(a_idIteracao) + ",a_custo_inferior,a_modeloOtimizacao): \n" + std::string(erro.what())); }
 
 } // void MetodoSolucao::executarPDDE_atualizarCustoInferior(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdRealizacao a_idRealizacao, const IdRealizacao a_maiorIdRealizacao, double a_custo_inferior){
 
@@ -838,23 +834,9 @@ void MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaida
 			const double tempo_execucao_total = getAtributo(AttComumMetodoSolucao_tempo_execucao_total, double());
 			addElemento(AttVetorMetodoSolucao_tempo_execucao_acumulado, a_idIteracao, tempo_execucao_total);
 
-			const double custo_inferior = getMedia_noNAN(getMatriz(AttMatrizMetodoSolucao_custo_inferior, IdIteracao(),  IdCenario(), double()).at(a_idIteracao));
-			addElemento(AttVetorMetodoSolucao_custo_inferior, a_idIteracao, custo_inferior);
+			const double custo_inferior = getElementoVetor(AttVetorMetodoSolucao_custo_inferior, a_idIteracao, double());
 
-			double custo_superior = 0.0;
-
-			const double soma_probabilidades = getSoma_noNAN(getMatriz(AttMatrizMetodoSolucao_probabilidade_cenario, IdIteracao(), IdCenario(), double()).at(a_idIteracao));
-
-			if (!doubleCompara(soma_probabilidades, 1.0))
-				custo_superior = getMedia_noNAN(getMatriz(AttMatrizMetodoSolucao_custo_superior,  IdIteracao(), IdCenario(), double()).at(a_idIteracao));
-			
-			else {
-				const IdCenario cenario_final = getIterador2Final(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, IdCenario());
-				for (IdCenario idCenario = IdCenario_1; idCenario <= cenario_final; idCenario++)
-					custo_superior += getElementoMatriz(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, double()) * getElementoMatriz(AttMatrizMetodoSolucao_probabilidade_cenario, a_idIteracao, idCenario, double());
-			}
-			
-			addElemento(AttVetorMetodoSolucao_custo_superior, a_idIteracao, custo_superior);
+			double custo_superior = getElementoVetor(AttVetorMetodoSolucao_custo_superior, a_idIteracao, double());
 
 			const double brecha = 100.0*(custo_superior - custo_inferior) / custo_superior;
 
@@ -923,7 +905,6 @@ void MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaida
 
 			setMatriz(AttMatrizMetodoSolucao_custo_inferior, SmartEnupla<IdIteracao, SmartEnupla<IdCenario, double>>());
 			setMatriz(AttMatrizMetodoSolucao_custo_superior, SmartEnupla<IdIteracao, SmartEnupla<IdCenario, double>>());
-			setMatriz(AttMatrizMetodoSolucao_probabilidade_cenario, SmartEnupla<IdIteracao, SmartEnupla<IdCenario, double>>());
 
 		} // if (a_idProcesso == IdProcesso_mestre) {
 
@@ -933,52 +914,43 @@ void MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaida
 } // void MetodoSolucao::executarPDDE_avaliarSolucao(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, IdModeloOtimizacao a_idModeloOtimizacao){
 
 
-void MetodoSolucao::executarPDDE_calcularCorteBenders_new(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, EstruturaResultados<int>& a_status_otimizacao, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_inf_var_dinamica, EstruturaResultados<double>& a_solucao_dual_var_dinamica, EstruturaResultados<double>& a_limite_inferior_var_dinamica, EstruturaResultados<double>& a_limite_superior_var_dinamica, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<double>& a_vlr_var_estado, ModeloOtimizacao& a_modeloOtimizacao){
+void MetodoSolucao::executarPDDE_calcularCorteBenders_new(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, EstruturaResultados<int>& a_status_otimizacao, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_inf_var_dinamica, EstruturaResultados<double>& a_solucao_dual_var_dinamica, EstruturaResultados<double>& a_limite_inferior_var_dinamica, EstruturaResultados<double>& a_limite_superior_var_dinamica, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<double>& a_vlr_var_estado, ModeloOtimizacao& a_modeloOtimizacao){
 	try{
 
-		bool busca_abertura_em_todos_processos = false;
-		if (a_modeloOtimizacao.getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, a_idEstagio, TipoProcessamentoParalelo()) == TipoProcessamentoParalelo_por_abertura)
-			busca_abertura_em_todos_processos = true;		
-
-		executarPDDE_sincronizarResultadosParaCorteBenders(a_TSS, a_idIteracao, a_idProcesso, a_maiorIdProcesso, a_idEstagio, a_status_otimizacao, a_custo_total, a_sol_inf_var_dinamica, a_solucao_dual_var_dinamica, a_limite_inferior_var_dinamica, a_limite_superior_var_dinamica, a_sol_dual_var_estado, a_vlr_var_estado, a_modeloOtimizacao, busca_abertura_em_todos_processos);
+		executarPDDE_sincronizarResultadosParaCorteBenders(a_TSS, a_idIteracao, a_idEstagio, a_status_otimizacao, a_custo_total, a_sol_inf_var_dinamica, a_solucao_dual_var_dinamica, a_limite_inferior_var_dinamica, a_limite_superior_var_dinamica, a_sol_dual_var_estado, a_vlr_var_estado, a_modeloOtimizacao);
 
 		EstruturaResultados<int> map_solucao_dual_proxy;
 
-		executarPDDE_mapearSolucaoProxy(a_status_otimizacao, a_custo_total, a_sol_inf_var_dinamica, a_solucao_dual_var_dinamica, a_limite_inferior_var_dinamica, a_limite_superior_var_dinamica, a_sol_dual_var_estado, map_solucao_dual_proxy, a_modeloOtimizacao, busca_abertura_em_todos_processos);
+		executarPDDE_mapearSolucaoProxy(a_idIteracao, a_idEstagio, a_status_otimizacao, a_custo_total, a_sol_inf_var_dinamica, a_solucao_dual_var_dinamica, a_limite_inferior_var_dinamica, a_limite_superior_var_dinamica, a_sol_dual_var_estado, map_solucao_dual_proxy, a_modeloOtimizacao);
 
 		if (a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_cortes_multiplos, int()) == 0) {
 
 			const TipoAversaoRisco tipo_aversao_a_risco = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_aversao_a_risco, TipoAversaoRisco());
 
 			if (tipo_aversao_a_risco == TipoAversaoRisco_valor_esperado)
-				executarPDDE_calcularCorteBendersValorEsperado_new(a_idIteracao, a_idProcesso, a_maiorIdProcesso, a_idEstagio, a_custo_total, a_sol_dual_var_estado, map_solucao_dual_proxy, a_vlr_var_estado, a_modeloOtimizacao, busca_abertura_em_todos_processos);
+				executarPDDE_calcularCorteBendersValorEsperado_new(a_idIteracao, a_idEstagio, a_custo_total, a_sol_dual_var_estado, map_solucao_dual_proxy, a_vlr_var_estado, a_modeloOtimizacao);
 			else if (tipo_aversao_a_risco == TipoAversaoRisco_CVAR)
-				executarPDDE_calcularCorteBendersCVaR_new(a_idIteracao, a_idProcesso, a_maiorIdProcesso, a_idEstagio, a_custo_total, a_sol_dual_var_estado, map_solucao_dual_proxy, a_vlr_var_estado, a_modeloOtimizacao, busca_abertura_em_todos_processos);
+				executarPDDE_calcularCorteBendersCVaR_new(a_idIteracao, a_idEstagio, a_custo_total, a_sol_dual_var_estado, map_solucao_dual_proxy, a_vlr_var_estado, a_modeloOtimizacao);
 			else
 				throw std::invalid_argument("Tipo de aversao a risco nao implementado.");
 
 		} // if (a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_cortes_multiplos, int()) == 0) {
 
 		else
-			executarPDDE_calcularCorteBendersMultiCut_new(a_idIteracao, a_idProcesso, a_maiorIdProcesso, a_idEstagio, a_custo_total, a_sol_dual_var_estado, map_solucao_dual_proxy, a_vlr_var_estado, a_modeloOtimizacao, busca_abertura_em_todos_processos);
+			executarPDDE_calcularCorteBendersMultiCut_new(a_idIteracao, a_idEstagio, a_custo_total, a_sol_dual_var_estado, map_solucao_dual_proxy, a_vlr_var_estado, a_modeloOtimizacao);
 
 
 	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_calcularCorteBenders_new(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + "," + getFullString(a_idEstagio) + ",...,a_modeloOtimizacao): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_calcularCorteBenders_new(" + getFullString(a_idEstagio) + ",...,a_modeloOtimizacao): \n" + std::string(erro.what())); }
 
 } // void MetodoSolucao::executarPDDE_calcularCorteBenders_new(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, double* a_custo_total, double* a_sol_inf_var_dinamica, double* a_solucao_dual_var_dinamica, double* a_limite_inferior_var_dinamica, double* a_limite_superior_var_dinamica, double* a_sol_dual_var_estado, ModeloOtimizacao& a_modeloOtimizacao){
 
-void MetodoSolucao::executarPDDE_sincronizarResultadosParaCorteBenders(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, EstruturaResultados<int>& a_status_otimizacao, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_inf_var_dinamica, EstruturaResultados<double>& a_solucao_dual_var_dinamica, EstruturaResultados<double>& a_limite_inferior_var_dinamica, EstruturaResultados<double>& a_limite_superior_var_dinamica, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<double>& a_vlr_var_estado, ModeloOtimizacao& a_modeloOtimizacao, const bool a_busca_global) {
+void MetodoSolucao::executarPDDE_sincronizarResultadosParaCorteBenders(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, EstruturaResultados<int>& a_status_otimizacao, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_inf_var_dinamica, EstruturaResultados<double>& a_solucao_dual_var_dinamica, EstruturaResultados<double>& a_limite_inferior_var_dinamica, EstruturaResultados<double>& a_limite_superior_var_dinamica, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<double>& a_vlr_var_estado, ModeloOtimizacao& a_modeloOtimizacao) {
 	try {
 
 		const int numero_estados = int(a_modeloOtimizacao.getMaiorId(a_idEstagio, IdVariavelEstado()));
-		int numero_total_cenarios_em_estados = 0;
-		
-		if (a_busca_global)
-			numero_total_cenarios_em_estados = a_modeloOtimizacao.getNumeroTotalCenariosEmEstados(a_idProcesso, a_maiorIdProcesso, a_idEstagio, a_idIteracao);
-
 		const int numero_variaveis_dinamicas = a_modeloOtimizacao.getNumeroVariavelDinamica(a_TSS, a_idEstagio);
-		const int numero_processos = int(a_maiorIdProcesso);
+		const int numero_processos = int(a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()));
 
 		EstruturaResultados<int> status_otimizacao_all(numero_processos);
 		EstruturaResultados<double> custo_total_all(numero_processos);
@@ -991,31 +963,26 @@ void MetodoSolucao::executarPDDE_sincronizarResultadosParaCorteBenders(const Tip
 		EstruturaResultados<double> vlr_var_estado_all(numero_processos);
 		EstruturaResultados<double> sol_dual_var_estado_all(numero_processos);
 
-		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) {
+		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
 
 			const int rank = getRank(idProcesso);
 
-			const int maior_numero_aberturas_processo_estagio = a_modeloOtimizacao.getMaiorNumeroAberturasProcessoEstagio(idProcesso, a_idEstagio, a_idIteracao);
+			const int numero_cenarios_estados = int(a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso, a_idIteracao, a_idEstagio).size());
 
-			const IdCenario cenario_inicial = a_modeloOtimizacao.getCenarioInicial(idProcesso, a_idIteracao);
-			const IdCenario cenario_final = a_modeloOtimizacao.getCenarioFinal(idProcesso, a_idIteracao);
+			const int numero_aberturas = a_modeloOtimizacao.arranjoResolucao.getNumeroAberturas(idProcesso, a_idIteracao, a_idEstagio);
 
-			int numero_cenarios = a_modeloOtimizacao.getNumeroCenarios(cenario_inicial, cenario_final);
-			if (a_busca_global)
-				numero_cenarios = numero_total_cenarios_em_estados;
+			status_otimizacao_all.setSize(rank, numero_cenarios_estados, numero_aberturas);
+			custo_total_all.setSize(rank, numero_cenarios_estados, numero_aberturas);
+			sol_inf_var_dinamica_all.setSize(rank, numero_cenarios_estados, numero_aberturas);
 
-			status_otimizacao_all.setSize(rank, numero_cenarios, maior_numero_aberturas_processo_estagio);
-			custo_total_all.setSize(rank, numero_cenarios, maior_numero_aberturas_processo_estagio);
-			sol_inf_var_dinamica_all.setSize(rank, numero_cenarios, maior_numero_aberturas_processo_estagio);
+			solucao_dual_var_dinamica_all.setSize(rank, numero_cenarios_estados, numero_aberturas, numero_variaveis_dinamicas);
+			limite_inferior_var_dinamica_all.setSize(rank, numero_cenarios_estados, numero_aberturas, numero_variaveis_dinamicas);
+			limite_superior_var_dinamica_all.setSize(rank, numero_cenarios_estados, numero_aberturas, numero_variaveis_dinamicas);
 
-			solucao_dual_var_dinamica_all.setSize(rank, numero_cenarios, maior_numero_aberturas_processo_estagio, numero_variaveis_dinamicas);
-			limite_inferior_var_dinamica_all.setSize(rank, numero_cenarios, maior_numero_aberturas_processo_estagio, numero_variaveis_dinamicas);
-			limite_superior_var_dinamica_all.setSize(rank, numero_cenarios, maior_numero_aberturas_processo_estagio, numero_variaveis_dinamicas);
+			vlr_var_estado_all.setSize(rank, numero_cenarios_estados, numero_estados);
+			sol_dual_var_estado_all.setSize(rank, numero_cenarios_estados, numero_aberturas, numero_estados);
 
-			vlr_var_estado_all.setSize(rank, numero_cenarios, numero_estados);
-			sol_dual_var_estado_all.setSize(rank, numero_cenarios, maior_numero_aberturas_processo_estagio, numero_estados);
-
-		} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) {
+		} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
 
 		MPI_Allgatherv(a_status_otimizacao.vetor, a_status_otimizacao.sizeT[0], MPI_INT, status_otimizacao_all.vetor, status_otimizacao_all.sizeT, status_otimizacao_all.displ, MPI_INT, MPI_COMM_WORLD);
 		a_status_otimizacao = status_otimizacao_all;
@@ -1042,22 +1009,28 @@ void MetodoSolucao::executarPDDE_sincronizarResultadosParaCorteBenders(const Tip
 		a_sol_dual_var_estado = sol_dual_var_estado_all;
 
 	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_sincronizarResultadosParaCorteBenders(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + "," + getFullString(a_idEstagio) + ",...,a_modeloOtimizacao): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_sincronizarResultadosParaCorteBenders(" + getFullString(a_idEstagio) + ",...,a_modeloOtimizacao): \n" + std::string(erro.what())); }
 }
 
-void MetodoSolucao::executarPDDE_calcularCorteBendersValorEsperado_new(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<int> & a_map_solucao_dual_proxy, EstruturaResultados<double>& a_vlr_var_estado, ModeloOtimizacao& a_modeloOtimizacao, const bool a_busca_global) {
+void MetodoSolucao::executarPDDE_calcularCorteBendersValorEsperado_new(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<int> & a_map_solucao_dual_proxy, EstruturaResultados<double>& a_vlr_var_estado, ModeloOtimizacao& a_modeloOtimizacao) {
 	try {
+
+		const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_menor_cenario, IdCenario());
+		const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_maior_cenario, IdCenario());
+
+		const int numero_cenarios = int(maior_cenario - menor_cenario) + 1;
+
+		SmartEnupla<IdCenario, SmartEnupla<IdVariavelEstado, double>>  lista_enupla_estado(menor_cenario, std::vector<SmartEnupla<IdVariavelEstado, double>>(numero_cenarios, SmartEnupla<IdVariavelEstado, double>()));
+		SmartEnupla<IdCenario, SmartEnupla<IdRealizacao, double>>      lista_enupla_rhs        (menor_cenario, std::vector<SmartEnupla<IdRealizacao, double>>(numero_cenarios, SmartEnupla<IdRealizacao, double>()));
+		SmartEnupla<IdCenario, SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>>> lista_enupla_coeficiente(menor_cenario, std::vector<SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>>>(numero_cenarios, SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>>()));
+
+		SmartEnupla<IdCenario, int> sem_corte(menor_cenario, std::vector<int>(numero_cenarios, 0));
 
 		const int nr = a_custo_total.bloco;
 
 		// Inicialização com inclusão de número de cortes igual a nr * nc
 		int r_min = 0;
 		int r_max = nr;
-		// Em caso de busca global, numero de cortes igual a nc
-		if (a_busca_global) {
-			r_min = getRank(a_idProcesso);
-			r_max = getRank(a_idProcesso) + 1;
-		} // if (a_busca_global) {
 
 		for (int r_aux = r_min; r_aux < r_max; r_aux++) {
 
@@ -1067,109 +1040,78 @@ void MetodoSolucao::executarPDDE_calcularCorteBendersValorEsperado_new(const IdI
 				r = 0;
 
 			const int nc = a_custo_total.size1[r];
+			const int na = a_custo_total.size2[r];
 			const int ne = a_sol_dual_var_estado.size3[r];
 
-			// Inicialização com busca de abertura somente em r
-			int r_min_busca = r;
-			int r_max_busca = r + 1;
-			// Em caso de busca global, busca-se aberturas em todo nr
-			if (a_busca_global) {
-				r_min_busca = 0;
-				r_max_busca = nr;
-			} // if (a_busca_global) {
+			const IdProcesso idProcesso = IdProcesso(r + 1);
+
+			const std::vector<IdCenario> cenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso, a_idIteracao, a_idEstagio);
 
 			for (int c = 0; c < nc; c++) {
 
-				IdCenario idCenario = IdCenario_Nenhum;
+				const int indice_inicial_estado = a_vlr_var_estado.displ[r] + c * ne;
 
-				if (!a_busca_global)
-					idCenario = IdCenario(a_modeloOtimizacao.getCenarioInicial(IdProcesso(r + 1), a_idIteracao) + c);
+				const IdCenario idCenario_estado = cenarios_estado.at(c);
 
-				SmartEnupla<IdRealizacao, double> enupla_rhs(IdRealizacao_1, std::vector<double>(1, 0.0));
-				SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> enupla_coeficiente(IdRealizacao_1, std::vector<SmartEnupla<IdVariavelEstado, double>>(1, SmartEnupla<IdVariavelEstado, double>(IdVariavelEstado_1, std::vector<double>(ne, 0.0))));
-				SmartEnupla<IdVariavelEstado, double> enupla_estado(IdVariavelEstado_1, std::vector<double>(ne, 0.0));
+				const IdAbertura menor_abertura = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_menor_abertura, idCenario_estado, a_idEstagio, IdAbertura());
 
-				bool sem_corte = false;
+				if (lista_enupla_rhs.at(idCenario_estado).size() == 0) {
+					lista_enupla_rhs.at(idCenario_estado) = SmartEnupla<IdRealizacao, double>(IdRealizacao_1, std::vector<double>(1, 0.0));
+					lista_enupla_coeficiente.at(idCenario_estado) = SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>>(IdRealizacao_1, std::vector<SmartEnupla<IdVariavelEstado, double>>(1, SmartEnupla<IdVariavelEstado, double>(IdVariavelEstado_1, std::vector<double>(ne, 0.0))));
+				}
 
-				bool first_round = true;
-				for (int r_busca = r_min_busca; r_busca < r_max_busca; r_busca++) {
+				if (lista_enupla_estado.at(idCenario_estado).size() == 0){
+					lista_enupla_estado.at(idCenario_estado) = SmartEnupla<IdVariavelEstado, double>(IdVariavelEstado_1, std::vector<double>(ne, 0.0));
+					for (int e = 0; e < ne; e++)
+						lista_enupla_estado.at(idCenario_estado).at(IdVariavelEstado(e + 1)) = a_vlr_var_estado.vetor[indice_inicial_estado + e];
+				}
 
-					if ((a_busca_global) && (r != r_busca)) {
-						if ((nc > a_custo_total.size1[r_busca]) && (a_custo_total.size1[r_busca] > 0))
-							throw std::invalid_argument("Estrutura nao compativel com busca global.");
-					} // if ((a_busca_global) && (r != r_busca)){
+				for (int a = 0; a < na; a++) {
+					const int indice_custo_total = a_custo_total.displ[r] + c * na + a;
 
-					const int na_busca = a_custo_total.size2[r_busca];
-
-					IdProcesso idProcesso_busca = IdProcesso(r + 1);
-					if (a_busca_global) {
-						idProcesso_busca = IdProcesso(r_busca + 1);					
-						idCenario = a_modeloOtimizacao.getCenarioInicial(idProcesso_busca, a_idIteracao);
-					} // if (a_busca_global) {
-
-					const IdAbertura abertura_inicial = a_modeloOtimizacao.getElementoMatriz(a_idIteracao, idProcesso_busca, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
-
-					const int indice_inicial_estado = a_vlr_var_estado.displ[r_busca] + c * ne;
-					for (int a_busca = 0; a_busca < na_busca; a_busca++) {
-						const int indice_custo_total = a_custo_total.displ[r_busca] + c * na_busca + a_busca;
-
-						int indice_inicial_sol_dual = a_sol_dual_var_estado.displ[r_busca] + c * na_busca * ne + a_busca * ne;
-						if (a_map_solucao_dual_proxy.vetor[indice_custo_total] == -2) {
-							sem_corte = true;
-							break;
-						}
-						else if (a_map_solucao_dual_proxy.vetor[indice_custo_total] > -1)
-							indice_inicial_sol_dual = a_map_solucao_dual_proxy.vetor[indice_custo_total];
-
-						const double probabilidade_original = a_modeloOtimizacao.getProbabilidadeAbertura(a_idEstagio, IdRealizacao(abertura_inicial + a_busca));
-
-						enupla_rhs.at(IdRealizacao_1) += a_custo_total.vetor[indice_custo_total] * probabilidade_original;
-
-						for (int e = 0; e < ne; e++) {
-							const IdVariavelEstado idVariavelEstado = IdVariavelEstado(e + 1);
-
-							enupla_rhs.at(IdRealizacao_1) -= a_sol_dual_var_estado.vetor[indice_inicial_sol_dual + e] * a_vlr_var_estado.vetor[indice_inicial_estado + e] * probabilidade_original;
-							enupla_coeficiente.at(IdRealizacao_1).at(idVariavelEstado) += a_sol_dual_var_estado.vetor[indice_inicial_sol_dual + e] * probabilidade_original;
-							if (first_round)
-								enupla_estado.at(idVariavelEstado) = a_vlr_var_estado.vetor[indice_inicial_estado + e];
-						} // for (int e = 0; e < ne; e++) {
-
-						first_round = false;
-					} // for (int a_busca = 0; a_busca < na_busca; a_busca++) {
-
-					if (sem_corte)
+					int indice_inicial_sol_dual = a_sol_dual_var_estado.displ[r] + c * na * ne + a * ne;
+					if (a_map_solucao_dual_proxy.vetor[indice_custo_total] == -2) {
+						sem_corte.at(idCenario_estado) = 1;
 						break;
+					}
+					else if (a_map_solucao_dual_proxy.vetor[indice_custo_total] > -1)
+						indice_inicial_sol_dual = a_map_solucao_dual_proxy.vetor[indice_custo_total];
 
-				} // for (int r_busca = r_min_busca; r_busca < r_max_busca; r_busca++) {
+					const double probabilidade_original = a_modeloOtimizacao.getProbabilidadeAbertura(a_idEstagio, IdRealizacao(menor_abertura + a));
 
-				if (!sem_corte)
-					a_modeloOtimizacao.instanciarCorteBenders(a_idEstagio, enupla_rhs, enupla_coeficiente, enupla_estado);
+					lista_enupla_rhs.at(idCenario_estado).at(IdRealizacao_1) += a_custo_total.vetor[indice_custo_total] * probabilidade_original;
+
+					for (int e = 0; e < ne; e++) {
+						lista_enupla_rhs.at(idCenario_estado).at(IdRealizacao_1) -= a_sol_dual_var_estado.vetor[indice_inicial_sol_dual + e] * a_vlr_var_estado.vetor[indice_inicial_estado + e] * probabilidade_original;
+						lista_enupla_coeficiente.at(idCenario_estado).at(IdRealizacao_1).at(IdVariavelEstado(e + 1)) += a_sol_dual_var_estado.vetor[indice_inicial_sol_dual + e] * probabilidade_original;
+					} // for (int e = 0; e < ne; e++) {
+				} // for (int a = 0; a < na; a++) {
 
 			} // for (int c = 0; c < nc; c++) {
 
 		} // for (int r = r_min; r < r_max; r++) {
 
+		for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
+			if ((sem_corte.at(idCenario) == 0) && (lista_enupla_rhs.at(idCenario).size() > 0))
+				a_modeloOtimizacao.instanciarCorteBenders(a_idEstagio, lista_enupla_rhs.at(idCenario), lista_enupla_coeficiente.at(idCenario), lista_enupla_estado.at(idCenario));
+		}
+
+
 	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_calcularCorteBendersValorEsperado_new(" + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + "," + getFullString(a_idEstagio) + "a_custo_total,a_solucao_dual_variavel_estado,a_modeloOtimizacao): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_calcularCorteBendersValorEsperado_new(" + getFullString(a_idIteracao) + "," + getFullString(a_idEstagio) + "a_custo_total,a_solucao_dual_variavel_estado,a_modeloOtimizacao): \n" + std::string(erro.what())); }
 }
 
-void MetodoSolucao::executarPDDE_calcularCorteBendersCVaR_new(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<int>& a_map_solucao_dual_proxy, EstruturaResultados<double>& a_vlr_var_estado, ModeloOtimizacao& a_modeloOtimizacao, const bool a_busca_global) {
+void MetodoSolucao::executarPDDE_calcularCorteBendersCVaR_new(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<int>& a_map_solucao_dual_proxy, EstruturaResultados<double>& a_vlr_var_estado, ModeloOtimizacao& a_modeloOtimizacao) {
 	try {
-
+		/*
 		const double lambda_CVAR = a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_lambda_CVAR, double());
 		const double  alpha_CVAR = a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_alpha_CVAR, double());
-		const int numero_total_aberturas_estagio = int(a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()));
 
 		const int nr = a_custo_total.bloco;
 
 		// Inicialização com inclusão de número de cortes igual a nr * nc
 		int r_min = 0;
 		int r_max = nr;
-		// Em caso de busca global, numero de cortes igual a nc
-		if (a_busca_global) {
-			r_min = getRank(a_idProcesso);
-			r_max = getRank(a_idProcesso) + 1;
-		} // if (a_busca_global) {
 
 		for (int r_aux = r_min; r_aux < r_max; r_aux++) {
 
@@ -1179,23 +1121,18 @@ void MetodoSolucao::executarPDDE_calcularCorteBendersCVaR_new(const IdIteracao a
 				r = 0;
 
 			const int nc = a_custo_total.size1[r];
+			const int na = a_custo_total.size2[r];
 			const int ne = a_sol_dual_var_estado.size3[r];
 
-			// Inicialização com busca de abertura somente em r
-			int r_min_busca = r;
-			int r_max_busca = r + 1;
-			// Em caso de busca global, busca-se aberturas em todo nr
-			if (a_busca_global) {
-				r_min_busca = 0;
-				r_max_busca = nr;
-			} // if (a_busca_global) {
+			const IdProcesso idProcesso = IdProcesso(r + 1);
+
+			const std::vector<IdCenario> cenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso, a_idIteracao, a_idEstagio);
 
 			for (int c = 0; c < nc; c++) {
 
-				IdCenario idCenario = IdCenario_Nenhum;
+				const IdCenario idCenario_estado = cenarios_estado.at(c);
 
-				if (!a_busca_global)
-					idCenario = IdCenario(a_modeloOtimizacao.getCenarioInicial(IdProcesso(r + 1), a_idIteracao) + c);
+				const IdAbertura menor_abertura = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_menor_abertura, idCenario_estado, a_idEstagio, IdAbertura());
 
 				bool sem_corte = false;
 
@@ -1209,61 +1146,44 @@ void MetodoSolucao::executarPDDE_calcularCorteBendersCVaR_new(const IdIteracao a
 				a_custo_total_maior_para_menor.reserve(numero_total_aberturas_estagio);
 				na_custo_total_maior_para_menor.reserve(numero_total_aberturas_estagio);
 
-				for (int r_busca = r_min_busca; r_busca < r_max_busca; r_busca++) {
+				const IdAbertura abertura_inicial = IdAbertura_Nenhum;// = a_modeloOtimizacao.getElementoMatriz(a_idIteracao, idProcesso_busca, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
 
-					if ((a_busca_global) && (r != r_busca)) {
-						if ((nc > a_custo_total.size1[r_busca]) && (a_custo_total.size1[r_busca] > 0))
-							throw std::invalid_argument("Estrutura nao compativel com busca global.");
-					} // if ((a_busca_global) && (r != r_busca)){
+				for (int a = 0; a < na; a++) {
 
-					const int na_busca = a_custo_total.size2[r_busca];
+					const int indice_custo_total = a_custo_total.displ[r] + c * na + a;
 
-					IdProcesso idProcesso_busca = IdProcesso(r + 1);
+					if (a_map_solucao_dual_proxy.vetor[indice_custo_total] == -2) {
+						sem_corte = true;
+						break;
+					}
 
-					if (a_busca_global) {
-						idProcesso_busca = IdProcesso(r_busca + 1);
-						idCenario = a_modeloOtimizacao.getCenarioInicial(idProcesso_busca, a_idIteracao);
-					} // if (a_busca_global) {
+					const double probabilidade_original = a_modeloOtimizacao.getProbabilidadeAbertura(a_idEstagio, IdRealizacao(abertura_inicial + a));
 
-					const IdAbertura abertura_inicial = a_modeloOtimizacao.getElementoMatriz(a_idIteracao, idProcesso_busca, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
+					const double custo_total = a_custo_total.vetor[indice_custo_total];
 
-					for (int a_busca = 0; a_busca < na_busca; a_busca++) {
-
-						const int indice_custo_total = a_custo_total.displ[r_busca] + c * na_busca + a_busca;
-
-						if (a_map_solucao_dual_proxy.vetor[indice_custo_total] == -2) {
-							sem_corte = true;
+					bool custo_maior_inserido = false;
+					for (int i = 0; i < int(custo_total_maior_para_menor.size()); i++) {
+						if (custo_total > custo_total_maior_para_menor.at(i)) {
+							custo_total_maior_para_menor.insert(custo_total_maior_para_menor.begin() + i, custo_total);
+							probabilidade_maior_para_menor.insert(probabilidade_maior_para_menor.begin() + i, probabilidade_original);
+							r_custo_total_maior_para_menor.insert(r_custo_total_maior_para_menor.begin() + i, r);
+							a_custo_total_maior_para_menor.insert(a_custo_total_maior_para_menor.begin() + i, a);
+							na_custo_total_maior_para_menor.insert(na_custo_total_maior_para_menor.begin() + i, na);
+							custo_maior_inserido = true;
 							break;
-						}
+						} // if (custo_total > custo_total_maior_para_menor.at(i)) {
+					} // for (int i = 0; i < int(custo_total_maior_para_menor.size()); i++) {
 
-						const double probabilidade_original = a_modeloOtimizacao.getProbabilidadeAbertura(a_idEstagio, IdRealizacao(abertura_inicial + a_busca));
+					if (!custo_maior_inserido) {
+						custo_total_maior_para_menor.push_back(custo_total);
+						probabilidade_maior_para_menor.push_back(probabilidade_original);
+						r_custo_total_maior_para_menor.push_back(r);
+						a_custo_total_maior_para_menor.push_back(a);
+						na_custo_total_maior_para_menor.push_back(na);
+					} // if (!custo_maior_inserido) {
 
-						const double custo_total = a_custo_total.vetor[indice_custo_total];
+				} // for (int a = 0; a < na; a++) {
 
-						bool custo_maio_inserido = false;
-						for (int i = 0; i < int(custo_total_maior_para_menor.size()); i++) {
-							if (custo_total > custo_total_maior_para_menor.at(i)) {
-								custo_total_maior_para_menor.insert(custo_total_maior_para_menor.begin() + i, custo_total);
-								probabilidade_maior_para_menor.insert(probabilidade_maior_para_menor.begin() + i, probabilidade_original);
-								r_custo_total_maior_para_menor.insert(r_custo_total_maior_para_menor.begin() + i, r_busca);
-								a_custo_total_maior_para_menor.insert(a_custo_total_maior_para_menor.begin() + i, a_busca);
-								na_custo_total_maior_para_menor.insert(na_custo_total_maior_para_menor.begin() + i, na_busca);
-								custo_maio_inserido = true;
-								break;
-							} // if (custo_total > custo_total_maior_para_menor.at(i)) {
-						} // for (int i = 0; i < int(custo_total_maior_para_menor.size()); i++) {
-
-						if (!custo_maio_inserido) {
-							custo_total_maior_para_menor.push_back(custo_total);
-							probabilidade_maior_para_menor.push_back(probabilidade_original);
-							r_custo_total_maior_para_menor.push_back(r_busca);
-							a_custo_total_maior_para_menor.push_back(a_busca);
-							na_custo_total_maior_para_menor.push_back(na_busca);
-						} // if (!custo_maio_inserido) {
-
-					} // for (int a_busca = 0; a_busca < na_busca; a_busca++) {
-
-				} // for (int r_busca = r_min_busca; r_busca < r_max_busca; r_busca++) {
 
 				if (!sem_corte) {
 
@@ -1320,14 +1240,16 @@ void MetodoSolucao::executarPDDE_calcularCorteBendersCVaR_new(const IdIteracao a
 			} // for (int c = 0; c < nc; c++) {
 
 		} // for (int r = r_min; r < r_max; r++) {
-
+		*/
 	} // try {
 
-	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_calcularCorteBendersCVaR_new(" + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + "," + getFullString(a_idEstagio) + "a_custo_total,a_solucao_dual_variavel_estado,a_modeloOtimizacao): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_calcularCorteBendersCVaR_new(" + getFullString(a_idIteracao) + "," + getFullString(a_idEstagio) + "a_custo_total,a_solucao_dual_variavel_estado,a_modeloOtimizacao): \n" + std::string(erro.what())); }
 }
 
-void MetodoSolucao::executarPDDE_calcularCorteBendersMultiCut_new(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<int>& a_map_solucao_dual_proxy, EstruturaResultados<double>& a_vlr_var_estado, ModeloOtimizacao& a_modeloOtimizacao, const bool a_busca_global) {
+void MetodoSolucao::executarPDDE_calcularCorteBendersMultiCut_new(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<int>& a_map_solucao_dual_proxy, EstruturaResultados<double>& a_vlr_var_estado, ModeloOtimizacao& a_modeloOtimizacao) {
 	try {
+
+		/*
 
 		const int nr = a_custo_total.bloco;
 
@@ -1390,7 +1312,7 @@ void MetodoSolucao::executarPDDE_calcularCorteBendersMultiCut_new(const IdIterac
 						idCenario = a_modeloOtimizacao.getCenarioInicial(idProcesso_busca, a_idIteracao);;
 					} // if (a_busca_global) {
 
-					const IdAbertura abertura_inicial = a_modeloOtimizacao.getElementoMatriz(a_idIteracao, idProcesso_busca, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
+					const IdAbertura abertura_inicial = IdAbertura_Nenhum;// = a_modeloOtimizacao.getElementoMatriz(a_idIteracao, idProcesso_busca, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
 
 					const int indice_inicial_estado = a_vlr_var_estado.displ[r_busca] + c * ne;
 					for (int a_busca = 0; a_busca < na_busca; a_busca++) {
@@ -1435,17 +1357,19 @@ void MetodoSolucao::executarPDDE_calcularCorteBendersMultiCut_new(const IdIterac
 			} // for (int c = 0; c < nc; c++) {
 
 		} // for (int r = r_min; r < r_max; r++) {
-
+		*/
 	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_calcularCorteBendersMultiCut_new(" + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + "," + getFullString(a_idEstagio) + ",a_custo_total,a_solucao_dual_variavel_estado,a_modeloOtimizacao): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_calcularCorteBendersMultiCut_new(" + getFullString(a_idIteracao) + "," + getFullString(a_idEstagio) + ",a_custo_total,a_solucao_dual_variavel_estado,a_modeloOtimizacao): \n" + std::string(erro.what())); }
 }
 
-void MetodoSolucao::executarPDDE_mapearSolucaoProxy(EstruturaResultados<int>& a_status_otimizacao, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_inf_var_dinamica, EstruturaResultados<double>& a_solucao_dual_var_dinamica, EstruturaResultados<double>& a_limite_inferior_var_dinamica, EstruturaResultados<double>& a_limite_superior_var_dinamica, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<int>& a_map_solucao_dual_proxy, ModeloOtimizacao& a_modeloOtimizacao, const bool a_busca_global) {
+void MetodoSolucao::executarPDDE_mapearSolucaoProxy(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, EstruturaResultados<int>& a_status_otimizacao, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_inf_var_dinamica, EstruturaResultados<double>& a_solucao_dual_var_dinamica, EstruturaResultados<double>& a_limite_inferior_var_dinamica, EstruturaResultados<double>& a_limite_superior_var_dinamica, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<int>& a_map_solucao_dual_proxy, ModeloOtimizacao& a_modeloOtimizacao) {
 
 	try {
 	 
 		const TipoSelecaoSolucaoProxy tipo_selecao_solucao_proxy = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_selecao_solucao_proxy, TipoSelecaoSolucaoProxy());
-		
+	
+		const bool busca_global = a_modeloOtimizacao.arranjoResolucao.isIdsCenarioEstadoDiferentesEmAberturasAndCenarios(a_idIteracao, a_idEstagio);
+
 		const int nr = a_custo_total.bloco;
 
 		EstruturaResultados<int> map_solucao_dual_proxy(nr);
@@ -1461,7 +1385,7 @@ void MetodoSolucao::executarPDDE_mapearSolucaoProxy(EstruturaResultados<int>& a_
 
 			int r_min_busca = r;
 			int r_max_busca = r + 1;
-			if (a_busca_global) {
+			if (busca_global) {
 				r_min_busca = 0;
 				r_max_busca = nr;
 			} // if (a_busca_global) {
@@ -1473,10 +1397,10 @@ void MetodoSolucao::executarPDDE_mapearSolucaoProxy(EstruturaResultados<int>& a_
 
 					const int na_busca = a_custo_total.size2[r_busca];
 
-					if ((a_busca_global) && (r != r_busca)) {
+					if ((busca_global) && (r != r_busca)) {
 						if ((nc > a_custo_total.size1[r_busca]) && (a_custo_total.size1[r_busca] > 0))
 							throw std::invalid_argument("Estrutura nao compativel com busca global.");
-					} // if ((a_busca_global) && (r != r_busca)){
+					} // if ((busca_global) && (r != r_busca)){
 
 					for (int a_busca = 0; a_busca < na_busca; a_busca++) {
 						if (a_status_otimizacao.vetor[a_status_otimizacao.displ[r_busca] + c * na_busca + a_busca] > 0) {
@@ -1600,309 +1524,9 @@ void MetodoSolucao::executarPDDE_mapearSolucaoProxy(EstruturaResultados<int>& a_
 
 	} // try {
 
-	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_mapearSolucaoProxy(" + getFullString(a_busca_global) +  ",...,a_modeloOtimizacao): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_mapearSolucaoProxy(" + getFullString(a_idIteracao) + "," + getFullString(a_idEstagio) + ",...,a_modeloOtimizacao): \n" + std::string(erro.what())); }
 
 }
-
-
-void MetodoSolucao::executarPDDE_calcularCorteBendersCVaR(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, const SmartEnupla <IdCenario, SmartEnupla<IdRealizacao, double>>& a_custo_total, const SmartEnupla <IdCenario, SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>>>& a_solucao_dual_variavel_estado, const SmartEnupla <IdCenario, SmartEnupla<IdVariavelEstado, double>>& a_valor_variavel_estado, ModeloOtimizacao& a_modeloOtimizacao) {
-
-	try {
-
-		const IdCenario cenario_inicial = a_custo_total.getIteradorInicial();
-		const IdCenario cenario_final = a_custo_total.getIteradorFinal();
-
-		const IdVariavelEstado maiorIdVariavelEstado = a_valor_variavel_estado.at(cenario_inicial).getIteradorFinal();
-
-		const IdRealizacao maiorIdRealizacao = a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao());
-
-		const int numero_realizacao  = a_custo_total.at(cenario_inicial).size();
-		const int numero_estado      = a_valor_variavel_estado.at(cenario_inicial).size();
-		
-		int numero_cenario     = int(cenario_final - cenario_inicial) + 1;
-		const int numero_processo = int(a_maiorIdProcesso);
-
-		int* numero_cenario_por_processo = new int[numero_processo];
-
-		MPI_Allgather(&numero_cenario, 1, MPI_INT, numero_cenario_por_processo, 1, MPI_INT, MPI_COMM_WORLD);
-
-		int maior_numero_cenario = 0;
-		for (int rank = 0; rank < numero_processo; rank++) {
-			if (maior_numero_cenario < numero_cenario_por_processo[rank])
-				maior_numero_cenario = numero_cenario_por_processo[rank];
-		} // for (int rank = 0; rank < numero_processo; rank++) {
-
-		int* multiplicidade_otimizada_por_cenario = new int[maior_numero_cenario];
-
-		double* vetor_estado      = new double[maior_numero_cenario * numero_estado];
-		double* vetor_rhs         = new double[maior_numero_cenario];
-		double* vetor_rhs_primal  = new double[maior_numero_cenario];
-		double* vetor_rhs_estado  = new double[maior_numero_cenario];
-		double* vetor_coeficiente = new double[maior_numero_cenario * numero_estado];
-
-		
-		const double lambda_CVAR = a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_lambda_CVAR, double());
-		const double  alpha_CVAR = a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_alpha_CVAR, double());
-
-		SmartEnupla<IdRealizacao, double> probabilidade_naoCVAR(IdRealizacao_1, std::vector<double>(maiorIdRealizacao, 0.0));
-		SmartEnupla<IdRealizacao, double> probabilidade_CVAR(IdRealizacao_1, std::vector<double>(maiorIdRealizacao, 0.0));
-		
-		for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao; idRealizacao++) {
-
-			const double probabilidade_original = a_modeloOtimizacao.getProbabilidadeAbertura(a_idEstagio, idRealizacao);
-
-			probabilidade_naoCVAR.setElemento(idRealizacao, probabilidade_original * (1.0 - lambda_CVAR));
-			probabilidade_CVAR.setElemento(idRealizacao, probabilidade_original * (1.0 - lambda_CVAR) + probabilidade_original * (lambda_CVAR / alpha_CVAR));
-
-		}//for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao; idRealizacao++) {
-			
-
-		for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-
-			const int c = int(idCenario - cenario_inicial);
-
-			multiplicidade_otimizada_por_cenario[c] = 1;
-
-			SmartEnupla<IdRealizacao, double> probabilidade(IdRealizacao_1, std::vector<double>(maiorIdRealizacao, 0.0));
-
-			const std::vector<int> ordenacao = getOrdenacaoMaiorParaMenor(a_custo_total.at(idCenario).getElementos());
-
-			const int i_CVAR = int(alpha_CVAR * double(maiorIdRealizacao));
-		
-			for (int i = 1; i <= int(ordenacao.size()); i++) {
-
-				const IdRealizacao idRealizacao = IdRealizacao(ordenacao.at(i - 1) + 1);
-
-				double probabilidade = probabilidade_naoCVAR.getElemento(idRealizacao);
-
-				if (i <= i_CVAR)
-					probabilidade = probabilidade_CVAR.getElemento(idRealizacao);
-
-				if (numero_realizacao == 1)
-					probabilidade = 1.0;
-
-				if (i == 1)
-					vetor_rhs_primal[c] = 0;
-
-				vetor_rhs_primal[c] += a_custo_total.at(idCenario).at(idRealizacao) * probabilidade;
-
-				for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
-					const int e = int(idVariavelEstado - IdVariavelEstado_1);
-
-					if (i == 1)
-						vetor_coeficiente[c * numero_estado + e] = 0;
-
-					vetor_coeficiente[c * numero_estado + e] += a_solucao_dual_variavel_estado.at(idCenario).at(idRealizacao).at(idVariavelEstado) * probabilidade;
-
-				} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
-
-			} // for (int i = 1; i <= int(ordenacao.size()); i++) {
-
-			for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
-				const int e = int(idVariavelEstado - IdVariavelEstado_1);
-
-				vetor_estado[c * numero_estado + e] = a_valor_variavel_estado.at(idCenario).at(idVariavelEstado);
-
-				if (e == 0)
-					vetor_rhs_estado[c] = 0;
-
-				vetor_rhs_estado[c] -= vetor_coeficiente[c * numero_estado + e] * vetor_estado[c * numero_estado + e];
-				 
-			} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
-
-			vetor_rhs[c] = vetor_rhs_primal[c] + vetor_rhs_estado[c];
-
-		} // for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-
-		executarPDDE_adicionarCorteBenders(a_idIteracao, a_idProcesso, a_maiorIdProcesso, a_idEstagio, vetor_estado, vetor_rhs, vetor_rhs_primal, vetor_rhs_estado, vetor_coeficiente, numero_cenario_por_processo, maior_numero_cenario, multiplicidade_otimizada_por_cenario, 1, numero_estado, a_modeloOtimizacao);
-		
-		delete[]multiplicidade_otimizada_por_cenario;
-		delete[]numero_cenario_por_processo;
-		delete[]vetor_estado;
-		delete[]vetor_rhs;
-		delete[]vetor_rhs_estado;
-		delete[]vetor_rhs_primal;
-		delete[]vetor_coeficiente;
-		
-	} // try {
-	catch (const std::exception & erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_calcularCorteBendersCVaR(" + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + "," + getFullString(a_idEstagio) + "a_custo_total,a_solucao_dual_variavel_estado,a_modeloOtimizacao): \n" + std::string(erro.what())); }
-
-} // void MetodoSolucao::executarPDDE_calcularCorteBendersCVaR(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, const SmartEnupla<IdRealizacao, double>& a_custo_total, const SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>>& a_solucao_dual_variavel_estado, SmartEnupla<IdVariavelEstado, double>& a_valor_variavel_estado, ModeloOtimizacao& a_modeloOtimizacao){
-
-void MetodoSolucao::executarPDDE_calcularCorteBendersMultiCut(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, const SmartEnupla<IdCenario, SmartEnupla<IdRealizacao, double>>& a_custo_total, const SmartEnupla<IdCenario, SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>>>& a_solucao_dual_variavel_estado, const SmartEnupla<IdCenario, SmartEnupla<IdVariavelEstado, double>>& a_valor_variavel_estado, ModeloOtimizacao& a_modeloOtimizacao){
-
-	try{
-
-		const IdCenario cenario_inicial = a_custo_total.getIteradorInicial();
-		const IdCenario cenario_final = a_custo_total.getIteradorFinal();
-
-		const IdVariavelEstado maiorIdVariavelEstado = a_valor_variavel_estado.at(cenario_inicial).getIteradorFinal();
-
-		const IdRealizacao maiorIdRealizacao = a_modeloOtimizacao.getAtributo(a_idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao());
-
-		const int multiplicidade = int(maiorIdRealizacao);
-
-		const int numero_realizacao = a_custo_total.at(cenario_inicial).size();
-		const int numero_estado = a_valor_variavel_estado.at(cenario_inicial).size();
-
-		int numero_cenario = int(cenario_final - cenario_inicial) + 1;
-		const int numero_processo = int(a_maiorIdProcesso);
-
-		int* numero_cenario_por_processo = new int[numero_processo];
-
-		MPI_Allgather(&numero_cenario, 1, MPI_INT, numero_cenario_por_processo, 1, MPI_INT, MPI_COMM_WORLD);
-
-		int maior_numero_cenario = 0;
-		for (int rank = 0; rank < numero_processo; rank++) {
-			if (maior_numero_cenario < numero_cenario_por_processo[rank])
-				maior_numero_cenario = numero_cenario_por_processo[rank];
-		} // for (int rank = 0; rank < numero_processo; rank++) {
-
-		int* multiplicidade_otimizada_por_cenario = new int[maior_numero_cenario * multiplicidade];
-
-		double* vetor_estado      = new double[maior_numero_cenario * numero_estado];
-		double* vetor_rhs         = new double[maior_numero_cenario * multiplicidade];
-		double* vetor_rhs_primal  = new double[maior_numero_cenario * multiplicidade];
-		double* vetor_rhs_estado  = new double[maior_numero_cenario * multiplicidade];
-		double* vetor_coeficiente = new double[maior_numero_cenario * multiplicidade * numero_estado];
-
-		for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-
-			const int c = int(idCenario - cenario_inicial);
-
-			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao; idRealizacao++) {
-
-				const int m = int(idRealizacao - IdRealizacao_1);
-
-				if (a_solucao_dual_variavel_estado.at(idCenario).at(idRealizacao).size() > 0) {
-
-					multiplicidade_otimizada_por_cenario[c * multiplicidade + m] = 1;
-
-					vetor_rhs_primal[c * multiplicidade + m] = a_custo_total.at(idCenario).at(idRealizacao);
-
-					vetor_rhs_estado[c * multiplicidade + m] = 0.0;
-
-					for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
-						const int e = int(idVariavelEstado - IdVariavelEstado_1);
-						vetor_coeficiente[c * multiplicidade * numero_estado + m * numero_estado + e] = a_solucao_dual_variavel_estado.at(idCenario).at(idRealizacao).at(idVariavelEstado);
-
-						if (m == 0)
-							vetor_estado[c * numero_estado + e] = a_valor_variavel_estado.at(idCenario).at(idVariavelEstado);
-
-						vetor_rhs_estado[c * multiplicidade + m] -= a_solucao_dual_variavel_estado.at(idCenario).at(idRealizacao).at(idVariavelEstado) * a_valor_variavel_estado.at(idCenario).at(idVariavelEstado);
-
-					} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
-
-					vetor_rhs[c * multiplicidade + m] = vetor_rhs_primal[c * multiplicidade + m] + vetor_rhs_estado[c * multiplicidade + m];
-
-				} // if (a_solucao_dual_variavel_estado.at(idCenario).at(idRealizacao).size() > 0) {
-
-				else
-					multiplicidade_otimizada_por_cenario[c * multiplicidade + m] = 0;
-
-			} // for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao; idRealizacao++) {
-		} // for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-
-		executarPDDE_adicionarCorteBenders(a_idIteracao, a_idProcesso, a_maiorIdProcesso, a_idEstagio, vetor_estado, vetor_rhs, vetor_rhs_primal, vetor_rhs_estado, vetor_coeficiente, numero_cenario_por_processo, maior_numero_cenario, multiplicidade_otimizada_por_cenario, multiplicidade, numero_estado, a_modeloOtimizacao);
-
-		delete[]multiplicidade_otimizada_por_cenario;
-		delete[]numero_cenario_por_processo;
-		delete[]vetor_estado;
-		delete[]vetor_rhs;
-		delete[]vetor_rhs_estado;
-		delete[]vetor_rhs_primal;
-		delete[]vetor_coeficiente;
-
-	} // try {
-	catch (const std::exception & erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_calcularCorteBendersMultiCut(" + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + "," + getFullString(a_idEstagio) + "a_custo_total,a_solucao_dual_variavel_estado,a_modeloOtimizacao): \n" + std::string(erro.what())); }
-
-} // void MetodoSolucao::executarPDDE_calcularCorteBendersMultiCut(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, const SmartEnupla<IdCenario, SmartEnupla<IdRealizacao, double>>& a_custo_total, const SmartEnupla<IdCenario, SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>>>& a_solucao_dual_variavel_estado, const SmartEnupla<IdCenario, SmartEnupla<IdVariavelEstado, double>>& a_valor_variavel_estado, ModeloOtimizacao& a_modeloOtimizacao){
-
-void MetodoSolucao::executarPDDE_adicionarCorteBenders(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, double* a_vetor_estado, double* a_vetor_rhs, double* a_vetor_rhs_primal, double* a_vetor_rhs_estado, double* a_vetor_coeficiente, int* a_numero_cenario_por_processo, const int a_maior_numero_cenario, int* a_abertura_otimizada_por_cenario, const int a_multiplicidade_corte, const int a_numero_estado, ModeloOtimizacao& a_modeloOtimizacao){
-
-	try {
-
-		const int numero_processo = int(a_maiorIdProcesso);
-
-		int* abertura_otimizada = new int[numero_processo * a_maior_numero_cenario * a_multiplicidade_corte];
-
-		MPI_Allgather(a_abertura_otimizada_por_cenario, a_maior_numero_cenario * a_multiplicidade_corte, MPI_INT, abertura_otimizada, a_maior_numero_cenario * a_multiplicidade_corte, MPI_INT, MPI_COMM_WORLD);
-
-		double* estado = new double[numero_processo * a_maior_numero_cenario * a_numero_estado];
-
-		MPI_Allgather(a_vetor_estado, a_maior_numero_cenario * a_numero_estado, MPI_DOUBLE, estado, a_maior_numero_cenario * a_numero_estado, MPI_DOUBLE, MPI_COMM_WORLD);
-
-		double* rhs = new double[numero_processo * a_maior_numero_cenario * a_multiplicidade_corte];
-
-		MPI_Allgather(a_vetor_rhs, a_maior_numero_cenario * a_multiplicidade_corte, MPI_DOUBLE, rhs, a_maior_numero_cenario * a_multiplicidade_corte, MPI_DOUBLE, MPI_COMM_WORLD);
-
-		double* rhs_primal = new double[numero_processo * a_maior_numero_cenario * a_multiplicidade_corte];
-
-		MPI_Allgather(a_vetor_rhs_primal, a_maior_numero_cenario * a_multiplicidade_corte, MPI_DOUBLE, rhs_primal, a_maior_numero_cenario * a_multiplicidade_corte, MPI_DOUBLE, MPI_COMM_WORLD);
-
-		double* rhs_estado = new double[numero_processo * a_maior_numero_cenario * a_multiplicidade_corte];
-
-		MPI_Allgather(a_vetor_rhs_estado, a_maior_numero_cenario * a_multiplicidade_corte, MPI_DOUBLE, rhs_estado, a_maior_numero_cenario * a_multiplicidade_corte, MPI_DOUBLE, MPI_COMM_WORLD);
-
-		double* coeficiente = new double[numero_processo * a_maior_numero_cenario * a_multiplicidade_corte * a_numero_estado];
-
-		MPI_Allgather(a_vetor_coeficiente, a_maior_numero_cenario * a_multiplicidade_corte * a_numero_estado, MPI_DOUBLE, coeficiente, a_maior_numero_cenario * a_multiplicidade_corte * a_numero_estado, MPI_DOUBLE, MPI_COMM_WORLD);
-
-		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) {
-
-			const int rank = getRank(idProcesso);
-
-			const int c_ini_estado      = rank * a_maior_numero_cenario * a_numero_estado;
-			const int c_ini_rhs         = rank * a_maior_numero_cenario * a_multiplicidade_corte;
-			const int c_ini_coeficiente = rank * a_maior_numero_cenario * a_multiplicidade_corte * a_numero_estado;
-			const int c_ini_abertura    = rank * a_maior_numero_cenario * a_multiplicidade_corte;
-
-			for (int c = 0; c < a_numero_cenario_por_processo[rank]; c++) {
-
-				SmartEnupla<IdVariavelEstado, double> enupla_estado(IdVariavelEstado_1, std::vector<double>(&estado[c_ini_estado + c * a_numero_estado], &estado[c_ini_estado + c * a_numero_estado] + a_numero_estado));
-
-				SmartEnupla<IdRealizacao, double> enupla_rhs(IdRealizacao_1, std::vector<double>(a_multiplicidade_corte, 0.0));
-
-				SmartEnupla<IdRealizacao, double> enupla_rhs_primal(IdRealizacao_1, std::vector<double>(a_multiplicidade_corte, 0.0));
-				SmartEnupla<IdRealizacao, double> enupla_rhs_estado(IdRealizacao_1, std::vector<double>(a_multiplicidade_corte, 0.0));
-				
-				SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> enupla_coeficiente(IdRealizacao_1, std::vector<SmartEnupla<IdVariavelEstado, double>>(a_multiplicidade_corte, SmartEnupla<IdVariavelEstado, double>()));
-
-				for (int a = 0; a < a_multiplicidade_corte; a++) {
-
-					if (abertura_otimizada[c_ini_abertura + c * a_multiplicidade_corte + a] == 1) {
-
-						const IdRealizacao idRealizacao = IdRealizacao(a + 1);
-
-						enupla_rhs.at(idRealizacao)        = rhs       [c_ini_rhs + c * a_multiplicidade_corte + a];
-						enupla_rhs_primal.at(idRealizacao) = rhs_primal[c_ini_rhs + c * a_multiplicidade_corte + a];
-						enupla_rhs_estado.at(idRealizacao) = rhs_estado[c_ini_rhs + c * a_multiplicidade_corte + a];
-
-						enupla_coeficiente.at(idRealizacao) = SmartEnupla<IdVariavelEstado, double>(IdVariavelEstado_1, std::vector<double>(&coeficiente[c_ini_coeficiente + c * a_multiplicidade_corte * a_numero_estado + a * a_numero_estado], &coeficiente[c_ini_coeficiente + c * a_multiplicidade_corte * a_numero_estado + a * a_numero_estado] + a_numero_estado));
-						
-					} // if (abertura_otimizada[c_ini_abertura + c * a_multiplicidade_corte + a] == 1) {
-
-				} // for (int a = 0; a < a_multiplicidade_corte; a++) {
-
-				a_modeloOtimizacao.instanciarCorteBenders(a_idEstagio, enupla_rhs, enupla_rhs_primal, enupla_rhs_estado, enupla_coeficiente, enupla_estado);
-
-			} // for (int c = 0; c < a_numero_cenario; c++) {
-
-		} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) {
-
-		delete[]abertura_otimizada;
-		delete[]estado;
-		delete[]rhs;
-		delete[]rhs_estado;
-		delete[]rhs_primal;
-		delete[]coeficiente;
-
-	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_adicionarCorteBenders(" + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + "," + getFullString(a_idEstagio) + ",a_rhs,a_rhs_primal,a_rhs_estado,a_coeficiente,a_estado,a_modeloOtimizacao): \n" + std::string(erro.what())); }
-
-} // void MetodoSolucao::executarPDDE_adicionarCorteBenders_multi(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, const double a_rhs, const SmartEnupla<IdVariavelEstado, double>& a_coeficientes_variavel_estado, const SmartEnupla<IdVariavelEstado, double>& a_valor_variavel_estado, ModeloOtimizacao & a_modeloOtimizacao){
-
-
 
 void MetodoSolucao::executarPDDE_requestCorteBenders(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, ModeloOtimizacao& a_modeloOtimizacao, const std::string a_diretorio, EntradaSaidaDados a_entradaSaidaDados) {
 
@@ -1916,128 +1540,89 @@ void MetodoSolucao::executarPDDE_requestCorteBenders(const IdProcesso a_idProces
 } // void MetodoSolucao::executarPDDE_requestCorteBenders(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, ModeloOtimizacao &a_modeloOtimizacao){
 
 
-void MetodoSolucao::executarPDDE_distribuirEstadosEntreProcessos(const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdIteracao a_idIteracao, ModeloOtimizacao& a_modeloOtimizacao){
+
+void MetodoSolucao::executarPDDE_distribuirEstadosEntreProcessos(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, ModeloOtimizacao& a_modeloOtimizacao){
 
 	try {
 
-		const IdEstagio estagio_inicial = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
-		const IdEstagio estagio_final = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
-		const IdEstagio maior_estagio = a_modeloOtimizacao.getMaiorId(IdEstagio());
+		const int numero_estados = int(a_modeloOtimizacao.getMaiorId(a_idEstagio, IdVariavelEstado()));
 
-		bool pre_estudo = false;
-		if (!strCompara(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_diretorio_importacao_pos_estudo, std::string()), "nenhum"))
-			pre_estudo = true;
+		const IdProcesso idProcesso_local = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+		const IdProcesso maior_processo = a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso());
 
-		int numero_total_estados = 0;
-		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= maior_estagio; idEstagio++) {
-			bool considera_estagio = false;
+		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= maior_processo; idProcesso++) {
 
-			if (idEstagio <= estagio_final) {
-				if (a_modeloOtimizacao.getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, idEstagio, TipoProcessamentoParalelo()) == TipoProcessamentoParalelo_por_abertura)
-					considera_estagio = true;
-			}
-			else if ((idEstagio > estagio_final) && (pre_estudo) && (numero_total_estados > 0))
-				considera_estagio = true;
+			if (idProcesso == idProcesso_local) {
 
-			if (considera_estagio)
-				numero_total_estados += int(a_modeloOtimizacao.getMaiorId(idEstagio, IdVariavelEstado()));
-		}
+				for (IdProcesso idProcesso_para = IdProcesso_mestre; idProcesso_para <= maior_processo; idProcesso_para++) {
 
+					if (idProcesso_para != idProcesso) {
+						std::vector<IdCenario> lista_idCenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstado(idProcesso_local, idProcesso_para, a_idIteracao, a_idEstagio);
 
-		if (numero_total_estados == 0)
-			return;
+						const int numero_cenarios_estado = int(lista_idCenarios_estado.size());
 
-		const int numero_processos = int(a_maior_processo);
+						if (numero_cenarios_estado > 0) {
 
-		EstruturaResultados<double> estados(1);
-		EstruturaResultados<double> estados_all(numero_processos);
+							double* valores = new double[numero_cenarios_estado * numero_estados];
 
-		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maior_processo; idProcesso++) {
-			const int rank = getRank(idProcesso);	
-
-			const IdCenario cenario_inicial = a_modeloOtimizacao.getCenarioInicial(idProcesso, a_idIteracao);
-			const IdCenario cenario_final = a_modeloOtimizacao.getCenarioFinal(idProcesso, a_idIteracao);
-
-			int numero_cenarios = a_modeloOtimizacao.getNumeroCenarios(cenario_inicial, cenario_final);
-
-			estados_all.setSize(rank, numero_total_estados, numero_cenarios);
-
-			if (idProcesso == a_idProcesso) {
-
-				estados.setSize(0, numero_total_estados, numero_cenarios);
-
-				if (estados.total > 0) {
-					int i = 0;
-					for (IdEstagio idEstagio = estagio_inicial; idEstagio <= maior_estagio; idEstagio++) {
-						for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_modeloOtimizacao.getMaiorId(idEstagio, IdVariavelEstado()); idVariavelEstado++) {
-							if (a_modeloOtimizacao.isVariavelEstadoInstanciada(idEstagio, idVariavelEstado)) {
-								for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-									estados.vetor[i] = a_modeloOtimizacao.getElementoMatriz(idEstagio, idVariavelEstado, AttMatrizVariavelEstado_valor, a_idProcesso, idCenario, double());
+							int i = 0;
+							for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_modeloOtimizacao.getMaiorId(a_idEstagio, IdVariavelEstado()); idVariavelEstado++) {
+								if (a_modeloOtimizacao.isVariavelEstadoInstanciada(a_idEstagio, idVariavelEstado)) {
+									for (int c = 0; c < numero_cenarios_estado; c++) {
+										const IdCenario idCenario_estado = lista_idCenarios_estado.at(c);
+										valores[i] = a_modeloOtimizacao.getElementoVetor(a_idEstagio, idVariavelEstado, AttVetorVariavelEstado_valor, idCenario_estado, double());
 										i++;
+									}
 								}
 							}
-						}
-					} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= maior_estagio; idEstagio++) {
-				} // if (estados.total > 0) {
 
-			} // if (idProcesso == a_idProcesso) {
+							MPI_Send(valores, i, MPI_DOUBLE, getRank(idProcesso_para), 0, MPI_COMM_WORLD);
 
-		} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maior_processo; idProcesso++) {
+							delete[] valores;
 
-		MPI_Allgatherv(estados.vetor, estados.total, MPI_DOUBLE, estados_all.vetor, estados_all.sizeT, estados_all.displ, MPI_DOUBLE, MPI_COMM_WORLD);
+						} // if (lista_idCenarios_estado.size() > 0) {
 
-		estados.esvaziar();
+					} // if (idProcesso_para != idProcesso) {
 
-		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maior_processo; idProcesso++) {
+				} // for (IdProcesso idProcesso_para = IdProcesso_mestre; idProcesso_para <= maior_processo; idProcesso_para++) {
 
-			if (idProcesso != a_idProcesso) {
+			} // if (idProcesso == idProcesso_local) {
 
-				const int rank = getRank(idProcesso);
+			else if (idProcesso != idProcesso_local) {
 
-				const IdCenario cenario_inicial = a_modeloOtimizacao.getCenarioInicial(idProcesso, a_idIteracao);
-				const IdCenario cenario_final = a_modeloOtimizacao.getCenarioFinal(idProcesso, a_idIteracao);
+				std::vector<IdCenario> lista_idCenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstado(idProcesso, idProcesso_local, a_idIteracao, a_idEstagio);
 
-				int numero_cenarios = a_modeloOtimizacao.getNumeroCenarios(cenario_inicial, cenario_final);
+				const int numero_cenarios_estado = int(lista_idCenarios_estado.size());
 
-				if (numero_cenarios > 0) {
+				if (numero_cenarios_estado > 0) {
+
+					double* valores = new double[numero_cenarios_estado * numero_estados];
+
+					MPI_Recv(valores, numero_cenarios_estado * numero_estados, MPI_DOUBLE, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 					int e = 0;
-					for (IdEstagio idEstagio = estagio_inicial; idEstagio <= maior_estagio; idEstagio++) {
-
-						bool considera_estagio = false;
-
-						if (idEstagio <= estagio_final) {
-							if (a_modeloOtimizacao.getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, idEstagio, TipoProcessamentoParalelo()) == TipoProcessamentoParalelo_por_abertura)
-								considera_estagio = true;
+					for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_modeloOtimizacao.getMaiorId(a_idEstagio, IdVariavelEstado()); idVariavelEstado++) {
+						if (a_modeloOtimizacao.isVariavelEstadoInstanciada(a_idEstagio, idVariavelEstado)) {
+							for (int c = 0; c < numero_cenarios_estado; c++) {
+								const IdCenario idCenario_estado = lista_idCenarios_estado.at(c);
+								a_modeloOtimizacao.addValorVariavelEstado(a_idEstagio, idVariavelEstado, idCenario_estado, valores[e * numero_cenarios_estado + c]);
+							}
+							e++;
 						}
-						else if ((idEstagio > estagio_final) && (pre_estudo) && (numero_total_estados > 0))
-							considera_estagio = true;
+					}
 
-						if (considera_estagio) {
-							for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_modeloOtimizacao.getMaiorId(idEstagio, IdVariavelEstado()); idVariavelEstado++) {
-								if (a_modeloOtimizacao.isVariavelEstadoInstanciada(idEstagio, idVariavelEstado)) {
-									for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-										const int c = int(idCenario - cenario_inicial);
+					delete[] valores;
 
-										const double valor = estados_all.vetor[estados_all.displ[rank] + e * numero_cenarios + c];
+				} // if (lista_idCenarios_estado.size() > 0) {
 
-										a_modeloOtimizacao.addValorVariavelEstado(idEstagio, idVariavelEstado, idProcesso, a_maior_processo, idCenario, valor);
+			} // else if (idProcesso != idProcesso_local) {
 
-									} // for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
-									e++;
-								} // if (a_modeloOtimizacao.isVariavelEstadoInstanciada(idEstagio, idVariavelEstado)) {
-							} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_modeloOtimizacao.getMaiorId(idEstagio, IdVariavelEstado()); idVariavelEstado++) {
-						} // if (considera_estagio){
-					} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
-				} // if (numero_cenarios > 0) {
-			} // if (idProcesso != a_idProcesso) {
-		} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) {
+		} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= maior_processo; idProcesso++) {
 
 	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_distribuirEstadosEntreProcessos(" + getFullString(a_idProcesso) + "," + getFullString(a_maior_processo) + "," + ",a_valor_estados,a_modeloOtimizacao): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_distribuirEstadosEntreProcessos(" + getFullString(a_idIteracao) + "," + getFullString(a_idEstagio) + "," + ",a_valor_estados,a_modeloOtimizacao): \n" + std::string(erro.what())); }
 
 } // void MetodoSolucao::executarPDDE_distribuirEstadosEntreProcessos(const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const SmartEnupla<IdCenario, SmartEnupla<IdVariavelEstado, double>>& a_estados, ModeloOtimizacao& a_modeloOtimizacao){
-
 
 void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdIteracao a_idIteracao, ModeloOtimizacao& a_modeloOtimizacao){
 
@@ -2048,7 +1633,7 @@ void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdPro
 
 		bool algum_truncamento = false;
 		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
-			if (a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, idEstagio, bool())) {
+			if (a_modeloOtimizacao.getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, idEstagio, int()) == 1) {
 				algum_truncamento = true;
 				break;
 			}
@@ -2072,7 +1657,7 @@ void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdPro
 				for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 					const Periodo periodo_otimizacao = a_modeloOtimizacao.getAtributo(idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
 					if (periodo_otimizacao == periodo) {
-						if (a_modeloOtimizacao.getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, idEstagio, TipoProcessamentoParalelo()) == TipoProcessamentoParalelo_por_abertura)
+						//if (a_modeloOtimizacao.getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, idEstagio, TipoProcessamentoParalelo()) == TipoProcessamentoParalelo_por_abertura)
 							numero_periodos++;
 						break;
 					} // if (periodo_otimizacao == periodo) {
@@ -2211,7 +1796,7 @@ void MetodoSolucao::executarPDDE_imprimirEstados(EntradaSaidaDados a_entradaSaid
 		a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//Estados");
 
 		if (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_imprimir_estado_por_iteracao, bool()))
-			a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("VariaveisEstado_valores_" + getFullString(a_idProcesso) + ".csv", IdEstagio_Nenhum, IdVariavelEstado_Nenhum,     a_modeloOtimizacao, AttMatrizVariavelEstado_valor);
+			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("VariaveisEstado_valores_" + getFullString(a_idProcesso) + ".csv", IdEstagio_Nenhum, IdVariavelEstado_Nenhum,     a_modeloOtimizacao, AttVetorVariavelEstado_valor);
 
 	} // try {
 	catch (const std::exception&erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_imprimirEstados(a_entradaSaidaDados," + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + ",a_modeloOtimizacao): \n" + std::string(erro.what())); }

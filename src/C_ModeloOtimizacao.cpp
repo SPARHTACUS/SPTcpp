@@ -194,7 +194,7 @@ void ModeloOtimizacao::removerCortesBendersDominados(const IdEstagio a_idEstagio
 
 			if (vetorEstagio.att(a_idEstagio).vetorCorteBenders.isInstanciado(idCorteBenders)) {
 
-				if (getAtributo(a_idEstagio, idCorteBenders, AttComumCorteBenders_is_corte_dominado, bool())) {
+				if (getAtributo(a_idEstagio, idCorteBenders, AttComumCorteBenders_is_corte_dominado, int()) == 1) {
 
 					if ((a_idProcesso == IdProcesso_mestre) && (getAtributo(AttComumModeloOtimizacao_imprimir_selecao_corte_por_iteracao, bool()))) {
 
@@ -213,7 +213,7 @@ void ModeloOtimizacao::removerCortesBendersDominados(const IdEstagio a_idEstagio
 					if (!primeiro_corte)
 						primeiro_corte = true;
 
-				} // if (getAtributo(a_idEstagio, idCorteBenders, AttComumCorteBenders_is_corte_dominado, bool())) {
+				} // if (getAtributo(a_idEstagio, idCorteBenders, AttComumCorteBenders_is_corte_dominado, int())) {
 
 			} // if (vetorEstagio.att(a_idEstagio).vetorCorteBenders.isInstanciado(idCorteBenders)) {
 
@@ -365,6 +365,9 @@ void ModeloOtimizacao::gerarRealizacoes(const IdProcesso a_idProcesso, const IdP
 
 	try {
 
+		if (a_cenario_inicial == IdCenario_Nenhum)
+			return;
+
 		if (!getAtributo(AttComumModeloOtimizacao_calcular_cenario_hidrologico_pre_otimizacao, bool()))
 			return;
 
@@ -376,7 +379,7 @@ void ModeloOtimizacao::gerarRealizacoes(const IdProcesso a_idProcesso, const IdP
 
 		bool algum_truncamento = false;
 		for (IdEstagio idEstagio = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()); idEstagio <= getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()); idEstagio++) {
-			if (getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, idEstagio, bool())) {
+			if (getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, idEstagio, int()) == 1) {
 				algum_truncamento = true;
 				break;
 			}
@@ -401,20 +404,20 @@ void ModeloOtimizacao::gerarRealizacoes(const IdProcesso a_idProcesso, const IdP
 } // void ModeloOtimizacao::gerarRealizacaoInterna(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao){
 
 
-void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado(const IdEstagio a_idEstagio, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdCenario a_idCenario){
+void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado(const IdEstagio a_idEstagio, const IdCenario a_idCenario){
 
 	try {
 
 		EstruturaResultados<double> retorno_estados;
 
-		atualizarModeloOtimizacaoComVariavelEstado(a_idEstagio, a_idProcesso, a_maiorIdProcesso, a_idCenario, retorno_estados);
+		atualizarModeloOtimizacaoComVariavelEstado(a_idEstagio, a_idCenario, retorno_estados);
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarModeloOtimizacaoComVariavelEstado(" + getFullString(a_idEstagio) + "," + getFullString(a_idProcesso) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarModeloOtimizacaoComVariavelEstado(" + getFullString(a_idEstagio) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado(const IdEstagio a_idEstagio, const IdCenario a_idCenario){
 
-void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado(const IdEstagio a_idEstagio, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdCenario a_idCenario, EstruturaResultados<double>& a_retorno_estados){
+void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado(const IdEstagio a_idEstagio, const IdCenario a_idCenario, EstruturaResultados<double>& a_retorno_estados){
 
 	try {
 
@@ -429,7 +432,7 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado(const IdEstagi
 
 			const TipoSubproblemaSolver tSS_anterior = getAtributo(a_idEstagio, idVariavelEstado, AttComumVariavelEstado_tipoSubproblemaSolverEstagioAnterior, TipoSubproblemaSolver());
 
-			const double valor = getElementoMatriz(a_idEstagio, idVariavelEstado, AttMatrizVariavelEstado_valor, a_idProcesso, a_idCenario, double());
+			const double valor = getElementoVetor(a_idEstagio, idVariavelEstado, AttVetorVariavelEstado_valor, a_idCenario, double());
 
 			if (a_retorno_estados.total > 0)
 				a_retorno_estados.add(valor);
@@ -455,7 +458,7 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado(const IdEstagi
 		} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarModeloOtimizacaoComVariavelEstado(" + getFullString(a_idEstagio) + "," + getFullString(a_idProcesso) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarModeloOtimizacaoComVariavelEstado(" + getFullString(a_idEstagio) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
 
 
 } // void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado(const IdEstagio a_idEstagio, const IdProcesso a_idProcesso, const IdCenario a_idCenario, int& a_indice, double* a_array){
@@ -846,9 +849,24 @@ void ModeloOtimizacao::resetarVariavelRealizacaoInterna(const TipoSubproblemaSol
 } // void ModeloOtimizacao::resetarVariavelRealizacaoInterna(){
 
 
-void ModeloOtimizacao::atualizarVariavelEstadoComSolucaoPrimal(const bool a_resetar, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdEstagio a_idEstagio, const IdCenario a_idCenario){
+void ModeloOtimizacao::atualizarVariavelEstadoComSolucaoPrimal(const bool a_resetar, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, const IdCenario a_idCenario){
 
 	try {
+
+		IdCenario menor_cenario = IdCenario_Nenhum;
+		IdCenario maior_cenario = IdCenario_Nenhum;
+
+		if (a_resetar) {
+			const IdProcesso idProcesso_local = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+			if (arranjoResolucao.getSize1Matriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_abertura) > 0) {
+				menor_cenario = arranjoResolucao.getIterador1Inicial(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_abertura, IdCenario());
+				maior_cenario = arranjoResolucao.getIterador1Final(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_abertura, IdCenario());
+			}
+			else {
+				menor_cenario = arranjoResolucao.getIterador1Inicial(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_cenario, IdCenario());
+				maior_cenario = arranjoResolucao.getIterador1Final(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_cenario, IdCenario());
+			}
+		}
 
 		const TipoSubproblemaSolver tSS = TipoSubproblemaSolver_geral;
 
@@ -862,10 +880,6 @@ void ModeloOtimizacao::atualizarVariavelEstadoComSolucaoPrimal(const bool a_rese
 
 				try {
 
-					bool resetar = false;
-					if ((a_resetar) && (idVariavelEstado == IdVariavelEstado_1))
-						resetar = true;
-
 					const int idVariavelDecisaoEstagioAnterior = getAtributo(a_idEstagio, idVariavelEstado, AttComumVariavelEstado_idVariavelDecisaoEstagioAnterior, int());
 
 					if (idVariavelDecisaoEstagioAnterior > 0) {
@@ -878,7 +892,7 @@ void ModeloOtimizacao::atualizarVariavelEstadoComSolucaoPrimal(const bool a_rese
 						else if (solucao_primal < vetorEstagio.att(idEstagio_anterior).getSolver(tSS)->getLimInferior(idVariavelDecisaoEstagioAnterior))
 							solucao_primal = vetorEstagio.att(idEstagio_anterior).getSolver(tSS)->getLimInferior(idVariavelDecisaoEstagioAnterior);
 
-						vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, resetar, a_idProcesso, a_maior_processo, a_idCenario, solucao_primal);
+						vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, a_idCenario, menor_cenario, maior_cenario, solucao_primal);
 
 					} // if (idVariavelDecisaoEstagioAnterior > 0) {
 
@@ -896,10 +910,6 @@ void ModeloOtimizacao::atualizarVariavelEstadoComSolucaoPrimal(const bool a_rese
 
 								if (vetorEstagio.att(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
-									bool resetar = false;
-									if ((a_resetar) && (idVariavelEstado == IdVariavelEstado_1))
-										resetar = true;
-
 									const int idVariavelDecisaoEstagioAnterior = getAtributo(a_idEstagio, idVariavelEstado, AttComumVariavelEstado_idVariavelDecisaoEstagioAnterior, int());
 
 									if (idVariavelDecisaoEstagioAnterior > 0) {
@@ -909,7 +919,7 @@ void ModeloOtimizacao::atualizarVariavelEstadoComSolucaoPrimal(const bool a_rese
 
 										const double valor = (limite_superior - limite_inferior) / 2.0;
 
-										vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, resetar, a_idProcesso, a_maior_processo, a_idCenario, valor);
+										vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, a_idCenario, menor_cenario, maior_cenario, valor);
 
 									} // if (idVariavelDecisaoEstagioAnterior > 0) {
 
@@ -928,17 +938,17 @@ void ModeloOtimizacao::atualizarVariavelEstadoComSolucaoPrimal(const bool a_rese
 		} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarVariavelEstadoComSolucaoPrimal(" + getFullString(a_idProcesso) + "," + getFullString(a_maior_processo) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::atualizarVariavelEstadoComSolucaoPrimal(" + getFullString(a_idIteracao) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::atualizarVariavelEstadoComSolucao(const IdEstagio a_idEstagio, const IdCenario a_idCenario){
 
-void ModeloOtimizacao::addValorVariavelEstado(const IdEstagio a_idEstagio, const IdVariavelEstado idVariavelEstado, const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdCenario a_idCenario, const double valor){
+void ModeloOtimizacao::addValorVariavelEstado(const IdEstagio a_idEstagio, const IdVariavelEstado idVariavelEstado, const IdCenario a_idCenario, const double valor){
 	try {
 
-		vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, false, a_idProcesso, a_maior_processo, a_idCenario, valor);
+		vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, a_idCenario, IdCenario_Nenhum, IdCenario_Nenhum, valor);
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::addValorVariavelEstado(" + getFullString(a_idEstagio) + "," + getFullString(idVariavelEstado) + "," + getFullString(a_idProcesso) + "," + getFullString(a_maior_processo) + "," + getFullString(a_idCenario) + "," + ",double): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::addValorVariavelEstado(" + getFullString(a_idEstagio) + "," + getFullString(idVariavelEstado) + "," + getFullString(a_idCenario) + "," + ",double): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::addValorVariavelEstado(const IdEstagio a_idEstagio, const IdVariavelEstado idVariavelEstado, const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdCenario a_idCenario, const double valor){
 
@@ -1855,13 +1865,13 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPreEstudo(const IdProc
 
 			if (estagio.vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
-				if (estagio.getSize1Matriz(idVariavelEstado, AttMatrizVariavelEstado_valor) > 0) {
+				if (estagio.getSizeVetor(idVariavelEstado, AttVetorVariavelEstado_valor) > 0) {
 
 					for (IdCenario idCenario = a_cenario_inicial; idCenario <= a_cenario_final; idCenario++) {
 
 						IdProcesso idProcesso_busca = IdProcesso_Nenhum;
-
-						for (IdProcesso idProcesso = estagio.getIterador1Inicial(IdVariavelEstado_1, AttMatrizVariavelEstado_valor, IdProcesso()); idProcesso <= estagio.getIterador1Final(IdVariavelEstado_1, AttMatrizVariavelEstado_valor, IdProcesso()); idProcesso++) {
+						/*
+						for (IdProcesso idProcesso = estagio.getIteradorInicial(IdVariavelEstado_1, AttMatrizVariavelEstado_valor, IdProcesso()); idProcesso <= estagio.getIterador1Final(IdVariavelEstado_1, AttMatrizVariavelEstado_valor, IdProcesso()); idProcesso++) {
 							if (estagio.getSize2Matriz(IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso) > 0) {
 								if ((estagio.getIterador2Inicial(IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso, IdCenario()) <= idCenario) && (idCenario <= estagio.getIterador2Final(IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso, IdCenario()))) {
 									idProcesso_busca = idProcesso;
@@ -1869,8 +1879,8 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPreEstudo(const IdProc
 								}
 							}
 						}
-
-						vetorEstagio.att(estagio_acoplamento_pre_estudo).addValorVariavelEstado(idVariavelEstado, true, a_idProcesso, a_maior_processo, idCenario, estagio.getElementoMatriz(idVariavelEstado, AttMatrizVariavelEstado_valor, idProcesso_busca, idCenario, double()));
+						*/
+						//vetorEstagio.att(estagio_acoplamento_pre_estudo).addValorVariavelEstado(idVariavelEstado, true, a_idProcesso, a_maior_processo, idCenario, estagio.getElementoMatriz(idVariavelEstado, AttMatrizVariavelEstado_valor, idProcesso_busca, idCenario, double()));
 
 					} // for (IdCenario idCenario = a_cenario_inicial; idCenario <= a_cenario_final; idCenario++) {
 
@@ -2357,7 +2367,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 } // void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(Dados& a_dados, const IdProcesso a_idProcesso, EntradaSaidaDados a_entradaSaidaDados, const SmartEnupla <Periodo, bool> a_horizonte_defluencia_passada) {
 
 
-void ModeloOtimizacao::exportarVariaveisEstado_AcoplamentoPosEstudo(const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdIteracao a_idIteracao, EntradaSaidaDados a_entradaSaidaDados) {
+void ModeloOtimizacao::exportarVariaveisEstado_AcoplamentoPosEstudo(const IdIteracao a_idIteracao, EntradaSaidaDados a_entradaSaidaDados) {
 	try {
 
 		const string diretorio_importacao_pos_estudo = getAtributo(AttComumModeloOtimizacao_diretorio_importacao_pos_estudo, std::string());
@@ -2374,23 +2384,7 @@ void ModeloOtimizacao::exportarVariaveisEstado_AcoplamentoPosEstudo(const IdProc
 			a_entradaSaidaDados.imprimirArquivoCSV_AttComum("estado.csv", IdVariavelEstado_Nenhum, vetorEstagio.att(idEstagio));
 		} // if (a_idIteracao == getAtributo(AttComumModeloOtimizacao_iteracao_inicial,  IdIteracao())) {
 
-		IdCenario menor_cenario_iteracao = IdCenario_Excedente;
-		IdCenario maior_cenario_iteracao = IdCenario_Nenhum;
-
-		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maior_processo; idProcesso++) {
-			if (getSize1Matriz(idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor) > 0) {
-				if (getSize2Matriz(idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso) > 0) {
-					const IdCenario menor_cenario = getIterador2Inicial(idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso, IdCenario());
-					const IdCenario maior_cenario = getIterador2Final(idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso, IdCenario());
-					if (menor_cenario < menor_cenario_iteracao)
-						menor_cenario_iteracao = menor_cenario;
-					if (maior_cenario > maior_cenario_iteracao)
-						maior_cenario_iteracao = maior_cenario;
-				} // if (getSize2Matriz(idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso) > 0) {
-			} // if (getSize1Matriz(idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor) > 0) {
-		} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maior_processo; idProcesso++) {
-
-		a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("estado_valores_" + getFullString(a_idIteracao) + ".csv", IdVariavelEstado_Nenhum, vetorEstagio.att(idEstagio), IdProcesso_mestre, a_maior_processo, menor_cenario_iteracao, maior_cenario_iteracao, AttMatrizVariavelEstado_valor);
+		a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("estado_valores_" + getFullString(a_idIteracao) + ".csv", IdVariavelEstado_Nenhum, vetorEstagio.att(idEstagio), AttVetorVariavelEstado_valor);
 
 		if (a_idIteracao == getAtributo(AttComumModeloOtimizacao_iteracao_final, IdIteracao()))
 			a_entradaSaidaDados.imprimirArquivoCSV_AttComum("eop.txt", vetorEstagio.att(getMaiorId(IdEstagio())), std::vector<AttComumEstagio>{AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao});
@@ -2686,7 +2680,7 @@ double ModeloOtimizacao::otimizarProblema(const TipoSubproblemaSolver a_TSS, con
 
 		resetarVariavelRealizacaoInterna(a_TSS, a_idEstagio);
 
-		if ((getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, a_idEstagio, bool())) && (!getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool())))
+		if ((getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, a_idEstagio, int()) == 1) && (!getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool())))
 			atualizarModeloOtimizacaoComVariavelRealizacaoInterna(a_TSS, a_idProcesso, a_idEstagio, a_idCenario, IdRealizacao_Nenhum);
 
 		if (getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool()))
@@ -2767,7 +2761,7 @@ bool ModeloOtimizacao::otimizarProblema(const TipoSubproblemaSolver a_TSS, const
 
 		setElemento(AttVetorModeloOtimizacao_tratamento_inviabilidade, a_idEstagio, 2);
 
-		if ((getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, a_idEstagio, bool())) || (getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool())))
+		if ((getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, a_idEstagio, int()) == 1) || (getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool())))
 			atualizarModeloOtimizacaoComVariavelRealizacaoInterna(a_TSS, a_idProcesso, a_idEstagio, a_idCenario, a_idRealizacao);
 
 		if (!solucao_proxy)
@@ -3303,16 +3297,6 @@ void ModeloOtimizacao::getSolucaoDualVariavelEstado(const IdEstagio a_idEstagio,
 
 } // SmartEnupla<IdVariavelEstado, double> ModeloOtimizacao::getSolucaoDualVariavelEstado(const IdEstagio a_idEstagio){
 
-double* ModeloOtimizacao::getReferenciaValoresEstado(const IdEstagio a_idEstagio, const IdVariavelEstado a_idVariavelEstado, const IdProcesso a_idProcesso, const IdCenario a_idCenario_inicial, const IdCenario a_idCenario_final){
-	
-	try {	
-		return vetorEstagio.att(a_idEstagio).getReferenciaValoresEstado(a_idVariavelEstado, a_idProcesso, a_idCenario_inicial, a_idCenario_final);
-	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::getReferenciaValoresEstado(" + getString(a_idEstagio) + "," + getString(a_idProcesso) + "," + getString(a_idVariavelEstado) + "," + getString(a_idCenario_inicial) + "," + getString(a_idCenario_final) + "): \n" + std::string(erro.what())); }
-
-} // double* ModeloOtimizacao::getReferenciaValoresEstado(const IdEstagio a_idEstagio, const IdVariavelEstado a_idVariavelEstado, const IdCenario a_idCenario_inicial, const IdCenario a_idCenario_final){
-
-
 double ModeloOtimizacao::getCustoTotal(const IdEstagio a_idEstagio){
 
 	try{ return getElementoVetor(AttVetorModeloOtimizacao_custo_total, a_idEstagio, double()); } // try
@@ -3581,8 +3565,8 @@ int ModeloOtimizacao::getMenorNumeroAberturasEstagio(const IdProcesso a_maiorIdP
 
 				for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
-					const IdAbertura abertura_inicial = getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
-					const IdAbertura abertura_final = getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_mapeamento_abertura_final_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
+					const IdAbertura abertura_inicial = IdAbertura_Nenhum;// = getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
+					const IdAbertura abertura_final = IdAbertura_Nenhum;// = getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_mapeamento_abertura_final_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
 
 					int numero_aberturas = 0;
 					if ((abertura_inicial != IdAbertura_Nenhum) && (abertura_final != IdAbertura_Nenhum))
@@ -3613,8 +3597,8 @@ int ModeloOtimizacao::getMaiorNumeroAberturasEstagio(const IdProcesso a_maiorIdP
 
 				for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
-					const IdAbertura abertura_inicial = getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
-					const IdAbertura abertura_final = getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_mapeamento_abertura_final_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
+					const IdAbertura abertura_inicial = IdAbertura_Nenhum;// = getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
+					const IdAbertura abertura_final = IdAbertura_Nenhum;// = getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_mapeamento_abertura_final_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
 
 					int numero_aberturas = 0;
 					if ((abertura_inicial != IdAbertura_Nenhum) && (abertura_final != IdAbertura_Nenhum))
@@ -3644,8 +3628,8 @@ int ModeloOtimizacao::getMenorNumeroAberturasProcessoEstagio(const IdProcesso a_
 
 			for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
-				const IdAbertura abertura_inicial = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
-				const IdAbertura abertura_final = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_final_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
+				const IdAbertura abertura_inicial = IdAbertura_Nenhum;// = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
+				const IdAbertura abertura_final = IdAbertura_Nenhum;// = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_final_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
 
 				int numero_aberturas = 0;
 				if ((abertura_inicial != IdAbertura_Nenhum) && (abertura_final != IdAbertura_Nenhum))
@@ -3673,8 +3657,8 @@ int ModeloOtimizacao::getMaiorNumeroAberturasProcessoEstagio(const IdProcesso a_
 
 			for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
-				const IdAbertura abertura_inicial = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
-				const IdAbertura abertura_final = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_final_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
+				const IdAbertura abertura_inicial = IdAbertura_Nenhum;// = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
+				const IdAbertura abertura_final = IdAbertura_Nenhum;// = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_final_por_cenario_por_estagio, idCenario, a_idEstagio, IdAbertura());
 
 				int numero_aberturas = 0;
 				if ((abertura_inicial != IdAbertura_Nenhum) && (abertura_final != IdAbertura_Nenhum))
@@ -3696,10 +3680,9 @@ int ModeloOtimizacao::getNumeroTotalCenariosEmEstados(const IdProcesso a_idProce
 
 		int numero_total_cenarios_em_estados = 0;
 		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) {
-			if ((a_idProcesso == idProcesso) || (getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, a_idEstagio, TipoProcessamentoParalelo()) == TipoProcessamentoParalelo_por_abertura)) {
-				if (getSize1Matriz(a_idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor) > 0)
-					numero_total_cenarios_em_estados += getSize2Matriz(a_idEstagio, IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso);
-			}
+			//if ((a_idProcesso == idProcesso) || (getElementoVetor(a_idIteracao, AttVetorIteracao_tipo_processamento_paralelo, a_idEstagio, TipoProcessamentoParalelo()) == TipoProcessamentoParalelo_por_abertura)) {
+				numero_total_cenarios_em_estados += getSizeVetor(a_idEstagio, IdVariavelEstado_1, AttVetorVariavelEstado_valor);
+			//}
 		}
 		
 		return numero_total_cenarios_em_estados;
@@ -3722,8 +3705,8 @@ int ModeloOtimizacao::getNumeroVariavelDinamica(const TipoSubproblemaSolver a_TS
 IdCenario ModeloOtimizacao::getCenarioInicial(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao){
 	try {
 
-		if (getSize1Matriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio) > 0)
-			return getIterador1Inicial(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, IdCenario());
+		//if (getSize1Matriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio) > 0)
+			//return getIterador1Inicial(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, IdCenario());
 			
 		return IdCenario_Nenhum;
 
@@ -3735,8 +3718,8 @@ IdCenario ModeloOtimizacao::getCenarioInicial(const IdProcesso a_idProcesso, con
 IdCenario ModeloOtimizacao::getCenarioFinal(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao){
 	try {
 
-		if (getSize1Matriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio) > 0)
-			return getIterador1Final(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, IdCenario());
+		//if (getSize1Matriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio) > 0)
+			//return getIterador1Final(a_idIteracao, a_idProcesso, AttMatrizProcesso_mapeamento_abertura_inicial_por_cenario_por_estagio, IdCenario());
 
 		return IdCenario_Nenhum;
 
@@ -3765,8 +3748,6 @@ void ModeloOtimizacao::criarModeloOtimizacao(Dados &a_dados, EntradaSaidaDados a
 	try {
 
 		const IdModeloOtimizacao idModeloOtimizacao = getAtributo(AttComumModeloOtimizacao_idModeloOtimizacao, IdModeloOtimizacao());
-
-		const IdProcesso idProcesso = a_dados.getAtributo(AttComumDados_idProcesso, IdProcesso());
 
 		if ((idModeloOtimizacao == IdModeloOtimizacao_multiestagio_estocastico_otimizacao) || (idModeloOtimizacao == IdModeloOtimizacao_multiestagio_estocastico_simulacao)) {
 
@@ -3828,11 +3809,6 @@ void ModeloOtimizacao::criarModeloOtimizacao(Dados &a_dados, EntradaSaidaDados a
 
 			setAtributo(AttComumModeloOtimizacao_imprimir_cenario_hidrologico_pre_otimizacao, a_dados.getAtributo(AttComumDados_imprimir_cenario_hidrologico_pre_otimizacao, bool()));
 
-			for (IdIteracao idIteracao = IdIteracao_0; idIteracao <= a_dados.getMaiorId(IdIteracao()); idIteracao++) {
-				if (a_dados.vetorIteracao.isInstanciado(idIteracao))
-					vetorIteracao.add(a_dados.vetorIteracao.at(idIteracao));
-			}
-
 			setAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, a_dados.getAtributo(AttComumDados_imprimir_resultado_por_estagio_por_cenario, bool()));
 			setAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, a_dados.getAtributo(AttComumDados_imprimir_resultado_por_estagio_por_cenario_por_realizacao, bool()));
 
@@ -3843,11 +3819,6 @@ void ModeloOtimizacao::criarModeloOtimizacao(Dados &a_dados, EntradaSaidaDados a
 			setAtributo(AttComumModeloOtimizacao_imprimir_resultado_mestre, a_dados.getAtributo(AttComumDados_imprimir_resultado_mestre, bool()));
 
 			setAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, a_dados.getAtributo(AttComumDados_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool()));
-
-			setAtributo(AttComumModeloOtimizacao_cenario_inicial, a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()));
-			setAtributo(AttComumModeloOtimizacao_cenario_final, a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario()));
-
-			setAtributo(AttComumModeloOtimizacao_numero_cenarios, a_dados.getAtributo(AttComumDados_numero_cenarios, int()));
 
 			setAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, a_dados.getAtributo(AttComumDados_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()));
 
@@ -3871,6 +3842,8 @@ void ModeloOtimizacao::criarModeloOtimizacao(Dados &a_dados, EntradaSaidaDados a
 				setAtributo(AttComumModeloOtimizacao_selecao_cortes_nivel_dominancia, 0);
 
 			} // else if (idModeloOtimizacao == IdModeloOtimizacao_multiestagio_estocastico_simulacao) {
+
+			arranjoResolucao = a_dados.arranjoResolucao;
 
 			instanciarProcessoEstocastico(a_dados, a_entradaSaidaDados, a_dados.getAtributo(AttComumDados_idProcesso, IdProcesso()));
 
@@ -3919,16 +3892,9 @@ void ModeloOtimizacao::instanciarProcessoEstocastico(Dados& a_dados, EntradaSaid
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_tendencia_temporal) + ".csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_membroMembro);
 
-		ProcessoEstocastico processoEstocastico;
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) + ".csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_direto);
 
-		const IdCenario idCenarioInicial = getAtributo(AttComumModeloOtimizacao_cenario_inicial, IdCenario());
-		const IdCenario idCenarioFinal = getAtributo(AttComumModeloOtimizacao_cenario_final, IdCenario());
-
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) + ".csv", processoEstocastico, TipoAcessoInstancia_direto);
-
-		if (processoEstocastico.getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) > 0)
-			vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico).setCenariosMapeamento(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, processoEstocastico.getCenariosMapeamento(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenarioInicial, idCenarioFinal));
-
+		
 	} // try
 
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::instanciarProcessoEstocastico(a_entradaSaidaDados): \n" + std::string(erro.what())); }

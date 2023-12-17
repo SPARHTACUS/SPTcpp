@@ -72,7 +72,7 @@
 	  m(Hidreletrica,  AttVetor,                                 montante,                        IdHidreletrica,        min,          max,           min,        int) \
       m(Hidreletrica,  AttVetor,                          montante_desvio,                        IdHidreletrica,        min,          max,           min,        int) \
 	  m(Hidreletrica,  AttVetor,               tipo_detalhamento_producao,  TipoDetalhamentoProducaoHidreletrica,        min,          max,           min,    Periodo) \
-	  m(Hidreletrica,  AttVetor,                            regularizacao,                                  bool,        min,          max,           min,    Periodo) \
+	  m(Hidreletrica,  AttVetor,                            regularizacao,                                   int,          0,            1,             0,    Periodo) \
 	  m(Hidreletrica,  AttVetor,              cota_montante_usina_jusante,                                double,          0,         1000,             0,    Periodo) \
 	  m(Hidreletrica,  AttVetor,                   vazao_turbinada_minima,                                double,          0,        50000,             0,    Periodo) \
 	  m(Hidreletrica,  AttVetor,                   vazao_turbinada_maxima,                                double,          0,        50000,             0,    Periodo) \

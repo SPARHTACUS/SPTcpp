@@ -23,7 +23,7 @@
 #include "C_IntercambioHidraulico.h"
 #include "C_DemandaEspecial.h"
 #include "C_EstruturaResultados.h"
-#include "C_Iteracao.h"
+#include "C_ArranjoResolucao.h"
 
 #define ATT_COMUM_DADOS(m)  \
 	  m(Dados,  AttComum,                                         idDados,                           IdDados,           1,           1,             1,      nao) \
@@ -75,8 +75,6 @@
 	  m(Dados,  AttComum,                      numero_processos_paralelos,                               int,           1,         max,             1,      nao) \
 	  m(Dados,  AttComum,                                  maior_processo,                        IdProcesso,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                                      idProcesso,                        IdProcesso,         min,         max,           min,      nao) \
-	  m(Dados,  AttComum,                       maior_cenario_do_processo,                         IdCenario,      Nenhum,         max,           min,      nao) \
-	  m(Dados,  AttComum,                       menor_cenario_do_processo,                         IdCenario,      Nenhum,         max,           min,      nao) \
 	  m(Dados,  AttComum,                         diretorio_entrada_dados,                            string,         min,         max,  DadosEntrada,      nao) \
 	  m(Dados,  AttComum,                           diretorio_saida_dados,                            string,         min,         max,    DadosSaida,      nao) \
 	  m(Dados,  AttComum,                                    tipo_solver,                         TipoSolver,         min,         max,           clp,      nao) \
@@ -160,7 +158,6 @@
     m(Dados, Discretizacao)          \
     m(Dados, Regua11)                \
     m(Dados, DemandaEspecial)        \
-    m(Dados, Iteracao)               \
     m(Dados, IntercambioHidraulico)
 
 
@@ -256,8 +253,7 @@ public:
 
 	void validacao_operacional_UsinasElevatorias(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
-	void validacao_mapeamento_cenarios(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_atributos_sem_recarregar, bool &a_mapeamento_cenarios_e_aberturas_carregado);
-	void validacao_mapeamento_aberturas(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_atributos_sem_recarregar, bool &a_mapeamento_cenarios_e_aberturas_carregado);
+	void validacao_mapeamento_cenarios_aberturas(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_atributos_sem_recarregar, bool &a_mapeamento_cenarios_e_aberturas_carregado);
 
 	void instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncremental(const IdProcessoEstocastico a_tipo_processo_estocastico, ProcessoEstocastico& a_processo_estocastico);
 
@@ -329,6 +325,11 @@ public:
 
 	void defineMapeamentoAberturas(const IdIteracao a_iteracao_inicial, const IdIteracao a_iteracao_final);
 
+	void defineMapeamentoAberturas();
+
+	void definirCenariosPorProcessosEmArranjoResolucao();
+	void mapearCenariosAberturasPorIteracaoEmArranjoResolucao();
+
 	void adicionaHidreletricasMontante();
 
 	void adicionaHidreletricasMontanteDesvio();
@@ -347,6 +348,8 @@ public:
 
 
 	ProcessoEstocastico processoEstocastico_hidrologico;
+
+	ArranjoResolucao arranjoResolucao;
 
 };
 

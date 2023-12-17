@@ -396,6 +396,10 @@ DEFINE_GET_FROM_CHAR(IdMin)
 	m(IdDados, 1)
 DEFINE_SMART_ENUM(IdDados, ID_DADOS)
 
+#define ID_ARRANJO_RESOLUCAO(m)\
+	m(IdArranjoResolucao, 1)
+DEFINE_SMART_ENUM(IdArranjoResolucao, ID_ARRANJO_RESOLUCAO)
+
 #define ID_PROCESSO(m)\
 	m(IdProcesso, mestre) m(IdProcesso,    1) m(IdProcesso,    2) m(IdProcesso,    3) m(IdProcesso,    4) m(IdProcesso,    5) m(IdProcesso,    6) m(IdProcesso,    7) m(IdProcesso,    8) m(IdProcesso,    9) m(IdProcesso,   10)\
 	m(IdProcesso,     11) m(IdProcesso,   12) m(IdProcesso,   13) m(IdProcesso,   14) m(IdProcesso,   15) m(IdProcesso,   16) m(IdProcesso,   17) m(IdProcesso,   18) m(IdProcesso,   19) m(IdProcesso,   20)\
@@ -1347,6 +1351,7 @@ m(IdCorteBenders)               \
 m(IdConjuntoHidraulico)         \
 m(IdContrato)                   \
 m(IdDados)                      \
+m(IdArranjoResolucao)           \
 m(IdDemandaEletrica)            \
 m(IdDemandaEspecial)            \
 m(IdDefluencia)                 \
