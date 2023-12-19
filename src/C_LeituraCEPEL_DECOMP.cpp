@@ -162,12 +162,8 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 
 					if (periodo_DC.getTipoPeriodo() <= periodo_otimizacao.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
 
-						if (periodo_DC.getTipoPeriodo() < periodo_otimizacao.getTipoPeriodo()) {
+						if (periodo_DC.getTipoPeriodo() < periodo_otimizacao.getTipoPeriodo())
 							a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_tipo_lag_autocorrelacao, TipoLagAutocorrelacao_semanal_sab);
-							a_dados.setAtributo(AttComumDados_mapear_processos_com_um_unico_cenario, false);
-						}
-						else
-							a_dados.setAtributo(AttComumDados_mapear_processos_com_um_unico_cenario, true);
 
 						periodo_processo_estocastico = periodo_otimizacao;
 
@@ -13622,7 +13618,7 @@ void LeituraCEPEL::imprime_na_tela_avisos_de_possiveis_inviabilidades_fph(Dados&
 				const IdCenario cenario_inicial = a_dados.arranjoResolucao.getAtributo(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()), AttComumProcesso_menor_cenario, IdCenario());
 				const IdCenario cenario_final = a_dados.arranjoResolucao.getAtributo(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()), AttComumProcesso_maior_cenario, IdCenario());
 
-				const IdProcesso idProcesso = a_dados.getAtributo(AttComumDados_idProcesso, IdProcesso());
+				const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 				for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 

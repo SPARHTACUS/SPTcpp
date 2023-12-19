@@ -15,21 +15,14 @@ void MetodoSolucao::executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const Id
 		const IdEstagio estagio_inicial = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
 		const IdEstagio estagio_final = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
 
-		const IdIteracao iteracao_inicial  = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_inicial,  IdIteracao());
-		IdIteracao iteracao_final    = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_final,    IdIteracao());
+		const IdIteracao iteracao_inicial       = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial,  IdIteracao());
+		const IdIteracao iteracao_final         = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_final,    IdIteracao());
+		const IdIteracao iteracao_numero_maximo = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_numero_maximo,    IdIteracao());
 		
 		if (a_idProcesso == IdProcesso_mestre) {
 			std::cout << std::endl;
 			std::cout << "Metodo Solucao Iniciado" << std::endl;
 		}
-
-		IdIteracao iteracao_simulacao_final = IdIteracao_Nenhum;
-		if (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_realizar_simulacao_final, bool())) {
-			iteracao_simulacao_final = IdIteracao(iteracao_final + 1);
-			iteracao_final = iteracao_simulacao_final;
-		}
-		else if (iteracao_final == IdIteracao_0)
-			iteracao_simulacao_final = iteracao_final;
 
 		for (IdIteracao idIteracao = iteracao_inicial; idIteracao <= iteracao_final; idIteracao++) {
 
@@ -38,11 +31,11 @@ void MetodoSolucao::executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const Id
 			if (idIteracao == IdIteracao_0)
 				simulacao = true;
 
-			if (idIteracao == iteracao_simulacao_final){
+			if (iteracao_numero_maximo < idIteracao){
 				simulacao = true;
 				a_modeloOtimizacao.setAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, true);
 				a_modeloOtimizacao.setAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, true);
-			} // if (idIteracao == iteracao_simulacao_final){
+			} // if (iteracao_numero_maximo < idIteracao){
 
 			executarPDDE_forward(a_entradaSaidaDados, estagio_inicial, estagio_final, simulacao, idIteracao, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao);
 
@@ -144,6 +137,8 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 		a_modeloOtimizacao.gerarRealizacoes(a_idProcesso, a_maiorIdProcesso, menor_cenario, maior_cenario, a_entradaSaidaDados);
 		a_entradaSaidaDados.setDiretorioSaida(diretorio);
 
+		a_entradaSaidaDados.setAppendArquivo(false);
+
 		double cont_tempo_otimizacao = 0.0;
 		int cont_numero_otimizacao = 0;
 		for (IdEstagio idEstagio = a_estagio_inicial; idEstagio <= a_estagio_final; idEstagio++) {
@@ -179,6 +174,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 			if (idEstagio < a_estagio_final)
 				a_modeloOtimizacao.alocarVariaveisEstado(a_idIteracao, idEstagio_seguinte);
 
+			bool algum_cenario = false;
 			for (int c = 0; c < numero_cenarios; c++) {
 
 				const IdCenario idCenario = IdCenario(menor_cenario + c);
@@ -210,7 +206,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 						if (true) {
 							double custo_geral = 0.0;
 							double custo_individual = 0.0;
-							a_modeloOtimizacao.calcularCustoPrimalViaSubproblemaMestre(TipoSubproblemaSolver_mestre, idEstagio, idCenario, diretorio_pl, custo_geral, custo_individual);
+							a_modeloOtimizacao.calcularCustoPrimalViaSubproblemaMestre(TipoSubproblemaSolver_mestre, a_idIteracao, idEstagio, idCenario, diretorio_pl, custo_geral, custo_individual);
 
 							if (idEstagio == a_estagio_inicial)
 								custo_inferior_problema_mestre.at(idEstagio).push_back(custo_individual);
@@ -235,6 +231,8 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 						cont_numero_otimizacao++;
 
+						algum_cenario = true;
+
 						if (imprimir_tempos) {
 							valores_tempo.at(1).push_back(getString(tempo_cenario.count()));
 							valores_tempo_otimizacao.at(1).push_back(getString(tempo_otimizacao));
@@ -254,20 +252,22 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 				} // if (idCenario_estado != IdCenario_Nenhum) {
 			} // for (int c = 0; c < numero_cenarios; c++) {
 
-			if (idEstagio == a_estagio_inicial)
-				a_entradaSaidaDados.setAppendArquivo(false);
-			else
-				a_entradaSaidaDados.setAppendArquivo(true);
+			if (algum_cenario) {		
 
-			if (imprimir_tempos) {
-				a_entradaSaidaDados.setDiretorioSaida(diretorio_tempos);
-				a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(getFullString(a_idProcesso) + "_tempos_cenario.csv", valores_tempo);
-				a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(getFullString(a_idProcesso) + "_tempos_otimizacao_cenario.csv", valores_tempo_otimizacao);
-				a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(getFullString(a_idProcesso) + "_tratamento_inviabilidade.csv", valores_tratamento);
-			} // if (imprimir_tempos) {
+				if (imprimir_tempos) {
+					a_entradaSaidaDados.setDiretorioSaida(diretorio_tempos);
+					a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(getFullString(a_idProcesso) + "_tempos_cenario.csv", valores_tempo);
+					a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(getFullString(a_idProcesso) + "_tempos_otimizacao_cenario.csv", valores_tempo_otimizacao);
+					a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(getFullString(a_idProcesso) + "_tratamento_inviabilidade.csv", valores_tratamento);
+				} // if (imprimir_tempos) {
 
-			a_entradaSaidaDados.setDiretorioSaida(diretorio_resultado);
-			a_modeloOtimizacao.imprimirSolucaoPorEstagioPorCenario_porEstagio(a_idProcesso, "", a_entradaSaidaDados);
+				a_entradaSaidaDados.setDiretorioSaida(diretorio_resultado);
+				a_modeloOtimizacao.imprimirSolucaoPorEstagioPorCenario_porEstagio(a_idProcesso, "", a_entradaSaidaDados);
+
+				if (!a_entradaSaidaDados.getAppendArquivo())
+					a_entradaSaidaDados.setAppendArquivo(true);
+
+			} // if (algum_cenario) {	
 
 		} // for (IdEstagio idEstagio = a_estagio_inicial; idEstagio <= a_estagio_final; idEstagio++) {
 
@@ -559,7 +559,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 		for (IdEstagio idEstagio = a_estagio_final; idEstagio >= estagio_inicial; idEstagio--) {
 
 			if (a_idProcesso == IdProcesso_mestre) {
-				if ((a_idIteracao == a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_final, IdIteracao())) || (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_imprimir_corte_por_iteracao, bool()))) {
+				if ((a_idIteracao == a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_final, IdIteracao())) || (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_imprimir_corte_por_iteracao, bool()))) {
 					a_entradaSaidaDados.setAppendArquivo(false);
 					a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao);
 					a_modeloOtimizacao.exportarCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
@@ -570,7 +570,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 					a_modeloOtimizacao.exportarCorteBenders_AcoplamentoPreEstudo(a_idIteracao, a_entradaSaidaDados);
 				}
 
-				if (a_idIteracao == a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_final, IdIteracao())) {
+				if (a_idIteracao == a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_final, IdIteracao())) {
 					a_entradaSaidaDados.setAppendArquivo(false);
 					a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao);
 					a_modeloOtimizacao.exportarVersaoAlternativaCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
@@ -578,7 +578,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 			} // if (a_idProcesso == IdProcesso_mestre) {
 
-			if (a_idIteracao == a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_final, IdIteracao()))
+			if (a_idIteracao == a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_final, IdIteracao()))
 				a_modeloOtimizacao.removerCorteBenders(idEstagio);
 
 		} // for (IdEstagio idEstagio = a_estagio_final; idEstagio >= a_estagio_inicial; idEstagio--) {
@@ -885,7 +885,7 @@ void MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaida
 
 			}
 
-			else if (a_idIteracao == IdIteracao(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_final, IdIteracao()) + 1)) {
+			else if (a_idIteracao > a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_numero_maximo, IdIteracao())) {
 				std::cout << "Simulacao Final: " << std::endl;
 				std::cout << std::endl;
 				double tempo_solver_fw = getElementoVetor(AttVetorMetodoSolucao_tempo_medio_solver_fw, a_idIteracao, double());
@@ -918,7 +918,7 @@ void MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaida
 			a_entradaSaidaDados.setAppendArquivo(false);
 			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("resultado_por_iteracao.csv", *this, std::vector<AttVetorMetodoSolucao>{AttVetorMetodoSolucao_tempo_execucao, AttVetorMetodoSolucao_custo_inferior, AttVetorMetodoSolucao_custo_superior});
 
-			if (a_idIteracao > a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_inicial, IdIteracao()))
+			if (a_idIteracao > a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao()))
 				a_entradaSaidaDados.setAppendArquivo(true);
 
 			a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("custos_inferior_e_superior.csv", *this, AttMatrizMetodoSolucao_custo_inferior);
@@ -1422,8 +1422,7 @@ void MetodoSolucao::executarPDDE_mapearSolucaoProxy(const IdIteracao a_idIteraca
 	 
 		const TipoSelecaoSolucaoProxy tipo_selecao_solucao_proxy = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_selecao_solucao_proxy, TipoSelecaoSolucaoProxy());
 	
-		//const bool busca_global = a_modeloOtimizacao.arranjoResolucao.isIdsCenarioEstadoDiferentesEmAberturasAndCenarios(a_idIteracao, a_idEstagio);
-		const bool busca_global = true;
+		const int agrupar_aberturas = a_modeloOtimizacao.arranjoResolucao.getElementoVetor(AttVetorArranjoResolucao_agrupar_aberturas, a_idEstagio, int());
 
 		const int nr = a_custo_total.bloco;
 
@@ -1440,10 +1439,10 @@ void MetodoSolucao::executarPDDE_mapearSolucaoProxy(const IdIteracao a_idIteraca
 
 			int r_min_busca = r;
 			int r_max_busca = r + 1;
-			if (busca_global) {
+			if (agrupar_aberturas == 1) {
 				r_min_busca = 0;
 				r_max_busca = nr;
-			} // if (a_busca_global) {
+			} // if (agrupar_aberturas == 1) {
 
 			for (int c = 0; c < nc; c++) {
 
@@ -1452,10 +1451,10 @@ void MetodoSolucao::executarPDDE_mapearSolucaoProxy(const IdIteracao a_idIteraca
 
 					const int na_busca = a_custo_total.size2.at(r_busca);
 
-					if ((busca_global) && (r != r_busca)) {
+					if ((agrupar_aberturas == 1) && (r != r_busca)) {
 						if ((nc > a_custo_total.size1.at(r_busca)) && (a_custo_total.size1.at(r_busca) > 0))
-							throw std::invalid_argument("Estrutura nao compativel com busca global.");
-					} // if ((busca_global) && (r != r_busca)){
+							throw std::invalid_argument("Estrutura nao compativel com agrupamento de aberturas.");
+					} // if ((agrupar_aberturas == 1) && (r != r_busca)){
 
 					for (int a_busca = 0; a_busca < na_busca; a_busca++) {
 						if (a_status_otimizacao.vetor.at(a_status_otimizacao.displ.at(r_busca) + c * na_busca + a_busca) > 0) {
@@ -1816,13 +1815,13 @@ void MetodoSolucao::executarPDDE_operacao_final(EntradaSaidaDados a_entradaSaida
 
 	try{
 
-		const IdIteracao iteracao_final = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_final, IdIteracao());
+		const IdIteracao iteracao_final = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_final, IdIteracao());
 
 		const std::string diretorio = a_entradaSaidaDados.getDiretorioSaida();
 
 		const TipoSubproblemaSolver tSS = TipoSubproblemaSolver_geral;
 
-		for (IdIteracao idIteracao = IdIteracao(iteracao_final + 1); idIteracao >= a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_iteracao_inicial, IdIteracao()); idIteracao--) {
+		for (IdIteracao idIteracao = IdIteracao(iteracao_final + 1); idIteracao >= a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao()); idIteracao--) {
 
 			const std::string diretorio_FW = diretorio + "//" + getFullString(idIteracao) + "//Foward//Resultados";
 

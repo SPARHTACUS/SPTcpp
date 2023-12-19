@@ -35,7 +35,6 @@ class EntradaSaidaDados;
 	  m(ModeloOtimizacao,  AttComum,                                           tolerancia_otimalidade,                             double,       1e-12,         1e-2,       1e-6,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                           tolerancia_viabilidade,                             double,       1e-12,         1e-2,       1e-6,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                       tipo_selecao_solucao_proxy,            TipoSelecaoSolucaoProxy,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                         realizar_simulacao_final,                               bool,        min,          max,        sim,      nao) \
 	  m(ModeloOtimizacao,  AttComum,                                               solucao_proxy_nula,                               bool,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                                  imprimir_solver,                               bool,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                           imprimir_solver_viabilidade_hidraulica,                               bool,        min,          max,        min,      sim) \
@@ -59,8 +58,6 @@ class EntradaSaidaDados;
 	  m(ModeloOtimizacao,  AttComum,                                                    estagio_final,                          IdEstagio,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                                  cenario_inicial,                          IdCenario,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                                    cenario_final,                          IdCenario,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                                 iteracao_inicial,                         IdIteracao,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                                   iteracao_final,                         IdIteracao,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                       periodo_otimizacao_inicial,                            Periodo,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                         periodo_otimizacao_final,                            Periodo,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                           periodo_estudo_inicial,                            Periodo,        min,          max,        min,      sim) \
@@ -601,7 +598,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		void atualizarModeloOtimizacaoComRestricaoRealizacao(const IdEstagio a_idEstagio, const IdCenario    a_idCenario);
 		void atualizarModeloOtimizacaoComRestricaoRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao);
 
-		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const TipoSubproblemaSolver a_TSS_origem, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const std::string a_diretorio);
+		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const TipoSubproblemaSolver a_TSS_origem, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const std::string a_diretorio);
 
 		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao);
 
@@ -638,7 +635,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		bool posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, bool a_retornar_proxy, EstruturaResultados<double>& a_sol_inf_var_dinamica, EstruturaResultados<double>& a_solucao_dual_var_dinamica, EstruturaResultados<double>& a_limite_inferior_var_dinamica, EstruturaResultados<double>& a_limite_superior_var_dinamica, EstruturaResultados<double>& a_sol_dual_var_estado, const std::string a_diretorio);
 
-		void calcularCustoPrimalViaSubproblemaMestre(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const std::string a_diretorio, double& a_custo_geral, double& a_custo_individual);
+		void calcularCustoPrimalViaSubproblemaMestre(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const std::string a_diretorio, double& a_custo_geral, double& a_custo_individual);
 
 		double getProbabilidadeAbertura(const IdEstagio a_idEstagio, const IdCenario a_idCenario);
 
@@ -778,53 +775,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 			catch (const std::exception& erro) { throw std::invalid_argument("tratConteudoIter(a_listasIdxElem," + getFullString(a_it) + "): \n" + std::string(erro.what())); }
 		};
 		
-		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		void addConteudoIters_10(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10) {
-
-			try {
-
-				tratConteudoIter(a_listasIdxElem, a_it1);
-				tratConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
-				if (alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10).size() > 1)
-					throw std::invalid_argument("Multiplos iteradores na ultima camada.");
-
-				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).setElemento(a_it10, a_conteudo);
-
-			}
-			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what())); }
-		};
-
-		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11>
-		void addConteudoIters_11(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11) {
-
-			try {
-
-				tratConteudoIter(a_listasIdxElem, a_it1);
-				tratConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
-				if (alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10), a_it11).size() > 1)
-					throw std::invalid_argument("Multiplos iteradores na ultima camada.");
-
-				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).setElemento(a_it11, a_conteudo);
-
-			}
-			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_11(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "): \n" + std::string(erro.what())); }
-		};
-
 		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11, typename TIt12>
 		void addConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11, const TIt12 a_it12) {
 
@@ -851,7 +801,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		};
 
 		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_10(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		bool varredurasIters_10(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -893,7 +843,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 																								if ((!a_isPrimal) && (a_lNorm.size() > 0))
 																									vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10).at(IdRealizacao_1).at(IdCenario_1);
 																								
-																								varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), vlrNorm, a_TSS, a_idEstagio, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																								varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 
 																							}
 																						}
@@ -925,7 +875,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		} // bool varredurasIters_10(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 		template<typename TListasArmzElem, typename TListasIdxElem>
-		void varredurasIters(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const double a_VlrNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		void varredurasIters(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const double a_VlrNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -943,8 +893,9 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 			
 				if (a_idRealizacao == IdRealizacao_Nenhum) {
 					if (a_lArmz.at(IdRealizacao_1).size() == 1) {
-						const IdCenario cIni = getAtributo(AttComumModeloOtimizacao_cenario_inicial, IdCenario());
-						const int numero_cenarios = int(getAtributo(AttComumModeloOtimizacao_cenario_final, IdCenario())) - int(cIni) + 1;
+						const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+						const IdCenario cIni = arranjoResolucao.getAtributo(a_idIteracao, idProcesso, AttComumProcesso_menor_cenario, IdCenario());
+						const int numero_cenarios = int(arranjoResolucao.getAtributo(a_idIteracao, idProcesso, AttComumProcesso_maior_cenario, IdCenario()) - cIni) + 1;
 						a_lArmz.at(IdRealizacao_1) = SmartEnupla<IdCenario, double>(cIni, std::vector<double>(numero_cenarios, NAN));
 					}
 
@@ -964,8 +915,9 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 					if (a_lArmz.at(a_idRealizacao).size() == 0) {
 
-						const IdCenario cIni = getAtributo(AttComumModeloOtimizacao_cenario_inicial, IdCenario());
-						const int numero_cenarios = int(getAtributo(AttComumModeloOtimizacao_cenario_final, IdCenario())) - int(cIni) + 1;
+						const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+						const IdCenario cIni = arranjoResolucao.getAtributo(a_idIteracao, idProcesso, AttComumProcesso_menor_cenario, IdCenario());
+						const int numero_cenarios = int(arranjoResolucao.getAtributo(a_idIteracao, idProcesso, AttComumProcesso_maior_cenario, IdCenario()) - cIni) + 1;
 
 						a_lArmz.at(a_idRealizacao) = SmartEnupla<IdCenario, double>(cIni, std::vector<double>(numero_cenarios, NAN));
 
@@ -979,56 +931,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
 
 		}
-
-		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool getConteudoIters_10(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10) {
-
-			try {
-
-				if (!a_listasIdxElem.isIteradorValido(a_it1)) return false;
-				else if (!a_listasIdxElem.at(a_it1).isIteradorValido(a_it2)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).isIteradorValido(a_it3)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).isIteradorValido(a_it4)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).isIteradorValido(a_it5)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).isIteradorValido(a_it6)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).isIteradorValido(a_it7)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).isIteradorValido(a_it8)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).isIteradorValido(a_it9)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).isIteradorValido(a_it10)) return false;
-				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10);
-				return true;
-
-			}
-			catch (const std::exception& erro) {
-				throw std::invalid_argument("getConteudoIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what()));
-			}
-		};
-
-		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11>
-		bool getConteudoIters_11(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11) {
-
-			try {
-
-				if (!a_listasIdxElem.isIteradorValido(a_it1)) return false;
-				else if (!a_listasIdxElem.at(a_it1).isIteradorValido(a_it2)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).isIteradorValido(a_it3)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).isIteradorValido(a_it4)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).isIteradorValido(a_it5)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).isIteradorValido(a_it6)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).isIteradorValido(a_it7)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).isIteradorValido(a_it8)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).isIteradorValido(a_it9)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).isIteradorValido(a_it10)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).isIteradorValido(a_it11)) return false;
-
-				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11);
-				return true;
-
-			}
-			catch (const std::exception& erro) {
-				throw std::invalid_argument("getConteudoIters_11(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "): \n" + std::string(erro.what()));
-			}
-		};
 
 		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11, typename TIt12>
 		bool getConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo &a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11, const TIt12 a_it12) {
@@ -1077,7 +979,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 			INEQUACAO_LINEAR_7(DECLARAR_METODOS_ELEMENTO)
 
 
-		void instanciarProcessoEstocastico(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso);
+		void instanciarProcessoEstocastico(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados);
 
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_penalizacao);
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo_lag);

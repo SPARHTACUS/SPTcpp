@@ -31,6 +31,27 @@ ArranjoResolucao::~ArranjoResolucao() { EXCLUI_SMART_ELEMENTO(ArranjoResolucao, 
 
 
 
+void ArranjoResolucao::instanciarProcessos(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso){
+
+	try {
+
+		setAtributo(AttComumArranjoResolucao_idProcesso, a_idProcesso);
+
+		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) {
+
+			Processo processo;
+			processo.setAtributo(AttComumProcesso_idProcesso, idProcesso);
+
+			vetorProcesso.add(processo);
+
+		} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= getMaiorId(IdProcesso()); idProcesso++) {
+
+		
+	}
+	catch (const std::exception& erro) { throw std::invalid_argument("ArranjoResolucao::instanciarProcessos(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + "): \n" + std::string(erro.what())); }
+
+}
+
 bool ArranjoResolucao::isIdsCenarioEstadoDiferentesEmAberturasAndCenarios(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio){
 
 	try {

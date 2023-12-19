@@ -102,16 +102,16 @@ Periodo Dados::getMaiorPeriodoHorizonteEstudo() const {
 void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 	try {
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
-		const IdProcesso maior_processo = getAtributo(AttComumDados_maior_processo, IdProcesso());
-		const int numero_processos_paralelos = getAtributo(AttComumDados_numero_processos_paralelos, int());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+		const IdProcesso maior_processo = arranjoResolucao.getMaiorId(IdProcesso());
+		const int numero_processos_paralelos = int(arranjoResolucao.getMaiorId(IdProcesso()));
 
 
 		if (true) {
 			int barreira = 0;
 
-			if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-				for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+			if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+				for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 					MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
 			}
 			else
@@ -162,9 +162,6 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		if (strCompara(getAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string()), "nenhum"))
 			diretorio_exportacao_pos_estudo = "nenhum";
 
-		setAtributo(AttComumDados_idProcesso, idProcesso);
-		setAtributo(AttComumDados_maior_processo, maior_processo);
-		setAtributo(AttComumDados_numero_processos_paralelos, numero_processos_paralelos);
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_direto);
 		a_entradaSaidaDados.carregarArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, TipoAcessoInstancia_direto);
@@ -969,7 +966,7 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 
 	try {
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		bool calculo_att_operacionais = false;
 
@@ -1370,8 +1367,6 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 					std::vector<AttComumDados> attComumDados_impressao;
 					for (AttComumDados attComumDados = AttComumDados(AttComumDados_Nenhum + 1); attComumDados < AttComumDados_Excedente; attComumDados++) {
 						if (attComumDados == AttComumDados_idDados) {}
-						else if (attComumDados == AttComumDados_maior_processo) {}
-						else if (attComumDados == AttComumDados_idProcesso) {}
 						else if (attComumDados == AttComumDados_numero_aberturas) {}
 						else if (attComumDados == AttComumDados_alpha_CVAR) {}
 						else if (attComumDados == AttComumDados_lambda_CVAR) {}
@@ -1380,7 +1375,6 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 						else if (attComumDados == AttComumDados_numero_periodos_avaliacao_geracao_cenario_hidrologico) {}
 						else if (attComumDados == AttComumDados_periodo_tendencia_hidrologica_historica) {}
 						else if (attComumDados == AttComumDados_periodo_historico_geracao_cenario_hidrologico) {}
-						else if (attComumDados == AttComumDados_numero_processos_paralelos) {}
 						else if (attComumDados == AttComumDados_numero_maximo_tentativas_resolucao) {}
 						else if (attComumDados == AttComumDados_diretorio_entrada_dados) {}
 						else if (attComumDados == AttComumDados_exibir_na_tela_resultado_solver) {}
@@ -1417,8 +1411,8 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 				if (true) {
 					int barreira = 0;
 
-					if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+					if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 							MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
 					}
 					else
@@ -1462,7 +1456,7 @@ void Dados::validacao_operacional_Intercambio_Hidraulico(EntradaSaidaDados a_ent
 		bool recarregar_atributo = false;
 
 		// ID PROCESSO
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		const IdIntercambioHidraulico maiorIdIntercambioHidraulico = getMaiorId(IdIntercambioHidraulico());
 
@@ -1579,8 +1573,8 @@ void Dados::validacao_operacional_Intercambio_Hidraulico(EntradaSaidaDados a_ent
 			if (true) {
 				int barreira = 0;
 
-				if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-					for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+				if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+					for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 						MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
 				}
 				else
@@ -1627,7 +1621,7 @@ void Dados::validacao_operacional_UsinasElevatorias(EntradaSaidaDados a_entradaS
 		bool recarregar_atributo = false;
 
 		// ID PROCESSO
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		const IdUsinaElevatoria maiorIdUsinaElevatoria = getMaiorId(IdUsinaElevatoria());
 
@@ -1816,8 +1810,8 @@ void Dados::validacao_operacional_UsinasElevatorias(EntradaSaidaDados a_entradaS
 			if (true) {
 				int barreira = 0;
 
-				if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-					for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+				if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+					for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 						MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
 				}
 				else
@@ -1887,7 +1881,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>> preencher_AttMatrizUnidadeUTE(menorIdTermeletrica, std::vector< SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>>(numIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>()));
 
 		// ID PROCESSO
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		// HORIZONTE DE ESTUDO 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
@@ -3209,8 +3203,8 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 			if (true) {
 				int barreira = 0;
 
-				if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-					for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+				if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+					for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 						MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
 				}
 				else
@@ -3732,7 +3726,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 		validaDefluencia();
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
@@ -6741,8 +6735,8 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 			if (true) {
 				int barreira = 0;
 
-				if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-					for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+				if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+					for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 						MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
 				}
 				else
@@ -6803,7 +6797,7 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 
 	try {
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		bool calcular_atributos_operacionais_submercado = false;
 		bool calcular_atributos_operacionais_patamar_deficit = false;
@@ -7191,8 +7185,8 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 				if (true) {
 					int barreira = 0;
 
-					if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+					if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 							MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
 					}
 					else
@@ -7233,7 +7227,7 @@ void Dados::validacao_operacional_Intercambio(EntradaSaidaDados a_entradaSaidaDa
 
 	try {
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		bool calcular_att_operacionais_intercambio = false;
 
@@ -7433,8 +7427,8 @@ void Dados::validacao_operacional_Intercambio(EntradaSaidaDados a_entradaSaidaDa
 				if (true) {
 					int barreira = 0;
 
-					if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+					if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 							MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
 					}
 					else
@@ -7470,7 +7464,7 @@ void Dados::validacao_operacional_BaciaHidrografica(EntradaSaidaDados a_entradaS
 
 	try {
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		validaBaciaHidrografica();
 
@@ -7494,8 +7488,8 @@ void Dados::validacao_operacional_BaciaHidrografica(EntradaSaidaDados a_entradaS
 				if (true) {
 					int barreira = 0;
 
-					if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+					if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 							MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
 					}
 					else
@@ -7529,7 +7523,7 @@ void Dados::validacao_operacional_Contrato(EntradaSaidaDados a_entradaSaidaDados
 
 	try {
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
@@ -7585,7 +7579,7 @@ void Dados::validacao_operacional_DemandaEspecial(EntradaSaidaDados a_entradaSai
 
 	try {
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 		const IdDemandaEspecial maiorIdDemandaEspecial = getMaiorId(IdDemandaEspecial());
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
@@ -7632,7 +7626,7 @@ void Dados::validacao_operacional_Eolica(EntradaSaidaDados a_entradaSaidaDados, 
 
 	try {
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 		const IdUsinaEolica maiorIdUsinaEolica = getMaiorId(IdUsinaEolica());
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
@@ -7681,7 +7675,7 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 
 	try {
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		bool calcular_att_operacionais_restricao_eletrica = false;
 		bool calcular_att_operacionais_elemento_sistema = false;
@@ -7951,8 +7945,8 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 				if (true) {
 					int barreira = 0;
 
-					if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+					if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 							MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
 					}
 					else
@@ -7998,7 +7992,7 @@ void Dados::validacao_operacional_AgrupamentoIntercambio(EntradaSaidaDados a_ent
 
 	try {
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		bool calcular_att_operacionais_agrupamento_intercambio = false;
 
@@ -8119,8 +8113,8 @@ void Dados::validacao_operacional_AgrupamentoIntercambio(EntradaSaidaDados a_ent
 				if (true) {
 					int barreira = 0;
 
-					if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+					if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 							MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
 					}
 					else
@@ -8163,7 +8157,7 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 		const IdEstagio estagio_inicial = getAtributo(AttComumDados_estagio_inicial, IdEstagio());
 		const IdEstagio estagio_final = getAtributo(AttComumDados_estagio_final, IdEstagio());
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		const Periodo periodo_inicial_otimizacao = horizonte_otimizacao.getElemento(estagio_inicial);
 		const Periodo periodo_final_otimizacao = horizonte_otimizacao.getElemento(estagio_final);
@@ -8413,7 +8407,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 	try {
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		bool calcular_att_operacionais_historico_hidrologico = false;
 		bool calcular_att_operacionais_tendencia_hidrologica = false;
@@ -8442,8 +8436,8 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 		int calcular_att_operacionais_processo_estocastico_hidrologico = isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(processoEstocastico_hidrologico, tipo_processo_estocastico_hidrologico);
 
-		if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-			for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++) {
+		if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+			for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
 				int calcular_att_operacionais_processo_estocastico_hidrologico_rank = 0;
 				MPI_Recv(&calcular_att_operacionais_processo_estocastico_hidrologico_rank, 1, MPI_INT, getRank(idProcesso), 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
@@ -8453,13 +8447,13 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 				else if ((calcular_att_operacionais_processo_estocastico_hidrologico == 0) && (calcular_att_operacionais_processo_estocastico_hidrologico_rank < 0))
 					calcular_att_operacionais_processo_estocastico_hidrologico = calcular_att_operacionais_processo_estocastico_hidrologico_rank;
 
-			} // for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++) {
+			} // for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
 		}
 		else
 			MPI_Send(&calcular_att_operacionais_processo_estocastico_hidrologico, 1, MPI_INT, getRank(IdProcesso_mestre), 1, MPI_COMM_WORLD);
 
-		if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-			for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+		if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+			for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 				MPI_Send(&calcular_att_operacionais_processo_estocastico_hidrologico, 1, MPI_INT, getRank(idProcesso), 1, MPI_COMM_WORLD);
 		}
 		else
@@ -8890,7 +8884,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 			else
 				throw std::invalid_argument("Erro impressao de " + getFullString(AttMatrizAfluencia_natural) + " em " + getFullString(idProcesso));
 
-			if (getAtributo(AttComumDados_maior_processo, IdProcesso()) != idProcesso)
+			if (arranjoResolucao.getMaiorId(IdProcesso()) != idProcesso)
 				MPI_Send(&imprimir_HIDRELETRICA_AFLUENCIA_AttMatrizPremissa, 1, MPI_INT, getRank(IdProcesso(idProcesso + 1)), getRank(IdProcesso(idProcesso + 1)), MPI_COMM_WORLD);
 
 			MPI_Barrier(MPI_COMM_WORLD);
@@ -10217,10 +10211,8 @@ void Dados::definirCenariosPorProcessosEmArranjoResolucao(){
 
 	try {
 
-		arranjoResolucao.setAtributo(AttComumArranjoResolucao_idProcesso, getAtributo(AttComumDados_idProcesso, IdProcesso()));
-
-		const IdProcesso maior_processo = getAtributo(AttComumDados_maior_processo, IdProcesso());
-		const int numero_processos = getAtributo(AttComumDados_numero_processos_paralelos, int());
+		const IdProcesso maior_processo = arranjoResolucao.getMaiorId(IdProcesso());
+		const int numero_processos = int(maior_processo);
 
 		const int numero_cenarios = getAtributo(AttComumDados_numero_cenarios, int());
 
@@ -10236,27 +10228,22 @@ void Dados::definirCenariosPorProcessosEmArranjoResolucao(){
 
 		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= maior_processo; idProcesso++) {
 
-			Processo processo;
-			processo.setAtributo(AttComumProcesso_idProcesso, idProcesso);
-
-			processo.setAtributo(AttComumProcesso_menor_cenario, IdCenario_Nenhum);
-			processo.setAtributo(AttComumProcesso_maior_cenario, IdCenario_Nenhum);
+			arranjoResolucao.vetorProcesso.att(idProcesso).setAtributo(AttComumProcesso_menor_cenario, IdCenario_Nenhum);
+			arranjoResolucao.vetorProcesso.att(idProcesso).setAtributo(AttComumProcesso_maior_cenario, IdCenario_Nenhum);
 
 			if (idProcesso <= maior_processo_desbalanceado) {//Processos desbalanceados
 
-				processo.setAtributo(AttComumProcesso_menor_cenario, IdCenario(numero_cenarios_balanceados_por_processo * int(idProcesso - 1) + int(idProcesso - 1) + 1)); //+ int(idProcesso - 1) sao os cenarios desbalanceados dos Processos anteriores			
-				processo.setAtributo(AttComumProcesso_maior_cenario, IdCenario(numero_cenarios_balanceados_por_processo * int(idProcesso) + int(idProcesso))); //+int(idProcesso) eh o cenario desbalanceado
+				arranjoResolucao.vetorProcesso.att(idProcesso).setAtributo(AttComumProcesso_menor_cenario, IdCenario(numero_cenarios_balanceados_por_processo * int(idProcesso - 1) + int(idProcesso - 1) + 1)); //+ int(idProcesso - 1) sao os cenarios desbalanceados dos Processos anteriores			
+				arranjoResolucao.vetorProcesso.att(idProcesso).setAtributo(AttComumProcesso_maior_cenario, IdCenario(numero_cenarios_balanceados_por_processo * int(idProcesso) + int(idProcesso))); //+int(idProcesso) eh o cenario desbalanceado
 
 			}//if (idProcesso <= maior_processo_desbalanceado) {
 
 			else if ((idProcesso > maior_processo_desbalanceado) && (numero_cenarios_balanceados_por_processo > 0)) {////Processos balanceados
 
-				processo.setAtributo(AttComumProcesso_menor_cenario, IdCenario(numero_cenarios_balanceados_por_processo * int(idProcesso - 1) + 1 + numero_cenarios_desbalanceados));
-				processo.setAtributo(AttComumProcesso_maior_cenario, IdCenario(numero_cenarios_balanceados_por_processo * int(idProcesso) + numero_cenarios_desbalanceados));
+				arranjoResolucao.vetorProcesso.att(idProcesso).setAtributo(AttComumProcesso_menor_cenario, IdCenario(numero_cenarios_balanceados_por_processo * int(idProcesso - 1) + 1 + numero_cenarios_desbalanceados));
+				arranjoResolucao.vetorProcesso.att(idProcesso).setAtributo(AttComumProcesso_maior_cenario, IdCenario(numero_cenarios_balanceados_por_processo * int(idProcesso) + numero_cenarios_desbalanceados));
 
 			}// // else if ((idProcesso > maior_processo_desbalanceado) && (numero_cenarios_por_processo_otimizacao > 0)) {
-
-			arranjoResolucao.vetorProcesso.add(processo);
 
 		} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= maior_processo; idProcesso++) {
 
@@ -10400,14 +10387,27 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 		// Mapeamento cenarios por iteracao
 		//
 
+		const TipoProcessamentoParalelo tipo_processamento = getAtributo(AttComumDados_tipo_processamento_paralelo, TipoProcessamentoParalelo());
+
 		const IdEstagio estagio_inicial = getAtributo(AttComumDados_estagio_inicial, IdEstagio());
 		const IdEstagio estagio_final = getAtributo(AttComumDados_estagio_final, IdEstagio());
 
-		SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> mapeamento_espaco_amostral = processoEstocastico_hidrologico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao());
+		SmartEnupla<IdEstagio, int> agrupar_aberturas(estagio_inicial, std::vector<int>(int(estagio_final - estagio_inicial) + 1, 0));
 
+		SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> mapeamento_espaco_amostral = processoEstocastico_hidrologico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao());
 		SmartEnupla<IdEstagio, Periodo> periodos(estagio_inicial, std::vector<Periodo>(int(estagio_final - estagio_inicial) + 1, Periodo()));
-		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++)
+		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
+
+			const int cortes_multiplos = getElementoVetor(AttVetorDados_cortes_multiplos, idEstagio, int());
+
+			if ((tipo_processamento == TipoProcessamentoParalelo_por_abertura) && (cortes_multiplos != 1))
+				agrupar_aberturas.at(idEstagio) = 1;
+
 			periodos.at(idEstagio) = mapeamento_espaco_amostral.at(mapeamento_espaco_amostral.getIteradorInicial()).getIteradores(getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo())).at(0);
+
+		} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
+
+		arranjoResolucao.setVetor_forced(AttVetorArranjoResolucao_agrupar_aberturas, agrupar_aberturas);
 
 		SmartEnupla<IdEstagio, IdCenario> enupla_inicial(estagio_inicial, std::vector<IdCenario>(int(estagio_final - estagio_inicial) + 1, IdCenario_Nenhum));
 
@@ -10490,8 +10490,6 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 		//
 		// Mapeamento aberturas por iteracao
 		//
-
-		const TipoProcessamentoParalelo tipo_processamento = getAtributo(AttComumDados_tipo_processamento_paralelo, TipoProcessamentoParalelo());
 
 		SmartEnupla<IdEstagio, IdAbertura> enupla_inicial_abertura(estagio_inicial, std::vector<IdAbertura>(int(estagio_final - estagio_inicial) + 1, IdAbertura_Nenhum));
 
@@ -10580,7 +10578,7 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 								const int numero_aberturas = getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int());
 
-								const int numero_processos = getAtributo(AttComumDados_numero_processos_paralelos, int());
+								const int numero_processos = int(arranjoResolucao.getMaiorId(IdProcesso()));
 
 								const int numero_aberturas_balanceados_por_processo = numero_aberturas / numero_processos;
 								const int numero_aberturas_desbalanceados = numero_aberturas - (numero_aberturas_balanceados_por_processo * numero_processos);
@@ -10732,7 +10730,7 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 
 	try {
 
-		const IdProcesso idProcesso = getAtributo(AttComumDados_idProcesso, IdProcesso());
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		bool calcular_att_operacionais_restricao_operativa_UHE = false;
 		bool calcular_att_operacionais_elemento_sistema = false;
@@ -10979,8 +10977,8 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 				if (true) {
 					int barreira = 0;
 
-					if (getAtributo(AttComumDados_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= getAtributo(AttComumDados_maior_processo, IdProcesso()); idProcesso++)
+					if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
+						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
 							MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
 					}
 					else

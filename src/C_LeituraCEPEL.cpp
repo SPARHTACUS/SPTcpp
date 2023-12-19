@@ -27,9 +27,7 @@ void LeituraCEPEL::leitura_CEPEL(const IdProcesso a_idProcesso, const IdProcesso
 
 		Dados dados;
 
-		dados.setAtributo(AttComumDados_idProcesso, a_idProcesso);
-		dados.setAtributo(AttComumDados_maior_processo, a_maiorIdProcesso);
-		dados.setAtributo(AttComumDados_numero_processos_paralelos, int(a_maiorIdProcesso));
+		dados.arranjoResolucao.instanciarProcessos(a_idProcesso, a_maiorIdProcesso);
 
 		EntradaSaidaDados entradaSaidaDados;
 		entradaSaidaDados.setDiretorioEntrada(entradaSaidaDados.getDiretorioEntrada() + a_nick);

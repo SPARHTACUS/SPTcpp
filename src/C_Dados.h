@@ -72,9 +72,6 @@
 	  m(Dados,  AttComum,                maior_corte_importado_pos_estudo,                    IdCorteBenders,         min,         max,           max,      nao) \
 	  m(Dados,  AttComum,                 selecao_cortes_nivel_dominancia,                               int,           0,          10,             1,      nao) \
 	  m(Dados,  AttComum,                       remover_cortes_dominados,                               bool,         min,         max,           sim,      nao) \
-	  m(Dados,  AttComum,                      numero_processos_paralelos,                               int,           1,         max,             1,      nao) \
-	  m(Dados,  AttComum,                                  maior_processo,                        IdProcesso,         min,         max,           min,      nao) \
-	  m(Dados,  AttComum,                                      idProcesso,                        IdProcesso,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                         diretorio_entrada_dados,                            string,         min,         max,  DadosEntrada,      nao) \
 	  m(Dados,  AttComum,                           diretorio_saida_dados,                            string,         min,         max,    DadosSaida,      nao) \
 	  m(Dados,  AttComum,                                    tipo_solver,                         TipoSolver,         min,         max,           clp,      nao) \
@@ -112,7 +109,6 @@
       m(Dados,  AttComum,                              mes_penalizacao_volume_util_minimo,             IdMes,      nenhum,         max,            11,      nao) \
       m(Dados,  AttComum,                  custo_acumulado_penalizacao_volume_util_minimo,            double,           0,         max,             0,      nao) \
       m(Dados,  AttComum,               taxa_considerar_tempo_viagem_agua,                            double,           0,           1,           0.2,      nao) \
-      m(Dados,  AttComum,                mapear_processos_com_um_unico_cenario,                        bool,         min,         max,         nao,      nao) \
       m(Dados,  AttComum,                     tipo_processamento_paralelo,         TipoProcessamentoParalelo,         min,         max,   por_cenario,      nao) \
       m(Dados,  AttComum,              imprimir_cortes_NW_com_reducao_estados,                          bool,         min,         max,           nao,      nao) \
       m(Dados,  AttComum,                          considerar_variaveis_folga,                          bool,         min,         max,           sim,      nao)

@@ -184,17 +184,14 @@ int main(int argc, char *argv[]) {
 
 		if (!encerrar_apos_deck_cepel) {
 
-			if (idProcesso == IdProcesso_mestre)
-				std::system("pause");
+			//if (idProcesso == IdProcesso_mestre)
+				//std::system("pause");
 
 			MPI_Barrier(MPI_COMM_WORLD);
 
 			Dados  dados;
 
-			dados.setAtributo(AttComumDados_idProcesso, idProcesso);
-			dados.setAtributo(AttComumDados_maior_processo, maiorIdProcesso);
-			dados.setAtributo(AttComumDados_numero_processos_paralelos, numProcs);
-			dados.setAtributo(AttComumDados_maior_processo, maiorIdProcesso);
+			dados.arranjoResolucao.instanciarProcessos(idProcesso, maiorIdProcesso);
 
 			EntradaSaidaDados entradaSaidaDados;
 

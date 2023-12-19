@@ -14,6 +14,8 @@
 	  m(ArranjoResolucao,  AttComum,          maior_cenario,              IdCenario,         min,         max,           min,      sim) 
 //     c_classe,   smrtAtt,     nomeAtributo,          tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
+#define ATT_VETOR_ARRANJO_RESOLUCAO(m)  \
+	m(ArranjoResolucao, AttVetor, agrupar_aberturas, int, 0, 1, 0, IdEstagio)
 
 #define MEMBRO_ARRANJO_RESOLUCAO(m) \
 m(ArranjoResolucao, Processo) \
@@ -22,6 +24,7 @@ m(ArranjoResolucao, Iteracao)
 
 #define SMART_ELEMENTO_ARRANJO_RESOLUCAO(m) \
 	  m(ArranjoResolucao, AttComum, ATT_COMUM_ARRANJO_RESOLUCAO)\
+	  m(ArranjoResolucao, AttVetor, ATT_VETOR_ARRANJO_RESOLUCAO)\
 	  m(ArranjoResolucao, Membro, MEMBRO_ARRANJO_RESOLUCAO) 
 
 DEFINE_SMART_ELEMENTO(ArranjoResolucao, SMART_ELEMENTO_ARRANJO_RESOLUCAO)
@@ -38,6 +41,7 @@ public:
 	DECLARA_SMART_ELEMENTO(ArranjoResolucao, SMART_ELEMENTO_ARRANJO_RESOLUCAO)
 
 
+	void instanciarProcessos(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso);
 	bool isIdsCenarioEstadoDiferentesEmAberturasAndCenarios(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
 	std::vector<IdCenario> getIdsCenarioEstadoFromCenarios(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
 	std::vector<IdCenario> getIdsCenarioEstadoFromAberturas(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
