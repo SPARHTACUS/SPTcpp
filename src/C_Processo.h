@@ -11,10 +11,9 @@
 
 
 #define ATT_MATRIZ_PROCESSO(m)  \
-      m(Processo,  AttMatriz,  menor_abertura,        IdAbertura,     Nenhum,          max,           Nenhum,  IdCenario,  IdEstagio) \
-      m(Processo,  AttMatriz,  maior_abertura,        IdAbertura,     Nenhum,          max,           Nenhum,  IdCenario,  IdEstagio) \
-      m(Processo,  AttMatriz,  menor_cenario,         IdCenario,     Nenhum,          max,           Nenhum,  IdCenario,  IdEstagio) \
-      m(Processo,  AttMatriz,  maior_cenario,         IdCenario,     Nenhum,          max,           Nenhum,  IdCenario,  IdEstagio) 
+      m(Processo,  AttMatriz,  menor_abertura_por_cenario_estado,        IdAbertura,     Nenhum,          max,           Nenhum,  IdCenario,  IdEstagio) \
+      m(Processo,  AttMatriz,  maior_abertura_por_cenario_estado,        IdAbertura,     Nenhum,          max,           Nenhum,  IdCenario,  IdEstagio) \
+      m(Processo,  AttMatriz,  cenario_estado_por_cenario,         IdCenario,     Nenhum,          max,           Nenhum,  IdCenario,  IdEstagio) 
 
 
 #define SMART_ELEMENTO_PROCESSO(m) \

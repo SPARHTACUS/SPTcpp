@@ -224,7 +224,7 @@ IdVariavelRealizacaoInterna Estagio::addVariavelRealizacaoInterna(const TipoSubp
 void Estagio::addValorVariavelEstado(const IdVariavelEstado a_idVariavelEstado, const IdCenario a_idCenario, const IdCenario a_menorIdCenario, const IdCenario a_maiorIdCenario, const double a_valor){
 	try {
 
-		if ((getSizeVetor(a_idVariavelEstado, AttVetorVariavelEstado_valor) == 0) || (a_menorIdCenario != IdCenario_Nenhum))
+		if ((getSizeVetor(a_idVariavelEstado, AttVetorVariavelEstado_valor) == 0) && (a_menorIdCenario != IdCenario_Nenhum))
 			vetorVariavelEstado.att(a_idVariavelEstado).setVetor_forced(AttVetorVariavelEstado_valor, SmartEnupla<IdCenario, double>(a_menorIdCenario, std::vector<double>(int(a_maiorIdCenario - a_menorIdCenario) + 1, 0.0)));
 
 		vetorVariavelEstado.att(a_idVariavelEstado).setElemento(AttVetorVariavelEstado_valor, a_idCenario, a_valor);
@@ -233,6 +233,22 @@ void Estagio::addValorVariavelEstado(const IdVariavelEstado a_idVariavelEstado, 
 	catch (const std::exception& erro) { throw std::invalid_argument("Estagio::addValorVariavelEstado(" + getFullString(a_idVariavelEstado) + "," + getFullString(a_idCenario) + "," + getFullString(a_menorIdCenario) + "," + getFullString(a_maiorIdCenario) + "," + getString(a_valor) + "): \n" + std::string(erro.what())); }
 
 } // void Estagio::adicionarValorVariavelEstado(const IdVariavelEstado a_idVariavelEstado, const IdIteracao a_idIteracao, const IdCenario a_idCenario, const double a_valor){
+
+void Estagio::alocarVariaveisEstado(const IdCenario a_menorIdCenario, const IdCenario a_maiorIdCenario){
+
+	try {
+
+		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(IdVariavelEstado()); idVariavelEstado++) {
+
+			if (vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
+				vetorVariavelEstado.att(idVariavelEstado).setVetor_forced(AttVetorVariavelEstado_valor, SmartEnupla<IdCenario, double>(a_menorIdCenario, std::vector<double>(int(a_maiorIdCenario - a_menorIdCenario) + 1, 0.0)));
+			}
+		}
+
+	} // try
+	catch (const std::exception& erro) { throw std::invalid_argument("Estagio::alocarVariaveisEstado(" + getFullString(a_menorIdCenario) + "," + getFullString(a_maiorIdCenario) + "): \n" + std::string(erro.what())); }
+
+}
 
 
 std::vector<std::string> Estagio::getNomeVariavelEstado(const IdVariavelEstado a_idVariavelEstado){

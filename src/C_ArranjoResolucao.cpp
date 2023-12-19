@@ -37,18 +37,20 @@ bool ArranjoResolucao::isIdsCenarioEstadoDiferentesEmAberturasAndCenarios(const 
 
 		for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= vetorProcesso.getMaiorId(); idProcesso++) {
 
-			// IdsCenarioEstado obtidos da matriz de abertura
-			if ((getSize1Matriz(a_idIteracao, idProcesso, AttMatrizProcesso_menor_cenario) > 0) && (getSize1Matriz(a_idIteracao, idProcesso, AttMatrizProcesso_menor_abertura))) {
+			const std::vector<IdCenario> lista_cenario_estado_from_cenario  = getIdsCenarioEstadoFromCenarios(idProcesso, a_idIteracao, a_idEstagio);
+			const std::vector<IdCenario> lista_cenario_estado_from_abertura = getIdsCenarioEstadoFromAberturas(idProcesso, a_idIteracao, a_idEstagio);
 
-				if ((getIterador1Inicial(a_idIteracao, idProcesso, AttMatrizProcesso_menor_cenario, IdCenario()) == getIterador1Inicial(a_idIteracao, idProcesso, AttMatrizProcesso_menor_abertura, IdCenario())) &&
-					(getIterador1Final(a_idIteracao, idProcesso, AttMatrizProcesso_menor_cenario, IdCenario()) == getIterador1Final(a_idIteracao, idProcesso, AttMatrizProcesso_menor_cenario, IdCenario())))
-					return true;
+			if (lista_cenario_estado_from_cenario.size() != lista_cenario_estado_from_abertura.size())
+				return false;
 
-			} // if ((getSize1Matriz(a_idIteracao, idProcesso, AttMatrizProcesso_menor_cenario) > 0) && (getSize1Matriz(a_idIteracao, idProcesso, AttMatrizProcesso_menor_abertura))) {
+			for (int i = 0; i < int(lista_cenario_estado_from_cenario.size()); i++) {
+				if (lista_cenario_estado_from_cenario.at(i) != lista_cenario_estado_from_abertura.at(i))
+					return false;
+			}
 
 		} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= getMaiorId(IdProcesso()); idProcesso++) {
 
-		return false;
+		return true;
 
 	}
 	catch (const std::exception& erro) { throw std::invalid_argument("ArranjoResolucao::isIdsCenarioEstadoDiferentesEmAberturasAndCenarios(" + getFullString(a_idIteracao) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
@@ -58,22 +60,37 @@ std::vector<IdCenario> ArranjoResolucao::getIdsCenarioEstadoFromCenarios(const I
 	try {
 
 		// IdsCenarioEstado obtidos da matriz de abertura
-		if (getSize1Matriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_cenario) > 0) {
+		if (getSize1Matriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_cenario_estado_por_cenario) > 0) {
 
-			IdCenario menor_idCenario_estado = getIterador1Inicial(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_cenario, IdCenario());
-			IdCenario maior_idCenario_estado = getIterador1Final(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_cenario, IdCenario());
+			IdCenario menor_idCenario = getIterador1Inicial(a_idIteracao, a_idProcesso, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
+			IdCenario maior_idCenario = getIterador1Final(a_idIteracao, a_idProcesso, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
 
 			vector<IdCenario> lista_retorno;
-			lista_retorno.reserve(int(maior_idCenario_estado - menor_idCenario_estado) + 1);
+			lista_retorno.reserve(int(maior_idCenario - menor_idCenario) + 1);
 
-			for (IdCenario idCenario_estado = menor_idCenario_estado; idCenario_estado <= maior_idCenario_estado; idCenario_estado++) {
+			for (IdCenario idCenario = menor_idCenario; idCenario <= maior_idCenario; idCenario++) {
 
-				const IdCenario idCenario = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_cenario, idCenario_estado, a_idEstagio, IdCenario());
+				const IdCenario idCenario_estado = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_cenario_estado_por_cenario, idCenario, a_idEstagio, IdCenario());
 
-				if (idCenario != IdCenario_Nenhum)
-					lista_retorno.push_back(idCenario_estado);
+				if (idCenario_estado != IdCenario_Nenhum) {
 
-			} // for (IdCenario idCenario_estado = menor_idCenario_estado; idCenario_estado <= maior_idCenario_estado; idCenario_estado++) {
+					for (int i = 0; i < int(lista_retorno.size()); i++) {
+						if (lista_retorno.at(i) == idCenario_estado)
+							break;
+						else if (lista_retorno.at(i) > idCenario_estado) {
+							lista_retorno.insert(lista_retorno.begin() + i, idCenario_estado);
+							break;
+						}
+						else if (i == int(lista_retorno.size() - 1))
+							lista_retorno.push_back(idCenario_estado);
+					}
+
+					if (lista_retorno.size() == 0)
+						lista_retorno.push_back(idCenario_estado);
+
+				} // if (idCenario_estado != IdCenario_Nenhum) {
+
+			} // for (IdCenario idCenario = menor_idCenario; idCenario <= maior_idCenario; idCenario++) {
 
 			return lista_retorno;
 
@@ -91,17 +108,17 @@ std::vector<IdCenario> ArranjoResolucao::getIdsCenarioEstadoFromAberturas(const 
 	try {
 
 		// IdsCenarioEstado obtidos da matriz de abertura
-		if (getSize1Matriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura) > 0) {
+		if (getSize1Matriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura_por_cenario_estado) > 0) {
 
-			IdCenario menor_idCenario_estado = getIterador1Inicial(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura, IdCenario());
-			IdCenario maior_idCenario_estado = getIterador1Final(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura, IdCenario());
+			IdCenario menor_idCenario_estado = getIterador1Inicial(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura_por_cenario_estado, IdCenario());
+			IdCenario maior_idCenario_estado = getIterador1Final(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura_por_cenario_estado, IdCenario());
 
 			vector<IdCenario> lista_retorno;
 			lista_retorno.reserve(int(maior_idCenario_estado - menor_idCenario_estado) + 1);
 
 			for (IdCenario idCenario_estado = menor_idCenario_estado; idCenario_estado <= maior_idCenario_estado; idCenario_estado++) {
 
-				const IdAbertura idAbertura = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura, idCenario_estado, a_idEstagio, IdAbertura());
+				const IdAbertura idAbertura = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura_por_cenario_estado, idCenario_estado, a_idEstagio, IdAbertura());
 
 				if (idAbertura != IdAbertura_Nenhum)
 					lista_retorno.push_back(idCenario_estado);
@@ -110,7 +127,7 @@ std::vector<IdCenario> ArranjoResolucao::getIdsCenarioEstadoFromAberturas(const 
 
 			return lista_retorno;
 
-		} // if (getSize1Matriz(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_abertura) > 0) {
+		} // if (getSize1Matriz(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_abertura_por_cenario_estado) > 0) {
 
 		return std::vector<IdCenario>();
 
@@ -128,60 +145,32 @@ std::vector<IdCenario> ArranjoResolucao::getIdsCenarioEstado(const IdProcesso a_
 		if (menor_idCenarioDE == IdCenario_Nenhum)
 			return vector<IdCenario>();
 
+		std::vector<IdCenario> lista_cenario_estado_para;
+
 		// IdsCenarioEstado obtidos da matriz de abertura
-		if (getSize1Matriz(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_abertura) > 0) {
+		if (getSize1Matriz(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_abertura_por_cenario_estado) > 0) 
+			lista_cenario_estado_para = getIdsCenarioEstadoFromAberturas(a_idProcessoPARA, a_idIteracao, a_idEstagio);
 
-			IdCenario menor_idCenario_estado = getIterador1Inicial(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_abertura, IdCenario());
-			IdCenario maior_idCenario_estado = getIterador1Final(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_abertura, IdCenario());
+		else if (getSize1Matriz(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_cenario_estado_por_cenario) > 0)
+			lista_cenario_estado_para = getIdsCenarioEstadoFromCenarios(a_idProcessoPARA, a_idIteracao, a_idEstagio);
 
-			if (menor_idCenario_estado < menor_idCenarioDE)
-				menor_idCenario_estado = menor_idCenarioDE;
-
-			if (maior_idCenario_estado > maior_idCenarioDE)
-				maior_idCenario_estado = maior_idCenarioDE;
+		if (lista_cenario_estado_para.size() > 0){
 
 			vector<IdCenario> lista_retorno;
-			lista_retorno.reserve(int(maior_idCenario_estado - menor_idCenario_estado) + 1);
+			lista_retorno.reserve(lista_cenario_estado_para.size());
 
-			for (IdCenario idCenario_estado = menor_idCenario_estado; idCenario_estado <= maior_idCenario_estado; idCenario_estado++) {
+			for (int c = 0; c < int(lista_cenario_estado_para.size()); c++) {
 
-				const IdAbertura idAbertura = getElementoMatriz(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_abertura, idCenario_estado, a_idEstagio, IdAbertura());
+				const IdCenario idcenario_estado = lista_cenario_estado_para.at(c);
 
-				if (idAbertura != IdAbertura_Nenhum)
-					lista_retorno.push_back(idCenario_estado);
+				if ((menor_idCenarioDE <= idcenario_estado) && (idcenario_estado <= maior_idCenarioDE))
+					lista_retorno.push_back(idcenario_estado);
 
-			} // for (IdCenario idCenario_estado = menor_idCenario_estado; idCenario_estado <= maior_idCenario_estado; idCenario_estado++) {
-		
-			return lista_retorno;
-
-		} // if (getSize1Matriz(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_abertura) > 0) {
-
-		else {
-
-			IdCenario menor_idCenario_estado = getIterador1Inicial(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_cenario, IdCenario());
-			IdCenario maior_idCenario_estado = getIterador1Final(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_maior_cenario, IdCenario());
-
-			if (menor_idCenario_estado < menor_idCenarioDE)
-				menor_idCenario_estado = menor_idCenarioDE;
-
-			if (maior_idCenario_estado > maior_idCenarioDE)
-				maior_idCenario_estado = maior_idCenarioDE;
-
-			vector<IdCenario> lista_retorno;
-			lista_retorno.reserve(int(maior_idCenario_estado - menor_idCenario_estado) + 1);
-
-			for (IdCenario idCenario_estado = menor_idCenario_estado; idCenario_estado <= maior_idCenario_estado; idCenario_estado++) {
-
-				const IdCenario idcenario = getElementoMatriz(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_cenario, idCenario_estado, a_idEstagio, IdCenario());
-
-				if (idcenario != IdCenario_Nenhum)
-					lista_retorno.push_back(idCenario_estado);
-
-			} // for (IdCenario idCenario_estado = menor_idCenario_estado; idCenario_estado <= maior_idCenario_estado; idCenario_estado++) {
+			} // for (int c = 0; c < int(lista_cenario_estado_para.size()); c++) {
 
 			return lista_retorno;
 
-		}
+		} // if (lista_cenario_estado_para.size() > 0){
 
 		return vector<IdCenario>();
 
@@ -193,15 +182,15 @@ int ArranjoResolucao::getNumeroAberturas(const IdProcesso a_idProcesso, const Id
 	try {
 
 		// IdsCenarioEstado obtidos da matriz de abertura
-		if (getSize1Matriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura) > 0) {
+		if (getSize1Matriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura_por_cenario_estado) > 0) {
 
-			IdCenario menor_idCenario_estado = getIterador1Inicial(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura, IdCenario());
-			IdCenario maior_idCenario_estado = getIterador1Final(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura, IdCenario());
+			IdCenario menor_idCenario_estado = getIterador1Inicial(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura_por_cenario_estado, IdCenario());
+			IdCenario maior_idCenario_estado = getIterador1Final(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura_por_cenario_estado, IdCenario());
 
 			for (IdCenario idCenario_estado = menor_idCenario_estado; idCenario_estado <= maior_idCenario_estado; idCenario_estado++) {
 
-				const IdAbertura menor_abertura = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura, idCenario_estado, a_idEstagio, IdAbertura());
-				const IdAbertura maior_abertura = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_maior_abertura, idCenario_estado, a_idEstagio, IdAbertura());
+				const IdAbertura menor_abertura = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_menor_abertura_por_cenario_estado, idCenario_estado, a_idEstagio, IdAbertura());
+				const IdAbertura maior_abertura = getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_maior_abertura_por_cenario_estado, idCenario_estado, a_idEstagio, IdAbertura());
 
 				if (menor_abertura != IdAbertura_Nenhum)
 					return int(maior_abertura - menor_abertura) + 1;
@@ -210,7 +199,7 @@ int ArranjoResolucao::getNumeroAberturas(const IdProcesso a_idProcesso, const Id
 
 			return 0;
 
-		} // if (getSize1Matriz(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_abertura) > 0) {
+		} // if (getSize1Matriz(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_abertura_por_cenario_estado) > 0) {
 
 		throw std::invalid_argument("Erro");
 	}

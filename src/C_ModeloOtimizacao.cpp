@@ -849,24 +849,9 @@ void ModeloOtimizacao::resetarVariavelRealizacaoInterna(const TipoSubproblemaSol
 } // void ModeloOtimizacao::resetarVariavelRealizacaoInterna(){
 
 
-void ModeloOtimizacao::atualizarVariavelEstadoComSolucaoPrimal(const bool a_resetar, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, const IdCenario a_idCenario){
+void ModeloOtimizacao::atualizarVariavelEstadoComSolucaoPrimal(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, const IdCenario a_idCenario){
 
 	try {
-
-		IdCenario menor_cenario = IdCenario_Nenhum;
-		IdCenario maior_cenario = IdCenario_Nenhum;
-
-		if (a_resetar) {
-			const IdProcesso idProcesso_local = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
-			if (arranjoResolucao.getSize1Matriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_abertura) > 0) {
-				menor_cenario = arranjoResolucao.getIterador1Inicial(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_abertura, IdCenario());
-				maior_cenario = arranjoResolucao.getIterador1Final(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_abertura, IdCenario());
-			}
-			else {
-				menor_cenario = arranjoResolucao.getIterador1Inicial(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_cenario, IdCenario());
-				maior_cenario = arranjoResolucao.getIterador1Final(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_cenario, IdCenario());
-			}
-		}
 
 		const TipoSubproblemaSolver tSS = TipoSubproblemaSolver_geral;
 
@@ -892,7 +877,7 @@ void ModeloOtimizacao::atualizarVariavelEstadoComSolucaoPrimal(const bool a_rese
 						else if (solucao_primal < vetorEstagio.att(idEstagio_anterior).getSolver(tSS)->getLimInferior(idVariavelDecisaoEstagioAnterior))
 							solucao_primal = vetorEstagio.att(idEstagio_anterior).getSolver(tSS)->getLimInferior(idVariavelDecisaoEstagioAnterior);
 
-						vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, a_idCenario, menor_cenario, maior_cenario, solucao_primal);
+						addValorVariavelEstado(a_idEstagio, idVariavelEstado, a_idCenario, solucao_primal);
 
 					} // if (idVariavelDecisaoEstagioAnterior > 0) {
 
@@ -919,7 +904,7 @@ void ModeloOtimizacao::atualizarVariavelEstadoComSolucaoPrimal(const bool a_rese
 
 										const double valor = (limite_superior - limite_inferior) / 2.0;
 
-										vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, a_idCenario, menor_cenario, maior_cenario, valor);
+										addValorVariavelEstado(a_idEstagio, idVariavelEstado, a_idCenario, valor);
 
 									} // if (idVariavelDecisaoEstagioAnterior > 0) {
 
@@ -951,6 +936,39 @@ void ModeloOtimizacao::addValorVariavelEstado(const IdEstagio a_idEstagio, const
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::addValorVariavelEstado(" + getFullString(a_idEstagio) + "," + getFullString(idVariavelEstado) + "," + getFullString(a_idCenario) + "," + ",double): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::addValorVariavelEstado(const IdEstagio a_idEstagio, const IdVariavelEstado idVariavelEstado, const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdCenario a_idCenario, const double valor){
+
+
+void ModeloOtimizacao::alocarVariaveisEstado(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio) {
+
+	try {
+
+		IdCenario menor_cenario_estado = IdCenario_Nenhum;
+		IdCenario maior_cenario_estado = IdCenario_Nenhum;
+
+		const IdProcesso idProcesso_local = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+		if (arranjoResolucao.getSize1Matriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_abertura_por_cenario_estado) > 0) {
+			const std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso_local, a_idIteracao, a_idEstagio);
+			if (lista_cenario_estado.size() > 0) {
+				menor_cenario_estado = lista_cenario_estado.at(0);
+				maior_cenario_estado = lista_cenario_estado.at(lista_cenario_estado.size() - 1);
+			}
+		}
+		if (menor_cenario_estado == IdCenario_Nenhum) {
+			const std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstadoFromCenarios(idProcesso_local, a_idIteracao, a_idEstagio);
+			if (lista_cenario_estado.size() > 0) {
+				menor_cenario_estado = lista_cenario_estado.at(0);
+				maior_cenario_estado = lista_cenario_estado.at(lista_cenario_estado.size() - 1);
+			}
+		}
+
+		if (menor_cenario_estado == IdCenario_Nenhum)
+			return;
+
+		vetorEstagio.att(a_idEstagio).alocarVariaveisEstado(menor_cenario_estado, maior_cenario_estado);
+
+	} // try
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::alocarVariaveisEstado(" + getFullString(a_idIteracao) + "," + getFullString(a_idEstagio) + "," + ",double): \n" + std::string(erro.what())); }
+}
 
 
 void ModeloOtimizacao::imprimirEstagios(EntradaSaidaDados a_entradaSaidaDados) {

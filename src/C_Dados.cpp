@@ -10200,11 +10200,10 @@ void Dados::validacao_mapeamento_cenarios_aberturas(EntradaSaidaDados a_entradaS
 		if (idProcesso == IdProcesso_mestre) {
 			if ((!a_mapeamento_cenarios_e_aberturas_carregado) && (!a_imprimir_atributos_sem_recarregar)) {
 				a_entradaSaidaDados.setAppendArquivo(false);
-				a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("PROCESSO_ITERACAO_AttMatrizOperacional_PorCenarioPorEstagio.csv", IdIteracao_Nenhum, IdProcesso_Nenhum, arranjoResolucao, AttMatrizProcesso_menor_cenario);
+				a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("PROCESSO_ITERACAO_AttMatrizOperacional_PorCenarioPorEstagio.csv", IdIteracao_Nenhum, IdProcesso_Nenhum, arranjoResolucao, AttMatrizProcesso_cenario_estado_por_cenario);
 				a_entradaSaidaDados.setAppendArquivo(true);
-				a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("PROCESSO_ITERACAO_AttMatrizOperacional_PorCenarioPorEstagio.csv", IdIteracao_Nenhum, IdProcesso_Nenhum, arranjoResolucao, AttMatrizProcesso_maior_cenario);
-				a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("PROCESSO_ITERACAO_AttMatrizOperacional_PorCenarioPorEstagio.csv", IdIteracao_Nenhum, IdProcesso_Nenhum, arranjoResolucao, AttMatrizProcesso_menor_abertura);
-				a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("PROCESSO_ITERACAO_AttMatrizOperacional_PorCenarioPorEstagio.csv", IdIteracao_Nenhum, IdProcesso_Nenhum, arranjoResolucao, AttMatrizProcesso_maior_abertura);
+				a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("PROCESSO_ITERACAO_AttMatrizOperacional_PorCenarioPorEstagio.csv", IdIteracao_Nenhum, IdProcesso_Nenhum, arranjoResolucao, AttMatrizProcesso_menor_abertura_por_cenario_estado);
+				a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("PROCESSO_ITERACAO_AttMatrizOperacional_PorCenarioPorEstagio.csv", IdIteracao_Nenhum, IdProcesso_Nenhum, arranjoResolucao, AttMatrizProcesso_maior_abertura_por_cenario_estado);
 			} // if ((!mapeamento_aberturas_carregado) && (!a_imprimir_atributos_sem_recarregar)) {
 		}
 
@@ -10416,11 +10415,11 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 			for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
 
-				SmartEnupla<IdCenario, SmartEnupla<IdEstagio, IdCenario>> map_menor_cenario;
-				SmartEnupla<IdCenario, SmartEnupla<IdEstagio, IdCenario>> map_maior_cenario;
-
 				const IdCenario menor_cenario_iteracao = arranjoResolucao.getAtributo(idIteracao, idProcesso, AttComumProcesso_menor_cenario, IdCenario());
 				const IdCenario maior_cenario_iteracao = arranjoResolucao.getAtributo(idIteracao, idProcesso, AttComumProcesso_maior_cenario, IdCenario());
+
+				if (menor_cenario_iteracao != IdCenario_Nenhum)
+					arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso).setMatriz_forced(AttMatrizProcesso_cenario_estado_por_cenario, SmartEnupla<IdCenario, SmartEnupla<IdEstagio, IdCenario>>(menor_cenario_iteracao, std::vector<SmartEnupla<IdEstagio, IdCenario>>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, enupla_inicial)));
 
 				if ((menor_cenario_iteracao != IdCenario_Nenhum) &&
 					((numero_iteracoes_com_divisao_cenarios == 1) ||
@@ -10437,66 +10436,41 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 							IdCenario idCenario_mesmo_passado = IdCenario_Excedente;
 							IdCenario idCenario_mesma_trajetoria = IdCenario_Excedente;
 
-							if (idEstagio == estagio_inicial)
+							if (idEstagio == estagio_inicial) {
 								idCenario_mesmo_passado = IdCenario_1;
+								idCenario_mesma_trajetoria = IdCenario_1;
+							}
 
-							for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
-								if (arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()) != IdCenario_Nenhum) {
-									for (IdCenario idCenario = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()); idCenario <= arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario()); idCenario++) {
-										for (IdEstagio idEstagio_past = estagio_inicial; idEstagio_past <= idEstagio; idEstagio_past++) {
-											if ((IdAbertura(processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario_iteracao, periodos.at(idEstagio_past), IdRealizacao())) !=
-												IdAbertura(processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, periodos.at(idEstagio_past), IdRealizacao()))))
-												break;
-											else if ((idEstagio_past == IdEstagio(idEstagio - 1)) && (idCenario < idCenario_mesmo_passado))
-												idCenario_mesmo_passado = idCenario;
-											else if ((idEstagio_past == idEstagio) && (idCenario < idCenario_mesma_trajetoria))
-												idCenario_mesma_trajetoria = idCenario;
-										}
-									} // for (IdCenario idCenario = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()); idCenario <= arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario()); idCenario++) {
-								} // if (arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()) != IdCenario_Nenhum) {
-							} // for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
+							else {
+								for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
+									if (arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()) != IdCenario_Nenhum) {
+										for (IdCenario idCenario = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()); idCenario <= arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario()); idCenario++) {
+											for (IdEstagio idEstagio_past = estagio_inicial; idEstagio_past <= idEstagio; idEstagio_past++) {
+												if ((IdAbertura(processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario_iteracao, periodos.at(idEstagio_past), IdRealizacao())) !=
+													IdAbertura(processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, periodos.at(idEstagio_past), IdRealizacao()))))
+													break;
+												else if ((idEstagio_past == IdEstagio(idEstagio - 1)) && (idCenario < idCenario_mesmo_passado))
+													idCenario_mesmo_passado = idCenario;
+												else if ((idEstagio_past == idEstagio) && (idCenario < idCenario_mesma_trajetoria))
+													idCenario_mesma_trajetoria = idCenario;
+											}
+										} // for (IdCenario idCenario = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()); idCenario <= arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario()); idCenario++) {
+									} // if (arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()) != IdCenario_Nenhum) {
+								} // for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
+							}
 
-							// Resolver cenario: priorizado resolver sempre o cenario de menor id daqueles que são iguais
+						// Resolver cenario: priorizado resolver sempre o cenario de menor id daqueles que são iguais
 							if (idCenario_iteracao <= idCenario_mesma_trajetoria) {
 
 								IdCenario idCenario_estado = idCenario_iteracao;
 								if (idCenario_mesmo_passado < idCenario_estado)
 									idCenario_estado = idCenario_mesmo_passado;
 
-								if (map_menor_cenario.size() == 0) {
-									map_menor_cenario.addElemento(idCenario_estado, enupla_inicial);
-									map_maior_cenario.addElemento(idCenario_estado, enupla_inicial);
-								}
-
-								else if ((idCenario_estado < map_menor_cenario.getIteradorInicial())) {
-									for (IdCenario idCenario = IdCenario(map_menor_cenario.getIteradorInicial() - 1); idCenario >= idCenario_estado; idCenario--) {
-										map_menor_cenario.addElemento(idCenario, enupla_inicial);
-										map_maior_cenario.addElemento(idCenario, enupla_inicial);
-									}
-								}
-								else if ((map_menor_cenario.getIteradorFinal() < idCenario_estado)) {
-									for (IdCenario idCenario = IdCenario(map_menor_cenario.getIteradorFinal() + 1); idCenario <= idCenario_estado; idCenario++) {
-										map_menor_cenario.addElemento(idCenario, enupla_inicial);
-										map_maior_cenario.addElemento(idCenario, enupla_inicial);
-									}
-								}
-
-								if (map_menor_cenario.at(idCenario_estado).at(idEstagio) == IdCenario_Nenhum) {
-									map_menor_cenario.at(idCenario_estado).at(idEstagio) = idCenario_iteracao;
-									map_maior_cenario.at(idCenario_estado).at(idEstagio) = idCenario_iteracao;
-								}
-								else if (idCenario_iteracao < map_menor_cenario.at(idCenario_estado).at(idEstagio))
-									map_menor_cenario.at(idCenario_estado).at(idEstagio) = idCenario_iteracao;
-								else if (map_maior_cenario.at(idCenario_estado).at(idEstagio) < idCenario_iteracao)
-									map_maior_cenario.at(idCenario_estado).at(idEstagio) = idCenario_iteracao;
-
+								arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso).setElemento(AttMatrizProcesso_cenario_estado_por_cenario, idCenario_iteracao, idEstagio, idCenario_estado);
 
 							} // if (idCenario_iteracao <= idCenario_mesma_trajetoria) {
 						} // for (IdCenario idCenario_iteracao = menor_cenario_iteracao; idCenario_iteracao <= menor_cenario_iteracao; idCenario_iteracao++) {
 					} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
-
-					arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso).setMatriz_forced(AttMatrizProcesso_menor_cenario, map_menor_cenario);
-					arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso).setMatriz_forced(AttMatrizProcesso_maior_cenario, map_maior_cenario);
 
 				} // Condicoes para mapeamento de cenarios
 
@@ -10504,8 +10478,7 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 					((numero_iteracoes_com_divisao_cenarios == 0) && (idIteracao > iteracao_inicial) ||
 						(iteracao_inicial == IdIteracao_0) && (iteracao_numero_maximo < idIteracao))) {
 
-					arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso).setMatriz_forced(AttMatrizProcesso_menor_cenario, arranjoResolucao.vetorIteracao.att(iteracao_inicial).vetorProcesso.att(idProcesso).getMatriz(AttMatrizProcesso_menor_cenario, IdCenario(), IdEstagio(), IdCenario()));
-					arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso).setMatriz_forced(AttMatrizProcesso_maior_cenario, arranjoResolucao.vetorIteracao.att(iteracao_inicial).vetorProcesso.att(idProcesso).getMatriz(AttMatrizProcesso_maior_cenario, IdCenario(), IdEstagio(), IdCenario()));
+					arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso).setMatriz_forced(AttMatrizProcesso_cenario_estado_por_cenario, arranjoResolucao.vetorIteracao.att(iteracao_inicial).vetorProcesso.att(idProcesso).getMatriz(AttMatrizProcesso_cenario_estado_por_cenario, IdCenario(), IdEstagio(), IdCenario()));
 
 				}
 
@@ -10530,8 +10503,8 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 					if ((idIteracao > IdIteracao_1) && (numero_iteracoes_com_divisao_cenarios == 0)) {
 						for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
-							arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso_aux).setMatriz_forced(AttMatrizProcesso_menor_abertura, arranjoResolucao.vetorIteracao.att(IdIteracao_1).vetorProcesso.att(idProcesso_aux).getMatriz(AttMatrizProcesso_menor_abertura, IdCenario(), IdEstagio(), IdAbertura()));
-							arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso_aux).setMatriz_forced(AttMatrizProcesso_maior_abertura, arranjoResolucao.vetorIteracao.att(IdIteracao_1).vetorProcesso.att(idProcesso_aux).getMatriz(AttMatrizProcesso_maior_abertura, IdCenario(), IdEstagio(), IdAbertura()));
+							arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso_aux).setMatriz_forced(AttMatrizProcesso_menor_abertura_por_cenario_estado, arranjoResolucao.vetorIteracao.att(IdIteracao_1).vetorProcesso.att(idProcesso_aux).getMatriz(AttMatrizProcesso_menor_abertura_por_cenario_estado, IdCenario(), IdEstagio(), IdAbertura()));
+							arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso_aux).setMatriz_forced(AttMatrizProcesso_maior_abertura_por_cenario_estado, arranjoResolucao.vetorIteracao.att(IdIteracao_1).vetorProcesso.att(idProcesso_aux).getMatriz(AttMatrizProcesso_maior_abertura_por_cenario_estado, IdCenario(), IdEstagio(), IdAbertura()));
 						}
 					} // if ((idIteracao > IdIteracao_1) && (numero_iteracoes_com_divisao_cenarios == 0)) {
 
@@ -10549,55 +10522,52 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 								if (((tipo_processamento == TipoProcessamentoParalelo_por_abertura) && (cortes_multiplos != 1)) || (idProcesso_aux == idProcesso)) {
 
-									if (arranjoResolucao.getSize1Matriz(idIteracao, idProcesso_aux, AttMatrizProcesso_menor_cenario) > 0) {
+									std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstadoFromCenarios(idProcesso_aux, idIteracao, idEstagio);
 
-										const IdCenario menor_cenario_estado = arranjoResolucao.getIterador1Inicial(idIteracao, idProcesso_aux, AttMatrizProcesso_menor_cenario, IdCenario());
-										const IdCenario maior_cenario_estado = arranjoResolucao.getIterador1Final(idIteracao, idProcesso_aux, AttMatrizProcesso_menor_cenario, IdCenario());
+									if (lista_cenario_estado.size() > 0) {
 
-										for (IdCenario idCenario_estado = menor_cenario_estado; idCenario_estado <= maior_cenario_estado; idCenario_estado++) {
+										for (int c = 0; c < int(lista_cenario_estado.size()); c++) {
 
-											if (arranjoResolucao.getElementoMatriz(idIteracao, idProcesso_aux, AttMatrizProcesso_menor_cenario, idCenario_estado, idEstagio, IdCenario()) != IdCenario_Nenhum) {
+											const IdCenario idCenario_estado = lista_cenario_estado.at(c);
 
-												if (map_menor_abertura.size() == 0) {
-													map_menor_abertura.addElemento(idCenario_estado, enupla_inicial_abertura);
-													map_maior_abertura.addElemento(idCenario_estado, enupla_inicial_abertura);
+											if (map_menor_abertura.size() == 0) {
+												map_menor_abertura.addElemento(idCenario_estado, enupla_inicial_abertura);
+												map_maior_abertura.addElemento(idCenario_estado, enupla_inicial_abertura);
+											}
+
+											else if ((idCenario_estado < map_menor_abertura.getIteradorInicial())) {
+												for (IdCenario idCenario = IdCenario(map_menor_abertura.getIteradorInicial() - 1); idCenario >= idCenario_estado; idCenario--) {
+													map_menor_abertura.addElemento(idCenario, enupla_inicial_abertura);
+													map_maior_abertura.addElemento(idCenario, enupla_inicial_abertura);
 												}
-
-												else if ((idCenario_estado < map_menor_abertura.getIteradorInicial())) {
-													for (IdCenario idCenario = IdCenario(map_menor_abertura.getIteradorInicial() - 1); idCenario >= idCenario_estado; idCenario--) {
-														map_menor_abertura.addElemento(idCenario, enupla_inicial_abertura);
-														map_maior_abertura.addElemento(idCenario, enupla_inicial_abertura);
-													}
+											}
+											else if ((map_menor_abertura.getIteradorFinal() < idCenario_estado)) {
+												for (IdCenario idCenario = IdCenario(map_menor_abertura.getIteradorFinal() + 1); idCenario <= idCenario_estado; idCenario++) {
+													map_menor_abertura.addElemento(idCenario, enupla_inicial_abertura);
+													map_maior_abertura.addElemento(idCenario, enupla_inicial_abertura);
 												}
-												else if ((map_menor_abertura.getIteradorFinal() < idCenario_estado)) {
-													for (IdCenario idCenario = IdCenario(map_menor_abertura.getIteradorFinal() + 1); idCenario <= idCenario_estado; idCenario++) {
-														map_menor_abertura.addElemento(idCenario, enupla_inicial_abertura);
-														map_maior_abertura.addElemento(idCenario, enupla_inicial_abertura);
-													}
-												}
+											}
 
-												// Em caso de cortes_multiplos == 1, preenche-se com a abertura do mapeamento do espaço amostral.
-												if (cortes_multiplos == 1) {
-													const IdCenario idCenario = arranjoResolucao.getElementoMatriz(idIteracao, idProcesso_aux, AttMatrizProcesso_menor_cenario, idCenario_estado, idEstagio, IdCenario());
-													const IdAbertura idAbertura = IdAbertura(processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, periodos.at(idEstagio), IdRealizacao()));
+											// Em caso de cortes_multiplos == 1, preenche-se com a abertura do mapeamento do espaço amostral.
+											if (cortes_multiplos == 1) {
+												const IdAbertura idAbertura = IdAbertura(processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario_estado, periodos.at(idEstagio), IdRealizacao()));
 
-													map_menor_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
-													map_maior_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
-												} // if (cortes_multiplos == 1) {
+												map_menor_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
+												map_maior_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
+											} // if (cortes_multiplos == 1) {
 
-												else if (tipo_processamento == TipoProcessamentoParalelo_por_cenario) {
-													map_menor_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_1;
-													map_maior_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura(getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int()));
-												}
-												else {
-													map_menor_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_Excedente;
-													map_maior_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_Excedente;
-												}
+											else if (tipo_processamento == TipoProcessamentoParalelo_por_cenario) {
+												map_menor_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_1;
+												map_maior_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura(getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int()));
+											}
+											else {
+												map_menor_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_Excedente;
+												map_maior_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_Excedente;
+											}
 
-											} // if (arranjoResolucao.getElementoMatriz(idProcesso, idIteracao, AttMatrizIteracao_menor_cenario, idCenario_estado, idEstagio, IdCenario()) != IdCenario_Nenhum) {
-										} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
-									} // for (IdCenario idCenario_estado = menor_cenario_estado; idCenario_estado <= maior_cenario_estado; idCenario_estado++) {
-								}
+										} // for (int c = 0; c < int(lista_cenario_estado.size()); c++) {
+									} // if (lista_cenario_estado.size() > 0){
+								} // if (((tipo_processamento == TipoProcessamentoParalelo_por_abertura) && (cortes_multiplos != 1)) || (idProcesso_aux == idProcesso)) {
 							} // if (arranjoResolucao.getSize1Matriz(idProcesso, idIteracao, AttMatrizIteracao_menor_cenario) > 0) {
 						} // for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
 
@@ -10651,8 +10621,8 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 						} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
-						arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso).setMatriz_forced(AttMatrizProcesso_menor_abertura, map_menor_abertura);
-						arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso).setMatriz_forced(AttMatrizProcesso_maior_abertura, map_maior_abertura);
+						arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso).setMatriz_forced(AttMatrizProcesso_menor_abertura_por_cenario_estado, map_menor_abertura);
+						arranjoResolucao.vetorIteracao.att(idIteracao).vetorProcesso.att(idProcesso).setMatriz_forced(AttMatrizProcesso_maior_abertura_por_cenario_estado, map_maior_abertura);
 
 					} // else {
 

@@ -27,7 +27,7 @@ void MetodoSolucao::executarPSD(EntradaSaidaDados a_entradaSaidaDados, const IdP
 
 			try {
 
-				a_modeloOtimizacao.atualizarVariavelEstadoComSolucaoPrimal(true, IdIteracao_0, idEstagio, IdCenario_1);
+				a_modeloOtimizacao.atualizarVariavelEstadoComSolucaoPrimal(IdIteracao_0, idEstagio, IdCenario_1);
 
 				a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, IdCenario_1);
 
