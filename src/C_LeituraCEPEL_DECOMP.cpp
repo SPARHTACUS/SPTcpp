@@ -19326,6 +19326,8 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 	try {
 
+		const double conversao_MWporVazao_em_MWhporVolume = 1e6 / 3600.0;
+
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
 		const IdRestricaoOperativaUHE maiorIdRestricaoOperativaUHE = a_dados.getMaiorId(IdRestricaoOperativaUHE());
@@ -19366,7 +19368,6 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 				///////////////////////////////////
 
-
 				const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
 				const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 
@@ -19387,7 +19388,7 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 						elementoSistema.setAtributo(AttComumElementoSistema_hidreletrica, idHidreletrica);
 						elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_volume_util);
 
-						const double fator_participacao = produtibilidade_acumulada_EAR;
+						const double fator_participacao = produtibilidade_acumulada_EAR * conversao_MWporVazao_em_MWhporVolume;
 
 						elementoSistema.setVetor(AttVetorElementoSistema_fator_participacao, SmartEnupla<Periodo, double>(horizonte_estudo, fator_participacao));
 
@@ -19403,7 +19404,7 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 							const double volume_util_maximo = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_util_maximo, periodo, double());
 
 							double energia_maxima_periodo_anterior = energia_maxima_REE.getElemento(periodo);
-							double energia_maxima_periodo_nova = energia_maxima_periodo_anterior + (volume_util_maximo - volume_util_minimo) * produtibilidade_acumulada_EAR;
+							double energia_maxima_periodo_nova = energia_maxima_periodo_anterior + (volume_util_maximo - volume_util_minimo) * produtibilidade_acumulada_EAR * conversao_MWporVazao_em_MWhporVolume;
 
 							energia_maxima_REE.setElemento(periodo, energia_maxima_periodo_nova);
 
@@ -19514,7 +19515,6 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_energia_armazenada: \n" + std::string(erro.what())); }
 
 }
-
 
 Periodo LeituraCEPEL::get_periodo_ultimo_sobreposicao_com_horizonte_DC(Dados& a_dados) {
 
@@ -21306,8 +21306,8 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		a_dados.validacao_mapeamento_cenarios(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar, a_mapeamento_cenarios_e_aberturas_carregado);
 
 	
-		a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("nenhum")); // temporario para agilizar processo
-		a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false); // temporario par aagilizar processo
+		//a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("nenhum")); // temporario para agilizar processo
+		//a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false); // temporario par aagilizar processo
 
 		
 		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_ultimo_sobreposicao, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario()));

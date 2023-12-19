@@ -7166,6 +7166,7 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 				//
 				a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
+				a_entradaSaidaDados.setAppendArquivo(false);
 				a_entradaSaidaDados.imprimirArquivoCSV_AttComum("SUBMERCADO_AttComumOperacional.csv", IdSubmercado_Nenhum, *this, std::vector<AttComumSubmercado> {AttComumSubmercado_idSubmercado, AttComumSubmercado_nome });
 
 				a_entradaSaidaDados.setAppendArquivo(false);
