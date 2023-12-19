@@ -3114,13 +3114,13 @@ bool ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS, 
 
 				const double valorSolucaoInferiorVarDinamica = valorObjetivo - valorSolucaoInferior;
 
-				a_sol_inf_var_dinamica.vetor[a_sol_inf_var_dinamica.conta] = valorSolucaoInferiorVarDinamica;
+				a_sol_inf_var_dinamica.vetor.at(a_sol_inf_var_dinamica.conta) = valorSolucaoInferiorVarDinamica;
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getReducedCostVarDinamica(a_solucao_dual_var_dinamica.conta, a_solucao_dual_var_dinamica.vetor);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getLimiteInferiorVarDinamica(a_limite_inferior_var_dinamica.conta, a_limite_inferior_var_dinamica.vetor);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getLimiteSuperiorVarDinamica(a_limite_superior_var_dinamica.conta, a_limite_superior_var_dinamica.vetor);
+				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getReducedCostVarDinamica(a_solucao_dual_var_dinamica.conta, &a_solucao_dual_var_dinamica.vetor[0]);
+				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getLimiteInferiorVarDinamica(a_limite_inferior_var_dinamica.conta, &a_limite_inferior_var_dinamica.vetor[0]);
+				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getLimiteSuperiorVarDinamica(a_limite_superior_var_dinamica.conta, &a_limite_superior_var_dinamica.vetor[0]);
 
-				getSolucaoDualVariavelEstado(a_idEstagio, a_sol_dual_var_estado.conta, a_sol_dual_var_estado.vetor);
+				getSolucaoDualVariavelEstado(a_idEstagio, a_sol_dual_var_estado.conta, &a_sol_dual_var_estado.vetor[0]);
 
 				setElemento(AttVetorModeloOtimizacao_custo_total, a_idEstagio, valorObjetivo);
 
@@ -3172,10 +3172,10 @@ bool ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS, 
 			for (int i = 0; i < vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getNumeroVarDinamica(); i++)
 				a_solucao_dual_var_dinamica.add(0.0);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getLimiteInferiorVarDinamica(a_limite_inferior_var_dinamica.conta, a_limite_inferior_var_dinamica.vetor);
+			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getLimiteInferiorVarDinamica(a_limite_inferior_var_dinamica.conta, &a_limite_inferior_var_dinamica.vetor[0]);
 			a_limite_inferior_var_dinamica.conta += vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getNumeroVarDinamica();
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getLimiteSuperiorVarDinamica(a_limite_superior_var_dinamica.conta, a_limite_superior_var_dinamica.vetor);
+			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getLimiteSuperiorVarDinamica(a_limite_superior_var_dinamica.conta, &a_limite_superior_var_dinamica.vetor[0]);
 			a_limite_superior_var_dinamica.conta += vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getNumeroVarDinamica();
 
 			for (int i = 0; i < int(getMaiorId(a_idEstagio, IdVariavelEstado())); i++)
