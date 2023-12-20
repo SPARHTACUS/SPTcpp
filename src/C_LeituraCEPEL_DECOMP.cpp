@@ -19329,6 +19329,7 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 		const double conversao_MWporVazao_em_MWhporVolume = 1e6 / 3600.0;
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
 
 		const IdRestricaoOperativaUHE maiorIdRestricaoOperativaUHE = a_dados.getMaiorId(IdRestricaoOperativaUHE());
 
@@ -19446,6 +19447,8 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 					////////////////////////////
 
+					const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
+
 					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 						const IdPatamarCarga maiorIdPatamarCarga = a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
@@ -19456,35 +19459,70 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 							
 							if (limite_inferior_percentual != getdoubleFromChar("min")) {
 
-
 								///////////////////////////////////////////////////////
 								//Verifica se é um período final do período semanal
 								///////////////////////////////////////////////////////
 
 								bool is_periodo_um_periodo_final_deck = false;
 
-								if (periodo == horizonte_estudo.getIteradorFinal())
-									is_periodo_um_periodo_final_deck = true;
-								else {
+								if (periodo <= periodo_ultimo_sobreposicao) {
 
-									for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
+									if (periodo == horizonte_estudo.getIteradorFinal())
+										is_periodo_um_periodo_final_deck = true;
+									else {
 
-										const TipoPeriodo tipo_periodo = tipo_periodos_horizonte_DECK.at(pos);
-										const Periodo periodo_seguinte = Periodo(tipo_periodo, periodo + 1);
+										Periodo periodo_teste = Periodo(periodo.getTipoPeriodo(), periodo + 1);
 
-										for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+										if(periodo_teste > periodo_ultimo_sobreposicao)
+											is_periodo_um_periodo_final_deck = true;
+										else {
 
-											if (periodo_seguinte == periodo_deck) {
+											for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
+
+												const TipoPeriodo tipo_periodo = tipo_periodos_horizonte_DECK.at(pos);
+												const Periodo periodo_seguinte = Periodo(tipo_periodo, periodo + 1);
+
+												for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+													if (periodo_seguinte == periodo_deck) {
+														is_periodo_um_periodo_final_deck = true;
+														break;
+													}//if (periodo_seguinte == periodo_deck) {
+
+												}//for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+											}//for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
+										}//else {
+									}//else {
+
+								}//if (periodo <= periodo_ultimo_sobreposicao) {
+								else if (periodo > periodo_ultimo_sobreposicao) {
+
+									//Verifica que seja o último período do horizonte de otimização
+
+									for (IdEstagio idEstagio = horizonte_otimizacao.getIteradorInicial(); idEstagio <= horizonte_otimizacao.getIteradorFinal(); idEstagio++) {
+
+										const Periodo periodo_otimizacao = horizonte_otimizacao.at(idEstagio);
+
+										const double sobreposicao = periodo.sobreposicao(periodo_otimizacao);
+
+										if (sobreposicao > 0.0) {
+
+											Periodo periodo_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo + 1);
+											Periodo periodo_otimizacao_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo_otimizacao + 1);
+
+											if(periodo_teste == periodo_otimizacao_teste) //Garante que o período onde a restrição RHE é ativada é no último período pertencente ao período de otimização
 												is_periodo_um_periodo_final_deck = true;
-												break;
-											}//if (periodo_seguinte == periodo_deck) {
 
-										}//for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+											break;
 
-									}//for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
+										}//if (sobreposicao > 0.0) {
 
-								}//else {
-								
+									}//for (IdEstagio idEstagio = horizonte_otimizacao.getIteradorInicial(); idEstagio <= horizonte_otimizacao.getIteradorFinal(); idEstagio++) {
+
+								}//else if (periodo > periodo_ultimo_sobreposicao) {
+									
+
 								///////////////////////////////////////////////////////
 							
 								if (is_periodo_um_periodo_final_deck) {
@@ -21289,11 +21327,31 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		// INICIO DEV NOVO PROC ESTOCASTICO
 
+		/////////////////////
 		const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
+
+		//Procura o periodo_otimizacao com sobreposicao com o periodo_ultimo_sobreposicao com o horizonte_DC
+
+		Periodo periodo_ultimo_sobreposicao_otimizacao = periodo_ultimo_sobreposicao;
+
+		for (IdEstagio idEstagio = horizonte_otimizacao.getIteradorInicial(); idEstagio <= horizonte_otimizacao.getIteradorFinal(); idEstagio++) {
+
+			Periodo periodo_otimizacao = horizonte_otimizacao.at(idEstagio);
+
+			const double sobreposicao = periodo_ultimo_sobreposicao.sobreposicao(periodo_otimizacao);
+
+			if (sobreposicao > 0.0) {
+				periodo_ultimo_sobreposicao_otimizacao = periodo_otimizacao;
+				break;
+			}
+
+		}//for (IdEstagio idEstagio = horizonte_otimizacao.getIteradorInicial(); idEstagio <= horizonte_otimizacao.getIteradorFinal(); idEstagio++) {
+
+		/////////////////////
 
 		if (horizonte_estudo.getIteradorFinal() > periodo_ultimo_sobreposicao) {//Significa que existe extensão do horizonte
 
-			const int numero_cenarios = numero_realizacoes_por_periodo.at(periodo_ultimo_sobreposicao);
+			const int numero_cenarios = numero_realizacoes_por_periodo.at(periodo_ultimo_sobreposicao_otimizacao);
 			//const int numero_cenarios = a_dados.getAtributo(AttComumDados_numero_cenarios, int());
 
 			const int numero_iteracoes = a_dados.getAtributo(AttComumDados_numero_maximo_iteracoes, int());
@@ -21310,7 +21368,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		//a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false); // temporario par aagilizar processo
 
 		
-		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_ultimo_sobreposicao, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario()));
+		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_ultimo_sobreposicao_otimizacao, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), a_dados.getAtributo(AttComumDados_menor_cenario_do_processo, IdCenario()), a_dados.getAtributo(AttComumDados_maior_cenario_do_processo, IdCenario()));
 
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
@@ -21374,11 +21432,9 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		a_dados.validacao_operacional_RestricaoEletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		////////////////
-		
+
 		atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_energia_armazenada(a_dados, a_diretorio); //Para criar as restrições por energia é necessário calcular a produtibilidade_acumulada_EAR (que dependia de aplicar das modificações)
-
 		sequenciarRestricoesHidraulicas(a_dados);
-
 		a_dados.validacao_operacional_RestricaoOperativaUHE(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		////////////////
