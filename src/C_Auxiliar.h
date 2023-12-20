@@ -210,6 +210,8 @@ static double getdoubleFromChar(const char * a_char) {
 static double getFromChar(const double a_double, const char * a_char) { return getdoubleFromChar(a_char); };
 
 static std::string getString(const double a_double) {
+	if (isnan(a_double))
+		return "NAN";
 	if (a_double >= DOUBLE_MAX * 0.99)
 		return "inf";
 	else if (a_double <= DOUBLE_MIN * 0.99)

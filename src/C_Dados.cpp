@@ -1303,6 +1303,9 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 		//
 		//
 
+		bool alpha_cvar_redefinido = false;
+		bool lambda_cvar_redefinido = false;
+
 		if (getAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco()) == TipoAversaoRisco_CVAR) {
 
 			if (getSizeVetor(AttVetorDados_alpha_CVAR) == 0) {
@@ -1316,6 +1319,47 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 			}
 
 		} // if (getAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco()) == TipoAversaoRisco_CVAR){
+
+		else {
+
+			if (getSizeVetor(AttVetorDados_lambda_CVAR) > 0) {
+
+				for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
+
+					const double lambda = getElementoVetor(AttVetorDados_lambda_CVAR, idEstagio, double());
+
+					if (lambda > 0.0) {
+						lambda_cvar_redefinido = true;
+						break;
+					}
+
+				} // for (IdEstagio idEstagio = estagio_inicial; idEstagio < estagio_final; idEstagio++) {
+			}
+
+			if ((getSizeVetor(AttVetorDados_lambda_CVAR) == 0) || (lambda_cvar_redefinido)) {
+				setVetor_forced(AttVetorDados_lambda_CVAR, SmartEnupla<IdEstagio, double>(estagio_inicial, std::vector<double>(estagio_final, 0.0)));
+				lambda_cvar_redefinido = true;
+			}
+
+			if (getSizeVetor(AttVetorDados_alpha_CVAR) > 0) {
+
+				for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
+
+					const double alpha = getElementoVetor(AttVetorDados_alpha_CVAR, idEstagio, double());
+
+					if (alpha > 0.0) {
+						alpha_cvar_redefinido = true;
+						break;
+					}
+
+				} // for (IdEstagio idEstagio = estagio_inicial; idEstagio < estagio_final; idEstagio++) {
+			}
+
+			if ((getSizeVetor(AttVetorDados_alpha_CVAR) == 0) || (alpha_cvar_redefinido)) {
+				setVetor_forced(AttVetorDados_alpha_CVAR, SmartEnupla<IdEstagio, double>(estagio_inicial, std::vector<double>(estagio_final, 0.0)));
+				alpha_cvar_redefinido = true;
+			}
+		}
 
 
 		if (idProcesso == IdProcesso_mestre) {
@@ -1338,6 +1382,22 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 
 		a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
+		if ((!calculo_att_operacionais) && (!a_imprimir_atributos_sem_recarregar)) {
+			if (idProcesso == IdProcesso_mestre) {
+
+				a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
+
+				a_entradaSaidaDados.setAppendArquivo(false);
+
+				if (lambda_cvar_redefinido) {
+					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, estagio_inicial, estagio_final, AttVetorDados_lambda_CVAR);
+					a_entradaSaidaDados.setAppendArquivo(true);
+				}
+				if (alpha_cvar_redefinido)
+					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, estagio_inicial, estagio_final, AttVetorDados_alpha_CVAR);
+			}
+		}
+
 		if ((calculo_att_operacionais) || (a_imprimir_atributos_sem_recarregar)) {
 
 			if (idProcesso == IdProcesso_mestre) {
@@ -1350,10 +1410,8 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 				a_entradaSaidaDados.setAppendArquivo(true);
 				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, estagio_inicial, estagio_final, AttVetorDados_numero_aberturas_solucao_proxy);
 				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, estagio_inicial, estagio_final, AttVetorDados_cortes_multiplos);
-				if (getAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco()) == TipoAversaoRisco_CVAR) {
-					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, estagio_inicial, estagio_final, AttVetorDados_lambda_CVAR);
-					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, estagio_inicial, estagio_final, AttVetorDados_alpha_CVAR);
-				} // if (getAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco()) == TipoAversaoRisco_CVAR) {
+				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, estagio_inicial, estagio_final, AttVetorDados_lambda_CVAR);
+				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, estagio_inicial, estagio_final, AttVetorDados_alpha_CVAR);
 
 				a_entradaSaidaDados.setAppendArquivo(false);
 				a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("DADOS_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, periodo_inicial_horizonte_estudo, periodo_final_horizonte_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte_estudo, AttMatrizDados_percentual_duracao_patamar_carga);
@@ -8186,6 +8244,8 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 		Periodo periodo_inicial_espaco_amostral = mapeamento_espaco_amostral.at(IdCenario_1).getIteradorInicial();
 		Periodo periodo_final_espaco_amostral = mapeamento_espaco_amostral.at(IdCenario_1).getIteradorFinal();
 
+		SmartEnupla<Periodo, IdRealizacao> maior_realizacao_espaco_amostral(mapeamento_espaco_amostral.at(IdCenario_1), IdRealizacao_Nenhum);
+
 		for (IdCenario idCenario = IdCenario_2; idCenario <= mapeamento_espaco_amostral.getIteradorFinal(); idCenario++) {
 
 			if (mapeamento_espaco_amostral.at(idCenario).size() == 0)
@@ -8197,10 +8257,36 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 			if (mapeamento_espaco_amostral.at(idCenario).getIteradorFinal() != periodo_final_espaco_amostral)
 				return 7;
 
+			for (Periodo periodo = periodo_inicial_espaco_amostral; periodo <= periodo_final_espaco_amostral; mapeamento_espaco_amostral.at(IdCenario_1).incrementarIterador(periodo)) {
+				if (mapeamento_espaco_amostral.at(idCenario).at(periodo) > maior_realizacao_espaco_amostral.at(periodo))
+					maior_realizacao_espaco_amostral.at(periodo) = mapeamento_espaco_amostral.at(idCenario).at(periodo);
+			}
+
 		} // 
 
 		if (periodo_inicial_espaco_amostral > periodo_inicial_otimizacao)
 			return 8;
+
+		SmartEnupla<IdEstagio, std::vector<Periodo>> periodos_em_estagio(estagio_inicial, std::vector<std::vector<Periodo>>(int(estagio_final - estagio_inicial) + 1, std::vector<Periodo>()));
+		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
+			const Periodo periodo_decomposicao = getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
+			periodos_em_estagio.at(idEstagio) = mapeamento_espaco_amostral.at(IdCenario_1).getIteradores(periodo_decomposicao);
+
+			if (Periodo(TipoPeriodo_minuto, periodo_decomposicao) != Periodo(TipoPeriodo_minuto, periodos_em_estagio.at(idEstagio).at(0)))
+				return 81;
+
+			if (Periodo(TipoPeriodo_minuto, periodo_decomposicao + 1) != Periodo(TipoPeriodo_minuto, periodos_em_estagio.at(idEstagio).at(periodos_em_estagio.at(idEstagio).size() - 1) + 1))
+				return 82;
+
+			for (IdCenario idCenario = IdCenario_1; idCenario <= mapeamento_espaco_amostral.getIteradorFinal(); idCenario++) {
+				const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).at(periodos_em_estagio.at(idEstagio).at(0));
+				for (int i = 1; i < int(periodos_em_estagio.at(idEstagio).size()); i++) {
+					if (idRealizacao != mapeamento_espaco_amostral.at(idCenario).at(periodos_em_estagio.at(idEstagio).at(i)))
+						return 83;
+				}
+			}
+
+		}
 
 
 		const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> probabilidade_realizacao = a_processo_estocastico.getMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao, Periodo(), IdRealizacao(), double());
@@ -8287,6 +8373,8 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 					if (residuo_espaco_amostral.at(periodo_residuo).getIteradorInicial() != IdRealizacao_1)
 						return 124;
 
+					if (residuo_espaco_amostral.at(periodo_residuo).getIteradorFinal() > maior_realizacao_espaco_amostral.at(periodo_residuo))
+						return 1240;
 
 					if (residuo_espaco_amostral.at(periodo_residuo).size() == 1) {
 						if ((probabilidade_realizacao.getIteradorInicial() <= periodo_residuo) && (periodo_residuo <= probabilidade_realizacao.getIteradorFinal())) {

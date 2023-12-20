@@ -56,13 +56,10 @@ class EntradaSaidaDados;
 	  m(ModeloOtimizacao,  AttComum,                                   estagio_acoplamento_pre_estudo,                          IdEstagio,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                                  estagio_inicial,                          IdEstagio,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                                    estagio_final,                          IdEstagio,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                                  cenario_inicial,                          IdCenario,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                                    cenario_final,                          IdCenario,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                       periodo_otimizacao_inicial,                            Periodo,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                         periodo_otimizacao_final,                            Periodo,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                           periodo_estudo_inicial,                            Periodo,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                             periodo_estudo_final,                            Periodo,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                             tipo_aversao_a_risco,                   TipoAversaoRisco,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                            tipo_processo_estocastico_hidrologico,              IdProcessoEstocastico,        Nenhum,       max,        Nenhum,   sim) \
 	  m(ModeloOtimizacao,  AttComum,         relaxar_afluencia_incremental_com_viabilidade_hidraulica,                               bool,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                tipo_funcao_producao_hidreletrica,     TipoFuncaoProducaoHidreletrica,        Nenhum,       max,        Nenhum,   sim) 
@@ -635,6 +632,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		bool posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, bool a_retornar_proxy, EstruturaResultados<double>& a_sol_inf_var_dinamica, EstruturaResultados<double>& a_solucao_dual_var_dinamica, EstruturaResultados<double>& a_limite_inferior_var_dinamica, EstruturaResultados<double>& a_limite_superior_var_dinamica, EstruturaResultados<double>& a_sol_dual_var_estado, const std::string a_diretorio);
 
+		void armazenarValoresSolver(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao);
+
 		void calcularCustoPrimalViaSubproblemaMestre(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const std::string a_diretorio, double& a_custo_geral, double& a_custo_individual);
 
 		double getProbabilidadeAbertura(const IdEstagio a_idEstagio, const IdCenario a_idCenario);
@@ -652,18 +651,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		void consolidarEquacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados);
 		void consolidarInequacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados);
 
-		int getMenorNumeroAberturasEstagio(const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao);
-		int getMaiorNumeroAberturasEstagio(const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao);
-
-		int getMenorNumeroAberturasProcessoEstagio(const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao);
-		int getMaiorNumeroAberturasProcessoEstagio(const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao);
-
-		int getNumeroTotalCenariosEmEstados(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao);
 		int getNumeroVariavelDinamica(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio);
-
-		IdCenario getCenarioInicial(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao);
-		IdCenario getCenarioFinal(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao);
-		int getNumeroCenarios(const IdCenario a_cenario_inicial, const IdCenario a_cenario_final);
 
 	private:
 
@@ -881,15 +869,16 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 				double conteudo = NAN;
 
-				if ((a_isVar) && (a_isPrimal))
-					conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getValorPrimal(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1)));
+				if (a_idCenario != IdCenario_Nenhum) {
+					if ((a_isVar) && (a_isPrimal))
+						conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getValorPrimal(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1)));
 
-				else if ((a_isVar) && (!a_isPrimal))
-					conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getReducedCost(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1))) * a_VlrNorm;
+					else if ((a_isVar) && (!a_isPrimal))
+						conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getReducedCost(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1))) * a_VlrNorm;
 
-				else if ((!a_isVar) && (!a_isPrimal))
-					conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getMultiplicador(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1))) * a_VlrNorm;
-
+					else if ((!a_isVar) && (!a_isPrimal))
+						conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getMultiplicador(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1))) * a_VlrNorm;
+				}
 			
 				if (a_idRealizacao == IdRealizacao_Nenhum) {
 					if (a_lArmz.at(IdRealizacao_1).size() == 1) {
@@ -899,7 +888,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 						a_lArmz.at(IdRealizacao_1) = SmartEnupla<IdCenario, double>(cIni, std::vector<double>(numero_cenarios, NAN));
 					}
 
-					a_lArmz.at(IdRealizacao_1).at(a_idCenario) = conteudo;
+					if (a_idCenario != IdCenario_Nenhum)
+						a_lArmz.at(IdRealizacao_1).at(a_idCenario) = conteudo;
 
 				} // if (a_idRealizacao == IdRealizacao_Nenhum) {
 
