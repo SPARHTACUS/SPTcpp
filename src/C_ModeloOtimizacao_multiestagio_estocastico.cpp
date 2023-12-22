@@ -1916,39 +1916,41 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 							if (tipo_relaxacao != TipoRelaxacaoVariavelAleatoria_sem_relaxacao) {
 
 								// Variável Afluencia Incremental Folga (YHF): definida por periodo estocastico
-								int varYHF = -1;
+								int varYHF = getVarDecisao_YHFseExistir(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica);
 
-								if (viabilidade_hidraulica) {
+								if (varYHF == -1) {
 
-									if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica)
+									if (viabilidade_hidraulica) {
+
+										if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica)
+											varYHF = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica, 0.0, 0.0, 0.0);
+
+										else if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+											varYHF = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica, 0.0, infinito, 100.0);
+
+										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYHF);
+
+										vetorEstagio.att(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica), varYHF, idProcEstocastico, idVariavelAleatoria, idVarInt, periodo_processo_estocastico, sobreposicao, TipoValor_positivo, 1.0, 1.0);
+
+									} // if (viabilidade_hidraulica) {
+
+									// Afluencia Incremental Folga (YHF)
+									else if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_penalizacao)
+										varYHF = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica, 0.0, infinito, 0.0);
+
+									// Afluencia Incremental Folga (YHF)
+									else if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento) {
 										varYHF = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica, 0.0, 0.0, 0.0);
+										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYHF);
+										vetorEstagio.att(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica), varYHF, idProcEstocastico, idVariavelAleatoria, idVarInt, periodo_processo_estocastico, sobreposicao, TipoValor_positivo, 1.0, 1.0);
+									}
 
-									else if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
-										varYHF = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica, 0.0, infinito, 100.0);
+									// Variável Afluencia Incremental Folga (YHF): definida por periodo estocastico
+									if (varYHF > -1)
+										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYHF, posEquYH, -sobreposicao);
 
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYHF);
-
-									vetorEstagio.att(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica), varYHF, idProcEstocastico, idVariavelAleatoria, idVarInt, periodo_processo_estocastico, sobreposicao, TipoValor_positivo, 1.0, 1.0);
-
-								} // if (viabilidade_hidraulica) {
-
-								// Afluencia Incremental Folga (YHF)
-								else if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_penalizacao)
-									varYHF = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica, 0.0, infinito, 0.0);
-
-								// Afluencia Incremental Folga (YHF)
-								else if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento) {
-									varYHF = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica, 0.0, 0.0, 0.0);
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYHF);
-									vetorEstagio.att(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeVarDecisao_YHF(a_TSS, a_idEstagio, periodo_processo_estocastico, idHidreletrica), varYHF, idProcEstocastico, idVariavelAleatoria, idVarInt, periodo_processo_estocastico, sobreposicao, TipoValor_positivo, 1.0, 1.0);
-								}
-
-								// Variável Afluencia Incremental Folga (YHF): definida por periodo estocastico
-								if (varYHF > -1)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYHF, posEquYH, -sobreposicao);
-
+								} // if (varYHF == -1) {
 							} // if (tipo_relaxacao != TipoRelaxacaoVariavelAleatoria_sem_relaxacao) {
-
 						} // for (int i = 0; i < int(lista_hidreletrica.size()); i++) {
 
 						if (!sobreposicao_encontrada)

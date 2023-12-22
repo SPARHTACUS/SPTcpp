@@ -19827,7 +19827,7 @@ void LeituraCEPEL::atualizar_valores_periodos_horizonte_expandido_hidreletrica(D
 							
 							if (attVetorReservatorio.at(pos) == AttVetorReservatorio_volume_morto_completo || attVetorReservatorio.at(pos) == AttVetorReservatorio_enchendo_volume_morto) {
 								//Valores bool
-								const bool valor = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(attVetorReservatorio.at(pos), periodo_ultimo_sobreposicao, bool());
+								const int valor = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(attVetorReservatorio.at(pos), periodo_ultimo_sobreposicao, int());
 								a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setElemento(attVetorReservatorio.at(pos), periodo, valor);
 
 							}
@@ -21324,21 +21324,17 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		// INICIO DEV NOVO PROC ESTOCASTICO
 
-		const IdEstagio maior_estagio = a_dados.getIteradorFinal(AttVetorDados_horizonte_otimizacao, IdEstagio());
-		const IdEstagio estagio_extra = IdEstagio(maior_estagio + 1);
+		const Periodo periodo_final_PE_DECOMP = horizonte_otimizacao.at(horizonte_estudo.at(get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados)));
 
-		const Periodo maior_periodo = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, maior_estagio, Periodo());
-		const Periodo periodo_extra = Periodo(TipoPeriodo_mensal, maior_periodo + 1);
+		if (periodo_final_PE_DECOMP < horizonte_otimizacao.getIteradorFinal())
+			a_dados.setAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, false);
 
 		a_dados.definirCenariosPorProcessosEmArranjoResolucao();
 	
-		a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("nenhum")); // temporario para agilizar processo
-		a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false); // temporario par aagilizar processo
-
 		const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()), AttComumProcesso_menor_cenario, IdCenario());
 		const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()), AttComumProcesso_maior_cenario, IdCenario());
 
-		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(maior_periodo, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario);
+		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_final_PE_DECOMP, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario);
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 

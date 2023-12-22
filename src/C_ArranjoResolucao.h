@@ -46,6 +46,7 @@ public:
 	std::vector<IdCenario> getIdsCenarioEstadoFromCenarios(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
 	std::vector<IdCenario> getIdsCenarioEstadoFromAberturas(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
 	std::vector<IdCenario> getIdsCenarioEstado(const IdProcesso a_idProcessoDE, const IdProcesso a_idProcessoPARA, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
+	std::vector<IdCenario> getIdsCenarioEstado(const IdProcesso a_idProcessoDE, const IdProcesso a_idProcessoPARA, const IdIteracao a_idIteracao);
 	int getNumeroAberturas(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
 
 };

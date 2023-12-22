@@ -136,29 +136,29 @@ IdVariavelRealizacao Estagio::addVariavelRealizacao(const TipoSubproblemaSolver 
 
 } // IdVariavelRealizacao Estagio::adicionarVariavelRealizacao(const string a_nome, const IdEstagio a_idEstagio, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria){
 
-IdRestricaoRealizacao Estagio::addRestricaoRealizacao(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idRestricao, const SmartEnupla<IdRealizacao, double>& a_rhs, const SmartEnupla<int, SmartEnupla<IdRealizacao, double>> &a_coeficiente) {
+IdRestricaoCenario Estagio::addRestricaoCenario(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idRestricao, const SmartEnupla<IdCenario, double>& a_rhs, const SmartEnupla<int, SmartEnupla<IdCenario, double>> &a_coeficiente) {
 	
 	try{
 
-		const IdRestricaoRealizacao maiorIdRestricaoRealizacao = getMaiorId(IdRestricaoRealizacao());
+		const IdRestricaoCenario maiorIdRestricaoCenario = getMaiorId(IdRestricaoCenario());
 
-		const IdRestricaoRealizacao idRestricaoRealizacao = IdRestricaoRealizacao(maiorIdRestricaoRealizacao + 1);
+		const IdRestricaoCenario idRestricaoCenario = IdRestricaoCenario(maiorIdRestricaoCenario + 1);
 
-		RestricaoRealizacao variavelRealizacao;
-		variavelRealizacao.setAtributo(AttComumRestricaoRealizacao_idRestricaoRealizacao, idRestricaoRealizacao);
+		RestricaoCenario variavelRealizacao;
+		variavelRealizacao.setAtributo(AttComumRestricaoCenario_idRestricaoCenario, idRestricaoCenario);
 
-		vetorRestricaoRealizacao.add(variavelRealizacao);
+		vetorRestricaoCenario.add(variavelRealizacao);
 
-		vetorRestricaoRealizacao.att(idRestricaoRealizacao).setAtributo(AttComumRestricaoRealizacao_nome, a_nome);
+		vetorRestricaoCenario.att(idRestricaoCenario).setAtributo(AttComumRestricaoCenario_nome, a_nome);
 
-		vetorRestricaoRealizacao.att(idRestricaoRealizacao).setVetor_forced(AttVetorRestricaoRealizacao_idRestricao, SmartEnupla<TipoSubproblemaSolver, int>(TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1), std::vector<int>(TipoSubproblemaSolver(TipoSubproblemaSolver_Excedente - 1), -1)));
+		vetorRestricaoCenario.att(idRestricaoCenario).setVetor_forced(AttVetorRestricaoCenario_idRestricao, SmartEnupla<TipoSubproblemaSolver, int>(TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1), std::vector<int>(TipoSubproblemaSolver(TipoSubproblemaSolver_Excedente - 1), -1)));
 
-		vetorRestricaoRealizacao.att(idRestricaoRealizacao).setElemento(AttVetorRestricaoRealizacao_idRestricao, a_TSS, a_idRestricao);
+		vetorRestricaoCenario.att(idRestricaoCenario).setElemento(AttVetorRestricaoCenario_idRestricao, a_TSS, a_idRestricao);
 
-		vetorRestricaoRealizacao.att(idRestricaoRealizacao).setVetor_forced(AttVetorRestricaoRealizacao_rhs, a_rhs);
-		vetorRestricaoRealizacao.att(idRestricaoRealizacao).setMatriz_forced(AttMatrizRestricaoRealizacao_coeficiente, a_coeficiente);
+		vetorRestricaoCenario.att(idRestricaoCenario).setVetor_forced(AttVetorRestricaoCenario_rhs, a_rhs);
+		vetorRestricaoCenario.att(idRestricaoCenario).setMatriz_forced(AttMatrizRestricaoCenario_coeficiente, a_coeficiente);
 
-		return idRestricaoRealizacao;
+		return idRestricaoCenario;
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("Estagio(" + getString(getIdObjeto()) + ")::addVariavelRealizacao(" + getString(a_TSS) + "," + a_nome + "," + getString(a_idRestricao) + "): \n" + std::string(erro.what())); }

@@ -957,11 +957,11 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 
 		Periodo periodo_seguinte_mapeamento_existente = horizonte_espaco_amostral.getIteradorInicial();
 		if (getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) > 0) {
-			if (getIterador1Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario()) != a_menorIdcenario)
-				throw std::invalid_argument("Matriz inicializada com cenario inicial diferente do atual.");
+			if (getIterador1Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario()) > a_menorIdcenario)
+				throw std::invalid_argument("Matriz inicializada com cenario inicial maior que " + getFullString(a_menorIdcenario) + ".");
 
-			if (getIterador1Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario()) != a_maiorIdcenario)
-				throw std::invalid_argument("Matriz inicializada com cenario final diferente do atual.");
+			if (getIterador1Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario()) < a_maiorIdcenario)
+				throw std::invalid_argument("Matriz inicializada com cenario final menor que " + getFullString(a_maiorIdcenario) + ".");
 
 			periodo_seguinte_mapeamento_existente = getIterador2Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_menorIdcenario, Periodo());
 			horizonte_espaco_amostral.incrementarIterador(periodo_seguinte_mapeamento_existente);

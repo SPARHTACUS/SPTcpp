@@ -8275,17 +8275,20 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 			const Periodo periodo_decomposicao = getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
 			periodos_em_estagio.at(idEstagio) = mapeamento_espaco_amostral.at(IdCenario_1).getIteradores(periodo_decomposicao);
 
-			if (Periodo(TipoPeriodo_minuto, periodo_decomposicao) != Periodo(TipoPeriodo_minuto, periodos_em_estagio.at(idEstagio).at(0)))
-				return 81;
+			if (periodos_em_estagio.at(idEstagio).size() > 0) {
 
-			if (Periodo(TipoPeriodo_minuto, periodo_decomposicao + 1) != Periodo(TipoPeriodo_minuto, periodos_em_estagio.at(idEstagio).at(periodos_em_estagio.at(idEstagio).size() - 1) + 1))
-				return 82;
+				if (Periodo(TipoPeriodo_minuto, periodo_decomposicao) != Periodo(TipoPeriodo_minuto, periodos_em_estagio.at(idEstagio).at(0)))
+					return 81;
 
-			for (IdCenario idCenario = IdCenario_1; idCenario <= mapeamento_espaco_amostral.getIteradorFinal(); idCenario++) {
-				const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).at(periodos_em_estagio.at(idEstagio).at(0));
-				for (int i = 1; i < int(periodos_em_estagio.at(idEstagio).size()); i++) {
-					if (idRealizacao != mapeamento_espaco_amostral.at(idCenario).at(periodos_em_estagio.at(idEstagio).at(i)))
-						return 83;
+				if (Periodo(TipoPeriodo_minuto, periodo_decomposicao + 1) != Periodo(TipoPeriodo_minuto, periodos_em_estagio.at(idEstagio).at(periodos_em_estagio.at(idEstagio).size() - 1) + 1))
+					return 82;
+
+				for (IdCenario idCenario = IdCenario_1; idCenario <= mapeamento_espaco_amostral.getIteradorFinal(); idCenario++) {
+					const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).at(periodos_em_estagio.at(idEstagio).at(0));
+					for (int i = 1; i < int(periodos_em_estagio.at(idEstagio).size()); i++) {
+						if (idRealizacao != mapeamento_espaco_amostral.at(idCenario).at(periodos_em_estagio.at(idEstagio).at(i)))
+							return 83;
+					}
 				}
 			}
 
@@ -8678,9 +8681,9 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 			int semente_espaco_amostral_hidrologico = getAtributo(AttComumDados_semente_espaco_amostral_geracao_cenario_hidrologico, int());
 
 			if (realizar_reducao_espaco_amostral)
-				processoEstocastico_hidrologico.gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, imprimir_espaco_amostral_hidrologico, TipoRelaxacaoVariavelAleatoria_truncamento, getHorizonteEspacoAmostralHidrologico(estagio_inicial, estagio_final, IdRealizacao(getAtributo(AttComumDados_numero_aberturas, int())), true), getAtributo(AttComumDados_tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico, TipoSorteio()), semente_espaco_amostral_hidrologico);
+				processoEstocastico_hidrologico.gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, imprimir_espaco_amostral_hidrologico, TipoRelaxacaoVariavelAleatoria_penalizacao, getHorizonteEspacoAmostralHidrologico(estagio_inicial, estagio_final, IdRealizacao(getAtributo(AttComumDados_numero_aberturas, int())), true), getAtributo(AttComumDados_tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico, TipoSorteio()), semente_espaco_amostral_hidrologico);
 			else
-				processoEstocastico_hidrologico.gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, imprimir_espaco_amostral_hidrologico, TipoRelaxacaoVariavelAleatoria_truncamento, getHorizonteEspacoAmostralHidrologico(estagio_inicial, estagio_final), getAtributo(AttComumDados_tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico, TipoSorteio()), semente_espaco_amostral_hidrologico);
+				processoEstocastico_hidrologico.gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, imprimir_espaco_amostral_hidrologico, TipoRelaxacaoVariavelAleatoria_penalizacao, getHorizonteEspacoAmostralHidrologico(estagio_inicial, estagio_final), getAtributo(AttComumDados_tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico, TipoSorteio()), semente_espaco_amostral_hidrologico);
 
 
 

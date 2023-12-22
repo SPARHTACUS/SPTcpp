@@ -27,7 +27,7 @@
     <ClCompile Include="..\src\C_ElementoSistema.cpp" />
     <ClCompile Include="..\src\C_EntradaSaidaDados.cpp" />
     <ClCompile Include="..\src\C_Eolica.cpp" />
-    <ClCompile Include="..\src\C_RestricaoRealizacao.cpp" />
+    <ClCompile Include="..\src\C_RestricaoCenario.cpp" />
     <ClCompile Include="..\src\C_EstagioOtimizacao.cpp" />
     <ClCompile Include="..\src\C_FuncaoProducaoHidreletrica.cpp" />
     <ClCompile Include="..\src\C_Hidreletrica.cpp" />
@@ -83,7 +83,7 @@
     <ClInclude Include="..\src\C_ElementoSistema.h" />
     <ClInclude Include="..\src\C_EntradaSaidaDados.h" />
     <ClInclude Include="..\src\C_Eolica.h" />
-    <ClInclude Include="..\src\C_RestricaoRealizacao.h" />
+    <ClInclude Include="..\src\C_RestricaoCenario.h" />
     <ClInclude Include="..\src\C_EstagioOtimizacao.h" />
     <ClInclude Include="..\src\C_FuncaoProducaoHidreletrica.h" />
     <ClInclude Include="..\src\C_Hidreletrica.h" />
@@ -203,7 +203,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/Bv /bigobj %(AdditionalOptions)</AdditionalOptions>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <PreprocessToFile>false</PreprocessToFile>
       <LanguageStandard_C>Default</LanguageStandard_C>
