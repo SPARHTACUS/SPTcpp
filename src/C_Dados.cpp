@@ -406,6 +406,8 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
 
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+		
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
 
 		// ElementoSistema
@@ -7221,6 +7223,7 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 				//
 				a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
+				a_entradaSaidaDados.setAppendArquivo(false);
 				a_entradaSaidaDados.imprimirArquivoCSV_AttComum("SUBMERCADO_AttComumOperacional.csv", IdSubmercado_Nenhum, *this, std::vector<AttComumSubmercado> {AttComumSubmercado_idSubmercado, AttComumSubmercado_nome });
 
 				a_entradaSaidaDados.setAppendArquivo(false);
@@ -10043,7 +10046,7 @@ void Dados::calcular_tendencia_afluencia_incremental_com_natural() {
 		if (valida_tendencia_AfluenciaEmHidreletrica(AttVetorAfluencia_natural_tendencia)) {
 
 			const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
-			const IdHidreletrica menorIdHidreletrica = getMaiorId(IdHidreletrica());
+			const IdHidreletrica menorIdHidreletrica = getMenorId(IdHidreletrica());
 
 			SmartEnupla<Periodo, double> horizonte_tendencia;
 
@@ -10779,7 +10782,7 @@ SmartEnupla<IdHidreletrica, double> Dados::calculaAfluenciaIncremental(const Sma
 		const IdHidreletrica menorIdUHE = a_afluencia_natural.getIteradorInicial();
 		const IdHidreletrica maiorIdUHE = a_afluencia_natural.getIteradorFinal();
 
-		SmartEnupla<IdHidreletrica, double> afluencia_incremental_retorno(IdHidreletrica(1), std::vector<double>(maiorIdUHE, NAN));
+		SmartEnupla<IdHidreletrica, double> afluencia_incremental_retorno(menorIdUHE, std::vector<double>(int(maiorIdUHE - menorIdUHE) + 1, NAN));
 
 		for (IdHidreletrica idUHE = menorIdUHE; idUHE <= maiorIdUHE; vetorHidreletrica.incr(idUHE)) {
 
@@ -10879,6 +10882,10 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 				} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 			} // if ((getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior) == 0) || (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior) == 0)) {
+
+			if (getSizeVetor(idRestricaoOperativaUHE, AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior) == 0) {
+				vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setVetor(AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_limite_superior_folga_inferior, double())));
+			}//if (getSizeVetor(AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior) == 0) {
 
 			const IdElementoSistema maiorIdElementoSistema = getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 
@@ -11040,6 +11047,15 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 					a_entradaSaidaDados.setAppendArquivo(true);
 					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_limite_superior);
 
+
+					if (idRestricaoOperativaUHE == IdRestricaoOperativaUHE_1)
+						a_entradaSaidaDados.setAppendArquivo(false);
+					else
+						a_entradaSaidaDados.setAppendArquivo(true);
+
+					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorPeriodo.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior);
+
+
 					if (idRestricaoOperativaUHE == IdRestricaoOperativaUHE_1)
 						a_entradaSaidaDados.setAppendArquivo(false);
 					else
@@ -11085,6 +11101,8 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 				a_entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
 
 				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_membro);
+				
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
 
 				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
 

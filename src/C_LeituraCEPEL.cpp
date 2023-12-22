@@ -549,7 +549,8 @@ void LeituraCEPEL::instancia_termeletricas_preConfig(Dados& a_dados, const std::
 		EntradaSaidaDados entradaSaidaDados;
 
 		entradaSaidaDados.setDiretorioEntrada(a_diretorio);
-		entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("TERMELETRICA_AttComumOperacional.csv", a_dados, TipoAcessoInstancia_membro);
+		if (!entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("TERMELETRICA_AttComumOperacional.csv", a_dados, TipoAcessoInstancia_membro))
+			return;
 		const IdTermeletrica  maiorIdTermeletrica = a_dados.getMaiorId(IdTermeletrica());
 
 		for (IdTermeletrica idTermeletrica = a_dados.getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idTermeletrica)) {
@@ -2964,7 +2965,7 @@ void LeituraCEPEL::aplicarModificacoesUTE(Dados& a_dados) {
 } // void LeituraCEPEL::aplicarModificacoesUTE() {
 
 
-void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_dados) {
+void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo) {
 
 	try {
 
@@ -3007,6 +3008,22 @@ void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_
 			const std::string nome = "IV";
 
 			a_dados.vetorSubmercado.att(idSubmercado).setAtributo(AttComumSubmercado_nome, nome);
+
+			//////////////////////////////////////////////////////////////
+			//Instancia demanda = 0 para todos os patamares
+			a_dados.vetorSubmercado.att(idSubmercado).setMatriz(AttMatrizSubmercado_demanda, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>()));
+
+			for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
+
+				const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+
+				if (a_dados.vetorSubmercado.att(idSubmercado).getElementosMatriz(AttMatrizSubmercado_demanda, periodo, IdPatamarCarga(), double()).size() == 0)
+					a_dados.vetorSubmercado.att(idSubmercado).setElementos(AttMatrizSubmercado_demanda, periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+
+			}//for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
+
+			//////////////////////////////////////////////////////////////
+
 
 			lista_codigo_ONS_submercado.setElemento(idSubmercado, codigo_IV);
 			lista_submercado_mnemonico.setElemento(idSubmercado, nome);
@@ -3254,6 +3271,21 @@ void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_
 
 			a_dados.vetorSubmercado.att(idSubmercado).setAtributo(AttComumSubmercado_nome, nome);
 
+			//////////////////////////////////////////////////////////////
+			//Instancia demanda = 0 para todos os patamares
+			a_dados.vetorSubmercado.att(idSubmercado).setMatriz(AttMatrizSubmercado_demanda, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>()));
+
+			for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
+
+				const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+
+				if (a_dados.vetorSubmercado.att(idSubmercado).getElementosMatriz(AttMatrizSubmercado_demanda, periodo, IdPatamarCarga(), double()).size() == 0)
+					a_dados.vetorSubmercado.att(idSubmercado).setElementos(AttMatrizSubmercado_demanda, periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+
+			}//for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
+
+			//////////////////////////////////////////////////////////////
+
 			lista_codigo_ONS_submercado.setElemento(idSubmercado, codigo_ANDE);
 			lista_submercado_mnemonico.setElemento(idSubmercado, nome);
 
@@ -3331,6 +3363,21 @@ void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_
 				const std::string nome = "ITAIPU";
 
 				a_dados.vetorSubmercado.att(idSubmercado).setAtributo(AttComumSubmercado_nome, nome);
+
+				//////////////////////////////////////////////////////////////
+				//Instancia demanda = 0 para todos os patamares
+				a_dados.vetorSubmercado.att(idSubmercado).setMatriz(AttMatrizSubmercado_demanda, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>()));
+
+				for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
+
+					const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+
+					if (a_dados.vetorSubmercado.att(idSubmercado).getElementosMatriz(AttMatrizSubmercado_demanda, periodo, IdPatamarCarga(), double()).size() == 0)
+						a_dados.vetorSubmercado.att(idSubmercado).setElementos(AttMatrizSubmercado_demanda, periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+
+				}//for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
+
+				//////////////////////////////////////////////////////////////
 
 				lista_codigo_ONS_submercado.setElemento(idSubmercado, codigo_submercado_ITAIPU);
 				lista_submercado_mnemonico.setElemento(idSubmercado, nome);

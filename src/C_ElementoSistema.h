@@ -23,12 +23,12 @@
 
 
 #define ATT_VETOR_ELEMENTO_SISTEMA(m)  \
-	  m(ElementoSistema,  AttVetor,  fator_participacao,     double,        -10,          10,           0,      Periodo) 
+	  m(ElementoSistema,  AttVetor,  fator_participacao,     double,        min,          max,           0,      Periodo) 
 //               c_classe,   smrtAtt,     nomeAtributo,        Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 
 #define ATT_MATRIZ_ELEMENTO_SISTEMA(m)  \
-	  m(ElementoSistema,  AttMatriz, fator_participacao,          double,         -10,          10,             0,  Periodo, IdPatamarCarga) 
+	  m(ElementoSistema,  AttMatriz, fator_participacao,          double,         min,          max,             0,  Periodo, IdPatamarCarga) 
 //               c_classe,    smrtAtt,                      nomeAtributo,       Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 

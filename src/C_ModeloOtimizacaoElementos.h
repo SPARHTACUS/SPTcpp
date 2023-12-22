@@ -229,7 +229,7 @@ void ModeloOtimizacao::imprimirValorPrimalPorEstagioPorCenario##Elem##_##Nome##_
 		DECLARAR_CONDICAO_RETORNO_ImprimirPrimal_##ImprimirPrimal \
 		a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//" + std::string(#Elem)  + std::string(#Nome) + "_" + std::string(#Nro)); \
 		const std::string nome_arquivo = std::string(std::string(#Elem) + std::string(#Nome) + "_" + std::string(#Nro) + "_primal_" + a_nome_arquivo + ".csv"); \
-		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(##Nro, vlrP_e_c_##Elem##_##Nome##_##Nro.at(a_TSS))); \
+		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(Nro, vlrP_e_c_##Elem##_##Nome##_##Nro.at(a_TSS))); \
 		vlrP_e_c_##Elem##_##Nome##_##Nro.at(a_TSS) = \
 		Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>();\
 	} \
@@ -240,7 +240,7 @@ void ModeloOtimizacao::imprimirValorDualPorEstagioPorCenario##Elem##_##Nome##_##
 		DECLARAR_CONDICAO_RETORNO_ImprimirDual_##ImprimirDual \
 		a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//" + std::string(#Elem)  + std::string(#Nome) + "_" + std::string(#Nro)); \
 		const std::string nome_arquivo = std::string(std::string(#Elem) + std::string(#Nome) + "_" + std::string(#Nro) + "_dual_" + a_nome_arquivo + ".csv"); \
-		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(##Nro, vlrD_e_c_##Elem##_##Nome##_##Nro.at(a_TSS))); \
+		a_entradaSaidaDados.imprimirArquivoCSV_SmartEnupla(nome_arquivo, SmartEnupla<int,int>::getDadosAsString(Nro, vlrD_e_c_##Elem##_##Nome##_##Nro.at(a_TSS))); \
 		vlrD_e_c_##Elem##_##Nome##_##Nro.at(a_TSS) = \
 		Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>();\
 	} \
@@ -293,7 +293,7 @@ void ModeloOtimizacao::consolidarResultados##Elem##_##Nome##_##Nro(const TipoSub
 			std::vector<std::string> lista_arquivos(a_maiorIdProcesso, "");\
 			for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) \
 				lista_arquivos.at(getRank(idProcesso)) = std::string(std::string(#Elem) + std::string(#Nome) + "_" + std::string(#Nro) + "_primal_" + getFullString(idProcesso) + ".csv"); \
-			a_entradaSaidaDados.imprimirConsolidacaoHorizontalCSV(nome_arquivo, lista_arquivos, ##Nro, true); \
+			a_entradaSaidaDados.imprimirConsolidacaoHorizontalCSV(nome_arquivo, lista_arquivos, Nro, true); \
 		} \
 		if (getboolFromChar(#ImprimirDual)){ \
 			a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + std::string(#Elem) + std::string(#Nome) + "_" + std::string(#Nro)); \
@@ -301,7 +301,7 @@ void ModeloOtimizacao::consolidarResultados##Elem##_##Nome##_##Nro(const TipoSub
 			std::vector<std::string> lista_arquivos(a_maiorIdProcesso, "");\
 			for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) \
 				lista_arquivos.at(getRank(idProcesso)) = std::string(std::string(#Elem) + std::string(#Nome) + "_" + std::string(#Nro) + "_dual_" + getFullString(idProcesso) + ".csv"); \
-			a_entradaSaidaDados.imprimirConsolidacaoHorizontalCSV(nome_arquivo, lista_arquivos, ##Nro, true); \
+			a_entradaSaidaDados.imprimirConsolidacaoHorizontalCSV(nome_arquivo, lista_arquivos, Nro, true); \
 		} \
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao::consolidarResultados" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_maiorIdProcesso) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \

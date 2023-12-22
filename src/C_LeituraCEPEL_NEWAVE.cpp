@@ -49,7 +49,7 @@ void LeituraCEPEL::leitura_NEWAVE(Dados& a_dados, const std::string a_diretorio,
 
 			leitura_CONFHD_201908_NW25(a_dados, a_diretorio + "//CONFHD.DAT");
 
-			inicializa_Submercados_Intercambios_Nao_Registrados(a_dados);
+			inicializa_Submercados_Intercambios_Nao_Registrados(a_dados, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()));
 
 			leitura_CADUSIH_201904_NW25_DC29_DES16(a_dados, a_diretorio + "//HIDR.DAT", false, readPoliJusHidr_dat);
 
@@ -1980,7 +1980,7 @@ void LeituraCEPEL::leitura_CONFHD_201908_NW25(Dados &a_dados, std::string nomeAr
 
 						conteio_usinas_com_expansao_instanciadas++;
 
-						const IdHidreletrica idHidreletrica_expansao = IdHidreletrica(a_dados.getMaiorId(IdHidreletrica()) + 1);
+						const IdHidreletrica idHidreletrica_expansao = IdHidreletrica(codigo_usina);
 
 						if (true) {
 							Hidreletrica hidreletrica;
@@ -2038,15 +2038,16 @@ void LeituraCEPEL::leitura_CONFHD_201908_NW25(Dados &a_dados, std::string nomeAr
 						if (idHidreletrica_inicializado == IdHidreletrica_Nenhum) { //Hidrelétrica não inicializada
 
 							IdHidreletrica idHidreletrica_bacia = IdHidreletrica_Nenhum;
-							for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-								if (lista_codigo_ONS_REE.at(idHidreletrica) == codigo_REE_CEPEL){
-									idHidreletrica_bacia = idHidreletrica;
-									break;
-								} // if (getIdFromCodigoONS(lista_codigo_ONS_REE, codigo_REE_CEPEL) == idHidreletrica) {
-							} // for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+							if (a_dados.getMenorId(IdHidreletrica()) != IdHidreletrica_Nenhum) {
+								for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+									if (lista_codigo_ONS_REE.at(idHidreletrica) == codigo_REE_CEPEL) {
+										idHidreletrica_bacia = idHidreletrica;
+										break;
+									} // if (getIdFromCodigoONS(lista_codigo_ONS_REE, codigo_REE_CEPEL) == idHidreletrica) {
+								} // for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+							} // if (a_dados.getMenorId(IdHidreletrica()) != IdHidreletrica_Nenhum) {
 
-
-							const IdHidreletrica idHidreletrica = IdHidreletrica(a_dados.getMaiorId(IdHidreletrica()) + 1);
+							const IdHidreletrica idHidreletrica = IdHidreletrica(codigo_usina);
 
 							if (true) {
 								Hidreletrica hidreletrica;
@@ -4395,8 +4396,12 @@ void LeituraCEPEL::leitura_EXPT_201908_NW25(Dados& a_dados, std::string nomeArqu
 						else
 							periodo_inicio = Periodo(mes_inicio, ano_inicio);
 
+
 						// Inicializa adicao de modificacao na Termeletrica
-						if (lista_modificacaoUTE.size() - 1 < idTermeletrica) {
+						if ((lista_modificacaoUTE.size() - 1 < idTermeletrica) || (lista_modificacaoUTE.size() == 0)) {
+
+							if (lista_modificacaoUTE.size() == 0)
+								lista_modificacaoUTE.push_back(std::vector< ModificacaoUTE>());
 
 							IdTermeletrica menorIdTermeletrica = a_dados.getMenorId(IdTermeletrica());
 
