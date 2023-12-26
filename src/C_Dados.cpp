@@ -8225,13 +8225,8 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 
 		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
 
-		//Estrutura �rvore
-		if (a_processo_estocastico.getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) == 0)
-			return 0;
-
 		if (a_processo_estocastico.getAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico()) != a_tipo_processo_estocastico)
 			return 1;
-
 
 		const SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> mapeamento_espaco_amostral = a_processo_estocastico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao());
 
@@ -8774,7 +8769,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 		} // if (calcular_att_operacionais_processo_estocastico_hidrologico) {	
 
 
-		if ((!strCompara(a_diretorio_exportacao_pos_estudo, "nenhum") && (a_imprimir_atributos_sem_recarregar)) || (getAtributo(AttComumDados_imprimir_exportacao_pos_estudo, bool()))) {
+		if (getAtributo(AttComumDados_imprimir_exportacao_pos_estudo, bool())) {
 
 			const IdVariavelAleatoria maiorIdVariavelAleatoria = processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria());
 
@@ -8923,9 +8918,9 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 				for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica))
 					vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).setVetor_forced(AttVetorAfluencia_natural_historico, horizonte_historico);
 
-				for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
+				for (Periodo periodo = horizonte_historico.getIteradorInicial(); periodo <= horizonte_historico.getIteradorFinal(); horizonte_historico.incrementarIterador(periodo)) {
 
-					for (Periodo periodo = horizonte_historico.getIteradorInicial(); periodo <= horizonte_historico.getIteradorFinal(); horizonte_historico.incrementarIterador(periodo)) {
+					for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
 						const double afluencia_incremental = vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).getElementoVetor(AttVetorAfluencia_incremental_historico, periodo, double());
 
@@ -8944,9 +8939,9 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 						}//while (idhidreletrica_jusante != IdHidreletrica_Nenhum) {
 
-					}//for (Periodo periodo = horizonte_historico.getIteradorInicial(); periodo <= horizonte_historico.getIteradorFinal(); horizonte_historico.incrementarIterador(periodo)) {
+					}//for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
-				}//for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
+				}//for (Periodo periodo = horizonte_historico.getIteradorInicial(); periodo <= horizonte_historico.getIteradorFinal(); horizonte_historico.incrementarIterador(periodo)) {
 
 			} // if ((getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) == 0) && (getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico) > 0)) {
 
@@ -8983,7 +8978,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 
 			MPI_Barrier(MPI_COMM_WORLD);
 
-		}// if ((!strCompara(a_diretorio_exportacao_pos_estudo, "nenhum")) && ((a_imprimir_atributos_sem_recarregar) || (getAtributo(AttComumDados_imprimir_exportacao_pos_estudo, bool())))) {
+		}// if (getAtributo(AttComumDados_imprimir_exportacao_pos_estudo, bool())) {
 
 		//
 		// Esvazia Atributos

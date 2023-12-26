@@ -256,19 +256,19 @@ void VariavelAleatoria::calcularEstatisticaSerieTemporal(){
 
 		const IdEstacao maiorEstacao = Periodo::getMaiorEstacao(tipoPeriodo);
 
-		SmartEnupla<IdEstacao, double> media;
-		SmartEnupla<IdEstacao, double> desvio;
-		SmartEnupla<IdEstacao, double> assimetria;
+		SmartEnupla<IdEstacao, double> media(IdEstacao_1, std::vector<double>(int(maiorEstacao), 0.0));
+		SmartEnupla<IdEstacao, double> desvio = media;
+		SmartEnupla<IdEstacao, double> assimetria = media;
 
 		for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
 
 			const std::vector<double> dados = getVetor(AttVetorVariavelAleatoria_serie_temporal, Periodo(), double()).getElementos(idEstacao).at(tipoPeriodo);
 
-			media.addElemento(idEstacao, getMedia(dados));
+			media.setElemento(idEstacao, getMedia(dados));
 
-			desvio.addElemento(idEstacao, getDesvio(media.getElemento(idEstacao), dados));
+			desvio.setElemento(idEstacao, getDesvio(media.getElemento(idEstacao), dados));
 
-            assimetria.addElemento(idEstacao, getAssimetria(media.getElemento(idEstacao), desvio.getElemento(idEstacao), dados));
+            assimetria.setElemento(idEstacao, getAssimetria(media.getElemento(idEstacao), desvio.getElemento(idEstacao), dados));
 
 		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
 
@@ -291,24 +291,24 @@ void VariavelAleatoria::calcularEstatisticaSerieTransformada(){
 
 		const IdEstacao maiorEstacao = Periodo::getMaiorEstacao(tipoPeriodo);
 
-		SmartEnupla<IdEstacao, double> media;
-		SmartEnupla<IdEstacao, double> desvio;
-		SmartEnupla<IdEstacao, double> assimetria;
-		SmartEnupla<IdEstacao, double> ic_auto_correlacao;
+		SmartEnupla<IdEstacao, double> media(IdEstacao_1, std::vector<double>(int(maiorEstacao), 0.0));
+		SmartEnupla<IdEstacao, double> desvio = media;
+		SmartEnupla<IdEstacao, double> assimetria = media;
+		SmartEnupla<IdEstacao, double> ic_auto_correlacao = media;
 
 		for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
 
 			const std::vector<double> dados = getVetor(AttVetorVariavelAleatoria_serie_temporal_transformada, Periodo(), double()).getElementos(idEstacao).at(tipoPeriodo);
 
-			media.addElemento(idEstacao, getMedia(dados));
+			media.setElemento(idEstacao, getMedia(dados));
 
-			desvio.addElemento(idEstacao, getDesvio(media.getElemento(idEstacao), dados));
+			desvio.setElemento(idEstacao, getDesvio(media.getElemento(idEstacao), dados));
 
-			assimetria.addElemento(idEstacao, getAssimetria(media.getElemento(idEstacao), desvio.getElemento(idEstacao), dados));
+			assimetria.setElemento(idEstacao, getAssimetria(media.getElemento(idEstacao), desvio.getElemento(idEstacao), dados));
 
 			// Cálculo do Intervalo de Confiança
 			// rk(95%) = +- 1.96*sqrt(N)
-			ic_auto_correlacao.addElemento(idEstacao, 1.96 / std::sqrt(double(dados.size())));
+			ic_auto_correlacao.setElemento(idEstacao, 1.96 / std::sqrt(double(dados.size())));
 
 		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
 
@@ -403,7 +403,7 @@ void VariavelAleatoria::calcularAutoCorrelacaoParcialSerieTransformada(){
 
 		const int ordem_maxima = int(maiorEstacao) - 1;
 
-		SmartEnupla<IdEstacao, SmartEnupla<int, double>> auto_correlacao_parcial;
+		SmartEnupla<IdEstacao, SmartEnupla<int, double>> auto_correlacao_parcial(IdEstacao_1, std::vector<SmartEnupla<int, double>>(int(maiorEstacao), SmartEnupla<int, double>()));
 
 		// ----------------------------------------------------------
 		// Definindo a ordem da correlação temporal para cada estação
@@ -460,7 +460,7 @@ void VariavelAleatoria::calcularAutoCorrelacaoParcialSerieTransformada(){
 
 			} // for (int p = 1; p <= ordem_maxima; p++) {
 
-			auto_correlacao_parcial.addElemento(idEstacao, auto_correlacao_parcial_estacao);
+			auto_correlacao_parcial.setElemento(idEstacao, auto_correlacao_parcial_estacao);
 
 		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
 
@@ -596,6 +596,9 @@ void VariavelAleatoria::calcularCoeficientesAutoCorrelacaoSerieTransformada(cons
 
 		}
 
+		coeficiente_correlacao_temporal = SmartEnupla<IdEstacao, SmartEnupla<int, double>>(IdEstacao_1, std::vector<SmartEnupla<int, double>>(maiorEstacao, SmartEnupla<int, double>()));
+		coeficiente_linear_correlacao_temporal = coeficiente_correlacao_temporal;
+
 		// -------------------------------------------------------------------
 		// Estima coeficientes da correlação temporal para cada lag da estação
 		// -------------------------------------------------------------------
@@ -700,8 +703,8 @@ void VariavelAleatoria::calcularCoeficientesAutoCorrelacaoSerieTransformada(cons
 			if (coeficiente_linear_auto_correlacao.size() == 0)
 				coeficiente_linear_auto_correlacao.addElemento(1, 0.0);
 
-			coeficiente_correlacao_temporal.addElemento(idEstacao, coeficiente_auto_correlacao);
-			coeficiente_linear_correlacao_temporal.addElemento(idEstacao, coeficiente_linear_auto_correlacao);
+			coeficiente_correlacao_temporal.setElemento(idEstacao, coeficiente_auto_correlacao);
+			coeficiente_linear_correlacao_temporal.setElemento(idEstacao, coeficiente_linear_auto_correlacao);
 
 			if (idEstacao == maiorEstacao) {
 
@@ -863,11 +866,11 @@ void VariavelAleatoria::calcularEstatisticaSerieResiduo(){
 
 		const IdEstacao maiorEstacao = Periodo::getMaiorEstacao(tipoPeriodo);
 
-		SmartEnupla<IdEstacao ,double> enupla_media_residuo_normal;
-		SmartEnupla<IdEstacao, double> enupla_media_residuo_lognormal;
-		SmartEnupla<IdEstacao, double> enupla_desvio_residuo_normal;
-		SmartEnupla<IdEstacao, double> enupla_desvio_residuo_lognormal;
-		SmartEnupla<IdEstacao, double> enupla_assimetria_residuo_lognormal;
+		SmartEnupla<IdEstacao ,double> enupla_media_residuo_normal(IdEstacao_1, std::vector<double>(int(maiorEstacao), 0.0));
+		SmartEnupla<IdEstacao, double> enupla_media_residuo_lognormal = enupla_media_residuo_normal;
+		SmartEnupla<IdEstacao, double> enupla_desvio_residuo_normal = enupla_media_residuo_normal;
+		SmartEnupla<IdEstacao, double> enupla_desvio_residuo_lognormal = enupla_media_residuo_normal;
+		SmartEnupla<IdEstacao, double> enupla_assimetria_residuo_lognormal = enupla_media_residuo_normal;
 
 		for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
 
@@ -882,11 +885,11 @@ void VariavelAleatoria::calcularEstatisticaSerieResiduo(){
 
 			const double assimetria_residuo_lognormal = getAssimetria(media_residuo_lognormal, desvio_residuo_lognormal, dados_residuo_lognormal);
 
-			enupla_media_residuo_normal.addElemento(idEstacao, media_residuo_normal);
-			enupla_media_residuo_lognormal.addElemento(idEstacao, media_residuo_lognormal);
-			enupla_desvio_residuo_normal.addElemento(idEstacao, desvio_residuo_normal);
-			enupla_desvio_residuo_lognormal.addElemento(idEstacao, desvio_residuo_lognormal);
-			enupla_assimetria_residuo_lognormal.addElemento(idEstacao, assimetria_residuo_lognormal);
+			enupla_media_residuo_normal.setElemento(idEstacao, media_residuo_normal);
+			enupla_media_residuo_lognormal.setElemento(idEstacao, media_residuo_lognormal);
+			enupla_desvio_residuo_normal.setElemento(idEstacao, desvio_residuo_normal);
+			enupla_desvio_residuo_lognormal.setElemento(idEstacao, desvio_residuo_lognormal);
+			enupla_assimetria_residuo_lognormal.setElemento(idEstacao, assimetria_residuo_lognormal);
 
 		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
 
@@ -938,10 +941,10 @@ void VariavelAleatoria::calcularSigmaMiDeltaResiduoNormal(){
 
 		const IdEstacao maiorEstacao = Periodo::getMaiorEstacao(tipoPeriodo);
 
-		SmartEnupla<IdEstacao, double> enupla_sigma_residuo_normal;
-		SmartEnupla<IdEstacao, double> enupla_mi_residuo_normal;
-		SmartEnupla<IdEstacao, double> enupla_delta_residuo_normal;
-		SmartEnupla<IdEstacao, double> enupla_phi_residuo_lognormal;
+		SmartEnupla<IdEstacao, double> enupla_sigma_residuo_normal(IdEstacao_1, std::vector<double>(int(maiorEstacao), 0.0));
+		SmartEnupla<IdEstacao, double> enupla_mi_residuo_normal = enupla_sigma_residuo_normal;
+		SmartEnupla<IdEstacao, double> enupla_delta_residuo_normal = enupla_sigma_residuo_normal;
+		SmartEnupla<IdEstacao, double> enupla_phi_residuo_lognormal = enupla_sigma_residuo_normal;
 
 		for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
 
@@ -1000,10 +1003,10 @@ void VariavelAleatoria::calcularSigmaMiDeltaResiduoNormal(){
 				delta_residuo_normal = media_residuo_lognormal - std::pow((std::pow(desvio_residuo_lognormal, 2) / (phi_residuo_lognormal - 1.0)), 0.5) - grau_liberdade_residuo_lognormal;
 			}
 
-			enupla_mi_residuo_normal.addElemento    (idEstacao, mi_residuo_normal);
-			enupla_sigma_residuo_normal.addElemento (idEstacao, sigma_residuo_normal);
-			enupla_delta_residuo_normal.addElemento (idEstacao, delta_residuo_normal);
-			enupla_phi_residuo_lognormal.addElemento(idEstacao, phi_residuo_lognormal);
+			enupla_mi_residuo_normal.setElemento    (idEstacao, mi_residuo_normal);
+			enupla_sigma_residuo_normal.setElemento (idEstacao, sigma_residuo_normal);
+			enupla_delta_residuo_normal.setElemento (idEstacao, delta_residuo_normal);
+			enupla_phi_residuo_lognormal.setElemento(idEstacao, phi_residuo_lognormal);
 
 		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
 
@@ -1241,8 +1244,10 @@ void VariavelAleatoria::expandirParametrosEspacoAmostral(const SmartEnupla<Perio
 				const IdEstacao idEstacao = periodo.getEstacao();
 
 				if (idVariavelAleatoriaInterna == IdVariavelAleatoriaInterna_1) {
+
 					for (int lag = 1; lag <= getIterador2Final(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, int()); lag++)
 						addElemento(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo, lag, getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, lag, double()));
+
 						//coeficiente_linear_auto_correlacao.at(periodo).addElemento(lag, getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, lag, double()));
 				} // if (idVariavelAleatoriaInterna == IdVariavelAleatoriaInterna_1) {
 
