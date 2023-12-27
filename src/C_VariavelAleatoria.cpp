@@ -1164,7 +1164,7 @@ void VariavelAleatoria::gerarEspacoAmostralFromRuido(const SmartEnupla<Periodo, 
 } // void VariavelAleatoria::gerarEspacoAmostralFromRuido(const SmartEnupla<Periodo, IdRealizacao>& a_horizonte_amostra_comum, const TipoSorteio a_tipo_sorteio, int & a_semente){
 
 
-void VariavelAleatoria::gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario, SmartEnupla<Periodo, IdRealizacao>> &a_mapeamento_amostra_comum, const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>& a_horizonte_processo_estocastico, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const bool a_espaco_amostral_mesmo_tipo_periodo){
+void VariavelAleatoria::gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario, SmartEnupla<Periodo, IdRealizacao>> &a_mapeamento_amostra_comum, const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>& a_horizonte_processo_estocastico, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos){
 
 	try{
 
@@ -1217,9 +1217,9 @@ void VariavelAleatoria::gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario
 				const IdRealizacao idRealizacao = a_mapeamento_amostra_comum.at(idCenario).getElemento(periodo);
 
 				if (a_gerar_cenarios_buffer)
-					setElemento(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, idCenario, periodo, getRealizacaoTransformadaEspacoAmostral(idCenario, idRealizacao, periodo, a_espaco_amostral_mesmo_tipo_periodo));
+					setElemento(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, idCenario, periodo, getRealizacaoTransformadaEspacoAmostral(idCenario, idRealizacao, periodo));
 				else
-					setElemento(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, idCenario, periodo, getRealizacaoTransformadaEspacoAmostral_recursivo(idCenario, idRealizacao, a_mapeamento_amostra_comum.at(idCenario), periodo, periodo, a_horizonte_processo_estocastico.at(idCenario), a_espaco_amostral_mesmo_tipo_periodo));
+					setElemento(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, idCenario, periodo, getRealizacaoTransformadaEspacoAmostral_recursivo(idCenario, idRealizacao, a_mapeamento_amostra_comum.at(idCenario), periodo, periodo, a_horizonte_processo_estocastico.at(idCenario)));
 
 				if (a_gerar_cenarios_internos)
 					setRealizacaoInterna(idCenario, periodo);
@@ -1275,11 +1275,11 @@ double VariavelAleatoria::getRealizacaoEspacoAmostral(const IdCenario a_idCenari
 } // double VariavelAleatoria::getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const Periodo a_periodo) const{
 
 
-double VariavelAleatoria::getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const bool a_espaco_amostral_mesmo_tipo_periodo) {
+double VariavelAleatoria::getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo) {
 
 	try {
 
-		return getRealizacaoTransformadaEspacoAmostral(a_idCenario, a_idRealizacao, a_periodo, a_espaco_amostral_mesmo_tipo_periodo);
+		return getRealizacaoTransformadaEspacoAmostral(a_idCenario, a_idRealizacao, a_periodo);
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::getRealizacaoEspacoAmostral(" + getString(a_idCenario) + "," + getString(a_periodo) + "): \n" + std::string(erro.what())); }
@@ -1287,7 +1287,7 @@ double VariavelAleatoria::getRealizacaoEspacoAmostral(const IdCenario a_idCenari
 } // double VariavelAleatoria::getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo) const{
 
 
-double VariavelAleatoria::getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const Periodo a_periodo, const SmartEnupla<Periodo, IdRealizacao> a_horizonte_mapeamento_espaco_amostral, const bool a_espaco_amostral_mesmo_tipo_periodo){
+double VariavelAleatoria::getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const Periodo a_periodo, const SmartEnupla<Periodo, IdRealizacao> a_horizonte_mapeamento_espaco_amostral){
 
 	try { 
 		
@@ -1301,7 +1301,7 @@ double VariavelAleatoria::getRealizacaoEspacoAmostral(const IdCenario a_idCenari
 		for (Periodo periodo_mapeamento_espaco_amostral = a_horizonte_mapeamento_espaco_amostral.getIteradorInicial(); periodo_mapeamento_espaco_amostral <= a_horizonte_mapeamento_espaco_amostral.getIteradorFinal(); a_horizonte_mapeamento_espaco_amostral.incrementarIterador(periodo_mapeamento_espaco_amostral))
 			horizonte_completo.addElemento(periodo_mapeamento_espaco_amostral, 0.0);
 
-		return getRealizacaoTransformadaEspacoAmostral_recursivo(a_idCenario, a_idRealizacao, a_idRealizacoes_cenario, a_periodo, a_periodo, horizonte_completo, a_espaco_amostral_mesmo_tipo_periodo);
+		return getRealizacaoTransformadaEspacoAmostral_recursivo(a_idCenario, a_idRealizacao, a_idRealizacoes_cenario, a_periodo, a_periodo, horizonte_completo);
 	
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::getRealizacaoEspacoAmostral(" + getString(a_idCenario) + "," + getString(a_periodo) + "): \n" + std::string(erro.what())); }
@@ -1316,47 +1316,13 @@ double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral(const IdCenari
 } // double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral(const IdCenario a_idCenario, const Periodo a_periodo) const{
 
 
-double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const bool a_espaco_amostral_mesmo_tipo_periodo) const{
+double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo) const{
 
 	try{
-		// Adicionado 1 na ordem_auto_correlacao para que a SmartEnupla tendencia_por_periodo nao fique vazia em caso de AttVetorVariavelAleatoria_ordem_auto_correlacao = 0.
-		const int ordem_auto_correlacao = getSizeMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo);
 
-		SmartEnupla<Periodo, double> tendencia_por_periodo;
+		const SmartEnupla<Periodo, double> tendencia = getElementosMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, a_idCenario, Periodo(), double());
 
-		const SmartEnupla<Periodo, double> horizonte = getElementosMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, a_idCenario, Periodo(), double());
-
-		for (int lag = ordem_auto_correlacao; lag >= 1; lag--) {
-
-			Periodo periodo_lag = a_periodo;
-
-			if (a_espaco_amostral_mesmo_tipo_periodo)
-				periodo_lag = a_periodo - lag;
-
-			else {
-				for (int i = 0; i < lag; i++)
-					horizonte.decrementarIterador(periodo_lag);		
-			}
-
-			tendencia_por_periodo.addElemento(periodo_lag, 0.0);
-
-			bool sobreposicao_encontrada = false;
-			for (Periodo periodo = horizonte.getIteradorInicial(); periodo <= horizonte.getIteradorFinal(); horizonte.incrementarIterador(periodo)) {
-
-				const double sobreposicao = periodo_lag.sobreposicao(periodo);
-
-				if (sobreposicao > 0.0) {
-					tendencia_por_periodo.at(periodo_lag) += sobreposicao * getElementoMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, a_idCenario, periodo, double());
-					sobreposicao_encontrada = true;
-				}
-				else if ((sobreposicao == 0.0) && (sobreposicao_encontrada))
-					break;
-
-			} // for (Periodo periodo = horizonte.getIteradorInicial(); periodo <= horizonte.getIteradorFinal(); horizonte.incrementarIterador(periodo)) {
-
-		} // for (int lag = ordem_auto_correlacao; lag >= 1; lag--) {
-
-		return calcularRealizacao(a_periodo, tendencia_por_periodo, getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, a_idRealizacao, double()), a_espaco_amostral_mesmo_tipo_periodo);
+		return calcularRealizacao(a_periodo, tendencia, getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, a_idRealizacao, double()));
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::getRealizacaoTransformadaEspacoAmostral(" + getString(a_idCenario) + "," + getString(a_idRealizacao) + "," + getString(a_periodo) + "): \n" + std::string(erro.what())); }
@@ -1364,7 +1330,7 @@ double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral(const IdCenari
 } // double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo) const{
 
 
-double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral_recursivo(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const Periodo a_periodo, const Periodo a_periodo_realizacao, const SmartEnupla<Periodo, double> a_horizonte_completo, const bool a_espaco_amostral_mesmo_tipo_periodo) {
+double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral_recursivo(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const Periodo a_periodo, const Periodo a_periodo_realizacao, const SmartEnupla<Periodo, double> a_horizonte_completo) {
 
 	try {
 		
@@ -1380,78 +1346,46 @@ double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral_recursivo(cons
 
 		SmartEnupla<Periodo, double> tendencia_por_periodo;
 
-		const Periodo periodo_tendencia_final = getIteradorFinal(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo());
+		if ((ordem_auto_correlacao > 1) || (getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo, 1, double()) != 0.0)) {
 
-		for (int lag = ordem_auto_correlacao; lag >= 1; lag--) {
+			const Periodo periodo_tendencia_final = getIteradorFinal(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo());
 
-			Periodo periodo_lag = a_periodo;
+			for (int lag = 1; lag <= ordem_auto_correlacao; lag++) {
 
-			if (a_espaco_amostral_mesmo_tipo_periodo)
-				periodo_lag = a_periodo - lag;
+				const Periodo periodo_lag = a_periodo - lag;
 
-			else {
-				for (int i = 0; i < lag; i++)
-					a_horizonte_completo.decrementarIterador(periodo_lag);
-			}
+				const std::vector<Periodo> periodos = a_horizonte_completo.getIteradores(periodo_lag);
 
-			tendencia_por_periodo.addElemento(periodo_lag, 0.0);
+				for (int p = 0; p < int(periodos.size()); p++) {
 
-			bool sobreposicao_encontrada = false;
-			for (Periodo periodo = a_horizonte_completo.getIteradorInicial(); periodo <= a_horizonte_completo.getIteradorFinal(); a_horizonte_completo.incrementarIterador(periodo)) {
+					const Periodo periodo = periodos.at(p);
 
-				const double sobreposicao = periodo_lag.sobreposicao(periodo);
-
-				if (sobreposicao > 0.0) {
-					
-					sobreposicao_encontrada = true;
+					const double sobreposicao = periodo_lag.sobreposicao(periodo);
 
 					if (periodo <= periodo_tendencia_final) {
 
-						//Pega o valor da tendência, o qual está dentro da VariavelAleatoriaInterna
+						//Valor da tendência está em VariavelAleatoriaInterna
 
 						double valor_realizacao = 0;
 
-						const SmartEnupla<Periodo, double> horizonte_tendencia = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
+						for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= getMaiorId(IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++)
+							valor_realizacao += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double()) + getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
 
-						const Periodo periodo_tendencia_inicial = horizonte_tendencia.getIteradorInicial();
-
-						const IdVariavelAleatoriaInterna maiorIdVariavelAleatoriaInterna = getMaiorId(IdVariavelAleatoriaInterna());
-
-						bool sobreposicao_encontrada = false;
-						for (Periodo periodo_tendencia = periodo_tendencia_inicial; periodo_tendencia <= periodo_tendencia_final; horizonte_tendencia.incrementarIterador(periodo_tendencia)) {
-
-							const double sobreposicao = periodo_lag.sobreposicao(periodo_tendencia);
-
-							if (sobreposicao > 0.0) {
-
-								for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++)
-									valor_realizacao += sobreposicao * (getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo_tendencia, double()) + getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double()));
-
-								sobreposicao_encontrada = true;
-							}
-							else if ((sobreposicao == 0.0) && (sobreposicao_encontrada))
-								break;
-
-						}//for (Periodo periodo_tendencia = periodo_tendencia_inicial; periodo_tendencia <= periodo_tendencia_final; horizonte_tendencia.incrementarIterador(periodo_tendencia)) {
-
-						tendencia_por_periodo.at(periodo_lag) = valor_realizacao;
+						tendencia_por_periodo.addElemento(periodo, valor_realizacao);
 
 					}//if (a_periodo <= vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getIterador2Final(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, Periodo())) {
 					else
-						tendencia_por_periodo.at(periodo_lag) += sobreposicao * getRealizacaoTransformadaEspacoAmostral_recursivo(a_idCenario, a_idRealizacao, a_idRealizacoes_cenario, periodo_lag, a_periodo_realizacao, a_horizonte_completo, a_espaco_amostral_mesmo_tipo_periodo);
+						tendencia_por_periodo.addElemento(periodo, getRealizacaoTransformadaEspacoAmostral_recursivo(a_idCenario, a_idRealizacao, a_idRealizacoes_cenario, periodo_lag, a_periodo_realizacao, a_horizonte_completo));
 
-				}
-				else if ((sobreposicao == 0.0) && (sobreposicao_encontrada))
-					break;
+				} // for (int p = 0; p < int(periodos.size()); p++) {
 
-			} // for (Periodo periodo = a_horizonte_completo.getIteradorInicial(); periodo <= a_horizonte_completo.getIteradorFinal(); a_horizonte_completo.incrementarIterador(periodo)) {
+			} // for (int lag = 1; lag <= ordem_auto_correlacao; lag++) {
+		}
 
-		} // for (int lag = ordem_auto_correlacao; lag >= 1; lag--) {
-
-		return calcularRealizacao(a_periodo, tendencia_por_periodo, getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, a_idRealizacao, double()), a_espaco_amostral_mesmo_tipo_periodo);
+		return calcularRealizacao(a_periodo, tendencia_por_periodo, getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, a_idRealizacao, double()));
 
 	} // try{
-	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::getRealizacaoTransformadaEspacoAmostral_recursivo(" + getString(a_idCenario)  + "," + getString(a_periodo) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::getRealizacaoTransformadaEspacoAmostral_recursivo(" + getString(a_idCenario) + "," + getString(a_periodo) + "): \n" + std::string(erro.what())); }
 
 } // double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral_recursivo(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo) const{
 
@@ -1549,7 +1483,7 @@ double VariavelAleatoria::calcularResiduo(double a_ruido_correlacionado, const P
 
 
 
-double VariavelAleatoria::calcularResiduo(const Periodo a_periodo, const SmartEnupla<Periodo, double>& a_tendencia, const double a_realizacao, const bool a_espaco_amostral_mesmo_tipo_periodo) const {
+double VariavelAleatoria::calcularResiduo(const Periodo a_periodo, const SmartEnupla<Periodo, double>& a_tendencia, const double a_realizacao) const {
 
 	try {
 
@@ -1559,7 +1493,7 @@ double VariavelAleatoria::calcularResiduo(const Periodo a_periodo, const SmartEn
 		const TipoModeloGeracaoSinteticaCenario tipo_modelo_geracao_sintetica = getAtributo(AttComumVariavelAleatoria_tipo_modelo_geracao_sintetica, TipoModeloGeracaoSinteticaCenario());
 
 		if (tipo_modelo_geracao_sintetica == TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal)
-			return a_realizacao - calcularRegressivo_lognormal_3p(a_periodo, a_tendencia, a_espaco_amostral_mesmo_tipo_periodo);
+			return a_realizacao - calcularRegressivo_lognormal_3p(a_periodo, a_tendencia);
 
 		else
 			throw std::invalid_argument("TipoModeloGeracaoSinteticaCenario nao utilizado.");
@@ -1570,7 +1504,7 @@ double VariavelAleatoria::calcularResiduo(const Periodo a_periodo, const SmartEn
 } // double VariavelAleatoria::calcularResiduo(const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const SmartEnupla<Periodo, double>& a_tendencia, const double a_realizacao) {
 
 
-double VariavelAleatoria::calcularRealizacao(const Periodo a_periodo, const SmartEnupla<Periodo, double>& a_tendencia, const double a_residuo, const bool a_espaco_amostral_mesmo_tipo_periodo) const {
+double VariavelAleatoria::calcularRealizacao(const Periodo a_periodo, const SmartEnupla<Periodo, double>& a_tendencia, const double a_residuo) const {
 
 	try {
 
@@ -1580,7 +1514,7 @@ double VariavelAleatoria::calcularRealizacao(const Periodo a_periodo, const Smar
 		const TipoModeloGeracaoSinteticaCenario tipo_modelo_geracao_sintetica = getAtributo(AttComumVariavelAleatoria_tipo_modelo_geracao_sintetica, TipoModeloGeracaoSinteticaCenario());
 
 		if (tipo_modelo_geracao_sintetica == TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal)
-			return a_residuo + calcularRegressivo_lognormal_3p(a_periodo, a_tendencia, a_espaco_amostral_mesmo_tipo_periodo);
+			return a_residuo + calcularRegressivo_lognormal_3p(a_periodo, a_tendencia);
 
 		else
 			throw std::invalid_argument("TipoModeloGeracaoSinteticaCenario nao utilizado.");
@@ -1592,7 +1526,7 @@ double VariavelAleatoria::calcularRealizacao(const Periodo a_periodo, const Smar
 
 
 
-void VariavelAleatoria::calcularRealizacaoAndResiduo(double a_ruido_correlacionado, const Periodo a_periodo, const SmartEnupla<Periodo, double>& a_tendencia, double & a_valor_realizacao, double & a_valor_residuo_realizacao, const bool a_espaco_amostral_mesmo_tipo_periodo) const {
+void VariavelAleatoria::calcularRealizacaoAndResiduo(double a_ruido_correlacionado, const Periodo a_periodo, const SmartEnupla<Periodo, double>& a_tendencia, double & a_valor_realizacao, double & a_valor_residuo_realizacao) const {
 
 	try {
 
@@ -1603,7 +1537,7 @@ void VariavelAleatoria::calcularRealizacaoAndResiduo(double a_ruido_correlaciona
 
 		if (tipo_modelo_geracao_sintetica == TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal) {
 			residuo    = calcularResiduo_lognormal_3p   (a_ruido_correlacionado, a_periodo);
-			regressivo = calcularRegressivo_lognormal_3p(a_periodo, a_tendencia, a_espaco_amostral_mesmo_tipo_periodo);
+			regressivo = calcularRegressivo_lognormal_3p(a_periodo, a_tendencia);
 		} // if (tipo_modelo_geracao_sintetica == TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal) {
 
 		else
@@ -1644,11 +1578,11 @@ double VariavelAleatoria::calcularRealizacaoInterna(const IdVariavelAleatoriaInt
 
 
 
-double VariavelAleatoria::calcularRealizacaoInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const bool a_espaco_amostral_mesmo_tipo_periodo) {
+double VariavelAleatoria::calcularRealizacaoInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo) {
 
 	try {
 
-		const double realizacao = getRealizacaoEspacoAmostral(a_idCenario, a_idRealizacao, a_periodo, a_espaco_amostral_mesmo_tipo_periodo);
+		const double realizacao = getRealizacaoEspacoAmostral(a_idCenario, a_idRealizacao, a_periodo);
 
 		return vetorVariavelAleatoriaInterna.att(a_idVariavelAleatoriaInterna).calcularRealizacao(realizacao, a_periodo);
 
@@ -1658,11 +1592,11 @@ double VariavelAleatoria::calcularRealizacaoInterna(const IdVariavelAleatoriaInt
 } // double VariavelAleatoria::calcularRealizacaoInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo) {
 
 
-double VariavelAleatoria::calcularRealizacaoInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const SmartEnupla<Periodo, IdRealizacao> a_horizonte_mapeamento_espaco_amostral, const bool a_espaco_amostral_mesmo_tipo_periodo) {
+double VariavelAleatoria::calcularRealizacaoInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const SmartEnupla<Periodo, IdRealizacao> a_horizonte_mapeamento_espaco_amostral) {
 
 	try {
 
-		const double realizacao = getRealizacaoEspacoAmostral(a_idCenario, a_idRealizacao, a_idRealizacoes_cenario, a_periodo, a_horizonte_mapeamento_espaco_amostral, a_espaco_amostral_mesmo_tipo_periodo);
+		const double realizacao = getRealizacaoEspacoAmostral(a_idCenario, a_idRealizacao, a_idRealizacoes_cenario, a_periodo, a_horizonte_mapeamento_espaco_amostral);
 
 		return vetorVariavelAleatoriaInterna.att(a_idVariavelAleatoriaInterna).calcularRealizacao(realizacao, a_periodo);
 
@@ -1742,59 +1676,33 @@ void VariavelAleatoria::setRealizacaoInternaFromTendencia(const IdCenario a_idCe
 } // void VariavelAleatoria::addRealizacaoInterna(const IdCenario a_idCenario, const Periodo a_periodo){
 
 
-double VariavelAleatoria::calcularRegressivo_lognormal_3p(const Periodo a_periodo, const SmartEnupla<Periodo, double>& a_tendencia, const bool a_espaco_amostral_mesmo_tipo_periodo)const {
+double VariavelAleatoria::calcularRegressivo_lognormal_3p(const Periodo a_periodo, const SmartEnupla<Periodo, double>& a_tendencia)const {
 
 	try {
 
 		double parcela_regressiva_realizacao = 0.0;
 		const int lag_final = getIterador2Final(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo, int());
 
-		Periodo periodo_final_tendencia;
-		for (Periodo periodo = a_tendencia.getIteradorFinal(); periodo >= a_tendencia.getIteradorInicial(); a_tendencia.decrementarIterador(periodo)) {
-			if (Periodo(a_periodo.getTipoPeriodo(), periodo + 1) == a_periodo) {
-				periodo_final_tendencia = periodo;
-				break;
-			}
-		}
-
-		if (!periodo_final_tendencia.isValido())
-			throw std::invalid_argument("Nao foi possivel encontrar periodo final da tendencia.");
-
-		int lag = 1;
-		Periodo periodo_lag;
-		
-		if (a_espaco_amostral_mesmo_tipo_periodo)
-			periodo_lag = a_periodo - lag;
-
-		else
-			periodo_lag = periodo_final_tendencia;
-
-		for (Periodo periodo = periodo_final_tendencia; periodo >= a_tendencia.getIteradorInicial(); a_tendencia.decrementarIterador(periodo)) {
-
-			const double sobreposicao = periodo_lag.sobreposicao(periodo);
-
-			if (sobreposicao == 0.0)
-				throw std::invalid_argument("Erro ao calcular parcela autoregressiva.");
+		for (int lag = 1; lag <= lag_final; lag++){
 
 			const double coeficiente_linear = getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo, lag, double());
 
-			parcela_regressiva_realizacao += coeficiente_linear * a_tendencia.getElemento(periodo) * sobreposicao;
+			if (coeficiente_linear != 0.0) {
 
-			Periodo periodo_anterior = periodo;
-			a_tendencia.decrementarIterador(periodo_anterior);
+				const Periodo periodo_lag = a_periodo - lag;
 
-			if (periodo_anterior < periodo_lag) {
-				lag++;
-				if (a_espaco_amostral_mesmo_tipo_periodo)
-					periodo_lag = a_periodo - lag;
-				else
-					a_tendencia.decrementarIterador(periodo_lag);
-			}
+				if (a_tendencia.getIteradorInicial() > periodo_lag)
+					throw std::invalid_argument("Tendencia nao compativel com lag " + getString(lag) + ".");
+				
+				const std::vector<Periodo> periodos = a_tendencia.getIteradores(periodo_lag);
+				if (periodos.size() == 0)
+					throw std::invalid_argument("Nao encontrados periodos com lag " + getString(lag) + ".");
 
-			if (lag_final < lag)
-				break;
+				for (int p = 0; p < int(periodos.size()); p++)
+					parcela_regressiva_realizacao += periodo_lag.sobreposicao(periodos.at(p)) * a_tendencia.at(periodos.at(p)) * coeficiente_linear;
 
-		} // for (Periodo periodo = a_tendencia.getIteradorInicial(); periodo <= a_tendencia.getIteradorFinal(); a_tendencia.incrementarIterador(periodo)) {
+			} // if (coeficiente_linear != 0.0) {
+		} // for (int lag = 1; lag <= lag_final; lag++)
 
 		if (std::isnan(parcela_regressiva_realizacao))
 			throw std::invalid_argument("Regressivo invalido (NaN ou inf.");

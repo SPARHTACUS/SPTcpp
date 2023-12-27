@@ -21310,8 +21310,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		a_dados.setAtributo(AttComumDados_diretorio_entrada_dados, entradaSaidaDados.getDiretorioEntrada());
 		a_dados.setAtributo(AttComumDados_diretorio_saida_dados, entradaSaidaDados.getDiretorioSaida());
 
-		a_dados.validacao_operacional_Dados(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
-
 		/////////////////
 
 		define_afluencia_arvore_de_cenarios_postos_CP(a_dados);
@@ -21328,10 +21326,12 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		if (periodo_final_PE_DECOMP < horizonte_otimizacao.at(horizonte_otimizacao.getIteradorFinal())) {
 			a_dados.setAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, false);
-			a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, true);
+			a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false);
+			a_dados.setAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, true);
+			a_dados.setAtributo(AttComumDados_ordem_maxima_auto_correlacao_geracao_cenario_hidrologico, 6);
 		}
 
-		a_dados.setAtributo(AttComumDados_numero_cenarios, 429);
+		a_dados.validacao_operacional_Dados(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		a_dados.definirCenariosPorProcessosEmArranjoResolucao();
 	

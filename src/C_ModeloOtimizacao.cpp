@@ -1067,7 +1067,7 @@ void ModeloOtimizacao::imprimirVariaveisRealizacao(EntradaSaidaDados a_entradaSa
 
 } // void ModeloOtimizacao::imprimirVariaveisRealizacao(EntradaSaidaDados a_entradaSaidaDados){
 
-void ModeloOtimizacao::imprimirRestricoesRealizacao(EntradaSaidaDados a_entradaSaidaDados) {
+void ModeloOtimizacao::imprimirRestricoesCenario(EntradaSaidaDados a_entradaSaidaDados) {
 
 	const IdEstagio estagio_inicial = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
 	const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());

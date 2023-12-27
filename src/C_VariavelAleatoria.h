@@ -144,7 +144,7 @@ public:
 
 	void gerarEspacoAmostralFromRuido(const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral);
 
-	void gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario, SmartEnupla<Periodo, IdRealizacao>> &a_mapeamento_amostra_comum, const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>> &a_horizonte_processo_estocastico, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const bool a_espaco_amostral_mesmo_tipo_periodo);
+	void gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario, SmartEnupla<Periodo, IdRealizacao>> &a_mapeamento_amostra_comum, const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>> &a_horizonte_processo_estocastico, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos);
 
 	void expandirParametrosEspacoAmostral(const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral);
 
@@ -152,25 +152,25 @@ public:
 	//double getResiduoEspacoAmostral(const IdCenario a_idCenario, const Periodo a_periodo) const;
 
 	double getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const Periodo a_periodo) const;
-	double getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const bool a_espaco_amostral_mesmo_tipo_periodo);
-	double getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const Periodo a_periodo, const SmartEnupla<Periodo, IdRealizacao> a_horizonte_mapeamento_espaco_amostral, const bool a_espaco_amostral_mesmo_tipo_periodo);
+	double getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo);
+	double getRealizacaoEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const Periodo a_periodo, const SmartEnupla<Periodo, IdRealizacao> a_horizonte_mapeamento_espaco_amostral);
 
 	double getRealizacaoTransformadaEspacoAmostral(const IdCenario a_idCenario, const Periodo a_periodo) const;
-	double getRealizacaoTransformadaEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const bool a_espaco_amostral_mesmo_tipo_periodo) const;
-	double getRealizacaoTransformadaEspacoAmostral_recursivo(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao,  const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const Periodo a_periodo, const Periodo a_periodo_realizacao, const SmartEnupla<Periodo, double> a_horizonte_completo, const bool a_espaco_amostral_mesmo_tipo_periodo);
+	double getRealizacaoTransformadaEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo) const;
+	double getRealizacaoTransformadaEspacoAmostral_recursivo(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao,  const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const Periodo a_periodo, const Periodo a_periodo_realizacao, const SmartEnupla<Periodo, double> a_horizonte_completo);
 
 	double getTendenciaTemporalTransformada(const IdCenario a_idCenario, const Periodo a_periodo);
 	double getTendenciaTemporalTransformadaFromVariavelAleatoriaInterna(const IdCenario a_idCenario, const Periodo a_periodo);
 
 	double calcularResiduo             (const double a_ruido_correlacionado, const Periodo a_periodo) const;
-	double calcularResiduo             (const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia, const double a_realizacao, const bool a_espaco_amostral_mesmo_tipo_periodo) const;
-	double calcularRealizacao          (const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia, const double a_residuo, const bool a_espaco_amostral_mesmo_tipo_periodo) const;
-	void   calcularRealizacaoAndResiduo(const double a_ruido_correlacionado, const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia, double &a_valor_realizacao, double &a_valor_residuo_realizacao, const bool a_espaco_amostral_mesmo_tipo_periodo) const;
+	double calcularResiduo             (const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia, const double a_realizacao) const;
+	double calcularRealizacao          (const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia, const double a_residuo) const;
+	void   calcularRealizacaoAndResiduo(const double a_ruido_correlacionado, const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia, double &a_valor_realizacao, double &a_valor_residuo_realizacao) const;
 
 	double calcularRealizacaoInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const Periodo a_periodo, const double a_realizacao);
 	double calcularRealizacaoInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdCenario a_idCenario, const Periodo a_periodo);
-	double calcularRealizacaoInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const bool a_espaco_amostral_mesmo_tipo_periodo);
-	double calcularRealizacaoInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const SmartEnupla<Periodo, IdRealizacao> a_horizonte_mapeamento_espaco_amostral, const bool a_espaco_amostral_mesmo_tipo_periodo) ;
+	double calcularRealizacaoInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo);
+	double calcularRealizacaoInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const SmartEnupla<Periodo, IdRealizacao> a_idRealizacoes_cenario, const SmartEnupla<Periodo, IdRealizacao> a_horizonte_mapeamento_espaco_amostral) ;
 
 	double calcularRealizacaoParaValor(const double a_valor, const Periodo a_periodo);
 
@@ -179,7 +179,7 @@ public:
 	void setRealizacaoInterna(const IdCenario a_idCenario, const Periodo a_periodo);
 	void setRealizacaoInternaFromTendencia(const IdCenario a_idCenario, const Periodo a_periodo);
 
-	double calcularRegressivo_lognormal_3p(const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia, const bool a_espaco_amostral_mesmo_tipo_periodo) const;
+	double calcularRegressivo_lognormal_3p(const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia) const;
 
 	double calcularResiduo_lognormal_3p(double a_ruido_correlacionado, const Periodo a_periodo) const;
 
