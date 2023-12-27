@@ -21161,7 +21161,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		//Extensão do horizonte
 		////////////////////////////////////
 		atualizar_valores_periodos_horizonte_expandido(a_dados);//Atualiza valores dos vetores que tenham periodos > periodo_final_DECK (caso de extensão do horizonte CP)
-		atualizar_valores_periodos_horizonte_expandido_com_DadosEntradaMP_PRECONFIG(a_dados, a_diretorio + "//DadosAdicionais" + "//DadosEntradaMP_PRECONFIG");
+		atualizar_valores_periodos_horizonte_expandido_com_DadosEntradaMP_PRECONFIG(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG" + "//DadosEntradaMP_PRECONFIG");
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Lê volumes metas (se existir relato.rvX e relato2.rvX) e turbinamento_maximo (se existir relato.rvX)
