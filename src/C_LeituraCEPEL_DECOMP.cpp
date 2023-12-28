@@ -21715,7 +21715,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		const Periodo periodo_final_PE_DECOMP = horizonte_otimizacao.at(horizonte_estudo.at(get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados)));
 
-		if (periodo_final_PE_DECOMP < horizonte_otimizacao.at(horizonte_otimizacao.getIteradorFinal()))
+		if (periodo_final_PE_DECOMP < horizonte_otimizacao.at(horizonte_otimizacao.getIteradorFinal())){
 			a_dados.setAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, false);
 			a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false);
 			a_dados.setAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, true);
