@@ -1067,7 +1067,7 @@ void ModeloOtimizacao::imprimirVariaveisRealizacao(EntradaSaidaDados a_entradaSa
 
 } // void ModeloOtimizacao::imprimirVariaveisRealizacao(EntradaSaidaDados a_entradaSaidaDados){
 
-void ModeloOtimizacao::imprimirRestricoesRealizacao(EntradaSaidaDados a_entradaSaidaDados) {
+void ModeloOtimizacao::imprimirRestricoesCenario(EntradaSaidaDados a_entradaSaidaDados) {
 
 	const IdEstagio estagio_inicial = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
 	const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
@@ -1796,7 +1796,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 		const int numero_cortes = vetorEstagio.att(idEstagio_futuro).vetorCorteBenders.numObjetos();
 
 		// Todos os cortes são instanciados de maneira estática (maior performance)
-		if (getAtributo(idEstagio_futuro, AttComumEstagio_selecao_cortes_nivel_dominancia, int()) == 0) {
+		if ((getAtributo(idEstagio_futuro, AttComumEstagio_selecao_cortes_nivel_dominancia, int()) == 0) || (!std_carregado)) {
 
 			const int numero_cortes_total = numero_cortes * int(maiorIdRealizacao_corte);
 			int indice_corte = -1;
@@ -2243,7 +2243,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 									throw std::invalid_argument("Nao foi possivel carregar arquivo HIDRELETRICA_REE_conversao_ENA_acoplamento.csv necessario para conversao de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 								is_conversao_ENA_carregado = true;
 
-								estagio.vetorRestricaoCenario.alocar(int(int(a_dados.getMaiorId(IdHidreletrica())) * 1.3));
+								estagio.vetorRestricaoCenario.alocar(int(IdRestricaoCenario_Excedente) - 1);
 
 							}
 

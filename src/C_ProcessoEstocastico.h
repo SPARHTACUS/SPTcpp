@@ -100,9 +100,6 @@ public:
 	
 	void reducao_adaptacao_nested_distance(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_reducao_cenarios, IdProcesso a_idProcesso, std::vector<std::vector<std::vector<double>>>&a_residuo_espaco_amostral_reduzido, std::vector<std::vector<double>>& a_probabilidade_reduzido, const SmartEnupla <IdEstagio, int> a_numero_aberturas, const SmartEnupla <IdEstagio, Periodo> a_horizonte_otimizacao, const IdEstagio a_estagio_acoplamento_pre_estudo, const IdEstagio a_estagio_final, TipoSolver& a_tipoSolver);
 
-	void mapearTipoPeriodoEspacoAmostral();
-	std::vector<TipoPeriodo> getTipoPeriodoEspacoAmostral();
-
 	template<typename IdFisico>
 	IdFisico getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdFisico a_IdFisico) {
 		try { 

@@ -99,7 +99,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 			a_modeloOtimizacao.imprimirVariaveisRealizacao(a_entradaSaidaDados);
 
-			a_modeloOtimizacao.imprimirRestricoesRealizacao(a_entradaSaidaDados);
+			//a_modeloOtimizacao.imprimirRestricoesCenario(a_entradaSaidaDados);
 
 			a_modeloOtimizacao.imprimirVariaveisRealizacaoInterna(a_entradaSaidaDados);
 
