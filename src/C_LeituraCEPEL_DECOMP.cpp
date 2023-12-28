@@ -57,6 +57,64 @@ SmartEnupla<int, IdReservatorioEquivalente> idReservatorioEquivalente_restricao_
 ////////////////////////////////////////////////////////////////////////////////////////
 SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> percentual_duracao_patamar_carga_original; //Necessário para a donversão da parcela do corte das GNLs
 
+//////////////////////////////////////////////////////////////////////////////
+// Leitura cortes NEWAVE
+//Nota: A estrutura dos arquivos fcfnwn.rvX e nwlistcf.rel é diferente.
+//      Definem-se como default as posições e tamanho no arquivo fcfnwn.rvX. 
+//      Caso exista o nwlistcf.rel são atualizados estes parâmetros
+//////////////////////////////////////////////////////////////////////////////
+
+//Estrutura arquivo fcfnwn.rvX:
+//Posição do começo dos parâmetros 
+int pos_RHS = 13;
+int pos_idREE = 26;
+int pos_Coef_Earm = 33;
+int pos_Eafl_lag_1 = 53;
+int pos_Eafl_lag_2 = 73;
+int pos_Eafl_lag_3 = 93;
+int pos_Eafl_lag_4 = 113;
+int pos_Eafl_lag_5 = 133;
+int pos_Eafl_lag_6 = 153;
+int pos_Eafl_lag_7 = 173;
+int pos_Eafl_lag_8 = 193;
+int pos_Eafl_lag_9 = 213;
+int pos_Eafl_lag_10 = 233;
+int pos_Eafl_lag_11 = 253;
+int pos_Eafl_lag_12 = 273;
+int pos_GNL_pat_1_lag_1 = 294;
+int pos_GNL_pat_1_lag_2 = 314;
+int pos_GNL_pat_2_lag_1 = 334;
+int pos_GNL_pat_2_lag_2 = 354;
+int pos_GNL_pat_3_lag_1 = 374;
+int pos_GNL_pat_3_lag_2 = 394;
+int pos_Vminop = 414;
+
+//Tamanho dos parâmetros
+int tam_RHS = 12;
+int tam_idREE = 6;
+int tam_Coef_Earm = 20;
+int tam_Eafl_lag_1 = 20;
+int tam_Eafl_lag_2 = 20;
+int tam_Eafl_lag_3 = 20;
+int tam_Eafl_lag_4 = 20;
+int tam_Eafl_lag_5 = 20;
+int tam_Eafl_lag_6 = 20;
+int tam_Eafl_lag_7 = 20;
+int tam_Eafl_lag_8 = 20;
+int tam_Eafl_lag_9 = 20;
+int tam_Eafl_lag_10 = 20;
+int tam_Eafl_lag_11 = 20;
+int tam_Eafl_lag_12 = 20;
+int tam_GNL_pat_1_lag_1 = 20;
+int tam_GNL_pat_1_lag_2 = 20;
+int tam_GNL_pat_2_lag_1 = 20;
+int tam_GNL_pat_2_lag_2 = 20;
+int tam_GNL_pat_3_lag_1 = 20;
+int tam_GNL_pat_3_lag_2 = 20;
+int tam_Vminop = 23;
+
+//////////////////////////////////////////////////////////////////////////////
+
 void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio) {
 
 	try {
@@ -13818,16 +13876,46 @@ void LeituraCEPEL::atualiza_volume_util_maximo_com_percentual_volume_util_maximo
 
 }
 
-void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, std::string a_diretorio, std::string a_diretorio_cortes, std::string a_nomeArquivo)
+void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, std::string a_diretorio, std::string a_diretorio_cortes, std::string a_revisao)
 {
 	try {
 
 		std::string line;
 		std::string atributo;
 
-		std::ifstream leituraArquivo(a_diretorio + a_diretorio_cortes + a_nomeArquivo);
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Podem ser informados os cortes do NEWAVE via duas opções: 
+		// (i) fcfnwn.rvX: arquivo impresso pelo modelo DECOMP, com a impressão dos cortes de acoplamento entre o DC/NW 
+		//                 (i.e. somente é impresso os cortes do período de acoplamento: terceiro mês do horizonte do NW)
+		// (ii) nwlistcf.rel: impressão dos cortes de TODO o horizonte do NW
+		// Nota: caso o usuário informe (i) e (ii) simultaneamente, (ii) vai ser mandatório
+		//       (ii) serve para também para estudos com expansão do horizonte do CP
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		if (leituraArquivo.is_open()) {
+		std::string nomeArquivo = "nenhum";
+
+		const std::string nomeArquivo_fcfnwn = a_diretorio + a_diretorio_cortes + "//fcfnwn." + a_revisao;
+		const std::string nomeArquivo_nwlistcf = a_diretorio + a_diretorio_cortes + "//nwlistcf.rel";
+
+		std::ifstream leituraArquivo_fcfnwn(nomeArquivo_fcfnwn);
+		std::ifstream leituraArquivo_nwlistcf(nomeArquivo_nwlistcf);
+
+		if (leituraArquivo_fcfnwn.is_open()) {
+			nomeArquivo = nomeArquivo_fcfnwn;
+			leituraArquivo_fcfnwn.close();
+		}//if (leituraArquivo_fcfnwn.is_open()) {
+			
+
+		if (leituraArquivo_nwlistcf.is_open()){
+			nomeArquivo = nomeArquivo_nwlistcf;
+			leituraArquivo_nwlistcf.close();
+		}//if (leituraArquivo_nwlistcf.is_open()){
+			
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		if (nomeArquivo != "nenhum") {
+
+			std::cout << "Lendo cortes do modelo NEWAVE do arquivo: " << nomeArquivo << " ..." << std::endl;
 
 			const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
 			const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
@@ -13952,7 +14040,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 					SmartEnupla<IdReservatorioEquivalente, bool> coeficientes_EAR;
 					SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>> coeficiente_ENA;
 
-					leitura_cortes_NEWAVE_para_dimensionamento(coeficientes_EAR, coeficiente_ENA, a_diretorio, a_diretorio_cortes, a_nomeArquivo);
+					leitura_cortes_NEWAVE_para_dimensionamento(a_dados, a_horizonte_estudo, coeficientes_EAR, coeficiente_ENA, nomeArquivo);
 
 
 					// Variaveis Estado
@@ -14115,25 +14203,148 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				SmartEnupla<IdRealizacao, double> rhs_corte(IdRealizacao_1, std::vector<double>(1, 0.0));
 				SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> coeficientes_corte(IdRealizacao_1, std::vector<SmartEnupla<IdVariavelEstado, double>>(1, SmartEnupla<IdVariavelEstado, double>(IdVariavelEstado_1, std::vector<double>(int(estados.getIteradorFinal()), 0.0))));
 
+				///////////////////////////////////////////////////////////////////////////////////////
+				// Atualiza estrutura de leitura do arquivo de cortes caso seja o arquivo nwlistcf.rel:
 
-				/////////////////////////////////////////
+				bool is_arquivo_fcfnwn = true;
 
+				int periodo_acoplamento = 3; //default de impressão: ver arquivo nwlistcf.rel
+
+				if (nomeArquivo.find("nwlistcf")) {
+
+					is_arquivo_fcfnwn = false;
+
+					if (true) {
+
+						pos_RHS = 15;
+						pos_idREE = 11;
+						pos_Coef_Earm = 31;
+						pos_Eafl_lag_1 = 49;
+						pos_Eafl_lag_2 = 67;
+						pos_Eafl_lag_3 = 85;
+						pos_Eafl_lag_4 = 103;
+						pos_Eafl_lag_5 = 121;
+						pos_Eafl_lag_6 = 139;
+						pos_Eafl_lag_7 = 157;
+						pos_Eafl_lag_8 = 175;
+						pos_Eafl_lag_9 = 193;
+						pos_Eafl_lag_10 = 211;
+						pos_Eafl_lag_11 = 229;
+						pos_Eafl_lag_12 = 247;
+						pos_GNL_pat_1_lag_1 = 265;
+						pos_GNL_pat_1_lag_2 = 283;
+						pos_GNL_pat_2_lag_1 = 301;
+						pos_GNL_pat_2_lag_2 = 319;
+						pos_GNL_pat_3_lag_1 = 337;
+						pos_GNL_pat_3_lag_2 = 355;
+						pos_Vminop = 391;
+
+						////////////////
+						tam_RHS = 16;
+						tam_idREE = 3;
+						tam_Coef_Earm = 18;
+						tam_Eafl_lag_1 = 18;
+						tam_Eafl_lag_2 = 18;
+						tam_Eafl_lag_3 = 18;
+						tam_Eafl_lag_4 = 18;
+						tam_Eafl_lag_5 = 18;
+						tam_Eafl_lag_6 = 18;
+						tam_Eafl_lag_7 = 18;
+						tam_Eafl_lag_8 = 18;
+						tam_Eafl_lag_9 = 18;
+						tam_Eafl_lag_10 = 18;
+						tam_Eafl_lag_11 = 18;
+						tam_Eafl_lag_12 = 18;
+						tam_GNL_pat_1_lag_1 = 18;
+						tam_GNL_pat_1_lag_2 = 18;
+						tam_GNL_pat_2_lag_1 = 18;
+						tam_GNL_pat_2_lag_2 = 18;
+						tam_GNL_pat_3_lag_1 = 18;
+						tam_GNL_pat_3_lag_2 = 18;
+						tam_Vminop = 17;
+
+					}//if (true) {
+
+					/////////////////////////////////////////
+					//Atualiza periodo_acoplamento caso tenha
+					//períodos de expansão do horizonte
+					/////////////////////////////////////////
+					const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
+					const Periodo periodo_final = a_horizonte_estudo.getIteradorFinal();
+
+					Periodo periodo_mensal_aux = Periodo(TipoPeriodo_mensal, periodo_ultimo_sobreposicao + 1);
+
+					if (periodo_ultimo_sobreposicao < periodo_final) {//Existe expansão do horizonte
+
+						double sobreposicao = 0.0;
+
+						for (Periodo periodo = periodo_ultimo_sobreposicao; periodo <= periodo_final; a_horizonte_estudo.incrementarIterador(periodo)) {
+
+							if (periodo > periodo_ultimo_sobreposicao) {//Periodos extensão do horizonte
+
+								sobreposicao += periodo_mensal_aux.sobreposicao(periodo);
+
+								if (sobreposicao == 1.0) {
+									sobreposicao = 0.0;
+									periodo_mensal_aux++;
+
+									periodo_acoplamento += 1; //Parâmetro para leitura dos cortes
+
+								}//if (sobreposicao == 1.0) {
+
+							}//if (periodo > periodo_ultimo_sobreposicao) {
+
+						}//for (Periodo periodo = periodo_ultimo_sobreposicao; periodo <= periodo_final; a_horizonte_estudo.incrementarIterador(periodo)) {
+
+						if (sobreposicao != 0.0)
+							throw std::invalid_argument("Periodos do horizonte expandido nao completam um mes operativo");
+
+					}//if (periodo_ultimo_sobreposicao < periodo_final) {
+
+
+				}//if (nomeArquivo.find("nwlistcf")) {
+
+				///////////////////////////////////////////////////////////////////////////////////////
+
+				std::ifstream leituraArquivo(nomeArquivo);
+
+				////////////////////////////////////////////////////////////////////////////////////
+				//Parâmetros para identificar o bloco de informação quando for o arquivo fcfnwn.rvX
 				int numero_simbolo_cabecalho = 0;
 				std::string simbolo_cabecalho = "X---------";
+
+				////////////////////////////////////////////////////////////////////////////////////
+				//Parâmetro para identificar o bloco de informação quando for o arquivo nwlistcf.rel
+				std::string str_periodo_acoplamento = "PERIODO:" + getString(periodo_acoplamento);
+
+				////////////////////////////////////////////////////////////////////////////////////
+
+				bool is_bloco_informacao = false;
 
 				while (std::getline(leituraArquivo, line)) {
 
 					strNormalizada(line);
 
 					//Leitura dos cortes
-					if (line.size() >= 13) {
+					if (line.size() >= 23) {
 
 						double rhs_valor = 0.0;
 
-						if (numero_simbolo_cabecalho == 2) {
+						if (is_bloco_informacao) {
+
+							////////////////////////////////////////////
+							//Critério de parada arquivo nwlistcf.rel
+							////////////////////////////////////////////
+
+							atributo = line.substr(0, 9);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							if (atributo == "PERIODO")//Significa que passou para um novo bloco de cortes de um outro período
+								break;
+							////////////////////////////////////////////
 
 							//Leitura RHS
-							atributo = line.substr(13, 12);
+							atributo = line.substr(pos_RHS, tam_RHS);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							rhs_valor = std::atof(atributo.c_str());
@@ -14148,7 +14359,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 							for (int pos = 0; pos < maior_ONS_REE; pos++) {
 
 								//idREE
-								atributo = line.substr(26, 6);
+								atributo = line.substr(pos_idREE, tam_idREE);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente(std::atoi(atributo.c_str()));
@@ -14156,7 +14367,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 								///////////////////////////////
 								//Coef.Earm ($/MWh)
 								///////////////////////////////
-								atributo = line.substr(33, 20);
+								atributo = line.substr(pos_Coef_Earm, tam_Coef_Earm);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_energia_armazenada = std::atof(atributo.c_str());
@@ -14166,73 +14377,73 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 								///////////////////////////////
 
 								//lag_1
-								atributo = line.substr(53, 20);
+								atributo = line.substr(pos_Eafl_lag_1, tam_Eafl_lag_1);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_ENA_lag_1 = std::atof(atributo.c_str());
 
 								//lag_2
-								atributo = line.substr(73, 20);
+								atributo = line.substr(pos_Eafl_lag_2, tam_Eafl_lag_2);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_ENA_lag_2 = std::atof(atributo.c_str());
 
 								//lag_3
-								atributo = line.substr(93, 20);
+								atributo = line.substr(pos_Eafl_lag_3, tam_Eafl_lag_3);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_ENA_lag_3 = std::atof(atributo.c_str());
 
 								//lag_4
-								atributo = line.substr(113, 20);
+								atributo = line.substr(pos_Eafl_lag_4, tam_Eafl_lag_4);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_ENA_lag_4 = std::atof(atributo.c_str());
 
 								//lag_5
-								atributo = line.substr(133, 20);
+								atributo = line.substr(pos_Eafl_lag_5, tam_Eafl_lag_5);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_ENA_lag_5 = std::atof(atributo.c_str());
 
 								//lag_6
-								atributo = line.substr(153, 20);
+								atributo = line.substr(pos_Eafl_lag_6, tam_Eafl_lag_6);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_ENA_lag_6 = std::atof(atributo.c_str());
 
 								//lag_7
-								atributo = line.substr(173, 20);
+								atributo = line.substr(pos_Eafl_lag_7, tam_Eafl_lag_7);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_ENA_lag_7 = std::atof(atributo.c_str());
 
 								//lag_8
-								atributo = line.substr(193, 20);
+								atributo = line.substr(pos_Eafl_lag_8, tam_Eafl_lag_8);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_ENA_lag_8 = std::atof(atributo.c_str());
 
 								//lag_9
-								atributo = line.substr(213, 20);
+								atributo = line.substr(pos_Eafl_lag_9, tam_Eafl_lag_9);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_ENA_lag_9 = std::atof(atributo.c_str());
 
 								//lag_10
-								atributo = line.substr(233, 20);
+								atributo = line.substr(pos_Eafl_lag_10, tam_Eafl_lag_10);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_ENA_lag_10 = std::atof(atributo.c_str());
 
 								//lag_11
-								atributo = line.substr(253, 20);
+								atributo = line.substr(pos_Eafl_lag_11, tam_Eafl_lag_11);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_ENA_lag_11 = std::atof(atributo.c_str());
 
 								//lag_12
-								atributo = line.substr(273, 20);
+								atributo = line.substr(pos_Eafl_lag_12, tam_Eafl_lag_12);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_ENA_lag_12 = std::atof(atributo.c_str());
@@ -14242,37 +14453,37 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 								///////////////////////////////
 
 								//pat_1_lag_1
-								atributo = line.substr(294, 20);
+								atributo = line.substr(pos_GNL_pat_1_lag_1, tam_GNL_pat_1_lag_1);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_GNL_pat_1_lag_1 = std::atof(atributo.c_str());
 
 								//pat_1_lag_2
-								atributo = line.substr(314, 20);
+								atributo = line.substr(pos_GNL_pat_1_lag_2, tam_GNL_pat_1_lag_2);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_GNL_pat_1_lag_2 = std::atof(atributo.c_str());
 
 								//pat_2_lag_1
-								atributo = line.substr(334, 20);
+								atributo = line.substr(pos_GNL_pat_2_lag_1, tam_GNL_pat_2_lag_1);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_GNL_pat_2_lag_1 = std::atof(atributo.c_str());
 
 								//pat_2_lag_2
-								atributo = line.substr(354, 20);
+								atributo = line.substr(pos_GNL_pat_2_lag_2, tam_GNL_pat_2_lag_2);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_GNL_pat_2_lag_2 = std::atof(atributo.c_str());
 
 								//pat_3_lag_1
-								atributo = line.substr(374, 20);
+								atributo = line.substr(pos_GNL_pat_3_lag_1, tam_GNL_pat_3_lag_1);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_GNL_pat_3_lag_1 = std::atof(atributo.c_str());
 
 								//pat_3_lag_2
-								atributo = line.substr(394, 20);
+								atributo = line.substr(pos_GNL_pat_3_lag_2, tam_GNL_pat_3_lag_2);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_GNL_pat_3_lag_2 = std::atof(atributo.c_str());
@@ -14280,7 +14491,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 								///////////////////////////////
 								//Coef.Vminop-Max ($/MWh)
 								///////////////////////////////
-								atributo = line.substr(414, 23);
+								atributo = line.substr(pos_Vminop, tam_Vminop);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_Vminop = std::atof(atributo.c_str());
@@ -14341,12 +14552,12 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 								for (IdReservatorioEquivalente idREE = coeficiente_ENA.getIteradorInicial(); idREE <= coeficiente_ENA.getIteradorFinal(); idREE++) {
 
-										const IdVariavelEstado idVariavelEstado = estados_ENA.at(idREE).at(lag);
+									const IdVariavelEstado idVariavelEstado = estados_ENA.at(idREE).at(lag);
 
-										if (idVariavelEstado > IdVariavelEstado_Nenhum)
-											coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) = coeficiente_ENA.at(idREE).at(lag) * numero_horas_estagio_NEWAVE;
-									}
-								
+									if (idVariavelEstado > IdVariavelEstado_Nenhum)
+										coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado) = coeficiente_ENA.at(idREE).at(lag) * numero_horas_estagio_NEWAVE;
+								}
+
 							} // for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
 
 							// Variaveis PTDISPCOM 
@@ -14386,17 +14597,45 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 							estagio_pos_estudo.instanciarCorteBenders(rhs_corte, coeficientes_corte, estados_vazios);
 
-						}//if (numero_simbolo_cabecalho == 2) {
+						}//if (is_bloco_informacao) {
 
-						///////////////////////////////////////////////////
+						//////////////////////////////////////////////////////////////////////////////////
 						//Chave para saber que está no bloco de informação
-						if (line.substr(3, 10) == simbolo_cabecalho)
-							numero_simbolo_cabecalho += 1;
-						///////////////////////////////////////////////////
+						// Nota: Lembrar que a estrutura do arquivo fcfnwn.rvX e nwlistcf.rel é diferente
+						//////////////////////////////////////////////////////////////////////////////////
+						if (is_arquivo_fcfnwn) { //Leitura arquivo fcfnwn.rvX
+							if (line.substr(3, 10) == simbolo_cabecalho) {
+								numero_simbolo_cabecalho += 1;
 
-					}//if (line.size() >= 13) {
+								if (numero_simbolo_cabecalho == 2)
+									is_bloco_informacao = true;
+
+							}//if (line.substr(3, 10) == simbolo_cabecalho) {
+
+						}//if (is_arquivo_fcfnwn) {
+						else if (!is_arquivo_fcfnwn) {//Leitura arquivo nwlistcf.rel
+
+							atributo = line.substr(0, 23);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							if (atributo == str_periodo_acoplamento) {
+								is_bloco_informacao = true;
+
+								//Passa duas linhas de cabecalho (ver arquivo nwlistcf.rel)
+								std::getline(leituraArquivo, line);
+								std::getline(leituraArquivo, line);
+
+							}//if (atributo == str_periodo_acoplamento) {
+
+						}//else if (!is_arquivo_fcfnwn) {
+
+						//////////////////////////////////////////////////////////////////////////////////
+
+					}//if (line.size() >= 23) {
 
 				}//while (std::getline(leituraArquivo, line)) {
+
+				////////////////////////////////////////////////////////////////////////
 
 				EntradaSaidaDados entradaSaidaDados;
 
@@ -14440,14 +14679,14 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 }
 
-void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(SmartEnupla<IdReservatorioEquivalente, bool> &a_coeficientes_EAR, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>> & a_coeficiente_ENA, std::string a_diretorio, std::string a_diretorio_cortes, std::string a_nomeArquivo){
+void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, SmartEnupla<IdReservatorioEquivalente, bool> &a_coeficientes_EAR, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>> & a_coeficiente_ENA, std::string a_nomeArquivo){
 
 	try {
 
 		std::string line;
 		std::string atributo;
 
-		std::ifstream leituraArquivo(a_diretorio + a_diretorio_cortes + a_nomeArquivo);
+		std::ifstream leituraArquivo(a_nomeArquivo);
 
 		if (leituraArquivo.is_open()) {
 
@@ -14455,23 +14694,148 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(SmartEnupla<IdRese
 			a_coeficiente_ENA = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>>(IdReservatorioEquivalente(1), std::vector<SmartEnupla<int, bool>>(IdReservatorioEquivalente(maior_ONS_REE), SmartEnupla<int, bool>(1, std::vector<bool>(12, false))));
 
 			/////////////////////////////////////////
+				///////////////////////////////////////////////////////////////////////////////////////
+				// Atualiza estrutura de leitura do arquivo de cortes caso seja o arquivo nwlistcf.rel:
 
+			bool is_arquivo_fcfnwn = true;
+
+			int periodo_acoplamento = 3; //default de impressão: ver arquivo nwlistcf.rel
+
+			if (a_nomeArquivo.find("nwlistcf")) {
+
+				is_arquivo_fcfnwn = false;
+
+				if (true) {
+
+					pos_RHS = 15;
+					pos_idREE = 11;
+					pos_Coef_Earm = 31;
+					pos_Eafl_lag_1 = 49;
+					pos_Eafl_lag_2 = 67;
+					pos_Eafl_lag_3 = 85;
+					pos_Eafl_lag_4 = 103;
+					pos_Eafl_lag_5 = 121;
+					pos_Eafl_lag_6 = 139;
+					pos_Eafl_lag_7 = 157;
+					pos_Eafl_lag_8 = 175;
+					pos_Eafl_lag_9 = 193;
+					pos_Eafl_lag_10 = 211;
+					pos_Eafl_lag_11 = 229;
+					pos_Eafl_lag_12 = 247;
+					pos_GNL_pat_1_lag_1 = 265;
+					pos_GNL_pat_1_lag_2 = 283;
+					pos_GNL_pat_2_lag_1 = 301;
+					pos_GNL_pat_2_lag_2 = 319;
+					pos_GNL_pat_3_lag_1 = 337;
+					pos_GNL_pat_3_lag_2 = 355;
+					pos_Vminop = 391;
+
+					////////////////
+					tam_RHS = 16;
+					tam_idREE = 3;
+					tam_Coef_Earm = 18;
+					tam_Eafl_lag_1 = 18;
+					tam_Eafl_lag_2 = 18;
+					tam_Eafl_lag_3 = 18;
+					tam_Eafl_lag_4 = 18;
+					tam_Eafl_lag_5 = 18;
+					tam_Eafl_lag_6 = 18;
+					tam_Eafl_lag_7 = 18;
+					tam_Eafl_lag_8 = 18;
+					tam_Eafl_lag_9 = 18;
+					tam_Eafl_lag_10 = 18;
+					tam_Eafl_lag_11 = 18;
+					tam_Eafl_lag_12 = 18;
+					tam_GNL_pat_1_lag_1 = 18;
+					tam_GNL_pat_1_lag_2 = 18;
+					tam_GNL_pat_2_lag_1 = 18;
+					tam_GNL_pat_2_lag_2 = 18;
+					tam_GNL_pat_3_lag_1 = 18;
+					tam_GNL_pat_3_lag_2 = 18;
+					tam_Vminop = 17;
+
+				}//if (true) {
+
+				/////////////////////////////////////////
+				//Atualiza periodo_acoplamento caso tenha
+				//períodos de expansão do horizonte
+				/////////////////////////////////////////
+				const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
+				const Periodo periodo_final = a_horizonte_estudo.getIteradorFinal();
+
+				Periodo periodo_mensal_aux = Periodo(TipoPeriodo_mensal, periodo_ultimo_sobreposicao + 1);
+
+				if (periodo_ultimo_sobreposicao < periodo_final) {//Existe expansão do horizonte
+
+					double sobreposicao = 0.0;
+
+					for (Periodo periodo = periodo_ultimo_sobreposicao; periodo <= periodo_final; a_horizonte_estudo.incrementarIterador(periodo)) {
+
+						if (periodo > periodo_ultimo_sobreposicao) {//Periodos extensão do horizonte
+
+							sobreposicao += periodo_mensal_aux.sobreposicao(periodo);
+
+							if (sobreposicao == 1.0) {
+								sobreposicao = 0.0;
+								periodo_mensal_aux++;
+
+								periodo_acoplamento += 1; //Parâmetro para leitura dos cortes
+
+							}//if (sobreposicao == 1.0) {
+
+						}//if (periodo > periodo_ultimo_sobreposicao) {
+
+					}//for (Periodo periodo = periodo_ultimo_sobreposicao; periodo <= periodo_final; a_horizonte_estudo.incrementarIterador(periodo)) {
+
+					if (sobreposicao != 0.0)
+						throw std::invalid_argument("Periodos do horizonte expandido nao completam um mes operativo");
+
+				}//if (periodo_ultimo_sobreposicao < periodo_final) {
+
+
+			}//if (nomeArquivo.find("nwlistcf")) {
+
+			///////////////////////////////////////////////////////////////////////////////////////
+
+			std::ifstream leituraArquivo(a_nomeArquivo);
+
+			////////////////////////////////////////////////////////////////////////////////////
+			//Parâmetros para identificar o bloco de informação quando for o arquivo fcfnwn.rvX
 			int numero_simbolo_cabecalho = 0;
 			std::string simbolo_cabecalho = "X---------";
+
+			////////////////////////////////////////////////////////////////////////////////////
+			//Parâmetro para identificar o bloco de informação quando for o arquivo nwlistcf.rel
+			std::string str_periodo_acoplamento = "PERIODO:" + getString(periodo_acoplamento);
+
+			////////////////////////////////////////////////////////////////////////////////////
+
+			bool is_bloco_informacao = false;
 
 			while (std::getline(leituraArquivo, line)) {
 
 				strNormalizada(line);
 
 				//Leitura dos cortes
-				if (line.size() >= 13) {
+				if (line.size() >= 23) {
 
-					if (numero_simbolo_cabecalho == 2) {
+					if (is_bloco_informacao) {
+
+						////////////////////////////////////////////
+						//Critério de parada arquivo nwlistcf.rel
+						////////////////////////////////////////////
+
+						atributo = line.substr(0, 9);
+						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+						if (atributo == "PERIODO")//Significa que passou para um novo bloco de cortes de um outro período
+							break;
+						////////////////////////////////////////////
 
 						for (int pos = 0; pos < maior_ONS_REE; pos++) {
 
 							//idREE
-							atributo = line.substr(26, 6);
+							atributo = line.substr(pos_idREE, tam_idREE);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente(std::atoi(atributo.c_str()));
@@ -14479,7 +14843,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(SmartEnupla<IdRese
 							///////////////////////////////
 							//Coef.Earm ($/MWh)
 							///////////////////////////////
-							atributo = line.substr(33, 20);
+							atributo = line.substr(pos_Coef_Earm, tam_Coef_Earm);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_energia_armazenada = std::atof(atributo.c_str());
@@ -14489,73 +14853,73 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(SmartEnupla<IdRese
 							///////////////////////////////
 
 							//lag_1
-							atributo = line.substr(53, 20);
+							atributo = line.substr(pos_Eafl_lag_1, tam_Eafl_lag_1);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_ENA_lag_1 = std::atof(atributo.c_str());
 
 							//lag_2
-							atributo = line.substr(73, 20);
+							atributo = line.substr(pos_Eafl_lag_2, tam_Eafl_lag_2);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_ENA_lag_2 = std::atof(atributo.c_str());
 
 							//lag_3
-							atributo = line.substr(93, 20);
+							atributo = line.substr(pos_Eafl_lag_3, tam_Eafl_lag_3);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_ENA_lag_3 = std::atof(atributo.c_str());
 
 							//lag_4
-							atributo = line.substr(113, 20);
+							atributo = line.substr(pos_Eafl_lag_4, tam_Eafl_lag_4);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_ENA_lag_4 = std::atof(atributo.c_str());
 
 							//lag_5
-							atributo = line.substr(133, 20);
+							atributo = line.substr(pos_Eafl_lag_5, tam_Eafl_lag_5);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_ENA_lag_5 = std::atof(atributo.c_str());
 
 							//lag_6
-							atributo = line.substr(153, 20);
+							atributo = line.substr(pos_Eafl_lag_6, tam_Eafl_lag_6);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_ENA_lag_6 = std::atof(atributo.c_str());
 
 							//lag_7
-							atributo = line.substr(173, 20);
+							atributo = line.substr(pos_Eafl_lag_7, tam_Eafl_lag_7);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_ENA_lag_7 = std::atof(atributo.c_str());
 
 							//lag_8
-							atributo = line.substr(193, 20);
+							atributo = line.substr(pos_Eafl_lag_8, tam_Eafl_lag_8);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_ENA_lag_8 = std::atof(atributo.c_str());
 
 							//lag_9
-							atributo = line.substr(213, 20);
+							atributo = line.substr(pos_Eafl_lag_9, tam_Eafl_lag_9);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_ENA_lag_9 = std::atof(atributo.c_str());
 
 							//lag_10
-							atributo = line.substr(233, 20);
+							atributo = line.substr(pos_Eafl_lag_10, tam_Eafl_lag_10);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_ENA_lag_10 = std::atof(atributo.c_str());
 
 							//lag_11
-							atributo = line.substr(253, 20);
+							atributo = line.substr(pos_Eafl_lag_11, tam_Eafl_lag_11);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_ENA_lag_11 = std::atof(atributo.c_str());
 
 							//lag_12
-							atributo = line.substr(273, 20);
+							atributo = line.substr(pos_Eafl_lag_12, tam_Eafl_lag_12);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							const double coeficiente_ENA_lag_12 = std::atof(atributo.c_str());
@@ -14609,17 +14973,44 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(SmartEnupla<IdRese
 								std::getline(leituraArquivo, line);//Passa de linha
 						}//for (int pos = 0; pos < 11; pos++) {
 
-					}//if (numero_simbolo_cabecalho == 2) {
+					}//if (is_bloco_informacao) {
 
-					///////////////////////////////////////////////////
+					//////////////////////////////////////////////////////////////////////////////////
 					//Chave para saber que está no bloco de informação
-					if (line.substr(3, 10) == simbolo_cabecalho)
-						numero_simbolo_cabecalho += 1;
-					///////////////////////////////////////////////////
+					// Nota: Lembrar que a estrutura do arquivo fcfnwn.rvX e nwlistcf.rel é diferente
+					//////////////////////////////////////////////////////////////////////////////////
+					if (is_arquivo_fcfnwn) { //Leitura arquivo fcfnwn.rvX
+						if (line.substr(3, 10) == simbolo_cabecalho) {
+							numero_simbolo_cabecalho += 1;
 
-				}//if (line.size() >= 13) {
+							if (numero_simbolo_cabecalho == 2)
+								is_bloco_informacao = true;
+
+						}//if (line.substr(3, 10) == simbolo_cabecalho) {
+
+					}//if (is_arquivo_fcfnwn) {
+					else if (!is_arquivo_fcfnwn) {//Leitura arquivo nwlistcf.rel
+
+						atributo = line.substr(0, 23);
+						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+						if (atributo == str_periodo_acoplamento) {
+							is_bloco_informacao = true;
+
+							//Passa duas linhas de cabecalho (ver arquivo nwlistcf.rel)
+							std::getline(leituraArquivo, line);
+							std::getline(leituraArquivo, line);
+
+						}//if (atributo == str_periodo_acoplamento) {
+
+					}//else if (!is_arquivo_fcfnwn) {
+
+					//////////////////////////////////////////////////////////////////////////////////
+
+				}//if (line.size() >= 23) {
 
 			}//while (std::getline(leituraArquivo, line)) {
+
 
 
 		}//if (leituraArquivo.is_open()) {
@@ -21326,7 +21717,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		const Periodo periodo_final_PE_DECOMP = horizonte_otimizacao.at(horizonte_estudo.at(get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados)));
 
-		if (periodo_final_PE_DECOMP < horizonte_otimizacao.getIteradorFinal())
+		if (periodo_final_PE_DECOMP < horizonte_otimizacao.at(horizonte_otimizacao.getIteradorFinal()))
 			a_dados.setAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, false);
 
 		a_dados.definirCenariosPorProcessosEmArranjoResolucao();
@@ -21407,7 +21798,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		imprime_na_tela_avisos_de_possiveis_inviabilidades_fph(a_dados);
 
-		leitura_cortes_NEWAVE(a_dados, horizonte_estudo, a_diretorio, "//DadosAdicionais//Cortes_NEWAVE", "//fcfnwn." + a_revisao);
+		leitura_cortes_NEWAVE(a_dados, horizonte_estudo, a_diretorio, "//DadosAdicionais//Cortes_NEWAVE", a_revisao);
 
 		//
 		// Esvazia Atributos Processo Estocástico Hidrológico
