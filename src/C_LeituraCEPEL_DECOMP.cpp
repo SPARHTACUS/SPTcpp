@@ -13915,6 +13915,12 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 		if (nomeArquivo != "nenhum") {
 
+			const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
+			const Periodo periodo_final = a_horizonte_estudo.getIteradorFinal();
+
+			if ((periodo_ultimo_sobreposicao < periodo_final) && (nomeArquivo.find("fcfnwn") != std::string::npos))//Existe expansão do horizonte
+				throw std::invalid_argument("Cortes do NEWAVE do arquivo fcfnwn.rvX nao copativeis com acomplamento de horizonte estendido");
+
 			std::cout << "Lendo cortes do modelo NEWAVE do arquivo: " << nomeArquivo << " ..." << std::endl;
 
 			const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
@@ -13940,7 +13946,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				horizonte_tendencia_mais_estudo.addElemento(periodo, true);
 
 			//Adiciona os periodos da extensão do horizonte
-			const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
 
 			for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 				if(periodo > periodo_ultimo_sobreposicao)
@@ -14210,7 +14215,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 				int periodo_acoplamento = 3; //default de impressão: ver arquivo nwlistcf.rel
 
-				if (nomeArquivo.find("nwlistcf")) {
+				if (nomeArquivo.find("nwlistcf") != std::string::npos) {
 
 					is_arquivo_fcfnwn = false;
 
@@ -14269,9 +14274,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 					//Atualiza periodo_acoplamento caso tenha
 					//períodos de expansão do horizonte
 					/////////////////////////////////////////
-					const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
-					const Periodo periodo_final = a_horizonte_estudo.getIteradorFinal();
-
 					Periodo periodo_mensal_aux = Periodo(TipoPeriodo_mensal, periodo_ultimo_sobreposicao + 1);
 
 					if (periodo_ultimo_sobreposicao < periodo_final) {//Existe expansão do horizonte
@@ -14302,7 +14304,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 					}//if (periodo_ultimo_sobreposicao < periodo_final) {
 
 
-				}//if (nomeArquivo.find("nwlistcf")) {
+				}//if (nomeArquivo.find("nwlistcf") != std::string::npos) {
 
 				///////////////////////////////////////////////////////////////////////////////////////
 
@@ -14635,6 +14637,11 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 				}//while (std::getline(leituraArquivo, line)) {
 
+				if((!is_bloco_informacao) && (!is_arquivo_fcfnwn))
+					throw std::invalid_argument("Nao encontrado o bloco de cortes no arquivo nwlistcf.rel para o periodo: " + str_periodo_acoplamento);
+				else if ((!is_bloco_informacao) && (is_arquivo_fcfnwn))
+					throw std::invalid_argument("Nao encontrado o bloco de cortes no arquivo fcfnwn.rvX");
+
 				////////////////////////////////////////////////////////////////////////
 
 				EntradaSaidaDados entradaSaidaDados;
@@ -14701,7 +14708,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 
 			int periodo_acoplamento = 3; //default de impressão: ver arquivo nwlistcf.rel
 
-			if (a_nomeArquivo.find("nwlistcf")) {
+			if (a_nomeArquivo.find("nwlistcf") != std::string::npos) {
 
 				is_arquivo_fcfnwn = false;
 
@@ -14793,7 +14800,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 				}//if (periodo_ultimo_sobreposicao < periodo_final) {
 
 
-			}//if (nomeArquivo.find("nwlistcf")) {
+			}//if (nomeArquivo.find("nwlistcf") != std::string::npos) {
 
 			///////////////////////////////////////////////////////////////////////////////////////
 
@@ -21732,6 +21739,12 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_final_PE_DECOMP, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario);
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
+
+		if (periodo_final_PE_DECOMP == horizonte_otimizacao.at(horizonte_otimizacao.getIteradorFinal())) {
+			int semente = 1; //Precisa de qualquer valor (Nao vai realizar sorteio, só alocar valores já sorteados)
+			a_dados.processoEstocastico_hidrologico.gerarCenariosPorSorteio(entradaSaidaDados, a_dados.getAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, bool()), true, true, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario, TipoSorteio_uniforme, semente);
+
+		}//if (periodo_final_PE_DECOMP == horizonte_otimizacao.at(horizonte_otimizacao.getIteradorFinal())) {
 
 		// Esvazia todos atributos do proc. estocástico hidrológico exceto AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral
 		if (true) {
