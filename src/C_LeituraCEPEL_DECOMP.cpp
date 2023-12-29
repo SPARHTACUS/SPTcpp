@@ -14038,7 +14038,12 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				SmartEnupla <IdTermeletrica, SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>> estados_GNL(menorIdTermeletrica, std::vector<SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>>(int(maiorIdTermeletrica - menorIdTermeletrica) + 1, SmartEnupla<IdSubmercado, SmartEnupla<int, IdVariavelEstado>>()));
 
 				SmartEnupla<IdSubmercado, IdReservatorioEquivalente> mapeamentoSubmercadoxREE(IdSubmercado(1), std::vector<IdReservatorioEquivalente>(int(IdSubmercado_Excedente - 1), IdReservatorioEquivalente_Nenhum));
-	
+				
+				mapeamentoSubmercadoxREE.at(IdSubmercado_SUDESTE) = IdReservatorioEquivalente_1_SUDESTE;
+				mapeamentoSubmercadoxREE.at(IdSubmercado_SUL) = IdReservatorioEquivalente_2_SUL;
+				mapeamentoSubmercadoxREE.at(IdSubmercado_NORDESTE) = IdReservatorioEquivalente_3_NORDESTE;
+				mapeamentoSubmercadoxREE.at(IdSubmercado_NORTE) = IdReservatorioEquivalente_4_NORTE;
+
 				const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>> inicializacao_conversao_ENA_acoplamento(IdCenario_1, std::vector<SmartEnupla<Periodo, double>>(idCenario_final, SmartEnupla<Periodo, double>(lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario, 0.0)));
 
 				if (true) {
@@ -14062,7 +14067,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 							}
 						}
 
-						mapeamentoSubmercadoxREE.at(a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado())) = IdReservatorioEquivalente(lista_codigo_ONS_REE.at(idHidreletrica));
+						//mapeamentoSubmercadoxREE.at(a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado())) = IdReservatorioEquivalente(lista_codigo_ONS_REE.at(idHidreletrica));
 
 					} // for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
@@ -14321,13 +14326,16 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 				////////////////////////////////////////////////////////////////////////////////////
 
+				//*********************************
+				//Leitura dos cortes
+				//*********************************
+
 				bool is_bloco_informacao = false;
 
 				while (std::getline(leituraArquivo, line)) {
 
 					strNormalizada(line);
 
-					//Leitura dos cortes
 					if (line.size() >= 23) {
 
 						double rhs_valor = 0.0;
@@ -14459,6 +14467,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 								const double coeficiente_GNL_pat_1_lag_1 = std::atof(atributo.c_str());
+
 
 								//pat_1_lag_2
 								atributo = line.substr(pos_GNL_pat_1_lag_2, tam_GNL_pat_1_lag_2);
