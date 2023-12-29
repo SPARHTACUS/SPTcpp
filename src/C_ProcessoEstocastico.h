@@ -11,6 +11,7 @@
 	  m(ProcessoEstocastico,  AttComum,                   idProcessoEstocastico,               IdProcessoEstocastico,         min,         max,           min,      nao) \
 	  m(ProcessoEstocastico,  AttComum,                    tipo_espaco_amostral,                  TipoEspacoAmostral,         min,         max,           min,      nao) \
 	  m(ProcessoEstocastico,  AttComum,                  tipo_lag_autocorrelacao,               TipoLagAutocorrelacao,         min,         max,           min,      nao) \
+	  m(ProcessoEstocastico,  AttComum,                 correlacao_determinante,                              double,        0.1,         1.0,           0.95,      nao) \
 	  m(ProcessoEstocastico,  AttComum,    tipo_correlacao_variaveis_aleatorias,   TipoCorrelacaoVariaveisAleatorias,         min,         max,           min,      nao) 
 //                 c_classe,   smrtAtt,                            nomeAtributo,                                tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
@@ -53,7 +54,7 @@ public:
 
 	void gerarTendenciaTemporalMedia(const Periodo a_periodo_final);
 
-	void parametrizarModelo(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_parametros, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_coeficiente_auto_correlacao, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao_variaveis_aleatorias);
+	void parametrizarModelo(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_parametros, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_coeficiente_auto_correlacao, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao_variaveis_aleatorias, const double a_valor_determinacao_correlacao);
 
 	void avaliarModeloViaSerieSintetica(const EntradaSaidaDados &a_entradaSaidaDados, const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, const int a_numero_periodos_avaliacao_sintetica);
 
@@ -174,9 +175,9 @@ private:
 	void mapearCenariosEspacoAmostralPorSorteio  (const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int &a_semente);
 	bool mapearCenariosEspacoAmostralCompleto    (const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);
 	
-	void calcularCorrelacaoSazonalVariaveisAleatorias();
+	void calcularCorrelacaoSazonalVariaveisAleatorias(const double a_valor_determinacao_correlacao);
 
-	void calcularCorrelacaoSazonalResiduoVariaveisAleatorias();
+	void calcularCorrelacaoSazonalResiduoVariaveisAleatorias(const double a_valor_determinacao_correlacao);
 
 	void calcularMatrizCargaSazonalResiduoVariaveisAleatorias();
 
@@ -219,6 +220,7 @@ inline void ProcessoEstocastico::addSeriesTemporais(const TipoVariavelAleatoria 
 			VariavelAleatoria variavelAleatoria;
 			variavelAleatoria.setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria, idVariavelAleatoria);
 			variavelAleatoria.setAtributo(AttComumVariavelAleatoria_nome, getFullString(a_tipo_variavel_aleatoria));
+			variavelAleatoria.setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, idVariavelAleatoria);
 			vetorVariavelAleatoria.add(variavelAleatoria);
 		}	
 

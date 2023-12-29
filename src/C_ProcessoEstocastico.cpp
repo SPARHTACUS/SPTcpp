@@ -58,7 +58,7 @@ void ProcessoEstocastico::gerarTendenciaTemporalMedia(const Periodo a_periodo_fi
 
 
 
-void ProcessoEstocastico::parametrizarModelo(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_parametros, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_maxima_coeficiente_auto_correlacao, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao_variaveis_aleatorias){
+void ProcessoEstocastico::parametrizarModelo(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_parametros, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_maxima_coeficiente_auto_correlacao, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao_variaveis_aleatorias, const double a_valor_determinacao_correlacao){
 
 	try {
 
@@ -69,10 +69,13 @@ void ProcessoEstocastico::parametrizarModelo(const EntradaSaidaDados &a_entradaS
 
 		
 		setAtributo(AttComumProcessoEstocastico_tipo_correlacao_variaveis_aleatorias, a_tipo_correlacao_variaveis_aleatorias);
+		setAtributo(AttComumProcessoEstocastico_correlacao_determinante, a_valor_determinacao_correlacao);
 
-		calcularCorrelacaoSazonalVariaveisAleatorias();
 
-		calcularCorrelacaoSazonalResiduoVariaveisAleatorias();
+
+		calcularCorrelacaoSazonalVariaveisAleatorias(a_valor_determinacao_correlacao);
+
+		calcularCorrelacaoSazonalResiduoVariaveisAleatorias(a_valor_determinacao_correlacao);
 
 		calcularMatrizCargaSazonalResiduoVariaveisAleatorias();
 
@@ -132,10 +135,11 @@ void ProcessoEstocastico::avaliarModeloViaSerieSintetica(const EntradaSaidaDados
 		const int                               ordem_maxima_coeficiente_auto_correlacao = getAtributo(IdVariavelAleatoria_1, AttComumVariavelAleatoria_ordem_maxima_coeficiente_auto_correlacao, int());
 
 		const TipoCorrelacaoVariaveisAleatorias tipo_correlacao_variaveis_aleatorias     = getAtributo(AttComumProcessoEstocastico_tipo_correlacao_variaveis_aleatorias,                          TipoCorrelacaoVariaveisAleatorias());
+		const double correlacao_determinante     = getAtributo(AttComumProcessoEstocastico_correlacao_determinante,                          double());
 
 		//processoEstocastico.addSeriesTemporais(serie_sintetica);
 
-		processoEstocastico.parametrizarModelo(a_entradaSaidaDados, true, tipo_modelo_geracao_sintetica, tipo_coeficiente_auto_correlacao, ordem_maxima_coeficiente_auto_correlacao, tipo_correlacao_variaveis_aleatorias);
+		processoEstocastico.parametrizarModelo(a_entradaSaidaDados, true, tipo_modelo_geracao_sintetica, tipo_coeficiente_auto_correlacao, ordem_maxima_coeficiente_auto_correlacao, tipo_correlacao_variaveis_aleatorias, correlacao_determinante);
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::avaliarModeloViaSerieSintetica(a_entradaSaidaDados," + getString(a_tipo_sorteio) + "," + getString(a_numero_periodos_avaliacao_sintetica) + "): \n" + std::string(erro.what())); }
@@ -678,7 +682,7 @@ double ProcessoEstocastico::getGrauLiberdade(const IdVariavelAleatoria a_idVaria
 }
 
 
-void ProcessoEstocastico::calcularCorrelacaoSazonalVariaveisAleatorias() {
+void ProcessoEstocastico::calcularCorrelacaoSazonalVariaveisAleatorias(const double a_valor_determinacao_correlacao) {
 
 	try {
 
@@ -686,30 +690,64 @@ void ProcessoEstocastico::calcularCorrelacaoSazonalVariaveisAleatorias() {
 
 		for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++) {
 
-			SmartEnupla<Periodo, double> serie_temporal_idVar_A;
+			const IdVariavelAleatoria idVar_A_determinacao = getAtributo(idVar_A, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria());
 
-			SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdEstacao, double>> correlacao_idVar_A(IdVariavelAleatoria_1, std::vector<SmartEnupla<IdEstacao, double>>(int(maiorVariavelAleatoria), SmartEnupla<IdEstacao, double>()));
+			if (idVar_A_determinacao != IdVariavelAleatoria_Nenhum) {
 
-			for (IdVariavelAleatoria idVar_B = IdVariavelAleatoria_1; idVar_B <= maiorVariavelAleatoria; idVar_B++) {
+				SmartEnupla<Periodo, double> serie_temporal_idVar_A;
 
-				if (getSize1Matriz(idVar_B, AttMatrizVariavelAleatoria_correlacao) > 0) {
-					const IdEstacao maiorEstacao = getIterador2Final(idVar_B, AttMatrizVariavelAleatoria_correlacao, idVar_A, IdEstacao());
-					correlacao_idVar_A.at(idVar_B) = SmartEnupla<IdEstacao, double>(IdEstacao_1, std::vector<double>(int(maiorEstacao), 0.0));
-					for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++)
-						correlacao_idVar_A.at(idVar_B).setElemento(idEstacao, getElementoMatriz(idVar_B, AttMatrizVariavelAleatoria_correlacao, idVar_A, idEstacao, double()));
+				SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdEstacao, double>> correlacao_idVar_A(IdVariavelAleatoria_1, std::vector<SmartEnupla<IdEstacao, double>>(int(maiorVariavelAleatoria), SmartEnupla<IdEstacao, double>()));
+
+				for (IdVariavelAleatoria idVar_B = IdVariavelAleatoria_1; idVar_B <= maiorVariavelAleatoria; idVar_B++) {
+
+					const IdVariavelAleatoria idVar_B_determinacao = getAtributo(idVar_B, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria());
+
+					if (idVar_B_determinacao != IdVariavelAleatoria_Nenhum) {
+
+						if (getSize1Matriz(idVar_B, AttMatrizVariavelAleatoria_correlacao) > 0) {
+							const IdEstacao maiorEstacao = getIterador2Final(idVar_B, AttMatrizVariavelAleatoria_correlacao, idVar_A, IdEstacao());
+							correlacao_idVar_A.at(idVar_B) = SmartEnupla<IdEstacao, double>(IdEstacao_1, std::vector<double>(int(maiorEstacao), 0.0));
+							for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++)
+								correlacao_idVar_A.at(idVar_B).setElemento(idEstacao, getElementoMatriz(idVar_B, AttMatrizVariavelAleatoria_correlacao, idVar_A, idEstacao, double()));
+						}
+						else {
+
+							if (serie_temporal_idVar_A.size() == 0)
+								serie_temporal_idVar_A = vetorVariavelAleatoria.att(idVar_A).getVetor(AttVetorVariavelAleatoria_serie_temporal_transformada, Periodo(), double());
+
+							const SmartEnupla<Periodo, double> serie_temporal_idVar_B = vetorVariavelAleatoria.att(idVar_B).getVetor(AttVetorVariavelAleatoria_serie_temporal_transformada, Periodo(), double());
+							correlacao_idVar_A.setElemento(idVar_B, getCorrelacaoSazonal(serie_temporal_idVar_A, serie_temporal_idVar_B));
+
+							if (idVar_A_determinacao == idVar_A) {
+								bool determinarAemB = true;
+								for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= correlacao_idVar_A.at(idVar_B).getIteradorFinal(); idEstacao++) {
+									if (correlacao_idVar_A.at(idVar_B).at(idEstacao) < a_valor_determinacao_correlacao) {
+										determinarAemB = false;
+										break;
+									}
+									if (idVar_B_determinacao != idVar_B) {
+										if (getElementoMatriz(idVar_B_determinacao, AttMatrizVariavelAleatoria_correlacao, idVar_B, idEstacao, double()) > correlacao_idVar_A.at(idVar_B).at(idEstacao)) {
+											determinarAemB = false;
+											break;
+										}
+									}
+								}
+
+								if (determinarAemB) {
+									for (IdVariavelAleatoria idVar_C = IdVariavelAleatoria_1; idVar_C <= maiorVariavelAleatoria; idVar_C++) {
+										if (getAtributo(idVar_C, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_B)
+											vetorVariavelAleatoria.att(idVar_C).setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, idVar_A);
+									}
+								}
+							}
+
+						}
+					} // if (getAtributo(idVar_B, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_B) {
 				}
-				else {
 
-					if (serie_temporal_idVar_A.size() == 0)
-						serie_temporal_idVar_A = vetorVariavelAleatoria.att(idVar_A).getVetor(AttVetorVariavelAleatoria_serie_temporal_transformada, Periodo(), double());
+				vetorVariavelAleatoria.att(idVar_A).setMatriz_forced(AttMatrizVariavelAleatoria_correlacao, correlacao_idVar_A);
 
-					const SmartEnupla<Periodo, double> serie_temporal_idVar_B = vetorVariavelAleatoria.att(idVar_B).getVetor(AttVetorVariavelAleatoria_serie_temporal_transformada, Periodo(), double());
-					correlacao_idVar_A.setElemento(idVar_B, getCorrelacaoSazonal(serie_temporal_idVar_A, serie_temporal_idVar_B));
-				}
-			
-			}
-				
-			vetorVariavelAleatoria.att(idVar_A).setMatriz_forced(AttMatrizVariavelAleatoria_correlacao, correlacao_idVar_A);
+			} // if (getAtributo(idVar_A, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_A) {
 
 		} // for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++) {
 
@@ -720,7 +758,7 @@ void ProcessoEstocastico::calcularCorrelacaoSazonalVariaveisAleatorias() {
 
 
 
-void ProcessoEstocastico::calcularCorrelacaoSazonalResiduoVariaveisAleatorias(){
+void ProcessoEstocastico::calcularCorrelacaoSazonalResiduoVariaveisAleatorias(const double a_valor_determinacao_correlacao){
 
 	try {
 
@@ -728,28 +766,65 @@ void ProcessoEstocastico::calcularCorrelacaoSazonalResiduoVariaveisAleatorias(){
 
 		for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++) {
 
-			SmartEnupla<Periodo, double> serie_temporal_idVar_A;
+			const IdVariavelAleatoria idVar_A_determinacao = getAtributo(idVar_A, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria());
 
-			SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdEstacao, double>> correlacao_idVar_A(IdVariavelAleatoria_1, std::vector<SmartEnupla<IdEstacao, double>>(int(maiorVariavelAleatoria), SmartEnupla<IdEstacao, double>()));
+			if (idVar_A_determinacao != IdVariavelAleatoria_Nenhum) {
 
-			for (IdVariavelAleatoria idVar_B = IdVariavelAleatoria_1; idVar_B <= maiorVariavelAleatoria; idVar_B++) {
+				SmartEnupla<Periodo, double> serie_temporal_idVar_A;
 
-				if (getSize1Matriz(idVar_B, AttMatrizVariavelAleatoria_correlacao_residuo_lognormal) > 0) {
-					const IdEstacao maiorEstacao = getIterador2Final(idVar_B, AttMatrizVariavelAleatoria_correlacao_residuo_lognormal, idVar_A, IdEstacao());
-					correlacao_idVar_A.at(idVar_B) = SmartEnupla<IdEstacao, double>(IdEstacao_1, std::vector<double>(int(maiorEstacao), 0.0));
-					for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++)
-						correlacao_idVar_A.at(idVar_B).setElemento(idEstacao, getElementoMatriz(idVar_B, AttMatrizVariavelAleatoria_correlacao_residuo_lognormal, idVar_A, idEstacao, double()));
+				SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdEstacao, double>> correlacao_idVar_A(IdVariavelAleatoria_1, std::vector<SmartEnupla<IdEstacao, double>>(int(maiorVariavelAleatoria), SmartEnupla<IdEstacao, double>()));
+
+				for (IdVariavelAleatoria idVar_B = IdVariavelAleatoria_1; idVar_B <= maiorVariavelAleatoria; idVar_B++) {
+
+					const IdVariavelAleatoria idVar_B_determinacao = getAtributo(idVar_B, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria());
+
+					if (idVar_B_determinacao != IdVariavelAleatoria_Nenhum) {
+
+						if (getSize1Matriz(idVar_B, AttMatrizVariavelAleatoria_correlacao_residuo_lognormal) > 0) {
+							const IdEstacao maiorEstacao = getIterador2Final(idVar_B, AttMatrizVariavelAleatoria_correlacao_residuo_lognormal, idVar_A, IdEstacao());
+							correlacao_idVar_A.at(idVar_B) = SmartEnupla<IdEstacao, double>(IdEstacao_1, std::vector<double>(int(maiorEstacao), 0.0));
+							for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++)
+								correlacao_idVar_A.at(idVar_B).setElemento(idEstacao, getElementoMatriz(idVar_B, AttMatrizVariavelAleatoria_correlacao_residuo_lognormal, idVar_A, idEstacao, double()));
+						}
+						else {
+							if (serie_temporal_idVar_A.size() == 0)
+								serie_temporal_idVar_A = vetorVariavelAleatoria.att(idVar_A).getVetor(AttVetorVariavelAleatoria_serie_residuo_lognormal, Periodo(), double());
+
+							const SmartEnupla<Periodo, double> serie_temporal_idVar_B = vetorVariavelAleatoria.att(idVar_B).getVetor(AttVetorVariavelAleatoria_serie_residuo_lognormal, Periodo(), double());
+							correlacao_idVar_A.setElemento(idVar_B, getCorrelacaoSazonal(serie_temporal_idVar_A, serie_temporal_idVar_B));
+
+							if (idVar_A_determinacao == idVar_A) {
+								bool determinarAemB = true;
+								for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= correlacao_idVar_A.at(idVar_B).getIteradorFinal(); idEstacao++) {
+									if (correlacao_idVar_A.at(idVar_B).at(idEstacao) < a_valor_determinacao_correlacao) {
+										determinarAemB = false;
+										break;
+									}
+									if (idVar_B_determinacao != idVar_B) {
+										if (getSize1Matriz(idVar_B_determinacao, AttMatrizVariavelAleatoria_correlacao_residuo_lognormal) > 0) {
+											if (getElementoMatriz(idVar_B_determinacao, AttMatrizVariavelAleatoria_correlacao_residuo_lognormal, idVar_B, idEstacao, double()) > correlacao_idVar_A.at(idVar_B).at(idEstacao)) {
+												determinarAemB = false;
+												break;
+											}
+										}
+									}
+								}
+
+								if (determinarAemB) {
+									for (IdVariavelAleatoria idVar_C = IdVariavelAleatoria_1; idVar_C <= maiorVariavelAleatoria; idVar_C++) {
+										if (getAtributo(idVar_C, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_B)
+											vetorVariavelAleatoria.att(idVar_C).setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, idVar_A);
+									}
+								}
+							}
+
+						} // if (idVar_B_determinacao != IdVariavelAleatoria_Nenhum) {
+					} // if (getAtributo(idVar_B, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_B) {
 				}
-				else {
-					if (serie_temporal_idVar_A.size() == 0)
-						serie_temporal_idVar_A = vetorVariavelAleatoria.att(idVar_A).getVetor(AttVetorVariavelAleatoria_serie_residuo_lognormal, Periodo(), double());
 
-					const SmartEnupla<Periodo, double> serie_temporal_idVar_B = vetorVariavelAleatoria.att(idVar_B).getVetor(AttVetorVariavelAleatoria_serie_residuo_lognormal, Periodo(), double());
-					correlacao_idVar_A.setElemento(idVar_B, getCorrelacaoSazonal(serie_temporal_idVar_A, serie_temporal_idVar_B));
-				}
-			}
+				vetorVariavelAleatoria.att(idVar_A).setMatriz_forced(AttMatrizVariavelAleatoria_correlacao_residuo_lognormal, correlacao_idVar_A);
 
-			vetorVariavelAleatoria.att(idVar_A).setMatriz_forced(AttMatrizVariavelAleatoria_correlacao_residuo_lognormal, correlacao_idVar_A);
+			} // if (idVar_A_determinacao != IdVariavelAleatoria_Nenhum) {
 
 		} // for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++) {
 
@@ -759,80 +834,91 @@ void ProcessoEstocastico::calcularCorrelacaoSazonalResiduoVariaveisAleatorias(){
 } // void ProcessoEstocastico::calcularCorrelacaoSazonalResiduoVariaveisAleatorias(){
 
 
-
 void ProcessoEstocastico::calcularMatrizCargaSazonalResiduoVariaveisAleatorias() {
 
 	try {
 
 		const TipoCorrelacaoVariaveisAleatorias tipo_correlacao = getAtributo(AttComumProcessoEstocastico_tipo_correlacao_variaveis_aleatorias, TipoCorrelacaoVariaveisAleatorias());
 
-		const IdEstacao maiorEstacao = getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_correlacao_residuo_lognormal, IdVariavelAleatoria_1, IdEstacao());
-
 		const IdVariavelAleatoria maiorVariavelAleatoria = getMaiorIdVariavelAleatoria();
 
 		for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++) {
 
-			SmartEnupla<IdEstacao, SmartEnupla<IdVariavelAleatoria, double>> matriz_carga(IdEstacao_1, std::vector<SmartEnupla<IdVariavelAleatoria, double>>(int(maiorEstacao), SmartEnupla<IdVariavelAleatoria, double>()));
+			if (getAtributo(idVar_A, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_A) {
 
-			for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+				const IdEstacao maiorEstacao = getIterador2Final(idVar_A, AttMatrizVariavelAleatoria_correlacao_residuo_lognormal, idVar_A, IdEstacao());
 
-				SmartEnupla<IdVariavelAleatoria, double> matriz_carga_estacao(IdVariavelAleatoria_1, std::vector<double>(int(idVar_A), 0.0));
+				SmartEnupla<IdEstacao, SmartEnupla<IdVariavelAleatoria, double>> matriz_carga(IdEstacao_1, std::vector<SmartEnupla<IdVariavelAleatoria, double>>(int(maiorEstacao), SmartEnupla<IdVariavelAleatoria, double>()));
 
-				for (IdVariavelAleatoria idVar_B = IdVariavelAleatoria_1; idVar_B <= idVar_A; idVar_B++) {
+				for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
 
-					double carga = getElementoMatriz(idVar_A, AttMatrizVariavelAleatoria_correlacao_residuo_lognormal, idVar_B, idEstacao, double());
+					SmartEnupla<IdVariavelAleatoria, double> matriz_carga_estacao(IdVariavelAleatoria_1, std::vector<double>(int(idVar_A), 0.0));
 
-					if (idVar_B == idVar_A) {
+					for (IdVariavelAleatoria idVar_B = IdVariavelAleatoria_1; idVar_B <= idVar_A; idVar_B++) {
 
-						carga *= (1.0 + 1e-3);
+						if (getAtributo(idVar_B, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_B) {
 
-						for (IdVariavelAleatoria idVar_C = IdVariavelAleatoria_1; idVar_C < idVar_B; idVar_C++) {
-							//const double elemento_ = getElementoMatriz(idVar_A, AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, idEstacao, idVar_C, double());
-							const double elemento = matriz_carga_estacao.getElemento(idVar_C);
-							carga -= elemento * elemento;
-						} // for (IdVariavelAleatoria idVar_C = IdVariavelAleatoria_1; idVar_C < idVar_B; idVar_C++) {
+							double carga = getElementoMatriz(idVar_A, AttMatrizVariavelAleatoria_correlacao_residuo_lognormal, idVar_B, idEstacao, double());
 
-						if (carga > 0)
-							carga = std::sqrt(carga);
-						else
-							carga = 0;
+							if (idVar_B == idVar_A) {
 
-					} // if (idVar_B == idVar_A) {
+								carga *= (1.0 + 1e-5);
 
-					else if (idVar_B < idVar_A) {
+								for (IdVariavelAleatoria idVar_C = IdVariavelAleatoria_1; idVar_C < idVar_B; idVar_C++) {
+									if (getAtributo(idVar_C, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_C) {
+										//const double elemento_ = getElementoMatriz(idVar_A, AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, idEstacao, idVar_C, double());
+										const double elemento = matriz_carga_estacao.getElemento(idVar_C);
+										carga -= elemento * elemento;
+									} // if (getAtributo(idVar_C, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_C) {
+								} // for (IdVariavelAleatoria idVar_C = IdVariavelAleatoria_1; idVar_C < idVar_B; idVar_C++) {
 
-						for (IdVariavelAleatoria idVar_C = IdVariavelAleatoria_1; idVar_C < idVar_B; idVar_C++) {
-							//const double elementoA_ = getElementoMatriz(idVar_A, AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, idEstacao, idVar_C, double());
-							const double elementoA = matriz_carga_estacao.getElemento(idVar_C);
-							const double elementoB = getElementoMatriz(idVar_B, AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, idEstacao, idVar_C, double());
-							carga -= elementoA * elementoB;
-						} // for (IdVariavelAleatoria idVar_C = IdVariavelAleatoria_1; idVar_C < idVar_B; idVar_C++) {
+								if (carga > 0)
+									carga = std::sqrt(carga);
+								else
+									carga = 0;
 
-						const double denominador = getElementoMatriz(idVar_B, AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, idEstacao, idVar_B, double());
+							} // if (idVar_B == idVar_A) {
 
-						if (denominador > 0)
-							carga /= denominador;
-						else
-							carga = 0;
+							else if (idVar_B < idVar_A) {
 
-					} // else if (idVar_B < idVar_A) {
+								for (IdVariavelAleatoria idVar_C = IdVariavelAleatoria_1; idVar_C < idVar_B; idVar_C++) {
+									if (getAtributo(idVar_C, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_C) {
+										//const double elementoA_ = getElementoMatriz(idVar_A, AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, idEstacao, idVar_C, double());
+										const double elementoA = matriz_carga_estacao.getElemento(idVar_C);
+										const double elementoB = getElementoMatriz(idVar_B, AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, idEstacao, idVar_C, double());
+										carga -= elementoA * elementoB;
+									} // if (getAtributo(idVar_C, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_C) {
+								} // for (IdVariavelAleatoria idVar_C = IdVariavelAleatoria_1; idVar_C < idVar_B; idVar_C++) {
 
-					//vetorVariavelAleatoria.att(idVar_A).addElemento(AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, idVar_B, idEstacao, carga);
+								const double denominador = getElementoMatriz(idVar_B, AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, idEstacao, idVar_B, double());
 
-					matriz_carga_estacao.setElemento(idVar_B, carga);
+								if (denominador > 0)
+									carga /= denominador;
+								else
+									carga = 0;
 
-				} // for (IdVariavelAleatoria idVar_B = IdVariavelAleatoria_1; idVar_B <= idVar_A; idVar_B++) {
+							} // else if (idVar_B < idVar_A) {
 
-				matriz_carga.setElemento(idEstacao, matriz_carga_estacao);
+							//vetorVariavelAleatoria.att(idVar_A).addElemento(AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, idVar_B, idEstacao, carga);
 
-			} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+							matriz_carga_estacao.setElemento(idVar_B, carga);
 
-			vetorVariavelAleatoria.att(idVar_A).setMatriz_forced(AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, matriz_carga);
+						} // if (getAtributo(idVar_B, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_B) {
+
+					} // for (IdVariavelAleatoria idVar_B = IdVariavelAleatoria_1; idVar_B <= idVar_A; idVar_B++) {
+
+					matriz_carga.setElemento(idEstacao, matriz_carga_estacao);
+
+				} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+
+				vetorVariavelAleatoria.att(idVar_A).setMatriz_forced(AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, matriz_carga);
+
+			} // if (getAtributo(idVar_A, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_A) {
 
 		} // for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++) {
 
 	} // try{
-	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::calcularCorrelacaoSazonalResiduoVariaveisAleatorias(): \n" + std::string(erro.what())); }
+	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::calcularMatrizCargaSazonalResiduoVariaveisAleatorias(): \n" + std::string(erro.what())); }
 
 } // void ProcessoEstocastico::calcularMatrizCargaSazonalResiduoVariaveisAleatorias(){
 
@@ -847,21 +933,29 @@ void ProcessoEstocastico::calcularRuidoCorrelacionadoEspacoAmostral(){
 
 		const TipoCorrelacaoVariaveisAleatorias tipo_correlacao_variaveis_aleatorias = getAtributo(AttComumProcessoEstocastico_tipo_correlacao_variaveis_aleatorias, TipoCorrelacaoVariaveisAleatorias());
 
-		const Periodo periodo_inicial = getIterador1Inicial(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, Periodo());
-		const Periodo periodo_final   = getIterador1Final  (IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, Periodo());
 
-		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
+		IdVariavelAleatoria idVar_ref;
+		for (idVar_ref = IdVariavelAleatoria_1; idVar_ref <= maiorVariavelAleatoria; idVar_ref++) {
+			if (getSize1Matriz(idVar_ref, AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral) > 0)
+				break;
+		}
 
-			const IdRealizacao realizacao_final = getIterador2Final (IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, periodo, IdRealizacao());
+		SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> ruido_branco_ref = getMatriz(idVar_ref, AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, Periodo(), IdRealizacao(), double());
 
-			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= realizacao_final; idRealizacao++) {
+		for (Periodo periodo = ruido_branco_ref.getIteradorInicial(); periodo <= ruido_branco_ref.getIteradorFinal(); ruido_branco_ref.incrementarIterador(periodo)) {
+
+			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= ruido_branco_ref.at(periodo).getIteradorFinal(); idRealizacao++) {
 
 				for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++) {
 
-					SmartEnupla<IdVariavelAleatoria, double> ruido_branco;
+					SmartEnupla<IdVariavelAleatoria, double> ruido_branco(IdVariavelAleatoria_1, std::vector<double>(int(maiorVariavelAleatoria), NAN));
 
-					for (IdVariavelAleatoria idVar_B = IdVariavelAleatoria_1; idVar_B <= maiorVariavelAleatoria; idVar_B++)
-						ruido_branco.addElemento(idVar_B, getElementoMatriz(idVar_B, AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, periodo, idRealizacao, double()));
+					for (IdVariavelAleatoria idVar_B = IdVariavelAleatoria_1; idVar_B <= maiorVariavelAleatoria; idVar_B++) {
+						if (getAtributo(idVar_B, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_B)
+							ruido_branco.setElemento(idVar_B, getElementoMatriz(idVar_B, AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, periodo, idRealizacao, double()));
+						else
+							ruido_branco.setElemento(idVar_B, 0.0);
+					}
 
 					const double ruido_correlacionado = vetorVariavelAleatoria.att(idVar_A).calcularRuidoCorrelacionado(tipo_correlacao_variaveis_aleatorias, periodo.getEstacao(), ruido_branco);
 
@@ -874,9 +968,11 @@ void ProcessoEstocastico::calcularRuidoCorrelacionadoEspacoAmostral(){
 		} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
 
 	} // try{
-	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::calcularRuidoCorrelacionadoEspacoAmostral(): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::calcularRuidoCorrelacionadoEspacoAmostral(): \n" + std::string(erro.what())); }
 
 } // void ProcessoEstocastico::gerarRuidoCorrelacionadoAmostra(){
+
+
 
 
 

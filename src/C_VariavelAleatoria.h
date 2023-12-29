@@ -9,6 +9,7 @@
 #define ATT_COMUM_VARIAVEL_ALEATORIA(m)  \
 	  m(VariavelAleatoria,  AttComum,                        idVariavelAleatoria,               IdVariavelAleatoria,         min,         max,           min,      nao) \
 	  m(VariavelAleatoria,  AttComum,                                       nome,                            string,         min,         max,        Nenhum,      nao) \
+	  m(VariavelAleatoria,  AttComum,           idVariavelAleatoria_determinacao,               IdVariavelAleatoria,      Nenhum,         max,        Nenhum,      nao) \
 	  m(VariavelAleatoria,  AttComum,           grau_liberdade_residuo_lognormal,                            double,           0,         max,             0,      nao) \
 	  m(VariavelAleatoria,  AttComum,              tipo_modelo_geracao_sintetica, TipoModeloGeracaoSinteticaCenario,      nenhum,         max,           min,      nao) \
 	  m(VariavelAleatoria,  AttComum,           tipo_coeficiente_auto_correlacao,                         TipoValor,         min,         max,           min,      nao) \
@@ -47,7 +48,7 @@
 	  m(VariavelAleatoria,  AttVetor,                auto_correlacao_residuo_normal,   double,        min,          max,             0,  int) \
 	  m(VariavelAleatoria,  AttVetor,             auto_correlacao_residuo_lognormal,   double,        min,          max,             0,  int) \
 	  m(VariavelAleatoria,  AttVetor,                  ruido_branco_serie_sintetica,   double,        min,          max,             0,  Periodo) \
-	  m(VariavelAleatoria,  AttVetor,          ruido_correlacionado_serie_sintetica,   double,        min,          max,             0,  Periodo)
+	  m(VariavelAleatoria,  AttVetor,          ruido_correlacionado_serie_sintetica,   double,        min,          max,             0,  Periodo) 
 //               c_classe,   smrtAtt,                                  nomeAtributo,     Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define ATT_MATRIZ_VARIAVEL_ALEATORIA(m)  \

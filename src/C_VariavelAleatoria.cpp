@@ -310,7 +310,13 @@ void VariavelAleatoria::calcularEstatisticaSerieTransformada(){
 			// rk(95%) = +- 1.96*sqrt(N)
 			ic_auto_correlacao.setElemento(idEstacao, 1.96 / std::sqrt(double(dados.size())));
 
+			if (desvio.at(idEstacao) <= 1.0)
+				setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria_Nenhum);
+
 		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+
+
+
 
 		setVetor_forced(AttVetorVariavelAleatoria_media_serie_transformada, media);
 		setVetor_forced(AttVetorVariavelAleatoria_desvio_serie_transformada, desvio);
@@ -511,18 +517,23 @@ void VariavelAleatoria::determinarOrdemAutoCorrelacaoSerieTransformada(const Tip
 			const double ic_auto_correlacao = getElementoVetor(AttVetorVariavelAleatoria_ic_auto_correlacao, idEstacao, double());
 
 			int ordem = 0;
-			for (int p = 1; p <= ordem_maxima; p++) {
-				const double valor_PACF = getElementoMatriz(AttMatrizVariavelAleatoria_auto_correlacao_parcial, idEstacao, p, double());
 
-				// A ordem é determinada pelo numero consecutivo de valores significativos de PACF
-				if (((a_tipo_coeficiente_auto_correlacao == TipoValor_positivo_e_negativo) || (a_tipo_coeficiente_auto_correlacao == TipoValor_negativo)) && (valor_PACF < -ic_auto_correlacao))
-					ordem = p;
-				else if (((a_tipo_coeficiente_auto_correlacao == TipoValor_positivo_e_negativo) || (a_tipo_coeficiente_auto_correlacao == TipoValor_positivo)) && (valor_PACF > ic_auto_correlacao))
-					ordem = p;
-				else
-					break;
+			if (getAtributo(AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) != IdVariavelAleatoria_Nenhum) {
 
-			} // for (int p = 1; p <= ordem_maxima; p++) {
+				for (int p = 1; p <= ordem_maxima; p++) {
+					const double valor_PACF = getElementoMatriz(AttMatrizVariavelAleatoria_auto_correlacao_parcial, idEstacao, p, double());
+
+					// A ordem é determinada pelo numero consecutivo de valores significativos de PACF
+					if (((a_tipo_coeficiente_auto_correlacao == TipoValor_positivo_e_negativo) || (a_tipo_coeficiente_auto_correlacao == TipoValor_negativo)) && (valor_PACF < -ic_auto_correlacao))
+						ordem = p;
+					else if (((a_tipo_coeficiente_auto_correlacao == TipoValor_positivo_e_negativo) || (a_tipo_coeficiente_auto_correlacao == TipoValor_positivo)) && (valor_PACF > ic_auto_correlacao))
+						ordem = p;
+					else
+						break;
+
+				} // for (int p = 1; p <= ordem_maxima; p++) {
+
+			}
 
 			if (ordem > a_ordem_fixa_correlacao_temporal)
 				ordem = a_ordem_fixa_correlacao_temporal;
@@ -951,6 +962,8 @@ void VariavelAleatoria::calcularSigmaMiDeltaResiduoNormal(){
 			const double  media_residuo_normal = getElementoVetor(AttVetorVariavelAleatoria_media_residuo_normal, idEstacao, double());
 			const double desvio_residuo_normal = getElementoVetor(AttVetorVariavelAleatoria_desvio_residuo_normal, idEstacao, double());
 
+			const double desvio_serie_transformada = getElementoVetor(AttVetorVariavelAleatoria_desvio_serie_transformada, idEstacao, double());
+
 			const double      media_residuo_lognormal = getElementoVetor(AttVetorVariavelAleatoria_media_residuo_lognormal,      idEstacao, double());
 			const double     desvio_residuo_lognormal = getElementoVetor(AttVetorVariavelAleatoria_desvio_residuo_lognormal,     idEstacao, double());
 			const double assimetria_residuo_lognormal = getElementoVetor(AttVetorVariavelAleatoria_assimetria_residuo_lognormal, idEstacao, double());
@@ -977,7 +990,7 @@ void VariavelAleatoria::calcularSigmaMiDeltaResiduoNormal(){
 			//
 			// Em caso de desvio do resíduo nulo, resíduo é nulo.
 			//
-			if (desvio_residuo_lognormal == 0.0) {}
+			if ((desvio_residuo_lognormal == 0.0) || (getAtributo(AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == IdVariavelAleatoria_Nenhum)){}
 
 			//
 			// Em caso de distribuição Lognormal inviável p/ resíduos, utiliza-se Normal.
@@ -1026,16 +1039,21 @@ double VariavelAleatoria::calcularRuidoCorrelacionado(const TipoCorrelacaoVariav
 
 	try {
 
+		const IdVariavelAleatoria idVar_determinacao = getAtributo(AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria());
+
 		if (a_tipo_correlacao_variaveis_aleatorias == TipoCorrelacaoVariaveisAleatorias_matriz_carga) {
 
 			double ruido_correlacionado = 0.0;
-			for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= getIdObjeto(); idVariavelAleatoria++) {
+			for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= idVar_determinacao; idVariavelAleatoria++) {
 
-				const double carga = getElementoMatriz(AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, a_idEstacao, idVariavelAleatoria, double());
+				if (getSizeMatriz(AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal) > 0) {
 
-				const double ruido = a_ruido_branco.getElemento(idVariavelAleatoria);
+					const double carga = getElementoMatriz(AttMatrizVariavelAleatoria_matriz_carga_residuo_lognormal, a_idEstacao, idVariavelAleatoria, double());
 
-				ruido_correlacionado += carga * ruido;
+					const double ruido = a_ruido_branco.getElemento(idVariavelAleatoria);
+					ruido_correlacionado += carga * ruido;
+
+				}
 
 			} // for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= getIdObjeto(); idVariavelAleatoria++) {
 
@@ -1044,7 +1062,7 @@ double VariavelAleatoria::calcularRuidoCorrelacionado(const TipoCorrelacaoVariav
 		} // if (tipo_correlacao_variaveis_aleatorias == TipoCorrelacaoVariaveisAleatorias_matriz_carga) {
 
 		else if (a_tipo_correlacao_variaveis_aleatorias == TipoCorrelacaoVariaveisAleatorias_sem_correlacao)
-			return a_ruido_branco.getElemento(getIdObjeto());
+			return a_ruido_branco.getElemento(idVar_determinacao);
 
 		else
 			throw std::invalid_argument("Tipo de correlacao nao utilizada no modelo.");
@@ -1085,6 +1103,9 @@ void VariavelAleatoria::gerarRuidoBrancoEspacoAmostral(const SmartEnupla<Periodo
 
 void VariavelAleatoria::gerarRuidoBrancoEspacoAmostral(const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> &a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, const int a_numero_maximo_periodos, int &a_semente) {
 	try {
+
+		if (getAtributo(AttComumVariavelAleatoria_idVariavelAleatoria, IdVariavelAleatoria()) != getAtributo(AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()))
+			return;
 
 		if (a_horizonte_espaco_amostral.size() == 0)
 			throw std::invalid_argument("Horizonte vazio.");
