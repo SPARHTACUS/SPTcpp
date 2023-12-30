@@ -85,51 +85,58 @@ double VariavelAleatoriaInterna::deslocarComGrauLiberdade(SmartEnupla<Periodo, d
 } // double VariavelAleatoriaInterna::transformarComGrauLiberdade(const SmartEnupla<Periodo, double>& a_serie, const double a_grau_liberdade){
 
 
-void VariavelAleatoriaInterna::deslocarSerieComGrauLiberdade() {
+void VariavelAleatoriaInterna::deslocarSerieComGrauLiberdade(const double a_grau_liberdade) {
 
 	try {
 
 		SmartEnupla<Periodo, double> serie = getVetor(AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, Periodo(), double());
 
-		const double grau_liberdade = getAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, double());
+		double grau_liberdade = getAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, double());
+		if (!isnan(a_grau_liberdade))
+			grau_liberdade = a_grau_liberdade;
 
 		const double grau_liberdade_transformacao = deslocarComGrauLiberdade(serie, grau_liberdade);
 
-		setVetor(AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, serie);
+		const double grau_liberdade_ajuste = grau_liberdade_transformacao - grau_liberdade;
 
-		if (grau_liberdade_transformacao > grau_liberdade)
+		setVetor_forced(AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, serie);
+
+		if (grau_liberdade_ajuste != 0.0) {
 			setAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, grau_liberdade_transformacao);
+			if (getSizeVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada) > 0)
+				deslocarTendenciaComGrauLiberdade(grau_liberdade_ajuste);
+		} // if (grau_liberdade_ajuste != 0.0) {
 
 	} // try{
-	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoriaInterna(" + getString(getIdObjeto()) + ")::deslocarSerieComGrauLiberdade(): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoriaInterna(" + getString(getIdObjeto()) + ")::deslocarSerieComGrauLiberdade(): \n" + std::string(erro.what())); }
 
 } // void VariavelAleatoriaInterna::transformarSerieComGrauLiberdade(){
 
 
 
-void VariavelAleatoriaInterna::deslocarTendenciaComGrauLiberdade(){
+void VariavelAleatoriaInterna::deslocarTendenciaComGrauLiberdade(const double a_grau_liberdade) {
 
 	try {
 
 		SmartEnupla<Periodo, double> tendencias = getVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, Periodo(), double());
 
-		const double grau_liberdade = getAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, double());
+		double grau_liberdade = getAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, double());
+		if (!isnan(a_grau_liberdade))
+			grau_liberdade = a_grau_liberdade;
 
-		double grau_liberdade_final = grau_liberdade;
-			const double grau_liberdade_tendencia = deslocarComGrauLiberdade(tendencias, grau_liberdade_final);
-			if (grau_liberdade_tendencia > grau_liberdade_final)
-				grau_liberdade_final = grau_liberdade_tendencia;
+		const double grau_liberdade_transformacao = deslocarComGrauLiberdade(tendencias, grau_liberdade);
+
+		const double grau_liberdade_ajuste = grau_liberdade_transformacao - grau_liberdade;
+
+		setVetor_forced(AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, tendencias);
 
 		// Em caso de diferença, uma nova transformação das tendencias é procedida de maneira a garantir 
 		// que todos os cenarios sejam deslocados com o mesmo grau de liberdade: grau_liberdade_final.
-		if (grau_liberdade_final > grau_liberdade) {
-			setAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, grau_liberdade_final);
-			deslocarTendenciaComGrauLiberdade();
-			deslocarSerieComGrauLiberdade();
-		} // if (grau_liberdade_final > grau_liberdade) {
-
-		else if (grau_liberdade_final == grau_liberdade)
-			setVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, tendencias);
+		if (grau_liberdade_ajuste != 0.0) {
+			setAtributo(AttComumVariavelAleatoriaInterna_grau_liberdade, grau_liberdade_transformacao);
+			if (getSizeVetor(AttVetorVariavelAleatoriaInterna_serie_temporal_transformada) > 0)
+				deslocarSerieComGrauLiberdade(grau_liberdade_ajuste);
+		} // if (grau_liberdade_ajuste != 0.0) {	
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoriaInterna(" + getString(getIdObjeto()) + ")::deslocarTendenciaComGrauLiberdade(): \n" + std::string(erro.what())); }

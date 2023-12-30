@@ -61,9 +61,9 @@ public:
 
 	double deslocarComGrauLiberdade(SmartEnupla<Periodo, double> &a_serie, const double a_grau_liberdade);
 
-	void deslocarSerieComGrauLiberdade();
+	void deslocarSerieComGrauLiberdade(const double a_grau_liberdade);
 
-	void deslocarTendenciaComGrauLiberdade();
+	void deslocarTendenciaComGrauLiberdade(const double a_grau_liberdade);
 
 	void calcularEstatisticaSerieTemporal();
 

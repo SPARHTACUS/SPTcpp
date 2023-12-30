@@ -102,7 +102,8 @@ void VariavelAleatoria::calcularSerieTemporal(){
 		if (periodo_inicial.getTipoPeriodo() != periodo_final.getTipoPeriodo())
 			throw std::invalid_argument("O tipo de periodo inicial e final das series temporais de variaveis aleatorias internas deve ser o mesmo.");
 
-		const SmartEnupla<Periodo, double> horizonte_serie_temporal = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_serie_temporal, Periodo(), double());
+		bool is_variacao_grau_liberdade = false;
+		SmartEnupla<IdVariavelAleatoriaInterna, double> delta_grau_liberdade(IdVariavelAleatoriaInterna_1, std::vector<double>(int(maiorIdVariavelAleatoriaInterna), 0.0));
 
 		for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
 
@@ -111,29 +112,66 @@ void VariavelAleatoria::calcularSerieTemporal(){
 			else if (getIteradorFinal(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_serie_temporal, Periodo()) != periodo_final)
 				throw std::invalid_argument("O periodo final das series temporais de variaveis aleatorias internas deve ser o mesmo.");
 
-			vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).deslocarSerieComGrauLiberdade();
+			delta_grau_liberdade.at(idVariavelAleatoriaInterna) = getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
+
+			vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).deslocarSerieComGrauLiberdade(NAN);
 
 			vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).calcularEstatisticaSerieTransformada();
 
+			delta_grau_liberdade.at(idVariavelAleatoriaInterna) = getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double()) - delta_grau_liberdade.at(idVariavelAleatoriaInterna);
+
+			if (delta_grau_liberdade.at(idVariavelAleatoriaInterna) != 0.0)
+				is_variacao_grau_liberdade = true;
+
 		} // for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
 
-		SmartEnupla<Periodo, double> serie_temporal(horizonte_serie_temporal, NAN);
+		if (true) {
+			const SmartEnupla<Periodo, double> horizonte_serie_temporal = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_serie_temporal, Periodo(), double());
+			SmartEnupla<Periodo, double> serie_temporal(horizonte_serie_temporal, 0.0);
+			SmartEnupla<Periodo, double> serie_temporal_transformada(horizonte_serie_temporal, 0.0);
+			for (Periodo periodo = horizonte_serie_temporal.getIteradorInicial(); periodo <= horizonte_serie_temporal.getIteradorFinal(); horizonte_serie_temporal.incrementarIterador(periodo)) {
+				for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
+					serie_temporal.at(periodo) += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_serie_temporal, periodo, double());
+					serie_temporal_transformada.at(periodo) += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, periodo, double());
+				}
+			} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
+			setVetor_forced(AttVetorVariavelAleatoria_serie_temporal, serie_temporal);
+			setVetor_forced(AttVetorVariavelAleatoria_serie_temporal_transformada, serie_temporal_transformada);
+		}
 
-		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
-
-			double valor = 0.0;
-
-			for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++)
-				valor += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, periodo, double());
-
-			serie_temporal.setElemento(periodo, valor);
-
-		} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
-
-		setVetor_forced(AttVetorVariavelAleatoria_serie_temporal,              serie_temporal);
-		setVetor_forced(AttVetorVariavelAleatoria_serie_temporal_transformada, serie_temporal);
+		if (is_variacao_grau_liberdade && (getSizeVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada) > 0)) {
+			SmartEnupla<Periodo, double> horizonte_tendencia = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, Periodo(), double());
+			SmartEnupla<Periodo, double> tendencia_temporal_transformada(horizonte_tendencia, 0.0);
+			for (Periodo periodo = horizonte_tendencia.getIteradorInicial(); periodo <= horizonte_tendencia.getIteradorFinal(); horizonte_tendencia.incrementarIterador(periodo)) {
+				for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
+					tendencia_temporal_transformada.at(periodo) += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, periodo, double());
+				}
+			} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
+			setVetor_forced(AttVetorVariavelAleatoria_tendencia_temporal_transformada, tendencia_temporal_transformada);
+		}
 
 		calcularCoeficienteParticipacaoVariavelAleatoriaInterna();
+
+		if ((getSizeMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral) > 0.0) && (is_variacao_grau_liberdade)){
+
+			SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> residuo_espaco_amostral = getMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double());
+
+			for (Periodo periodo = residuo_espaco_amostral.getIteradorInicial(); periodo <= residuo_espaco_amostral.getIteradorFinal(); residuo_espaco_amostral.incrementarIterador(periodo)) {
+
+				double variacao_residuos = 0.0;
+				for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
+					const double coeficiente_participacao = getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodo, double());
+					variacao_residuos += coeficiente_participacao * delta_grau_liberdade.at(idVariavelAleatoriaInterna);
+				}
+
+				for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= residuo_espaco_amostral.at(periodo).getIteradorFinal(); idRealizacao++)
+					residuo_espaco_amostral.at(periodo).at(idRealizacao) += variacao_residuos;
+
+			} // for (Periodo periodo = residuo_espaco_amostral.getIteradorInicial(); periodo <= residuo_espaco_amostral.getIteradorFinal(); residuo_espaco_amostral.incrementarIterador(periodo)) {
+
+			setMatriz_forced(AttMatrizVariavelAleatoria_residuo_espaco_amostral, residuo_espaco_amostral);
+
+		} // if ((getSizeMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral) > 0.0) && (is_variacao_grau_liberdade)){
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::calcularSerieTemporal(): \n" + std::string(erro.what())); }
@@ -155,6 +193,8 @@ void VariavelAleatoria::calcularTendenciaTemporal(){
 
 		const SmartEnupla<Periodo, double> horizonte_tendencia = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
+		bool is_variacao_grau_liberdade = false;
+		SmartEnupla<IdVariavelAleatoriaInterna, double> delta_grau_liberdade(IdVariavelAleatoriaInterna_1, std::vector<double>(int(maiorIdVariavelAleatoriaInterna), 0.0));
 		for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
 
 			if (getIteradorInicial(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo()) != periodo_inicial)
@@ -162,25 +202,64 @@ void VariavelAleatoria::calcularTendenciaTemporal(){
 			else if (getIteradorFinal(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo()) != periodo_final)
 				throw std::invalid_argument("O periodo final das tendencias temporais de variaveis aleatorias internas deve ser o mesmo.");
 
-			vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).deslocarTendenciaComGrauLiberdade();
+			delta_grau_liberdade.at(idVariavelAleatoriaInterna) = getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
+
+			vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).deslocarTendenciaComGrauLiberdade(NAN);
+
+			delta_grau_liberdade.at(idVariavelAleatoriaInterna) = getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double()) - delta_grau_liberdade.at(idVariavelAleatoriaInterna);
+
+			if (delta_grau_liberdade.at(idVariavelAleatoriaInterna) != 0.0)
+				is_variacao_grau_liberdade = true;
 
 		} // for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
 
-		SmartEnupla<Periodo, double> tendencia_temporal(horizonte_tendencia, NAN);
 
-		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_tendencia.incrementarIterador(periodo)) {
+		if (true) {
+			const SmartEnupla<Periodo, double> horizonte_tendencia_temporal = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
+			SmartEnupla<Periodo, double> tendencia_temporal(horizonte_tendencia_temporal, 0.0);
+			SmartEnupla<Periodo, double> tendencia_temporal_transformada(horizonte_tendencia_temporal, 0.0);
+			for (Periodo periodo = horizonte_tendencia_temporal.getIteradorInicial(); periodo <= horizonte_tendencia_temporal.getIteradorFinal(); horizonte_tendencia_temporal.incrementarIterador(periodo)) {
+				for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
+					tendencia_temporal.at(periodo) += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double());
+					tendencia_temporal_transformada.at(periodo) += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, periodo, double());
+				}
+			} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
+			setVetor_forced(AttVetorVariavelAleatoria_tendencia_temporal, tendencia_temporal);
+			setVetor_forced(AttVetorVariavelAleatoria_tendencia_temporal_transformada, tendencia_temporal_transformada);
+		}
 
-			double valor = 0.0;
+		if (is_variacao_grau_liberdade && (getSizeVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_serie_temporal_transformada) > 0)) {
+			SmartEnupla<Periodo, double> horizonte_serie = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, Periodo(), double());
+			SmartEnupla<Periodo, double> serie_temporal_transformada(horizonte_serie, 0.0);
+			for (Periodo periodo = horizonte_serie.getIteradorInicial(); periodo <= horizonte_serie.getIteradorFinal(); horizonte_serie.incrementarIterador(periodo)) {
+				for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
+					serie_temporal_transformada.at(periodo) += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, periodo, double());
+					vetorVariavelAleatoriaInterna.att(idVariavelAleatoriaInterna).calcularEstatisticaSerieTransformada();
+				}
+			} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
+			setVetor_forced(AttVetorVariavelAleatoria_serie_temporal_transformada, serie_temporal_transformada);
+		}
 
-			for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++)
-				valor += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, periodo, double());
+		if ((getSizeMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral) > 0.0) && (is_variacao_grau_liberdade)) {
 
-			tendencia_temporal.setElemento(periodo, valor);
+			SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> residuo_espaco_amostral = getMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double());
 
-		} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_tendencia.incrementarIterador(periodo)) {
+			for (Periodo periodo = residuo_espaco_amostral.getIteradorInicial(); periodo <= residuo_espaco_amostral.getIteradorFinal(); residuo_espaco_amostral.incrementarIterador(periodo)) {
 
-		setVetor_forced(AttVetorVariavelAleatoria_tendencia_temporal, tendencia_temporal);
-		setVetor_forced(AttVetorVariavelAleatoria_tendencia_temporal_transformada, tendencia_temporal);
+				double variacao_residuos = 0.0;
+				for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
+					const double coeficiente_participacao = getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodo, double());
+					variacao_residuos += coeficiente_participacao * delta_grau_liberdade.at(idVariavelAleatoriaInterna);
+				}
+
+				for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= residuo_espaco_amostral.at(periodo).getIteradorFinal(); idRealizacao++)
+					residuo_espaco_amostral.at(periodo).at(idRealizacao) += variacao_residuos;
+
+			} // for (Periodo periodo = residuo_espaco_amostral.getIteradorInicial(); periodo <= residuo_espaco_amostral.getIteradorFinal(); residuo_espaco_amostral.incrementarIterador(periodo)) {
+
+			setMatriz_forced(AttMatrizVariavelAleatoria_residuo_espaco_amostral, residuo_espaco_amostral);
+
+		} // if ((getSizeMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral) > 0.0) && (is_variacao_grau_liberdade)){
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::calcularTendenciaTemporal(): \n" + std::string(erro.what())); }
@@ -216,7 +295,7 @@ void VariavelAleatoria::calcularCoeficienteParticipacaoVariavelAleatoriaInterna(
 
 				const IdEstacao idEstacao = periodo.getEstacao();
 
-				const double valor         = getElementoVetor(AttVetorVariavelAleatoria_serie_temporal, periodo, double());
+				const double valor         = getElementoVetor(AttVetorVariavelAleatoria_serie_temporal_transformada, periodo, double());
 				const double valor_interno = getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, periodo, double());
 
 				participacao.at(idEstacao).addElemento(valor_interno / valor);
