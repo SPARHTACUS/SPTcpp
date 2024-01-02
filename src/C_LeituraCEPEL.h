@@ -223,6 +223,8 @@ private:
 	void imprime_afluencia_natural_x_idHidreletrica_x_cenario_x_periodo(Dados& a_dados, std::string nomeArquivo, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
 	void imprime_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados, std::string nomeArquivo);
 
+	void instanciar_hidreletricas_ficticias_sem_producao(Dados& a_dados);//Para o acoplamento com os cortes NW com horizonte CP espandido é necessário o sorteio de postos fictícios para o cálculo das ENAs de acoplamento
+
 	//Validações
 	void validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao);
 
