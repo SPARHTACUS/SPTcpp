@@ -9078,11 +9078,11 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 
 				a_processo_estocastico.vetorVariavelAleatoria.att(idVar).setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, idVar);
 
-				if (isSerieTemporalAdicionadaEmVarExistente)
-					a_processo_estocastico.vetorVariavelAleatoria.att(idVar).calcularSerieTemporal();
-
 				if (isTendenciaTemporalAdicionadaEmVarExistente)
 					a_processo_estocastico.vetorVariavelAleatoria.att(idVar).calcularTendenciaTemporal();
+
+				if (isSerieTemporalAdicionadaEmVarExistente)
+					a_processo_estocastico.vetorVariavelAleatoria.att(idVar).calcularSerieTemporal();
 
 			} // for (IdVariavelAleatoria idVar = a_processo_estocastico.getMenorId(IdVariavelAleatoria()); idVar <= a_processo_estocastico.getMaiorId(IdVariavelAleatoria()); idVar++) {
 

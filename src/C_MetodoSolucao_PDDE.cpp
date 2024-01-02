@@ -218,7 +218,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 							}
 
-							if ((idEstagio < a_estagio_final) || (IdEstagio(a_estagio_final + 1) <= a_modeloOtimizacao.getMaiorId(IdEstagio())))
+							if (idEstagio < a_estagio_final)
 								a_modeloOtimizacao.atualizarVariavelEstadoComSolucaoPrimal(a_idIteracao, idEstagio_seguinte, idCenario);
 
 							auto stop_clock_cenario = std::chrono::high_resolution_clock::now();
