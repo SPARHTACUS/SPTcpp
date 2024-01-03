@@ -830,36 +830,52 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 				double novo_valor_sup = 0.0;
 
 				// Penalizacao
-				if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_penalizacao)
-					novo_valor_sup = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
+				if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_penalizacao) {
+
+					if (getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool()) && (a_idRealizacao != IdRealizacao_Nenhum))
+						novo_valor_sup = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
+
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(idVariavelDecisao, novo_valor_inf);
+					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(idVariavelDecisao, novo_valor_sup);
+
+				}
 
 				// Truncamento
-				else if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento) {
+				else if ((tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento) || (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao)) {
 
-					double realizacao = 0.0;
-
-					// forward
-					if (a_idRealizacao == IdRealizacao_Nenhum)
-						realizacao = realizacoes.at(idProcessoEstocastico).at(idVariavelAleatoria).at(a_idCenario).at(periodo);
-
-					// backward
-					else if (a_idRealizacao > IdRealizacao_Nenhum)
-						realizacao = vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacao(idVariavelAleatoria, a_idRealizacao, periodo, realizacoes.at(idProcessoEstocastico).at(idVariavelAleatoria).at(a_idCenario));
-
-					const double valor_minimo_convexo = vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacaoParaValor(idVariavelAleatoria, 0.0, periodo);
-
-					if (realizacao < valor_minimo_convexo) {
-						const double realizacao_flex = valor_minimo_convexo - realizacao;
-						novo_valor_sup = valor_viabilidade + vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacaoInterna(idVariavelAleatoria, idVariavelAleatoriaInterna, periodo, realizacao_flex);
-						novo_valor_inf = novo_valor_sup;
+					if (getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool()) && (a_idRealizacao == IdRealizacao_Nenhum)) {
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(idVariavelDecisao, novo_valor_inf);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(idVariavelDecisao, novo_valor_sup);
 					}
 
+					else {
+
+						double realizacao = 0.0;
+
+						// forward
+						if (a_idRealizacao == IdRealizacao_Nenhum)
+							realizacao = realizacoes.at(idProcessoEstocastico).at(idVariavelAleatoria).at(a_idCenario).at(periodo);
+
+						// backward
+						else if (a_idRealizacao > IdRealizacao_Nenhum)
+							realizacao = vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacao(idVariavelAleatoria, a_idRealizacao, periodo, realizacoes.at(idProcessoEstocastico).at(idVariavelAleatoria).at(a_idCenario));
+
+						const double valor_minimo_convexo = vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacaoParaValor(idVariavelAleatoria, 0.0, periodo);
+
+						if (realizacao < valor_minimo_convexo) {
+							const double realizacao_flex = valor_minimo_convexo - realizacao;
+							novo_valor_sup = valor_viabilidade + realizacao_flex;
+							if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento)
+								novo_valor_inf = novo_valor_sup;
+						}
+
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(idVariavelDecisao, novo_valor_inf);
+						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(idVariavelDecisao, novo_valor_sup);
+
+					}
 				} // else if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento) {
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(idVariavelDecisao, novo_valor_inf);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(idVariavelDecisao, novo_valor_sup);
-
-			} // if (tipo_relaxacao != TipoRelaxacaoVariavelAleatoria_sem_relaxacao) {
+			} // else if ((tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento) || (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao)) {
 
 		} // for (IdVariavelRealizacaoInterna idVariavelRealizacaoInterna = IdVariavelRealizacaoInterna_1; idVariavelRealizacaoInterna <= maiorIdVariavelRealizacaoInterna; idVariavelRealizacaoInterna++) {
 
@@ -2749,7 +2765,7 @@ double ModeloOtimizacao::otimizarProblema(const TipoSubproblemaSolver a_TSS, con
 
 		resetarVariavelRealizacaoInterna(a_TSS, a_idEstagio);
 
-		if ((getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, a_idEstagio, int()) == 1) && (!getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool())))
+		if ((getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, a_idEstagio, int()) == 1) || (getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool())))
 			atualizarModeloOtimizacaoComVariavelRealizacaoInterna(a_TSS, a_idProcesso, a_idEstagio, a_idCenario, IdRealizacao_Nenhum);
 
 		if (getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool()))

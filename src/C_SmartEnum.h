@@ -1573,7 +1573,8 @@ DEFINE_SMART_ENUM(TipoValor, TIPO_VALOR)
 #define TIPO_RELAXACAO_VARIAVEL_ALEATORIA_INTERNA(m)\
 	m(TipoRelaxacaoVariavelAleatoria, sem_relaxacao)       \
 	m(TipoRelaxacaoVariavelAleatoria, penalizacao)         \
-	m(TipoRelaxacaoVariavelAleatoria, truncamento)                        
+	m(TipoRelaxacaoVariavelAleatoria, truncamento)         \
+	m(TipoRelaxacaoVariavelAleatoria, truncamento_penalizacao)                
 DEFINE_SMART_ENUM(TipoRelaxacaoVariavelAleatoria, TIPO_RELAXACAO_VARIAVEL_ALEATORIA_INTERNA)
 
 
