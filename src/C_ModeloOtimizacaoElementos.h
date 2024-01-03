@@ -169,7 +169,7 @@ void armazenarValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoS
 	try{ \
 		DECLARAR_CONDICAO_RETORNO_ImprimirPrimal_##ImprimirPrimal \
 		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)) return; \
-		varredurasIters_10(vlrP_e_c_##Elem##_##Nome##_##Nro.at(a_TSS), idx_##Elem##_##Nome##_##Nro.at(a_TSS), normD_##Elem##_##Nome##_##Nro.at(a_TSS), a_TSS, a_IdEstagio_1, a_idIteracao, DECLARAR_ISVAR_##Elem, true, Valores(DECLARA_TITERS) DECLARA_TITERS_CONST_##Nro##_10 IdRealizacao_Nenhum, a_idCenario);\
+		varredurasIters_##Nro(vlrP_e_c_##Elem##_##Nome##_##Nro.at(a_TSS), idx_##Elem##_##Nome##_##Nro.at(a_TSS), normD_##Elem##_##Nome##_##Nro.at(a_TSS), a_TSS, a_IdEstagio_1, a_idIteracao, DECLARAR_ISVAR_##Elem, true, Valores(DECLARA_TITERS) DECLARA_TITERS_CONST_##Nro##_10 IdRealizacao_Nenhum, a_idCenario);\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorPrimalPorEstagioPorCenario" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_idIteracao) + "," + getFullString(a_IdEstagio_1) + "," + getString(a_idCenario) + "): \n" + std::string(erro.what())); } \
 }; \
@@ -178,7 +178,7 @@ void armazenarValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(const TipoSub
 	try{ \
 		DECLARAR_CONDICAO_RETORNO_ImprimirDual_##ImprimirDual \
 		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)) return; \
-		varredurasIters_10(vlrD_e_c_##Elem##_##Nome##_##Nro.at(a_TSS), idx_##Elem##_##Nome##_##Nro.at(a_TSS), normD_##Elem##_##Nome##_##Nro.at(a_TSS), a_TSS, a_IdEstagio_1, a_idIteracao, DECLARAR_ISVAR_##Elem, false, Valores(DECLARA_TITERS) DECLARA_TITERS_CONST_##Nro##_10 IdRealizacao_Nenhum, a_idCenario);\
+		varredurasIters_##Nro(vlrD_e_c_##Elem##_##Nome##_##Nro.at(a_TSS), idx_##Elem##_##Nome##_##Nro.at(a_TSS), normD_##Elem##_##Nome##_##Nro.at(a_TSS), a_TSS, a_IdEstagio_1, a_idIteracao, DECLARAR_ISVAR_##Elem, false, Valores(DECLARA_TITERS) DECLARA_TITERS_CONST_##Nro##_10 IdRealizacao_Nenhum, a_idCenario);\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorDualPorEstagioPorCenario" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_IdEstagio_1) + "," + getString(a_idCenario) + "): \n" + std::string(erro.what())); } \
 }; \
@@ -187,7 +187,7 @@ void armazenarValorPrimalPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nr
 	try{ \
 		DECLARAR_CONDICAO_RETORNO_ImprimirPrimal_##ImprimirPrimal \
 		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)) return; \
-		varredurasIters_10(vlrP_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS), idx_##Elem##_##Nome##_##Nro.at(a_TSS), normD_##Elem##_##Nome##_##Nro.at(a_TSS), a_TSS, a_IdEstagio_1, a_idIteracao, DECLARAR_ISVAR_##Elem, true, Valores(DECLARA_TITERS) DECLARA_TITERS_CONST_##Nro##_10 a_idRealizacao, a_idCenario);\
+		varredurasIters_##Nro(vlrP_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS), idx_##Elem##_##Nome##_##Nro.at(a_TSS), normD_##Elem##_##Nome##_##Nro.at(a_TSS), a_TSS, a_IdEstagio_1, a_idIteracao, DECLARAR_ISVAR_##Elem, true, Valores(DECLARA_TITERS) DECLARA_TITERS_CONST_##Nro##_10 a_idRealizacao, a_idCenario);\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorPrimalPorEstagioPorCenarioPorRealizacao" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_IdEstagio_1) + "," + getString(a_idCenario) + "," + getString(a_idRealizacao) + "): \n" + std::string(erro.what())); } \
 }; \
@@ -196,7 +196,7 @@ void armazenarValorDualPorEstagioPorCenarioPorRealizacao##Elem##_##Nome##_##Nro(
 	try{ \
 		DECLARAR_CONDICAO_RETORNO_ImprimirDual_##ImprimirDual \
 		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)) return; \
-		varredurasIters_10(vlrD_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS), idx_##Elem##_##Nome##_##Nro.at(a_TSS), normD_##Elem##_##Nome##_##Nro.at(a_TSS), a_TSS, a_IdEstagio_1, a_idIteracao, DECLARAR_ISVAR_##Elem, false, Valores(DECLARA_TITERS) DECLARA_TITERS_CONST_##Nro##_10 a_idRealizacao, a_idCenario);\
+		varredurasIters_##Nro(vlrD_e_c_r_##Elem##_##Nome##_##Nro.at(a_TSS), idx_##Elem##_##Nome##_##Nro.at(a_TSS), normD_##Elem##_##Nome##_##Nro.at(a_TSS), a_TSS, a_IdEstagio_1, a_idIteracao, DECLARAR_ISVAR_##Elem, false, Valores(DECLARA_TITERS) DECLARA_TITERS_CONST_##Nro##_10 a_idRealizacao, a_idCenario);\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorDualPorEstagioPorCenarioPorRealizacao" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_IdEstagio_1) + "," + getString(a_idCenario) + "," + getString(a_idRealizacao) + "): \n" + std::string(erro.what())); } \
 }; \
