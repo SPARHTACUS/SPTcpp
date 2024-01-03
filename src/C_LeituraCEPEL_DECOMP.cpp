@@ -21597,6 +21597,17 @@ void LeituraCEPEL::instanciar_hidreletricas_ficticias_sem_producao(Dados& a_dado
 		a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_4, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_4, double())));
 		a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_enchendo_volume_morto, SmartEnupla<Periodo, int>(horizonte_estudo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_enchendo_volume_morto, int())));
 
+		////////////////////
+
+		lista_hidreletrica_IdVariavelAleatoria.at(idHidreletrica) = IdVariavelAleatoria(a_dados.processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria()) + 1);
+		
+		VariavelAleatoria variavelAleatoria;
+		variavelAleatoria.setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria, IdVariavelAleatoria(a_dados.processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria()) + 1));
+		variavelAleatoria.setAtributo(AttComumVariavelAleatoria_ordem_maxima_coeficiente_auto_correlacao, 0);
+		variavelAleatoria.setAtributo(AttComumVariavelAleatoria_tipo_coeficiente_auto_correlacao, TipoValor_positivo_e_negativo);
+
+		a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.add(variavelAleatoria);
+		
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_hidreletricas_ficticias_sem_producao: \n" + std::string(erro.what())); }
 
@@ -21774,15 +21785,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		a_dados.setAtributo(AttComumDados_diretorio_saida_dados, entradaSaidaDados.getDiretorioSaida());
 
 		/////////////////
-
-		define_afluencia_arvore_de_cenarios_postos_CP(a_dados);
-
-		a_dados.adicionaHidreletricasMontante();
-		inicializa_vazao_defluente_CP(a_dados);
-
-		//Define variavel_aleatoria_interna para cada Processo (é realizado logo de estabelecer os cenários resolvidos por cada processo) e das modificaçõesUHE dos postos
-		define_variavel_aleatoria_interna_CP(a_dados);
-
 		// INICIO DEV NOVO PROC ESTOCASTICO
 
 		const Periodo periodo_final_PE_DECOMP = horizonte_otimizacao.at(horizonte_estudo.at(get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados)));
@@ -21798,6 +21800,15 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			a_dados.setAtributo(AttComumDados_tipo_correlacao_geracao_cenario_hidrologico, TipoCorrelacaoVariaveisAleatorias_matriz_carga);
 			a_dados.setAtributo(AttComumDados_correlacao_dominante_geracao_cenario_hidrologico, 0.85);
 		}//if (periodo_final_PE_DECOMP < horizonte_otimizacao.at(horizonte_otimizacao.getIteradorFinal())){
+
+		//Define variavel_aleatoria_interna para cada Processo (é realizado logo de estabelecer os cenários resolvidos por cada processo) e das modificaçõesUHE dos postos
+		
+		define_afluencia_arvore_de_cenarios_postos_CP(a_dados);
+
+		a_dados.adicionaHidreletricasMontante();
+		inicializa_vazao_defluente_CP(a_dados);
+
+		define_variavel_aleatoria_interna_CP(a_dados);
 
 		a_dados.validacao_operacional_Dados(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
