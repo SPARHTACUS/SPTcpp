@@ -18868,10 +18868,22 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 					}//if (a_periodo <= periodo_ultimo_sobreposicao) {
 					else if (a_periodo > periodo_ultimo_sobreposicao) {//Extensão do horizonte
 
+						//Nota: Como sobradinho fictício (posto = 169) está isolado do sistema, devem ser somadas as naturais de Três Marias e Queimado
+
 						/////////////
-						// VAZ(168) //Sobradinho
+						// VAZ(156) //Três Marias
 						/////////////
-						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 168, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 156, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+
+						/////////////
+						// VAZ(158) //Queimado
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 158, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+
+						/////////////
+						// VAZ(169) //Sobradinho Fictício
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 169, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
 
 					}//else if (a_periodo > periodo_ultimo_sobreposicao) {
 
@@ -18950,10 +18962,22 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 					}//if (a_periodo <= periodo_ultimo_sobreposicao) {//Periodos dentro do horizonte DC -> Pega a info do posto 169 do computado pelo DC
 					else if (a_periodo > periodo_ultimo_sobreposicao) {//Extensão do horizonte
 
+						//Nota: Como sobradinho fictício (posto = 169) está isolado do sistema, devem ser somadas as naturais de Três Marias e Queimado
+
 						/////////////
-						// VAZ(168) //Sobradinho
+						// VAZ(156) //Três Marias
 						/////////////
-						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 168, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 156, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+
+						/////////////
+						// VAZ(158) //Queimado
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 158, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+
+						/////////////
+						// VAZ(169) //Sobradinho Fictício
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 169, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
 
 					}//else if (a_periodo > periodo_ultimo_sobreposicao) {
 
@@ -19029,10 +19053,22 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 					}//if (a_periodo <= periodo_ultimo_sobreposicao) {//Periodos dentro do horizonte DC -> Pega a info do posto 169 do computado pelo DC
 					else if (a_periodo > periodo_ultimo_sobreposicao) {//Extensão do horizonte
 
+						//Nota: Como sobradinho fictício (posto = 169) está isolado do sistema, devem ser somadas as naturais de Três Marias e Queimado
+
 						/////////////
-						// VAZ(168) //Sobradinho
+						// VAZ(156) //Três Marias
 						/////////////
-						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 168, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 156, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+
+						/////////////
+						// VAZ(158) //Queimado
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 158, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+
+						/////////////
+						// VAZ(169) //Sobradinho Fictício
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 169, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
 
 					}//else if (a_periodo > periodo_ultimo_sobreposicao) {
 
@@ -19105,10 +19141,22 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 					}//if (a_periodo <= periodo_ultimo_sobreposicao) {//Periodos dentro do horizonte DC -> Pega a info do posto 169 do computado pelo DC
 					else if (a_periodo > periodo_ultimo_sobreposicao) {//Extensão do horizonte
 
+						//Nota: Como sobradinho fictício (posto = 169) está isolado do sistema, devem ser somadas as naturais de Três Marias e Queimado
+
 						/////////////
-						// VAZ(168) //Sobradinho
+						// VAZ(156) //Três Marias
 						/////////////
-						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 168, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 156, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+
+						/////////////
+						// VAZ(158) //Queimado
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 158, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
+
+						/////////////
+						// VAZ(169) //Sobradinho Fictício
+						/////////////
+						retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 169, 1.0, a_idHidreletricas_calculo_ENA, a_coeficiente_idHidreletricas_calculo_ENA);
 
 					}//else if (a_periodo > periodo_ultimo_sobreposicao) {
 
@@ -19133,7 +19181,7 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 				//******************************
 				a_termo_independente_calculo_ENA += 0.0;
 
-			}//else if (codigo_posto_acoplamento_NW == 178) {//XINGO
+			}//else if (codigo_posto_acoplamento_NW == 300) {//MOXOTÓ / P.AFONSO 123 / P.AFONSO 4
 			else { throw std::invalid_argument("Nao implementada regra de cálculo de vazao para posto com codigo: " + getString(codigo_posto_acoplamento_NW) + "\n"); }
 			
 		}//else if (codigo_posto_acoplamento_NW >= 0) {
