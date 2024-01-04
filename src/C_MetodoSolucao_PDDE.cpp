@@ -338,7 +338,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 		a_modeloOtimizacao.importarCorteBenders_AcoplamentoPosEstudo(tSS, a_idProcesso, a_idIteracao, diretorio_selecao_corte, a_entradaSaidaDados);
 
-		executarPDDE_distribuirRealizacoesEntreProcessos(a_idIteracao, a_modeloOtimizacao);
+		//executarPDDE_distribuirRealizacoesEntreProcessos(a_idIteracao, a_modeloOtimizacao);
 
 		IdEstagio estagio_inicial = a_estagio_inicial;
 		if (estagio_inicial == IdEstagio_1)
@@ -1631,12 +1631,15 @@ void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdIte
 									break;
 							}
 
+							SmartEnupla<Periodo, double> inicializacao(a_modeloOtimizacao.realizacoes.at(idPE).at(IdVariavelAleatoria_1).at(idCenario), 0.0);
+
 							int i = 0;
 							for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= a_modeloOtimizacao.realizacoes.at(idPE).getIteradorFinal(); idVariavelAleatoria++) {
 								for (int c = 0; c < numero_cenarios_estado; c++) {
 									const IdCenario idCenario_estado = lista_idCenarios_estado.at(c);
+									a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario_estado) = inicializacao;
 									for (Periodo periodo = a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario).getIteradorInicial(); periodo <= a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario).getIteradorFinal(); a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario).incrementarIterador(periodo)) {
-										a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario_estado).addElemento(periodo, valores[i]);
+										a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario_estado).at(periodo) = valores[i];
 										i++;
 									}
 								}

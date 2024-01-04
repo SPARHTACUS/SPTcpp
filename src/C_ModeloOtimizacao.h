@@ -426,7 +426,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 #define EQUACAO_LINEAR_5(m)\
 	m(  EquLinear,    ENA,                                         5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA_REE,                      nao,        nao,                nao)      \
-	m(  EquLinear,    AFLUENCIA_PROCESSO_ESTOCASTICO,              5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA, nao,        nao,                nao)      \
+	m(  EquLinear,    YP,                                          5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA, nao,        nao,                nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA,                             5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao,                nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA_RELAXADA,                    5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao,                nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA_DISPONIVEL,                  5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao,                nao)      \
@@ -600,7 +600,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const TipoSubproblemaSolver a_TSS_origem, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const std::string a_diretorio);
 
-		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao);
+		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao);
 
 		void resetarVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio);
 
