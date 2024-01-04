@@ -2293,23 +2293,6 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 								if (a_dados.getSize1Matriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1) > 0)
 									is_valores_1 = true;
 
-								SmartEnupla<Periodo, double> periodos_conversao;
-
-								if (is_valores_0) {
-									//cenarioInicial = a_dados.getIterador1Inicial(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, IdCenario());
-									//cenarioFinal = a_dados.getIterador1Final(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, IdCenario());
-									periodos_conversao = a_dados.getElementosMatriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, cenarioInicial, Periodo(), double());
-								}
-								else if (is_valores_1) {
-									//cenarioInicial = a_dados.getIterador1Inicial(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, IdCenario());
-									//cenarioFinal = a_dados.getIterador1Final(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, IdCenario());
-									periodos_conversao = a_dados.getElementosMatriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, cenarioInicial, Periodo(), double());
-								}
-								else
-									throw std::invalid_argument("Nao foram encontrados dados necessarios para conversao de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
-
-
-
 								const int varENA = addVarDecisao_ENA(a_TSS, idEstagio, periodo, periodo_lag, idHidreletrica, idREE, -vetorEstagio.att(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.att(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
 								const int equENA = addEquLinear_ENA(a_TSS, idEstagio, periodo, periodo_lag, idHidreletrica, idREE);
@@ -2319,60 +2302,45 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 								SmartEnupla<IdCenario, double> valores_0;
 								SmartEnupla<int, SmartEnupla<IdCenario, double>> valores_1;
 
-								bool is_sobreposicao_encontrada = false;
-								for (Periodo periodo_conversao = periodos_conversao.getIteradorInicial(); periodo_conversao <= periodos_conversao.getIteradorFinal(); periodos_conversao.incrementarIterador(periodo_conversao)) {
-
-									const double sobreposicao = periodo_lag.sobreposicao(periodo_conversao);
-
-									if (sobreposicao > 0.0) {
-
-										const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, periodo, IdProcessoEstocastico_hidrologico_hidreletrica, IdVariavelAleatoria(idHidreletrica), periodo_conversao, 0.0, std::vector<IdHidreletrica>{idHidreletrica});
-										if (varYP == -1)
-											throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(periodo_conversao) + "," + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
+								const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, periodo, IdProcessoEstocastico_hidrologico_hidreletrica, IdVariavelAleatoria(idHidreletrica), periodo_lag, 0.0, std::vector<IdHidreletrica>{idHidreletrica});
+								if (varYP == -1)
+									throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(periodo_lag) + "," + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 
 
-										for (IdCenario idCenario = cenarioInicial; idCenario <= cenarioFinal; idCenario++) {
+								for (IdCenario idCenario = cenarioInicial; idCenario <= cenarioFinal; idCenario++) {
 
-											if (is_valores_0) {
-												if (valores_0.size() == 0)
-													valores_0 = enupla_inicializacao;
-												valores_0.at(idCenario) += sobreposicao * a_dados.getElementoMatriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, idCenario, periodo_conversao, double());
-											}
+									if (is_valores_0) {
+										if (valores_0.size() == 0)
+											valores_0 = enupla_inicializacao;
+										valores_0.at(idCenario) = a_dados.getElementoMatriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, idCenario, periodo_lag, double());
+									}
 
-											if (is_valores_1) {
-												if (valores_1.size() == 0)
-													valores_1 = SmartEnupla<int, SmartEnupla<IdCenario, double>>(varYP, std::vector<SmartEnupla<IdCenario, double>>(1, enupla_inicializacao));
+									if (is_valores_1) {
+										if (valores_1.size() == 0)
+											valores_1 = SmartEnupla<int, SmartEnupla<IdCenario, double>>(varYP, std::vector<SmartEnupla<IdCenario, double>>(1, enupla_inicializacao));
 
-												else if (varYP < valores_1.getIteradorInicial()) {
+										else if (varYP < valores_1.getIteradorInicial()) {
 
-													SmartEnupla<int, SmartEnupla<IdCenario, double>> valores_1_aux(varYP, std::vector<SmartEnupla<IdCenario, double>>(valores_1.getIteradorFinal() - varYP + 1, SmartEnupla<IdCenario, double>()));
+											SmartEnupla<int, SmartEnupla<IdCenario, double>> valores_1_aux(varYP, std::vector<SmartEnupla<IdCenario, double>>(valores_1.getIteradorFinal() - varYP + 1, SmartEnupla<IdCenario, double>()));
 
-													valores_1_aux.at(varYP) = enupla_inicializacao;
+											valores_1_aux.at(varYP) = enupla_inicializacao;
 
-													for (int pos = valores_1.getIteradorInicial(); pos <= valores_1.getIteradorFinal(); pos++)
-														valores_1_aux.at(pos) = valores_1.at(pos);
+											for (int pos = valores_1.getIteradorInicial(); pos <= valores_1.getIteradorFinal(); pos++)
+												valores_1_aux.at(pos) = valores_1.at(pos);
 
-													valores_1 = valores_1_aux;
-												}
+											valores_1 = valores_1_aux;
+										}
 
-												else if (valores_1.getIteradorFinal() < varYP) {
-													for (int pos = valores_1.getIteradorFinal() + 1; pos < varYP; pos++)
-														valores_1.addElemento(pos, SmartEnupla<IdCenario, double>());
-													valores_1.addElemento(varYP, enupla_inicializacao);
-												}
+										else if (valores_1.getIteradorFinal() < varYP) {
+											for (int pos = valores_1.getIteradorFinal() + 1; pos < varYP; pos++)
+												valores_1.addElemento(pos, SmartEnupla<IdCenario, double>());
+											valores_1.addElemento(varYP, enupla_inicializacao);
+										}
 
-												valores_1.at(varYP).at(idCenario) = -sobreposicao * a_dados.getElementoMatriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, idCenario, periodo_conversao, double());
-											}
+										valores_1.at(varYP).at(idCenario) = a_dados.getElementoMatriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, idCenario, periodo_lag, double());
+									}
 
-										} // for (IdCenario idCenario = cenarioInicial; idCenario <= cenarioFinal; idCenario++) {
-
-										is_sobreposicao_encontrada = true;
-
-									} // if (sobreposicao > 0.0) {
-									else if ((sobreposicao == 0.0) && (is_sobreposicao_encontrada))
-										break;
-
-								} // for (Periodo periodo_conversao = periodos_conversao.getIteradorInicial(); periodo_conversao <= periodos_conversao.getIteradorFinal(); periodos_conversao.incrementarIterador(periodo_conversao)) {
+								} // for (IdCenario idCenario = cenarioInicial; idCenario <= cenarioFinal; idCenario++) {
 
 
 								vetorEstagio.att(idEstagio).addRestricaoCenario(a_TSS, getNomeVarDecisao_ENA(a_TSS, idEstagio, periodo, periodo_lag, idHidreletrica, idREE), equENA, valores_0, valores_1);
