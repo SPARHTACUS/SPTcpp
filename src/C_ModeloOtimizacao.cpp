@@ -398,13 +398,14 @@ void ModeloOtimizacao::gerarRealizacoes(const IdIteracao a_idIteracao, const IdP
 			if (imprimir_cenarios)
 				gerar_cenarios_internos = true;
 
+			
 			SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> realizacoes_buffer = vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico).gerarCenariosPorSorteioRetorno(a_entradaSaidaDados, imprimir_cenarios, true, gerar_cenarios_internos, getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()), menor_cenario_processo, maior_cenario_processo, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);	
 			
 			for (IdVariavelAleatoria idVar = realizacoes_buffer.getIteradorInicial(); idVar <= realizacoes_buffer.getIteradorFinal(); idVar++) {
 				realizacoes.at(tipo_processo_estocastico_hidrologico).addElemento(idVar, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>(menor_cenario_iteracao, std::vector<SmartEnupla<Periodo, double>>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, SmartEnupla<Periodo, double>())));
 				for (IdCenario idCenario = menor_cenario_processo; idCenario <= maior_cenario_processo; idCenario++)
 					realizacoes.at(tipo_processo_estocastico_hidrologico).at(idVar).at(idCenario) = realizacoes_buffer.at(idVar).at(idCenario);
-			}	
+			}
 			
 		}
 
@@ -821,6 +822,9 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 			const Periodo periodo = getAtributo(a_idEstagio, idVariavelRealizacaoInterna, AttComumVariavelRealizacaoInterna_periodo, Periodo());
 
 			const TipoRelaxacaoVariavelAleatoria tipo_relaxacao = getElementoVetor(idProcessoEstocastico, idVariavelAleatoria, AttVetorVariavelAleatoria_tipo_relaxacao, periodo, TipoRelaxacaoVariavelAleatoria());
+
+			if (idVariavelAleatoria == IdVariavelAleatoria_122)
+				int aa = 1;
 
 			if (tipo_relaxacao != TipoRelaxacaoVariavelAleatoria_sem_relaxacao) {
 
