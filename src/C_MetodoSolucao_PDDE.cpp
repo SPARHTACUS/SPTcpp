@@ -1584,15 +1584,18 @@ void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdIte
 
 								if (numero_cenarios_estado > 0) {
 
-									double* valores = new double[numero_cenarios_estado * numero_variaveis];
+									const int numero_periodos = a_modeloOtimizacao.realizacoes.at(idPE).at(IdVariavelAleatoria_1).at(lista_idCenarios_estado.at(0)).size();
+
+									double* valores = new double[numero_cenarios_estado * numero_variaveis * numero_periodos];
 
 									int i = 0;
 									for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= a_modeloOtimizacao.realizacoes.at(idPE).getIteradorFinal(); idVariavelAleatoria++) {
 										for (int c = 0; c < numero_cenarios_estado; c++) {
 											const IdCenario idCenario_estado = lista_idCenarios_estado.at(c);
-											for (Periodo periodo = a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario_estado).getIteradorInicial(); periodo <= a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario_estado).getIteradorFinal(); a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario_estado).incrementarIterador(periodo))
+											for (Periodo periodo = a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario_estado).getIteradorInicial(); periodo <= a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario_estado).getIteradorFinal(); a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario_estado).incrementarIterador(periodo)) {
 												valores[i] = a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario_estado).at(periodo);
-											i++;
+												i++;
+											}
 										}
 									}
 
@@ -1616,7 +1619,9 @@ void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdIte
 
 						if (numero_cenarios_estado > 0) {
 
-							double* valores = new double[numero_cenarios_estado * numero_variaveis];
+							const int numero_periodos = a_modeloOtimizacao.realizacoes.at(idPE).at(IdVariavelAleatoria_1).at(lista_idCenarios_estado.at(0)).size();
+
+							double* valores = new double[numero_cenarios_estado * numero_variaveis * numero_periodos];
 
 							MPI_Recv(valores, numero_cenarios_estado * numero_variaveis, MPI_DOUBLE, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
@@ -1626,14 +1631,15 @@ void MetodoSolucao::executarPDDE_distribuirRealizacoesEntreProcessos(const IdIte
 									break;
 							}
 
-							int e = 0;
+							int i = 0;
 							for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= a_modeloOtimizacao.realizacoes.at(idPE).getIteradorFinal(); idVariavelAleatoria++) {
 								for (int c = 0; c < numero_cenarios_estado; c++) {
 									const IdCenario idCenario_estado = lista_idCenarios_estado.at(c);
-									for (Periodo periodo = a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario).getIteradorInicial(); periodo <= a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario).getIteradorFinal(); a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario).incrementarIterador(periodo))
-										a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario_estado).addElemento(periodo, valores[e * numero_cenarios_estado + c]);
+									for (Periodo periodo = a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario).getIteradorInicial(); periodo <= a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario).getIteradorFinal(); a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario).incrementarIterador(periodo)) {
+										a_modeloOtimizacao.realizacoes.at(idPE).at(idVariavelAleatoria).at(idCenario_estado).addElemento(periodo, valores[i]);
+										i++;
+									}
 								}
-								e++;
 							}
 
 							delete[] valores;
