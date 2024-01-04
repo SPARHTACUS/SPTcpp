@@ -1845,7 +1845,7 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 				const int varYP = addVarDecisao_YP(a_TSS, a_idEstagio, periodo_otimizacao, periodo_processo_estocastico, idProcEstocastico, idVariavelAleatoria, -infinito, infinito, 0.0);
 
 				// Restricao YP (YP = RP + SOMA(fp*YPt-1))
-				const int posEquYP = addEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICO(a_TSS, a_idEstagio, periodo_otimizacao, periodo_processo_estocastico, idProcEstocastico, idVariavelAleatoria);
+				const int posEquYP = addEquLinear_YP(a_TSS, a_idEstagio, periodo_otimizacao, periodo_processo_estocastico, idProcEstocastico, idVariavelAleatoria);
 
 				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, posEquYP, 1.0);
 
@@ -6673,7 +6673,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 		const double sobreposicao_periodo_otimizacao = a_periodo_lag.sobreposicao(periodo_otimizacao);
 		if (sobreposicao_periodo_otimizacao > 0.0) {
 
-			equYP = addEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICO(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria);
+			equYP = addEquLinear_YP(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria);
 			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, equYP, 1.0);
 
 			bool sobreposicao_encontrada = false;
@@ -6746,10 +6746,10 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 								varYH = addVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica, -infinito, infinito, 0.0);
 						}
 
-						equYP = getEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICOseExistir(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria);
+						equYP = getEquLinear_YPseExistir(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria);
 
 						if (equYP == -1) {
-							equYP = addEquLinear_AFLUENCIA_PROCESSO_ESTOCASTICO(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria);
+							equYP = addEquLinear_YP(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria);
 							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, equYP, 1.0);
 						}
 
