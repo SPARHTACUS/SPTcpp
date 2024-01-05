@@ -8314,7 +8314,8 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 						probabilidade_realizacao.incrementarIterador(periodo_prob_realizacao);
 				}
 
-				mapeamento_espaco_amostral.at(IdCenario_1).incrementarIterador(periodo_espaco_amostral);
+				if (periodo_espaco_amostral < periodo_final_espaco_amostral)
+					mapeamento_espaco_amostral.at(IdCenario_1).incrementarIterador(periodo_espaco_amostral);
 
 			}
 
