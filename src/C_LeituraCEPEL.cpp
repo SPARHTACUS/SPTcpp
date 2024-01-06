@@ -171,10 +171,8 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 
 		if (a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getSizeMatriz(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) > 0) {
 
-			const SmartEnupla < Periodo, double> horizonte_processo_estocastico_tendencia = a_dados.processoEstocastico_hidrologico.getElementosMatriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario_1, Periodo(), double());
+			horizonte_processo_estocastico = SmartEnupla<Periodo, bool>(a_dados.processoEstocastico_hidrologico.getMatriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, Periodo(), IdCenario(), double()), true);
 
-			for (Periodo periodo_processo_estocastico = horizonte_processo_estocastico_tendencia.getIteradorInicial(); periodo_processo_estocastico <= horizonte_processo_estocastico_tendencia.getIteradorFinal(); horizonte_processo_estocastico_tendencia.incrementarIterador(periodo_processo_estocastico))
-				horizonte_processo_estocastico.addElemento(periodo_processo_estocastico, true);
 
 		}//	if (a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getSizeMatriz(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) > 0) {
 
@@ -449,7 +447,7 @@ double LeituraCEPEL::calculaDefluenciaMinima_para_EngolimentoMaximo(Dados& a_dad
 					const IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria(lista_hidreletrica_IdVariavelAleatoria.at(idHidreletricas_calculo_defluencia_minima.at(pos)));
 
 					if (a_idEstagio <= a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio()))
-						vazao_defluencia_minima += a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVariavelAleatoria, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario_1, periodo_processo_estocastico, double());
+						vazao_defluencia_minima += a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVariavelAleatoria, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, periodo_processo_estocastico, IdCenario_1, double());
 					else
 						vazao_defluencia_minima += a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_processo_estocastico, IdRealizacao_1, double());
 

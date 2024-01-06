@@ -118,11 +118,11 @@ void ProcessoEstocastico::avaliarModeloViaSerieSintetica(const EntradaSaidaDados
 
 		gerarCenariosPorSorteio(a_entradaSaidaDados, true, true, true, 1, IdCenario_1, IdCenario_1, TipoSorteio_uniforme, semente);
 
-		SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, double>> serie_sintetica;
+		//SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, double>> serie_sintetica;
 		
-		const IdVariavelAleatoria maiorVariavelAleatoria = getMaiorIdVariavelAleatoria();
-		for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= maiorVariavelAleatoria; idVar++)
-			serie_sintetica.addElemento(idVar, vetorVariavelAleatoria.att(idVar).getMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, IdCenario(), Periodo(), double()).at(IdCenario_1));
+		//const IdVariavelAleatoria maiorVariavelAleatoria = getMaiorIdVariavelAleatoria();
+		//for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= maiorVariavelAleatoria; idVar++)
+			//serie_sintetica.addElemento(idVar, vetorVariavelAleatoria.att(idVar).getMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, IdCenario(), Periodo(), double()).at(IdCenario_1));
 
 		ProcessoEstocastico processoEstocastico;
 
@@ -274,7 +274,7 @@ void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_ent
 		else
 			periodo_inicial_amostra = horizonte_tendencia.getIteradorFinal() + 1;
 
-		SmartEnupla<Periodo, double> horizonte_processo_estocastico;
+		SmartEnupla<Periodo, double> horizonte_processo_estocastico(horizonte_tendencia.size() + horizonte_amostra.size());
 		for (Periodo periodo = horizonte_tendencia.getIteradorInicial(); periodo < periodo_inicial_amostra; horizonte_tendencia.incrementarIterador(periodo)) {
 
 			if (periodo >= periodo_inicial_amostra)
@@ -289,7 +289,7 @@ void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_ent
 				horizonte_processo_estocastico.addElemento(periodo, NAN);
 		}
 
-		const SmartEnupla<IdCenario, SmartEnupla<Periodo, double>> cenarios_horizonte_processo_estocastico(a_cenario_inicial, std::vector<SmartEnupla<Periodo, double>>(int(a_cenario_final - a_cenario_inicial) + 1, horizonte_processo_estocastico));
+		const SmartEnupla<Periodo, SmartEnupla<IdCenario, double>> cenarios_horizonte_processo_estocastico(horizonte_processo_estocastico, SmartEnupla<IdCenario, double>(a_cenario_inicial, std::vector<double>(int(a_cenario_final - a_cenario_inicial) + 1, NAN)));
 
 		for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= getMaiorIdVariavelAleatoria(); idVar++) {
 			vetorVariavelAleatoria.att(idVar).gerarCenariosEspacoAmostral(mapeamento_espaco_amostral, cenarios_horizonte_processo_estocastico, a_gerar_cenarios_buffer, a_gerar_cenarios_internos);
@@ -303,18 +303,18 @@ void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_ent
 
 } // void ProcessoEstocastico::gerarCenariosPorSorteio(const SmartEnupla<IdCenario, IdCenario> a_mapeamento_cenarios_tendencia, const int a_semente){
 
-SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> ProcessoEstocastico::gerarCenariosPorSorteioRetorno(const EntradaSaidaDados& a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int& a_semente){
+SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> ProcessoEstocastico::gerarCenariosPorSorteioRetorno(const EntradaSaidaDados& a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int& a_semente){
 	try {
 
 		gerarCenariosPorSorteio(a_entradaSaidaDados, a_imprimir_cenarios, a_gerar_cenarios_buffer, a_gerar_cenarios_internos, a_numero_cenarios_global, a_cenario_inicial, a_cenario_final, a_tipo_sorteio, a_semente);
 
 		const IdVariavelAleatoria maiorIdVariavelAleatoria = getMaiorIdVariavelAleatoria();
 
-		SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> enupla_retorno(IdVariavelAleatoria_1, std::vector<SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>(maiorIdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>()));
+		SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> enupla_retorno(IdVariavelAleatoria_1, std::vector<SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>>(maiorIdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>()));
 
 		for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= maiorIdVariavelAleatoria; idVar++) {
-			enupla_retorno.at(idVar) = getMatriz(idVar, AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, IdCenario(), Periodo(), double());
-			vetorVariavelAleatoria.att(idVar).setMatriz_forced(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>());
+			enupla_retorno.at(idVar) = getMatriz(idVar, AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, Periodo(), IdCenario(), double());
+			vetorVariavelAleatoria.att(idVar).setMatriz_forced(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>());
 		}
 
 		return enupla_retorno;
@@ -344,20 +344,20 @@ SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> ProcessoEstocastico::
 
 }
 
-SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> ProcessoEstocastico::getCenarios(const AttMatrizVariavelAleatoria a_attMatrizVariavelAleatoria){
+SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> ProcessoEstocastico::getCenarios(const AttMatrizVariavelAleatoria a_attMatrizVariavelAleatoria){
 
 	try {
 
 		if (a_attMatrizVariavelAleatoria != AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral)
 			throw std::invalid_argument("Argumento invalido.");
 			
-
-		SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> cenarios;
-
 		const IdVariavelAleatoria maiorVariavelAleatoria = getMaiorIdVariavelAleatoria();
 
+
+		SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> cenarios(IdVariavelAleatoria_1, std::vector<SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>>(int(maiorVariavelAleatoria), SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>()));
+
 		for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= maiorVariavelAleatoria; idVar++)
-			cenarios.addElemento(idVar, vetorVariavelAleatoria.att(idVar).getMatriz(a_attMatrizVariavelAleatoria, IdCenario(), Periodo(), double()));
+			cenarios.at(idVar) = vetorVariavelAleatoria.att(idVar).getMatriz(a_attMatrizVariavelAleatoria, Periodo(), IdCenario(), double());
 
 		return cenarios;
 
@@ -367,17 +367,17 @@ SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, dou
 } // SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, double>> ProcessoEstocastico::getCenarios(const AttMatrizVariavelAleatoria a_attMatrizVariavelAleatoria){
 
 
-SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> ProcessoEstocastico::getCenariosInternos(const IdVariavelAleatoria a_idVariavelAleatoria, const AttMatrizVariavelAleatoriaInterna a_attMatrizVariavelAleatoriaInterna){
+SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> ProcessoEstocastico::getCenariosInternos(const IdVariavelAleatoria a_idVariavelAleatoria, const AttMatrizVariavelAleatoriaInterna a_attMatrizVariavelAleatoriaInterna){
 
 	try {
 
 		if (a_attMatrizVariavelAleatoriaInterna != AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral)
 			throw std::invalid_argument("Argumento invalido.");
 
-		SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> cenarios;
+		SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> cenarios;
 
 		for (IdVariavelAleatoriaInterna idVarInterna = IdVariavelAleatoriaInterna_1; idVarInterna <= getMaiorId(a_idVariavelAleatoria, IdVariavelAleatoriaInterna()); idVarInterna++)
-			cenarios.addElemento(idVarInterna, vetorVariavelAleatoria.att(a_idVariavelAleatoria).getMatriz(idVarInterna, a_attMatrizVariavelAleatoriaInterna, IdCenario(), Periodo(), double()));
+			cenarios.addElemento(idVarInterna, vetorVariavelAleatoria.att(a_idVariavelAleatoria).getMatriz(idVarInterna, a_attMatrizVariavelAleatoriaInterna, Periodo(), IdCenario(), double()));
 
 		return cenarios;
 
@@ -387,7 +387,7 @@ SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<IdCenario, SmartEnupla<Perio
 } // SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> ProcessoEstocastico::getCenariosInternos(const IdVariavelAleatoria a_idVariavelAleatoria, const AttMatrizVariavelAleatoriaInterna a_attMatrizVariavelAleatoriaInterna){
 
 
-SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> ProcessoEstocastico::getCenariosInternos(const IdVariavelAleatoria a_idVariavelAleatoria, const AttMatrizVariavelAleatoriaInterna a_attMatrizVariavelAleatoriaInterna, const IdCenario a_cenarioInicial, const IdCenario a_cenarioFinal){
+SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> ProcessoEstocastico::getCenariosInternos(const IdVariavelAleatoria a_idVariavelAleatoria, const AttMatrizVariavelAleatoriaInterna a_attMatrizVariavelAleatoriaInterna, const IdCenario a_cenarioInicial, const IdCenario a_cenarioFinal){
 	
 	try {
 
@@ -396,11 +396,15 @@ SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<IdCenario, SmartEnupla<Perio
 
 		const IdVariavelAleatoriaInterna maiorIdVariavelAleatoriaInterna = getMaiorId(a_idVariavelAleatoria, IdVariavelAleatoriaInterna());
 
-		SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> cenarios(IdVariavelAleatoriaInterna_1, std::vector<SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>(maiorIdVariavelAleatoriaInterna, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>(a_cenarioInicial, std::vector<SmartEnupla<Periodo, double>>(int(a_cenarioFinal - a_cenarioInicial) + 1, SmartEnupla<Periodo, double>()))));
+		SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> cenarios(IdVariavelAleatoriaInterna_1, std::vector<SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>>(maiorIdVariavelAleatoriaInterna, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>(vetorVariavelAleatoria.att(a_idVariavelAleatoria).getMatriz(IdVariavelAleatoriaInterna_1, a_attMatrizVariavelAleatoriaInterna, Periodo(), IdCenario(), double()), SmartEnupla<IdCenario, double>())));
 
+		const SmartEnupla<IdCenario, double> inicializacao(a_cenarioInicial, std::vector<double>(int(a_cenarioFinal - a_cenarioInicial) + 1, NAN));
 		for (IdVariavelAleatoriaInterna idVarInterna = IdVariavelAleatoriaInterna_1; idVarInterna <= maiorIdVariavelAleatoriaInterna; idVarInterna++) {
-			for (IdCenario idCenario = a_cenarioInicial; idCenario <= a_cenarioFinal; idCenario++)
-				cenarios.at(idVarInterna).setElemento(idCenario, vetorVariavelAleatoria.att(a_idVariavelAleatoria).getElementosMatriz(idVarInterna, a_attMatrizVariavelAleatoriaInterna, idCenario, Periodo(), double()));
+			for (Periodo periodo = cenarios.at(idVarInterna).getIteradorInicial(); periodo <= cenarios.at(idVarInterna).getIteradorFinal(); cenarios.at(idVarInterna).incrementarIterador(periodo)) {
+				cenarios.at(idVarInterna).at(periodo) = inicializacao;
+				for (IdCenario idCenario = a_cenarioInicial; idCenario <= a_cenarioFinal; idCenario++)
+					cenarios.at(idVarInterna).at(periodo).at(idCenario) = vetorVariavelAleatoria.att(a_idVariavelAleatoria).getElementoMatriz(IdVariavelAleatoriaInterna_1, a_attMatrizVariavelAleatoriaInterna, periodo, idCenario, double());
+			}
 		}
 
 		return cenarios;
@@ -462,7 +466,7 @@ double ProcessoEstocastico::calcularRealizacaoInterna(const IdVariavelAleatoria 
 double ProcessoEstocastico::calcularRealizacao(const IdVariavelAleatoria a_idVariavelAleatoria, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia){
 	try {
 
-		return vetorVariavelAleatoria.att(a_idVariavelAleatoria).calcularRealizacao(a_periodo, a_tendencia, getElementoMatriz(a_idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, a_idRealizacao, double()));
+		return vetorVariavelAleatoria.att(a_idVariavelAleatoria).calcularRealizacao(a_periodo, IdCenario_Nenhum, a_tendencia, getElementoMatriz(a_idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, a_idRealizacao, double()));
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::calcularRealizacao(" + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_periodo) + "): \n" + std::string(erro.what())); }
 }
@@ -557,8 +561,9 @@ void ProcessoEstocastico::imprimirCenarios(EntradaSaidaDados a_entradaSaidaDados
 			a_entradaSaidaDados.setDiretorioSaida(diretorio_va);
 
 			if (getSize1Matriz(idVar, AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral) > 0) {
-				menor_cenario = getIterador1Inicial(idVar, AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, IdCenario());
-				maior_cenario = getIterador1Final(idVar, AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, IdCenario());
+				const Periodo menor_periodo = getIterador1Inicial(idVar, AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, Periodo());
+				menor_cenario = getIterador2Inicial(idVar, AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, menor_periodo, IdCenario());
+				maior_cenario = getIterador2Final(idVar, AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, menor_periodo, IdCenario());
 			}
 			else {
 				menor_cenario = IdCenario_Nenhum;
@@ -574,8 +579,9 @@ void ProcessoEstocastico::imprimirCenarios(EntradaSaidaDados a_entradaSaidaDados
 				a_entradaSaidaDados.setDiretorioSaida(diretorio_var_interna);
 
 				if (getSize1Matriz(idVar, idVarInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) > 0) {
-					menor_cenario = getIterador1Inicial(idVar, idVarInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario());
-					maior_cenario = getIterador1Final(idVar, idVarInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, IdCenario());
+					const Periodo menor_periodo = getIterador1Inicial(idVar, idVarInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, Periodo());
+					menor_cenario = getIterador2Inicial(idVar, idVarInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, menor_periodo, IdCenario());
+					maior_cenario = getIterador2Final(idVar, idVarInterna, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, menor_periodo, IdCenario());
 				}
 				else {
 					menor_cenario = IdCenario_Nenhum;
@@ -1011,7 +1017,7 @@ void ProcessoEstocastico::setCenariosMapeamento(const AttMatrizProcessoEstocasti
 }
 
 
-void ProcessoEstocastico::setCenarios(const AttMatrizVariavelAleatoria a_attMatrizVariavelAleatoria, const SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> &a_enupla){
+void ProcessoEstocastico::setCenarios(const AttMatrizVariavelAleatoria a_attMatrizVariavelAleatoria, const SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> &a_enupla){
 	try {
 
 
@@ -1029,7 +1035,7 @@ void ProcessoEstocastico::setCenarios(const AttMatrizVariavelAleatoria a_attMatr
 } // void ProcessoEstocastico::setCenarios(const AttMatrizVariavelAleatoria a_attMatrizVariavelAleatoria, const SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> &a_enupla){
 
 
-void ProcessoEstocastico::setCenariosInternos(const IdVariavelAleatoria a_idVariavelAleatoria, const AttMatrizVariavelAleatoriaInterna a_attMatrizVariavelAleatoriaInterna, const SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>& a_matriz){
+void ProcessoEstocastico::setCenariosInternos(const IdVariavelAleatoria a_idVariavelAleatoria, const AttMatrizVariavelAleatoriaInterna a_attMatrizVariavelAleatoriaInterna, const SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>>& a_matriz){
 
 	try{
 

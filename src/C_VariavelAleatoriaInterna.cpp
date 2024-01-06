@@ -317,7 +317,7 @@ void VariavelAleatoriaInterna::addRealizacao(const double a_realizacao_variavel_
 
 	try {
 
-		addElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, a_periodo, calcularRealizacao(a_realizacao_variavel_aleatoria, a_periodo));
+		addElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_periodo, a_idCenario, calcularRealizacao(a_realizacao_variavel_aleatoria, a_periodo));
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoriaInterna(" + getString(getIdObjeto()) + ")::addRealizacao(" + getFullString(a_realizacao_variavel_aleatoria) + "," + getFullString(a_idCenario) + "," + getFullString(a_periodo) + "): \n" + std::string(erro.what())); }
@@ -329,7 +329,7 @@ void VariavelAleatoriaInterna::setRealizacao(const double a_realizacao_variavel_
 
 	try {
 
-		setElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, a_periodo, calcularRealizacao(a_realizacao_variavel_aleatoria, a_periodo));
+		setElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_periodo, a_idCenario, calcularRealizacao(a_realizacao_variavel_aleatoria, a_periodo));
 
 	} // try{
 	catch (const std::exception & erro) { throw std::invalid_argument("VariavelAleatoriaInterna(" + getString(getIdObjeto()) + ")::setRealizacao(" + getFullString(a_realizacao_variavel_aleatoria) + "," + getFullString(a_idCenario) + "," + getFullString(a_periodo) + "): \n" + std::string(erro.what())); }
@@ -342,7 +342,7 @@ void VariavelAleatoriaInterna::setRealizacaoFromTendencia(const IdCenario a_idCe
 	try {
 
 		if (getSizeVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal) > 0)
-			setElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, a_periodo, getElementoVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodo, double()));
+			setElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_periodo, a_idCenario, getElementoVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodo, double()));
 
 	} // try{
 	catch (const std::exception & erro) { throw std::invalid_argument("VariavelAleatoriaInterna(" + getString(getIdObjeto()) + ")::setRealizacaoFromTendencia(" + getFullString(a_idCenario) + "," + getFullString(a_periodo) + "): \n" + std::string(erro.what())); }

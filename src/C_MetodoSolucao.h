@@ -63,8 +63,6 @@ private:
 
 	void executarPDDE_distribuirEstadosEntreProcessos(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, ModeloOtimizacao& a_modeloOtimizacao);
 
-	void executarPDDE_distribuirRealizacoesEntreProcessos(const IdIteracao a_idIteracao, ModeloOtimizacao& a_modeloOtimizacao);
-
 	void executarPDDE_operacao_final(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao& a_modeloOtimizacao);
 
 	void executarPDDE_imprimirEstados(EntradaSaidaDados a_entradaSaidaDados, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, ModeloOtimizacao& a_modeloOtimizacao);

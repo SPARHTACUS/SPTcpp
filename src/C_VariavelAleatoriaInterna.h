@@ -28,7 +28,7 @@
 //                         c_classe,   smrtAtt,                                  nomeAtributo,     Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define ATT_MATRIZ_VARIAVEL_ALEATORIA_INTERNA(m)  \
-	  m(VariavelAleatoriaInterna,  AttMatriz,              cenarios_realizacao_espaco_amostral,       double,          min,          max,             1,  IdCenario,      Periodo)   \
+	  m(VariavelAleatoriaInterna,  AttMatriz,              cenarios_realizacao_espaco_amostral,       double,          min,          max,             1,  Periodo, IdCenario)   \
 	  m(VariavelAleatoriaInterna,  AttMatriz,                                 auto_covariancia,       double,          min,          max,             0,  IdEstacao, int)       \
 	  m(VariavelAleatoriaInterna,  AttMatriz,                                  auto_correlacao,       double,          min,          max,             0,  IdEstacao, int)       \
 	  m(VariavelAleatoriaInterna,  AttMatriz,                                       correlacao,       double,          min,          max,             0,  IdVariavelAleatoriaInterna, IdEstacao)
