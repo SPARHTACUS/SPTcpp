@@ -13916,6 +13916,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		if (nomeArquivo != "nenhum") {
 
 			const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
+			const Periodo periodo_inicial = a_horizonte_estudo.getIteradorInicial();
 			const Periodo periodo_final = a_horizonte_estudo.getIteradorFinal();
 
 			if ((periodo_ultimo_sobreposicao < periodo_final) && (nomeArquivo.find("fcfnwn") != std::string::npos))//Existe expansão do horizonte
@@ -14015,6 +14016,38 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 			if (true) {
 
+				///////////////////////////////////////////////////////////////////////////////////////
+				// Atualiza parâmetros de leitura do arquivo de cortes caso seja o arquivo nwlistcf.rel:
+				///////////////////////////////////////////////////////////////////////////////////////
+
+				bool is_arquivo_fcfnwn = true;
+
+				int periodo_acoplamento = 0; //Inicializa com este valor por ser parte da lógica
+
+				if (nomeArquivo.find("nwlistcf") != std::string::npos) {
+
+					is_arquivo_fcfnwn = false;
+
+					/////////////////////////////////////////
+					//Atualiza periodo_acoplamento
+					/////////////////////////////////////////
+
+					Periodo periodo_inicial_mensal = Periodo(TipoPeriodo_mensal, horizonte_estudo_DECK.getIteradorFinal().getMes(), horizonte_estudo_DECK.getIteradorFinal().getAno());
+					periodo_inicial_mensal--;
+
+					Periodo periodo_final_mensal = horizonte_tendencia_mais_estudo_MENSAL.getIteradorFinal();
+
+					//////////////////////
+					Periodo periodo_inicial_aux = Periodo(TipoPeriodo_mensal, IdMes_1, periodo_inicial_mensal.getAno()); //A impressão dos cortes no arquivo nwlistcf.rel é desde o mês 1 até o mês 12 (mesmo que o estudo comece p.ex. no mês 6)
+
+					for (Periodo periodo = periodo_inicial_aux; periodo <= periodo_final_mensal; periodo++)//Todos os períodos são em base mensal
+						periodo_acoplamento++;
+
+				}//if (nomeArquivo.find("nwlistcf") != std::string::npos) {
+
+
+				////////////////////////////////////////////////////////////////////////////////////
+
 				const IdCenario idCenario_final = a_dados.processoEstocastico_hidrologico.getIterador1Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario());
 
 				const int ordem_maxima_PAR = 12;
@@ -14064,7 +14097,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 					SmartEnupla<IdReservatorioEquivalente, bool> coeficientes_EAR;
 					SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>> coeficiente_ENA;
 
-					leitura_cortes_NEWAVE_para_dimensionamento(a_dados, a_horizonte_estudo, coeficientes_EAR, coeficiente_ENA, nomeArquivo);
+					leitura_cortes_NEWAVE_para_dimensionamento(a_dados, a_horizonte_estudo, coeficientes_EAR, coeficiente_ENA, nomeArquivo, is_arquivo_fcfnwn, periodo_acoplamento);
 
 
 					// Variaveis Estado
@@ -14228,104 +14261,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> coeficientes_corte(IdRealizacao_1, std::vector<SmartEnupla<IdVariavelEstado, double>>(1, SmartEnupla<IdVariavelEstado, double>(IdVariavelEstado_1, std::vector<double>(int(estados.getIteradorFinal()), 0.0))));
 
 				///////////////////////////////////////////////////////////////////////////////////////
-				// Atualiza estrutura de leitura do arquivo de cortes caso seja o arquivo nwlistcf.rel:
-
-				bool is_arquivo_fcfnwn = true;
-
-				int periodo_acoplamento = 3; //default de impressão: ver arquivo nwlistcf.rel
-
-				if (nomeArquivo.find("nwlistcf") != std::string::npos) {
-
-					is_arquivo_fcfnwn = false;
-
-					if (true) {
-
-						pos_RHS = 15;
-						pos_idREE = 11;
-						pos_Coef_Earm = 31;
-						pos_Eafl_lag_1 = 49;
-						pos_Eafl_lag_2 = 67;
-						pos_Eafl_lag_3 = 85;
-						pos_Eafl_lag_4 = 103;
-						pos_Eafl_lag_5 = 121;
-						pos_Eafl_lag_6 = 139;
-						pos_Eafl_lag_7 = 157;
-						pos_Eafl_lag_8 = 175;
-						pos_Eafl_lag_9 = 193;
-						pos_Eafl_lag_10 = 211;
-						pos_Eafl_lag_11 = 229;
-						pos_Eafl_lag_12 = 247;
-						pos_GNL_pat_1_lag_1 = 265;
-						pos_GNL_pat_1_lag_2 = 283;
-						pos_GNL_pat_2_lag_1 = 301;
-						pos_GNL_pat_2_lag_2 = 319;
-						pos_GNL_pat_3_lag_1 = 337;
-						pos_GNL_pat_3_lag_2 = 355;
-						pos_Vminop = 391;
-
-						////////////////
-						tam_RHS = 16;
-						tam_idREE = 3;
-						tam_Coef_Earm = 18;
-						tam_Eafl_lag_1 = 18;
-						tam_Eafl_lag_2 = 18;
-						tam_Eafl_lag_3 = 18;
-						tam_Eafl_lag_4 = 18;
-						tam_Eafl_lag_5 = 18;
-						tam_Eafl_lag_6 = 18;
-						tam_Eafl_lag_7 = 18;
-						tam_Eafl_lag_8 = 18;
-						tam_Eafl_lag_9 = 18;
-						tam_Eafl_lag_10 = 18;
-						tam_Eafl_lag_11 = 18;
-						tam_Eafl_lag_12 = 18;
-						tam_GNL_pat_1_lag_1 = 18;
-						tam_GNL_pat_1_lag_2 = 18;
-						tam_GNL_pat_2_lag_1 = 18;
-						tam_GNL_pat_2_lag_2 = 18;
-						tam_GNL_pat_3_lag_1 = 18;
-						tam_GNL_pat_3_lag_2 = 18;
-						tam_Vminop = 17;
-
-					}//if (true) {
-
-					/////////////////////////////////////////
-					//Atualiza periodo_acoplamento caso tenha
-					//períodos de expansão do horizonte
-					/////////////////////////////////////////
-					Periodo periodo_mensal_aux = Periodo(TipoPeriodo_mensal, periodo_ultimo_sobreposicao + 1);
-
-					if (periodo_ultimo_sobreposicao < periodo_final) {//Existe expansão do horizonte
-
-						double sobreposicao = 0.0;
-
-						for (Periodo periodo = periodo_ultimo_sobreposicao; periodo <= periodo_final; a_horizonte_estudo.incrementarIterador(periodo)) {
-
-							if (periodo > periodo_ultimo_sobreposicao) {//Periodos extensão do horizonte
-
-								sobreposicao += periodo_mensal_aux.sobreposicao(periodo);
-
-								if (sobreposicao == 1.0) {
-									sobreposicao = 0.0;
-									periodo_mensal_aux++;
-
-									periodo_acoplamento += 1; //Parâmetro para leitura dos cortes
-
-								}//if (sobreposicao == 1.0) {
-
-							}//if (periodo > periodo_ultimo_sobreposicao) {
-
-						}//for (Periodo periodo = periodo_ultimo_sobreposicao; periodo <= periodo_final; a_horizonte_estudo.incrementarIterador(periodo)) {
-
-						if (sobreposicao != 0.0)
-							throw std::invalid_argument("Periodos do horizonte expandido nao completam um mes operativo");
-
-					}//if (periodo_ultimo_sobreposicao < periodo_final) {
-
-
-				}//if (nomeArquivo.find("nwlistcf") != std::string::npos) {
-
-				///////////////////////////////////////////////////////////////////////////////////////
 
 				std::ifstream leituraArquivo(nomeArquivo);
 
@@ -14401,74 +14336,134 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 								///////////////////////////////
 
 								//lag_1
-								atributo = line.substr(pos_Eafl_lag_1, tam_Eafl_lag_1);
-								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								atributo = "";
+
+								if (pos_Eafl_lag_1 > 0) {
+									atributo = line.substr(pos_Eafl_lag_1, tam_Eafl_lag_1);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+								}
 
 								const double coeficiente_ENA_lag_1 = std::atof(atributo.c_str());
 
 								//lag_2
-								atributo = line.substr(pos_Eafl_lag_2, tam_Eafl_lag_2);
-								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								atributo = "";
+
+								if (pos_Eafl_lag_2 > 0) {
+									atributo = line.substr(pos_Eafl_lag_2, tam_Eafl_lag_2);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+								}
 
 								const double coeficiente_ENA_lag_2 = std::atof(atributo.c_str());
 
 								//lag_3
-								atributo = line.substr(pos_Eafl_lag_3, tam_Eafl_lag_3);
-								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								atributo = "";
+
+								if (tam_Eafl_lag_3 > 0) {
+									atributo = line.substr(pos_Eafl_lag_3, tam_Eafl_lag_3);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+								}//if (tam_Eafl_lag_3 > 0) {
 
 								const double coeficiente_ENA_lag_3 = std::atof(atributo.c_str());
 
 								//lag_4
-								atributo = line.substr(pos_Eafl_lag_4, tam_Eafl_lag_4);
-								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								atributo = "";
+
+								if (pos_Eafl_lag_4 > 0) {
+									atributo = line.substr(pos_Eafl_lag_4, tam_Eafl_lag_4);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+								}
 
 								const double coeficiente_ENA_lag_4 = std::atof(atributo.c_str());
 
 								//lag_5
-								atributo = line.substr(pos_Eafl_lag_5, tam_Eafl_lag_5);
-								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								atributo = "";
+
+								if (pos_Eafl_lag_5 > 0) {
+									atributo = line.substr(pos_Eafl_lag_5, tam_Eafl_lag_5);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+								}
 
 								const double coeficiente_ENA_lag_5 = std::atof(atributo.c_str());
 
 								//lag_6
-								atributo = line.substr(pos_Eafl_lag_6, tam_Eafl_lag_6);
-								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								atributo = "";
+
+								if (pos_Eafl_lag_6 > 0) {
+									atributo = line.substr(pos_Eafl_lag_6, tam_Eafl_lag_6);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+								}//if (pos_Eafl_lag_6 > 0) {
 
 								const double coeficiente_ENA_lag_6 = std::atof(atributo.c_str());
 
 								//lag_7
-								atributo = line.substr(pos_Eafl_lag_7, tam_Eafl_lag_7);
-								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								atributo = "";
+
+								if (pos_Eafl_lag_7 > 0) {
+									atributo = line.substr(pos_Eafl_lag_7, tam_Eafl_lag_7);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+								}
 
 								const double coeficiente_ENA_lag_7 = std::atof(atributo.c_str());
 
 								//lag_8
-								atributo = line.substr(pos_Eafl_lag_8, tam_Eafl_lag_8);
-								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								atributo = "";
+
+								if (pos_Eafl_lag_8 > 0) {
+									atributo = line.substr(pos_Eafl_lag_8, tam_Eafl_lag_8);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+								}
 
 								const double coeficiente_ENA_lag_8 = std::atof(atributo.c_str());
 
 								//lag_9
-								atributo = line.substr(pos_Eafl_lag_9, tam_Eafl_lag_9);
-								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								atributo = "";
+
+								if (pos_Eafl_lag_9 > 0) {
+									atributo = line.substr(pos_Eafl_lag_9, tam_Eafl_lag_9);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+								}
 
 								const double coeficiente_ENA_lag_9 = std::atof(atributo.c_str());
 
 								//lag_10
-								atributo = line.substr(pos_Eafl_lag_10, tam_Eafl_lag_10);
-								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								atributo = "";
+
+								if (pos_Eafl_lag_10 > 0) {
+									atributo = line.substr(pos_Eafl_lag_10, tam_Eafl_lag_10);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+								}
 
 								const double coeficiente_ENA_lag_10 = std::atof(atributo.c_str());
 
 								//lag_11
-								atributo = line.substr(pos_Eafl_lag_11, tam_Eafl_lag_11);
-								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								atributo = "";
+
+								if (pos_Eafl_lag_11 > 0) {
+									atributo = line.substr(pos_Eafl_lag_11, tam_Eafl_lag_11);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+								}
 
 								const double coeficiente_ENA_lag_11 = std::atof(atributo.c_str());
 
 								//lag_12
-								atributo = line.substr(pos_Eafl_lag_12, tam_Eafl_lag_12);
-								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								atributo = "";
+
+								if (pos_Eafl_lag_12 > 0) {
+									atributo = line.substr(pos_Eafl_lag_12, tam_Eafl_lag_12);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+								}
 
 								const double coeficiente_ENA_lag_12 = std::atof(atributo.c_str());
 
@@ -14644,11 +14639,182 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							if (atributo == str_periodo_acoplamento) {
+								std::cout << "Encontrado bloco de cortes de acoplamento do " << str_periodo_acoplamento << std::endl;
 								is_bloco_informacao = true;
 
 								//Passa duas linhas de cabecalho (ver arquivo nwlistcf.rel)
-								std::getline(leituraArquivo, line);
-								std::getline(leituraArquivo, line);
+
+								////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								//Arquivo sem formatação fixa: 
+								// 1. Nota: vai ser obtida a posição e tamanho do atributo dependendo do tamanho dos campos X-----------------
+								////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+								std::vector<int> pos_estrutura_atributos;
+
+								if (true) {
+
+									std::getline(leituraArquivo, line);
+
+									int contador = 0;
+									int numero_atributos = 0;
+
+									while (line.size() > 0) {
+										int pos = int(line.find('X'));
+										pos_estrutura_atributos.push_back(pos + contador + numero_atributos);
+
+										contador += pos;
+										numero_atributos++;
+
+										line = line.substr(pos + 1, int(line.length()));
+									}//while (line.size() > 0) {
+
+								}
+
+								////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								//Arquivo sem formatação fixa: 
+								// 2. Nota: identifica os registros com o mnemônico do arquivo
+								////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+								if (true) {
+
+									std::getline(leituraArquivo, line);
+
+									//Instancia posições =-1 
+									if (true) {
+
+										pos_RHS = -1;
+										pos_idREE = -1;
+										pos_Coef_Earm = -1;
+										pos_Eafl_lag_1 = -1;
+										pos_Eafl_lag_2 = -1;
+										pos_Eafl_lag_3 = -1;
+										pos_Eafl_lag_4 = -1;
+										pos_Eafl_lag_5 = -1;
+										pos_Eafl_lag_6 = -1;
+										pos_Eafl_lag_7 = -1;
+										pos_Eafl_lag_8 = -1;
+										pos_Eafl_lag_9 = -1;
+										pos_Eafl_lag_10 = -1;
+										pos_Eafl_lag_11 = -1;
+										pos_Eafl_lag_12 = -1;
+										pos_GNL_pat_1_lag_1 = -1;
+										pos_GNL_pat_1_lag_2 = -1;
+										pos_GNL_pat_2_lag_1 = -1;
+										pos_GNL_pat_2_lag_2 = -1;
+										pos_GNL_pat_3_lag_1 = -1;
+										pos_GNL_pat_3_lag_2 = -1;
+										pos_Vminop = -1;
+
+									}//if (true) {
+
+									//Atualiza posições dependendo do estrutura do arquivo
+									for (int aux = 0; aux < int(pos_estrutura_atributos.size()) - 1; aux++) {
+
+										//pos e tam para não pegar as posições dos 'X' no arquivo
+										int pos = pos_estrutura_atributos.at(aux) + 1;
+										int tam = pos_estrutura_atributos.at(aux + 1) - pos_estrutura_atributos.at(aux) - 1;
+
+										atributo = line.substr(pos, tam);
+										atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+										if (atributo == "REE") {
+											pos_idREE = pos;
+											tam_idREE = tam;
+										}//if (atributo == "REE") {
+										else if (atributo == "RHS") {
+											pos_RHS = pos;
+											tam_RHS = tam;
+										}//else if (atributo == "RHS") {
+										else if (atributo == "PIV") {
+											pos_Coef_Earm = pos;
+											tam_Coef_Earm = tam;
+										}//else if (atributo == "PIV") {
+										else if (atributo == "PIH(1)") {
+											pos_Eafl_lag_1 = pos;
+											tam_Eafl_lag_1 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIH(2)") {
+											pos_Eafl_lag_2 = pos;
+											tam_Eafl_lag_2 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIH(3)") {
+											pos_Eafl_lag_3 = pos;
+											tam_Eafl_lag_3 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIH(4)") {
+											pos_Eafl_lag_4 = pos;
+											tam_Eafl_lag_4 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIH(5)") {
+											pos_Eafl_lag_5 = pos;
+											tam_Eafl_lag_5 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIH(6)") {
+											pos_Eafl_lag_6 = pos;
+											tam_Eafl_lag_6 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIH(7)") {
+											pos_Eafl_lag_7 = pos;
+											tam_Eafl_lag_7 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIH(8)") {
+											pos_Eafl_lag_8 = pos;
+											tam_Eafl_lag_8 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIH(9)") {
+											pos_Eafl_lag_9 = pos;
+											tam_Eafl_lag_9 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIH(10)") {
+											pos_Eafl_lag_10 = pos;
+											tam_Eafl_lag_10 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIH(11)") {
+											pos_Eafl_lag_11 = pos;
+											tam_Eafl_lag_11 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIH(12)") {
+											pos_Eafl_lag_12 = pos;
+											tam_Eafl_lag_12 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIGTAD(P1L1)") {
+											pos_GNL_pat_1_lag_1 = pos;
+											tam_GNL_pat_1_lag_1 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIGTAD(P1L2)") {
+											pos_GNL_pat_1_lag_2 = pos;
+											tam_GNL_pat_1_lag_2 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIGTAD(P2L1)") {
+											pos_GNL_pat_2_lag_1 = pos;
+											tam_GNL_pat_2_lag_1 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIGTAD(P2L2)") {
+											pos_GNL_pat_2_lag_2 = pos;
+											tam_GNL_pat_2_lag_2 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIGTAD(P3L1)") {
+											pos_GNL_pat_3_lag_1 = pos;
+											tam_GNL_pat_3_lag_1 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIGTAD(P3L2)") {
+											pos_GNL_pat_3_lag_2 = pos;
+											tam_GNL_pat_3_lag_2 = tam;
+										}//else if (atributo == "PIH(1)") {
+										else if (atributo == "PIMX_VMN") {
+											pos_Vminop = pos;
+											tam_Vminop = tam;
+										}//else if (atributo == "PIH(1)") {
+										else {
+
+											if(atributo != "IREG" && atributo != "PIMX_SAR")
+												throw std::invalid_argument("Nao identificado na leitura de cortes o atributo: " + atributo);
+
+										}//else {
+
+									}//for (int aux = 0; aux < int(pos_estrutura_atributos.size()) - 1; aux++) {
+
+								}//if (true) {
 
 							}//if (atributo == str_periodo_acoplamento) {
 
@@ -14709,7 +14875,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 }
 
-void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, SmartEnupla<IdReservatorioEquivalente, bool> &a_coeficientes_EAR, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>> & a_coeficiente_ENA, std::string a_nomeArquivo){
+void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, SmartEnupla<IdReservatorioEquivalente, bool> &a_coeficientes_EAR, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>> & a_coeficiente_ENA, std::string a_nomeArquivo, const bool a_is_arquivo_fcfnwn, const int a_periodo_acoplamento){
 
 	try {
 
@@ -14727,106 +14893,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 				///////////////////////////////////////////////////////////////////////////////////////
 				// Atualiza estrutura de leitura do arquivo de cortes caso seja o arquivo nwlistcf.rel:
 
-			bool is_arquivo_fcfnwn = true;
-
-			int periodo_acoplamento = 3; //default de impressão: ver arquivo nwlistcf.rel
-
-			if (a_nomeArquivo.find("nwlistcf") != std::string::npos) {
-
-				is_arquivo_fcfnwn = false;
-
-				if (true) {
-
-					pos_RHS = 15;
-					pos_idREE = 11;
-					pos_Coef_Earm = 31;
-					pos_Eafl_lag_1 = 49;
-					pos_Eafl_lag_2 = 67;
-					pos_Eafl_lag_3 = 85;
-					pos_Eafl_lag_4 = 103;
-					pos_Eafl_lag_5 = 121;
-					pos_Eafl_lag_6 = 139;
-					pos_Eafl_lag_7 = 157;
-					pos_Eafl_lag_8 = 175;
-					pos_Eafl_lag_9 = 193;
-					pos_Eafl_lag_10 = 211;
-					pos_Eafl_lag_11 = 229;
-					pos_Eafl_lag_12 = 247;
-					pos_GNL_pat_1_lag_1 = 265;
-					pos_GNL_pat_1_lag_2 = 283;
-					pos_GNL_pat_2_lag_1 = 301;
-					pos_GNL_pat_2_lag_2 = 319;
-					pos_GNL_pat_3_lag_1 = 337;
-					pos_GNL_pat_3_lag_2 = 355;
-					pos_Vminop = 391;
-
-					////////////////
-					tam_RHS = 16;
-					tam_idREE = 3;
-					tam_Coef_Earm = 18;
-					tam_Eafl_lag_1 = 18;
-					tam_Eafl_lag_2 = 18;
-					tam_Eafl_lag_3 = 18;
-					tam_Eafl_lag_4 = 18;
-					tam_Eafl_lag_5 = 18;
-					tam_Eafl_lag_6 = 18;
-					tam_Eafl_lag_7 = 18;
-					tam_Eafl_lag_8 = 18;
-					tam_Eafl_lag_9 = 18;
-					tam_Eafl_lag_10 = 18;
-					tam_Eafl_lag_11 = 18;
-					tam_Eafl_lag_12 = 18;
-					tam_GNL_pat_1_lag_1 = 18;
-					tam_GNL_pat_1_lag_2 = 18;
-					tam_GNL_pat_2_lag_1 = 18;
-					tam_GNL_pat_2_lag_2 = 18;
-					tam_GNL_pat_3_lag_1 = 18;
-					tam_GNL_pat_3_lag_2 = 18;
-					tam_Vminop = 17;
-
-				}//if (true) {
-
-				/////////////////////////////////////////
-				//Atualiza periodo_acoplamento caso tenha
-				//períodos de expansão do horizonte
-				/////////////////////////////////////////
-				const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
-				const Periodo periodo_final = a_horizonte_estudo.getIteradorFinal();
-
-				Periodo periodo_mensal_aux = Periodo(TipoPeriodo_mensal, periodo_ultimo_sobreposicao + 1);
-
-				if (periodo_ultimo_sobreposicao < periodo_final) {//Existe expansão do horizonte
-
-					double sobreposicao = 0.0;
-
-					for (Periodo periodo = periodo_ultimo_sobreposicao; periodo <= periodo_final; a_horizonte_estudo.incrementarIterador(periodo)) {
-
-						if (periodo > periodo_ultimo_sobreposicao) {//Periodos extensão do horizonte
-
-							sobreposicao += periodo_mensal_aux.sobreposicao(periodo);
-
-							if (sobreposicao == 1.0) {
-								sobreposicao = 0.0;
-								periodo_mensal_aux++;
-
-								periodo_acoplamento += 1; //Parâmetro para leitura dos cortes
-
-							}//if (sobreposicao == 1.0) {
-
-						}//if (periodo > periodo_ultimo_sobreposicao) {
-
-					}//for (Periodo periodo = periodo_ultimo_sobreposicao; periodo <= periodo_final; a_horizonte_estudo.incrementarIterador(periodo)) {
-
-					if (sobreposicao != 0.0)
-						throw std::invalid_argument("Periodos do horizonte expandido nao completam um mes operativo");
-
-				}//if (periodo_ultimo_sobreposicao < periodo_final) {
-
-
-			}//if (nomeArquivo.find("nwlistcf") != std::string::npos) {
-
-			///////////////////////////////////////////////////////////////////////////////////////
-
 			std::ifstream leituraArquivo(a_nomeArquivo);
 
 			////////////////////////////////////////////////////////////////////////////////////
@@ -14836,7 +14902,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 
 			////////////////////////////////////////////////////////////////////////////////////
 			//Parâmetro para identificar o bloco de informação quando for o arquivo nwlistcf.rel
-			std::string str_periodo_acoplamento = "PERIODO:" + getString(periodo_acoplamento);
+			std::string str_periodo_acoplamento = "PERIODO:" + getString(a_periodo_acoplamento);
 
 			////////////////////////////////////////////////////////////////////////////////////
 
@@ -14883,74 +14949,134 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 							///////////////////////////////
 
 							//lag_1
-							atributo = line.substr(pos_Eafl_lag_1, tam_Eafl_lag_1);
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							atributo = "";
+
+							if (pos_Eafl_lag_1 > 0) {
+								atributo = line.substr(pos_Eafl_lag_1, tam_Eafl_lag_1);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+							}
 
 							const double coeficiente_ENA_lag_1 = std::atof(atributo.c_str());
 
 							//lag_2
-							atributo = line.substr(pos_Eafl_lag_2, tam_Eafl_lag_2);
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							atributo = "";
+
+							if (pos_Eafl_lag_2 > 0) {
+								atributo = line.substr(pos_Eafl_lag_2, tam_Eafl_lag_2);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+							}
 
 							const double coeficiente_ENA_lag_2 = std::atof(atributo.c_str());
 
 							//lag_3
-							atributo = line.substr(pos_Eafl_lag_3, tam_Eafl_lag_3);
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							atributo = "";
+
+							if (tam_Eafl_lag_3 > 0) {
+								atributo = line.substr(pos_Eafl_lag_3, tam_Eafl_lag_3);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+							}//if (tam_Eafl_lag_3 > 0) {
 
 							const double coeficiente_ENA_lag_3 = std::atof(atributo.c_str());
 
 							//lag_4
-							atributo = line.substr(pos_Eafl_lag_4, tam_Eafl_lag_4);
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							atributo = "";
+
+							if (pos_Eafl_lag_4 > 0) {
+								atributo = line.substr(pos_Eafl_lag_4, tam_Eafl_lag_4);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+							}
 
 							const double coeficiente_ENA_lag_4 = std::atof(atributo.c_str());
 
 							//lag_5
-							atributo = line.substr(pos_Eafl_lag_5, tam_Eafl_lag_5);
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							atributo = "";
+
+							if (pos_Eafl_lag_5 > 0) {
+								atributo = line.substr(pos_Eafl_lag_5, tam_Eafl_lag_5);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+							}
 
 							const double coeficiente_ENA_lag_5 = std::atof(atributo.c_str());
 
 							//lag_6
-							atributo = line.substr(pos_Eafl_lag_6, tam_Eafl_lag_6);
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							atributo = "";
+
+							if (pos_Eafl_lag_6 > 0) {
+								atributo = line.substr(pos_Eafl_lag_6, tam_Eafl_lag_6);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+							}//if (pos_Eafl_lag_6 > 0) {
 
 							const double coeficiente_ENA_lag_6 = std::atof(atributo.c_str());
 
 							//lag_7
-							atributo = line.substr(pos_Eafl_lag_7, tam_Eafl_lag_7);
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							atributo = "";
+
+							if (pos_Eafl_lag_7 > 0) {
+								atributo = line.substr(pos_Eafl_lag_7, tam_Eafl_lag_7);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+							}
 
 							const double coeficiente_ENA_lag_7 = std::atof(atributo.c_str());
 
 							//lag_8
-							atributo = line.substr(pos_Eafl_lag_8, tam_Eafl_lag_8);
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							atributo = "";
+
+							if (pos_Eafl_lag_8 > 0) {
+								atributo = line.substr(pos_Eafl_lag_8, tam_Eafl_lag_8);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+							}
 
 							const double coeficiente_ENA_lag_8 = std::atof(atributo.c_str());
 
 							//lag_9
-							atributo = line.substr(pos_Eafl_lag_9, tam_Eafl_lag_9);
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							atributo = "";
+
+							if (pos_Eafl_lag_9 > 0) {
+								atributo = line.substr(pos_Eafl_lag_9, tam_Eafl_lag_9);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+							}
 
 							const double coeficiente_ENA_lag_9 = std::atof(atributo.c_str());
 
 							//lag_10
-							atributo = line.substr(pos_Eafl_lag_10, tam_Eafl_lag_10);
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							atributo = "";
+
+							if (pos_Eafl_lag_10 > 0) {
+								atributo = line.substr(pos_Eafl_lag_10, tam_Eafl_lag_10);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+							}
 
 							const double coeficiente_ENA_lag_10 = std::atof(atributo.c_str());
 
 							//lag_11
-							atributo = line.substr(pos_Eafl_lag_11, tam_Eafl_lag_11);
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							atributo = "";
+
+							if (pos_Eafl_lag_11 > 0) {
+								atributo = line.substr(pos_Eafl_lag_11, tam_Eafl_lag_11);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+							}
 
 							const double coeficiente_ENA_lag_11 = std::atof(atributo.c_str());
 
 							//lag_12
-							atributo = line.substr(pos_Eafl_lag_12, tam_Eafl_lag_12);
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							atributo = "";
+
+							if (pos_Eafl_lag_12 > 0) {
+								atributo = line.substr(pos_Eafl_lag_12, tam_Eafl_lag_12);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+							}
 
 							const double coeficiente_ENA_lag_12 = std::atof(atributo.c_str());
 
@@ -15009,7 +15135,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 					//Chave para saber que está no bloco de informação
 					// Nota: Lembrar que a estrutura do arquivo fcfnwn.rvX e nwlistcf.rel é diferente
 					//////////////////////////////////////////////////////////////////////////////////
-					if (is_arquivo_fcfnwn) { //Leitura arquivo fcfnwn.rvX
+					if (a_is_arquivo_fcfnwn) { //Leitura arquivo fcfnwn.rvX
 						if (line.substr(3, 10) == simbolo_cabecalho) {
 							numero_simbolo_cabecalho += 1;
 
@@ -15019,7 +15145,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 						}//if (line.substr(3, 10) == simbolo_cabecalho) {
 
 					}//if (is_arquivo_fcfnwn) {
-					else if (!is_arquivo_fcfnwn) {//Leitura arquivo nwlistcf.rel
+					else if (!a_is_arquivo_fcfnwn) {//Leitura arquivo nwlistcf.rel
 
 						atributo = line.substr(0, 23);
 						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
@@ -15028,8 +15154,179 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 							is_bloco_informacao = true;
 
 							//Passa duas linhas de cabecalho (ver arquivo nwlistcf.rel)
-							std::getline(leituraArquivo, line);
-							std::getline(leituraArquivo, line);
+							
+							////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Arquivo sem formatação fixa: 
+							// 1. Nota: vai ser obtida a posição e tamanho do atributo dependendo do tamanho dos campos X-----------------
+							////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							
+							std::vector<int> pos_estrutura_atributos;
+
+							if (true) {
+
+								std::getline(leituraArquivo, line);
+
+								int contador = 0;
+								int numero_atributos = 0;
+
+								while (line.size() > 0) {
+									int pos = int(line.find('X'));
+									pos_estrutura_atributos.push_back(pos + contador + numero_atributos);
+
+									contador += pos;
+									numero_atributos++;
+
+									line = line.substr(pos + 1, int(line.length()));
+								}//while (line.size() > 0) {
+
+							}
+
+							////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Arquivo sem formatação fixa: 
+							// 2. Nota: identifica os registros com o mnemônico do arquivo
+							////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+							if (true) {
+
+								std::getline(leituraArquivo, line);
+
+								//Instancia posições =-1 
+								if (true) {
+
+									pos_RHS = -1;
+									pos_idREE = -1;
+									pos_Coef_Earm = -1;
+									pos_Eafl_lag_1 = -1;
+									pos_Eafl_lag_2 = -1;
+									pos_Eafl_lag_3 = -1;
+									pos_Eafl_lag_4 = -1;
+									pos_Eafl_lag_5 = -1;
+									pos_Eafl_lag_6 = -1;
+									pos_Eafl_lag_7 = -1;
+									pos_Eafl_lag_8 = -1;
+									pos_Eafl_lag_9 = -1;
+									pos_Eafl_lag_10 = -1;
+									pos_Eafl_lag_11 = -1;
+									pos_Eafl_lag_12 = -1;
+									pos_GNL_pat_1_lag_1 = -1;
+									pos_GNL_pat_1_lag_2 = -1;
+									pos_GNL_pat_2_lag_1 = -1;
+									pos_GNL_pat_2_lag_2 = -1;
+									pos_GNL_pat_3_lag_1 = -1;
+									pos_GNL_pat_3_lag_2 = -1;
+									pos_Vminop = -1;
+
+								}//if (true) {
+
+								//Atualiza posições dependendo do estrutura do arquivo
+								for (int aux = 0; aux < int(pos_estrutura_atributos.size()) - 1; aux++) {
+
+									//pos e tam para não pegar as posições dos 'X' no arquivo
+									int pos = pos_estrutura_atributos.at(aux) + 1;
+									int tam = pos_estrutura_atributos.at(aux + 1) - pos_estrutura_atributos.at(aux) - 1;
+
+									atributo = line.substr(pos, tam);
+									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+									if (atributo == "REE") {
+										pos_idREE = pos;
+										tam_idREE = tam;
+									}//if (atributo == "REE") {
+									else if (atributo == "RHS") {
+										pos_RHS = pos;
+										tam_RHS = tam;
+									}//else if (atributo == "RHS") {
+									else if (atributo == "PIV") {
+										pos_Coef_Earm = pos;
+										tam_Coef_Earm = tam;
+									}//else if (atributo == "PIV") {
+									else if (atributo == "PIH(1)") {
+										pos_Eafl_lag_1 = pos;
+										tam_Eafl_lag_1 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIH(2)") {
+										pos_Eafl_lag_2 = pos;
+										tam_Eafl_lag_2 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIH(3)") {
+										pos_Eafl_lag_3 = pos;
+										tam_Eafl_lag_3 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIH(4)") {
+										pos_Eafl_lag_4 = pos;
+										tam_Eafl_lag_4 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIH(5)") {
+										pos_Eafl_lag_5 = pos;
+										tam_Eafl_lag_5 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIH(6)") {
+										pos_Eafl_lag_6 = pos;
+										tam_Eafl_lag_6 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIH(7)") {
+										pos_Eafl_lag_7 = pos;
+										tam_Eafl_lag_7 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIH(8)") {
+										pos_Eafl_lag_8 = pos;
+										tam_Eafl_lag_8 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIH(9)") {
+										pos_Eafl_lag_9 = pos;
+										tam_Eafl_lag_9 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIH(10)") {
+										pos_Eafl_lag_10 = pos;
+										tam_Eafl_lag_10 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIH(11)") {
+										pos_Eafl_lag_11 = pos;
+										tam_Eafl_lag_11 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIH(12)") {
+										pos_Eafl_lag_12 = pos;
+										tam_Eafl_lag_12 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIGTAD(P1L1)") {
+										pos_GNL_pat_1_lag_1 = pos;
+										tam_GNL_pat_1_lag_1 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIGTAD(P1L2)") {
+										pos_GNL_pat_1_lag_2 = pos;
+										tam_GNL_pat_1_lag_2 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIGTAD(P2L1)") {
+										pos_GNL_pat_2_lag_1 = pos;
+										tam_GNL_pat_2_lag_1 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIGTAD(P2L2)") {
+										pos_GNL_pat_2_lag_2 = pos;
+										tam_GNL_pat_2_lag_2 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIGTAD(P3L1)") {
+										pos_GNL_pat_3_lag_1 = pos;
+										tam_GNL_pat_3_lag_1 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIGTAD(P3L2)") {
+										pos_GNL_pat_3_lag_2 = pos;
+										tam_GNL_pat_3_lag_2 = tam;
+									}//else if (atributo == "PIH(1)") {
+									else if (atributo == "PIMX_VMN") {
+										pos_Vminop = pos;
+										tam_Vminop = tam;
+									}//else if (atributo == "PIH(1)") {
+									else {
+
+										if (atributo != "IREG" && atributo != "PIMX_SAR")
+											throw std::invalid_argument("Nao identificado na leitura de cortes o atributo: " + atributo);
+
+									}//else {
+
+
+								}//for (int aux = 0; aux < int(pos_estrutura_atributos.size()) - 1; aux++) {
+
+							}//if (true) {
 
 						}//if (atributo == str_periodo_acoplamento) {
 
