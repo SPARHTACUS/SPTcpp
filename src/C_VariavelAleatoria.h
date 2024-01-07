@@ -155,6 +155,7 @@ public:
 
 	double getRealizacaoTransformadaEspacoAmostral(const IdCenario a_idCenario, const Periodo a_periodo) const;
 	double getRealizacaoTransformadaEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo) const;
+	double getRealizacaoTransformadaEspacoAmostral(const Periodo a_periodo, const IdRealizacao a_idRealizacao, const SmartEnupla<int, double>& a_tendencia) const;
 	double getRealizacaoTransformadaEspacoAmostral_recursivo(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao,  const SmartEnupla<Periodo, IdRealizacao> &a_idRealizacoes_cenario, const Periodo a_periodo, const Periodo a_periodo_realizacao, const SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>& a_horizonte_completo);
 
 	double getTendenciaTemporalTransformada(const IdCenario a_idCenario, const Periodo a_periodo);
@@ -163,6 +164,7 @@ public:
 	double calcularResiduo             (const double a_ruido_correlacionado, const Periodo a_periodo) const;
 	double calcularResiduo             (const Periodo a_periodo, const IdCenario a_idCenario, const SmartEnupla<Periodo, double> &a_tendencia, const double a_realizacao) const;
 	double calcularRealizacao          (const Periodo a_periodo, const IdCenario a_idCenario, const SmartEnupla<Periodo, double> &a_tendencia, const double a_residuo) const;
+	double calcularRealizacao(const Periodo a_periodo, const SmartEnupla<int, double>& a_tendencia, const double a_residuo) const;
 	void   calcularRealizacaoAndResiduo(const double a_ruido_correlacionado, const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia, double &a_valor_realizacao, double &a_valor_residuo_realizacao) const;
 
 	double calcularRealizacaoInterna(const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const Periodo a_periodo, const double a_realizacao);
@@ -178,6 +180,7 @@ public:
 	void setRealizacaoInternaFromTendencia(const IdCenario a_idCenario, const Periodo a_periodo);
 
 	double calcularRegressivo_lognormal_3p(const Periodo a_periodo, const IdCenario a_idCenario, const SmartEnupla<Periodo, double> &a_tendencia) const;
+	double calcularRegressivo_lognormal_3p(const Periodo a_periodo, const SmartEnupla<int, double>& a_tendencia)const;
 
 	double calcularResiduo_lognormal_3p(double a_ruido_correlacionado, const Periodo a_periodo) const;
 

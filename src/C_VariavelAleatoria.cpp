@@ -1638,6 +1638,58 @@ double VariavelAleatoria::calcularRealizacao(const Periodo a_periodo, const IdCe
 
 } // double VariavelAleatoria::calcularRealizacao(const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const SmartEnupla<Periodo, double>& a_tendencia, const double a_residuo) {
 
+double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral(const Periodo a_periodo, const IdRealizacao a_idRealizacao, const SmartEnupla<int, double>& a_tendencia) const {
+
+	try {
+
+		return calcularRealizacao(a_periodo, a_tendencia, getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, a_idRealizacao, double()));
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::getRealizacaoTransformadaEspacoAmostral(" + getString(a_periodo) + "," + getString(a_idRealizacao) + "): \n" + std::string(erro.what())); }
+
+} // double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral(const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo) const{
+
+double VariavelAleatoria::calcularRealizacao(const Periodo a_periodo, const SmartEnupla<int, double>& a_tendencia, const double a_residuo) const {
+
+	try {
+
+		if (std::isnan(a_residuo) || (std::isinf(a_residuo)))
+			throw std::invalid_argument("Residuo invalido (NaN ou inf.");
+
+		const TipoModeloGeracaoSinteticaCenario tipo_modelo_geracao_sintetica = getAtributo(AttComumVariavelAleatoria_tipo_modelo_geracao_sintetica, TipoModeloGeracaoSinteticaCenario());
+
+		if (tipo_modelo_geracao_sintetica == TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal)
+			return a_residuo + calcularRegressivo_lognormal_3p(a_periodo, a_tendencia);
+
+		else
+			throw std::invalid_argument("TipoModeloGeracaoSinteticaCenario nao utilizado.");
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::calcularRealizacao(a_tendencia," + getString(a_residuo) + "): \n" + std::string(erro.what())); }
+
+} // double VariavelAleatoria::calcularRealizacao(const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const SmartEnupla<Periodo, double>& a_tendencia, const double a_residuo) {
+
+
+double VariavelAleatoria::calcularRegressivo_lognormal_3p(const Periodo a_periodo, const SmartEnupla<int, double>& a_tendencia)const {
+
+	try {
+		
+		double parcela_regressiva_realizacao = 0.0;
+
+		if (a_tendencia.size() > 0) {
+			for (int lag = 1; lag <= a_tendencia.getIteradorFinal(); lag++) {
+				const double coeficiente_linear = getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo, lag, double());
+				parcela_regressiva_realizacao += a_tendencia.at(lag) * coeficiente_linear;
+			} // for (int lag = 1; lag <= lag_final; lag++)
+		}
+
+		return parcela_regressiva_realizacao;
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::calcularRegressivo_lognormal_3p(" + getFullString(a_periodo) + ",a_tendencia): \n" + std::string(erro.what())); }
+
+} // void VariavelAleatoria::calcularRegressivo_lognormal_3p(const SmartEnupla<IdVariavelAleatoria, double>& a_ruido_branco, const SmartEnupla<Periodo, double>& a_tendencia){
+
 
 
 void VariavelAleatoria::calcularRealizacaoAndResiduo(double a_ruido_correlacionado, const Periodo a_periodo, const SmartEnupla<Periodo, double>& a_tendencia, double & a_valor_realizacao, double & a_valor_residuo_realizacao) const {
@@ -1880,7 +1932,6 @@ double VariavelAleatoria::calcularRegressivo_lognormal_3p(const Periodo a_period
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::calcularRegressivo_lognormal_3p(" + getFullString(a_periodo) + ",a_tendencia): \n" + std::string(erro.what())); }
 
 } // void VariavelAleatoria::calcularRegressivo_lognormal_3p(const SmartEnupla<IdVariavelAleatoria, double>& a_ruido_branco, const SmartEnupla<Periodo, double>& a_tendencia){
-
 
 
 double VariavelAleatoria::calcularResiduo_lognormal_3p(double a_ruido_correlacionado, const Periodo a_periodo) const {
