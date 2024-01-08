@@ -367,12 +367,6 @@ void ModeloOtimizacao::gerarRealizacoes(const IdIteracao a_idIteracao, const IdP
 
 		const IdProcessoEstocastico idPE = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
 
-		realizacoes = SmartEnupla<IdProcessoEstocastico, SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<int, double>>>>();
-		map_realizacoes = SmartEnupla<IdProcessoEstocastico, SmartEnupla<IdCenario, int>>();
-
-		realizacoes.addElemento(idPE, SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<int, double>>>());
-		map_realizacoes.addElemento(idPE, SmartEnupla<IdCenario, int>());
-
 		bool algum_truncamento = false;
 		for (IdEstagio idEstagio = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()); idEstagio <= getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()); idEstagio++) {
 			if (getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, idEstagio, int()) == 1) {
@@ -393,51 +387,13 @@ void ModeloOtimizacao::gerarRealizacoes(const IdIteracao a_idIteracao, const IdP
 			int semente_geracao_cenario_hidrologico = -1;
 
 			bool gerar_cenarios_internos = false;
-			if (imprimir_cenarios) {
+			if ((imprimir_cenarios) && (a_idProcesso == IdProcesso_mestre)) {
 				gerar_cenarios_internos = true;
-				const IdCenario menor_cenario_processo = arranjoResolucao.getAtributo(a_idIteracao, a_idProcesso, AttComumProcesso_menor_cenario, IdCenario());
-				const IdCenario maior_cenario_processo = arranjoResolucao.getAtributo(a_idIteracao, a_idProcesso, AttComumProcesso_maior_cenario, IdCenario());
-				a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//ProcessoEstocasticoHidrologico//" + getFullString(a_idProcesso));
-				vetorProcessoEstocastico.att(idPE).gerarCenariosPorSorteio(a_entradaSaidaDados, imprimir_cenarios, true, gerar_cenarios_internos, getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()), menor_cenario_processo, maior_cenario_processo, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
+				a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//ProcessoEstocasticoHidrologico");
 			}
 
-			const IdVariavelAleatoria maiorIdVar = vetorProcessoEstocastico.att(idPE).getMaiorId(IdVariavelAleatoria());
+			vetorProcessoEstocastico.att(idPE).gerarCenariosPorSorteio(a_entradaSaidaDados, imprimir_cenarios, true, gerar_cenarios_internos, getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()), menor_cenario_iteracao, maior_cenario_iteracao, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
 
-			int cont_cenarios_estado = 0;
-			SmartEnupla<IdProcesso, std::vector<IdCenario>> lista_idCenarios_estado(IdProcesso_mestre, std::vector<std::vector<IdCenario>>(arranjoResolucao.getMaiorId(IdProcesso()), std::vector<IdCenario>()));
-			for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
-				lista_idCenarios_estado.at(idProcesso) = arranjoResolucao.getIdsCenarioEstado(idProcesso, a_idProcesso, a_idIteracao);
-				cont_cenarios_estado += int(lista_idCenarios_estado.at(idProcesso).size());
-			}
-			
-			if (cont_cenarios_estado == 0)
-				return;
-			
-			map_realizacoes.at(idPE) = SmartEnupla<IdCenario, int>(menor_cenario_iteracao, std::vector<int>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, -1));
-
-			int i = 0;
-			for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
-
-				if (lista_idCenarios_estado.at(idProcesso).size() > 0) {
-
-					if (realizacoes.at(idPE).size() == 0)
-						realizacoes.at(idPE) = SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<int, double>>>(IdVariavelAleatoria_1, std::vector<SmartEnupla<Periodo, SmartEnupla<int, double>>>(int(maiorIdVar), SmartEnupla<Periodo, SmartEnupla<int, double>>()));
-
-					for (int c = 0; c < int(lista_idCenarios_estado.size()); c++) {
-						const IdCenario idCenario = lista_idCenarios_estado.at(idProcesso).at(c);
-						map_realizacoes.at(idPE).at(idCenario) = i;
-						SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> realizacoes_buffer = vetorProcessoEstocastico.att(idPE).gerarCenariosPorSorteioRetorno(a_entradaSaidaDados, false, true, false, getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()), idCenario, idCenario, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
-						for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= maiorIdVar; idVar++) {
-							if (realizacoes.at(idPE).at(idVar).size() == 0)
-								realizacoes.at(idPE).at(idVar) = SmartEnupla<Periodo, SmartEnupla<int, double>>(realizacoes_buffer.at(idVar), SmartEnupla<int, double>(0, std::vector<double>(cont_cenarios_estado, NAN)));
-
-							for (Periodo periodo = realizacoes_buffer.at(idVar).getIteradorInicial(); periodo <= realizacoes_buffer.at(idVar).getIteradorFinal(); realizacoes_buffer.at(idVar).incrementarIterador(periodo))
-								realizacoes.at(idPE).at(idVar).at(periodo).at(i) = realizacoes_buffer.at(idVar).at(periodo).at(idCenario);
-						}
-						i++;
-					}
-				}
-			}
 		}
 
 	} // try
@@ -701,13 +657,9 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 				double valor = NAN;
 
 				if (a_idRealizacao == IdRealizacao_Nenhum)
-					valor = vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacaoInterna(idVariavelAleatoria, idVariavelAleatoriaInterna, periodo, realizacoes.at(idProcessoEstocastico).at(idVariavelAleatoria).at(periodo).at(map_realizacoes.at(idProcessoEstocastico).at(a_idCenario)));
-				else {
-					SmartEnupla<Periodo, double> tendencia(realizacoes.at(idProcessoEstocastico).at(idVariavelAleatoria), NAN);
-					for (Periodo periodo_tend = tendencia.getIteradorInicial(); periodo_tend < periodo; tendencia.incrementarIterador(periodo_tend))
-						tendencia.at(periodo_tend) = realizacoes.at(idProcessoEstocastico).at(idVariavelAleatoria).at(periodo_tend).at(map_realizacoes.at(idProcessoEstocastico).at(a_idCenario));
-					valor = vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacaoInterna(idVariavelAleatoria, idVariavelAleatoriaInterna, periodo, vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacao(idVariavelAleatoria, a_idRealizacao, periodo, tendencia));
-				}
+					valor = vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacaoInterna(idVariavelAleatoria, idVariavelAleatoriaInterna, periodo, vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoMatriz(idVariavelAleatoria, AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodo, a_idCenario, double()));
+				else
+					valor = vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacaoInterna(idVariavelAleatoria, idVariavelAleatoriaInterna, periodo, vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacao(idVariavelAleatoria, a_idCenario, a_idRealizacao, periodo));
 
 				double valor_novo = 0.0;
 
@@ -892,18 +844,12 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 						double realizacao = 0.0;
 
 						// forward
-						if (a_idRealizacao == IdRealizacao_Nenhum) {
-							const IdCenario idCenario_estado = arranjoResolucao.getElementoMatriz(a_idIteracao, a_idProcesso, AttMatrizProcesso_cenario_estado_por_cenario, a_idCenario, a_idEstagio, IdCenario());
-							realizacao = realizacoes.at(idProcessoEstocastico).at(idVariavelAleatoria).at(periodo).at(map_realizacoes.at(idProcessoEstocastico).at(idCenario_estado));
-						}
+						if (a_idRealizacao == IdRealizacao_Nenhum)
+							realizacao = vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoMatriz(idVariavelAleatoria, AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodo, a_idCenario, double());
 
 						// backward
-						else if (a_idRealizacao > IdRealizacao_Nenhum) {
-							SmartEnupla<Periodo, double> tendencia(realizacoes.at(idProcessoEstocastico).at(idVariavelAleatoria), NAN);
-							for (Periodo periodo_tend = tendencia.getIteradorInicial(); periodo_tend < periodo; tendencia.incrementarIterador(periodo_tend))
-								tendencia.at(periodo_tend) = realizacoes.at(idProcessoEstocastico).at(idVariavelAleatoria).at(periodo_tend).at(map_realizacoes.at(idProcessoEstocastico).at(a_idCenario));
-							realizacao = vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacao(idVariavelAleatoria, a_idRealizacao, periodo, tendencia);
-						}
+						else if (a_idRealizacao > IdRealizacao_Nenhum)
+							realizacao = vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacao(idVariavelAleatoria, a_idCenario, a_idRealizacao, periodo);
 
 						const double valor_minimo_convexo = vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacaoParaValor(idVariavelAleatoria, 0.0, periodo);
 

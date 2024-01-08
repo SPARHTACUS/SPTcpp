@@ -585,10 +585,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		void esvaziarVetorCorteBenders();
 		void esvaziarVetorCorteBenders(const IdEstagio a_idEstagio);
 
-		SmartEnupla<IdProcessoEstocastico, SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<int, double>>>> realizacoes;
-
-		SmartEnupla<IdProcessoEstocastico, SmartEnupla<IdCenario, int>> map_realizacoes;
-
 		void gerarRealizacoes(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, EntradaSaidaDados a_entradaSaidaDados);
 
 		void atualizarModeloOtimizacaoComVariavelEstado(const IdEstagio a_idEstagio, const IdCenario a_idCenario);

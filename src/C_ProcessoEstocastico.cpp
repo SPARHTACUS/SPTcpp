@@ -463,14 +463,6 @@ double ProcessoEstocastico::calcularRealizacaoInterna(const IdVariavelAleatoria 
 } // double ProcessoEstocastico::calcularRealizacao(const SmartEnupla<Periodo, double>& a_tendencia, const double a_residuo) const{
 
 
-double ProcessoEstocastico::calcularRealizacao(const IdVariavelAleatoria a_idVariavelAleatoria, const IdRealizacao a_idRealizacao, const Periodo a_periodo, const SmartEnupla<Periodo, double> &a_tendencia){
-	try {
-
-		return vetorVariavelAleatoria.att(a_idVariavelAleatoria).calcularRealizacao(a_periodo, IdCenario_Nenhum, a_tendencia, getElementoMatriz(a_idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, a_idRealizacao, double()));
-	} // try{
-	catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::calcularRealizacao(" + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_periodo) + "): \n" + std::string(erro.what())); }
-}
-
 double ProcessoEstocastico::calcularRealizacao(const IdVariavelAleatoria a_idVariavelAleatoria, const IdCenario a_idCenario, const Periodo a_periodo){
 
 	try {
@@ -489,13 +481,14 @@ double ProcessoEstocastico::calcularRealizacao(const IdVariavelAleatoria a_idVar
 	catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::calcularRealizacao(" + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idCenario) + "," + getFullString(a_periodo) + "): \n" + std::string(erro.what())); }
 }
 
+
 double ProcessoEstocastico::calcularRealizacao(const IdVariavelAleatoria a_idVariavelAleatoria, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodo){
 
 	try {
 
 		/**/
 		if (vetorVariavelAleatoria.att(a_idVariavelAleatoria).getSizeMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral) > 0)
-			return vetorVariavelAleatoria.att(a_idVariavelAleatoria).getRealizacaoEspacoAmostral(a_idCenario, a_idRealizacao, a_periodo);
+			return vetorVariavelAleatoria.att(a_idVariavelAleatoria).calcularRealizacao(a_periodo, a_idCenario, SmartEnupla<Periodo, double>(), getElementoMatriz(a_idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, a_idRealizacao, double()));
 		else {
 			const SmartEnupla<Periodo, IdRealizacao> idRealizacoes_cenario = getElementosMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, Periodo(), IdRealizacao());
 			const SmartEnupla<Periodo, IdRealizacao> horizonte_mapeamento_espaco_amostral = getElementosMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, Periodo(), IdRealizacao());
@@ -1058,6 +1051,7 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 
 		const Periodo periodo_final = horizonte_espaco_amostral.getIteradorFinal();
 
+
 		Periodo periodo_seguinte_mapeamento_existente = horizonte_espaco_amostral.getIteradorInicial();
 		if (getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) > 0) {
 			if (getIterador1Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario()) > a_menorIdcenario)
@@ -1065,6 +1059,9 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 
 			if (getIterador1Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario()) < a_maiorIdcenario)
 				throw std::invalid_argument("Matriz inicializada com cenario final menor que " + getFullString(a_maiorIdcenario) + ".");
+
+			if (getIterador2Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_menorIdcenario, Periodo()) == periodo_final)
+				return;
 
 			periodo_seguinte_mapeamento_existente = getIterador2Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_menorIdcenario, Periodo());
 			horizonte_espaco_amostral.incrementarIterador(periodo_seguinte_mapeamento_existente);

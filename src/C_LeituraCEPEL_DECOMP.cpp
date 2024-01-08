@@ -22065,6 +22065,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		a_dados.setAtributo(AttComumDados_tipo_processamento_paralelo, TipoProcessamentoParalelo_por_abertura);
 		a_dados.setAtributo(AttComumDados_numero_maximo_iteracoes, 20);
+		a_dados.setAtributo(AttComumDados_iteracao_inicial, IdIteracao_1);
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -22201,6 +22202,19 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()), AttComumProcesso_maior_cenario, IdCenario());
 
 		a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_final_PE_DECOMP, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario);
+
+		// Verifica se existem afluencias na árvore de cenários e aplica relaxação
+		if (true) {
+			SmartEnupla<Periodo, bool> horizonte_processo_estocastico(a_dados.processoEstocastico_hidrologico.getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double()), true);
+			for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
+				for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= a_dados.processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria()); idVar++) {
+					for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= a_dados.processoEstocastico_hidrologico.getIterador2Final(idVar, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, IdRealizacao()); idRealizacao++) {
+						if (a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVar, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double()) < 0.0)
+							a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVar).setElemento(AttVetorVariavelAleatoria_tipo_relaxacao, periodo, TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao);
+					}
+				}
+			}
+		}
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 
