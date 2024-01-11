@@ -14462,7 +14462,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 								atributo = "";
 
-								if (tam_Eafl_lag_3 > 0) {
+								if (pos_Eafl_lag_3 > 0) {
 									atributo = line.substr(pos_Eafl_lag_3, tam_Eafl_lag_3);
 									atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 								}//if (tam_Eafl_lag_3 > 0) {
@@ -15087,7 +15087,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 
 							atributo = "";
 
-							if (tam_Eafl_lag_3 > 0) {
+							if (pos_Eafl_lag_3 > 0) {
 								atributo = line.substr(pos_Eafl_lag_3, tam_Eafl_lag_3);
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 							}//if (tam_Eafl_lag_3 > 0) {
@@ -15456,7 +15456,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 		}//if (leituraArquivo.is_open()) {
 
 	}//	try {
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::leitura_cortes_NEWAVE: \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::leitura_cortes_NEWAVE_dimensionamento: \n" + std::string(erro.what())); }
 
 }
 
