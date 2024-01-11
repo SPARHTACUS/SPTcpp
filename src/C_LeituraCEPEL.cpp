@@ -768,6 +768,85 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 
 }
 
+void LeituraCEPEL::instancia_processoEstocasticoHidrologico_preConfig(Dados& a_dados, const std::string a_diretorio){
+
+	try {
+
+		EntradaSaidaDados entradaSaidaDados;
+
+		entradaSaidaDados.setDiretorioEntrada(a_diretorio);
+
+		const std::string diretorio_entrada = entradaSaidaDados.getDiretorioEntrada();
+
+		entradaSaidaDados.setDiretorioEntrada(diretorio_entrada + "//ProcessoEstocasticoHidrologico");
+
+		bool processoEstocastico_totalmente_carregado = true;
+
+		if (true) {
+			ProcessoEstocastico processoEstocastico_hidrologico;
+			if (!entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("PROCESSO_ESTOCASTICO_AttComumOperacional.csv", processoEstocastico_hidrologico, TipoAcessoInstancia_direto))
+				processoEstocastico_totalmente_carregado = false;
+			else if (!entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_probabilidade_realizacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_direto))
+				processoEstocastico_totalmente_carregado = false;
+			else if (!entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_direto))
+				processoEstocastico_totalmente_carregado = false;
+			else if (!entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_" + getString(AttVetorVariavelAleatoria_tipo_relaxacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro))
+				processoEstocastico_totalmente_carregado = false;
+			else if (!entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_residuo_espaco_amostral) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro))
+				processoEstocastico_totalmente_carregado = false;
+			else if (!entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro))
+				processoEstocastico_totalmente_carregado = false;
+			else if (!entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro))
+				processoEstocastico_totalmente_carregado = false;
+			else if (!entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_coeficiente_participacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro))
+				processoEstocastico_totalmente_carregado = false;
+			else if (!entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_tendencia_temporal) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro))
+				processoEstocastico_totalmente_carregado = false;
+		}
+
+		if (!processoEstocastico_totalmente_carregado)
+			return;
+
+		entradaSaidaDados.carregarArquivoCSV_AttComum("PROCESSO_ESTOCASTICO_AttComumOperacional.csv", a_dados.processoEstocastico_hidrologico, TipoAcessoInstancia_direto);
+		entradaSaidaDados.carregarArquivoCSV_AttMatriz("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_probabilidade_realizacao) + ".csv", a_dados.processoEstocastico_hidrologico, TipoAcessoInstancia_direto);
+		entradaSaidaDados.carregarArquivoCSV_AttMatriz("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) + ".csv", a_dados.processoEstocastico_hidrologico, TipoAcessoInstancia_direto);
+		entradaSaidaDados.carregarArquivoCSV_AttVetor("VARIAVEL_ALEATORIA_" + getString(AttVetorVariavelAleatoria_tipo_relaxacao) + ".csv", a_dados.processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
+		entradaSaidaDados.carregarArquivoCSV_AttMatriz("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_residuo_espaco_amostral) + ".csv", a_dados.processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
+		entradaSaidaDados.carregarArquivoCSV_AttMatriz("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) + ".csv", a_dados.processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
+		entradaSaidaDados.carregarArquivoCSV_AttComum("VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv", a_dados.processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro);
+		entradaSaidaDados.carregarArquivoCSV_AttVetor("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_coeficiente_participacao) + ".csv", a_dados.processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro);
+		entradaSaidaDados.carregarArquivoCSV_AttVetor("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_tendencia_temporal) + ".csv", a_dados.processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro);
+
+		processoEstocasticoHidrologicoPreConfig_instanciado = true;
+
+		for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idUHE)) {
+
+				IdVariavelAleatoria idVar = IdVariavelAleatoria_Nenhum;
+				IdVariavelAleatoriaInterna idVarInt = IdVariavelAleatoriaInterna_Nenhum;
+				a_dados.processoEstocastico_hidrologico.getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(idVar, idVarInt, idUHE);
+				lista_hidreletrica_IdVariavelAleatoria.at(idUHE) = idVar;
+				a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVar).setAtributo(AttComumVariavelAleatoria_nome, getFullString(idUHE));
+
+		} // for (IdHidreletrica idUHE = IdHidreletrica(1); idUHE <= a_dados.getMaiorId(IdHidreletrica()); idUHE++) {
+
+
+		const int numero_cenarios = a_dados.processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral);
+
+		if (numero_cenarios == 0)
+			throw std::invalid_argument("Processo estocastico pre config sem cenarios em " + getFullString(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) + ".");
+
+		a_dados.setAtributo(AttComumDados_numero_cenarios, numero_cenarios);
+
+		entradaSaidaDados.setDiretorioEntrada(diretorio_entrada);
+		entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorPeriodo.csv", a_dados, TipoAcessoInstancia_membroMembro);
+
+
+	}// try
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instancia_processoEstocasticoHidrologico_preConfig(): \n" + std::string(erro.what())); }
+
+
+}
+
 void LeituraCEPEL::instancia_horizonte_preConfig(Dados& a_dados, const std::string a_diretorio) {
 
 	try {

@@ -163,6 +163,26 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(" + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idVariavelAleatoriaInterna) + "," + getFullString(a_idFisico) + "): \n" + std::string(erro.what())); }
 	};
 
+	template<typename IdFisico>
+	void getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico_seExistir(IdVariavelAleatoria& a_idVariavelAleatoria, IdVariavelAleatoriaInterna& a_idVariavelAleatoriaInterna, const IdFisico a_idFisico) {
+		try {
+			for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= getMaiorId(IdVariavelAleatoria()); idVar++) {
+
+				const IdVariavelAleatoriaInterna maiorIdVariavelAleatoriaInterna = getMaiorId(idVar, IdVariavelAleatoriaInterna());
+
+				for (IdVariavelAleatoriaInterna idVarInterna = IdVariavelAleatoriaInterna_1; idVarInterna <= maiorIdVariavelAleatoriaInterna; idVarInterna++) {
+					if (getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(idVar, idVarInterna, a_idFisico) == a_idFisico) {
+						a_idVariavelAleatoria = idVar;
+						a_idVariavelAleatoriaInterna = idVarInterna;
+						return;
+					}
+				}
+			}
+			a_idVariavelAleatoria = IdVariavelAleatoria_Nenhum;
+			a_idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_Nenhum;
+		}
+		catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(" + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idVariavelAleatoriaInterna) + "," + getFullString(a_idFisico) + "): \n" + std::string(erro.what())); }
+	};
 
 	bool mapearCenariosEspacoAmostralCompletoPorPeriodo(const Periodo a_periodo_final, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);
 
