@@ -324,6 +324,9 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 
+		if (!processoEstocasticoHidrologicoPreConfig_instanciado)
+			instanciar_hidreletricas_ficticias_sem_producao(a_dados);
+
 		instanciar_membros_das_hidreletricas_instanciadas(a_dados);
 
 		leitura_DADGER_201906_DC29(a_dados, a_diretorio + "//DADGER." + revisao);
@@ -16243,12 +16246,14 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 
 					}//while (codigo_usina_jusante > 0) {
 
-					if (idReservatorioEquivalente == IdReservatorioEquivalente_Nenhum) {
-						std::cout << getFullString(idHidreletrica) << std::endl;
+					if (idHidreletrica != IdHidreletrica_168_SOBRADINHO_FICTICIO) {
+
+						if (idReservatorioEquivalente == IdReservatorioEquivalente_Nenhum) {
+							std::cout << getFullString(idHidreletrica) << std::endl;
+						}
+
+						a_dados.vetorHidreletrica.att(idHidreletrica).setElemento(AttVetorHidreletrica_produtibilidade_acumulada_EAR, idReservatorioEquivalente, produtibilidade_acumulada_EAR);
 					}
-
-					a_dados.vetorHidreletrica.att(idHidreletrica).setElemento(AttVetorHidreletrica_produtibilidade_acumulada_EAR, idReservatorioEquivalente, produtibilidade_acumulada_EAR);
-
 				}//for (int pos = 0; pos < int(codigos_ONS_REE_aporte_energia.size()); pos++) {
 
 			}//if (codigo_ONS_REE_alvo != -1) {
@@ -16535,6 +16540,9 @@ void LeituraCEPEL::calcular_equacionamento_afluencia_natural_x_hidreletrica(Dado
 			}
 
 			for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+				if (idHidreletrica == IdHidreletrica_169_SOBRADINHO)
+					int iii = 0;
 
 				if ((periodo < a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) || (lista_hidreletrica_NPOSNW.getElemento(idHidreletrica) < 0)) {
 					lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).setElemento(idHidreletrica, inicializacao_1b);
@@ -22049,18 +22057,7 @@ void LeituraCEPEL::instanciar_hidreletricas_ficticias_sem_producao(Dados& a_dado
 		a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_4, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_4, double())));
 		a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_enchendo_volume_morto, SmartEnupla<Periodo, int>(horizonte_estudo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_enchendo_volume_morto, int())));
 
-		////////////////////
-		if (!processoEstocasticoHidrologicoPreConfig_instanciado) {
-			lista_hidreletrica_IdVariavelAleatoria.at(idHidreletrica) = IdVariavelAleatoria(a_dados.processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria()) + 1);
-
-			VariavelAleatoria variavelAleatoria;
-			variavelAleatoria.setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria, IdVariavelAleatoria(a_dados.processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria()) + 1));
-			variavelAleatoria.setAtributo(AttComumVariavelAleatoria_ordem_maxima_coeficiente_auto_correlacao, 0);
-			variavelAleatoria.setAtributo(AttComumVariavelAleatoria_tipo_coeficiente_auto_correlacao, TipoValor_positivo_e_negativo);
-
-			a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.add(variavelAleatoria);
-		}
-		
+	
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_hidreletricas_ficticias_sem_producao: \n" + std::string(erro.what())); }
 
@@ -22244,10 +22241,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		const Periodo periodo_final_PE_DECOMP = horizonte_otimizacao.at(horizonte_estudo.at(get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados)));
 
 		if (periodo_final_PE_DECOMP < horizonte_otimizacao.at(horizonte_otimizacao.getIteradorFinal())){
-
-			if (!processoEstocasticoHidrologicoPreConfig_instanciado)
-				instanciar_hidreletricas_ficticias_sem_producao(a_dados);
-
 			a_dados.setAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, false);
 			a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false);
 			a_dados.setAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, true);
