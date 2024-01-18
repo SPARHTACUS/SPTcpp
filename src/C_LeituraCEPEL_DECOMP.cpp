@@ -654,10 +654,10 @@ void LeituraCEPEL::instanciar_membros_das_hidreletricas_instanciadas(Dados& a_da
 
 			//////////////////////////////////////////////
 
-			lista_hidreletrica_NPOSNW.setElemento(idHidreletrica, -1);//Este valor é atualizado logo de aplicar as modificações NPOSNW
+			//lista_hidreletrica_NPOSNW.setElemento(idHidreletrica, -1);//Este valor é atualizado logo de aplicar as modificações NPOSNW
 
 			/////////////////////////////////////////////
-			if (!hidreletricasPreConfig_instanciadas)
+			if ((!hidreletricasPreConfig_instanciadas) && (lista_codigo_ONS_REE.at(idHidreletrica) == -1))
 				lista_codigo_ONS_REE.setElemento(idHidreletrica, 0);
 
 		}//for(IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica))
@@ -13620,6 +13620,7 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 					IdHidreletrica idhidreletrica_jusante = idHidreletrica;
 
 					while (idhidreletrica_jusante != IdHidreletrica_Nenhum) {
+
 						const int posto_jusante = a_dados.getAtributo(idhidreletrica_jusante, AttComumHidreletrica_codigo_posto, int());
 
 						if (isnan(valor_afluencia_passadas_GEVAZP.at(posto_jusante - 1).at(periodo)))
@@ -16277,18 +16278,22 @@ void LeituraCEPEL::calcular_produtibilidade_ENA_por_usina_por_periodo(Dados& a_d
 
 		for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-			if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
+			if ((a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) && (idHidreletrica != IdHidreletrica_168_SOBRADINHO_FICTICIO)) {
 				a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_produtibilidade_ENA, SmartEnupla<Periodo, double>(a_horizonte_tendencia_mais_estudo, 0.0));
 
 			}//if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
 			else {
+
+				IdHidreletrica idUHE = idHidreletrica;
+				if (idHidreletrica == IdHidreletrica_168_SOBRADINHO_FICTICIO)
+					idUHE = IdHidreletrica_169_SOBRADINHO;
 
 				//////////////////////
 				//produtibilidade_ENA
 				//////////////////////
 				const double percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
 				for (Periodo periodo = a_horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= a_horizonte_tendencia_mais_estudo.getIteradorFinal(); a_horizonte_tendencia_mais_estudo.incrementarIterador(periodo))
-					a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()), a_dados.vetorHidreletrica.att(idHidreletrica), periodo, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial(), percentual_volume_util, true)));
+					a_dados.vetorHidreletrica.att(idHidreletrica).addElemento(AttVetorHidreletrica_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idUHE), get_cota_para_conversao_cortes_NEWAVE(a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()), a_dados.vetorHidreletrica.att(idUHE), periodo, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial(), percentual_volume_util, true)));
 
 			}//else {
 
@@ -16541,9 +16546,6 @@ void LeituraCEPEL::calcular_equacionamento_afluencia_natural_x_hidreletrica(Dado
 
 			for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-				if (idHidreletrica == IdHidreletrica_169_SOBRADINHO)
-					int iii = 0;
-
 				if ((periodo < a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) || (lista_hidreletrica_NPOSNW.getElemento(idHidreletrica) < 0)) {
 					lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).setElemento(idHidreletrica, inicializacao_1b);
 					lista_termo_independente_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).setElemento(idHidreletrica, inicializacao_2b);
@@ -16696,165 +16698,148 @@ void LeituraCEPEL::calcular_equacionamento_afluencia_natural_x_REE(Dados& a_dado
 			//Contribuição das Hidrelétricas instanciadas no estudo
 			//////////////////////////////////////////////////////////////////////
 
-			Periodo periodo_MENSAL = periodo_inicial_MENSAL; //buffer
+			for (Periodo periodo_MENSAL = periodo_inicial_MENSAL; periodo_MENSAL <= periodo_final_MENSAL; a_horizonte_tendencia_mais_estudo_MENSAL.incrementarIterador(periodo_MENSAL)) {
 
-			for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
+				for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
 
-				double sobreposicao = periodo_MENSAL.sobreposicao(periodo);
+					double sobreposicao = periodo_MENSAL.sobreposicao(periodo);
 
-				if (sobreposicao == 0) {//Significa que teve mudança de mês -> atualiza o buffer
+					if (sobreposicao > 0) {
 
-					periodo_MENSAL = Periodo(TipoPeriodo_mensal, periodo.getMes(), periodo.getAno());
-					sobreposicao = periodo_MENSAL.sobreposicao(periodo);
+						for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-				}//if (sobreposicao == 0) {
+							if (retorna_is_idHidreletrica_in_calculo_ENA(a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()))) {
 
-				for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+								const IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente(lista_codigo_ONS_REE.getElemento(idHidreletrica));
 
-					if (retorna_is_idHidreletrica_in_calculo_ENA(a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()))) {
 
-						const IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente(lista_codigo_ONS_REE.getElemento(idHidreletrica));
+								for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
 
-						for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
+									if (periodo_MENSAL >= a_periodo_inicial_horizonte_estudo || idCenario == idCenario_inicial) {//Evita realizar o processamento para todos os cenários na tendência (fazendo este cálculo só 1 vez)
 
-							if (periodo_MENSAL >= a_periodo_inicial_horizonte_estudo || idCenario == idCenario_inicial) {//Evita realizar o processamento para todos os cenários na tendência (fazendo este cálculo só 1 vez)
+										IdCenario idCenario_get = idCenario;
 
-								IdCenario idCenario_get = idCenario;
+										if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).at(idHidreletrica).size() == 1)
+											idCenario_get = lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).at(idHidreletrica).getIteradorInicial();
 
-								if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).at(idHidreletrica).size() == 1)
-									idCenario_get = lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).at(idHidreletrica).getIteradorInicial();
+										const double produtibilidade_ENA = a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(AttVetorHidreletrica_produtibilidade_ENA, periodo, double());
 
-								const double produtibilidade_ENA = a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(AttVetorHidreletrica_produtibilidade_ENA, periodo, double());
+										if (lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idHidreletrica).size() == 0)
+											lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idHidreletrica) = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>(IdReservatorioEquivalente(1), std::vector<SmartEnupla<IdCenario, double>>(maior_ONS_REE, SmartEnupla<IdCenario, double>()));
 
-								if (lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idHidreletrica).size() == 0)
-									lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idHidreletrica) = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>(IdReservatorioEquivalente(1), std::vector<SmartEnupla<IdCenario, double>>(maior_ONS_REE, SmartEnupla<IdCenario, double>()));
+										if (lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idHidreletrica).at(idReservatorioEquivalente).size() == 0)
+											lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idHidreletrica).at(idReservatorioEquivalente) = SmartEnupla<IdCenario, double>(idCenario_inicial, std::vector<double>(int(idCenario_final - idCenario_inicial) + 1, 0.0));
 
-								if (lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idHidreletrica).at(idReservatorioEquivalente).size() == 0)
-									lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idHidreletrica).at(idReservatorioEquivalente) = SmartEnupla<IdCenario, double>(idCenario_inicial, std::vector<double>(int(idCenario_final - idCenario_inicial) + 1, 0.0));
 
+										const double parcela_termo_independente = sobreposicao * produtibilidade_ENA * lista_termo_independente_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).at(idHidreletrica).at(idCenario_get);
 
-								const double parcela_termo_independente = sobreposicao * produtibilidade_ENA * lista_termo_independente_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).at(idHidreletrica).at(idCenario_get);
+										lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idHidreletrica).at(idReservatorioEquivalente).at(idCenario) += parcela_termo_independente;
 
-								lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idHidreletrica).at(idReservatorioEquivalente).at(idCenario) += parcela_termo_independente;
+										//////////////////////////////////
+										//Equacionamento ENA x REE
+										//////////////////////////////////
 
-								//////////////////////////////////
-								//Equacionamento ENA x REE
-								//////////////////////////////////
+										for (int pos = 0; pos < int(lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).at(idHidreletrica).at(idCenario_get).size()); pos++) {
 
-								for (int pos = 0; pos < int(lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).at(idHidreletrica).at(idCenario_get).size()); pos++) {
+											const IdHidreletrica idUHE = lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).at(idHidreletrica).at(idCenario_get).at(pos).getIteradorInicial();
 
-									const IdHidreletrica idUHE = lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).at(idHidreletrica).at(idCenario_get).at(pos).getIteradorInicial();
+											if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).size() == 0)
+												lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE) = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>(IdReservatorioEquivalente(1), std::vector<SmartEnupla<IdCenario, double>>(maior_ONS_REE, SmartEnupla<IdCenario, double>()));
 
-									if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).size() == 0)
-										lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE) = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>(IdReservatorioEquivalente(1), std::vector<SmartEnupla<IdCenario, double>>(maior_ONS_REE, SmartEnupla<IdCenario, double>()));
+											if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).at(idReservatorioEquivalente).size() == 0)
+												lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).at(idReservatorioEquivalente) = SmartEnupla<IdCenario, double>(idCenario_inicial, std::vector<double>(int(idCenario_final - idCenario_inicial) + 1, 0.0));
 
-									if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).at(idReservatorioEquivalente).size() == 0)
-										lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).at(idReservatorioEquivalente) = SmartEnupla<IdCenario, double>(idCenario_inicial, std::vector<double>(int(idCenario_final - idCenario_inicial) + 1, 0.0));
+											const double parcela_coeficiente = sobreposicao * produtibilidade_ENA * lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).at(idHidreletrica).at(idCenario_get).at(pos).at(idUHE);
 
-									const double parcela_coeficiente = sobreposicao * produtibilidade_ENA * lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario.at(periodo).at(idHidreletrica).at(idCenario_get).at(pos).at(idUHE);
+											lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).at(idReservatorioEquivalente).at(idCenario) += parcela_coeficiente;
 
-									lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).at(idReservatorioEquivalente).at(idCenario) += parcela_coeficiente;
+											if (idUHE == IdHidreletrica_1_CAMARGOS)
+												int aa = 0;
 
-								}//for (int pos = 1; pos <= int(idHidreletricas_calculo_ENA.size()); pos++) {
-							}//if (periodo_MENSAL >= a_periodo_inicial_horizonte_estudo || idCenario == idCenario_inicial) {
-							else
-								break;
+										}//for (int pos = 1; pos <= int(idHidreletricas_calculo_ENA.size()); pos++) {
+									}//if (periodo_MENSAL >= a_periodo_inicial_horizonte_estudo || idCenario == idCenario_inicial) {
+									else
+										break;
 
-						}//for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
+								}//for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
 
-					}//if (retorna_is_idHidreletrica_in_calculo_ENA(a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()))) {
+							}//if (retorna_is_idHidreletrica_in_calculo_ENA(a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int()))) {
 
-				}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 
-			}//for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
+						for (int pos = 1; pos <= int(lista_hidreletrica_out_estudo.size()); pos++) {
 
-			//////////////////////////////////////////////////////////////////////
-			//Contribuição das Hidrelétricas não instanciadas no estudo
-			//////////////////////////////////////////////////////////////////////
+							const int codigo_usina = lista_hidreletrica_out_estudo.at(pos).getAtributo(AttComumHidreletrica_codigo_usina, int());
 
-			periodo_MENSAL = periodo_inicial_MENSAL; //buffer
+							if (retorna_is_idHidreletrica_in_calculo_ENA(codigo_usina)) {
 
-			for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
+								IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente_Nenhum;
 
-				double sobreposicao = periodo_MENSAL.sobreposicao(periodo);
+								if (codigo_usina == 176)
+									idReservatorioEquivalente = IdReservatorioEquivalente_3_NORDESTE; //REE 3-Nordeste
+								else
+									throw std::invalid_argument("Nao identificada usina fora do estudo com codigo:" + getString(codigo_usina) + "\n");
 
-				if (sobreposicao == 0) {//Significa que teve mudança de mês -> atualiza o buffer
 
-					periodo_MENSAL = Periodo(TipoPeriodo_mensal, periodo.getMes(), periodo.getAno());
-					sobreposicao = periodo_MENSAL.sobreposicao(periodo);
+								const IdHidreletrica idUHE = IdHidreletrica_176_COMPPAFMOX;
 
-				}//if (sobreposicao == 0) {
+								IdHidreletrica idUHE_alocacao_termo_independente = idUHE;
 
-				for (int pos = 1; pos <= int(lista_hidreletrica_out_estudo.size()); pos++) {
+								if (idUHE == IdHidreletrica_176_COMPPAFMOX)
+									idUHE_alocacao_termo_independente = IdHidreletrica_174_PAFONSO123;
 
-					const int codigo_usina = lista_hidreletrica_out_estudo.at(pos).getAtributo(AttComumHidreletrica_codigo_usina, int());
+								//////////////////
 
-					if (retorna_is_idHidreletrica_in_calculo_ENA(codigo_usina)) {
+								for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
 
-						IdReservatorioEquivalente idReservatorioEquivalente = IdReservatorioEquivalente_Nenhum;
+									if (periodo_MENSAL >= a_periodo_inicial_horizonte_estudo || idCenario == idCenario_inicial) {//Evita realizar o processamento para todos os cenários na tendência (fazendo este cálculo só 1 vez)
 
-						if (codigo_usina == 176)
-							idReservatorioEquivalente = IdReservatorioEquivalente_3_NORDESTE; //REE 3-Nordeste
-						else
-							throw std::invalid_argument("Nao identificada usina fora do estudo com codigo:" + getString(codigo_usina) + "\n");
+										IdCenario idCenario_get = idCenario;
 
+										if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario.at(periodo).at(codigo_usina).size() == 1)
+											idCenario_get = lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario.at(periodo).at(codigo_usina).getIteradorInicial();
 
-						const IdHidreletrica idUHE = IdHidreletrica_176_COMPPAFMOX;
+										const double produtibilidade_ENA = lista_hidreletrica_out_estudo.at(pos).getElementoVetor(AttVetorHidreletrica_produtibilidade_ENA, periodo, double());
 
-						IdHidreletrica idUHE_alocacao_termo_independente = idUHE;
+										if (lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE_alocacao_termo_independente).size() == 0)
+											lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE_alocacao_termo_independente) = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>(IdReservatorioEquivalente(1), std::vector<SmartEnupla<IdCenario, double>>(maior_ONS_REE, SmartEnupla<IdCenario, double>()));
 
-						if (idUHE == IdHidreletrica_176_COMPPAFMOX)
-							idUHE_alocacao_termo_independente = IdHidreletrica_174_PAFONSO123;
+										if (lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE_alocacao_termo_independente).at(idReservatorioEquivalente).size() == 0)
+											lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE_alocacao_termo_independente).at(idReservatorioEquivalente) = SmartEnupla<IdCenario, double>(idCenario_inicial, std::vector<double>(int(idCenario_final - idCenario_inicial) + 1, 0.0));
 
-						//////////////////
+										lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE_alocacao_termo_independente).at(idReservatorioEquivalente).at(idCenario) += sobreposicao * produtibilidade_ENA * lista_termo_independente_calculo_ENA_x_periodo_x_codigo_usina_x_cenario.at(periodo).at(codigo_usina).at(idCenario_get);
 
-						for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
+										for (int pos = 0; pos < int(lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario.at(periodo).at(codigo_usina).at(idCenario_get).size()); pos++) {
 
-							if (periodo_MENSAL >= a_periodo_inicial_horizonte_estudo || idCenario == idCenario_inicial) {//Evita realizar o processamento para todos os cenários na tendência (fazendo este cálculo só 1 vez)
+											const IdHidreletrica idUHE = lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario.at(periodo).at(codigo_usina).at(idCenario_get).at(pos).getIteradorInicial();
 
-								IdCenario idCenario_get = idCenario;
+											if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).size() == 0)
+												lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE) = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>(IdReservatorioEquivalente(1), std::vector<SmartEnupla<IdCenario, double>>(maior_ONS_REE, SmartEnupla<IdCenario, double>()));
 
-								if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario.at(periodo).at(codigo_usina).size() == 1)
-									idCenario_get = lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario.at(periodo).at(codigo_usina).getIteradorInicial();
+											if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).at(idReservatorioEquivalente).size() == 0)
+												lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).at(idReservatorioEquivalente) = SmartEnupla<IdCenario, double>(idCenario_inicial, std::vector<double>(int(idCenario_final - idCenario_inicial) + 1, 0.0));
 
-								const double produtibilidade_ENA = lista_hidreletrica_out_estudo.at(pos).getElementoVetor(AttVetorHidreletrica_produtibilidade_ENA, periodo, double());
+											lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).at(idReservatorioEquivalente).at(idCenario) += sobreposicao * produtibilidade_ENA * lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario.at(periodo).at(codigo_usina).at(idCenario_get).at(pos).at(idUHE);
 
-								if (lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE_alocacao_termo_independente).size() == 0)
-									lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE_alocacao_termo_independente) = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>(IdReservatorioEquivalente(1), std::vector<SmartEnupla<IdCenario, double>>(maior_ONS_REE, SmartEnupla<IdCenario, double>()));
+										}
 
-								if (lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE_alocacao_termo_independente).at(idReservatorioEquivalente).size() == 0)
-									lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE_alocacao_termo_independente).at(idReservatorioEquivalente) = SmartEnupla<IdCenario, double>(idCenario_inicial, std::vector<double>(int(idCenario_final - idCenario_inicial) + 1, 0.0));
+									}//if (periodo_MENSAL >= a_periodo_inicial_horizonte_estudo || idCenario == idCenario_inicial) {
+									else
+										break;
 
-								lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE_alocacao_termo_independente).at(idReservatorioEquivalente).at(idCenario) += sobreposicao * produtibilidade_ENA * lista_termo_independente_calculo_ENA_x_periodo_x_codigo_usina_x_cenario.at(periodo).at(codigo_usina).at(idCenario_get);
 
-								for (int pos = 0; pos < int(lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario.at(periodo).at(codigo_usina).at(idCenario_get).size()); pos++) {
+								}//for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
 
-									const IdHidreletrica idUHE = lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario.at(periodo).at(codigo_usina).at(idCenario_get).at(pos).getIteradorInicial();
+							}//if (retorna_is_idHidreletrica_in_calculo_ENA(codigo_usina)) {
 
-									if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).size() == 0)
-										lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE) = SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>(IdReservatorioEquivalente(1), std::vector<SmartEnupla<IdCenario, double>>(maior_ONS_REE, SmartEnupla<IdCenario, double>()));
+						}//for (int pos = 1; pos <= int(lista_hidreletrica_out_estudo.size()); pos++) {
 
-									if (lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).at(idReservatorioEquivalente).size() == 0)
-										lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).at(idReservatorioEquivalente) = SmartEnupla<IdCenario, double>(idCenario_inicial, std::vector<double>(int(idCenario_final - idCenario_inicial) + 1, 0.0));
 
-									lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario.at(periodo_MENSAL).at(idUHE).at(idReservatorioEquivalente).at(idCenario) += sobreposicao * produtibilidade_ENA * lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario.at(periodo).at(codigo_usina).at(idCenario_get).at(pos).at(idUHE);
+					}
 
-								}
-
-							}//if (periodo_MENSAL >= a_periodo_inicial_horizonte_estudo || idCenario == idCenario_inicial) {
-							else
-								break;
-
-
-						}//for (IdCenario idCenario = idCenario_inicial; idCenario <= idCenario_final; idCenario++) {
-
-					}//if (retorna_is_idHidreletrica_in_calculo_ENA(codigo_usina)) {
-
-				}//for (int pos = 1; pos <= int(lista_hidreletrica_out_estudo.size()); pos++) {
-
-			}//for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
-
+				}//for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
+			}
 
 		}//if (true) {
 
@@ -16929,7 +16914,7 @@ void LeituraCEPEL::calcular_equacionamento_afluencia_natural_x_REE(Dados& a_dado
 					break;
 
 			}//for (Periodo periodo_MENSAL = periodo_inicial_MENSAL; periodo_MENSAL <= periodo_final_MENSAL; a_horizonte_tendencia_mais_estudo_MENSAL.incrementarIterador(periodo_MENSAL)) {
-
+	
 		}//if (true) {
 
 	}//	try {
@@ -17286,8 +17271,8 @@ void LeituraCEPEL::calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE
 							if (periodo < mapeamento_espaco_amostral.at(idCenario_inicial).getIteradorInicial()) //Valores da tendência
 								ENA_calculada += termo_independente_calculo_ENA + coeficiente_idHidreletrica * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(mapIdVar.at(idHidreletrica)).vetorVariavelAleatoriaInterna.att(mapIdVarInterna.at(idHidreletrica)).getElementoVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double());
 							else {
-								const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-								ENA_calculada += termo_independente_calculo_ENA + coeficiente_idHidreletrica * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(mapIdVar.at(idHidreletrica)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								//const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+								ENA_calculada += termo_independente_calculo_ENA + coeficiente_idHidreletrica * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(mapIdVar.at(idHidreletrica)).getElementoMatriz(mapIdVarInterna.at(idHidreletrica), AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, periodo, idCenario, double());
 							}//else {
 
 						}//if (coeficiente_idHidreletricas_calculo_ENA.getElemento(idHidreletrica) > 0) {
@@ -17318,10 +17303,10 @@ bool LeituraCEPEL::retorna_is_idHidreletrica_in_calculo_ENA(const int a_codigo_u
 		bool is_idHidreletrica_in_calculo_ENA = true;
 		 
 		//173-Moxotó / 174-P.Afonso 123 / 175-P.Afonso 4 -> São consideradas no cálculo da ENA como 176-COMP-MOX-PAFONSO
-		if (a_codigo_usina == 173 || a_codigo_usina == 174 || a_codigo_usina == 175) //173-Moxotó / 174-P.Afonso 123 / 175-P.Afonso 4
+		if (a_codigo_usina == 173 || a_codigo_usina == 175) //173-Moxotó / 175-P.Afonso 4. A ena de 176-COMP-MOX-PAFONSO será atribuída à 174-P.Afonso 123 
 			is_idHidreletrica_in_calculo_ENA = false;
 
-		if (a_codigo_usina == 168) //168_SOBRADINHO_FICTICIO
+		if (a_codigo_usina == 169) //169_SOBRADINHO
 			is_idHidreletrica_in_calculo_ENA = false;
 
 		return is_idHidreletrica_in_calculo_ENA;
@@ -19399,6 +19384,8 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 						else
 							a_termo_independente_calculo_ENA += a_dados.processoEstocastico_hidrologico.getElementoMatriz(a_mapIdVar.at(a_lista_codPosto.at(posto)), a_mapIdVarInterna.at(a_lista_codPosto.at(posto)), AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_periodo, a_idCenario, double());
 
+						int aa = 0;
+
 					}//if (a_periodo <= periodo_ultimo_sobreposicao) {
 					else if (a_periodo > periodo_ultimo_sobreposicao) {//Extensão do horizonte
 
@@ -19419,6 +19406,8 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 						/////////////
 						retorna_equacionamento_afluencia_natural_x_posto(a_dados, a_lista_codUsina, a_lista_codPosto, IdHidreletrica_Nenhum, 169, 1.0, a_coeficiente_idHidreletricas_calculo_ENA);
 
+						int aa = 0;
+
 					}//else if (a_periodo > periodo_ultimo_sobreposicao) {
 
 				}//if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
@@ -19432,6 +19421,8 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 					//Pega a informação da tendência do arquivo VAZOES.DAT (do modelo GEVAZP)-> Por construção esta informação já está em afluência natural
 
 					a_termo_independente_calculo_ENA += valor_afluencia_passadas_GEVAZP.at(posto - 1).getElemento(a_periodo);
+
+					int aa = 0;
 
 				}//else if (a_periodo < a_periodo_inicial_horizonte_estudo) {
 
@@ -20055,8 +20046,8 @@ void LeituraCEPEL::imprime_afluencia_natural_x_idHidreletrica_x_cenario_x_period
 							if (periodo < mapeamento_espaco_amostral.at(IdCenario_1).getIteradorInicial()) //Valores da tendência
 								afluencia += coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE) * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(mapIdVar.at(idUHE)).vetorVariavelAleatoriaInterna.att(mapIdVarInterna.at(idUHE)).getElementoVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double());
 							else {
-								const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-								afluencia += coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE) * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(mapIdVar.at(idUHE)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								//const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
+								afluencia += coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE) * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(mapIdVar.at(idUHE)).getElementoMatriz(mapIdVarInterna.at(idUHE), AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, periodo, idCenario, double());
 							}//else {
 
 						}//for (int pos = 1; pos <= int(idHidreletricas_calculo_ENA.size()); pos++) {
@@ -20120,7 +20111,7 @@ void LeituraCEPEL::imprime_afluencia_natural_x_idHidreletrica_x_cenario_x_period
 								afluencia += coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE) * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(mapIdVar.at(idUHE)).vetorVariavelAleatoriaInterna.att(mapIdVarInterna.at(idUHE)).getElementoVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double());
 							else {
 								const IdRealizacao idRealizacao = mapeamento_espaco_amostral.at(idCenario).getElemento(periodo);
-								afluencia += coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE) * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(mapIdVar.at(idUHE)).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double());
+								afluencia += coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE) * a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(mapIdVar.at(idUHE)).getElementoMatriz(mapIdVarInterna.at(idUHE), AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, periodo, idCenario, double());
 							}//else {
 
 						}//for (int pos = 1; pos <= int(idHidreletricas_calculo_ENA.size()); pos++) {
@@ -22038,6 +22029,9 @@ void LeituraCEPEL::instanciar_hidreletricas_ficticias_sem_producao(Dados& a_dado
 
 		}
 
+		lista_hidreletrica_NPOSNW.at(idHidreletrica) = codigo_posto;
+		lista_codigo_ONS_REE.at(idHidreletrica) = IdReservatorioEquivalente_3_NORDESTE;
+
 		if (!a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.isInstanciado(IdReservatorio_1)) {
 			Reservatorio reservatorio;
 			reservatorio.setAtributo(AttComumReservatorio_idReservatorio, IdReservatorio_1);
@@ -22086,6 +22080,9 @@ void LeituraCEPEL::instanciar_hidreletricas_ficticias_sem_producao(Dados& a_dado
 
 		if (a_dados.getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_enchendo_volume_morto) == 0)
 			a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_enchendo_volume_morto, SmartEnupla<Periodo, int>(horizonte_estudo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_enchendo_volume_morto, int())));
+
+		if (a_dados.getSizeVetor(idHidreletrica, AttVetorHidreletrica_regularizacao) == 0)
+			a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_regularizacao, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
 
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_hidreletricas_ficticias_sem_producao: \n" + std::string(erro.what())); }
