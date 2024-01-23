@@ -179,190 +179,147 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 
 		for (idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//Calcula a defluencia_maxima do polinomio_jusante para obter h_jus > 0 nas usinas com maiorPolinomiojusante = 1
-			//Usinas reportadas no arquivo polijus.dat tem a informaçao da defluência_maxima
+			if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) != TipoDetalhamentoProducaoHidreletrica_sem_producao) {
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				//Calcula a defluencia_maxima do polinomio_jusante para obter h_jus > 0 nas usinas com maiorPolinomiojusante = 1
+				//Usinas reportadas no arquivo polijus.dat tem a informaçao da defluência_maxima
 
-			if (a_dados.getMaiorId(idHidreletrica, IdPolinomioJusante()) == IdPolinomioJusante_1 && a_dados.getAtributo(idHidreletrica, IdPolinomioJusante_1, AttComumPolinomioJusante_defluencia_maxima, double()) == getdoubleFromChar("max")) {
-				const double defluencia_maxima = calculaRaizPolinomioJusante(a_dados, idHidreletrica, a_horizonte_estudo.getIteradorInicial());
-				a_dados.vetorHidreletrica.att(idHidreletrica).vetorPolinomioJusante.att(IdPolinomioJusante_1).setAtributo(AttComumPolinomioJusante_defluencia_maxima, defluencia_maxima);
-			}//if (a_dados.getMaiorId(idHidreletrica, IdPolinomioJusante()) == IdPolinomioJusante_1 && a_dados.getAtributo(idHidreletrica, IdPolinomioJusante_1, AttComumPolinomioJusante_defluencia_maxima, double()) == getdoubleFromChar("max")) {
+				if (a_dados.getMaiorId(idHidreletrica, IdPolinomioJusante()) == IdPolinomioJusante_1 && a_dados.getAtributo(idHidreletrica, IdPolinomioJusante_1, AttComumPolinomioJusante_defluencia_maxima, double()) == getdoubleFromChar("max")) {
+					const double defluencia_maxima = calculaRaizPolinomioJusante(a_dados, idHidreletrica, a_horizonte_estudo.getIteradorInicial());
+					a_dados.vetorHidreletrica.att(idHidreletrica).vetorPolinomioJusante.att(IdPolinomioJusante_1).setAtributo(AttComumPolinomioJusante_defluencia_maxima, defluencia_maxima);
+				}//if (a_dados.getMaiorId(idHidreletrica, IdPolinomioJusante()) == IdPolinomioJusante_1 && a_dados.getAtributo(idHidreletrica, IdPolinomioJusante_1, AttComumPolinomioJusante_defluencia_maxima, double()) == getdoubleFromChar("max")) {
 
-			/////////////////////////////////////////////////
+				/////////////////////////////////////////////////
 
-			const IdConjuntoHidraulico maiorIdConjunto = a_dados.getMaiorId(idHidreletrica, IdConjuntoHidraulico());
-			if (maiorIdConjunto != IdConjuntoHidraulico_Nenhum) {
-				TipoTurbina tipo_turbina = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_tipo_turbina, TipoTurbina());
+				const IdConjuntoHidraulico maiorIdConjunto = a_dados.getMaiorId(idHidreletrica, IdConjuntoHidraulico());
+				if (maiorIdConjunto != IdConjuntoHidraulico_Nenhum) {
+					TipoTurbina tipo_turbina = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_tipo_turbina, TipoTurbina());
 
-				if (tipo_turbina != TipoTurbina_sem_turbina) {
+					if (tipo_turbina != TipoTurbina_sem_turbina) {
 
-					double fator = 0.5;
-					if (tipo_turbina == TipoTurbina_kaplan) { fator = 0.2; }
+						double fator = 0.5;
+						if (tipo_turbina == TipoTurbina_kaplan) { fator = 0.2; }
 
-					double Q_max_usina = 0;
-					double P_max_usina = 0;
-					for (IdConjuntoHidraulico idConjunto = IdConjuntoHidraulico_1; idConjunto <= maiorIdConjunto; idConjunto++) {
-						const IdUnidadeUHE maiorIdunidade = a_dados.getMaiorId(idHidreletrica, idConjunto, IdUnidadeUHE());
-						if (maiorIdunidade != IdUnidadeUHE_Nenhum) {
-							Q_max_usina += double(int(maiorIdunidade)) * a_dados.getAtributo(idHidreletrica, idConjunto, IdUnidadeUHE_1, AttComumUnidadeUHE_vazao_turbinada_maxima, double());
-							P_max_usina += double(int(maiorIdunidade)) * a_dados.getAtributo(idHidreletrica, idConjunto, IdUnidadeUHE_1, AttComumUnidadeUHE_potencia_maxima, double());
+						double Q_max_usina = 0;
+						double P_max_usina = 0;
+						for (IdConjuntoHidraulico idConjunto = IdConjuntoHidraulico_1; idConjunto <= maiorIdConjunto; idConjunto++) {
+							const IdUnidadeUHE maiorIdunidade = a_dados.getMaiorId(idHidreletrica, idConjunto, IdUnidadeUHE());
+							if (maiorIdunidade != IdUnidadeUHE_Nenhum) {
+								Q_max_usina += double(int(maiorIdunidade)) * a_dados.getAtributo(idHidreletrica, idConjunto, IdUnidadeUHE_1, AttComumUnidadeUHE_vazao_turbinada_maxima, double());
+								P_max_usina += double(int(maiorIdunidade)) * a_dados.getAtributo(idHidreletrica, idConjunto, IdUnidadeUHE_1, AttComumUnidadeUHE_potencia_maxima, double());
+							}
 						}
-					}
 
-					const TipoPerdaHidraulica tipo_perda_hidraulica = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_tipo_de_perda_hidraulica, TipoPerdaHidraulica());
-					const IdPolinomioJusante maiorIdPolinomio = a_dados.getMaiorId(idHidreletrica, IdPolinomioJusante());
-					const double perda_hidraulica = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_perda_hidraulica, double());
-					const double h_efetiva = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_queda_referencia, double());
-					const double percentual_volume_inicial = a_dados.getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_percentual_volume_util_inicial, double());
-					const double canal_fuga_medio = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_canal_fuga_medio, double());
-					const double potencia_maxima = P_max_usina;
-					const double q_efetiva = Q_max_usina;
+						const TipoPerdaHidraulica tipo_perda_hidraulica = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_tipo_de_perda_hidraulica, TipoPerdaHidraulica());
+						const IdPolinomioJusante maiorIdPolinomio = a_dados.getMaiorId(idHidreletrica, IdPolinomioJusante());
+						const double perda_hidraulica = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_perda_hidraulica, double());
+						const double h_efetiva = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_queda_referencia, double());
+						const double percentual_volume_inicial = a_dados.getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_percentual_volume_util_inicial, double());
+						const double canal_fuga_medio = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_canal_fuga_medio, double());
+						const double potencia_maxima = P_max_usina;
+						const double q_efetiva = Q_max_usina;
 
-					//////////////////////////////
-					//Normalmente o fator_de_producao é único para todas as unidades da usina, porém, no DESSEM pode ser modificado o valor de uma unidade
-					//por isso é calculada a média para generalizar
+						//////////////////////////////
+						//Normalmente o fator_de_producao é único para todas as unidades da usina, porém, no DESSEM pode ser modificado o valor de uma unidade
+						//por isso é calculada a média para generalizar
 
-					double fator_de_producao = 0.0;
-					int numero_unidades = 0;
+						double fator_de_producao = 0.0;
+						int numero_unidades = 0;
 
-					for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= maiorIdConjunto; idConjuntoHidraulico++) {
-						for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++) {
-							fator_de_producao += a_dados.getAtributo(idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttComumUnidadeUHE_fator_de_producao, double());
-							numero_unidades++;
-						}//for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++) {
-					}//for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= maiorIdConjunto; idConjuntoHidraulico++) {
+						for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= maiorIdConjunto; idConjuntoHidraulico++) {
+							for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++) {
+								fator_de_producao += a_dados.getAtributo(idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttComumUnidadeUHE_fator_de_producao, double());
+								numero_unidades++;
+							}//for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++) {
+						}//for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= maiorIdConjunto; idConjuntoHidraulico++) {
 
-					fator_de_producao /= numero_unidades;
+						fator_de_producao /= numero_unidades;
 
-					//////////////////////////////
+						//////////////////////////////
 
-					if (a_dados.getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_turbinada_maxima) == 0)
-						a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_vazao_turbinada_maxima, SmartEnupla<Periodo, double>(a_horizonte_estudo, q_efetiva));
+						if (a_dados.getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_turbinada_maxima) == 0)
+							a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_vazao_turbinada_maxima, SmartEnupla<Periodo, double>(a_horizonte_estudo, q_efetiva));
 
-					if (a_dados.getSizeVetor(idHidreletrica, AttVetorHidreletrica_cota_montante_usina_jusante) == 0)
-						a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_cota_montante_usina_jusante, SmartEnupla<Periodo, double>(a_horizonte_estudo, 0));
+						if (a_dados.getSizeVetor(idHidreletrica, AttVetorHidreletrica_cota_montante_usina_jusante) == 0)
+							a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_cota_montante_usina_jusante, SmartEnupla<Periodo, double>(a_horizonte_estudo, 0));
 
-					Periodo periodo_inicial = a_horizonte_estudo.getIteradorInicial();
-					const Periodo periodo_final = a_horizonte_estudo.getIteradorFinal();
+						Periodo periodo_inicial = a_horizonte_estudo.getIteradorInicial();
+						const Periodo periodo_final = a_horizonte_estudo.getIteradorFinal();
 
-					if (a_lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC)//Se sao carregados os qMax do avl_turb_max.csv somente atualiza o último periodo do DC
-						periodo_inicial = a_horizonte_estudo.getIteradorFinal();
+						if (a_lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC)//Se sao carregados os qMax do avl_turb_max.csv somente atualiza o último periodo do DC
+							periodo_inicial = a_horizonte_estudo.getIteradorFinal();
 
-					for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_estudo.incrementarIterador(periodo)) {
-						double canal_fuga_medio = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_canal_fuga_medio, double());
+						for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_estudo.incrementarIterador(periodo)) {
+							double canal_fuga_medio = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_canal_fuga_medio, double());
 
-						//CALCULO DA COTA DE MONTANTE DA USINA DE JUSANTE 
-						double h_mont_jusante;
-						IdHidreletrica idHidreletrica_jusante = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante, IdHidreletrica());
-						if (idHidreletrica_jusante != IdHidreletrica_Nenhum) {
-							const double percentual_volume_inicial_jusante = a_dados.getAtributo(idHidreletrica_jusante, IdReservatorio_1, AttComumReservatorio_percentual_volume_util_inicial, double());
+							//CALCULO DA COTA DE MONTANTE DA USINA DE JUSANTE 
+							double h_mont_jusante;
+							IdHidreletrica idHidreletrica_jusante = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante, IdHidreletrica());
+							if (idHidreletrica_jusante != IdHidreletrica_Nenhum) {
+								const double percentual_volume_inicial_jusante = a_dados.getAtributo(idHidreletrica_jusante, IdReservatorio_1, AttComumReservatorio_percentual_volume_util_inicial, double());
 
-							double volume_minimo = a_dados.getAtributo(idHidreletrica_jusante, IdReservatorio_1, AttComumReservatorio_volume_minimo, double());
-							if (a_dados.getSizeVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_volume_minimo) > 0)
-								volume_minimo = a_dados.getElementoVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo, double());
+								double volume_minimo = a_dados.getAtributo(idHidreletrica_jusante, IdReservatorio_1, AttComumReservatorio_volume_minimo, double());
+								if (a_dados.getSizeVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_volume_minimo) > 0)
+									volume_minimo = a_dados.getElementoVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo, double());
 
-							double volume_maximo = a_dados.getAtributo(idHidreletrica_jusante, IdReservatorio_1, AttComumReservatorio_volume_maximo, double());
-							if (a_dados.getSizeVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_volume_maximo) > 0)
-								volume_maximo = a_dados.getElementoVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_volume_maximo, periodo, double());
+								double volume_maximo = a_dados.getAtributo(idHidreletrica_jusante, IdReservatorio_1, AttComumReservatorio_volume_maximo, double());
+								if (a_dados.getSizeVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_volume_maximo) > 0)
+									volume_maximo = a_dados.getElementoVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_volume_maximo, periodo, double());
 
-							double percentual_volume_util_maximo = a_dados.getAtributo(idHidreletrica_jusante, IdReservatorio_1, AttComumReservatorio_percentual_volume_util_maximo, double());
-							if (a_dados.getSizeVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_percentual_volume_util_maximo) > 0)
-								percentual_volume_util_maximo = a_dados.getElementoVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_percentual_volume_util_maximo, periodo, double());
+								double percentual_volume_util_maximo = a_dados.getAtributo(idHidreletrica_jusante, IdReservatorio_1, AttComumReservatorio_percentual_volume_util_maximo, double());
+								if (a_dados.getSizeVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_percentual_volume_util_maximo) > 0)
+									percentual_volume_util_maximo = a_dados.getElementoVetor(idHidreletrica_jusante, IdReservatorio_1, AttVetorReservatorio_percentual_volume_util_maximo, periodo, double());
 
-							if (a_dados.getElementoVetor(idHidreletrica_jusante, AttVetorHidreletrica_regularizacao, periodo, int()) != 1)
+								if (a_dados.getElementoVetor(idHidreletrica_jusante, AttVetorHidreletrica_regularizacao, periodo, int()) != 1)
+									volume_minimo = volume_maximo;
+
+								double volume = volume_minimo + percentual_volume_inicial_jusante * (volume_maximo - volume_minimo) * percentual_volume_util_maximo;
+								h_mont_jusante = a_dados.vetorHidreletrica.att(idHidreletrica_jusante).vetorReservatorio.att(IdReservatorio_1).getCota(periodo, volume);
+
+							}
+							else {
+								for (IdPolinomioJusante idPolinomio = IdPolinomioJusante_1; idPolinomio <= maiorIdPolinomio; idPolinomio++)
+									if (a_dados.getSizeVetor(idHidreletrica, idPolinomio, AttVetorPolinomioJusante_altura_jusante_ref) > 0)
+										h_mont_jusante = a_dados.getElementoVetor(idHidreletrica, idPolinomio, AttVetorPolinomioJusante_altura_jusante_ref, periodo, double());
+							}//else {
+
+							a_dados.vetorHidreletrica.att(idHidreletrica).setElemento(AttVetorHidreletrica_cota_montante_usina_jusante, periodo, h_mont_jusante);
+
+							if (a_dados.getSizeVetor(idHidreletrica, AttVetorHidreletrica_canal_fuga_medio) > 0)
+								canal_fuga_medio = a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_canal_fuga_medio, periodo, double());
+
+							////////////////////////////
+
+							double volume_minimo = a_dados.getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_volume_minimo, double());
+							if (a_dados.getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo) > 0)
+								volume_minimo = a_dados.getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo, double());
+
+							double volume_maximo = a_dados.getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_volume_maximo, double());
+							if (a_dados.getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_maximo) > 0)
+								volume_maximo = a_dados.getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_maximo, periodo, double());
+
+							double volume = volume_minimo + percentual_volume_inicial * (volume_maximo - volume_minimo);
+
+							//Se a usina for fio d'àgua utiliza o volume_referencia do Hidr.dat (pode ser maior do que o volume_máximo: verificado em consulta ao Cepel)
+							if (a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_regularizacao, periodo, int()) != 1) {
 								volume_minimo = volume_maximo;
+								volume = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_volume_referencia, double());
+							}//if (!bool(a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_regularizacao, periodo, bool()))) {
 
-							double volume = volume_minimo + percentual_volume_inicial_jusante * (volume_maximo - volume_minimo) * percentual_volume_util_maximo;
-							h_mont_jusante = a_dados.vetorHidreletrica.att(idHidreletrica_jusante).vetorReservatorio.att(IdReservatorio_1).getCota(periodo, volume);
+							const double h_mont = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getCota(periodo, volume);
 
-						}
-						else {
-							for (IdPolinomioJusante idPolinomio = IdPolinomioJusante_1; idPolinomio <= maiorIdPolinomio; idPolinomio++)
-								if (a_dados.getSizeVetor(idHidreletrica, idPolinomio, AttVetorPolinomioJusante_altura_jusante_ref) > 0)
-									h_mont_jusante = a_dados.getElementoVetor(idHidreletrica, idPolinomio, AttVetorPolinomioJusante_altura_jusante_ref, periodo, double());
-						}//else {
+							const double cota_referencia = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getCotaMedia(periodo, volume_minimo, volume_maximo);
+							const double produtibilidade_media = a_dados.vetorHidreletrica.att(idHidreletrica).calcularProdutibilidade(tipo_perda_hidraulica, perda_hidraulica, fator_de_producao, cota_referencia - canal_fuga_medio);
 
-						a_dados.vetorHidreletrica.att(idHidreletrica).setElemento(AttVetorHidreletrica_cota_montante_usina_jusante, periodo, h_mont_jusante);
+							const double vazao_maxima_gerador = potencia_maxima / produtibilidade_media;
 
-						if (a_dados.getSizeVetor(idHidreletrica, AttVetorHidreletrica_canal_fuga_medio) > 0)
-							canal_fuga_medio = a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_canal_fuga_medio, periodo, double());
+							double  q_max_inicial = 0;
+							double q_max = vazao_maxima_gerador;
 
-						////////////////////////////
+							for (int i = 0; i < 15; i++) {
+								q_max_inicial = q_max;
 
-						double volume_minimo = a_dados.getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_volume_minimo, double());
-						if (a_dados.getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo) > 0)
-							volume_minimo = a_dados.getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo, double());
-
-						double volume_maximo = a_dados.getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_volume_maximo, double());
-						if (a_dados.getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_maximo) > 0)
-							volume_maximo = a_dados.getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_maximo, periodo, double());
-
-						double volume = volume_minimo + percentual_volume_inicial * (volume_maximo - volume_minimo);
-
-						//Se a usina for fio d'àgua utiliza o volume_referencia do Hidr.dat (pode ser maior do que o volume_máximo: verificado em consulta ao Cepel)
-						if (a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_regularizacao, periodo, int()) != 1) {
-							volume_minimo = volume_maximo;
-							volume = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_volume_referencia, double());
-						}//if (!bool(a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_regularizacao, periodo, bool()))) {
-
-						const double h_mont = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getCota(periodo, volume);
-
-						const double cota_referencia = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getCotaMedia(periodo, volume_minimo, volume_maximo);
-						const double produtibilidade_media = a_dados.vetorHidreletrica.att(idHidreletrica).calcularProdutibilidade(tipo_perda_hidraulica, perda_hidraulica, fator_de_producao, cota_referencia - canal_fuga_medio);
-
-						const double vazao_maxima_gerador = potencia_maxima / produtibilidade_media;
-
-						double  q_max_inicial = 0;
-						double q_max = vazao_maxima_gerador;
-
-						for (int i = 0; i < 15; i++) {
-							q_max_inicial = q_max;
-
-							double h_jus = a_dados.vetorHidreletrica.att(idHidreletrica).getCotaJusante(q_max_inicial, periodo);
-							double cota = h_mont - h_jus;
-
-							if (tipo_perda_hidraulica == TipoPerdaHidraulica_percentual)
-								cota *= (1.0 - perda_hidraulica);
-							else if (tipo_perda_hidraulica == TipoPerdaHidraulica_metro)
-								cota -= perda_hidraulica;
-
-							q_max = std::pow(double(cota / h_efetiva), fator) * q_efetiva;
-							if (abs(q_max_inicial - q_max) < 1)
-								break;
-						}//for (int i = 0; i < 15; i++) {
-
-						////////////////////////////
-						//Identifica o número de aberturas do periodo
-
-						const SmartEnupla <IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
-
-						IdEstagio idEstagio_periodo = IdEstagio_Nenhum;
-
-						for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= horizonte_otimizacao.getIteradorFinal(); idEstagio++) {
-
-							if (periodo.sobreposicao(horizonte_otimizacao.getElemento(idEstagio)) == 1.0) {
-								idEstagio_periodo = idEstagio;
-								break;
-							}//if (periodo.sobreposicao(horizonte_otimizacao.getElemento(idEstagio)) == 1.0) {
-
-						}//for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= horizonte_otimizacao.getIteradorFinal(); idEstagio++) {
-
-						int numero_aberturas = 1;
-
-						for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= idEstagio_periodo; idEstagio++)
-							numero_aberturas *= a_dados.getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int());
-
-						bool cota_negativa = false;
-
-						if (periodo.sobreposicao(a_periodo_final) == 0 && numero_aberturas == 1) {
-							//Realiza o cálculo da vazao_defluencia_minima = vazoes_montante (até a próxima usina com regularizaçao) - vazao_armazenavel
-							const double vazao_defluencia_minima = calculaDefluenciaMinima_para_EngolimentoMaximo(a_dados, idHidreletrica, periodo, idEstagio_periodo, horizonte_processo_estocastico);
-							const double defluencia_maxima_polinomio_jusante = a_dados.getAtributo(idHidreletrica, a_dados.getMaiorId(idHidreletrica, IdPolinomioJusante()), AttComumPolinomioJusante_defluencia_maxima, double());
-
-							if (q_max < vazao_defluencia_minima && vazao_defluencia_minima < defluencia_maxima_polinomio_jusante) {
-
-								//Recalcula o q_Max com h_jus(vazao_defluencia_minima)
-								double h_jus = a_dados.vetorHidreletrica.att(idHidreletrica).getCotaJusante(vazao_defluencia_minima, periodo);
+								double h_jus = a_dados.vetorHidreletrica.att(idHidreletrica).getCotaJusante(q_max_inicial, periodo);
 								double cota = h_mont - h_jus;
 
 								if (tipo_perda_hidraulica == TipoPerdaHidraulica_percentual)
@@ -370,25 +327,69 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 								else if (tipo_perda_hidraulica == TipoPerdaHidraulica_metro)
 									cota -= perda_hidraulica;
 
-								if (cota < 0)
-									cota_negativa = true;
-
 								q_max = std::pow(double(cota / h_efetiva), fator) * q_efetiva;
+								if (abs(q_max_inicial - q_max) < 1)
+									break;
+							}//for (int i = 0; i < 15; i++) {
 
-							}//if (q_max < vazao_defluencia_minima && vazao_defluencia_minima < defluencia_maxima_polinomio_jusante) {
+							////////////////////////////
+							//Identifica o número de aberturas do periodo
 
-						}//if (periodo.sobreposicao(a_periodo_final) == 0) {
+							const SmartEnupla <IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
 
-						if (q_max > vazao_maxima_gerador || cota_negativa) { q_max = vazao_maxima_gerador; }
+							IdEstagio idEstagio_periodo = IdEstagio_Nenhum;
 
-						a_dados.vetorHidreletrica.att(idHidreletrica).setElemento(AttVetorHidreletrica_vazao_turbinada_maxima, periodo, q_max);
+							for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= horizonte_otimizacao.getIteradorFinal(); idEstagio++) {
 
-					}//for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
+								if (periodo.sobreposicao(horizonte_otimizacao.getElemento(idEstagio)) == 1.0) {
+									idEstagio_periodo = idEstagio;
+									break;
+								}//if (periodo.sobreposicao(horizonte_otimizacao.getElemento(idEstagio)) == 1.0) {
 
-				}//if (tipo_turbina != TipoTurbina_sem_turbina) {
+							}//for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= horizonte_otimizacao.getIteradorFinal(); idEstagio++) {
 
-			}//if (maiorIdConjunto != IdConjuntoHidraulico_Nenhum){
+							int numero_aberturas = 1;
 
+							for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= idEstagio_periodo; idEstagio++)
+								numero_aberturas *= a_dados.getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int());
+
+							bool cota_negativa = false;
+
+							if (periodo.sobreposicao(a_periodo_final) == 0 && numero_aberturas == 1) {
+								//Realiza o cálculo da vazao_defluencia_minima = vazoes_montante (até a próxima usina com regularizaçao) - vazao_armazenavel
+								const double vazao_defluencia_minima = calculaDefluenciaMinima_para_EngolimentoMaximo(a_dados, idHidreletrica, periodo, idEstagio_periodo, horizonte_processo_estocastico);
+								const double defluencia_maxima_polinomio_jusante = a_dados.getAtributo(idHidreletrica, a_dados.getMaiorId(idHidreletrica, IdPolinomioJusante()), AttComumPolinomioJusante_defluencia_maxima, double());
+
+								if (q_max < vazao_defluencia_minima && vazao_defluencia_minima < defluencia_maxima_polinomio_jusante) {
+
+									//Recalcula o q_Max com h_jus(vazao_defluencia_minima)
+									double h_jus = a_dados.vetorHidreletrica.att(idHidreletrica).getCotaJusante(vazao_defluencia_minima, periodo);
+									double cota = h_mont - h_jus;
+
+									if (tipo_perda_hidraulica == TipoPerdaHidraulica_percentual)
+										cota *= (1.0 - perda_hidraulica);
+									else if (tipo_perda_hidraulica == TipoPerdaHidraulica_metro)
+										cota -= perda_hidraulica;
+
+									if (cota < 0)
+										cota_negativa = true;
+
+									q_max = std::pow(double(cota / h_efetiva), fator) * q_efetiva;
+
+								}//if (q_max < vazao_defluencia_minima && vazao_defluencia_minima < defluencia_maxima_polinomio_jusante) {
+
+							}//if (periodo.sobreposicao(a_periodo_final) == 0) {
+
+							if (q_max > vazao_maxima_gerador || cota_negativa) { q_max = vazao_maxima_gerador; }
+
+							a_dados.vetorHidreletrica.att(idHidreletrica).setElemento(AttVetorHidreletrica_vazao_turbinada_maxima, periodo, q_max);
+
+						}//for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
+
+					}//if (tipo_turbina != TipoTurbina_sem_turbina) {
+
+				}//if (maiorIdConjunto != IdConjuntoHidraulico_Nenhum){
+			}
 		}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 	} // try{
