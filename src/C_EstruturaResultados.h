@@ -5,12 +5,12 @@ struct EstruturaResultados {
 	int   bloco = 0;
 	int   conta = 0;
 	int   total = 0;
-	int* displ = nullptr;
-	int* sizeT = nullptr;
-	int* size1 = nullptr;
-	int* size2 = nullptr;
-	int* size3 = nullptr;
-	Tipo* vetor = nullptr;
+	std::vector<int> displ;
+	std::vector<int> sizeT;
+	std::vector<int> size1;
+	std::vector<int> size2;
+	std::vector<int> size3;
+	std::vector<Tipo> vetor;
 	EstruturaResultados() {};
 	EstruturaResultados(const int a_bloco) {
 		inicializar(a_bloco);
@@ -34,18 +34,11 @@ struct EstruturaResultados {
 		if (a_bloco > 0) {
 			esvaziar();
 			bloco = a_bloco;
-			displ = new int[bloco];
-			sizeT = new int[bloco];
-			size1 = new int[bloco];
-			size2 = new int[bloco];
-			size3 = new int[bloco];
-			for (int i = 0; i < bloco; i++) {
-				displ[i] = 0;
-				sizeT[i] = 0;
-				size1[i] = 0;
-				size2[i] = 0;
-				size3[i] = 0;
-			}
+			displ = std::vector<int>(bloco, 0);
+			sizeT = std::vector<int>(bloco, 0);
+			size1 = std::vector<int>(bloco, 0);
+			size2 = std::vector<int>(bloco, 0);
+			size3 = std::vector<int>(bloco, 0);
 		} // if (a_bloco > 0) {
 	}
 	void setSize(const int a_idx, int a_size1, int a_size2 = -1, int a_size3 = -1) {
@@ -64,52 +57,46 @@ struct EstruturaResultados {
 		} // if (a_size2 < 0) {
 		if (a_size3 < 0)
 			a_size3 = 0;
-		size1[a_idx] = a_size1;
-		size2[a_idx] = a_size2;
-		size3[a_idx] = a_size3;
-		sizeT[a_idx] = a_size1;
+		size1.at(a_idx) = a_size1;
+		size2.at(a_idx) = a_size2;
+		size3.at(a_idx) = a_size3;
+		sizeT.at(a_idx) = a_size1;
 		if (a_size2 > 0)
-			sizeT[a_idx] *= a_size2;
+			sizeT.at(a_idx) *= a_size2;
 		if (a_size3 > 0)
-			sizeT[a_idx] *= a_size3;
+			sizeT.at(a_idx) *= a_size3;
 		if (a_idx > 0)
-			displ[a_idx] = displ[a_idx - 1] + sizeT[a_idx - 1];
+			displ.at(a_idx) = displ.at(a_idx - 1) + sizeT.at(a_idx - 1);
 		if (a_idx == bloco - 1) {
-			total = displ[a_idx] + sizeT[a_idx];
-			vetor = new Tipo[total];
+			total = displ.at(a_idx) + sizeT.at(a_idx);
+			vetor = std::vector<Tipo>(total, Tipo());
 		}
 	};
 	void esvaziar() {
 		bloco = 0;
 		conta = 0;
 		total = 0;
-		delete[] displ;
-		displ = nullptr;
-		delete[] sizeT;
-		sizeT = nullptr;
-		delete[] size1;
-		size1 = nullptr;
-		delete[] size2;
-		size2 = nullptr;
-		delete[] size3;
-		size3 = nullptr;
-		delete[] vetor;
-		vetor = nullptr;
+		displ = std::vector<int>();
+		sizeT = std::vector<int>();
+		size1 = std::vector<int>();
+		size2 = std::vector<int>();
+		size3 = std::vector<int>();
+		vetor = std::vector<Tipo>();
 	};
 	void zerar() {
 		bloco = 0;
 		conta = 0;
 		total = 0;
-		displ = nullptr;
-		sizeT = nullptr;
-		size1 = nullptr;
-		size2 = nullptr;
-		size3 = nullptr;
-		vetor = nullptr;
+		displ = std::vector<int>();
+		sizeT = std::vector<int>();
+		size1 = std::vector<int>();
+		size2 = std::vector<int>();
+		size3 = std::vector<int>();
+		vetor = std::vector<Tipo>();
 	}
 	void add(const Tipo a_valor) {
 		if ((conta >= 0) && (conta < total)) {
-			vetor[conta] = a_valor;
+			vetor.at(conta) = a_valor;
 			conta++;
 		}
 		else

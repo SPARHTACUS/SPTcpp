@@ -23,7 +23,7 @@
 #include "C_IntercambioHidraulico.h"
 #include "C_DemandaEspecial.h"
 #include "C_EstruturaResultados.h"
-#include "C_Iteracao.h"
+#include "C_ArranjoResolucao.h"
 
 #define ATT_COMUM_DADOS(m)  \
 	  m(Dados,  AttComum,                                         idDados,                           IdDados,           1,           1,             1,      nao) \
@@ -53,6 +53,7 @@
 	  m(Dados,  AttComum,    calcular_custo_primal_via_subproblema_mestre,                              bool,          min,         max,           min,     nao) \
 	  m(Dados,  AttComum,            tipo_espaco_amostral_geracao_cenario_hidrologico,                TipoEspacoAmostral,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                 tipo_correlacao_geracao_cenario_hidrologico, TipoCorrelacaoVariaveisAleatorias,         min,         max,                 min,      nao) \
+	  m(Dados,  AttComum,                 correlacao_dominante_geracao_cenario_hidrologico,                double,        0.1,         1.0,         0.95,      nao) \
 	  m(Dados,  AttComum,                     tipo_modelo_geracao_cenario_hidrologico, TipoModeloGeracaoSinteticaCenario,      nenhum,         max,                 min,      nao) \
 	  m(Dados,  AttComum,tipo_coeficiente_auto_correlacao_geracao_cenario_hidrologico,                         TipoValor,         min,         max, positivo_e_negativo,      nao) \
 	  m(Dados,  AttComum,       numero_periodos_avaliacao_geracao_cenario_hidrologico,                               int,           0,         max,                   0,      nao) \
@@ -72,11 +73,6 @@
 	  m(Dados,  AttComum,                maior_corte_importado_pos_estudo,                    IdCorteBenders,         min,         max,           max,      nao) \
 	  m(Dados,  AttComum,                 selecao_cortes_nivel_dominancia,                               int,           0,          10,             1,      nao) \
 	  m(Dados,  AttComum,                       remover_cortes_dominados,                               bool,         min,         max,           sim,      nao) \
-	  m(Dados,  AttComum,                      numero_processos_paralelos,                               int,           1,         max,             1,      nao) \
-	  m(Dados,  AttComum,                                  maior_processo,                        IdProcesso,         min,         max,           min,      nao) \
-	  m(Dados,  AttComum,                                      idProcesso,                        IdProcesso,         min,         max,           min,      nao) \
-	  m(Dados,  AttComum,                       maior_cenario_do_processo,                         IdCenario,      Nenhum,         max,           min,      nao) \
-	  m(Dados,  AttComum,                       menor_cenario_do_processo,                         IdCenario,      Nenhum,         max,           min,      nao) \
 	  m(Dados,  AttComum,                         diretorio_entrada_dados,                            string,         min,         max,  DadosEntrada,      nao) \
 	  m(Dados,  AttComum,                           diretorio_saida_dados,                            string,         min,         max,    DadosSaida,      nao) \
 	  m(Dados,  AttComum,                                    tipo_solver,                         TipoSolver,         min,         max,           clp,      nao) \
@@ -114,7 +110,6 @@
       m(Dados,  AttComum,                              mes_penalizacao_volume_util_minimo,             IdMes,      nenhum,         max,            11,      nao) \
       m(Dados,  AttComum,                  custo_acumulado_penalizacao_volume_util_minimo,            double,           0,         max,             0,      nao) \
       m(Dados,  AttComum,               taxa_considerar_tempo_viagem_agua,                            double,           0,           1,           0.2,      nao) \
-      m(Dados,  AttComum,                mapear_processos_com_um_unico_cenario,                        bool,         min,         max,         nao,      nao) \
       m(Dados,  AttComum,                     tipo_processamento_paralelo,         TipoProcessamentoParalelo,         min,         max,   por_cenario,      nao) \
       m(Dados,  AttComum,              imprimir_cortes_NW_com_reducao_estados,                          bool,         min,         max,           nao,      nao) \
       m(Dados,  AttComum,                          considerar_variaveis_folga,                          bool,         min,         max,           sim,      nao)
@@ -160,7 +155,6 @@
     m(Dados, Discretizacao)          \
     m(Dados, Regua11)                \
     m(Dados, DemandaEspecial)        \
-    m(Dados, Iteracao)               \
     m(Dados, IntercambioHidraulico)
 
 
@@ -256,12 +250,13 @@ public:
 
 	void validacao_operacional_UsinasElevatorias(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
-	void validacao_mapeamento_cenarios(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_atributos_sem_recarregar, bool &a_mapeamento_cenarios_e_aberturas_carregado);
-	void validacao_mapeamento_aberturas(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_atributos_sem_recarregar, bool &a_mapeamento_cenarios_e_aberturas_carregado);
+	void validacao_mapeamento_cenarios_aberturas(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_atributos_sem_recarregar, bool &a_mapeamento_cenarios_e_aberturas_carregado);
 
 	void instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncremental(const IdProcessoEstocastico a_tipo_processo_estocastico, ProcessoEstocastico& a_processo_estocastico);
 
-	int isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, ProcessoEstocastico& a_processo_estocastico, const IdProcessoEstocastico a_tipo_processo_estocastico, const TipoEspacoAmostral a_tipo_espaco_amostral, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const bool a_estacionar, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_maxima_auto_correlacao);
+	void calcularDeterminacaoEspacialFromHistoricoAfluenciaNatural(EntradaSaidaDados a_entradaSaidaDados, const bool a_imprimir, const double a_valor_r2, ProcessoEstocastico& a_processo_estocastico);
+
+	int isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(ProcessoEstocastico& a_processo_estocastico, const IdProcessoEstocastico a_tipo_processo_estocastico);
 
 	void validaHidreletrica();
 
@@ -324,10 +319,8 @@ public:
 
 	SmartEnupla<IdHidreletrica, double> calculaAfluenciaIncremental(const SmartEnupla<IdHidreletrica, double>& a_afluenciaNatural);
 
-	void defineCenariosOtimizacao(const IdIteracao a_iteracao_inicial, const IdIteracao a_iteracao_final);
-	void defineCenariosSimulacao();
-
-	void defineMapeamentoAberturas(const IdIteracao a_iteracao_inicial, const IdIteracao a_iteracao_final);
+	void definirCenariosPorProcessosEmArranjoResolucao();
+	void mapearCenariosAberturasPorIteracaoEmArranjoResolucao();
 
 	void adicionaHidreletricasMontante();
 
@@ -347,6 +340,8 @@ public:
 
 
 	ProcessoEstocastico processoEstocastico_hidrologico;
+
+	ArranjoResolucao arranjoResolucao;
 
 };
 

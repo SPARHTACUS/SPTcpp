@@ -7,7 +7,7 @@
 
 #include "C_VariavelEstado.h"
 #include "C_VariavelRealizacao.h"
-#include "C_RestricaoRealizacao.h"
+#include "C_RestricaoCenario.h"
 #include "C_VariavelRealizacaoInterna.h"
 #include "C_CorteBenders.h"
 
@@ -25,7 +25,7 @@
 
 #define ATT_VETOR_ESTAGIO_OTIMIZACAO(m)  \
 	  m(Estagio,  AttVetor, request_cortes_selecionados,                int,       0,         1,        0,  IdRealizacao)   \
-	  m(Estagio,  AttVetor,       selecao_solucao_proxy,               bool,     min,       max,      max,  int) 
+	  m(Estagio,  AttVetor,       selecao_solucao_proxy,               int,       0,         1,        0,  int) 
 
 #define ATT_MATRIZ_ESTAGIO_OTIMIZACAO(m)  \
 	  m(Estagio,  AttMatriz,   acao_cortes_selecionados,               int,      -1,      max,        0,  IdRealizacao, int) \
@@ -35,7 +35,7 @@
 #define MEMBRO_ESTAGIO_OTIMIZACAO(m)  \
 	m(Estagio, CorteBenders) \
 	m(Estagio, VariavelEstado) \
-	m(Estagio, RestricaoRealizacao) \
+	m(Estagio, RestricaoCenario) \
 	m(Estagio, VariavelRealizacao) \
 	m(Estagio, VariavelRealizacaoInterna) 
 
@@ -63,10 +63,11 @@ public:
 
 	IdVariavelEstado            addVariavelEstado           (const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const int a_idVariavelDecisaoEstagioAnterior);
 	IdVariavelRealizacao        addVariavelRealizacao       (const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo, const double a_fator);
-	IdRestricaoRealizacao         addRestricaoRealizacao        (const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idRestricao, const SmartEnupla<IdRealizacao, double>& a_rhs, const SmartEnupla<int, SmartEnupla<IdRealizacao, double>> &a_coeficiente);
+	IdRestricaoCenario         addRestricaoCenario        (const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idRestricao, const SmartEnupla<IdCenario, double>& a_rhs, const SmartEnupla<int, SmartEnupla<IdCenario, double>> &a_coeficiente);
 	IdVariavelRealizacaoInterna addVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const Periodo a_periodo, const double a_fator, const TipoValor a_tipo_valor, const double percentual_inicial, const double percentual_passo);
 
-	void addValorVariavelEstado(const IdVariavelEstado a_idVariavelEstado, const bool a_resetar, const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdCenario a_idCenario, const double a_valor);
+	void addValorVariavelEstado(const IdVariavelEstado a_idVariavelEstado, const IdCenario a_idCenario, const IdCenario a_menorIdCenario, const IdCenario a_maiorIdCenario, const double a_valor);
+	void alocarVariaveisEstado(const IdCenario a_menorIdCenario, const IdCenario a_maiorIdCenario);
 
 	std::vector<std::string> getNomeVariavelEstado(const IdVariavelEstado a_idVariavelEstado);
 
@@ -75,8 +76,6 @@ public:
 
 	double calcularValorVariavelRealizacaoInterna(const IdVariavelRealizacaoInterna idVariavelRealizacaoInterna, const double a_valor);
 	void resetarValorVariavelRealizacaoInterna(const TipoSubproblemaSolver a_tipoSubproblemaSolver, const IdVariavelRealizacaoInterna idVariavelRealizacaoInterna);
-
-	double* getReferenciaValoresEstado(const IdVariavelEstado a_idVariavelEstado, const IdProcesso a_idProcesso, const IdCenario a_idCenario_inicial, const IdCenario a_idCenario_final);
 
 	void selecaoSolucaoProxy(const int a_numero_aberturas_solucao_proxy);
 

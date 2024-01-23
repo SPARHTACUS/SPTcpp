@@ -10,8 +10,8 @@
 
 
 #define ATT_MATRIZ_REE(m)  \
-      m(ReservatorioEquivalente,  AttMatriz,     conversao_ENA_acoplamento_0,     double,       min,        max,              0,  IdCenario, Periodo) \
-      m(ReservatorioEquivalente,  AttMatriz,     conversao_ENA_acoplamento_1,     double,       min,        max,              0,  IdCenario, Periodo)
+      m(ReservatorioEquivalente,  AttMatriz,     conversao_ENA_acoplamento_0,     double,       min,        max,              0,  Periodo, IdCenario) \
+      m(ReservatorioEquivalente,  AttMatriz,     conversao_ENA_acoplamento_1,     double,       min,        max,              0,  Periodo, IdCenario)
 
 #define SMART_ELEMENTO_REE(m) \
 	  m(ReservatorioEquivalente, AttComum, ATT_COMUM_REE)\

@@ -5,7 +5,7 @@
 
 #define ATT_COMUM_CORTE_BENDERS(m)  \
 	  m(CorteBenders,  AttComum,     idCorteBenders,   IdCorteBenders,         min,         max,           min,      sim) \
-	  m(CorteBenders,  AttComum,     is_corte_dominado,          bool,         min,         max,           nao,      nao) 
+	  m(CorteBenders,  AttComum,     is_corte_dominado,           int,           0,           1,             0,      nao) 
 //          c_classe,   smrtAtt,       nomeAtributo,             tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
 
@@ -13,7 +13,7 @@
 	  m(CorteBenders,  AttVetor,                         rhs,          double,        min,          max,             0,  IdRealizacao)     \
 	  m(CorteBenders,  AttVetor,                  rhs_primal,          double,        min,          max,             0,  IdRealizacao)     \
 	  m(CorteBenders,  AttVetor,                  rhs_estado,          double,        min,          max,             0,  IdRealizacao)     \
-	  m(CorteBenders,  AttVetor,           is_corte_dominado,            bool,        min,          max,           nao,  IdRealizacao)     \
+	  m(CorteBenders,  AttVetor,           is_corte_dominado,             int,          0,            1,             0,  IdRealizacao)     \
 	  m(CorteBenders,  AttVetor,                      estado,          double,        min,          max,             0,  IdVariavelEstado) 
 
 

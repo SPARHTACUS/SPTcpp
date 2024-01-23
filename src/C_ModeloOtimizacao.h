@@ -14,6 +14,8 @@
 
 #include "C_EstruturaResultados.h"
 
+#include "C_ArranjoResolucao.h"
+
 class EntradaSaidaDados;
 
 #define ATT_COMUM_MODELO_OTIMIZACAO(m)  \
@@ -33,7 +35,6 @@ class EntradaSaidaDados;
 	  m(ModeloOtimizacao,  AttComum,                                           tolerancia_otimalidade,                             double,       1e-12,         1e-2,       1e-6,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                           tolerancia_viabilidade,                             double,       1e-12,         1e-2,       1e-6,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                       tipo_selecao_solucao_proxy,            TipoSelecaoSolucaoProxy,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                         realizar_simulacao_final,                               bool,        min,          max,        sim,      nao) \
 	  m(ModeloOtimizacao,  AttComum,                                               solucao_proxy_nula,                               bool,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                                  imprimir_solver,                               bool,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                           imprimir_solver_viabilidade_hidraulica,                               bool,        min,          max,        min,      sim) \
@@ -55,21 +56,16 @@ class EntradaSaidaDados;
 	  m(ModeloOtimizacao,  AttComum,                                   estagio_acoplamento_pre_estudo,                          IdEstagio,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                                  estagio_inicial,                          IdEstagio,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                                    estagio_final,                          IdEstagio,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                                  cenario_inicial,                          IdCenario,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                                    cenario_final,                          IdCenario,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                                 iteracao_inicial,                         IdIteracao,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                                   iteracao_final,                         IdIteracao,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                       periodo_otimizacao_inicial,                            Periodo,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                         periodo_otimizacao_final,                            Periodo,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                           periodo_estudo_inicial,                            Periodo,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                             periodo_estudo_final,                            Periodo,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                             tipo_aversao_a_risco,                   TipoAversaoRisco,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                            tipo_processo_estocastico_hidrologico,              IdProcessoEstocastico,        Nenhum,       max,        Nenhum,   sim) \
 	  m(ModeloOtimizacao,  AttComum,         relaxar_afluencia_incremental_com_viabilidade_hidraulica,                               bool,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                tipo_funcao_producao_hidreletrica,     TipoFuncaoProducaoHidreletrica,        Nenhum,       max,        Nenhum,   sim) 
 
 #define ATT_VETOR_MODELO_OTIMIZACAO(m)  \
-	  m(ModeloOtimizacao,  AttVetor,  alguma_variavel_aleatoria_hidrologica_com_truncamento,           bool,        0,          max,           0,  IdEstagio) \
+	  m(ModeloOtimizacao,  AttVetor,  alguma_variavel_aleatoria_hidrologica_com_truncamento,         int,        0,          1,           0,  IdEstagio) \
 	  m(ModeloOtimizacao,  AttVetor,           custo_total,         double,        0,          max,           0,  IdEstagio) \
 	  m(ModeloOtimizacao,  AttVetor,        custo_imediato,         double,        0,          max,           0,  IdEstagio) \
 	  m(ModeloOtimizacao,  AttVetor,          custo_futuro,         double,        0,          max,           0,  IdEstagio) \
@@ -85,7 +81,7 @@ class EntradaSaidaDados;
 
 #define MEMBRO_MODELO_OTIMIZACAO(m)         \
 	m(ModeloOtimizacao, Estagio)            \
-	m(ModeloOtimizacao, Iteracao)            \
+	m(ModeloOtimizacao, ArranjoResolucao)    \
 	m(ModeloOtimizacao, ProcessoEstocastico) 
 
 #define SMART_ELEMENTO_MODELO_OTIMIZACAO(m) \
@@ -166,6 +162,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,   ZP0_VF_FINF,      3,         ITERADORES_3_ESTAGIO_PERIODO_PERIODO,                   sim,          nao,                nao)  \
 	m(  VarDecisao,   YH,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao,                nao)  \
 	m(  VarDecisao,   YHF,              3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao,                nao)  \
+	m(  VarDecisao,   ENA,              3,         ITERADORES_3_ESTAGIO_PERIODO_PERIODO,                   sim,          nao,                nao)  \
 	m(  VarDecisao,   QEV,              3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao,                nao)  \
 	m(  VarDecisao,   QEV_REL,          3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao,                nao)  \
 	m(  VarDecisao,   QEV_FINF,         3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao,                nao)  \
@@ -201,6 +198,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
    //   Elemento,     Nome,       NroIter,         Iteradores,                                     Impr.Primal,     Impr.Dual              NormDual
 
 #define EQUACAO_LINEAR_3(m)\
+	m(  EquLinear,   ENA,                                            3,   ITERADORES_3_ESTAGIO_PERIODO_PERIODO,            nao,  nao,                nao)  \
 	m(  EquLinear,   CUSTO_PENALIDADE,                               3,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,       nao,  nao,                nao)  \
 	m(  EquLinear,   CUSTO_OPERACAO,                                 3,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,       nao,  nao,                nao)  \
 	m(  EquLinear,   CUSTO_PENALIDADE_VOLUME_INFERIOR_0,             3,   ITERADORES_3_ESTAGIO_PERIODO_PERIODO,            nao,  nao,                nao)  \
@@ -391,7 +389,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA(m)   m(1, IdEstagio) m(2, Periodo) m(3, Periodo) m(4, IdProcessoEstocastico) m(5, IdVariavelAleatoria)
 
 #define VARIAVEL_DECISAO_5(m)\
-	m(  VarDecisao,    ENA,         5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA_REE,                         sim,          sim,                nao)  \
+	m(  VarDecisao,    ENA,         5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA_REE,                         sim,          nao,                nao)  \
 	m(  VarDecisao,    PH,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao,                nao)  \
 	m(  VarDecisao,    PH_REL,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao,                nao)  \
 	m(  VarDecisao,    PH_FINF,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,     sim,          nao,                nao)  \
@@ -415,6 +413,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,    PTDISP,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE,             sim,          nao,                nao)  \
 	m(  VarDecisao,    RP,          5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA,    sim,          nao,                nao)  \
 	m(  VarDecisao,    YP,          5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA,    sim,          nao,                nao)  \
+	m(  VarDecisao,    YPF,         5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA,    sim,          nao,                nao)  \
 	m(  VarDecisao,    YP_ADD,      5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA,    sim,          nao,                nao)  \
 	m(  VarDecisao,    PD,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_PATAMARDEFICIT,           sim,          nao,                nao)  \
     m(  VarDecisao,    QOUT,        5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO_HIDRELETRICA,  sim,          nao,                nao)  \
@@ -427,7 +426,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 #define EQUACAO_LINEAR_5(m)\
 	m(  EquLinear,    ENA,                                         5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA_REE,                      nao,        nao,                nao)      \
-	m(  EquLinear,    AFLUENCIA_PROCESSO_ESTOCASTICO,              5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA, nao,        nao,                nao)      \
+	m(  EquLinear,    YP,                                          5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA, nao,        nao,                nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA,                             5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao,                nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA_RELAXADA,                    5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao,                nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA_DISPONIVEL,                  5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao,                nao)      \
@@ -517,6 +516,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 	public:
 
+		ArranjoResolucao arranjoResolucao;
+
 		ModeloOtimizacao(const IdModeloOtimizacao a_idModeloOtimizacao, Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados);
 		ModeloOtimizacao(const ModeloOtimizacao& instanciaCopiar);
 		void esvaziar();
@@ -554,7 +555,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		void imprimirVariaveisEstado(EntradaSaidaDados a_entradaSaidaDados);
 
 		void imprimirVariaveisRealizacao(EntradaSaidaDados a_entradaSaidaDados);
-		void imprimirRestricoesRealizacao(EntradaSaidaDados a_entradaSaidaDados);
+		void imprimirRestricoesCenario(EntradaSaidaDados a_entradaSaidaDados);
 
 		void imprimirVariaveisRealizacaoInterna(EntradaSaidaDados a_entradaSaidaDados);
 
@@ -577,35 +578,34 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		void exportarVariaveisEstado_AcoplamentoPreEstudo(EntradaSaidaDados a_entradaSaidaDados);
 
-		void exportarVariaveisEstado_AcoplamentoPosEstudo(const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdIteracao a_idIteracao, EntradaSaidaDados a_entradaSaidaDados);
+		void exportarVariaveisEstado_AcoplamentoPosEstudo(const IdIteracao a_idIteracao, EntradaSaidaDados a_entradaSaidaDados);
 
 		bool isVariavelEstadoInstanciada(const IdEstagio a_idEstagio, const IdVariavelEstado a_idVariavelEstado);
 
 		void esvaziarVetorCorteBenders();
 		void esvaziarVetorCorteBenders(const IdEstagio a_idEstagio);
 
-		SmartEnupla<IdProcessoEstocastico, SmartEnupla<IdProcesso, SmartEnupla<IdVariavelAleatoria, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>>> realizacoes;
+		void gerarRealizacoes(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, EntradaSaidaDados a_entradaSaidaDados);
 
-		void gerarRealizacoes(const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, EntradaSaidaDados a_entradaSaidaDados);
-
-		void atualizarModeloOtimizacaoComVariavelEstado(const IdEstagio a_idEstagio, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdCenario a_idCenario);
-		void atualizarModeloOtimizacaoComVariavelEstado(const IdEstagio a_idEstagio, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdCenario a_idCenario, EstruturaResultados<double> &a_retorno_estados);
+		void atualizarModeloOtimizacaoComVariavelEstado(const IdEstagio a_idEstagio, const IdCenario a_idCenario);
+		void atualizarModeloOtimizacaoComVariavelEstado(const IdEstagio a_idEstagio, const IdCenario a_idCenario, EstruturaResultados<double> &a_retorno_estados);
 
 		void atualizarModeloOtimizacaoComVariavelRealizacao(const IdEstagio a_idEstagio, const IdCenario    a_idCenario);
 		void atualizarModeloOtimizacaoComVariavelRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao);
 
-		void atualizarModeloOtimizacaoComRestricaoRealizacao(const IdEstagio a_idEstagio, const IdCenario    a_idCenario);
-		void atualizarModeloOtimizacaoComRestricaoRealizacao(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao);
+		void atualizarModeloOtimizacaoComRestricaoCenario(const IdEstagio a_idEstagio, const IdCenario    a_idCenario);
+		void atualizarModeloOtimizacaoComRestricaoCenario(const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao);
 
-		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const TipoSubproblemaSolver a_TSS_origem, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const std::string a_diretorio);
+		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const TipoSubproblemaSolver a_TSS_origem, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const std::string a_diretorio);
 
-		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao);
+		bool atualizarModeloOtimizacaoComVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao);
 
 		void resetarVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio);
 
-		void atualizarVariavelEstadoComSolucaoPrimal(const bool a_resetar, const IdIteracao a_idIteracao, IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdEstagio a_idEstagio, const IdCenario a_idCenario);
+		void atualizarVariavelEstadoComSolucaoPrimal(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, const IdCenario a_idCenario);
 
-		void addValorVariavelEstado(const IdEstagio a_idEstagio, const IdVariavelEstado idVariavelEstado, const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdCenario a_idCenario, const double valor);
+		void addValorVariavelEstado(const IdEstagio a_idEstagio, const IdVariavelEstado idVariavelEstado, const IdCenario a_idCenario, const double valor);
+		void alocarVariaveisEstado(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
 
 		void imprimirSolucaoPorEstagioPorCenario_porEstagio(const IdProcesso a_idProcesso, const std::string a_subdiretorio, EntradaSaidaDados a_entradaSaidaDados);
 
@@ -633,15 +633,15 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		bool posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, bool a_retornar_proxy, EstruturaResultados<double>& a_sol_inf_var_dinamica, EstruturaResultados<double>& a_solucao_dual_var_dinamica, EstruturaResultados<double>& a_limite_inferior_var_dinamica, EstruturaResultados<double>& a_limite_superior_var_dinamica, EstruturaResultados<double>& a_sol_dual_var_estado, const std::string a_diretorio);
 
-		void calcularCustoPrimalViaSubproblemaMestre(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const std::string a_diretorio, double& a_custo_geral, double& a_custo_individual);
+		void armazenarValoresSolver(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao);
+
+		void calcularCustoPrimalViaSubproblemaMestre(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, const IdCenario a_idCenario, const std::string a_diretorio, double& a_custo_geral, double& a_custo_individual);
 
 		double getProbabilidadeAbertura(const IdEstagio a_idEstagio, const IdCenario a_idCenario);
 
 		double getProbabilidadeAbertura(const IdEstagio a_idEstagio, const IdRealizacao a_idRealizacao);
 
 		void getSolucaoDualVariavelEstado(const IdEstagio a_idEstagio, int &a_idx_sol_dual_var_estado, double* a_sol_dual_var_estado);
-
-		double* getReferenciaValoresEstado(const IdEstagio a_idEstagio, const IdVariavelEstado a_idVariavelEstado, const IdProcesso a_idProcesso, const IdCenario a_idCenario_inicial, const IdCenario a_idCenario_final);
 
 		double getCustoTotal(const IdEstagio a_idEstagio);
 		double getCustoImediato(const IdEstagio a_idEstagio);
@@ -652,18 +652,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		void consolidarEquacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados);
 		void consolidarInequacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados);
 
-		int getMenorNumeroAberturasEstagio(const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao);
-		int getMaiorNumeroAberturasEstagio(const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao);
-
-		int getMenorNumeroAberturasProcessoEstagio(const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao);
-		int getMaiorNumeroAberturasProcessoEstagio(const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao);
-
-		int getNumeroTotalCenariosEmEstados(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao);
 		int getNumeroVariavelDinamica(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio);
-
-		IdCenario getCenarioInicial(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao);
-		IdCenario getCenarioFinal(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao);
-		int getNumeroCenarios(const IdCenario a_cenario_inicial, const IdCenario a_cenario_final);
 
 	private:
 
@@ -775,53 +764,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 			catch (const std::exception& erro) { throw std::invalid_argument("tratConteudoIter(a_listasIdxElem," + getFullString(a_it) + "): \n" + std::string(erro.what())); }
 		};
 		
-		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		void addConteudoIters_10(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10) {
-
-			try {
-
-				tratConteudoIter(a_listasIdxElem, a_it1);
-				tratConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
-				if (alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10).size() > 1)
-					throw std::invalid_argument("Multiplos iteradores na ultima camada.");
-
-				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).setElemento(a_it10, a_conteudo);
-
-			}
-			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what())); }
-		};
-
-		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11>
-		void addConteudoIters_11(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11) {
-
-			try {
-
-				tratConteudoIter(a_listasIdxElem, a_it1);
-				tratConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
-				if (alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10), a_it11).size() > 1)
-					throw std::invalid_argument("Multiplos iteradores na ultima camada.");
-
-				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).setElemento(a_it11, a_conteudo);
-
-			}
-			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_11(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "): \n" + std::string(erro.what())); }
-		};
-
 		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11, typename TIt12>
 		void addConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11, const TIt12 a_it12) {
 
@@ -848,7 +790,485 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		};
 
 		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_10(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		bool varredurasIters_1(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+			try {
+
+				if ((!a_isVar) && (a_isPrimal))
+					return false;
+
+				if (a_lIdx.size() == 0)
+					return false;
+
+				const TIt1 it1 = a_idEstagio;
+
+				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
+
+					if (a_lArmz.size() == 0)
+						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+
+					if (a_lArmz.at(it1).size() > 0) {
+
+						double vlrNorm = 1.0;
+
+						if ((!a_isPrimal) && (a_lNorm.size() > 0))
+							vlrNorm = a_lNorm.at(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+
+						varredurasIters(a_lArmz.at(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+					}
+				}
+
+
+				return true;
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_1(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+
+		} // bool varredurasIters_1(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool varredurasIters_2(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+			try {
+
+				if ((!a_isVar) && (a_isPrimal))
+					return false;
+
+				if (a_lIdx.size() == 0)
+					return false;
+
+				const TIt1 it1 = a_idEstagio;
+
+				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
+
+					if (a_lArmz.size() == 0)
+						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+
+					if (a_lArmz.at(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at(it1).at(it2).size() > 0) {
+
+								double vlrNorm = 1.0;
+
+								if ((!a_isPrimal) && (a_lNorm.size() > 0))
+									vlrNorm = a_lNorm.at(it1).at(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+
+								varredurasIters(a_lArmz.at(it1).at(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+							}
+						}
+					}
+				}
+
+
+				return true;
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_2(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+
+		} // bool varredurasIters_3(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool varredurasIters_3(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+			try {
+
+				if ((!a_isVar) && (a_isPrimal))
+					return false;
+
+				if (a_lIdx.size() == 0)
+					return false;
+
+				const TIt1 it1 = a_idEstagio;
+
+				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
+
+					if (a_lArmz.size() == 0)
+						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+
+					if (a_lArmz.at(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at(it1).at(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
+
+										double vlrNorm = 1.0;
+
+										if ((!a_isPrimal) && (a_lNorm.size() > 0))
+											vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+
+										varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+									}
+								}
+							}
+						}
+					}
+				}
+
+
+				return true;
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_3(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+
+		} // bool varredurasIters_3(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool varredurasIters_4(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+			try {
+
+				if ((!a_isVar) && (a_isPrimal))
+					return false;
+
+				if (a_lIdx.size() == 0)
+					return false;
+
+				const TIt1 it1 = a_idEstagio;
+
+				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
+
+					if (a_lArmz.size() == 0)
+						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+
+					if (a_lArmz.at(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at(it1).at(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
+
+												double vlrNorm = 1.0;
+
+												if ((!a_isPrimal) && (a_lNorm.size() > 0))
+													vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+
+												varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+
+				return true;
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_4(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+
+		} // bool varredurasIters_4(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool varredurasIters_5(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+			try {
+
+				if ((!a_isVar) && (a_isPrimal))
+					return false;
+
+				if (a_lIdx.size() == 0)
+					return false;
+
+				const TIt1 it1 = a_idEstagio;
+
+				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
+
+					if (a_lArmz.size() == 0)
+						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+
+					if (a_lArmz.at(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at(it1).at(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
+													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
+
+														double vlrNorm = 1.0;
+
+														if ((!a_isPrimal) && (a_lNorm.size() > 0))
+															vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+
+														varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+
+				return true;
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_5(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+
+		} // bool varredurasIters_5(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool varredurasIters_6(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+			try {
+
+				if ((!a_isVar) && (a_isPrimal))
+					return false;
+
+				if (a_lIdx.size() == 0)
+					return false;
+
+				const TIt1 it1 = a_idEstagio;
+
+				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
+
+					if (a_lArmz.size() == 0)
+						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+
+					if (a_lArmz.at(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at(it1).at(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
+													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
+															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
+
+																double vlrNorm = 1.0;
+
+																if ((!a_isPrimal) && (a_lNorm.size() > 0))
+																	vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+
+																varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+
+				return true;
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_6(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+
+		} // bool varredurasIters_6(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool varredurasIters_7(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+			try {
+
+				if ((!a_isVar) && (a_isPrimal))
+					return false;
+
+				if (a_lIdx.size() == 0)
+					return false;
+
+				const TIt1 it1 = a_idEstagio;
+
+				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
+
+					if (a_lArmz.size() == 0)
+						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+
+					if (a_lArmz.at(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at(it1).at(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
+													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
+															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
+																for (TIt7 it7 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorInicial(); it7 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).incrementarIterador(it7)) {
+																	if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).size() > 0) {
+
+																		double vlrNorm = 1.0;
+
+																		if ((!a_isPrimal) && (a_lNorm.size() > 0))
+																			vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+
+																		varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+
+				return true;
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_7(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+
+		} // bool varredurasIters_7(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool varredurasIters_8(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+			try {
+
+				if ((!a_isVar) && (a_isPrimal))
+					return false;
+
+				if (a_lIdx.size() == 0)
+					return false;
+
+				const TIt1 it1 = a_idEstagio;
+
+				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
+
+					if (a_lArmz.size() == 0)
+						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+
+					if (a_lArmz.at(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at(it1).at(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
+													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
+															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
+																for (TIt7 it7 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorInicial(); it7 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).incrementarIterador(it7)) {
+																	if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).size() > 0) {
+																		for (TIt8 it8 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorInicial(); it8 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).incrementarIterador(it8)) {
+																			if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).size() > 0) {
+
+																				double vlrNorm = 1.0;
+
+																				if ((!a_isPrimal) && (a_lNorm.size() > 0))
+																					vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+
+																				varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+
+				return true;
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_8(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+
+		} // bool varredurasIters_8(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool varredurasIters_9(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+			try {
+
+				if ((!a_isVar) && (a_isPrimal))
+					return false;
+
+				if (a_lIdx.size() == 0)
+					return false;
+
+				const TIt1 it1 = a_idEstagio;
+
+				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
+
+					if (a_lArmz.size() == 0)
+						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+
+					if (a_lArmz.at(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at(it1).at(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
+													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
+															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
+																for (TIt7 it7 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorInicial(); it7 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).incrementarIterador(it7)) {
+																	if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).size() > 0) {
+																		for (TIt8 it8 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorInicial(); it8 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).incrementarIterador(it8)) {
+																			if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).size() > 0) {
+																				for (TIt9 it9 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).getIteradorInicial(); it9 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).incrementarIterador(it9)) {
+																					if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).size() > 0) {
+
+																						double vlrNorm = 1.0;
+
+																						if ((!a_isPrimal) && (a_lNorm.size() > 0))
+																							vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(1).at(IdRealizacao_1).at(IdCenario_1);
+
+																						varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+
+				return true;
+
+			}
+			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters_9(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
+
+		} // bool varredurasIters_9(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+
+		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
+		bool varredurasIters_10(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -890,7 +1310,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 																								if ((!a_isPrimal) && (a_lNorm.size() > 0))
 																									vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10).at(IdRealizacao_1).at(IdCenario_1);
 																								
-																								varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), vlrNorm, a_TSS, a_idEstagio, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																								varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 
 																							}
 																						}
@@ -922,30 +1342,33 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		} // bool varredurasIters_10(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 		template<typename TListasArmzElem, typename TListasIdxElem>
-		void varredurasIters(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const double a_VlrNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		void varredurasIters(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const double a_VlrNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
 				double conteudo = NAN;
 
-				if ((a_isVar) && (a_isPrimal))
-					conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getValorPrimal(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1)));
+				if (a_idCenario != IdCenario_Nenhum) {
+					if ((a_isVar) && (a_isPrimal))
+						conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getValorPrimal(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1)));
 
-				else if ((a_isVar) && (!a_isPrimal))
-					conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getReducedCost(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1))) * a_VlrNorm;
+					else if ((a_isVar) && (!a_isPrimal))
+						conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getReducedCost(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1))) * a_VlrNorm;
 
-				else if ((!a_isVar) && (!a_isPrimal))
-					conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getMultiplicador(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1))) * a_VlrNorm;
-
+					else if ((!a_isVar) && (!a_isPrimal))
+						conteudo = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getMultiplicador(int(a_lIdx.at(IdRealizacao_1).at(IdCenario_1))) * a_VlrNorm;
+				}
 			
 				if (a_idRealizacao == IdRealizacao_Nenhum) {
 					if (a_lArmz.at(IdRealizacao_1).size() == 1) {
-						const IdCenario cIni = getAtributo(AttComumModeloOtimizacao_cenario_inicial, IdCenario());
-						const int numero_cenarios = int(getAtributo(AttComumModeloOtimizacao_cenario_final, IdCenario())) - int(cIni) + 1;
+						const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+						const IdCenario cIni = arranjoResolucao.getAtributo(a_idIteracao, idProcesso, AttComumProcesso_menor_cenario, IdCenario());
+						const int numero_cenarios = int(arranjoResolucao.getAtributo(a_idIteracao, idProcesso, AttComumProcesso_maior_cenario, IdCenario()) - cIni) + 1;
 						a_lArmz.at(IdRealizacao_1) = SmartEnupla<IdCenario, double>(cIni, std::vector<double>(numero_cenarios, NAN));
 					}
 
-					a_lArmz.at(IdRealizacao_1).at(a_idCenario) = conteudo;
+					if (a_idCenario != IdCenario_Nenhum)
+						a_lArmz.at(IdRealizacao_1).at(a_idCenario) = conteudo;
 
 				} // if (a_idRealizacao == IdRealizacao_Nenhum) {
 
@@ -961,8 +1384,9 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 					if (a_lArmz.at(a_idRealizacao).size() == 0) {
 
-						const IdCenario cIni = getAtributo(AttComumModeloOtimizacao_cenario_inicial, IdCenario());
-						const int numero_cenarios = int(getAtributo(AttComumModeloOtimizacao_cenario_final, IdCenario())) - int(cIni) + 1;
+						const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+						const IdCenario cIni = arranjoResolucao.getAtributo(a_idIteracao, idProcesso, AttComumProcesso_menor_cenario, IdCenario());
+						const int numero_cenarios = int(arranjoResolucao.getAtributo(a_idIteracao, idProcesso, AttComumProcesso_maior_cenario, IdCenario()) - cIni) + 1;
 
 						a_lArmz.at(a_idRealizacao) = SmartEnupla<IdCenario, double>(cIni, std::vector<double>(numero_cenarios, NAN));
 
@@ -976,56 +1400,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 			catch (const std::exception& erro) { throw std::invalid_argument("varredurasIters(" + getFullString(a_idEstagio) + "," + getFullString(a_isVar) + "," + getFullString(a_isPrimal) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCenario) + "): \n" + std::string(erro.what())); }
 
 		}
-
-		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool getConteudoIters_10(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10) {
-
-			try {
-
-				if (!a_listasIdxElem.isIteradorValido(a_it1)) return false;
-				else if (!a_listasIdxElem.at(a_it1).isIteradorValido(a_it2)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).isIteradorValido(a_it3)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).isIteradorValido(a_it4)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).isIteradorValido(a_it5)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).isIteradorValido(a_it6)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).isIteradorValido(a_it7)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).isIteradorValido(a_it8)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).isIteradorValido(a_it9)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).isIteradorValido(a_it10)) return false;
-				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10);
-				return true;
-
-			}
-			catch (const std::exception& erro) {
-				throw std::invalid_argument("getConteudoIters_10(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "): \n" + std::string(erro.what()));
-			}
-		};
-
-		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11>
-		bool getConteudoIters_11(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11) {
-
-			try {
-
-				if (!a_listasIdxElem.isIteradorValido(a_it1)) return false;
-				else if (!a_listasIdxElem.at(a_it1).isIteradorValido(a_it2)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).isIteradorValido(a_it3)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).isIteradorValido(a_it4)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).isIteradorValido(a_it5)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).isIteradorValido(a_it6)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).isIteradorValido(a_it7)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).isIteradorValido(a_it8)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).isIteradorValido(a_it9)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).isIteradorValido(a_it10)) return false;
-				else if (!a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).isIteradorValido(a_it11)) return false;
-
-				a_conteudo = a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11);
-				return true;
-
-			}
-			catch (const std::exception& erro) {
-				throw std::invalid_argument("getConteudoIters_11(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "): \n" + std::string(erro.what()));
-			}
-		};
 
 		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11, typename TIt12>
 		bool getConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo &a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11, const TIt12 a_it12) {
@@ -1074,7 +1448,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 			INEQUACAO_LINEAR_7(DECLARAR_METODOS_ELEMENTO)
 
 
-		void instanciarProcessoEstocastico(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso);
+		void instanciarProcessoEstocastico(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados);
 
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_penalizacao);
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo_lag);

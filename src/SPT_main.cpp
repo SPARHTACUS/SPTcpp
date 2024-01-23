@@ -191,10 +191,7 @@ int main(int argc, char *argv[]) {
 
 			Dados  dados;
 
-			dados.setAtributo(AttComumDados_idProcesso, idProcesso);
-			dados.setAtributo(AttComumDados_maior_processo, maiorIdProcesso);
-			dados.setAtributo(AttComumDados_numero_processos_paralelos, numProcs);
-			dados.setAtributo(AttComumDados_maior_processo, maiorIdProcesso);
+			dados.arranjoResolucao.instanciarProcessos(idProcesso, maiorIdProcesso);
 
 			EntradaSaidaDados entradaSaidaDados;
 

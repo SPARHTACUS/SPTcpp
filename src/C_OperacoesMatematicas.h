@@ -1045,4 +1045,121 @@ SmartEnupla<IdEstacao, Valor> getCorrelacaoSazonal(const SmartEnupla<Periodo, Va
 } // SmartEnupla<IdEstacao, Valor> getCorrelacaoSazonal(const SmartEnupla<Periodo, Valor> &a_serie_temporal1, const SmartEnupla<Periodo, Valor> &a_serie_temporal2) {
 
 
+template<typename Valor>
+Valor getRQuadrado(const SmartEnupla<Periodo, Valor>& a_serie_temporal1, const SmartEnupla<Periodo, Valor>& a_serie_temporal2) {
+
+	try {
+
+		if ((a_serie_temporal1.size() == 0) || (a_serie_temporal2.size() == 0))
+			return NAN;
+
+		const Periodo periodo_inicial_serie1 = a_serie_temporal1.getIteradorInicial();
+		const Periodo periodo_inicial_serie2 = a_serie_temporal2.getIteradorInicial();
+
+		const Periodo periodo_final_serie1 = a_serie_temporal1.getIteradorFinal();
+		const Periodo periodo_final_serie2 = a_serie_temporal2.getIteradorFinal();
+
+		if (periodo_final_serie1 < periodo_inicial_serie2)
+			return NAN;
+		else if (periodo_final_serie2 < periodo_inicial_serie1)
+			return NAN;
+
+		Periodo periodo_inicial = periodo_inicial_serie1;
+		Periodo periodo_final = periodo_final_serie1;
+
+		if (periodo_inicial_serie1 > periodo_inicial_serie2)
+			periodo_inicial = periodo_inicial_serie1;
+		else if (periodo_inicial_serie2 > periodo_inicial_serie1)
+			periodo_inicial = periodo_inicial_serie2;
+
+		if (periodo_final_serie1 < periodo_final_serie2)
+			periodo_final = periodo_final_serie1;
+		else if (periodo_final_serie2 < periodo_final_serie1)
+			periodo_final = periodo_final_serie2;
+
+		const Valor media_1 = getMedia(a_serie_temporal1);
+
+		Valor sq_res = 0.0;
+		Valor sq_tot = 0.0;
+		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_serie_temporal1.incrementarIterador(periodo)) {
+			sq_res += sqrt((a_serie_temporal1.at(periodo) - a_serie_temporal2.at(periodo)) * (a_serie_temporal1.at(periodo) - a_serie_temporal2.at(periodo)));
+			sq_tot += sqrt((a_serie_temporal1.at(periodo) - media_1) * (a_serie_temporal1.at(periodo) - media_1));
+		}
+
+		return 1 - (sq_res / sq_tot);
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("getRQuadrado(a_serie_temporal1, a_serie_temporal2): \n" + std::string(erro.what())); }
+
+} // Valor getRQuadrado(const SmartEnupla<Periodo, Valor>& a_serie_temporal1, const SmartEnupla<Periodo, Valor>& a_serie_temporal2) {
+
+template<typename Valor>
+Valor getMaior(const SmartEnupla<Periodo, Valor>& a_serie_temporal1) {
+
+	try {
+
+		Valor maior = NAN;
+		for (Periodo periodo = a_serie_temporal1.getIteradorInicial(); periodo <= a_serie_temporal1.getIteradorFinal(); a_serie_temporal1.incrementarIterador(periodo)) {
+			if (isnan(maior) || (a_serie_temporal1.at(periodo) > maior))
+				maior = a_serie_temporal1.at(periodo);
+		}
+
+		return maior;
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("getMaior(a_serie_temporal1): \n" + std::string(erro.what())); }
+
+} // Valor getRQuadrado(const SmartEnupla<Periodo, Valor>& a_serie_temporal1, const SmartEnupla<Periodo, Valor>& a_serie_temporal2) {
+
+template<typename Valor>
+Valor getRQuadradoNormalizadoMaior(const SmartEnupla<Periodo, Valor>& a_serie_temporal1, const SmartEnupla<Periodo, Valor>& a_serie_temporal2) {
+
+	try {
+
+		if ((a_serie_temporal1.size() == 0) || (a_serie_temporal2.size() == 0))
+			return NAN;
+
+		const Periodo periodo_inicial_serie1 = a_serie_temporal1.getIteradorInicial();
+		const Periodo periodo_inicial_serie2 = a_serie_temporal2.getIteradorInicial();
+
+		const Periodo periodo_final_serie1 = a_serie_temporal1.getIteradorFinal();
+		const Periodo periodo_final_serie2 = a_serie_temporal2.getIteradorFinal();
+
+		if (periodo_final_serie1 < periodo_inicial_serie2)
+			return NAN;
+		else if (periodo_final_serie2 < periodo_inicial_serie1)
+			return NAN;
+
+		Periodo periodo_inicial = periodo_inicial_serie1;
+		Periodo periodo_final = periodo_final_serie1;
+
+		if (periodo_inicial_serie1 > periodo_inicial_serie2)
+			periodo_inicial = periodo_inicial_serie1;
+		else if (periodo_inicial_serie2 > periodo_inicial_serie1)
+			periodo_inicial = periodo_inicial_serie2;
+
+		if (periodo_final_serie1 < periodo_final_serie2)
+			periodo_final = periodo_final_serie1;
+		else if (periodo_final_serie2 < periodo_final_serie1)
+			periodo_final = periodo_final_serie2;
+
+		const Valor maior_1 = getMaior(a_serie_temporal1);
+		const Valor maior_2 = getMaior(a_serie_temporal2);
+
+		SmartEnupla<Periodo, Valor> serie_temporal1_norm = a_serie_temporal1;
+		SmartEnupla<Periodo, Valor> serie_temporal2_norm = a_serie_temporal2;
+
+		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_serie_temporal1.incrementarIterador(periodo)) {
+			serie_temporal1_norm.at(periodo) /= maior_1;
+			serie_temporal2_norm.at(periodo) /= maior_2;
+		}
+
+		return getRQuadrado(serie_temporal1_norm, serie_temporal2_norm);
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("getRQuadrado(a_serie_temporal1, a_serie_temporal2): \n" + std::string(erro.what())); }
+
+} // Valor getRQuadrado(const SmartEnupla<Periodo, Valor>& a_serie_temporal1, const SmartEnupla<Periodo, Valor>& a_serie_temporal2) {
+
+
 #endif 

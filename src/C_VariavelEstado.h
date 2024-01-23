@@ -12,18 +12,14 @@
 
 
 #define ATT_VETOR_VARIAVEL_ESTADO(m)  \
-	  m(VariavelEstado,   AttVetor,  idVariavelDecisao,     int,        -1,          max,             -1,  TipoSubproblemaSolver)
-//            c_classe,    smrtAtt,       nomeAtributo,    Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
-
-#define ATT_MATRIZ_VARIAVEL_ESTADO(m)  \
-	  m(VariavelEstado,  AttMatriz,              valor,  double,        min,          max,             0,  IdProcesso, IdCenario)
+	  m(VariavelEstado,   AttVetor,  idVariavelDecisao,     int,        -1,          max,             -1,  TipoSubproblemaSolver)\
+	  m(VariavelEstado,   AttVetor,              valor,  double,        min,          max,             0,  IdCenario)
 //            c_classe,    smrtAtt,       nomeAtributo,    Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 
 #define SMART_ELEMENTO_VARIAVEL_ESTADO(m) \
 	m(VariavelEstado, AttComum,   ATT_COMUM_VARIAVEL_ESTADO)  \
-    m(VariavelEstado, AttVetor,   ATT_VETOR_VARIAVEL_ESTADO)  \
-	m(VariavelEstado, AttMatriz, ATT_MATRIZ_VARIAVEL_ESTADO) 
+    m(VariavelEstado, AttVetor,   ATT_VETOR_VARIAVEL_ESTADO)  
 
 DEFINE_SMART_ELEMENTO(VariavelEstado, SMART_ELEMENTO_VARIAVEL_ESTADO)
 

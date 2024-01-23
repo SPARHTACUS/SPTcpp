@@ -5,18 +5,20 @@
 
 #define ATT_COMUM_PROCESSO(m)  \
 	  m(Processo,  AttComum,    idProcesso,     IdProcesso,         min,         max,           min,      sim) \
-	  m(Processo,  AttComum, menor_cenario,      IdCenario,         min,         max,           min,      sim) \
-	  m(Processo,  AttComum, maior_cenario,      IdCenario,         min,         max,           min,      sim) 
+	  m(Processo,  AttComum, menor_cenario,      IdCenario,         Nenhum,         max,           Nenhum,      sim) \
+	  m(Processo,  AttComum, maior_cenario,      IdCenario,         Nenhum,         max,           Nenhum,      sim) 
 //     c_classe,   smrtAtt,     nomeAtributo,          tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
 
 #define ATT_MATRIZ_PROCESSO(m)  \
-      m(Processo,  AttMatriz,  mapeamento_abertura_inicial_por_cenario_por_estagio,         IdAbertura,     Nenhum,          max,           min,  IdCenario,  IdEstagio)      \
-      m(Processo,  AttMatriz,    mapeamento_abertura_final_por_cenario_por_estagio,         IdAbertura,     Nenhum,          max,           min,  IdCenario,  IdEstagio) 
+      m(Processo,  AttMatriz,  menor_abertura_por_cenario_estado,        IdAbertura,     Nenhum,          max,           Nenhum,  IdCenario,  IdEstagio) \
+      m(Processo,  AttMatriz,  maior_abertura_por_cenario_estado,        IdAbertura,     Nenhum,          max,           Nenhum,  IdCenario,  IdEstagio) \
+      m(Processo,  AttMatriz,  cenario_estado_por_cenario,         IdCenario,     Nenhum,          max,           Nenhum,  IdCenario,  IdEstagio) 
+
 
 #define SMART_ELEMENTO_PROCESSO(m) \
-	  m(Processo, AttComum, ATT_COMUM_PROCESSO)\
-	  m(Processo, AttMatriz, ATT_MATRIZ_PROCESSO) 
+	  m(Processo, AttComum, ATT_COMUM_PROCESSO) \
+	  m(Processo, AttMatriz, ATT_MATRIZ_PROCESSO)
 
 DEFINE_SMART_ELEMENTO(Processo, SMART_ELEMENTO_PROCESSO)
 
@@ -30,8 +32,6 @@ public:
 
 	DECLARA_SMART_ELEMENTO(Processo, SMART_ELEMENTO_PROCESSO)
 
-
-	void setAberturasInicialFinalMapeamento(const IdCenario a_cenario, const IdEstagio a_estagio, const IdAbertura a_abertura_inicial, const IdAbertura a_abertura_final);
 
 };
 

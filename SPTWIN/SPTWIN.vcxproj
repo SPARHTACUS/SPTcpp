@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\C_Afluencia.cpp" />
     <ClCompile Include="..\src\C_AgrupamentoIntercambio.cpp" />
+    <ClCompile Include="..\src\C_ArranjoResolucao.cpp" />
     <ClCompile Include="..\src\C_BaciaHidrografica.cpp" />
     <ClCompile Include="..\src\C_ConjuntoHidraulico.cpp" />
     <ClCompile Include="..\src\C_Contrato.cpp" />
@@ -26,7 +27,7 @@
     <ClCompile Include="..\src\C_ElementoSistema.cpp" />
     <ClCompile Include="..\src\C_EntradaSaidaDados.cpp" />
     <ClCompile Include="..\src\C_Eolica.cpp" />
-    <ClCompile Include="..\src\C_RestricaoRealizacao.cpp" />
+    <ClCompile Include="..\src\C_RestricaoCenario.cpp" />
     <ClCompile Include="..\src\C_EstagioOtimizacao.cpp" />
     <ClCompile Include="..\src\C_FuncaoProducaoHidreletrica.cpp" />
     <ClCompile Include="..\src\C_Hidreletrica.cpp" />
@@ -69,6 +70,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\C_Afluencia.h" />
     <ClInclude Include="..\src\C_AgrupamentoIntercambio.h" />
+    <ClInclude Include="..\src\C_ArranjoResolucao.h" />
     <ClInclude Include="..\src\C_Auxiliar.h" />
     <ClInclude Include="..\src\C_BaciaHidrografica.h" />
     <ClInclude Include="..\src\C_ConjuntoHidraulico.h" />
@@ -81,7 +83,7 @@
     <ClInclude Include="..\src\C_ElementoSistema.h" />
     <ClInclude Include="..\src\C_EntradaSaidaDados.h" />
     <ClInclude Include="..\src\C_Eolica.h" />
-    <ClInclude Include="..\src\C_RestricaoRealizacao.h" />
+    <ClInclude Include="..\src\C_RestricaoCenario.h" />
     <ClInclude Include="..\src\C_EstagioOtimizacao.h" />
     <ClInclude Include="..\src\C_FuncaoProducaoHidreletrica.h" />
     <ClInclude Include="..\src\C_Hidreletrica.h" />
