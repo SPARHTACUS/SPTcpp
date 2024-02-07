@@ -1,0 +1,1 @@
+powershell.exe ./winInstaller.ps1

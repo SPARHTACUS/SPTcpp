@@ -28,7 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lsZollen", "lsZollen", "{61
 		..\ThirdParty\lsZollen\sparsematrix.h = ..\ThirdParty\lsZollen\sparsematrix.h
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPTWIN", "SPTWIN.vcxproj", "{5C3C71D3-E400-42B7-8C4F-3FFCACEFDE79}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PWFWIN", "PWFWIN.vcxproj", "{5C3C71D3-E400-42B7-8C4F-3FFCACEFDE79}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libCbc", "..\ThirdParty\COIN\Cbc\MSVisualStudio\v16\libCbc\libCbc.vcxproj", "{0B054D74-6082-452F-9744-5FBE12C7D476}"
 EndProject

@@ -10,7 +10,7 @@
 #include <sstream>
 #include <stdio.h>
 
-#ifndef SPTWIN
+#ifndef PWFWIN
 
 #include <climits>
 #include <limits.h>
@@ -210,8 +210,6 @@ static double getdoubleFromChar(const char * a_char) {
 static double getFromChar(const double a_double, const char * a_char) { return getdoubleFromChar(a_char); };
 
 static std::string getString(const double a_double) {
-	if (isnan(a_double))
-		return "NAN";
 	if (a_double >= DOUBLE_MAX * 0.99)
 		return "inf";
 	else if (a_double <= DOUBLE_MIN * 0.99)
@@ -350,7 +348,7 @@ static bool lerRegistro(std::string a_registro, std::string a_registroArquivo, s
 
 } // static bool lerRegistro(std::string a_registro, std::string a_registroArquivo, std::string a_registroLer) {
 
-#ifdef SPTWIN
+#ifdef PWFWIN
 
 #include <windows.h>
 
@@ -395,7 +393,7 @@ static void aguardarTempo(int a_tempo) { Sleep(a_tempo); };
 
 #endif
 
-#ifndef SPTWIN
+#ifndef PWFWIN
 
 #include <sys/types.h>
 #include <sys/stat.h>
