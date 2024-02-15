@@ -2658,7 +2658,7 @@ bool LeituraCEPEL::aplicarModificacaoNPOSNW(Dados& a_dados, const IdHidreletrica
 		if (a_modificacaoUHE.tipo_de_modificacao != TipoModificacaoUHE_NPOSNW)
 			throw std::invalid_argument("Modificacao nao compativel com metodo.");
 
-		lista_hidreletrica_NPOSNW.setElemento(a_idHidreletrica, int(a_modificacaoUHE.valor_1));
+		a_dados.vetorHidreletrica.att(a_idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, int(a_modificacaoUHE.valor_1));
 
 		return true;
 	} // try{
