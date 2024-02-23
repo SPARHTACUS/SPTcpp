@@ -1,0 +1,5 @@
+0;FINALIZADO_COM_EXCECAO
+LeituraCEPEL::leitura_CEPEL(IdProcesso_mestre,IdProcesso_mestre,DC,CP): 
+LeituraCEPEL::leitura_DECOMP: 
+LeituraCEPEL::leitura_CASO_201906_DC29: 
+Nao foi possivel abrir o arquivo DadosEntradaDECOMP//CASO.DAT.

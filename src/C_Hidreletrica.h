@@ -18,12 +18,11 @@
 	  m(Hidreletrica,  AttComum,                             bacia,                  IdBaciaHidrografica,     Nenhum,          max,            Nenhum,         sim) \
 	  m(Hidreletrica,  AttComum,                           jusante,                       IdHidreletrica,     Nenhum,          max,            Nenhum,         sim) \
  	  m(Hidreletrica,  AttComum,                    jusante_desvio,                       IdHidreletrica,     Nenhum,          max,            Nenhum,        CPPD) \
- 	  m(Hidreletrica,  AttComum,         idReservatorioEquivalente,            IdReservatorioEquivalente,     Nenhum,          max,            Nenhum,         sim) \
 	  m(Hidreletrica,  AttComum,        tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica,        min,          max,         por_usina,         nao) \
 	  m(Hidreletrica,  AttComum,   representacao_discreta_producao,                                 bool,      false,         true,             false,         nao) \
 	  m(Hidreletrica,  AttComum,                  considerar_usina,                                 bool,      false,         true,              true,         sim) \
 	  m(Hidreletrica,  AttComum,              numero_maquinas_base,                                  int,          0,          100,                 1,         nao) \
-	  m(Hidreletrica,  AttComum,                      codigo_usina,                                  int,          0,          500,                 1,         nao) \
+	  m(Hidreletrica,  AttComum,                      codigo_usina,                                  int,          0,          999,                 1,         nao) \
       m(Hidreletrica,  AttComum,                      codigo_posto,                                  int,          0,          500,                 0,         nao) \
       m(Hidreletrica,  AttComum,      codigo_posto_acoplamento_ENA,                                  int,          0,          999,                 0,         nao) \
 	  m(Hidreletrica,  AttComum,          tipo_de_perda_hidraulica,                  TipoPerdaHidraulica,        min,          max,               min,         nao) \
@@ -98,7 +97,6 @@
       m(Hidreletrica,  AttVetor,             indisponibilidade_programada,                                double,          0,            1,             0,    Periodo) \
       m(Hidreletrica,  AttVetor,                          disponibilidade,                                double,          0,            1,             0,    Periodo) \
       m(Hidreletrica,  AttVetor,            produtibilidade_acumulada_EAR,                                double,          0,        50000,             0,    IdReservatorioEquivalente) \
-      m(Hidreletrica,  AttVetor,                      produtibilidade_ENA,                                double,          0,        50000,             0,    Periodo) \
       m(Hidreletrica,  AttVetor,                codigo_usinas_calculo_ENA,                                   int,        min,          max,           min,        int)
 
 

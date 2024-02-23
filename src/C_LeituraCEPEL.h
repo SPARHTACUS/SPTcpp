@@ -186,8 +186,7 @@ private:
 	double get_cota_para_conversao_cortes_NEWAVE(const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, Hidreletrica& a_hidreletrica, const Periodo a_periodo, const Periodo a_periodo_inicial_horizonte_estudo, const double a_percentual_volume_util, const bool a_is_calculo_para_ENA);
 	double get_produtibilidade_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidreletrica, const double a_cota);
 	void instanciar_codigo_usina_jusante_JUSENA(Dados& a_dados);
-	void set_atributos_hidreletricas_agregadas_NW(Dados& a_dados, std::string a_nomeArquivo);
-	void set_atributos_hidreletrica_from_CadUsH_csv(Dados& a_dados, IdHidreletrica a_idHidreletrica, std::string a_nomeArquivo);
+	void set_atributos_hidreletrica_from_CadUsH_csv(Dados& a_dados, std::string a_nomeArquivo, const int a_codigo_usina);
 	void calcular_produtibilidade_ENA_regras_especiais(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
 	void calcular_produtibilidade_ENA_por_usina_por_periodo(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
 	void calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados);
@@ -218,11 +217,10 @@ private:
 
 	void imprime_produtibilidade_EAR_acumulada(Dados& a_dados, std::string nomeArquivo);
 	void imprime_produtibilidade_EAR(Dados& a_dados, std::string nomeArquivo);
-	void imprime_produtibilidade_ENA(Dados& a_dados, std::string nomeArquivo, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
 	void imprime_afluencia_natural_x_idHidreletrica_x_cenario_x_periodo(Dados& a_dados, std::string nomeArquivo, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
 	void imprime_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados, std::string nomeArquivo);
 
-	void instanciar_hidreletricas_sem_producao_para_acoplamento_cortes_NW(Dados& a_dados);//Postos de acoplamento + Usinas agregadas no NW (p.ex. COMP PAF-MOX)
+	void instanciar_hidreletricas_sem_producao_para_acoplamento_cortes_NW(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const int a_codigo_usina, const int a_codigo_posto, const int a_codigo_posto_acoplamento_ENA, const int a_codigo_ONS_REE);//Pra instanciar Postos de acoplamento + Usinas agregadas no NW (p.ex. COMP PAF-MOX)
 
 	//Validações
 	void validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao);
@@ -316,6 +314,8 @@ private:
 	double calculaRaizPolinomioJusante(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo);
 
 	void set_zero_vazao_defluente_minima_historica_usina_fio_sem_reservatorio_a_montante(Dados& a_dados, const IdHidreletrica a_idHidreletrica);
+
+	void instanciar_variavelAleatoria_x_idHidreletrica(Dados& a_dados, const IdHidreletrica a_idHidreletrica);
 
 	////////////////////////////////////////////////////////////////
 	//Definição de Submercados e Intercambios 
