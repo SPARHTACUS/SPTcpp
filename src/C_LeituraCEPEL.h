@@ -136,6 +136,7 @@ private:
 	void imprime_VAZOES_DAT();
 	void instanciar_hidreletricas_from_VAZOES_201906_DC29(Dados& a_dados, std::string nomeArquivo);
 	void instanciar_membros_das_hidreletricas_instanciadas(Dados& a_dados);
+	void atualizar_codigo_posto_acoplamento_ENA_das_hidreletricas_instanciadas(Dados& a_dados);
 	void instanciar_processo_estocastico_CP(Dados& a_dados);
 
 	bool criar_tendencia_temporal_com_vazoes_observadas_CP(const std::string a_diretorio, const std::string a_revisao);
@@ -196,7 +197,6 @@ private:
 	void calcular_equacionamento_afluencia_natural_x_hidreletrica(Dados& a_dados, const SmartEnupla<int, IdHidreletrica> &lista_codUsina, const SmartEnupla<int, IdHidreletrica>& lista_codPosto, const SmartEnupla<IdHidreletrica, IdVariavelAleatoria>& a_mapIdVar, const SmartEnupla<IdHidreletrica, IdVariavelAleatoriaInterna>& a_mapIdVarInterna, const SmartEnupla<Periodo, bool> &a_horizonte_tendencia_mais_estudo, const Periodo a_periodo_inicial_horizonte_estudo);
 	void retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(Dados& a_dados, const Periodo a_periodoPE, const SmartEnupla<int, IdHidreletrica>& lista_codUsina, const SmartEnupla<int, IdHidreletrica>& lista_codPosto, const SmartEnupla<IdHidreletrica, IdVariavelAleatoria> & a_mapIdVar, const SmartEnupla<IdHidreletrica, IdVariavelAleatoriaInterna>& a_mapIdVarInterna, const int a_codigo_posto, const int a_codigo_posto_acoplamento_ENA, const IdHidreletrica a_idHidreletrica, const IdCenario a_idCenario, const Periodo a_periodo_inicial, const Periodo a_periodo, std::vector<SmartEnupla<IdHidreletrica, double>>& a_coeficiente_idHidreletricas_calculo_ENA, double& a_termo_independente_calculo_ENA);
 	void retorna_equacionamento_afluencia_natural_x_posto(Dados& a_dados, const SmartEnupla<int, IdHidreletrica>& a_lista_codUsina, const SmartEnupla<int, IdHidreletrica>& a_lista_codPosto, const IdHidreletrica a_idHidreletrica, const int a_codigo_posto, const double a_coeficiente, std::vector<SmartEnupla<IdHidreletrica, double>>& a_coeficiente_idHidreletricas_calculo_ENA);
-	bool retorna_is_idHidreletrica_in_calculo_ENA(const int a_codigo_usina);
 	IdMes get_IdMes_operativo(const Periodo a_periodo, const bool is_periodo_inicial);
 	double get_afluencia_natural_posto(Dados& a_dados, const Periodo a_periodoPE, const SmartEnupla<int, IdHidreletrica>& a_lista_codUsina, const SmartEnupla<int, IdHidreletrica>& a_lista_codPosto, const SmartEnupla<IdHidreletrica, IdVariavelAleatoria>& a_mapIdVar, const SmartEnupla<IdHidreletrica, IdVariavelAleatoriaInterna>& a_mapIdVarInterna, const int a_codigo_posto, const IdCenario a_idCenario, const Periodo a_periodo);//Regras do hidrograma de Belo Monte
 

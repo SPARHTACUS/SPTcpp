@@ -676,8 +676,9 @@ void LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16(Dados& a_dados, const 
 					}
 
 					//CÓDIGO POSTO
-					if ((deck_str == "DC") && (!a_hidreletricasPreConfig_instanciadas))//Somente o CP usa os postos lidos no HIDR.DAT, o MP usa o CONFHD.DAT ou a Preconfig e a PD usa o arquivo de tempo de viagem da água
-						a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto, uhe.posto);
+					if ((deck_str == "DC") && (!a_hidreletricasPreConfig_instanciadas)) {//Somente o CP usa os postos lidos no HIDR.DAT, o MP usa o CONFHD.DAT ou a Preconfig e a PD usa o arquivo de tempo de viagem da água
+						a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto, uhe.posto);					
+					}
 
 					// USINA DE DESVIO
 					if (uhe.desvio != 0) {
