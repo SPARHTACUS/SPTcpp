@@ -13567,27 +13567,33 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 					for (Periodo periodo = periodo_inicial_historico; periodo <= periodo_final_historico; valor_afluencia_historica.at(posto - 1).incrementarIterador(periodo)) {
 
-						double afluencia_incremental;
+						if (horizonte_estudo.getIteradorInicial().sobreposicao(periodo) == 0.0) {//Não pega períodos dentro do horizonte de estudo
 
-						if (posto == 300)//posto com incremental 0
-							afluencia_incremental = 0;
-						else
-							afluencia_incremental = afluencia_incremental_periodo_hidreletrica_historico.at(periodo).getElemento(idHidreletrica);
+							double afluencia_incremental;
 
-						if (!a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.isInstanciado(IdAfluencia_vazao_afluente)) {
-							Afluencia afluencia;
-							afluencia.setAtributo(AttComumAfluencia_idAfluencia, IdAfluencia_vazao_afluente);
-							a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.add(afluencia);
-						}
+							if (posto == 300)//posto com incremental 0
+								afluencia_incremental = 0;
+							else
+								afluencia_incremental = afluencia_incremental_periodo_hidreletrica_historico.at(periodo).getElemento(idHidreletrica);
 
-						a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_incremental_historico, periodo, afluencia_incremental);
-						//a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_natural_historico, periodo, afluencia_natural_periodo_hidreletrica_historico.at(periodo).getElemento(idHidreletrica));
+							if (!a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.isInstanciado(IdAfluencia_vazao_afluente)) {
+								Afluencia afluencia;
+								afluencia.setAtributo(AttComumAfluencia_idAfluencia, IdAfluencia_vazao_afluente);
+								a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.add(afluencia);
+							}
+
+							a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_incremental_historico, periodo, afluencia_incremental);
+							a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_serie_temporal, periodo, afluencia_incremental);
+							//a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_natural_historico, periodo, afluencia_natural_periodo_hidreletrica_historico.at(periodo).getElemento(idHidreletrica));
+
+						}//if (horizonte_estudo.getIteradorInicial().sobreposicao(periodo) == 0.0) {
 
 					}//for (Periodo periodo = periodo_inicial_historico; periodo <= periodo_final_historico; valor_afluencia_passadas.at(posto-1).incrementarIterador(periodo)) {
 
 				}//if (int(valor_afluencia_passadas.size()) > 0) {
 
 				a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).addTendenciaTemporalVariavelAleatoriaInterna(IdVariavelAleatoriaInterna_1, tendencia_temporal);
+				
 
 			}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
@@ -14061,15 +14067,15 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		calcular_equacionamento_afluencia_natural_x_hidreletrica(a_dados, lista_codUsina_idHidreletrica, lista_codPosto_idHidreletrica, mapIdVar, mapIdVarInterna, horizonte_tendencia_mais_estudo, a_horizonte_estudo.getIteradorInicial());
 
 		std::cout << "Iniciando equacionamento afluencia natural por REE..." << std::endl;
-		//calcular_equacionamento_afluencia_natural_x_REE(a_dados, horizonte_tendencia_mais_estudo, horizonte_tendencia_mais_estudo_MENSAL, a_horizonte_estudo.getIteradorInicial());
-		calcular_equacionamento_afluencia_natural_x_REE(a_dados, horizonte_tendencia_mais_estudo, horizonte_tendencia_mais_estudo, a_horizonte_estudo.getIteradorInicial());
+		calcular_equacionamento_afluencia_natural_x_REE(a_dados, horizonte_tendencia_mais_estudo, horizonte_tendencia_mais_estudo_MENSAL, a_horizonte_estudo.getIteradorInicial());
+		//calcular_equacionamento_afluencia_natural_x_REE(a_dados, horizonte_tendencia_mais_estudo, horizonte_tendencia_mais_estudo, a_horizonte_estudo.getIteradorInicial());
 
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//Imprime info de cálculo
 		//////////////////////////////////////////////////////////////////////////////////
 
-		const bool imprimir_info_calculo_ENA = true;
+		const bool imprimir_info_calculo_ENA = false;
 
 		
 		if (imprimir_info_calculo_ENA) {//Somente para teste
@@ -14084,7 +14090,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 		}
 		
-		calcular_equacionamento_afluencia_natural_x_REE(a_dados, horizonte_tendencia_mais_estudo, horizonte_tendencia_mais_estudo_MENSAL, a_horizonte_estudo.getIteradorInicial());
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//4 Leitura dos cortes NW e conversão de formato REE em usina individualizada
@@ -14208,6 +14213,23 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				} // for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 				// Estados ENA
+				/*
+				for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
+
+					const Periodo periodo_lag = periodo_pos_estudo - lag;
+
+					for (IdReservatorioEquivalente idREE = coeficiente_ENA.getIteradorInicial(); idREE <= coeficiente_ENA.getIteradorFinal(); idREE++) {
+
+						estados_ENA.at(idREE).at(lag) = estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, std::string(strVarDecisaoENAIdEstagioPeriodo + "," + getString(periodo_lag) + "," + getString(idREE)), -1, -1);
+						estados.addElemento(estados_ENA.at(idREE).at(lag), 0.0);
+
+					}//for (IdReservatorioEquivalente idREE = coeficiente_ENA.getIteradorInicial(); idREE <= coeficiente_ENA.getIteradorFinal(); idREE++) {
+
+				}//for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
+				*/
+
+				/**/
+				// TIRAR
 				for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
 
 					const Periodo periodo_lag = periodo_pos_estudo - lag;
@@ -14285,7 +14307,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 				lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario = SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>>>();
 				lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario = SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>>>();
-
+				
 			} // if (true) {
 
 			// Estados PTDISPCOM
@@ -14927,6 +14949,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			entradaSaidaDados.setSeparadorCSV(";");
 			entradaSaidaDados.setDiretorioSaida(a_dados.getAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string()));
 
+			/**/
 			for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idUHE)) {
 
 				if (a_dados.vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.numObjetos() > 0) {
@@ -14947,6 +14970,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				}
 
 			}
+			
 
 			entradaSaidaDados.setAppendArquivo(false);
 			entradaSaidaDados.imprimirArquivoCSV_AttComum("estagio.csv", estagio_pos_estudo, std::vector<AttComumEstagio>{ AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao, AttComumEstagio_selecao_cortes_nivel_dominancia, AttComumEstagio_cortes_multiplos, AttComumEstagio_alpha_CVAR, AttComumEstagio_lambda_CVAR});
@@ -19055,7 +19079,6 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 					// VAZ(169) //Sobradinho Fictício
 					/////////////
 					retorna_equacionamento_afluencia_natural_x_posto(a_dados, a_lista_codUsina, a_lista_codPosto, IdHidreletrica_Nenhum, 169, 1.0, a_coeficiente_idHidreletricas_calculo_ENA);
-					//a_termo_independente_calculo_ENA += a_dados.processoEstocastico_hidrologico.getElementoMatriz(a_mapIdVar.at(a_lista_codPosto.at(169)), a_mapIdVarInterna.at(a_lista_codPosto.at(169)), AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_periodo, a_idCenario, double());
 
 				}//if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
 				else if (a_periodo < a_periodo_inicial_horizonte_estudo) {
@@ -19092,7 +19115,6 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 					// VAZ(169) //Sobradinho Fictício
 					/////////////
 					retorna_equacionamento_afluencia_natural_x_posto(a_dados, a_lista_codUsina, a_lista_codPosto, IdHidreletrica_Nenhum, 169, 1.0, a_coeficiente_idHidreletricas_calculo_ENA);
-					//a_termo_independente_calculo_ENA += a_dados.processoEstocastico_hidrologico.getElementoMatriz(a_mapIdVar.at(a_lista_codPosto.at(169)), a_mapIdVarInterna.at(a_lista_codPosto.at(169)), AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_periodo, a_idCenario, double());
 
 				}//if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
 				else if (a_periodo < a_periodo_inicial_horizonte_estudo) {
@@ -19129,7 +19151,6 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 					// VAZ(169) //Sobradinho Fictício
 					/////////////
 					retorna_equacionamento_afluencia_natural_x_posto(a_dados, a_lista_codUsina, a_lista_codPosto, IdHidreletrica_Nenhum, 169, 1.0, a_coeficiente_idHidreletricas_calculo_ENA);
-					//a_termo_independente_calculo_ENA += a_dados.processoEstocastico_hidrologico.getElementoMatriz(a_mapIdVar.at(a_lista_codPosto.at(169)), a_mapIdVarInterna.at(a_lista_codPosto.at(169)), AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_periodo, a_idCenario, double());
 
 				}//if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
 				else if (a_periodo < a_periodo_inicial_horizonte_estudo) {
@@ -19164,7 +19185,6 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 					// VAZ(169) //Sobradinho Fictício
 					/////////////
 					retorna_equacionamento_afluencia_natural_x_posto(a_dados, a_lista_codUsina, a_lista_codPosto, IdHidreletrica_Nenhum, 169, 1.0, a_coeficiente_idHidreletricas_calculo_ENA);
-					//a_termo_independente_calculo_ENA += a_dados.processoEstocastico_hidrologico.getElementoMatriz(a_mapIdVar.at(a_lista_codPosto.at(169)), a_mapIdVarInterna.at(a_lista_codPosto.at(169)), AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_periodo, a_idCenario, double());
 
 				}//if (a_periodo >= a_periodo_inicial_horizonte_estudo) {
 				else if (a_periodo < a_periodo_inicial_horizonte_estudo) {
@@ -21816,6 +21836,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			}
 		}
 
+
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 
 		if (a_dados.processoEstocastico_hidrologico.getSize1Matriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) == 0) {
@@ -21823,6 +21844,10 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			int semente = 1; //Precisa de qualquer valor (Nao vai realizar sorteio, só alocar valores já sorteados)
 			a_dados.processoEstocastico_hidrologico.gerarCenariosPorSorteio(entradaSaidaDados, a_dados.getAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, bool()), true, true, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario, TipoSorteio_uniforme, semente);
 		}// if (a_dados.processoEstocastico_hidrologico.getSize1Matriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) == 0) {
+		
+		a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, true);
+		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, false);//Só para imprimir arquivos de AcoplamentoPosEstudo
+
 
 		if (processoEstocasticoHidrologicoPreConfig_instanciado)
 			horizonte_processo_estocastico = SmartEnupla<Periodo, bool>(a_dados.processoEstocastico_hidrologico.getElementosMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo(), IdRealizacao()), true);

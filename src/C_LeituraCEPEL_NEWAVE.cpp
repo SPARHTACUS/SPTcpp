@@ -1837,7 +1837,7 @@ void LeituraCEPEL::leitura_CONFHD_201908_NW25(Dados &a_dados, std::string nomeAr
 
 		////////////////////////////////////////////////////////
 
-		int conteio_usinas_com_expansao_instanciadas = 0; //Atributo necessário no caso que hidreletricasPreConfig_instanciadas = true
+		std::vector<int> codigo_usina_usinas_com_expansao_instanciadas; //Vetor necessário no caso que hidreletricasPreConfig_instanciadas = true
 
 		if (leituraArquivo.is_open()) {
 
@@ -1978,7 +1978,7 @@ void LeituraCEPEL::leitura_CONFHD_201908_NW25(Dados &a_dados, std::string nomeAr
 					//Instancia as usinas com expansão (usinas não existentes na atualidade)
 					else if ((idHidreletrica == IdHidreletrica_Nenhum) && (usina_com_expansao) && (considerar_usina) && (hidreletrica_agregada == 0)) {
 
-						conteio_usinas_com_expansao_instanciadas++;
+						codigo_usina_usinas_com_expansao_instanciadas.push_back(codigo_usina);
 
 						const IdHidreletrica idHidreletrica_expansao = IdHidreletrica(codigo_usina);
 
@@ -2121,11 +2121,12 @@ void LeituraCEPEL::leitura_CONFHD_201908_NW25(Dados &a_dados, std::string nomeAr
 
 			if (hidreletricasPreConfig_instanciadas) {
 
-				for (int usina_com_expansao = 0; usina_com_expansao < conteio_usinas_com_expansao_instanciadas; usina_com_expansao++) {
+				for (int pos = 0; pos < int(codigo_usina_usinas_com_expansao_instanciadas.size()); pos++) {
 
-					const IdHidreletrica idHidreletrica = IdHidreletrica(a_dados.getMaiorId(IdHidreletrica()) - usina_com_expansao); //As últimas hidrelétricas instanciadas no modo de preconfig são as usinas em expansão
-
-					const int codigo_usina_original = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_codigo_usina, int());
+					//const IdHidreletrica idHidreletrica = IdHidreletrica(a_dados.getMaiorId(IdHidreletrica()) - usina_com_expansao); //As últimas hidrelétricas instanciadas no modo de preconfig são as usinas em expansão
+					
+					const int codigo_usina_original = codigo_usina_usinas_com_expansao_instanciadas.at(pos);
+					const IdHidreletrica idHidreletrica = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina_original);
 
 					////////////////////////////////////////////////////
 					//Set a usina jusante da usina em expansão
@@ -2231,7 +2232,7 @@ void LeituraCEPEL::leitura_CONFHD_201908_NW25(Dados &a_dados, std::string nomeAr
 
 					}
 
-				}//for (int usina_com_expansao = 0; usina_com_expansao < conteio_usinas_com_expansao_instanciadas; usina_com_expansao++) {
+				}//for (int pos = 0; pos < int(codigo_usina_usinas_com_expansao_instanciadas.size()); pos++) {
 
 			}//if (hidreletricasPreConfig_instanciadas) {
 
@@ -6123,7 +6124,7 @@ void LeituraCEPEL::leitura_VAZPAST_201908_NW25(Dados& a_dados, std::string nomeA
 		else  throw std::invalid_argument("Nao foi possivel abrir o arquivo " + nomeArquivo + ".");
 
 	}//try {
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::leitura_NEWAVE_26_VAZPAST: \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::leitura_VAZPAST_201908_NW25: \n" + std::string(erro.what())); }
 
 }
 
