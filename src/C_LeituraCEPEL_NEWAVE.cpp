@@ -8147,6 +8147,25 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados) {
 
 	try {
 
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Via pre-config podem ter sido instanciadas usinas sem produção necessárias para o acoplamento com o modelo NW (cálculo de ENAs)
+		// Nesse caso, é necessário instanciar o reservatório, afluência, variavelAleatoria etc
+
+		const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
+		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
+
+		for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+			for (int pos = 0; pos < int(idHidreletricas_sem_producao.size()); pos++) {
+
+				if (idHidreletrica == idHidreletricas_sem_producao.at(pos))
+					instanciar_hidreletricas_sem_producao_para_acoplamento_cortes_NW(a_dados, idHidreletrica, codigo_usina_idHidreletricas_sem_producao.at(pos), codigo_posto_idHidreletricas_sem_producao.at(pos), codigo_posto_acoplamento_ENA_idHidreletricas_sem_producao.at(pos), codigo_ONS_REE_idHidreletricas_sem_producao.at(pos));
+
+			}//for (int pos = 0; pos < int(idHidreletricas_sem_producao.size()); pos++) {
+		}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 		EntradaSaidaDados entradaSaidaDados;
 
 		entradaSaidaDados.setDiretorioEntrada(a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()));

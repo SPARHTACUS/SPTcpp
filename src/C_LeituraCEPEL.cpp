@@ -9,6 +9,51 @@ LeituraCEPEL::LeituraCEPEL() {
 
 	SPT_avisos = "SPT_avisos.txt";
 
+
+	//////////////////////////////////////////////////////////////////////
+	//Se existir arquivo de cortes instancia as hidrelétricas necessárias
+	//  para o acoplamento ENA (caso não estiverem instanciadas)
+	//////////////////////////////////////////////////////////////////////
+
+	idHidreletricas_sem_producao.push_back(IdHidreletrica_168_POSTO_ACOPLAMENTO_ENA_SOBRADINHO); //Usina Posto acoplamento Sobradinho
+	idHidreletricas_sem_producao.push_back(IdHidreletrica_172_POSTO_ACOPLAMENTO_ENA_ITAPARICA); //Usina Posto acoplamento Itaparica
+	idHidreletricas_sem_producao.push_back(IdHidreletrica_176_COMPPAFMOX); //Usina Comp. Moxotó
+	idHidreletricas_sem_producao.push_back(IdHidreletrica_178_POSTO_ACOPLAMENTO_ENA_XINGO); //Usina Posto acoplamento Xingo
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+
+	codigo_usina_idHidreletricas_sem_producao.push_back(168);   //Usina Posto acoplamento Sobradinho
+	codigo_usina_idHidreletricas_sem_producao.push_back(972);   //Usina Posto acoplamento Itaparica
+	codigo_usina_idHidreletricas_sem_producao.push_back(176); //Usina Comp. Moxotó
+	codigo_usina_idHidreletricas_sem_producao.push_back(978);   //Usina Posto acoplamento Xingo
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+
+	codigo_posto_idHidreletricas_sem_producao.push_back(169); //Usina Posto acoplamento Sobradinho
+	codigo_posto_idHidreletricas_sem_producao.push_back(172); //Usina Posto acoplamento Itaparica
+	codigo_posto_idHidreletricas_sem_producao.push_back(176); //Usina Comp. Moxotó
+	codigo_posto_idHidreletricas_sem_producao.push_back(178); //Usina Posto acoplamento Xingo
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+	//Nas regras de cálculo da ENA, 0 significa que não entra no cálculo do corte (estas usinas estão dentro das regras de outras usinas) 
+
+	codigo_posto_acoplamento_ENA_idHidreletricas_sem_producao.push_back(0);   //Usina Posto acoplamento Sobradinho
+	codigo_posto_acoplamento_ENA_idHidreletricas_sem_producao.push_back(0);   //Usina Posto acoplamento Itaparica
+	codigo_posto_acoplamento_ENA_idHidreletricas_sem_producao.push_back(976); //Usina Comp. Moxotó (Valor atribuido compatível com a lógica do cálculo das ENAs)
+	codigo_posto_acoplamento_ENA_idHidreletricas_sem_producao.push_back(0);   //Usina Posto acoplamento Xingo
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+
+	// codigo_ONS_REE = 3 -> NORDESTE
+
+	codigo_ONS_REE_idHidreletricas_sem_producao.push_back(3);   //Usina Posto acoplamento Sobradinho
+	codigo_ONS_REE_idHidreletricas_sem_producao.push_back(3);   //Usina Posto acoplamento Itaparica
+	codigo_ONS_REE_idHidreletricas_sem_producao.push_back(3);   //Usina Comp. Moxotó (Valor atribuido compatível com a lógica do cálculo das ENAs)
+	codigo_ONS_REE_idHidreletricas_sem_producao.push_back(3);   //Usina Posto acoplamento Xingo
+
+	////////////////////////////////////////////////////////////////////////////////////////////
+
+
 	/*
 	lista_modificacaoUHE.reserve(500);
 	lista_modificacaoUHE.push_back(std::vector<ModificacaoUHE>());
@@ -3799,5 +3844,104 @@ IdPatamarCarga LeituraCEPEL::get_maiorIdPatamarCarga_periodo_from_percentual_dur
 
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga: \n" + std::string(erro.what())); }
+
+}
+
+void LeituraCEPEL::instanciar_hidreletricas_sem_producao_para_acoplamento_cortes_NW(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const int a_codigo_usina, const int a_codigo_posto, const int a_codigo_posto_acoplamento_ENA, const int a_codigo_ONS_REE) {
+
+	try {
+
+		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+
+		////////////////////////////////////////////////////////////////////////////////////////////
+
+		if (!a_dados.vetorHidreletrica.isInstanciado(a_idHidreletrica)) {
+
+			Hidreletrica   hidreletrica;
+
+			//Set idHidreletrica
+			hidreletrica.setAtributo(AttComumHidreletrica_idHidreletrica, a_idHidreletrica);
+			a_dados.vetorHidreletrica.add(hidreletrica);
+
+		}//if (!a_dados.vetorHidreletrica.isInstanciado(a_idHidreletrica)) {
+
+
+		a_dados.vetorHidreletrica.att(a_idHidreletrica).setAtributo(AttComumHidreletrica_codigo_usina, a_codigo_usina);
+		a_dados.vetorHidreletrica.att(a_idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto, a_codigo_posto);
+		a_dados.vetorHidreletrica.att(a_idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, a_codigo_posto_acoplamento_ENA);
+		a_dados.vetorHidreletrica.att(a_idHidreletrica).setAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica_sem_producao);
+		lista_codigo_ONS_REE.setElemento(a_idHidreletrica, a_codigo_ONS_REE);
+		lista_codigo_ONS_hidreletrica.setElemento(a_idHidreletrica, a_codigo_usina);
+
+
+		/////////////////////////////////////////////////
+		//inicializa afluência
+		
+		if (!a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorAfluencia.isInstanciado(IdAfluencia_vazao_afluente)) {
+			Afluencia afluencia;
+			afluencia.setAtributo(AttComumAfluencia_idAfluencia, IdAfluencia_vazao_afluente);
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorAfluencia.add(afluencia);
+		}
+		
+
+		if (!processoEstocasticoHidrologicoPreConfig_instanciado)
+			instanciar_variavelAleatoria_x_idHidreletrica(a_dados, a_idHidreletrica);
+
+		///////////////////////////////////////////////////////////////////////
+		//Instancia atributos necessários para a validação das hidrelétricas
+		///////////////////////////////////////////////////////////////////////
+
+		if (!a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.isInstanciado(IdReservatorio_1)) {
+			Reservatorio reservatorio;
+			reservatorio.setAtributo(AttComumReservatorio_idReservatorio, IdReservatorio_1);
+
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.add(reservatorio);
+
+		}//if (!a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.isInstanciado(IdReservatorio_1)) {
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_evaporacao) == 0) {
+			for (IdMes idMes = IdMes_1; idMes <= IdMes_12; idMes++)
+				a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).addElemento(AttVetorReservatorio_evaporacao, idMes, 0.0);
+		}//if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_evaporacao) == 0) {
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_volume_0) == 0)
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_0, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_0, double())));
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_volume_1) == 0)
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_1, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_1, double())));
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_volume_2) == 0)
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_2, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_2, double())));
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_volume_3) == 0)
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_3, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_3, double())));
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_volume_4) == 0)
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_4, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_4, double())));
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_area_0) == 0)
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_0, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_0, double())));
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_area_1) == 0)
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_1, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_1, double())));
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_area_2) == 0)
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_2, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_2, double())));
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_area_3) == 0)
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_3, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_3, double())));
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_area_4) == 0)
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_4, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_4, double())));
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_enchendo_volume_morto) == 0)
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_enchendo_volume_morto, SmartEnupla<Periodo, int>(horizonte_estudo, a_dados.vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_enchendo_volume_morto, int())));
+
+		if (a_dados.getSizeVetor(a_idHidreletrica, AttVetorHidreletrica_regularizacao) == 0)
+			a_dados.vetorHidreletrica.att(a_idHidreletrica).setVetor(AttVetorHidreletrica_regularizacao, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
+
+
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_hidreletricas_sem_producao_para_acoplamento_cortes_NW: \n" + std::string(erro.what())); }
 
 }

@@ -9523,12 +9523,13 @@ bool Dados::validaFuncaoProducaoHidreletrica(FuncaoProducaoHidreletrica& a_funca
 								vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).addElemento(AttVetorReservatorio_cota_referencia, periodo, vetorHidreletrica.att(a_idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getCotaMedia(periodo, volume_minimo, volume_maximo));
 							}
 
+							a_preencher_AttVetorHidreletrica.at(AttVetorHidreletrica_canal_fuga_medio) = sim_premissa;
 							if (getSizeVetor(a_idHidreletrica, AttVetorHidreletrica_canal_fuga_medio) == 0) {
-								a_preencher_AttVetorHidreletrica.at(AttVetorHidreletrica_canal_fuga_medio) = sim_premissa;
+								//a_preencher_AttVetorHidreletrica.at(AttVetorHidreletrica_canal_fuga_medio) = sim_premissa;
 								vetorHidreletrica.att(a_idHidreletrica).addElemento(AttVetorHidreletrica_canal_fuga_medio, periodo, getAtributo(a_idHidreletrica, AttComumHidreletrica_canal_fuga_medio, double()));
 							} // if (getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_cota_referencia) == 0) {
 							else if (getIteradorFinal(a_idHidreletrica, AttVetorHidreletrica_canal_fuga_medio, Periodo()) < periodo) {
-								a_preencher_AttVetorHidreletrica.at(AttVetorHidreletrica_canal_fuga_medio) = sim_premissa;
+								//a_preencher_AttVetorHidreletrica.at(AttVetorHidreletrica_canal_fuga_medio) = sim_premissa;
 								vetorHidreletrica.att(a_idHidreletrica).addElemento(AttVetorHidreletrica_canal_fuga_medio, periodo, getAtributo(a_idHidreletrica, AttComumHidreletrica_canal_fuga_medio, double()));
 							}
 
