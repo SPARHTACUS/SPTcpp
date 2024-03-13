@@ -13584,6 +13584,7 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 							a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_incremental_historico, periodo, afluencia_incremental);
 							a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_serie_temporal, periodo, afluencia_incremental);
+							a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, periodo, afluencia_incremental);
 							//a_dados.vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_natural_historico, periodo, afluencia_natural_periodo_hidreletrica_historico.at(periodo).getElemento(idHidreletrica));
 
 						}//if (horizonte_estudo.getIteradorInicial().sobreposicao(periodo) == 0.0) {
@@ -14038,7 +14039,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		if (a_dados.vetorHidreletrica.att(a_dados.getMenorId(IdHidreletrica())).getSizeVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR) == 0)//Pode ter sido instanciado para o cálculo das produtibilidade_acumulada_EAR em restrições de energia armazenada RHV
 			calcular_produtibilidade_EAR_acumulada_por_usina(a_dados);
 		
-		calcular_produtibilidade_ENA_por_usina_por_periodo(a_dados, horizonte_tendencia_mais_processo_estocastico);
+		calcular_produtibilidade_ENA_por_usina_por_periodo(a_dados, horizonte_tendencia_mais_estudo);
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//3 Cálculo da ENA x REE x cenário x período
@@ -16183,7 +16184,7 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 				if (true) {
 					const double percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
 					const Periodo periodo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial(); //Premissa validada com dados do DC
-					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(horizonte_estudo_DECK, a_dados.vetorHidreletrica.att(idHidreletrica), periodo, percentual_volume_util, false)));
+					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(SmartEnupla<Periodo, bool>(a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()), true), a_dados.vetorHidreletrica.att(idHidreletrica), periodo, percentual_volume_util, false)));
 				}//if (true) {
 
 			}//else {
@@ -22009,9 +22010,17 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		//+ Calcula serieTemporal da variavelAleatoria
 		if (true) {
 			SmartEnupla<Periodo, bool> horizonte_processo_estocastico(a_dados.processoEstocastico_hidrologico.getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double()), true);
-			for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-				for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= a_dados.processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria()); idVar++) {
-					//a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVar).calcularSerieTemporal();
+			
+			for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= a_dados.processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria()); idVar++) {
+
+				if (periodo_final_PE_DECOMP < horizonte_otimizacao.at(horizonte_otimizacao.getIteradorFinal())) {
+					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVar).setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, idVar);
+					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVar).calcularSerieTemporal();
+					a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVar).calcularTendenciaTemporal();
+				}//if (periodo_final_PE_DECOMP < horizonte_otimizacao.at(horizonte_otimizacao.getIteradorFinal())) {
+
+
+				for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 					for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= a_dados.processoEstocastico_hidrologico.getIterador2Final(idVar, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, IdRealizacao()); idRealizacao++) {
 						if (a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVar, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, idRealizacao, double()) < 0.0)
 							a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVar).setElemento(AttVetorVariavelAleatoria_tipo_relaxacao, periodo, TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao);

@@ -15,10 +15,10 @@ LeituraCEPEL::LeituraCEPEL() {
 	//  para o acoplamento ENA (caso não estiverem instanciadas)
 	//////////////////////////////////////////////////////////////////////
 
-	idHidreletricas_sem_producao.push_back(IdHidreletrica_168_POSTO_ACOPLAMENTO_ENA_SOBRADINHO); //Usina Posto acoplamento Sobradinho
-	idHidreletricas_sem_producao.push_back(IdHidreletrica_172_POSTO_ACOPLAMENTO_ENA_ITAPARICA); //Usina Posto acoplamento Itaparica
+	idHidreletricas_sem_producao.push_back(IdHidreletrica_168_ENA_SOBRADINHO); //Usina Posto acoplamento Sobradinho
+	idHidreletricas_sem_producao.push_back(IdHidreletrica_172_ENA_ITAPARICA); //Usina Posto acoplamento Itaparica
 	idHidreletricas_sem_producao.push_back(IdHidreletrica_176_COMPPAFMOX); //Usina Comp. Moxotó
-	idHidreletricas_sem_producao.push_back(IdHidreletrica_178_POSTO_ACOPLAMENTO_ENA_XINGO); //Usina Posto acoplamento Xingo
+	idHidreletricas_sem_producao.push_back(IdHidreletrica_178_ENA_XINGO); //Usina Posto acoplamento Xingo
 
 	////////////////////////////////////////////////////////////////////////////////////////////
 
