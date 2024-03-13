@@ -13994,43 +13994,40 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 
 		/////////////////////////////////////////////////////
-		//Define horizonte tendencia + horizonte estudo
+		//Define horizontes de interesse
 
-		SmartEnupla <Periodo, bool> horizonte_tendencia_mais_estudo; //Vai conter nos iteradores os periodos da tendencia_temporal + periodos do horizonte de estudo
+		SmartEnupla <Periodo, bool> horizonte_tendencia_mais_processo_estocastico; //Vai conter nos iteradores os periodos da tendencia_temporal + processo estocástico
+		SmartEnupla <Periodo, bool> horizonte_tendencia_mais_estudo; //Vai conter nos iteradores os periodos da tendencia_temporal + horizonte de estudo (para cálculo das premissas necessárias do cálculo das produtibilidades EAR e ENA)
 
 		//Tendência temporal
 		const SmartEnupla <Periodo, double> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
-		for (Periodo periodo = tendencia_temporal.getIteradorInicial(); periodo <= tendencia_temporal.getIteradorFinal(); tendencia_temporal.incrementarIterador(periodo))
+		for (Periodo periodo = tendencia_temporal.getIteradorInicial(); periodo <= tendencia_temporal.getIteradorFinal(); tendencia_temporal.incrementarIterador(periodo)) {
+			horizonte_tendencia_mais_processo_estocastico.addElemento(periodo, true);
 			horizonte_tendencia_mais_estudo.addElemento(periodo, true);
+
+		}
 
 		//Horizonte de estudo
-		//for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo))
-			//horizonte_tendencia_mais_estudo.addElemento(periodo, true);
-
-		//A variável aleatória realiza com os tipos de periodos do horizonte_estudo_DECK
-		for (Periodo periodo = horizonte_estudo_DECK.getIteradorInicial(); periodo <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo))
+		for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo))
 			horizonte_tendencia_mais_estudo.addElemento(periodo, true);
 
-		//Adiciona os periodos da extensão do horizonte
+		//Adiciona os periodos do processo estocástico (incluídos os períodos da extensão do horizonte)
+		for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) 
+			horizonte_tendencia_mais_processo_estocastico.addElemento(periodo, true);
 
-		for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
-			if(periodo > periodo_ultimo_sobreposicao)
-				horizonte_tendencia_mais_estudo.addElemento(periodo, true);
-		}//for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) {
 			
-
 		///////////////////////////////////////////////////////////////////////
 		//Cria horizonte_MENSAL da tendência + estudo 
 		///////////////////////////////////////////////////////////////////////
 
-		SmartEnupla<Periodo, bool> horizonte_tendencia_mais_estudo_MENSAL;
+		SmartEnupla<Periodo, bool> horizonte_tendencia_mais_processo_estocastico_MENSAL;
 
-		const Periodo periodo_inicial_MENSAL = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_estudo.getIteradorInicial().getMes(), horizonte_tendencia_mais_estudo.getIteradorInicial().getAno());
-		const Periodo periodo_final_MENSAL = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_estudo.getIteradorFinal().getMes(), horizonte_tendencia_mais_estudo.getIteradorFinal().getAno());
+		const Periodo periodo_inicial_MENSAL = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_processo_estocastico.getIteradorInicial().getMes(), horizonte_tendencia_mais_processo_estocastico.getIteradorInicial().getAno());
+		const Periodo periodo_final_MENSAL = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_processo_estocastico.getIteradorFinal().getMes(), horizonte_tendencia_mais_processo_estocastico.getIteradorFinal().getAno());
 
 		for (Periodo periodo_aux = periodo_inicial_MENSAL; periodo_aux <= periodo_final_MENSAL; periodo_aux++)
-			horizonte_tendencia_mais_estudo_MENSAL.addElemento(periodo_aux, true);
+			horizonte_tendencia_mais_processo_estocastico_MENSAL.addElemento(periodo_aux, true);
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//2 Cálculo da produtibilidade_EAR acumulada por usina (aporte em cada REE)
@@ -14041,7 +14038,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		if (a_dados.vetorHidreletrica.att(a_dados.getMenorId(IdHidreletrica())).getSizeVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR) == 0)//Pode ter sido instanciado para o cálculo das produtibilidade_acumulada_EAR em restrições de energia armazenada RHV
 			calcular_produtibilidade_EAR_acumulada_por_usina(a_dados);
 		
-		calcular_produtibilidade_ENA_por_usina_por_periodo(a_dados, horizonte_tendencia_mais_estudo);
+		calcular_produtibilidade_ENA_por_usina_por_periodo(a_dados, horizonte_tendencia_mais_processo_estocastico);
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//3 Cálculo da ENA x REE x cenário x período
@@ -14066,10 +14063,10 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 		std::cout << "Iniciando equacionamento afluencia natural por UHE..." << std::endl;
 
-		calcular_equacionamento_afluencia_natural_x_hidreletrica(a_dados, lista_codUsina_idHidreletrica, lista_codPosto_idHidreletrica, mapIdVar, mapIdVarInterna, horizonte_tendencia_mais_estudo, a_horizonte_estudo.getIteradorInicial());
+		calcular_equacionamento_afluencia_natural_x_hidreletrica(a_dados, lista_codUsina_idHidreletrica, lista_codPosto_idHidreletrica, mapIdVar, mapIdVarInterna, horizonte_tendencia_mais_processo_estocastico, a_horizonte_estudo.getIteradorInicial());
 
 		std::cout << "Iniciando equacionamento afluencia natural por REE..." << std::endl;
-		calcular_equacionamento_afluencia_natural_x_REE(a_dados, horizonte_tendencia_mais_estudo, horizonte_tendencia_mais_estudo_MENSAL, a_horizonte_estudo.getIteradorInicial());
+		calcular_equacionamento_afluencia_natural_x_REE(a_dados, horizonte_tendencia_mais_processo_estocastico, horizonte_tendencia_mais_processo_estocastico_MENSAL, a_horizonte_estudo.getIteradorInicial());
 		//calcular_equacionamento_afluencia_natural_x_REE(a_dados, horizonte_tendencia_mais_estudo, horizonte_tendencia_mais_estudo, a_horizonte_estudo.getIteradorInicial());
 
 
@@ -14086,7 +14083,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			//imprime_produtibilidade_ENA(a_dados, a_diretorio + a_diretorio_cortes + "//_info_HIDRELETRICA_AttVetor_produtibilidade_ENA.csv", horizonte_tendencia_mais_estudo);
 			////calcular_ENA_x_REE_x_cenario_x_periodo(a_dados);
 			//calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE(a_dados, horizonte_tendencia_mais_estudo, horizonte_tendencia_mais_estudo_MENSAL, a_horizonte_estudo.getIteradorInicial(), mapIdVar, mapIdVarInterna);
-			calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE(a_dados, horizonte_tendencia_mais_estudo, horizonte_tendencia_mais_estudo, a_horizonte_estudo.getIteradorInicial(), mapIdVar, mapIdVarInterna);
+			calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE(a_dados, horizonte_tendencia_mais_processo_estocastico, horizonte_tendencia_mais_processo_estocastico, a_horizonte_estudo.getIteradorInicial(), mapIdVar, mapIdVarInterna);
 			//imprime_afluencia_natural_x_idHidreletrica_x_cenario_x_periodo(a_dados, a_diretorio + a_diretorio_cortes + "//_info_afluencia_natural_x_idHidreletrica_x_cenario_x_periodo.csv", horizonte_tendencia_mais_estudo);
 			imprime_ENA_x_REE_x_cenario_x_periodo(a_dados, a_dados.getAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string()) + "//_info_ENA_x_REE_x_cenario_x_periodo.csv");
 
@@ -14118,7 +14115,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				Periodo periodo_inicial_mensal = Periodo(TipoPeriodo_mensal, horizonte_estudo_DECK.getIteradorFinal().getMes(), horizonte_estudo_DECK.getIteradorFinal().getAno());
 				periodo_inicial_mensal--;
 
-				Periodo periodo_final_mensal = horizonte_tendencia_mais_estudo_MENSAL.getIteradorFinal();
+				Periodo periodo_final_mensal = horizonte_tendencia_mais_processo_estocastico_MENSAL.getIteradorFinal();
 
 				//////////////////////
 				Periodo periodo_inicial_aux = Periodo(TipoPeriodo_mensal, IdMes_1, periodo_inicial_mensal.getAno()); //A impressão dos cortes no arquivo nwlistcf.rel é desde o mês 1 até o mês 12 (mesmo que o estudo comece p.ex. no mês 6)
@@ -14149,7 +14146,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			estagio_pos_estudo.setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, 0);
 			estagio_pos_estudo.setAtributo(AttComumEstagio_cortes_multiplos, 0);
 
-			const Periodo periodo_pos_estudo = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_estudo_MENSAL.getIteradorFinal() + 1);
+			const Periodo periodo_pos_estudo = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_processo_estocastico_MENSAL.getIteradorFinal() + 1);
 			estagio_pos_estudo.setAtributo(AttComumEstagio_periodo_otimizacao, periodo_pos_estudo);
 
 			estagio_pos_estudo.alocarCorteBenders(8000);
@@ -19762,7 +19759,7 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 				////////////////////////////////////////////
 
 				if (a_dados.vetorHidreletrica.att(a_dados.getMenorId(IdHidreletrica())).getSizeVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR) == 0) {
-					atualizar_vetores_premissas_calculo_produtibilidades(a_dados, horizonte_estudo_DECK);
+					atualizar_vetores_premissas_calculo_produtibilidades(a_dados, SmartEnupla<Periodo, bool>(horizonte_estudo, true));
 					calcular_produtibilidade_EAR_acumulada_por_usina(a_dados);
 				}
 					
