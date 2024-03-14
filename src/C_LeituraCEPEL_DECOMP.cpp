@@ -13966,7 +13966,7 @@ void LeituraCEPEL::atualiza_volume_util_maximo_com_percentual_volume_util_maximo
 
 }
 
-void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, const std::string a_nomeArquivo_cortes)
+void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, const std::string a_nomeArquivo_cortes, const std::string a_diretorio_att_premissas)
 {
 	try {
 
@@ -13997,21 +13997,35 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		/////////////////////////////////////////////////////
 		//Define horizontes de interesse
 
+		SmartEnupla <Periodo, bool> horizonte_tendencia_mais_estudo_DIARIO; //Iteradores os periodos da tendencia_temporal + horizonte_estudo (em períodos diários): Premissa de menor discretização para impressão do vetor produtibilidade_ENA
 		SmartEnupla <Periodo, bool> horizonte_tendencia_mais_processo_estocastico; //Vai conter nos iteradores os periodos da tendencia_temporal + processo estocástico
-		SmartEnupla <Periodo, bool> horizonte_tendencia_mais_estudo; //Vai conter nos iteradores os periodos da tendencia_temporal + horizonte de estudo (para cálculo das premissas necessárias do cálculo das produtibilidades EAR e ENA)
+		//SmartEnupla <Periodo, bool> horizonte_tendencia_mais_estudo; //Vai conter nos iteradores os periodos da tendencia_temporal + horizonte de estudo (para cálculo das premissas necessárias do cálculo das produtibilidades EAR e ENA)
 
 		//Tendência temporal
 		const SmartEnupla <Periodo, double> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
 		for (Periodo periodo = tendencia_temporal.getIteradorInicial(); periodo <= tendencia_temporal.getIteradorFinal(); tendencia_temporal.incrementarIterador(periodo)) {
+			horizonte_tendencia_mais_estudo_DIARIO.addElemento(periodo, true);
 			horizonte_tendencia_mais_processo_estocastico.addElemento(periodo, true);
-			horizonte_tendencia_mais_estudo.addElemento(periodo, true);
+			//horizonte_tendencia_mais_estudo.addElemento(periodo, true);
 
 		}
 
 		//Horizonte de estudo
+		/*
 		for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo))
 			horizonte_tendencia_mais_estudo.addElemento(periodo, true);
+		*/
+
+
+		const Periodo periodo_inicial_DIARIO = Periodo(TipoPeriodo_diario, a_horizonte_estudo.getIteradorInicial().getDia(), a_horizonte_estudo.getIteradorInicial().getMes(), a_horizonte_estudo.getIteradorInicial().getAno());
+		const Periodo periodo_final_DIARIO = Periodo(TipoPeriodo_diario, a_horizonte_estudo.getIteradorFinal() + 1);
+
+
+		for (Periodo periodo_aux = periodo_inicial_DIARIO; periodo_aux < periodo_final_DIARIO; periodo_aux++)
+			horizonte_tendencia_mais_estudo_DIARIO.addElemento(periodo_aux, true);
+
+		/////
 
 		//Adiciona os periodos do processo estocástico (incluídos os períodos da extensão do horizonte)
 		for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) 
@@ -14034,12 +14048,12 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		//2 Cálculo da produtibilidade_EAR acumulada por usina (aporte em cada REE)
 		//////////////////////////////////////////////////////////////////////////////////
 
-		atualizar_vetores_premissas_calculo_produtibilidades(a_dados, horizonte_tendencia_mais_estudo);
+		atualizar_vetores_premissas_calculo_produtibilidades(a_dados, horizonte_tendencia_mais_estudo_DIARIO);
 
 		if (a_dados.vetorHidreletrica.att(a_dados.getMenorId(IdHidreletrica())).getSizeVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR) == 0)//Pode ter sido instanciado para o cálculo das produtibilidade_acumulada_EAR em restrições de energia armazenada RHV
-			calcular_produtibilidade_EAR_acumulada_por_usina(a_dados);
+			calcular_produtibilidade_EAR_acumulada_por_usina(a_dados, horizonte_tendencia_mais_estudo_DIARIO);
 		
-		calcular_produtibilidade_ENA_por_usina_por_periodo(a_dados, horizonte_tendencia_mais_estudo);
+		calcular_produtibilidade_ENA_por_usina_por_periodo(a_dados, horizonte_tendencia_mais_estudo_DIARIO);
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//3 Cálculo da ENA x REE x cenário x período
@@ -14062,6 +14076,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			mapIdVarInterna.at(idHidreletrica) = idVariavelAleatoriaInterna;
 		}
 
+		/*
 		std::cout << "Iniciando equacionamento afluencia natural por UHE..." << std::endl;
 
 		calcular_equacionamento_afluencia_natural_x_hidreletrica(a_dados, lista_codUsina_idHidreletrica, lista_codPosto_idHidreletrica, mapIdVar, mapIdVarInterna, horizonte_tendencia_mais_processo_estocastico, a_horizonte_estudo.getIteradorInicial());
@@ -14069,7 +14084,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		std::cout << "Iniciando equacionamento afluencia natural por REE..." << std::endl;
 		calcular_equacionamento_afluencia_natural_x_REE(a_dados, horizonte_tendencia_mais_processo_estocastico, horizonte_tendencia_mais_processo_estocastico_MENSAL, a_horizonte_estudo.getIteradorInicial());
 		//calcular_equacionamento_afluencia_natural_x_REE(a_dados, horizonte_tendencia_mais_estudo, horizonte_tendencia_mais_estudo, a_horizonte_estudo.getIteradorInicial());
-
+		*/
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//Imprime info de cálculo
@@ -14174,7 +14189,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 			std::cout << "Mapeando variaveis de estado..." << std::endl;
 
-			const SmartEnupla<Periodo, SmartEnupla<IdCenario, double>> inicializacao_conversao_ENA_acoplamento(lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario, SmartEnupla<IdCenario, double>(IdCenario_1, std::vector<double>(idCenario_final, 0.0)));
+			//const SmartEnupla<Periodo, SmartEnupla<IdCenario, double>> inicializacao_conversao_ENA_acoplamento(lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario, SmartEnupla<IdCenario, double>(IdCenario_1, std::vector<double>(idCenario_final, 0.0)));
 
 			if (true) {
 				SmartEnupla<IdReservatorioEquivalente, bool> coeficientes_EAR;
@@ -14228,8 +14243,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				}//for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
 				*/
 
-				/**/
-				// TIRAR
+				/*
 				for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
 
 					const Periodo periodo_lag = periodo_pos_estudo - lag;
@@ -14308,6 +14322,8 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario = SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>>>();
 				lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario = SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>>>();
 				
+				*/
+
 			} // if (true) {
 
 			// Estados PTDISPCOM
@@ -14949,7 +14965,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			entradaSaidaDados.setSeparadorCSV(";");
 			entradaSaidaDados.setDiretorioSaida(a_dados.getAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string()));
 
-			/**/
+			/*
 			for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idUHE)) {
 
 				if (a_dados.vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.numObjetos() > 0) {
@@ -14970,7 +14986,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				}
 
 			}
-			
+			*/
 
 			entradaSaidaDados.setAppendArquivo(false);
 			entradaSaidaDados.imprimirArquivoCSV_AttComum("estagio.csv", estagio_pos_estudo, std::vector<AttComumEstagio>{ AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao, AttComumEstagio_selecao_cortes_nivel_dominancia, AttComumEstagio_cortes_multiplos, AttComumEstagio_alpha_CVAR, AttComumEstagio_lambda_CVAR});
@@ -14979,25 +14995,25 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			entradaSaidaDados.imprimirArquivoCSV_AttMatriz("corteBenders_coeficientes.csv", IdCorteBenders_Nenhum, estagio_pos_estudo, AttMatrizCorteBenders_coeficiente);
 
 			///////////////////
-
+			entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissas);
 			entradaSaidaDados.setAppendArquivo(false);
 			for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idUHE)) {
 
-				entradaSaidaDados.imprimirArquivoCSV_AttVetor("info_HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_volume_minimo);
+				entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_RESERVATORIO_ENA_AttVetorPremissa.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_volume_minimo);
 				entradaSaidaDados.setAppendArquivo(true);
-				entradaSaidaDados.imprimirArquivoCSV_AttVetor("info_HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_volume_maximo);
-				entradaSaidaDados.imprimirArquivoCSV_AttVetor("info_HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_poli_cota_volume_0);
-				entradaSaidaDados.imprimirArquivoCSV_AttVetor("info_HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_poli_cota_volume_1);
-				entradaSaidaDados.imprimirArquivoCSV_AttVetor("info_HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_poli_cota_volume_2);
-				entradaSaidaDados.imprimirArquivoCSV_AttVetor("info_HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_poli_cota_volume_3);
-				entradaSaidaDados.imprimirArquivoCSV_AttVetor("info_HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_poli_cota_volume_4);
+				entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_RESERVATORIO_ENA_AttVetorPremissa.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_volume_maximo);
+				entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_RESERVATORIO_ENA_AttVetorPremissa.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_poli_cota_volume_0);
+				entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_RESERVATORIO_ENA_AttVetorPremissa.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_poli_cota_volume_1);
+				entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_RESERVATORIO_ENA_AttVetorPremissa.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_poli_cota_volume_2);
+				entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_RESERVATORIO_ENA_AttVetorPremissa.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_poli_cota_volume_3);
+				entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_RESERVATORIO_ENA_AttVetorPremissa.csv", idUHE, IdReservatorio_1, a_dados, AttVetorReservatorio_poli_cota_volume_4);
 
 			}//for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idUHE)) {
 
 			entradaSaidaDados.setAppendArquivo(false);
 			for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idUHE)) {
 
-				entradaSaidaDados.imprimirArquivoCSV_AttVetor("info_HIDRELETRICA_AttVetorPremissa_PorPeriodo.csv", idUHE, a_dados, AttVetorHidreletrica_canal_fuga_medio);
+				entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_ENA_AttVetorPremissa.csv", idUHE, a_dados, AttVetorHidreletrica_canal_fuga_medio);
 				entradaSaidaDados.setAppendArquivo(true);
 
 			}//for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idUHE)) {
@@ -15553,7 +15569,7 @@ void LeituraCEPEL::instanciar_codigo_usina_jusante_JUSENA(Dados& a_dados)
 
 }
 
-double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(const SmartEnupla<Periodo, bool> a_horizonte_alvo, Hidreletrica& a_hidreletrica, const Periodo a_periodo, const double a_percentual_volume_util, const bool a_is_calculo_para_ENA)
+double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidreletrica, const SmartEnupla<Periodo, bool> a_horizonte_alvo,  const Periodo a_periodo, const double a_percentual_volume_util, const bool a_is_calculo_para_ENA)
 {
 	try {
 
@@ -15587,26 +15603,9 @@ double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(const SmartEnupla<Per
 		//            são consideradas as modificações de cotas e canal de fuga médio do periodo_inicial_horizonte_estudo
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-
-		double canal_fuga_medio = 0.0;
-		double cotaMedia = 0.0;
-
-		bool is_sobreposicao_encontrada = false;
-		for (Periodo periodo_estudo = a_horizonte_alvo.getIteradorInicial(); periodo_estudo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo_estudo)) {
-
-			const double sobreposicao = a_periodo.sobreposicao(periodo_estudo);
-
-			if (sobreposicao > 0.0) {
-				is_sobreposicao_encontrada = true;
-				canal_fuga_medio += a_hidreletrica.getElementoVetor(AttVetorHidreletrica_canal_fuga_medio, periodo_estudo, double()) * sobreposicao;
-				cotaMedia += a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getCotaMedia(periodo_estudo, volume_minimo, volume_maximo) * sobreposicao;
-			}// if (sobreposicao > 0.0) {
-
-			if (sobreposicao == 0.0 && is_sobreposicao_encontrada)
-				break;
-
-		}//for (Periodo periodo_estudo = a_horizonte_alvo.getIteradorInicial(); periodo_estudo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo_estudo)) {
-			
+		const double canal_fuga_medio = a_hidreletrica.getElementoVetor(AttVetorHidreletrica_canal_fuga_medio, a_periodo, double());
+		const double cotaMedia        = a_hidreletrica.vetorReservatorio.att(IdReservatorio_1).getCotaMedia(a_periodo, volume_minimo, volume_maximo);
+		
 		const double cota = cotaMedia - canal_fuga_medio;
 
 		return cota;
@@ -15915,218 +15914,169 @@ void LeituraCEPEL::set_atributos_hidreletrica_from_CadUsH_csv(Dados& a_dados, st
 void LeituraCEPEL::atualizar_vetores_premissas_calculo_produtibilidades(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_alvo)
 {
 	try {
+		//**************************************************************************************************************
+		//Instancia vetores para o cálculo das produtibilidades no escopo temporal do a_horizonte_alvo
+		// Nota: Para periodos < periodo_inicial_horizonte_estudo utiliza a info do periodo_inicial_horizonte_estudo
+		//       Os atributos setados são os necessários para o cálculo das produtibilidades ENA e EAR
+		//**************************************************************************************************************
+		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+		const Periodo periodo_inicial_horizonte_estudo = horizonte_estudo.getIteradorInicial();
+		const Periodo periodo_final_horizonte_estudo = horizonte_estudo.getIteradorFinal();
 
-		//Instancia vetores (caso precisar) para o cálculo das produtibilidades
+		////////////////////////////
+		//AttVetorReservatorio
+		////////////////////////////
 
-		const Periodo periodo_inicial_horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial();
+		SmartEnupla<int, AttVetorReservatorio> attVetorReservatorio;
+		SmartEnupla<int, AttComumReservatorio> attComumReservatorio;
+
+		if (true) {
+			int pos_elemento = 1;
+			attVetorReservatorio.addElemento(pos_elemento, AttVetorReservatorio_volume_minimo);
+			attComumReservatorio.addElemento(pos_elemento, AttComumReservatorio_volume_minimo);
+			pos_elemento++;
+			attVetorReservatorio.addElemento(pos_elemento, AttVetorReservatorio_volume_maximo);
+			attComumReservatorio.addElemento(pos_elemento, AttComumReservatorio_volume_maximo);
+			pos_elemento++;
+			attVetorReservatorio.addElemento(pos_elemento, AttVetorReservatorio_poli_cota_volume_0);
+			attComumReservatorio.addElemento(pos_elemento, AttComumReservatorio_poli_cota_volume_0);
+			pos_elemento++;
+			attVetorReservatorio.addElemento(pos_elemento, AttVetorReservatorio_poli_cota_volume_1);
+			attComumReservatorio.addElemento(pos_elemento, AttComumReservatorio_poli_cota_volume_1);
+			pos_elemento++;
+			attVetorReservatorio.addElemento(pos_elemento, AttVetorReservatorio_poli_cota_volume_2);
+			attComumReservatorio.addElemento(pos_elemento, AttComumReservatorio_poli_cota_volume_2);
+			pos_elemento++;
+			attVetorReservatorio.addElemento(pos_elemento, AttVetorReservatorio_poli_cota_volume_3);
+			attComumReservatorio.addElemento(pos_elemento, AttComumReservatorio_poli_cota_volume_3);
+			pos_elemento++;
+			attVetorReservatorio.addElemento(pos_elemento, AttVetorReservatorio_poli_cota_volume_4);
+			attComumReservatorio.addElemento(pos_elemento, AttComumReservatorio_poli_cota_volume_4);
+			pos_elemento++;
+
+		}
+
+		////////////////////////////
+		//AttVetorHidreletrica
+		////////////////////////////
+
+		SmartEnupla<int, AttVetorHidreletrica> attVetorHidreletrica;
+		SmartEnupla<int, AttComumHidreletrica> attComumHidreletrica;
+
+		if (true) {
+			int pos_elemento = 1;
+			attVetorHidreletrica.addElemento(pos_elemento, AttVetorHidreletrica_canal_fuga_medio);
+			attComumHidreletrica.addElemento(pos_elemento, AttComumHidreletrica_canal_fuga_medio);
+			pos_elemento++;
+		}
+
+		////////////////////////////////////////
+		//Instancia vetores
+		////////////////////////////////////////
 
 		for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-			//AttVetorReservatorio_volume_maximo
+			////////////////////////////
+			//AttVetorReservatorio
+			////////////////////////////
 			if (true) {
 
-				if (a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_maximo) == 0)
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_maximo, SmartEnupla<Periodo, double>(a_horizonte_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_volume_maximo, double())));
-				else {
+				for (int pos = 1; pos <= int(attVetorReservatorio.size()); pos++) {
 
-					SmartEnupla<Periodo, double> volume_maximo;
+					if (a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getSizeVetor(attVetorReservatorio.at(pos)) == 0)
+						a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(attVetorReservatorio.at(pos), SmartEnupla<Periodo, double>(a_horizonte_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(attComumReservatorio.at(pos), double())));
+					else {
 
-					for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
+						SmartEnupla<Periodo, double> nova_enupla;
 
-						//Premissa do setor: períodos anteriores ao periodo_inicial do estudo adotam o valor do periodo_inicial
+						for (Periodo periodo_alvo = a_horizonte_alvo.getIteradorInicial(); periodo_alvo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo_alvo)) {
 
-						if (periodo >= periodo_inicial_horizonte_estudo)
-							volume_maximo.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_maximo, periodo, double()));
-						else
-							volume_maximo.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_maximo, periodo_inicial_horizonte_estudo, double()));
+							//Premissa do setor: períodos anteriores ao periodo_inicial do estudo adotam o valor do periodo_inicial
 
-					}//for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
+							if (periodo_alvo >= periodo_inicial_horizonte_estudo) {
 
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_maximo, volume_maximo);
+								bool is_sobreposicao_encontrada = false;
+								for (Periodo periodo = periodo_inicial_horizonte_estudo; periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
-				}//else {
+									const double sobreposicao = periodo_alvo.sobreposicao(periodo);
+
+									if (sobreposicao == 1.0) {
+										is_sobreposicao_encontrada = true;
+										nova_enupla.addElemento(periodo_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(attVetorReservatorio.at(pos), periodo, double()));
+										break;
+									}//if (sobreposicao == 1.0) {
+									else if (sobreposicao > 0.0)
+										throw std::invalid_argument("Periodo_alvo: " + getString(periodo_alvo) + "deve ser contido em sua totalidade pelo periodo do horizonte de estudo : " + getString(periodo));
+
+
+								}//for (Periodo periodo = periodo_inicial_horizonte_estudo; periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo)) {
+
+								if (!is_sobreposicao_encontrada)
+									throw std::invalid_argument("Nao encontrado no horizonte de estudo o periodo_alvo: " + getString(periodo_alvo));
+
+							}
+							else
+								nova_enupla.addElemento(periodo_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(attVetorReservatorio.at(pos), periodo_inicial_horizonte_estudo, double()));
+
+						}//for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
+
+						a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(attVetorReservatorio.at(pos), nova_enupla);
+
+					}//else {
+
+				}//for (int pos = 1; pos <= int(attVetorReservatorio.size()); pos++) {
 
 			}//if (true) {
 
-			//AttVetorReservatorio_volume_minimo
+			////////////////////////////
+			//AttVetorHidreletrica
+			////////////////////////////
 			if (true) {
 
-				if (a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_minimo) == 0)
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_minimo, SmartEnupla<Periodo, double>(a_horizonte_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_volume_minimo, double())));
-				else {
+				for (int pos = 1; pos <= int(attVetorHidreletrica.size()); pos++) {
 
-					SmartEnupla<Periodo, double> volume_minimo;
+					if (a_dados.vetorHidreletrica.att(idHidreletrica).getSizeVetor(attVetorHidreletrica.at(pos)) == 0)
+						a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(attVetorHidreletrica.at(pos), SmartEnupla<Periodo, double>(a_horizonte_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(attComumHidreletrica.at(pos), double())));
+					else {
 
-					for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
+						SmartEnupla<Periodo, double> nova_enupla;
 
-						//Premissa do setor: períodos anteriores ao periodo_inicial do estudo adotam o valor do periodo_inicial
+						for (Periodo periodo_alvo = a_horizonte_alvo.getIteradorInicial(); periodo_alvo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo_alvo)) {
 
-						if (periodo >= periodo_inicial_horizonte_estudo)
-							volume_minimo.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_minimo, periodo, double()));
-						else
-							volume_minimo.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_minimo, periodo_inicial_horizonte_estudo, double()));
+							//Premissa do setor: períodos anteriores ao periodo_inicial do estudo adotam o valor do periodo_inicial
 
-					}//for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
+							if (periodo_alvo >= periodo_inicial_horizonte_estudo) {
 
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_minimo, volume_minimo);
+								bool is_sobreposicao_encontrada = false;
+								for (Periodo periodo = periodo_inicial_horizonte_estudo; periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
-				}//else {
+									const double sobreposicao = periodo_alvo.sobreposicao(periodo);
 
-			}//if (true) {
+									if (sobreposicao == 1.0) {
+										is_sobreposicao_encontrada = true;
+										nova_enupla.addElemento(periodo_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(attVetorHidreletrica.at(pos), periodo, double()));
+										break;
+									}//if (sobreposicao == 1.0) {
+									else if (sobreposicao > 0.0)
+										throw std::invalid_argument("Periodo_alvo: " + getString(periodo_alvo) + "deve ser contido em sua totalidade pelo periodo do horizonte de estudo : " + getString(periodo));
 
-			//AttVetorReservatorio_poli_cota_volume_0
-			if (true) {
 
-				if (a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_0) == 0)
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_0, SmartEnupla<Periodo, double>(a_horizonte_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_0, double())));
-				else {
+								}//for (Periodo periodo = periodo_inicial_horizonte_estudo; periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
-					SmartEnupla<Periodo, double> poli_cota_volume_0;
+								if (!is_sobreposicao_encontrada)
+									throw std::invalid_argument("Nao encontrado no horizonte de estudo o periodo_alvo: " + getString(periodo_alvo));
 
-					for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
+							}
+							else
+								nova_enupla.addElemento(periodo_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(attVetorHidreletrica.at(pos), periodo_inicial_horizonte_estudo, double()));
 
-						//Premissa do setor: períodos anteriores ao periodo_inicial do estudo adotam o valor do periodo_inicial
+						}//for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
 
-						if (periodo >= periodo_inicial_horizonte_estudo)
-							poli_cota_volume_0.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_0, periodo, double()));
-						else
-							poli_cota_volume_0.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_0, periodo_inicial_horizonte_estudo, double()));
+						a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(attVetorHidreletrica.at(pos), nova_enupla);
 
-					}//for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
+					}//else {
 
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_0, poli_cota_volume_0);
-
-				}//else {
-
-			}//if (true) {
-
-			//AttVetorReservatorio_poli_cota_volume_1
-			if (true) {
-
-				if (a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_1) == 0)
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_1, SmartEnupla<Periodo, double>(a_horizonte_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_1, double())));
-				else {
-
-					SmartEnupla<Periodo, double> poli_cota_volume_1;
-
-					for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
-
-						//Premissa do setor: períodos anteriores ao periodo_inicial do estudo adotam o valor do periodo_inicial
-
-						if (periodo >= periodo_inicial_horizonte_estudo)
-							poli_cota_volume_1.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_1, periodo, double()));
-						else
-							poli_cota_volume_1.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_1, periodo_inicial_horizonte_estudo, double()));
-
-					}//for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
-
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_1, poli_cota_volume_1);
-
-				}//else {
-
-			}//if (true) {
-
-			//AttVetorReservatorio_poli_cota_volume_2
-			if (true) {
-
-				if (a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_2) == 0)
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_2, SmartEnupla<Periodo, double>(a_horizonte_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_2, double())));
-				else {
-
-					SmartEnupla<Periodo, double> poli_cota_volume_2;
-
-					for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
-
-						//Premissa do setor: períodos anteriores ao periodo_inicial do estudo adotam o valor do periodo_inicial
-
-						if (periodo >= periodo_inicial_horizonte_estudo)
-							poli_cota_volume_2.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_2, periodo, double()));
-						else
-							poli_cota_volume_2.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_2, periodo_inicial_horizonte_estudo, double()));
-
-					}//for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
-
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_2, poli_cota_volume_2);
-
-				}//else {
-
-			}//if (true) {
-
-			//AttVetorReservatorio_poli_cota_volume_3
-			if (true) {
-
-				if (a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_3) == 0)
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_3, SmartEnupla<Periodo, double>(a_horizonte_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_3, double())));
-				else {
-
-					SmartEnupla<Periodo, double> poli_cota_volume_3;
-
-					for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
-
-						//Premissa do setor: períodos anteriores ao periodo_inicial do estudo adotam o valor do periodo_inicial
-
-						if (periodo >= periodo_inicial_horizonte_estudo)
-							poli_cota_volume_3.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_3, periodo, double()));
-						else
-							poli_cota_volume_3.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_3, periodo_inicial_horizonte_estudo, double()));
-
-					}//for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
-
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_3, poli_cota_volume_3);
-
-				}//else {
-
-			}//if (true) {
-
-			//AttVetorReservatorio_poli_cota_volume_4
-			if (true) {
-
-				if (a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_4) == 0)
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_4, SmartEnupla<Periodo, double>(a_horizonte_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_3, double())));
-				else {
-
-					SmartEnupla<Periodo, double> poli_cota_volume_4;
-
-					for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
-
-						//Premissa do setor: períodos anteriores ao periodo_inicial do estudo adotam o valor do periodo_inicial
-
-						if (periodo >= periodo_inicial_horizonte_estudo)
-							poli_cota_volume_4.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_4, periodo, double()));
-						else
-							poli_cota_volume_4.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_4, periodo_inicial_horizonte_estudo, double()));
-
-					}//for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
-
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_4, poli_cota_volume_4);
-
-				}//else {
-
-			}//if (true) {
-
-			//AttVetorHidreletrica_canal_fuga_medio
-			if (true) {
-
-				if (a_dados.vetorHidreletrica.att(idHidreletrica).getSizeVetor(AttVetorHidreletrica_canal_fuga_medio) == 0)
-					a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_canal_fuga_medio, SmartEnupla<Periodo, double>(a_horizonte_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_canal_fuga_medio, double())));
-				else {
-
-					SmartEnupla<Periodo, double> canal_fuga_medio;
-
-					for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
-
-						//Premissa do setor: períodos anteriores ao periodo_inicial do estudo adotam o valor do periodo_inicial
-
-						if (periodo >= periodo_inicial_horizonte_estudo)
-							canal_fuga_medio.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(AttVetorHidreletrica_canal_fuga_medio, periodo, double()));
-						else
-							canal_fuga_medio.addElemento(periodo, a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(AttVetorHidreletrica_canal_fuga_medio, periodo_inicial_horizonte_estudo, double()));
-
-					}//for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
-
-					a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_canal_fuga_medio, canal_fuga_medio);
-
-				}//else {
+				}//for (int pos = 1; pos <= int(attVetorReservatorio.size()); pos++) {
 
 			}//if (true) {
 
@@ -16139,10 +16089,12 @@ void LeituraCEPEL::atualizar_vetores_premissas_calculo_produtibilidades(Dados& a
 }
 
 
-void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados)
+void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_alvo)
 {
 	try {
 
+
+		SmartEnupla<Periodo,IdEstagio> horizonte_estudo =  a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Calcula produtibilidade_equivalente (cota_media(Vmax, Vmin), canal_fuga_medio) 
@@ -16182,9 +16134,34 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 				//produtibilidade_EAR
 				//////////////////////
 				if (true) {
+									
+					////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					//Encontra o primeiro periododo horizonte_alvo dentro do horizonte_DECK //Premissa validada com dados do DC
+					////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					Periodo periodo_inicial_in_horizonte_estudo = a_horizonte_alvo.getIteradorInicial();
+					bool is_sobreposicao_encontrada = false;
+
+					for (Periodo periodo_alvo = a_horizonte_alvo.getIteradorInicial(); periodo_alvo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo_alvo)) {
+
+						const double sobreposicao = periodo_alvo.sobreposicao(horizonte_estudo.getIteradorInicial());
+
+						if (sobreposicao == 1.0) {
+							is_sobreposicao_encontrada = true;
+							periodo_inicial_in_horizonte_estudo = periodo_alvo;
+						}//if (sobreposicao == 1.0) {
+						else if (sobreposicao > 0.0)
+							throw std::invalid_argument("Periodo_alvo: " + getString(periodo_alvo) + "deve ser contido em sua totalidade pelo periodo do horizonte de estudo : " + getString(horizonte_estudo.getIteradorInicial()));
+
+					}//for (Periodo periodo_alvo = a_horizonte_alvo.getIteradorInicial(); periodo_alvo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo_alvo)) {
+
+					if (!is_sobreposicao_encontrada)
+						throw std::invalid_argument("Nao encontrado no horizonte_alvo o periodo_inicial do horizonte de estudo");
+
+					////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 					const double percentual_volume_util = 1.0; //Para cálculo produtibilidade_EAR
-					const Periodo periodo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial(); //Premissa validada com dados do DC
-					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(SmartEnupla<Periodo, bool>(a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()), true), a_dados.vetorHidreletrica.att(idHidreletrica), periodo, percentual_volume_util, false)));
+
+					a_dados.vetorHidreletrica.att(idHidreletrica).setAtributo(AttComumHidreletrica_produtibilidade_EAR, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), a_horizonte_alvo,  periodo_inicial_in_horizonte_estudo, percentual_volume_util, false)));
 				}//if (true) {
 
 			}//else {
@@ -16252,8 +16229,6 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 		//////////////////////////////
 		//1.Usinas dentro do estudo
 		//////////////////////////////
-
-		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
 		for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
@@ -16396,7 +16371,7 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 
 }
 
-void LeituraCEPEL::calcular_produtibilidade_ENA_por_usina_por_periodo(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo)
+void LeituraCEPEL::calcular_produtibilidade_ENA_por_usina_por_periodo(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_alvo)
 {
 	try {
 
@@ -16429,7 +16404,7 @@ void LeituraCEPEL::calcular_produtibilidade_ENA_por_usina_por_periodo(Dados& a_d
 			    || (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_idHidreletrica, IdHidreletrica()) == IdHidreletrica_173_MOXOTO) \
 				|| (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_idHidreletrica, IdHidreletrica()) == IdHidreletrica_174_PAFONSO123)
 				|| (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_idHidreletrica, IdHidreletrica()) == IdHidreletrica_175_PAFONSO4)){
-				a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorioEquivalente.att(idREE).setVetor(AttVetorReservatorioEquivalente_produtibilidade_ENA, SmartEnupla<Periodo, double>(a_horizonte_tendencia_mais_estudo, 0.0));
+				a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorioEquivalente.att(idREE).setVetor(AttVetorReservatorioEquivalente_produtibilidade_ENA, SmartEnupla<Periodo, double>(a_horizonte_alvo, 0.0));
 
 			}//if (a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_sem_producao) {
 			else {
@@ -16438,8 +16413,8 @@ void LeituraCEPEL::calcular_produtibilidade_ENA_por_usina_por_periodo(Dados& a_d
 				//produtibilidade_ENA
 				//////////////////////
 				const double percentual_volume_util = 0.65; //Para cálculo produtibilidade_ENA
-				for (Periodo periodo = a_horizonte_tendencia_mais_estudo.getIteradorInicial(); periodo <= a_horizonte_tendencia_mais_estudo.getIteradorFinal(); a_horizonte_tendencia_mais_estudo.incrementarIterador(periodo)) {
-					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorioEquivalente.att(idREE).addElemento(AttVetorReservatorioEquivalente_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_horizonte_tendencia_mais_estudo, a_dados.vetorHidreletrica.att(idHidreletrica), periodo, percentual_volume_util, true)));
+				for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
+					a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorioEquivalente.att(idREE).addElemento(AttVetorReservatorioEquivalente_produtibilidade_ENA, periodo, get_produtibilidade_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), get_cota_para_conversao_cortes_NEWAVE(a_dados.vetorHidreletrica.att(idHidreletrica), a_horizonte_alvo, periodo, percentual_volume_util, true)));
 				}
 
 			}//else {
@@ -16449,7 +16424,7 @@ void LeituraCEPEL::calcular_produtibilidade_ENA_por_usina_por_periodo(Dados& a_d
 		//////////////////////////////////////////////////////////////////////////////////
 		//Para a valoração das ENAs para as seguintes usinas deve ser somada a produtibilidade_ENA de Itaipu:
 		//Ilha Solteira / Três Marias / Capivara
-		calcular_produtibilidade_ENA_regras_especiais(a_dados, a_horizonte_tendencia_mais_estudo);
+		calcular_produtibilidade_ENA_regras_especiais(a_dados, a_horizonte_alvo);
 
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::calcular_produtibilidade_ENA_por_usina_por_periodo: \n" + std::string(erro.what())); }
@@ -19761,7 +19736,7 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 				if (a_dados.vetorHidreletrica.att(a_dados.getMenorId(IdHidreletrica())).getSizeVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR) == 0) {
 					atualizar_vetores_premissas_calculo_produtibilidades(a_dados, SmartEnupla<Periodo, bool>(horizonte_estudo, true));
-					calcular_produtibilidade_EAR_acumulada_por_usina(a_dados);
+					calcular_produtibilidade_EAR_acumulada_por_usina(a_dados, SmartEnupla<Periodo, bool>(horizonte_estudo, true));
 				}
 					
 				
@@ -22120,7 +22095,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		// Detecta se existe arquivo de cortes NEWAVE
 		////////////////////////////////////////////////////
 		if (nomeArquivo_cortes_NW != "nenhum")
-			leitura_cortes_NEWAVE(a_dados, horizonte_estudo, nomeArquivo_cortes_NW);
+			leitura_cortes_NEWAVE(a_dados, horizonte_estudo, nomeArquivo_cortes_NW, diretorio_att_premissas);
 
 
 		//
