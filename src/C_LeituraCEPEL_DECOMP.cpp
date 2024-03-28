@@ -14228,7 +14228,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				} // for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 				// Estados ENA
-				/*
+				
 				for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
 
 					const Periodo periodo_lag = periodo_pos_estudo - lag;
@@ -14241,7 +14241,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 					}//for (IdReservatorioEquivalente idREE = coeficiente_ENA.getIteradorInicial(); idREE <= coeficiente_ENA.getIteradorFinal(); idREE++) {
 
 				}//for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {
-				*/
+				
 
 				/*
 				for (int lag = 1; lag <= ordem_maxima_PAR; lag++) {

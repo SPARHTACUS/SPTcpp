@@ -342,6 +342,9 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 				throw std::invalid_argument("O arquivo HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv nao deve ser carregado quando " + getFullString(AttComumDados_estagio_inicial) + " for maior que " + getFullString(IdEstagio_1));
 		}
 
+		//produtibilidade_ENA (para valorar as afluências em energia -> acoplamento com cortes em termos da energia natural afluente -ENA)
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_REE_AttVetorPremissa_produtibilidade_ENA.csv", *this, TipoAcessoInstancia_membroMembro);
+
 		validacao_operacional_Hidreletrica(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 
@@ -3477,6 +3480,161 @@ void Dados::validaDefluencia() {
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaDefluencia(): \n" + std::string(erro.what())); }
 } // void Dados::validaHidreletrica(){
 
+void Dados::validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_premissa) {
+	try {
+
+		/////////////////////////////////////////////////////////////
+		//1. Validações simples
+		/////////////////////////////////////////////////////////////
+
+		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
+		const IdHidreletrica menorIdHidreletrica = getMenorId(IdHidreletrica());
+
+		int controle_size_produtibilidade_ENA = 0;
+
+		for (IdHidreletrica idUHE = menorIdHidreletrica; idUHE <= maiorIdHidreletrica; vetorHidreletrica.incr(idUHE)) {
+
+			if (vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.numObjetos() > 0) {
+
+				const IdReservatorioEquivalente maiorIdReservatorioEquivalente = getMaiorId(idUHE, IdReservatorioEquivalente());
+				const IdReservatorioEquivalente menorIdReservatorioEquivalente = getMenorId(idUHE, IdReservatorioEquivalente());
+							
+				for (IdReservatorioEquivalente idREE = menorIdReservatorioEquivalente; idREE <= maiorIdReservatorioEquivalente; vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.incr(idREE)) {
+
+					if(idREE == IdReservatorioEquivalente_Nenhum)
+						throw std::invalid_argument("Deve ser alocado um IdReservatorioEquivalente para a idHidreletrica: " + getString(idUHE));
+
+					const int sizeVetor_produtibilidade_ENA = getSizeVetor(idUHE, idREE, AttVetorReservatorioEquivalente_produtibilidade_ENA);
+
+					if (sizeVetor_produtibilidade_ENA > 0) {
+
+						if(idUHE == menorIdHidreletrica && idREE == menorIdReservatorioEquivalente)
+							controle_size_produtibilidade_ENA = sizeVetor_produtibilidade_ENA;
+
+						if(controle_size_produtibilidade_ENA != sizeVetor_produtibilidade_ENA)
+							throw std::invalid_argument("O tamanho do AttVetorReservatorioEquivalente_produtibilidade_ENA deve ser igual para todas as hidreletricas e REEs");
+
+					}//if (sizeVetor_produtibilidade_ENA > 0) {
+
+				}//for (IdReservatorioEquivalente idREE = getMenorId(idUHE, IdReservatorioEquivalente()); idREE <= getMaiorId(idUHE, IdReservatorioEquivalente()); vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.incr(idREE)) {
+			}//if (vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.numObjetos() > 0) {
+
+		} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//2. Calcula a produtibilidade_ENA com os periodos do horizonte de estudo
+		// Premissa: Por padrão o vetor produtibilidade_ENA é construído despois da tendência com períodos diários
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		if (controle_size_produtibilidade_ENA > 0) {//Significa que AttVetorReservatorioEquivalente_produtibilidade_ENA foi instanciado
+
+			SmartEnupla<Periodo, bool> horizonte_tendencia_mais_estudo;
+
+			if (true) {
+				const SmartEnupla<Periodo, double> produtibilidade_ENA_base = getVetor(menorIdHidreletrica, getMenorId(menorIdHidreletrica, IdReservatorioEquivalente()), AttVetorReservatorioEquivalente_produtibilidade_ENA, Periodo(), double());
+				const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+
+				const Periodo periodo_estudo_inicial = horizonte_estudo.getIteradorInicial();
+				const Periodo periodo_estudo_final = horizonte_estudo.getIteradorFinal();
+
+				//Inclui os periodos da tendência
+				for (Periodo periodo = produtibilidade_ENA_base.getIteradorInicial(); periodo <= produtibilidade_ENA_base.getIteradorFinal(); produtibilidade_ENA_base.incrementarIterador(periodo)) {
+
+					if (periodo >= periodo_estudo_inicial)
+						break;
+
+					horizonte_tendencia_mais_estudo.addElemento(periodo, true);
+
+				}//for (Periodo periodo = produtibilidade_ENA_base.getIteradorInicial(); periodo <= produtibilidade_ENA_base.getIteradorFinal(); produtibilidade_ENA_base.incrementarIterador(periodo)) {
+
+				//Inclui os periodos do horizonte de estudo
+				for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo))
+					horizonte_tendencia_mais_estudo.addElemento(periodo, true);
+			}//if (true) {
+
+			//////////////////////////
+
+			for (IdHidreletrica idUHE = menorIdHidreletrica; idUHE <= maiorIdHidreletrica; vetorHidreletrica.incr(idUHE)) {
+
+				const IdReservatorioEquivalente maiorIdReservatorioEquivalente = getMaiorId(idUHE, IdReservatorioEquivalente());
+				const IdReservatorioEquivalente menorIdReservatorioEquivalente = getMenorId(idUHE, IdReservatorioEquivalente());
+
+				for (IdReservatorioEquivalente idREE = menorIdReservatorioEquivalente; idREE <= maiorIdReservatorioEquivalente; vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.incr(idREE)) {
+
+					SmartEnupla<Periodo, double> produtibilidade_ENA_alvo(horizonte_tendencia_mais_estudo, 0.0);
+
+					const SmartEnupla<Periodo, double> produtibilidade_ENA_base = getVetor(idUHE, idREE, AttVetorReservatorioEquivalente_produtibilidade_ENA, Periodo(), double());
+
+					for (Periodo periodo_alvo = produtibilidade_ENA_alvo.getIteradorInicial(); periodo_alvo <= produtibilidade_ENA_alvo.getIteradorFinal(); produtibilidade_ENA_alvo.incrementarIterador(periodo_alvo)) {
+
+						double soma_sobreposicao = 0.0;
+						bool is_sobreposicao_encontrada = false;
+
+						for (Periodo periodo_base = produtibilidade_ENA_base.getIteradorInicial(); periodo_base <= produtibilidade_ENA_base.getIteradorFinal(); produtibilidade_ENA_base.incrementarIterador(periodo_base)) {
+
+							const double sobreposicao = periodo_alvo.sobreposicao(periodo_base);
+
+							if (sobreposicao > 0.0) {
+								is_sobreposicao_encontrada = true;
+								soma_sobreposicao += sobreposicao;
+
+								double valor_novo = produtibilidade_ENA_alvo.at(periodo_alvo) + sobreposicao * produtibilidade_ENA_base.at(periodo_base);
+								produtibilidade_ENA_alvo.setElemento(periodo_alvo, valor_novo);
+
+							}//if (sobreposicao > 0.0) {
+
+							if (is_sobreposicao_encontrada && sobreposicao == 0.0) {//Evita percorrer o horizonte base todo
+
+								const double tol = 1e-6;
+
+								if(abs(1-soma_sobreposicao) > tol)
+									throw std::invalid_argument("Soma de sobreposicao diferente de 1.0, valor encontrado: " + getString(soma_sobreposicao));
+
+								break;
+
+							}//if (is_sobreposicao_encontrada && sobreposicao == 0.0) {
+
+						}//for (Periodo periodo_base = produtibilidade_ENA_base.getIteradorInicial(); periodo_base <= produtibilidade_ENA_base.getIteradorFinal(); produtibilidade_ENA_base.incrementarIterador(periodo_base)) {
+
+					}//for (Periodo periodo_alvo = produtibilidade_ENA_alvo.getIteradorInicial(); periodo_alvo <= produtibilidade_ENA_alvo.getIteradorFinal(); produtibilidade_ENA_alvo.incrementarIterador(periodo_alvo)) {
+
+					////////////////////////////////////////////////////////////////
+					//Atualiza AttVetorReservatorioEquivalente_produtibilidade_ENA
+					////////////////////////////////////////////////////////////////
+					vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.att(idREE).setVetor(AttVetorReservatorioEquivalente_produtibilidade_ENA, produtibilidade_ENA_alvo);
+
+				}//for (IdReservatorioEquivalente idREE = getMenorId(idUHE, IdReservatorioEquivalente()); idREE <= getMaiorId(idUHE, IdReservatorioEquivalente()); vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.incr(idREE)) {
+
+			} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
+
+
+			///////////////////////////////
+			//Imprime info
+			///////////////////////////////
+			a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
+			a_entradaSaidaDados.setAppendArquivo(false);
+			for (IdHidreletrica idUHE = menorIdHidreletrica; idUHE <= maiorIdHidreletrica; vetorHidreletrica.incr(idUHE)) {
+
+				if (vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.numObjetos() > 0) {
+
+					for (IdReservatorioEquivalente idREE = getMenorId(idUHE, IdReservatorioEquivalente()); idREE <= getMaiorId(idUHE, IdReservatorioEquivalente()); vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.incr(idREE)) {
+
+						if (getSizeVetor(idUHE, idREE, AttVetorReservatorioEquivalente_produtibilidade_ENA) > 0) {
+							a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_REE_AttVetorPremissa_produtibilidade_ENA.csv", idUHE, idREE, *this, AttVetorReservatorioEquivalente_produtibilidade_ENA);
+							a_entradaSaidaDados.setAppendArquivo(true);
+						}
+
+					}
+				}
+
+			}//for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idUHE)) {
+		}//if (controle_size_produtibilidade_ENA > 0) {//Significa que AttVetorReservatorioEquivalente_produtibilidade_ENA foi instanciado
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaProdutibilidadeENA(): \n" + std::string(erro.what())); }
+} // void Dados::validaHidreletrica(){
+
+
 void Dados::valida_considerar_tempo_viagem_agua(const IdHidreletrica a_idHidreletrica) {
 	try {
 
@@ -3785,6 +3943,8 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 		adicionaHidreletricasMontanteDesvio();
 
 		validaDefluencia();
+
+		validaProdutibilidadeENA(a_entradaSaidaDados, a_diretorio_att_premissa);
 
 		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
