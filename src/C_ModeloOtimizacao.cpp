@@ -2232,6 +2232,30 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 						const IdReservatorioEquivalente idREE = getIdReservatorioEquivalenteFromChar(nome.at(4).c_str());
 
+						int varENA_REE = getVarDecisao_ENAseExistir(a_TSS, idEstagio, periodo, periodo_lag, idREE);
+
+						if (varENA_REE == -1)
+							varENA_REE = addVarDecisao_ENA(a_TSS, idEstagio, periodo, periodo_lag, idREE, -vetorEstagio.att(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.att(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+						
+						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varENA_REE);
+
+					}
+					catch (const std::exception& erro) { throw std::invalid_argument("VarDecisaoENA " + getFullString(idVariavelEstado) + " : \n" + std::string(erro.what())); }
+
+				} // else if (nome.at(0) == "VarDecisaoENA") {
+
+				/*
+				
+				else if (nome.at(0) == "VarDecisaoENA") {
+
+					try {
+
+						const Periodo periodo = Periodo(nome.at(2));
+
+						const Periodo periodo_lag = Periodo(nome.at(3));
+
+						const IdReservatorioEquivalente idREE = getIdReservatorioEquivalenteFromChar(nome.at(4).c_str());
+
 						bool any_UHE_REE = false;
 
 						for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {					
@@ -2351,7 +2375,8 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					catch (const std::exception& erro) { throw std::invalid_argument("VarDecisaoENA " + getFullString(idVariavelEstado) + " : \n" + std::string(erro.what())); }
 
 				} // else if (nome.at(0) == "VarDecisaoENA") {
-
+				*/
+				
 				//
 				// Defluencia viajante
 				//

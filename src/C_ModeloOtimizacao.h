@@ -198,7 +198,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
    //   Elemento,     Nome,       NroIter,         Iteradores,                                     Impr.Primal,     Impr.Dual              NormDual
 
 #define EQUACAO_LINEAR_3(m)\
-	m(  EquLinear,   ENA,                                            3,   ITERADORES_3_ESTAGIO_PERIODO_PERIODO,            nao,  nao,                nao)  \
 	m(  EquLinear,   CUSTO_PENALIDADE,                               3,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,       nao,  nao,                nao)  \
 	m(  EquLinear,   CUSTO_OPERACAO,                                 3,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,       nao,  nao,                nao)  \
 	m(  EquLinear,   CUSTO_PENALIDADE_VOLUME_INFERIOR_0,             3,   ITERADORES_3_ESTAGIO_PERIODO_PERIODO,            nao,  nao,                nao)  \
@@ -321,7 +320,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
    //   Elemento,      Nome,             NroIter,    Iteradores,                                                 Impr.Primal,     Impr.Dual              NormDual
 
 #define EQUACAO_LINEAR_4(m)\
-	m(  EquLinear,    ENA,                                               4,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_REE,                           nao,         nao,                nao)  \
 	m(  EquLinear,    ATENDIMENTO_DEMANDA,                               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO,               nao,         nao,                nao)  \
 	m(  EquLinear,    BALANCO_HIDRAULICO_VOL,                            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao,                nao)  \
 	m(  EquLinear,    BALANCO_HIDRAULICO_VAZ,                            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA,             nao,         nao,                nao)  \
@@ -425,7 +423,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 
 #define EQUACAO_LINEAR_5(m)\
-	m(  EquLinear,    ENA,                                         5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA_REE,                      nao,        nao,                nao)      \
 	m(  EquLinear,    YP,                                          5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA, nao,        nao,                nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA,                             5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao,                nao)      \
 	m(  EquLinear,    VAZAO_TURBINADA_RELAXADA,                    5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO,  nao,        nao,                nao)      \
