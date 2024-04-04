@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
 				if (idProcesso == IdProcesso_mestre)
 					std::cout << std::endl << std::endl << "TEMPO TOTAL PARA CRIAR O MODELO DE OTIMIZACAO                            = " << std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock_modelo).count() / 60 << std::endl;
 
-				MetodoSolucao(entradaSaidaDados, idProcesso, maiorIdProcesso, idMetodoSolucao, modeloOtimizacao);
+				MetodoSolucao(entradaSaidaDados, idProcesso, maiorIdProcesso, idMetodoSolucao, modeloOtimizacao, dados);
 
 				if (idProcesso == IdProcesso_mestre)
 					std::cout << std::endl << std::endl << "TEMPO TOTAL DE OTIMIZACAO = " << std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock_modelo).count() / 60 << std::endl;
@@ -215,7 +215,7 @@ int main(int argc, char *argv[]) {
 				auto start_clock_modelo = std::chrono::high_resolution_clock::now();
 
 				ModeloOtimizacao modeloOtimizacao(IdModeloOtimizacao_multiestagio_estocastico_simulacao, dados, entradaSaidaDados);
-				MetodoSolucao(entradaSaidaDados, idProcesso, maiorIdProcesso, idMetodoSolucao, modeloOtimizacao);
+				MetodoSolucao(entradaSaidaDados, idProcesso, maiorIdProcesso, idMetodoSolucao, modeloOtimizacao, dados);
 
 				if (idProcesso == IdProcesso_mestre)
 					std::cout << std::endl << std::endl << "Tempo Total Simulacao = " << std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock_modelo).count() / 60 << std::endl;

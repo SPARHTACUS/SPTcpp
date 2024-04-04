@@ -6,7 +6,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-MetodoSolucao::MetodoSolucao(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdMetodoSolucao a_idMetodoSolucao, ModeloOtimizacao &a_modeloOtimizacao){
+MetodoSolucao::MetodoSolucao(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdMetodoSolucao a_idMetodoSolucao, ModeloOtimizacao &a_modeloOtimizacao, Dados& a_dados){
 	try {
 
 		INICIALIZA_SMART_ELEMENTO(MetodoSolucao, SMART_ELEMENTO_METODO_SOLUCAO)
@@ -25,7 +25,7 @@ MetodoSolucao::MetodoSolucao(EntradaSaidaDados a_entradaSaidaDados, const IdProc
 			if ((idModeloOtimizacao != IdModeloOtimizacao_multiestagio_estocastico_otimizacao) && (idModeloOtimizacao != IdModeloOtimizacao_multiestagio_estocastico_simulacao))
 				throw std::invalid_argument("Modelo de otimizacao " + getFullString(idModeloOtimizacao) + " nao compativel com metodo de solucao.");
 
-			executarPDDE(a_entradaSaidaDados, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao);
+			executarPDDE(a_entradaSaidaDados, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao, a_dados);
 
 		} // if (a_idMetodoSolucao == IdMetodoSolucao_PDDE) {
 
@@ -34,7 +34,7 @@ MetodoSolucao::MetodoSolucao(EntradaSaidaDados a_entradaSaidaDados, const IdProc
  			if ((idModeloOtimizacao != IdModeloOtimizacao_multiestagio_estocastico_otimizacao) && (idModeloOtimizacao != IdModeloOtimizacao_multiestagio_estocastico_simulacao))
 				throw std::invalid_argument("Modelo de otimizacao " + getFullString(idModeloOtimizacao) + " nao compativel com metodo de solucao.");
 
-			executarPSD(a_entradaSaidaDados, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao);
+			executarPSD(a_entradaSaidaDados, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao, a_dados);
 
 		} // if (a_idMetodoSolucao == IdMetodoSolucao_PDDE) {
 
