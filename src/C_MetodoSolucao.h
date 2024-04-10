@@ -52,7 +52,7 @@ private:
 	void executarPDDE_forward (EntradaSaidaDados a_entradaSaidaDados, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, const bool a_simulacao, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao &a_modeloOtimizacao, Dados& a_dados);
 	void executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDados, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao &a_modeloOtimizacao, Dados& a_dados);
 	
-	void executarPSD(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao& a_modeloOtimizacao, Dados& a_dados);
+	void executarPSD(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao& a_modeloOtimizacao);
 		
 	void executarPDDE_atualizarCustoSuperior(const IdIteracao a_idIteracao, const SmartEnupla<IdEstagio, std::vector<double>>& a_custo_superior, ModeloOtimizacao &a_modeloOtimizacao);
 	void executarPDDE_atualizarCustoInferior(const IdIteracao a_idIteracao, const SmartEnupla<IdEstagio, std::vector<double>>& a_custo_inferior, ModeloOtimizacao &a_modeloOtimizacao);

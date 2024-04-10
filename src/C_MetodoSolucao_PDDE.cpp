@@ -139,6 +139,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 		double cont_tempo_otimizacao = 0.0;
 		int cont_numero_otimizacao = 0;
+
 		for (IdEstagio idEstagio = a_estagio_inicial; idEstagio <= a_estagio_final; idEstagio++) {
 
 			const IdEstagio idEstagio_seguinte = IdEstagio(idEstagio + 1);
@@ -187,7 +188,9 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 							auto start_clock_cenario = std::chrono::high_resolution_clock::now();
 
-							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, idCenario_estado, a_dados);
+							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, idCenario_estado);
+
+							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado_posEstudo(idEstagio, a_estagio_final, idCenario, IdRealizacao_Nenhum, a_dados);
 
 							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, idCenario);
 							
@@ -433,7 +436,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 				auto start_clock_cenario = std::chrono::high_resolution_clock::now();
 
-				a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, idCenario_estado, vlr_var_estado, a_dados);
+				a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, idCenario_estado, vlr_var_estado);
 
 				for (IdAbertura idAbertura = menor_abertura_em_cenario_estado; idAbertura <= maior_abertura_em_cenario_estado; idAbertura++) {
 
@@ -441,9 +444,9 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 						auto start_clock_realizacao = std::chrono::high_resolution_clock::now();
 
-						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, IdRealizacao(idAbertura));
+						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado_posEstudo(idEstagio, a_estagio_final, idCenario_estado, IdRealizacao(idAbertura), a_dados);
 
-						a_modeloOtimizacao.atualizarModeloOtimizacaoComRestricaoCenario(idEstagio, idCenario_estado, IdRealizacao(idAbertura));
+						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, IdRealizacao(idAbertura));
 
 						const bool otimizacao = a_modeloOtimizacao.otimizarProblema(tSS, a_idProcesso, a_idIteracao, idEstagio, idCenario_estado, IdRealizacao(idAbertura), sol_inf_var_dinamica, solucao_dual_var_dinamica, limite_inferior_var_dinamica, limite_superior_var_dinamica, sol_dual_var_estado, diretorio_pl);
 

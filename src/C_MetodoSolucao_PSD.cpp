@@ -8,7 +8,7 @@
 
 #include "mpi.h"
 
-void MetodoSolucao::executarPSD(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao& a_modeloOtimizacao, Dados& a_dados) {
+void MetodoSolucao::executarPSD(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao& a_modeloOtimizacao) {
 
 	try {
 
@@ -29,7 +29,7 @@ void MetodoSolucao::executarPSD(EntradaSaidaDados a_entradaSaidaDados, const IdP
 
 				a_modeloOtimizacao.atualizarVariavelEstadoComSolucaoPrimal(IdIteracao_0, idEstagio, IdCenario_1);
 
-				a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, IdCenario_1, a_dados);
+				a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, IdCenario_1);
 
 				a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, IdCenario_1);
 

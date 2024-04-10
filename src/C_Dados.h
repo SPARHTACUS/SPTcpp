@@ -272,7 +272,7 @@ public:
 
 	bool validaFuncaoProducaoHidreletrica(FuncaoProducaoHidreletrica& a_funcaoProducaoHidreletrica, SmartEnupla<Periodo, double> a_horizonte_estudo, const IdHidreletrica a_idHidreletrica, const IdConjuntoHidraulico a_idConjuntoHidraulico, const IdUnidadeUHE a_idUnidadeUHE, SmartEnupla<AttVetorFuncaoProducaoHidreletrica, PreencherAtributo>& a_preencher_AttVetorFuncaoProducaoHidreletrica, SmartEnupla<AttMatrizFuncaoProducaoHidreletrica, PreencherAtributo>& a_preencher_AttMatrizFuncaoProducaoHidreletrica, SmartEnupla<AttVetorHidreletrica, PreencherAtributo>& a_preencher_AttVetorHidreletrica, SmartEnupla<AttVetorReservatorio, PreencherAtributo>& a_preencher_AttVetorReservatorio);
 
-	void validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_premissa);
+	void validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_premissa, const ProcessoEstocastico& a_processoEstocastico);
 
 	void validaPatamarCarga();
 
