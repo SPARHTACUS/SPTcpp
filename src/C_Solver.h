@@ -2413,13 +2413,13 @@ public:
 
             if (colIdx >= solver->getNumCols()) { //restricao esta no buffer; ainda nao foi inserida no modelo
                 const int idxBuffer = colIdx - solver->getNumCols();
-                colDbg.changeLB(nomeCol[idxBuffer], ubCol[idxBuffer], newUB);
+                colDbg.changeUB(nomeCol[idxBuffer], ubCol[idxBuffer], newUB);
                 ubCol[idxBuffer] = newUB;
             }
             else { //restricao ja foi inserida no solver
 
                 solver->setColUpper(colIdx, newUB);
-                colDbg.changeLB(solver->getColumnName(a_posicao), solver->getColUpper()[a_posicao], newUB);
+                colDbg.changeUB(solver->getColumnName(a_posicao), solver->getColUpper()[a_posicao], newUB);
             }
 
             return true;
@@ -2519,6 +2519,35 @@ public:
 
     double getLimInferior(const int a_posicao) {
         try {
+            
+            const int colIdx = origColIdx.at(a_posicao);
+            if (colIdx == -1) {//restricao ja foi removida do modelo
+                throw std::invalid_argument(
+                    "Variavel de indice [" + std::to_string(a_posicao) + "] foi removida do modelo.");
+            }
+
+
+            if (colIdx >= solver->getNumCols()) { //restricao esta no buffer; ainda nao foi inserida no modelo
+                const int idxBuffer = colIdx - solver->getNumCols();
+                return lbCol[idxBuffer];
+            }
+            else { //restricao ja foi inserida no solver
+
+                return solver->getColLower()[a_posicao];
+
+            }
+
+        }
+
+        catch (const std::exception& erro) {
+            throw std::invalid_argument(
+                "SolverCLP::getLimInferior(" + std::to_string(a_posicao) + "): \n" + std::string(erro.what()));
+        }
+    }
+
+    /*
+    double getLimInferior(const int a_posicao) {
+        try {
             return solver->getColLower()[a_posicao];
         }
 
@@ -2527,7 +2556,37 @@ public:
                     "SolverCLP::getLimInferior(" + std::to_string(a_posicao) + "): \n" + std::string(erro.what()));
         }
     }
+    */
 
+    double getLimSuperior(const int a_posicao) {
+        try {
+
+            const int colIdx = origColIdx.at(a_posicao);
+            if (colIdx == -1) {//restricao ja foi removida do modelo
+                throw std::invalid_argument(
+                    "Variavel de indice [" + std::to_string(a_posicao) + "] foi removida do modelo.");
+            }
+
+
+            if (colIdx >= solver->getNumCols()) { //restricao esta no buffer; ainda nao foi inserida no modelo
+                const int idxBuffer = colIdx - solver->getNumCols();
+                return ubCol[idxBuffer];
+            }
+            else { //restricao ja foi inserida no solver
+
+                return solver->getColUpper()[a_posicao];
+
+            }
+
+        }
+
+        catch (const std::exception& erro) {
+            throw std::invalid_argument(
+                "SolverCLP::getLimSuperior(" + std::to_string(a_posicao) + "): \n" + std::string(erro.what()));
+        }
+    }
+
+    /*
     double getLimSuperior(const int a_posicao) {
         try {
             return solver->getColUpper()[a_posicao];
@@ -2538,6 +2597,7 @@ public:
                     "SolverCLP::getLimSuperior(" + std::to_string(a_posicao) + "): \n" + std::string(erro.what()));
         }
     }
+    */
 
     int addConstrIgual(const std::string a_nome) {
         try {

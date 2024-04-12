@@ -683,72 +683,78 @@ double ModeloOtimizacao::atualizar_ENA_acoplamento(Dados& a_dados, const IdReser
 			if (maiorIdREE == a_idReservatorioEquivalente) {
 
 				//O vetor produtibilidade_ENA é formado pelo horizonte_tendencia + horizonte_processo_estocastico
-				const SmartEnupla<Periodo, double> produtibilidade_ENA = getVetor(idUHE, maiorIdREE, AttVetorReservatorioEquivalente_produtibilidade_ENA, Periodo(), double());
+				const SmartEnupla<Periodo, double> produtibilidade_ENA = a_dados.getVetor(idUHE, maiorIdREE, AttVetorReservatorioEquivalente_produtibilidade_ENA, Periodo(), double());
 
 				const Periodo periodoPE_inicial = produtibilidade_ENA.getIteradorInicial();
 				const Periodo periodoPE_final = produtibilidade_ENA.getIteradorFinal();
 
 				bool is_sobreposicao_encontrada = false;
+				bool is_precisa_calcular = false;
 				double soma_sobreposicao = 0.0;
 
 				for (Periodo periodoPE = periodoPE_inicial; periodoPE <= periodoPE_final; produtibilidade_ENA.incrementarIterador(periodoPE)) {
 
-					const double sobreposicao = a_periodo_lag.sobreposicao(periodoPE);
+					if (produtibilidade_ENA.at(periodoPE) > 0.0) {//Evita cálcular afluências para cálculo de ENA desnecessárias
 
-					if (sobreposicao > 0.0) {
-						soma_sobreposicao += sobreposicao;
-						is_sobreposicao_encontrada = true;
+						is_precisa_calcular = true;
 
-						//****************************************************************************************************************************
-						//Filosofia: Obter o equacionamento da ENA x usina (termo_independente_calculo_ENA + coeficiente_idHidreletricas_calculo_ENA) 
-						// e logo pondera as afluências vezes a produtibilidade_ENA
-						//****************************************************************************************************************************					
-						std::vector<SmartEnupla<IdHidreletrica, double>> coeficiente_idHidreletricas_calculo_ENA;
-						double termo_independente_calculo_ENA = 0.0;
-						
-						retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(a_dados, periodoPE, codigo_posto, codigo_posto_acoplamento_ENA, idUHE, a_idCenario, a_idRealizacao, coeficiente_idHidreletricas_calculo_ENA, termo_independente_calculo_ENA);
-						
-						double afluencia_natural = termo_independente_calculo_ENA;
+						const double sobreposicao = a_periodo_lag.sobreposicao(periodoPE);
 
-						for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
+						if (sobreposicao > 0.0) {
+							soma_sobreposicao += sobreposicao;
+							is_sobreposicao_encontrada = true;
 
-							const IdHidreletrica idUHE_ENA             = coeficiente_idHidreletricas_calculo_ENA.at(pos).getIteradorInicial();
-							const double         coeficiente_idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE_ENA);
+							//****************************************************************************************************************************
+							//Filosofia: Obter o equacionamento da ENA x usina (termo_independente_calculo_ENA + coeficiente_idHidreletricas_calculo_ENA) 
+							// e logo pondera as afluências vezes a produtibilidade_ENA
+							//****************************************************************************************************************************					
+							std::vector<SmartEnupla<IdHidreletrica, double>> coeficiente_idHidreletricas_calculo_ENA;
+							double termo_independente_calculo_ENA = 0.0;
 
-							if (periodoPE < a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) //Valores da tendência
-								afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodoPE, double());
-							else {//Valores dentro da árvore
-								
-								// forward
-								if (a_idRealizacao == IdRealizacao_Nenhum)
-									afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoMatriz(mapIdVar.at(idUHE_ENA), AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodoPE, a_idCenario, double());
+							retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(a_dados, periodoPE, codigo_posto, codigo_posto_acoplamento_ENA, idUHE, a_idCenario, a_idRealizacao, idProcessoEstocastico, coeficiente_idHidreletricas_calculo_ENA, termo_independente_calculo_ENA);
 
-								// backward
-								else if (a_idRealizacao > IdRealizacao_Nenhum)
-									afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacao(mapIdVar.at(idUHE_ENA), a_idCenario, a_idRealizacao, periodoPE);
+							double afluencia_natural = termo_independente_calculo_ENA;
 
-								//afluencia_natural += coeficiente_idUHE_ENA * a_dados.processoEstocastico_hidrologico.getElementoMatriz(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, periodoPE, a_idCenario, double());
+							for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
 
-							}//else {
+								const IdHidreletrica idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).getIteradorInicial();
+								const double         coeficiente_idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE_ENA);
 
-						}//for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
-									
-						valor_ENA += sobreposicao * produtibilidade_ENA.at(periodoPE) * afluencia_natural;
-						//****************************************************************************************************************************
+								if (periodoPE < vetorProcessoEstocastico.att(idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) //Valores da tendência
+									afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodoPE, double());
+								else {//Valores dentro da árvore
 
-					}//if (sobreposicao > 0.0) {
+									// forward
+									if (a_idRealizacao == IdRealizacao_Nenhum)
+										afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoMatriz(mapIdVar.at(idUHE_ENA), AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodoPE, a_idCenario, double());
 
-					if (is_sobreposicao_encontrada && sobreposicao == 0.0) {//Evita percorrer o horizonte todo					
-						const double tol = 1e-6;
-						if (abs(1 - soma_sobreposicao) > tol)
-							throw std::invalid_argument("Soma de sobreposicao diferente de 1.0, valor encontrado: " + getString(soma_sobreposicao));
+									// backward
+									else if (a_idRealizacao > IdRealizacao_Nenhum)
+										afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacao(mapIdVar.at(idUHE_ENA), a_idCenario, a_idRealizacao, periodoPE);
 
-						break;
-					}//if (is_sobreposicao_encontrada && sobreposicao == 0.0) {
+								}//else {
+
+							}//for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
+
+							valor_ENA += sobreposicao * produtibilidade_ENA.at(periodoPE) * afluencia_natural;
+							//****************************************************************************************************************************
+
+						}//if (sobreposicao > 0.0) {
+
+						if (is_sobreposicao_encontrada && sobreposicao == 0.0) {//Evita percorrer o horizonte todo					
+							const double tol = 1e-6;
+							if (abs(1 - soma_sobreposicao) > tol)
+								throw std::invalid_argument("Soma de sobreposicao diferente de 1.0, valor encontrado: " + getString(soma_sobreposicao));
+
+							break;
+						}//if (is_sobreposicao_encontrada && sobreposicao == 0.0) {
+
+
+					}//if (produtibilidade_ENA.at(periodoPE) > 0.0) {
 
 				}//for (Periodo periodo = periodo_inicial; periodo <= periodo_final; produtibilidade_ENA.incrementarIterador(periodo)) {
 
-				if (!is_sobreposicao_encontrada)
+				if (!is_sobreposicao_encontrada && is_precisa_calcular)
 					throw std::invalid_argument("Nao encontrada sobreposicao do periodo_lag: " + getString(a_periodo_lag));
 
 			}//if (maiorIdREE == a_idReservatorioEquivalente) {
@@ -763,7 +769,7 @@ double ModeloOtimizacao::atualizar_ENA_acoplamento(Dados& a_dados, const IdReser
 
 } // double ModeloOtimizacao::atualizar_ENA_acoplamento(Dados& a_dados, const IdReservatorioEquivalente a_idReservatorioEquivalente, const IdCenario a_idCenario, const Periodo a_periodo_lag) {
 
-void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(Dados& a_dados, const Periodo a_periodoPE, const int a_codigo_posto, const int a_codigo_posto_acoplamento_ENA, const IdHidreletrica a_idHidreletrica, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, std::vector<SmartEnupla<IdHidreletrica, double>>& a_coeficiente_idHidreletricas_calculo_ENA, double& a_termo_independente_calculo_ENA) {
+void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(Dados& a_dados, const Periodo a_periodoPE, const int a_codigo_posto, const int a_codigo_posto_acoplamento_ENA, const IdHidreletrica a_idHidreletrica, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const IdProcessoEstocastico a_idProcessoEstocastico, std::vector<SmartEnupla<IdHidreletrica, double>>& a_coeficiente_idHidreletricas_calculo_ENA, double& a_termo_independente_calculo_ENA) {
 
 	try {
 
@@ -922,7 +928,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 
 				retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 76, 1.0, a_coeficiente_idHidreletricas_calculo_ENA);
 
-				const double afluencia_73 = get_afluencia_natural_posto(a_dados, a_periodoPE, 73, a_idCenario, a_idRealizacao);
+				const double afluencia_73 = get_afluencia_natural_posto(a_dados, a_periodoPE, 73, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
 				if ((afluencia_73 - 10) < 173.5) {
 					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 73, 1.0, a_coeficiente_idHidreletricas_calculo_ENA);
@@ -946,11 +952,11 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				/////////////////////////
 				//Postos "reais"
 				/////////////////////////
-				const double afluencia_129 = get_afluencia_natural_posto(a_dados, a_periodoPE, 129, a_idCenario, a_idRealizacao);
-				const double afluencia_125 = get_afluencia_natural_posto(a_dados, a_periodoPE, 125, a_idCenario, a_idRealizacao);
-				const double afluencia_203 = get_afluencia_natural_posto(a_dados, a_periodoPE, 203, a_idCenario, a_idRealizacao);
-				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao);
-				const double afluencia_123 = get_afluencia_natural_posto(a_dados, a_periodoPE, 123, a_idCenario, a_idRealizacao);
+				const double afluencia_129 = get_afluencia_natural_posto(a_dados, a_periodoPE, 129, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_125 = get_afluencia_natural_posto(a_dados, a_periodoPE, 125, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_203 = get_afluencia_natural_posto(a_dados, a_periodoPE, 203, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_123 = get_afluencia_natural_posto(a_dados, a_periodoPE, 123, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
 				/////////////////////////
 				//Postos "fictícios"
@@ -1143,10 +1149,10 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				//Postos "reais"
 				/////////////////////////
 
-				const double afluencia_203 = get_afluencia_natural_posto(a_dados, a_periodoPE, 203, a_idCenario, a_idRealizacao);
-				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao);
-				const double afluencia_125 = get_afluencia_natural_posto(a_dados, a_periodoPE, 125, a_idCenario, a_idRealizacao);
-				const double afluencia_123 = get_afluencia_natural_posto(a_dados, a_periodoPE, 123, a_idCenario, a_idRealizacao);
+				const double afluencia_203 = get_afluencia_natural_posto(a_dados, a_periodoPE, 203, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_125 = get_afluencia_natural_posto(a_dados, a_periodoPE, 125, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_123 = get_afluencia_natural_posto(a_dados, a_periodoPE, 123, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
 				/////////////////////////
 				//Postos "fictícios"
@@ -1253,11 +1259,11 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				//Postos "reais"
 				/////////////////////////
 
-				const double afluencia_130 = get_afluencia_natural_posto(a_dados, a_periodoPE, 130, a_idCenario, a_idRealizacao);
-				const double afluencia_125 = get_afluencia_natural_posto(a_dados, a_periodoPE, 125, a_idCenario, a_idRealizacao);
-				const double afluencia_203 = get_afluencia_natural_posto(a_dados, a_periodoPE, 203, a_idCenario, a_idRealizacao);
-				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao);
-				const double afluencia_123 = get_afluencia_natural_posto(a_dados, a_periodoPE, 123, a_idCenario, a_idRealizacao);
+				const double afluencia_130 = get_afluencia_natural_posto(a_dados, a_periodoPE, 130, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_125 = get_afluencia_natural_posto(a_dados, a_periodoPE, 125, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_203 = get_afluencia_natural_posto(a_dados, a_periodoPE, 203, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_123 = get_afluencia_natural_posto(a_dados, a_periodoPE, 123, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
 				/////////////////////////
 				//Postos "fictícios"
@@ -1418,11 +1424,11 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				//Postos "reais"
 				/////////////////////////
 
-				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao);
-				const double afluencia_202 = get_afluencia_natural_posto(a_dados, a_periodoPE, 202, a_idCenario, a_idRealizacao);
-				const double afluencia_203 = get_afluencia_natural_posto(a_dados, a_periodoPE, 203, a_idCenario, a_idRealizacao);
-				const double afluencia_125 = get_afluencia_natural_posto(a_dados, a_periodoPE, 125, a_idCenario, a_idRealizacao);
-				const double afluencia_123 = get_afluencia_natural_posto(a_dados, a_periodoPE, 123, a_idCenario, a_idRealizacao);
+				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_202 = get_afluencia_natural_posto(a_dados, a_periodoPE, 202, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_203 = get_afluencia_natural_posto(a_dados, a_periodoPE, 203, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_125 = get_afluencia_natural_posto(a_dados, a_periodoPE, 125, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_123 = get_afluencia_natural_posto(a_dados, a_periodoPE, 123, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
 				/////////////////////////
 				//Postos "fictícios"
@@ -1732,11 +1738,11 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				//Postos "reais"
 				/////////////////////////
 
-				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao);
-				const double afluencia_202 = get_afluencia_natural_posto(a_dados, a_periodoPE, 202, a_idCenario, a_idRealizacao);
-				const double afluencia_203 = get_afluencia_natural_posto(a_dados, a_periodoPE, 203, a_idCenario, a_idRealizacao);
-				const double afluencia_123 = get_afluencia_natural_posto(a_dados, a_periodoPE, 123, a_idCenario, a_idRealizacao);
-				const double afluencia_125 = get_afluencia_natural_posto(a_dados, a_periodoPE, 125, a_idCenario, a_idRealizacao);
+				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_202 = get_afluencia_natural_posto(a_dados, a_periodoPE, 202, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_203 = get_afluencia_natural_posto(a_dados, a_periodoPE, 203, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_123 = get_afluencia_natural_posto(a_dados, a_periodoPE, 123, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_125 = get_afluencia_natural_posto(a_dados, a_periodoPE, 125, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
 				/////////////////////////
 				//Postos "fictícios"
@@ -2112,13 +2118,13 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				//Postos "reais"
 				/////////////////////////
 
-				const double afluencia_161 = get_afluencia_natural_posto(a_dados, a_periodoPE, 161, a_idCenario, a_idRealizacao);
-				const double afluencia_117 = get_afluencia_natural_posto(a_dados, a_periodoPE, 117, a_idCenario, a_idRealizacao);
-				const double afluencia_301 = get_afluencia_natural_posto(a_dados, a_periodoPE, 301, a_idCenario, a_idRealizacao);
+				const double afluencia_161 = get_afluencia_natural_posto(a_dados, a_periodoPE, 161, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_117 = get_afluencia_natural_posto(a_dados, a_periodoPE, 117, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_301 = get_afluencia_natural_posto(a_dados, a_periodoPE, 301, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
 
 				bool is_periodo_inicial = false;
-				if (a_periodoPE == a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo()))
+				if (a_periodoPE == vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo()))
 					is_periodo_inicial = true;
 
 				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, is_periodo_inicial);
@@ -2225,9 +2231,9 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				//Postos "reais"
 				/////////////////////////
 
-				const double afluencia_203 = get_afluencia_natural_posto(a_dados, a_periodoPE, 203, a_idCenario, a_idRealizacao);
-				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao);
-				const double afluencia_125 = get_afluencia_natural_posto(a_dados, a_periodoPE, 125, a_idCenario, a_idRealizacao);
+				const double afluencia_203 = get_afluencia_natural_posto(a_dados, a_periodoPE, 203, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_125 = get_afluencia_natural_posto(a_dados, a_periodoPE, 125, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
 				/////////////////////////
 				//Postos "fictícios"
@@ -2338,8 +2344,8 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				//Postos "reais"
 				/////////////////////////
 
-				const double afluencia_202 = get_afluencia_natural_posto(a_dados, a_periodoPE, 202, a_idCenario, a_idRealizacao);
-				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao);
+				const double afluencia_202 = get_afluencia_natural_posto(a_dados, a_periodoPE, 202, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
+				const double afluencia_201 = get_afluencia_natural_posto(a_dados, a_periodoPE, 201, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
 				////////////
 				// +VAZ(202)
@@ -2422,12 +2428,12 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				/////////////////////////
 				//Postos "reais"
 				/////////////////////////
-				const double afluencia_288 = get_afluencia_natural_posto(a_dados, a_periodoPE, 288, a_idCenario, a_idRealizacao);
+				const double afluencia_288 = get_afluencia_natural_posto(a_dados, a_periodoPE, 288, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
 				///////
 
 				bool is_periodo_inicial = false;
-				if (a_periodoPE == a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo()))
+				if (a_periodoPE == vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo()))
 					is_periodo_inicial = true;
 
 				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, is_periodo_inicial);
@@ -2591,7 +2597,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				/////////////////////////
 				//Postos "reais"
 				/////////////////////////
-				const double afluencia_288 = get_afluencia_natural_posto(a_dados, a_periodoPE, 288, a_idCenario, a_idRealizacao);
+				const double afluencia_288 = get_afluencia_natural_posto(a_dados, a_periodoPE, 288, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
 				//**********************************
 				//VAZ(302) = VAZ(288) - VAZ(292)
@@ -2606,7 +2612,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				//-VAZ(292)
 				//////////
 				bool is_periodo_inicial = false;
-				if (a_periodoPE == a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo()))
+				if (a_periodoPE == vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo()))
 					is_periodo_inicial = true;
 
 				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, is_periodo_inicial);
@@ -2760,7 +2766,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 			}//else if (codigo_posto_acoplamento_NW == 292) {//BELO MONTE						
 			else if (a_codigo_posto_acoplamento_ENA == 169) {//SOBRADINHO - Posto para acoplamento com a FCF
 
-				if (a_periodoPE >= a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
+				if (a_periodoPE >= vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
 
 					//Nota: Como sobradinho fictício (posto = 169) está isolado do sistema, devem ser somadas as naturais de Três Marias e Queimado
 
@@ -2779,7 +2785,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 					/////////////
 					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 169, 1.0, a_coeficiente_idHidreletricas_calculo_ENA);
 
-				}//if (a_periodoPE >= a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
+				}//if (a_periodoPE >= vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
 				else {
 
 					//******************************
@@ -2787,7 +2793,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 					//******************************
 					//Pega a informação da tendência do arquivo VAZOES.DAT (do modelo GEVAZP)-> Por construção esta informação já está em afluência natural
 					const int posto = 169;
-					a_termo_independente_calculo_ENA += a_dados.processoEstocastico_hidrologico.getElementoVetor(mapIdVar.at(lista_codPosto_idHidreletrica.at(posto)), mapIdVarInterna.at(lista_codPosto_idHidreletrica.at(posto)), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
+					a_termo_independente_calculo_ENA += vetorProcessoEstocastico.att(a_idProcessoEstocastico).getElementoVetor(mapIdVar.at(lista_codPosto_idHidreletrica.at(posto)), mapIdVarInterna.at(lista_codPosto_idHidreletrica.at(posto)), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
 
 				}//else
 
@@ -2796,7 +2802,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 
 				//Usina com codigo_posto para otimização setado como 300 (afluência incremental = 0) mas com posto de acoplamento para cálculo das ENAs = posto do hidr.dat
 
-				if (a_periodoPE >= a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
+				if (a_periodoPE >= vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
 
 					//Nota: Como sobradinho fictício (posto = 169) está isolado do sistema, devem ser somadas as naturais de Três Marias e Queimado
 
@@ -2815,7 +2821,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 					/////////////
 					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 169, 1.0, a_coeficiente_idHidreletricas_calculo_ENA);
 
-				}//if (a_periodoPE >= a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
+				}//if (a_periodoPE >= vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
 				else {
 
 					//******************************
@@ -2823,7 +2829,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 					//******************************
 					//Pega a informação da tendência do arquivo VAZOES.DAT (do modelo GEVAZP)-> Por construção esta informação já está em afluência natural
 					const int posto = 172;
-					a_termo_independente_calculo_ENA += a_dados.processoEstocastico_hidrologico.getElementoVetor(mapIdVar.at(lista_codPosto_idHidreletrica.at(posto)), mapIdVarInterna.at(lista_codPosto_idHidreletrica.at(posto)), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
+					a_termo_independente_calculo_ENA += vetorProcessoEstocastico.att(a_idProcessoEstocastico).getElementoVetor(mapIdVar.at(lista_codPosto_idHidreletrica.at(posto)), mapIdVarInterna.at(lista_codPosto_idHidreletrica.at(posto)), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
 
 				}//else {
 
@@ -2832,7 +2838,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 
 				//Usina com codigo_posto para otimização setado como 300 (afluência incremental = 0) mas com posto de acoplamento para cálculo das ENAs = posto do hidr.dat
 
-				if (a_periodoPE >= a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
+				if (a_periodoPE >= vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
 
 					//Nota: Como sobradinho fictício (posto = 169) está isolado do sistema, devem ser somadas as naturais de Três Marias e Queimado
 
@@ -2851,7 +2857,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 					/////////////
 					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 169, 1.0, a_coeficiente_idHidreletricas_calculo_ENA);
 
-				}//if (a_periodoPE >= a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
+				}//if (a_periodoPE >= vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
 				else {
 
 					//******************************
@@ -2859,13 +2865,13 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 					//******************************
 					//Pega a informação da tendência do arquivo VAZOES.DAT (do modelo GEVAZP)-> Por construção esta informação já está em afluência natural
 					const int posto = 178;
-					a_termo_independente_calculo_ENA += a_dados.processoEstocastico_hidrologico.getElementoVetor(mapIdVar.at(lista_codPosto_idHidreletrica.at(posto)), mapIdVarInterna.at(lista_codPosto_idHidreletrica.at(posto)), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
+					a_termo_independente_calculo_ENA += vetorProcessoEstocastico.att(a_idProcessoEstocastico).getElementoVetor(mapIdVar.at(lista_codPosto_idHidreletrica.at(posto)), mapIdVarInterna.at(lista_codPosto_idHidreletrica.at(posto)), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
 
 				}//else if (a_periodo < a_periodo_inicial_horizonte_estudo) {
 			}//else if (codigo_posto_acoplamento_NW == 178) {//XINGO
 			else if (a_codigo_posto_acoplamento_ENA == 976) {//176-COMP-MOX-PAFONSO (atribuido o codigo_posto_acoplamento_ENA = 976 para ser compatível com a lógica das regras)
 
-				if (a_periodoPE >= a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
+				if (a_periodoPE >= vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
 
 
 					//Nota: Como sobradinho fictício (posto = 169) está isolado do sistema, devem ser somadas as naturais de Três Marias e Queimado
@@ -2885,7 +2891,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 					/////////////
 					retorna_equacionamento_afluencia_natural_x_posto(a_dados, IdHidreletrica_Nenhum, 169, 1.0, a_coeficiente_idHidreletricas_calculo_ENA);
 
-				}//if (a_periodoPE >= a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
+				}//if (a_periodoPE >= vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) {
 				else {
 
 					//******************************
@@ -2893,7 +2899,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 					//******************************
 					//Pega a informação da tendência do arquivo VAZOES.DAT (do modelo GEVAZP)-> Por construção esta informação já está em afluência natural
 					const int posto = 176;
-					a_termo_independente_calculo_ENA += a_dados.processoEstocastico_hidrologico.getElementoVetor(mapIdVar.at(lista_codPosto_idHidreletrica.at(posto)), mapIdVarInterna.at(lista_codPosto_idHidreletrica.at(posto)), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
+					a_termo_independente_calculo_ENA += vetorProcessoEstocastico.att(a_idProcessoEstocastico).getElementoVetor(mapIdVar.at(lista_codPosto_idHidreletrica.at(posto)), mapIdVarInterna.at(lista_codPosto_idHidreletrica.at(posto)), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
 
 				}//else if (a_periodo < a_periodo_inicial_horizonte_estudo) {
 
@@ -2953,7 +2959,7 @@ void ModeloOtimizacao::retorna_equacionamento_afluencia_natural_x_posto(Dados& a
 
 }
 
-double ModeloOtimizacao::get_afluencia_natural_posto(Dados& a_dados, const Periodo a_periodoPE, const int a_codigo_posto, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao) {
+double ModeloOtimizacao::get_afluencia_natural_posto(Dados& a_dados, const Periodo a_periodoPE, const int a_codigo_posto, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const IdProcessoEstocastico a_idProcessoEstocastico) {
 
 	try {
 
@@ -2976,7 +2982,7 @@ double ModeloOtimizacao::get_afluencia_natural_posto(Dados& a_dados, const Perio
 
 			const IdHidreletrica idHidreletrica_aux = idHidreletricas_x_usina_calculo_ENA.at(idHidreletrica).at(pos);
 
-			if (a_periodoPE < a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) //Valores da tendência
+			if (a_periodoPE < vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) //Valores da tendência
 				afluencia_natural_posto += vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idHidreletrica_aux), mapIdVarInterna.at(idHidreletrica_aux), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
 			else {//Valores dentro da árvore
 
@@ -4792,9 +4798,16 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 						int varENA_REE = getVarDecisao_ENAseExistir(a_TSS, estagio_final, periodo, periodo_lag, idREE);
 
-						if (varENA_REE == -1)
-							varENA_REE = addVarDecisao_ENA(a_TSS, estagio_final, periodo, periodo_lag, idREE, -vetorEstagio.att(estagio_final).getSolver(a_TSS)->getInfinito(), vetorEstagio.att(estagio_final).getSolver(a_TSS)->getInfinito(), 0.0);
-						
+						if (varENA_REE == -1) {
+
+							//Instancia a variável VarDecisaoENA = 0.0 -> faz parte da lógica da atualização dinâmica no método de solução
+							const double limite_inferior = 0.0;
+							const double limite_superior = 0.0;
+
+							varENA_REE = addVarDecisao_ENA(a_TSS, estagio_final, periodo, periodo_lag, idREE, limite_inferior, limite_superior, 0.0);
+
+						}
+
 
 						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varENA_REE);
 
