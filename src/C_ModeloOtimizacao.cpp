@@ -513,63 +513,67 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado_posEstudo(cons
 
 			for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
 
-				const std::vector<std::string> nome = vetorEstagio.att(idEstagio_futuro).getNomeVariavelEstado(idVariavelEstado);
+				if (vetorEstagio.att(idEstagio_futuro).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
-				if (nome.at(0) == "VarDecisaoENA") {
+					const std::vector<std::string> nome = vetorEstagio.att(idEstagio_futuro).getNomeVariavelEstado(idVariavelEstado);
 
-					//******************************************************************************
-					//Define parâmetros necessários para o cálculo das ENAs de acoplamento
-					//******************************************************************************
+					if (nome.at(0) == "VarDecisaoENA") {
 
-					if (true) {
+						//******************************************************************************
+						//Define parâmetros necessários para o cálculo das ENAs de acoplamento
+						//******************************************************************************
 
-						const IdProcessoEstocastico idProcessoEstocastico = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
+						if (true) {
 
-						if (int(idHidreletricas_x_usina_calculo_ENA.size()) == 0)//Define para cada idHidreletrica todas as usinas que estão a montante na cascata (necessário para o cálculo da ENA)						
-							defineHidreletricasMontanteNaCascataENA(a_dados);
+							const IdProcessoEstocastico idProcessoEstocastico = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
 
-						if (int(lista_codPosto_idHidreletrica.size()) == 0) {
+							if (int(idHidreletricas_x_usina_calculo_ENA.size()) == 0)//Define para cada idHidreletrica todas as usinas que estão a montante na cascata (necessário para o cálculo da ENA)						
+								defineHidreletricasMontanteNaCascataENA(a_dados);
 
-							const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
-							const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
+							if (int(lista_codPosto_idHidreletrica.size()) == 0) {
 
-							lista_codPosto_idHidreletrica = SmartEnupla<int, IdHidreletrica>(1, std::vector<IdHidreletrica>(999, IdHidreletrica_Nenhum));
-							mapIdVar = SmartEnupla<IdHidreletrica, IdVariavelAleatoria>(menorIdHidreletrica, std::vector<IdVariavelAleatoria>(int(maiorIdHidreletrica - menorIdHidreletrica) + 1, IdVariavelAleatoria_Nenhum));
-							mapIdVarInterna = SmartEnupla<IdHidreletrica, IdVariavelAleatoriaInterna>(menorIdHidreletrica, std::vector<IdVariavelAleatoriaInterna>(int(maiorIdHidreletrica - menorIdHidreletrica) + 1, IdVariavelAleatoriaInterna_Nenhum));
+								const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
+								const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 
-							for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-								lista_codPosto_idHidreletrica.at(a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_codigo_posto, int())) = idHidreletrica;
-								IdVariavelAleatoria        idVariavelAleatoria = IdVariavelAleatoria_Nenhum;
-								IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_Nenhum;
-								getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdHidreletrica(idProcessoEstocastico, idVariavelAleatoria, idVariavelAleatoriaInterna, idHidreletrica);
-								mapIdVar.at(idHidreletrica) = idVariavelAleatoria;
-								mapIdVarInterna.at(idHidreletrica) = idVariavelAleatoriaInterna;
-							}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+								lista_codPosto_idHidreletrica = SmartEnupla<int, IdHidreletrica>(1, std::vector<IdHidreletrica>(999, IdHidreletrica_Nenhum));
+								mapIdVar = SmartEnupla<IdHidreletrica, IdVariavelAleatoria>(menorIdHidreletrica, std::vector<IdVariavelAleatoria>(int(maiorIdHidreletrica - menorIdHidreletrica) + 1, IdVariavelAleatoria_Nenhum));
+								mapIdVarInterna = SmartEnupla<IdHidreletrica, IdVariavelAleatoriaInterna>(menorIdHidreletrica, std::vector<IdVariavelAleatoriaInterna>(int(maiorIdHidreletrica - menorIdHidreletrica) + 1, IdVariavelAleatoriaInterna_Nenhum));
 
-						}//if (int(lista_codPosto_idHidreletrica.size()) == 0) {
+								for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+									lista_codPosto_idHidreletrica.at(a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_codigo_posto, int())) = idHidreletrica;
+									IdVariavelAleatoria        idVariavelAleatoria = IdVariavelAleatoria_Nenhum;
+									IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_Nenhum;
+									getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdHidreletrica(idProcessoEstocastico, idVariavelAleatoria, idVariavelAleatoriaInterna, idHidreletrica);
+									mapIdVar.at(idHidreletrica) = idVariavelAleatoria;
+									mapIdVarInterna.at(idHidreletrica) = idVariavelAleatoriaInterna;
+								}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-					}//if (true) {
-					
-					//******************************************************************************
+							}//if (int(lista_codPosto_idHidreletrica.size()) == 0) {
 
-					const Periodo periodo_lag = Periodo(nome.at(3));
-					const IdReservatorioEquivalente idREE = getIdReservatorioEquivalenteFromChar(nome.at(4).c_str());
-					TipoSubproblemaSolver tSS = getAtributo(idEstagio_futuro, idVariavelEstado, AttComumVariavelEstado_tipoSubproblemaSolverEstagioAnterior, TipoSubproblemaSolver());
-					const int idVariavelDecisao = getAtributo(idEstagio_futuro, idVariavelEstado, AttComumVariavelEstado_idVariavelDecisaoEstagioAnterior, int());
+						}//if (true) {
 
-					if (idVariavelDecisao > -1) {
-						
-						double valor = vetorEstagio.att(a_idEstagio).getSolver(tSS)->getLimSuperior(idVariavelDecisao);
+						//******************************************************************************
 
-						if ((periodo_lag >= periodo_estudo_inicial) || (periodo_lag.sobreposicao(periodo_estudo_inicial) > 0.0) || (valor == 0.0))//Para calcular a ENA de períodos de tendência somente 1 vez
-							valor = atualizar_ENA_acoplamento(a_dados, idREE, a_idCenario, a_idRealizacao, periodo_lag);
+						const Periodo periodo_lag = Periodo(nome.at(3));
+						const IdReservatorioEquivalente idREE = getIdReservatorioEquivalenteFromChar(nome.at(4).c_str());
+						TipoSubproblemaSolver tSS = getAtributo(idEstagio_futuro, idVariavelEstado, AttComumVariavelEstado_tipoSubproblemaSolverEstagioAnterior, TipoSubproblemaSolver());
+						const int idVariavelDecisao = getAtributo(idEstagio_futuro, idVariavelEstado, AttComumVariavelEstado_idVariavelDecisaoEstagioAnterior, int());
 
-						vetorEstagio.att(a_idEstagio).getSolver(tSS)->setLimInferior(idVariavelDecisao, valor);
-						vetorEstagio.att(a_idEstagio).getSolver(tSS)->setLimSuperior(idVariavelDecisao, valor);
+						if (idVariavelDecisao > -1) {
 
-					} // if (idVariavelDecisao > -1) {
+							double valor = vetorEstagio.att(a_idEstagio).getSolver(tSS)->getLimSuperior(idVariavelDecisao);
 
-				}//if (nome.at(0) == "VarDecisaoENA") {
+							if ((periodo_lag >= periodo_estudo_inicial) || (periodo_lag.sobreposicao(periodo_estudo_inicial) > 0.0) || (valor == 0.0))//Para calcular a ENA de períodos de tendência somente 1 vez
+								valor = atualizar_ENA_acoplamento(a_dados, idREE, a_idCenario, a_idRealizacao, periodo_lag);
+
+							vetorEstagio.att(a_idEstagio).getSolver(tSS)->setLimInferior(idVariavelDecisao, valor);
+							vetorEstagio.att(a_idEstagio).getSolver(tSS)->setLimSuperior(idVariavelDecisao, valor);
+
+						} // if (idVariavelDecisao > -1) {
+
+					}//if (nome.at(0) == "VarDecisaoENA") {
+
+				}//if (vetorEstagio.att(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
 			}//for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
 
@@ -2991,9 +2995,9 @@ double ModeloOtimizacao::get_afluencia_natural_posto(Dados& a_dados, const Perio
 					afluencia_natural_posto += vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoMatriz(mapIdVar.at(idHidreletrica_aux), AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, a_periodoPE, a_idCenario, double());
 
 				// backward
-				else if (a_idRealizacao > IdRealizacao_Nenhum)
+				else if (a_idRealizacao > IdRealizacao_Nenhum) {
 					afluencia_natural_posto += vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacao(mapIdVar.at(idHidreletrica_aux), a_idCenario, a_idRealizacao, a_periodoPE);
-
+				}
 			}
 
 		}//for (pos = iterador_inicial; pos <= iterador_final; pos++) {
