@@ -705,6 +705,7 @@ double ModeloOtimizacao::atualizar_ENA_acoplamento(Dados& a_dados, const IdReser
 						const double sobreposicao = a_periodo_lag.sobreposicao(periodoPE);
 
 						if (sobreposicao > 0.0) {
+
 							soma_sobreposicao += sobreposicao;
 							is_sobreposicao_encontrada = true;
 
@@ -726,17 +727,8 @@ double ModeloOtimizacao::atualizar_ENA_acoplamento(Dados& a_dados, const IdReser
 
 								if (periodoPE < vetorProcessoEstocastico.att(idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) //Valores da tendência
 									afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodoPE, double());
-								else {//Valores dentro da árvore
-
-									// forward
-									if (a_idRealizacao == IdRealizacao_Nenhum)
-										afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoMatriz(mapIdVar.at(idUHE_ENA), AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodoPE, a_idCenario, double());
-
-									// backward
-									else if (a_idRealizacao > IdRealizacao_Nenhum)
-										afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacao(mapIdVar.at(idUHE_ENA), a_idCenario, a_idRealizacao, periodoPE);
-
-								}//else {
+								else//Valores dentro da árvore
+									afluencia_natural += coeficiente_idUHE_ENA * get_afluencia_incremental_from_idVariavelAleatoria(mapIdVar.at(idUHE_ENA), a_idCenario, a_idRealizacao, periodoPE); //Depende se estiver na etapa do forward/backward
 
 							}//for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
 
@@ -2963,6 +2955,38 @@ void ModeloOtimizacao::retorna_equacionamento_afluencia_natural_x_posto(Dados& a
 
 }
 
+double ModeloOtimizacao::get_afluencia_incremental_from_idVariavelAleatoria(const IdVariavelAleatoria a_idVariavelAleatoria, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodoPE) {
+
+	try {
+
+		//*****************************************************************************************************************************************************************************************
+		//Para o forward:  pega o valor do AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral
+		//Para o backward: Se periodo_PE < periodo_PE_final -> pega o valor do AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral (valor já calculado para o idCenario)
+		//                 Se periodo_PE = periodo_PE_final -> calcularRealizacao com o a_idCenario e a_idRealizacao do backward
+		//*****************************************************************************************************************************************************************************************
+
+		double afluencia_incremental = 0.0;	
+		const IdProcessoEstocastico idProcessoEstocastico = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
+
+		// forward
+		if (a_idRealizacao == IdRealizacao_Nenhum || a_periodoPE < vetorProcessoEstocastico.att(idProcessoEstocastico).getIterador2Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo()))
+			afluencia_incremental = vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoMatriz(a_idVariavelAleatoria, AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, a_periodoPE, a_idCenario, double());
+
+		// backward
+		else if (a_idRealizacao > IdRealizacao_Nenhum)
+			afluencia_incremental = vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacao(a_idVariavelAleatoria, a_idCenario, a_idRealizacao, a_periodoPE);
+
+		else
+			throw std::invalid_argument("Nao encontrada condicao para atualizar afluencia_incremental");
+
+
+		return afluencia_incremental;
+
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao::get_afluencia_incremental_from_idVariavelAleatoria: \n" + std::string(erro.what())); }
+
+}
+
 double ModeloOtimizacao::get_afluencia_natural_posto(Dados& a_dados, const Periodo a_periodoPE, const int a_codigo_posto, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const IdProcessoEstocastico a_idProcessoEstocastico) {
 
 	try {
@@ -2970,7 +2994,7 @@ double ModeloOtimizacao::get_afluencia_natural_posto(Dados& a_dados, const Perio
 		//Nota: soma as incrementais de todas as usinas que estejam a montante da usina com codigo_posto = a_codigo_posto
 
 		double afluencia_natural_posto = 0.0;
-		
+
 		const IdProcessoEstocastico idProcessoEstocastico = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
 
 		const IdHidreletrica idHidreletrica = lista_codPosto_idHidreletrica.at(a_codigo_posto);
@@ -2988,18 +3012,10 @@ double ModeloOtimizacao::get_afluencia_natural_posto(Dados& a_dados, const Perio
 
 			if (a_periodoPE < vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) //Valores da tendência
 				afluencia_natural_posto += vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idHidreletrica_aux), mapIdVarInterna.at(idHidreletrica_aux), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
-			else {//Valores dentro da árvore
+			else//Valores dentro da árvore
+				afluencia_natural_posto += get_afluencia_incremental_from_idVariavelAleatoria(mapIdVar.at(idHidreletrica_aux), a_idCenario, a_idRealizacao, a_periodoPE);
 
-				// forward
-				if (a_idRealizacao == IdRealizacao_Nenhum)
-					afluencia_natural_posto += vetorProcessoEstocastico.att(idProcessoEstocastico).getElementoMatriz(mapIdVar.at(idHidreletrica_aux), AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, a_periodoPE, a_idCenario, double());
-
-				// backward
-				else if (a_idRealizacao > IdRealizacao_Nenhum) {
-					afluencia_natural_posto += vetorProcessoEstocastico.att(idProcessoEstocastico).calcularRealizacao(mapIdVar.at(idHidreletrica_aux), a_idCenario, a_idRealizacao, a_periodoPE);
-				}
-			}
-
+			
 		}//for (pos = iterador_inicial; pos <= iterador_final; pos++) {
 
 		return afluencia_natural_posto;
