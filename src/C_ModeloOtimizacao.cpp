@@ -38,22 +38,7 @@ ModeloOtimizacao::ModeloOtimizacao(const IdModeloOtimizacao a_idModeloOtimizacao
 		//Se existirem idVariavelEstado associados às ENAs de acoplamento
 		//Carrega os AttComumHIDRELETRICA e HIDRELETRICA_REE_AttVetorPremissa_produtibilidade_ENA
 
-		bool is_variavelEstado_ENA = false;
-
-		const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
-		const IdEstagio estagio_futuro = IdEstagio(estagio_final + 1);
-
-		const IdVariavelEstado maiorIdVariavelEstado = getMaiorId(estagio_futuro, IdVariavelEstado());
-
-		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
-			const std::vector<std::string> nome = vetorEstagio.att(estagio_futuro).getNomeVariavelEstado(idVariavelEstado);
-			if (nome.at(0) == "VarDecisaoENA") {
-				is_variavelEstado_ENA = true;
-				break;
-			}//if (nome.at(0) == "VarDecisaoENA") {
-		}//for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
-
-		if (is_variavelEstado_ENA) {
+		if (get_is_variavelEstado_ENA()) {
 
 			const IdProcessoEstocastico maiorIdProcessoEstocastico = vetorProcessoEstocastico.getMaiorId();
 			const IdProcessoEstocastico menorIdProcessoEstocastico = vetorProcessoEstocastico.getMenorId();
@@ -69,7 +54,7 @@ ModeloOtimizacao::ModeloOtimizacao(const IdModeloOtimizacao a_idModeloOtimizacao
 
 			a_dados.validaProdutibilidadeENA(a_entradaSaidaDados, diretorio_att_premissas, vetorProcessoEstocastico.att(maiorIdProcessoEstocastico));
 
-		}//if (is_variavelEstado_ENA) {
+		}//if (get_is_variavelEstado_ENA()) {
 
 		///////////////////////////////
 
@@ -419,7 +404,9 @@ void ModeloOtimizacao::gerarRealizacoes(const IdIteracao a_idIteracao, const IdP
 
 		const bool imprimir_cenarios = getAtributo(AttComumModeloOtimizacao_imprimir_cenario_hidrologico_pre_otimizacao, bool());
 
-		if (imprimir_cenarios || algum_truncamento || viabilidade_hidraulica) {
+		const bool is_variavelEstado_ENA = get_is_variavelEstado_ENA();//Se existem variáveis de ENA de acoplamento precisa para o computo da AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral
+
+		if (imprimir_cenarios || algum_truncamento || viabilidade_hidraulica || is_variavelEstado_ENA) {
 
 			const IdCenario menor_cenario_iteracao = arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_menor_cenario, IdCenario());
 			const IdCenario maior_cenario_iteracao = arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_maior_cenario, IdCenario());
@@ -6342,5 +6329,32 @@ void ModeloOtimizacao::instanciarProcessoEstocastico(Dados& a_dados, EntradaSaid
 	} // try
 
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::instanciarProcessoEstocastico(a_entradaSaidaDados): \n" + std::string(erro.what())); }
+
+} // void ModeloOtimizacao::instanciarProcessoEstocastico(EntradaSaidaDados a_entradaSaidaDados) {
+
+bool ModeloOtimizacao::get_is_variavelEstado_ENA() {
+
+	try {
+
+		bool is_variavelEstado_ENA = false;
+
+		const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
+		const IdEstagio estagio_futuro = IdEstagio(estagio_final + 1);
+
+		const IdVariavelEstado maiorIdVariavelEstado = getMaiorId(estagio_futuro, IdVariavelEstado());
+
+		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
+			const std::vector<std::string> nome = vetorEstagio.att(estagio_futuro).getNomeVariavelEstado(idVariavelEstado);
+			if (nome.at(0) == "VarDecisaoENA") {
+				is_variavelEstado_ENA = true;
+				break;
+			}//if (nome.at(0) == "VarDecisaoENA") {
+		}//for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
+
+		return is_variavelEstado_ENA;
+
+	} // try
+
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao::get_is_variavelEstado_ENA(): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::instanciarProcessoEstocastico(EntradaSaidaDados a_entradaSaidaDados) {
