@@ -719,6 +719,9 @@ double ModeloOtimizacao::atualizar_ENA_acoplamento(Dados& a_dados, const IdReser
 
 							}//for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
 
+							if (afluencia_natural < 0.0)
+								afluencia_natural = 0.0;
+
 							valor_ENA += sobreposicao * produtibilidade_ENA.at(periodoPE) * afluencia_natural;
 							//****************************************************************************************************************************
 
