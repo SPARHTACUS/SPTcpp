@@ -192,10 +192,6 @@ private:
 	void calcular_produtibilidade_ENA_por_usina_por_periodo(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_alvo);
 	void calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_alvo);
 	void atualizar_vetores_premissas_calculo_produtibilidades(Dados& a_dados, const SmartEnupla<Periodo, bool> a_horizonte_alvo);
-	void calcular_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados);
-	void calcular_ENA_x_REE_x_cenario_x_periodo_com_equacionamento_REE(Dados& a_dados, const SmartEnupla<Periodo, bool>& a_horizonte_tendencia_mais_estudo, const SmartEnupla<Periodo, bool>& a_horizonte_tendencia_mais_estudo_MENSAL, const Periodo a_periodo_inicial_horizonte_estudo, const SmartEnupla<IdHidreletrica, IdVariavelAleatoria> a_mapIdVar, const SmartEnupla<IdHidreletrica, IdVariavelAleatoriaInterna> a_mapIdVarInterna);
-	void calcular_equacionamento_afluencia_natural_x_REE(Dados& a_dados, const SmartEnupla<Periodo, bool> &a_horizonte_tendencia_mais_estudo, const SmartEnupla<Periodo, bool> &a_horizonte_tendencia_mais_estudo_MENSAL, const Periodo a_periodo_inicial_horizonte_estudo);
-	void calcular_equacionamento_afluencia_natural_x_hidreletrica(Dados& a_dados, const SmartEnupla<int, IdHidreletrica> &lista_codUsina, const SmartEnupla<int, IdHidreletrica>& lista_codPosto, const SmartEnupla<IdHidreletrica, IdVariavelAleatoria>& a_mapIdVar, const SmartEnupla<IdHidreletrica, IdVariavelAleatoriaInterna>& a_mapIdVarInterna, const SmartEnupla<Periodo, bool> &a_horizonte_tendencia_mais_estudo, const Periodo a_periodo_inicial_horizonte_estudo);
 	void retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(Dados& a_dados, const Periodo a_periodoPE, const SmartEnupla<int, IdHidreletrica>& lista_codUsina, const SmartEnupla<int, IdHidreletrica>& lista_codPosto, const SmartEnupla<IdHidreletrica, IdVariavelAleatoria> & a_mapIdVar, const SmartEnupla<IdHidreletrica, IdVariavelAleatoriaInterna>& a_mapIdVarInterna, const int a_codigo_posto, const int a_codigo_posto_acoplamento_ENA, const IdHidreletrica a_idHidreletrica, const IdCenario a_idCenario, const Periodo a_periodo_inicial, const Periodo a_periodo, std::vector<SmartEnupla<IdHidreletrica, double>>& a_coeficiente_idHidreletricas_calculo_ENA, double& a_termo_independente_calculo_ENA);
 	void retorna_equacionamento_afluencia_natural_x_posto(Dados& a_dados, const SmartEnupla<int, IdHidreletrica>& a_lista_codUsina, const SmartEnupla<int, IdHidreletrica>& a_lista_codPosto, const IdHidreletrica a_idHidreletrica, const int a_codigo_posto, const double a_coeficiente, std::vector<SmartEnupla<IdHidreletrica, double>>& a_coeficiente_idHidreletricas_calculo_ENA);
 	IdMes get_IdMes_operativo(const Periodo a_periodo, const bool is_periodo_inicial);
@@ -215,11 +211,6 @@ private:
 	
 	void atualiza_codigo_posto_acoplamento_ENA_regras_especiais(Dados& a_dados);
 	void defineHidreletricasMontanteNaCascataENA(Dados& a_dados);
-
-	void imprime_produtibilidade_EAR_acumulada(Dados& a_dados, std::string nomeArquivo);
-	void imprime_produtibilidade_EAR(Dados& a_dados, std::string nomeArquivo);
-	void imprime_afluencia_natural_x_idHidreletrica_x_cenario_x_periodo(Dados& a_dados, std::string nomeArquivo, const SmartEnupla<Periodo, bool> a_horizonte_tendencia_mais_estudo);
-	void imprime_ENA_x_REE_x_cenario_x_periodo(Dados& a_dados, std::string nomeArquivo);
 
 	void instanciar_hidreletricas_sem_producao_para_acoplamento_cortes_NW(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const int a_codigo_usina, const int a_codigo_posto, const int a_codigo_posto_acoplamento_ENA, const int a_codigo_ONS_REE);//Pra instanciar Postos de acoplamento + Usinas agregadas no NW (p.ex. COMP PAF-MOX)
 
@@ -404,23 +395,6 @@ private:
 	//Listas necessárias para validação das hidrelétricas PreConfig
 	SmartEnupla<IdHidreletrica, IdHidreletrica> lista_jusante_hidreletrica = SmartEnupla<IdHidreletrica, IdHidreletrica>(IdHidreletrica(1), std::vector<IdHidreletrica>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdHidreletrica_Nenhum));        //Lista da jusante de cada hidrelétrica -> Somente para validação entre a configuração PD e CP
 	SmartEnupla<IdHidreletrica, IdHidreletrica> lista_jusante_desvio_hidreletrica = SmartEnupla<IdHidreletrica, IdHidreletrica>(IdHidreletrica(1), std::vector<IdHidreletrica>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdHidreletrica_Nenhum)); //Lista da jusante_desvio de cada hidrelétrica -> Somente para validação entre a configuração PD e CP
-
-	SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>> lista_ENA_calculada_x_REE_x_cenario_x_periodo;
-
-	/////////////////////////////////
-	//Informação com o equacionamento do cálculo das ENAs x usina em termos das afluências incrementais x cenário x período (Regras.dat não lineares, precisa de um equacionamento por realização de afluência)
-
-	//Para usinas instanciadas no estudo CP
-	SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, std::vector<SmartEnupla<IdHidreletrica, double>>>>>	lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_hidreletrica_x_cenario;
-	SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdCenario, double>>>							              	lista_termo_independente_calculo_ENA_x_periodo_x_hidreletrica_x_cenario;
-
-	//Para usinas NÃO instanciadas no estudo CP (e.g. COMP-MOX-PAFONSO): a chave vai ser um int com o código da usina
-	SmartEnupla<Periodo, SmartEnupla<           int, SmartEnupla<IdCenario, std::vector<SmartEnupla<IdHidreletrica, double>>>>>	lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_codigo_usina_x_cenario;
-	SmartEnupla<Periodo, SmartEnupla<           int, SmartEnupla<IdCenario, double>>>								            lista_termo_independente_calculo_ENA_x_periodo_x_codigo_usina_x_cenario;
-
-	//Para os REE
-	SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>>>	 lista_coeficiente_idHidreletricas_calculo_ENA_x_periodo_x_REE_x_cenario;
-	SmartEnupla<Periodo, SmartEnupla<IdHidreletrica, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<IdCenario, double>>>>	 lista_termo_independente_calculo_ENA_x_periodo_x_REE_x_cenario;
 
 	//////////////////////////////////
 
