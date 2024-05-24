@@ -253,6 +253,8 @@ public:
 	void validacao_mapeamento_cenarios_aberturas(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_atributos_sem_recarregar, bool &a_mapeamento_cenarios_e_aberturas_carregado);
 
 	void instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncremental(const IdProcessoEstocastico a_tipo_processo_estocastico, ProcessoEstocastico& a_processo_estocastico);
+	
+	void imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(EntradaSaidaDados& a_entradaSaidaDados, const std::string a_diretorio_exportacao_pos_estudo, const int a_calcular_att_operacionais_processo_estocastico_hidrologico, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const IdProcesso a_idProcesso);
 
 	void calcularDeterminacaoEspacialFromHistoricoAfluenciaNatural(EntradaSaidaDados a_entradaSaidaDados, const bool a_imprimir, const double a_valor_r2, ProcessoEstocastico& a_processo_estocastico);
 

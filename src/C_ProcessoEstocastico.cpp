@@ -956,7 +956,12 @@ void ProcessoEstocastico::calcularRuidoCorrelacionadoEspacoAmostral(){
 							ruido_branco.setElemento(idVar_B, 0.0);
 					}
 
-					const double ruido_correlacionado = vetorVariavelAleatoria.att(idVar_A).calcularRuidoCorrelacionado(tipo_correlacao_variaveis_aleatorias, periodo.getEstacao(), ruido_branco);
+					IdVariavelAleatoria idVar_A_determinacao = vetorVariavelAleatoria.att(idVar_A).getAtributo(AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria());
+
+					if (idVar_A_determinacao == IdVariavelAleatoria_Nenhum)
+						idVar_A_determinacao = idVar_A;
+
+					const double ruido_correlacionado = vetorVariavelAleatoria.att(idVar_A_determinacao).calcularRuidoCorrelacionado(tipo_correlacao_variaveis_aleatorias, periodo.getEstacao(), ruido_branco);
 
 					vetorVariavelAleatoria.att(idVar_A).addElemento(AttMatrizVariavelAleatoria_ruido_correlacionado_espaco_amostral, periodo, idRealizacao, ruido_correlacionado);
 
@@ -1131,6 +1136,82 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::mapearCenariosEspacoAmostralPorSorteio(" + getFullString(a_tipo_sorteio) + "," + getFullString(a_numero_cenarios_global) + "," + getFullString(a_menorIdcenario) + "," + getFullString(a_maiorIdcenario) + "," + getFullString(a_semente) + "): \n" + std::string(erro.what())); }
+
+} // void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorteio a_tipo_sorteio, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final){
+
+void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int& a_semente, const Periodo a_periodo_inicial, const Periodo a_periodo_final) {
+
+	try {
+
+		if (getSize1Matriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral) == 0)
+			return;
+
+		const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> horizonte_espaco_amostral = getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double());
+
+		const Periodo periodo_inicial = horizonte_espaco_amostral.getIteradorInicial();
+		const Periodo periodo_final = horizonte_espaco_amostral.getIteradorFinal();
+
+		if (periodo_inicial != a_periodo_inicial || periodo_final != a_periodo_final)
+			return;
+
+
+		if (periodo_inicial > periodo_final)
+			return;
+
+		Periodo periodo_seguinte_mapeamento_existente = periodo_inicial;
+
+		SmartEnupla<Periodo, int> horizonte_mapeamento_cenarios_por_sorteio;
+		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_espaco_amostral.incrementarIterador(periodo))
+			horizonte_mapeamento_cenarios_por_sorteio.addElemento(periodo, 0);
+
+		if (a_tipo_sorteio != TipoSorteio_uniforme)
+			throw std::invalid_argument("Tipo de sorteio nao utilizado no mapeamento de cenarios.");
+
+		SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> cenarios;
+
+		for (IdCenario idCenario = IdCenario_1; idCenario < IdCenario_Excedente; idCenario++) {
+
+			if ((a_menorIdcenario <= idCenario) && (idCenario <= a_maiorIdcenario)) {
+
+				SmartEnupla<Periodo, IdRealizacao> realizacoes_por_periodo(horizonte_mapeamento_cenarios_por_sorteio, IdRealizacao_Nenhum);
+
+				Periodo periodo = periodo_inicial;
+				for (int p = 1; p <= numero_maximo_periodos_espaco_amostral; p++) {
+
+					if (periodo.isValido()) {
+						realizacoes_por_periodo.setElemento(periodo, getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, IdRealizacao())));
+						if (periodo == periodo_final)
+							periodo = Periodo();
+						else if (periodo < periodo_final)
+							horizonte_mapeamento_cenarios_por_sorteio.incrementarIterador(periodo);
+					}
+					else
+						getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_final, IdRealizacao()));
+
+				} // for (int p = 1; p <= numero_maximo_periodos_espaco_amostral; p++){
+
+				cenarios.addElemento(idCenario, realizacoes_por_periodo);
+
+			} // if ((a_menorIdcenario <= idCenario) && (idCenario <= a_maiorIdcenario)) {
+
+			else {
+				for (int p = 1; p <= numero_maximo_periodos_espaco_amostral; p++)
+					getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_final, IdRealizacao()));
+			}
+
+		} // for (IdCenario idCenario = IdCenario_1; idCenario < IdCenario_Excedente; idCenario++) {
+
+		if (periodo_seguinte_mapeamento_existente == horizonte_espaco_amostral.getIteradorInicial())
+			setMatriz_forced(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, cenarios);
+		else {
+			for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_mapeamento_cenarios_por_sorteio.incrementarIterador(periodo)) {
+				for (IdCenario idCenario = a_menorIdcenario; idCenario <= a_maiorIdcenario; idCenario++)
+					addElemento(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, periodo, cenarios.at(idCenario).at(periodo));
+			}
+		}
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::mapearCenariosEspacoAmostralPorSorteio(" + getFullString(a_tipo_sorteio) + "," + getFullString(a_numero_cenarios_global) + "," + getFullString(a_menorIdcenario) + "," + getFullString(a_maiorIdcenario) + "," + getFullString(a_semente) + "): \n" + std::string(erro.what())); }
 
 } // void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorteio a_tipo_sorteio, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final){
 

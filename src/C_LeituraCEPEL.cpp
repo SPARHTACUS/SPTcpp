@@ -207,7 +207,7 @@ IdBaciaHidrografica LeituraCEPEL::atribui_bacia_hidrografica(Dados& a_dados, con
 } // IdBaciaHidrografica LeituraCEPEL::atribui_bacia_hidrografica(Dados& a_dados, const int codigo_ons_uhe)
 
 
-void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, const Periodo a_periodo_final, const bool a_lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC) {
+void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, const Periodo a_periodo_final, const bool a_lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC, const IdCenario a_menor_cenario, const IdCenario a_maior_cenario) {
 	IdHidreletrica idHidreletrica;
 	try {
 		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
@@ -402,7 +402,7 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 
 							if (periodo.sobreposicao(a_periodo_final) == 0 && numero_aberturas == 1) {
 								//Realiza o cálculo da vazao_defluencia_minima = vazoes_montante (até a próxima usina com regularizaçao) - vazao_armazenavel
-								const double vazao_defluencia_minima = calculaDefluenciaMinima_para_EngolimentoMaximo(a_dados, idHidreletrica, periodo, idEstagio_periodo, horizonte_processo_estocastico);
+								const double vazao_defluencia_minima = calculaDefluenciaMinima_para_EngolimentoMaximo(a_dados, idHidreletrica, periodo, idEstagio_periodo, horizonte_processo_estocastico, a_menor_cenario, a_maior_cenario);
 								const double defluencia_maxima_polinomio_jusante = a_dados.getAtributo(idHidreletrica, a_dados.getMaiorId(idHidreletrica, IdPolinomioJusante()), AttComumPolinomioJusante_defluencia_maxima, double());
 
 								if (q_max < vazao_defluencia_minima && vazao_defluencia_minima < defluencia_maxima_polinomio_jusante) {
@@ -441,7 +441,7 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::calculaEngolimentoMaximo(" + getFullString(idHidreletrica) + "): \n" + std::string(erro.what())); }
 }
 
-double LeituraCEPEL::calculaDefluenciaMinima_para_EngolimentoMaximo(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo, const IdEstagio a_idEstagio, const SmartEnupla<Periodo, bool> a_horizonte_processo_estocastico)
+double LeituraCEPEL::calculaDefluenciaMinima_para_EngolimentoMaximo(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo, const IdEstagio a_idEstagio, const SmartEnupla<Periodo, bool> a_horizonte_processo_estocastico, const IdCenario a_menor_cenario, const IdCenario a_maior_cenario)
 {
 	try {
 
@@ -493,9 +493,13 @@ double LeituraCEPEL::calculaDefluenciaMinima_para_EngolimentoMaximo(Dados& a_dad
 					const IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria(lista_hidreletrica_IdVariavelAleatoria.at(idHidreletricas_calculo_defluencia_minima.at(pos)));
 
 					if (a_idEstagio <= a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio()))
-						vazao_defluencia_minima += a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVariavelAleatoria, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, periodo_processo_estocastico, IdCenario_1, double());
-					else
-						vazao_defluencia_minima += a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_processo_estocastico, IdRealizacao_1, double());
+						vazao_defluencia_minima += a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVariavelAleatoria, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, periodo_processo_estocastico, a_menor_cenario, double());
+					else {
+						
+						const IdRealizacao idRealizacao = a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_menor_cenario, periodo_processo_estocastico, IdRealizacao());
+						vazao_defluencia_minima += a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_processo_estocastico, idRealizacao, double());
+
+					}//else {
 
 				}//for (int pos = 0; pos < int(idHidreletricas_calculo_defluencia_minima.size()); pos++) {
 

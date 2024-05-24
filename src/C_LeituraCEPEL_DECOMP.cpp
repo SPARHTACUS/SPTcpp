@@ -13187,6 +13187,8 @@ void LeituraCEPEL::define_numero_cenarios_CP(Dados& a_dados) {
 
 	try {
 
+		const int numero_maximo_cenarios = 8000;
+
 		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
 		const SmartEnupla<IdEstagio, int> numero_aberturas = a_dados.getVetor(AttVetorDados_numero_aberturas, IdEstagio(), int());
 
@@ -13202,6 +13204,9 @@ void LeituraCEPEL::define_numero_cenarios_CP(Dados& a_dados) {
 
 			for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo))
 				numero_cenarios *= numero_realizacoes_por_periodo.getElemento(periodo);
+
+			if (numero_cenarios > numero_maximo_cenarios)
+				numero_cenarios = numero_maximo_cenarios;
 
 			a_dados.setAtributo(AttComumDados_numero_cenarios, numero_cenarios);
 
@@ -21113,12 +21118,26 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		a_dados.validacao_operacional_Dados(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		a_dados.definirCenariosPorProcessosEmArranjoResolucao();
-	
-		const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()), AttComumProcesso_menor_cenario, IdCenario());
-		const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()), AttComumProcesso_maior_cenario, IdCenario());
 
-		if (!processoEstocasticoHidrologicoPreConfig_instanciado)
-			a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_final_PE_DECOMP, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario);
+		const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+	
+		const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_menor_cenario, IdCenario());
+		const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_maior_cenario, IdCenario());
+
+		if (!processoEstocasticoHidrologicoPreConfig_instanciado) {
+						
+			if (!a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_final_PE_DECOMP, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario)) {
+
+				int semente = a_dados.getAtributo(AttComumDados_semente_geracao_cenario_hidrologico, int());
+
+				const Periodo periodo_inicial_PE = a_dados.processoEstocastico_hidrologico.getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double()).getIteradorInicial();
+				const Periodo periodo_final_PE = a_dados.processoEstocastico_hidrologico.getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double()).getIteradorFinal();
+
+				a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralPorSorteio(TipoSorteio_uniforme, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario, semente, periodo_inicial_PE, periodo_final_PE);
+
+			}//if (!a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_final_PE_DECOMP, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario)) {
+
+		}//if (!processoEstocasticoHidrologicoPreConfig_instanciado) {
 
 		// Verifica se existem afluencias na árvore de cenários e aplica relaxação
 		//+ Calcula serieTemporal da variavelAleatoria
@@ -21145,16 +21164,21 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
-
+		
 		if (a_dados.processoEstocastico_hidrologico.getSize1Matriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) == 0) {
 			entradaSaidaDados.setDiretorioSaida(diretorio_att_premissas + "//ProcessoEstocasticoHidrologico");
 			int semente = 1; //Precisa de qualquer valor (Nao vai realizar sorteio, só alocar valores já sorteados)
 			a_dados.processoEstocastico_hidrologico.gerarCenariosPorSorteio(entradaSaidaDados, a_dados.getAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, bool()), true, true, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario, TipoSorteio_uniforme, semente);
 		}// if (a_dados.processoEstocastico_hidrologico.getSize1Matriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) == 0) {
 		
+		
 		a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, true);
-		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, false);//Só para imprimir arquivos de AcoplamentoPosEstudo
+		//a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, false);//Só para imprimir arquivos de AcoplamentoPosEstudo
 
+		//Para imprimir arquivos de AcoplamentoPosEstudo
+		if (a_dados.getAtributo(AttComumDados_imprimir_exportacao_pos_estudo, bool()))
+			a_dados.imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(entradaSaidaDados, diretorio_exportacao_pos_estudo, 0, menor_cenario, maior_cenario, idProcesso);
+		
 
 		if (processoEstocasticoHidrologicoPreConfig_instanciado)
 			horizonte_processo_estocastico = SmartEnupla<Periodo, bool>(a_dados.processoEstocastico_hidrologico.getElementosMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo(), IdRealizacao()), true);
@@ -21184,11 +21208,11 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			a_dados.processoEstocastico_hidrologico = processoEstocastico_hidrologico_buffer;
 		}
 
-
 		// FINAL DEV NOVO PROC ESTOCASTICO
 
 		leitura_volume_referencia_e_regularizacao_from_CadUsH_csv(a_dados, a_diretorio + "//CadUsH.csv");
-		calculaEngolimentoMaximo(a_dados, horizonte_estudo, horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal()), lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC);
+		
+		calculaEngolimentoMaximo(a_dados, horizonte_estudo, horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal()), lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC, menor_cenario, maior_cenario);
 
 		//Algumas usinas podem ter instanciado o volume_util_maximo no método determina_restricoes_hidraulicas_especiais() e precisa verificar com o percentual_volume_util_maximo
 		atualiza_volume_util_maximo_com_percentual_volume_util_maximo(a_dados); 
@@ -21226,14 +21250,13 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		if (hidreletricasPreConfig_instanciadas)
 			a_dados.valida_preconfig_hidraulica(lista_jusante_hidreletrica, lista_jusante_desvio_hidreletrica);
 
-
 		imprime_na_tela_avisos_de_possiveis_inviabilidades_fph(a_dados);
 
 
 		////////////////////////////////////////////////////
 		// Detecta se existe arquivo de cortes NEWAVE
 		////////////////////////////////////////////////////
-		if (nomeArquivo_cortes_NW != "nenhum")
+		if (idProcesso == IdProcesso_mestre && nomeArquivo_cortes_NW != "nenhum")
 			leitura_cortes_NEWAVE(a_dados, horizonte_estudo, nomeArquivo_cortes_NW, diretorio_att_premissas);
 
 

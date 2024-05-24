@@ -299,9 +299,9 @@ private:
 	void validacoes_DESSEM(Dados& a_dados, const std::string a_diretorio);
 
 
-	void calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, const Periodo a_periodo_final, const bool a_lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC);
+	void calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, const Periodo a_periodo_final, const bool a_lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC, const IdCenario menor_cenario, const IdCenario maior_cenario);
 
-	double calculaDefluenciaMinima_para_EngolimentoMaximo(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo, const IdEstagio idEstagio, const SmartEnupla<Periodo, bool> a_horizonte_processo_estocastico);
+	double calculaDefluenciaMinima_para_EngolimentoMaximo(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo, const IdEstagio idEstagio, const SmartEnupla<Periodo, bool> a_horizonte_processo_estocastico, const IdCenario a_menor_cenario, const IdCenario a_maior_cenario);
 
 	double calculaRaizPolinomioJusante(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo);
 
