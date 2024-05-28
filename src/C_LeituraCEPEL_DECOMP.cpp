@@ -128,8 +128,15 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 		instancia_dados_preConfig(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG");
 		instancia_dados_matriz_preConfig(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG");
 
-		a_dados.setAtributo(AttComumDados_tipo_geracao_cenario_hidrologico, TipoGeracaoCenario_serie_informada);
-		a_dados.setAtributo(AttComumDados_mes_penalizacao_volume_util_minimo, IdMes_Nenhum);
+		if (!dadosPreConfig_instanciados) {
+			a_dados.setAtributo(AttComumDados_tipo_geracao_cenario_hidrologico, TipoGeracaoCenario_serie_informada);
+			a_dados.setAtributo(AttComumDados_mes_penalizacao_volume_util_minimo, IdMes_Nenhum);
+		}//if (!dadosPreConfig_instanciados) {
+		else {
+			if(a_dados.getAtributo(AttComumDados_tipo_geracao_cenario_hidrologico, TipoGeracaoCenario()) != TipoGeracaoCenario_serie_informada)
+				throw std::invalid_argument("Pre-config deve ter tipo_geracao_cenario_hidrologico igual a TipoGeracaoCenario_serie_informada");
+		}//	else {
+
 
 		////////////////////////////////////////////////////////////////////
 		//Hidrelétricas
@@ -1803,7 +1810,11 @@ void LeituraCEPEL::instanciar_processo_estocastico_CP(Dados& a_dados) {
 		a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico_hidrologico_hidreletrica);
 		a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_tipo_espaco_amostral, TipoEspacoAmostral_arvore_cenarios);
 		a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_tipo_correlacao_variaveis_aleatorias, TipoCorrelacaoVariaveisAleatorias_sem_correlacao);
-		a_dados.setAtributo(AttComumDados_tipo_espaco_amostral_geracao_cenario_hidrologico, TipoEspacoAmostral_arvore_cenarios);
+		
+		if (!dadosPreConfig_instanciados)
+			a_dados.setAtributo(AttComumDados_tipo_espaco_amostral_geracao_cenario_hidrologico, TipoEspacoAmostral_arvore_cenarios);
+
+
 
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_processo_estocastico_CP: \n" + std::string(erro.what())); }
@@ -2144,8 +2155,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 						try {
 							//Título do estudo
 							atributo = line.substr(4, 80);
-							//if (!dadosPreConfig_instanciados)
-							a_dados.setAtributo(AttComumDados_nome_estudo, atributo);
+							if (!dadosPreConfig_instanciados)
+								a_dados.setAtributo(AttComumDados_nome_estudo, atributo);
 						}//try {
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro TE: \n" + std::string(erro.what())); }
 
@@ -4932,8 +4943,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							else
 								taxa_desconto_anual = atof(atributo.c_str()) / 100;
 
-							//if (!dadosPreConfig_instanciados)
-							a_dados.setAtributo(AttComumDados_taxa_desconto_anual, taxa_desconto_anual);
+							if (!dadosPreConfig_instanciados)
+								a_dados.setAtributo(AttComumDados_taxa_desconto_anual, taxa_desconto_anual);
 
 						}//try {
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro TX: \n" + std::string(erro.what())); }
@@ -12587,10 +12598,23 @@ void LeituraCEPEL::defineHorizontes_CP(Dados& a_dados)
 
 		valida_horizonte_estudo_CP_respeito_horizonte_otimizacao_DC(a_dados);
 
+		if (!dadosPreConfig_instanciados) {
+			a_dados.setAtributo(AttComumDados_periodo_referencia, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial());
+			a_dados.setAtributo(AttComumDados_estagio_final, a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal());
+			a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, estagio_acoplamento_pre_estudo);
+		}//if (!dadosPreConfig_instanciados) {
+		else {
 
-		a_dados.setAtributo(AttComumDados_periodo_referencia, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial());
-		a_dados.setAtributo(AttComumDados_estagio_final, a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal());
-		a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, estagio_acoplamento_pre_estudo);
+			if (a_dados.getAtributo(AttComumDados_periodo_referencia, Periodo()) != a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial())
+				throw std::invalid_argument("Pre-config deve ter periodo_referencia igual a: " + getString(a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial()));
+
+			if (a_dados.getAtributo(AttComumDados_estagio_final, IdEstagio()) != a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal())
+				throw std::invalid_argument("Pre-config deve ter estagio_final igual a: " + getString(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()));
+
+			if (a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio()) != estagio_acoplamento_pre_estudo)
+				throw std::invalid_argument("Pre-config deve ter estagio_acoplamento_pre_estudo igual a: " + getString(estagio_acoplamento_pre_estudo));
+
+		}//	else {
 
 
 		//////////////////////////////////////////////////////////////////////////////
@@ -13196,25 +13220,32 @@ void LeituraCEPEL::define_numero_cenarios_CP(Dados& a_dados) {
 		//Determina o número de cenários da árvore
 		/////////////////////////////////////////////////
 
+		int numero_cenarios = 1;
+
 		if (int(numero_realizacoes_por_periodo.size())) {
 
 			//Assume-se que a árvore é simêtrica
 
-			int numero_cenarios = 1;
-
 			for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo))
 				numero_cenarios *= numero_realizacoes_por_periodo.getElemento(periodo);
-
-			if (numero_cenarios > numero_maximo_cenarios)
-				numero_cenarios = numero_maximo_cenarios;
-
-			a_dados.setAtributo(AttComumDados_numero_cenarios, numero_cenarios);
 
 		}//else if (int(numero_realizacoes_por_periodo.size())) {
 		else
 			throw std::invalid_argument("Deve ser informado o mapeamento_arvore_cenarios ou numero_realizacoes_por_periodo");
 
-		a_dados.setAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, true);
+		if (!dadosPreConfig_instanciados) {
+
+			if (numero_cenarios > numero_maximo_cenarios)
+				numero_cenarios = numero_maximo_cenarios;
+
+			a_dados.setAtributo(AttComumDados_numero_cenarios, numero_cenarios);
+			//a_dados.setAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, true);
+
+		}//if (!dadosPreConfig_instanciados) {
+		else {
+			if (a_dados.getAtributo(AttComumDados_numero_cenarios, int()) > numero_cenarios)
+				throw std::invalid_argument("Pre-config deve ter numero_cenarios menor ou igual a: " + getString(numero_cenarios));
+		}//	else {
 
 	}//try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::define_numero_cenarios_CP(Dados& a_dados): \n" + std::string(erro.what())); }
@@ -20968,27 +20999,33 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		if (!dadosPreConfig_instanciados) {
+			a_dados.setAtributo(AttComumDados_tipo_estudo, TipoEstudo_otimizacao_e_simulacao);
 
-		a_dados.setAtributo(AttComumDados_tipo_estudo, TipoEstudo_otimizacao_e_simulacao);
+			//////////////////////////////////
+			//Dados padrao do CP modo DC
+			a_dados.setAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, true);
+			a_dados.setAtributo(AttComumDados_representar_todos_balancos_hidricos_por_volume, true);
+			a_dados.setAtributo(AttComumDados_representar_defluencia_disponivel_em_restricoes_hidraulicas, false);
+			a_dados.setAtributo(AttComumDados_representar_turbinamento_disponivel_em_restricoes_hidraulicas, false);
+			a_dados.setAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, false);
+			a_dados.setAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, false);
+			//////////////////////////////////
 
-		//////////////////////////////////
-		//Dados padrao do CP modo DC
-		a_dados.setAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, true);
-		a_dados.setAtributo(AttComumDados_representar_todos_balancos_hidricos_por_volume, true);
-		a_dados.setAtributo(AttComumDados_representar_defluencia_disponivel_em_restricoes_hidraulicas, false);
-		a_dados.setAtributo(AttComumDados_representar_turbinamento_disponivel_em_restricoes_hidraulicas, false);
-		a_dados.setAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, false);
-		a_dados.setAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, false);
-		//////////////////////////////////
+			a_dados.setAtributo(AttComumDados_ordem_maxima_auto_correlacao_geracao_cenario_hidrologico, 0);
+			a_dados.setAtributo(AttComumDados_tipo_coeficiente_auto_correlacao_geracao_cenario_hidrologico, TipoValor_positivo_e_negativo);
+			a_dados.setAtributo(AttComumDados_relaxar_afluencia_incremental_com_viabilidade_hidraulica, false);
+			a_dados.setAtributo(AttComumDados_tipo_correlacao_geracao_cenario_hidrologico, TipoCorrelacaoVariaveisAleatorias_sem_correlacao);
 
-		a_dados.setAtributo(AttComumDados_ordem_maxima_auto_correlacao_geracao_cenario_hidrologico, 0);
-		a_dados.setAtributo(AttComumDados_tipo_coeficiente_auto_correlacao_geracao_cenario_hidrologico, TipoValor_positivo_e_negativo);
-		a_dados.setAtributo(AttComumDados_relaxar_afluencia_incremental_com_viabilidade_hidraulica, false);
-		a_dados.setAtributo(AttComumDados_tipo_correlacao_geracao_cenario_hidrologico, TipoCorrelacaoVariaveisAleatorias_sem_correlacao);
+			a_dados.setAtributo(AttComumDados_tipo_processamento_paralelo, TipoProcessamentoParalelo_por_abertura);
+			a_dados.setAtributo(AttComumDados_numero_maximo_iteracoes, 20);
+			a_dados.setAtributo(AttComumDados_iteracao_inicial, IdIteracao_1);
 
-		a_dados.setAtributo(AttComumDados_tipo_processamento_paralelo, TipoProcessamentoParalelo_por_abertura);
-		a_dados.setAtributo(AttComumDados_numero_maximo_iteracoes, 20);
-		a_dados.setAtributo(AttComumDados_iteracao_inicial, IdIteracao_1);
+			a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("DadosSaidaMP//Otimizacao//AcoplamentoPreEstudo"));
+			a_dados.setAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco_CVAR);
+			a_dados.setAtributo(AttComumDados_selecao_cortes_nivel_dominancia, 0);
+
+		}//if (!dadosPreConfig_instanciados) {
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -21002,7 +21039,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		if (a_dados.getSize1Matriz(a_dados.getMenorId(IdHidreletrica()), AttMatrizHidreletrica_potencia_disponivel_meta) > 0)
 			a_dados.setAtributo(AttComumDados_tipo_estudo, TipoEstudo_simulacao);
 
-
+		////////////////////////////////////////
 
 		EntradaSaidaDados entradaSaidaDados;
 
@@ -21016,8 +21053,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		std::string diretorio_att_premissas = "";
 		std::string diretorio_exportacao_pos_estudo = "";
 
-		//if (!dadosPreConfig_instanciados)
-		a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("DadosSaidaMP//Otimizacao//AcoplamentoPreEstudo"));
 
 		if (a_dados.getAtributo(AttComumDados_tipo_estudo, TipoEstudo()) == TipoEstudo_simulacao) {
 			diretorio_att_premissas = entradaSaidaDados.getDiretorioEntrada() + "//Simulacao//AtributosPremissasDECOMP//";
@@ -21035,9 +21070,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Instancia parâmetros do CVaR no CP
-
-		a_dados.setAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco_CVAR);
-
 
 		if (a_dados.getSizeVetor(AttVetorDados_lambda_CVAR) == 0) {
 
@@ -21087,9 +21119,10 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		a_dados.validacaoDadosAttComum();
 
-		a_dados.setAtributo(AttComumDados_diretorio_entrada_dados, entradaSaidaDados.getDiretorioEntrada());
-		a_dados.setAtributo(AttComumDados_diretorio_saida_dados, entradaSaidaDados.getDiretorioSaida());
-		a_dados.setAtributo(AttComumDados_selecao_cortes_nivel_dominancia, 0);
+		if (!dadosPreConfig_instanciados) {
+			a_dados.setAtributo(AttComumDados_diretorio_entrada_dados, entradaSaidaDados.getDiretorioEntrada());
+			a_dados.setAtributo(AttComumDados_diretorio_saida_dados, entradaSaidaDados.getDiretorioSaida());
+		}
 
 		////////////////////////////////////////
 		// INICIO DEV NOVO PROC ESTOCASTICO
@@ -21097,13 +21130,34 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		const Periodo periodo_final_PE_DECOMP = horizonte_otimizacao.at(horizonte_estudo.at(get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados)));
 
 		if (periodo_final_PE_DECOMP < horizonte_otimizacao.at(horizonte_otimizacao.getIteradorFinal())){
-			a_dados.setAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, false);
-			a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false);
-			a_dados.setAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, true);
-			a_dados.setAtributo(AttComumDados_ordem_maxima_auto_correlacao_geracao_cenario_hidrologico, 6);
-			a_dados.setAtributo(AttComumDados_tipo_correlacao_geracao_cenario_hidrologico, TipoCorrelacaoVariaveisAleatorias_matriz_carga);
-			a_dados.setAtributo(AttComumDados_correlacao_dominante_geracao_cenario_hidrologico, 0.85);
+			
+			if (!dadosPreConfig_instanciados) {
+				a_dados.setAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, false);
+				a_dados.setAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, true);
+				a_dados.setAtributo(AttComumDados_ordem_maxima_auto_correlacao_geracao_cenario_hidrologico, 6);
+				a_dados.setAtributo(AttComumDados_tipo_correlacao_geracao_cenario_hidrologico, TipoCorrelacaoVariaveisAleatorias_matriz_carga);
+				a_dados.setAtributo(AttComumDados_correlacao_dominante_geracao_cenario_hidrologico, 0.85);
+			}//if (!dadosPreConfig_instanciados) {
+			else {
+				if (a_dados.getAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, bool()))
+					throw std::invalid_argument("Pre-config deve ter visitar_todos_cenarios_por_iteracao igual a False | Caso com expansao de horizonte");
+
+			}//	else {
+			
 		}//if (periodo_final_PE_DECOMP < horizonte_otimizacao.at(horizonte_otimizacao.getIteradorFinal())){
+		else {
+			if (!dadosPreConfig_instanciados)
+				a_dados.setAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, true);
+			else {
+				if (!a_dados.getAtributo(AttComumDados_visitar_todos_cenarios_por_iteracao, bool()))
+					throw std::invalid_argument("Pre-config deve ter visitar_todos_cenarios_por_iteracao igual a True | Caso sem expansao de horizonte");
+
+			}
+
+		}
+
+		const bool imprimir_exportacao_pos_estudo = a_dados.getAtributo(AttComumDados_imprimir_exportacao_pos_estudo, bool());
+		a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, false); //Precisa para a lógica de expansão do horizonte de estudo com geração de cenários
 
 		//Define variavel_aleatoria_interna para cada Processo (é realizado logo de estabelecer os cenários resolvidos por cada processo) e das modificaçõesUHE dos postos
 		
@@ -21171,9 +21225,8 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			a_dados.processoEstocastico_hidrologico.gerarCenariosPorSorteio(entradaSaidaDados, a_dados.getAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, bool()), true, true, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario, TipoSorteio_uniforme, semente);
 		}// if (a_dados.processoEstocastico_hidrologico.getSize1Matriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) == 0) {
 		
-		
-		a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, true);
-		//a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, false);//Só para imprimir arquivos de AcoplamentoPosEstudo
+		if(imprimir_exportacao_pos_estudo)
+			a_dados.setAtributo(AttComumDados_imprimir_exportacao_pos_estudo, true);
 
 		//Para imprimir arquivos de AcoplamentoPosEstudo
 		if (a_dados.getAtributo(AttComumDados_imprimir_exportacao_pos_estudo, bool()))
