@@ -9059,7 +9059,8 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 				vetorHidreletrica.att(idHidreletrica_YHF).vetorAfluencia.att(IdAfluencia_vazao_afluente).setMatriz_forced(AttMatrizAfluencia_incremental, cenarios_realizacao_espaco_amostral);
 
 				//Inicializa AttMatrizAfluencia_natural_tendencia			
-				vetorHidreletrica.att(idHidreletrica_YHF).vetorAfluencia.att(IdAfluencia_vazao_afluente).setMatriz_forced(AttMatrizAfluencia_natural, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>(horizonte_afluencia, SmartEnupla<IdCenario, double>(a_cenario_inicial, std::vector<double>(a_cenario_final, 0.0))));
+				//vetorHidreletrica.att(idHidreletrica_YHF).vetorAfluencia.att(IdAfluencia_vazao_afluente).setMatriz_forced(AttMatrizAfluencia_natural, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>(horizonte_afluencia, SmartEnupla<IdCenario, double>(a_cenario_inicial, std::vector<double>(a_cenario_final, 0.0))));
+				vetorHidreletrica.att(idHidreletrica_YHF).vetorAfluencia.att(IdAfluencia_vazao_afluente).setMatriz_forced(AttMatrizAfluencia_natural, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>(horizonte_afluencia, SmartEnupla<IdCenario, double>(a_cenario_inicial, std::vector<double>(int(a_cenario_final- a_cenario_inicial)+1, 0.0))));
 
 				//Inicializa AttVetorAfluencia_incremental_tendencia / AttVetorAfluencia_natural_tendencia
 				/*
@@ -9215,6 +9216,7 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 
 		//Imprime os cenários por cada processo
 
+		a_entradaSaidaDados.setAppendArquivo(false);
 		if (vetorHidreletrica.att(getMenorId(IdHidreletrica())).vetorAfluencia.att(IdAfluencia_vazao_afluente).getSizeMatriz(AttMatrizAfluencia_natural) > 0)
 			a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("_info_HIDRELETRICA_AFLUENCIA_AttMatriz_natural_" + getString(a_cenario_inicial) + "_" + getString(a_cenario_final) + ".csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttMatrizAfluencia_natural);
 		
