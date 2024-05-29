@@ -6344,6 +6344,11 @@ bool ModeloOtimizacao::get_is_variavelEstado_ENA() {
 		const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
 		const IdEstagio estagio_futuro = IdEstagio(estagio_final + 1);
 
+		IdEstagio maiorIdEstagio = getMaiorId(IdEstagio());
+
+		if (estagio_futuro > maiorIdEstagio) //Significa que não existem cortes futuros
+			return is_variavelEstado_ENA;
+
 		const IdVariavelEstado maiorIdVariavelEstado = getMaiorId(estagio_futuro, IdVariavelEstado());
 
 		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
