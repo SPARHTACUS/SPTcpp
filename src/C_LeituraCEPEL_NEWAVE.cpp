@@ -1707,24 +1707,18 @@ void LeituraCEPEL::leitura_SISTEMA_201908_NW25(Dados &a_dados, std::string nomeA
 				if (idSubmercado == IdSubmercado_Nenhum)
 					throw std::invalid_argument("SISTEMA.DAT submercado nao instanciado, ver Bloco 5 Registro tipo 1 ");
 
-				
-				IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada_1; //Por padrao IdUsinaNaoSimulada_1 é a total, se os valores estao desagregados instancia outros IdUsinaNaoSimulada
-
+				//Número do bloco de usinas não simuladas
 				if (line_size >= 9) {
-
-					//Número do bloco de usinas não simuladas
 					atributo = line.substr(5, 4); //Erro no manual, a posicao está entre a 6-9
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-					if (atributo != "")
-						idUsinaNaoSimulada = IdUsinaNaoSimulada(atoi(atributo.c_str()));
-
+					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());		
 				}//if (line_size >= 9) {
+				else
+					atributo = "";
 
-				UsinaNaoSimulada usinaNaoSimulada;
-				usinaNaoSimulada.setAtributo(AttComumUsinaNaoSimulada_idUsinaNaoSimulada, idUsinaNaoSimulada);
+				std::string bloco_usina_nao_simulada = "Nao_informado";
 
-				a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.add(usinaNaoSimulada);
+				if (atributo != "")
+					bloco_usina_nao_simulada = atributo;
 
 				//Descrição do bloco de usinas não simuladas
 				if (line.size() >= 20) {
@@ -1738,6 +1732,17 @@ void LeituraCEPEL::leitura_SISTEMA_201908_NW25(Dados &a_dados, std::string nomeA
 
 				if (atributo != "")
 					nome = atributo;
+
+
+				//Por padrao IdUsinaNaoSimulada_1 é a total, se os valores estao desagregados instancia outros IdUsinaNaoSimulada
+				const IdUsinaNaoSimulada idUsinaNaoSimulada = getIdUsinaNaoSimulada_from_nome_or_bloco(nome, bloco_usina_nao_simulada);
+
+				UsinaNaoSimulada usinaNaoSimulada;
+				usinaNaoSimulada.setAtributo(AttComumUsinaNaoSimulada_idUsinaNaoSimulada, idUsinaNaoSimulada);
+
+				a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.add(usinaNaoSimulada);
+				
+				lista_codigo_ONS_usina_nao_simulada.setElemento(idUsinaNaoSimulada, atoi(bloco_usina_nao_simulada.c_str()));//Mapeamento necessário para leitura do arquivo PATAMAR.DAT
 
 				a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setAtributo(AttComumUsinaNaoSimulada_nome, nome);
 
@@ -5013,9 +5018,10 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 						if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
 							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
 
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada_1; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; idUsinaNaoSimulada++)
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
 								a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_usinaNaoSimulada_percentual_variacao_patamar_carga);
 
 						}//if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
@@ -5047,9 +5053,10 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 							if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
+								const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
 								const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
 
-								for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada_1; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; idUsinaNaoSimulada++)
+								for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
 									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_usinaNaoSimulada_percentual_variacao_patamar_carga);
 
 							}//if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
@@ -5071,9 +5078,10 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 						for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
 
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
 							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
 
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada_1; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; idUsinaNaoSimulada++)
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
 								a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_periodo_patamar_zero);
 
 						}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
@@ -5123,8 +5131,12 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 								atributo = line.substr(5, (line.length()-4));
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-								if (atributo != "")
-									idUsinaNaoSimulada = IdUsinaNaoSimulada(atoi(atributo.c_str()));
+								if (atributo != "") {
+									//idUsinaNaoSimulada = IdUsinaNaoSimulada(atoi(atributo.c_str()));
+									idUsinaNaoSimulada = getIdFromCodigoONS(lista_codigo_ONS_usina_nao_simulada, atoi(atributo.c_str()));
+
+								}
+
 
 							}//if (line.size() >= 8) {
 
@@ -5625,9 +5637,10 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 						if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
 							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
 
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada_1; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; idUsinaNaoSimulada++)
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
 								a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_usinaNaoSimulada_percentual_variacao_patamar_carga);
 
 						}//if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
@@ -5659,9 +5672,10 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 							if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
+								const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
 								const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
 
-								for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada_1; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; idUsinaNaoSimulada++)
+								for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
 									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_usinaNaoSimulada_percentual_variacao_patamar_carga);
 
 							}//if (a_dados.vetorSubmercado.att(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
@@ -5683,9 +5697,10 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 						for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
 
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
 							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
 
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada_1; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; idUsinaNaoSimulada++)
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
 								a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_periodo_patamar_zero);
 
 						}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
@@ -5733,8 +5748,10 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 								atributo = line.substr(5, (line.length() - 4));
 								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-								if (atributo != "")
-									idUsinaNaoSimulada = IdUsinaNaoSimulada(atoi(atributo.c_str()));
+								if (atributo != "") {
+									//idUsinaNaoSimulada = IdUsinaNaoSimulada(atoi(atributo.c_str()));
+									idUsinaNaoSimulada = getIdFromCodigoONS(lista_codigo_ONS_usina_nao_simulada, atoi(atributo.c_str()));
+								}
 
 							}//if (line.size() >= 8) {
 

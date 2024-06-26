@@ -3948,3 +3948,49 @@ void LeituraCEPEL::instanciar_hidreletricas_sem_producao_para_acoplamento_cortes
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_hidreletricas_sem_producao_para_acoplamento_cortes_NW: \n" + std::string(erro.what())); }
 
 }
+
+IdUsinaNaoSimulada LeituraCEPEL::getIdUsinaNaoSimulada_from_nome_or_bloco(const std::string a_nome, const std::string a_bloco) {
+
+	try {
+
+		IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada_1; //Por padrao IdUsinaNaoSimulada_1 é a total
+
+		if (a_nome.find("UFVMMGD") != std::string::npos || a_nome.find("UFVgd") != std::string::npos)
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_UFV_MMGD;
+		else if (a_nome.find("PCHMMGD") != std::string::npos || a_nome.find("PCHgd") != std::string::npos)
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_UHE_MMGD;
+		else if (a_nome.find("PCTMMGD") != std::string::npos || a_nome.find("PCTgd") != std::string::npos)
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_UTE_MMGD;
+		else if (a_nome.find("EOLMMGD") != std::string::npos || a_nome.find("EOLgd") != std::string::npos)
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_UEE_MMGD;
+		else if (a_nome.find("UFV") != std::string::npos)
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_UFV;
+		else if (a_nome.find("PCH") != std::string::npos)
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_UHE;
+		else if (a_nome.find("PCT") != std::string::npos)
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_UTE;
+		else if (a_nome.find("EOL") != std::string::npos)
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_UEE;
+		else if (a_bloco == "1")
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_1;
+		else if (a_bloco == "2")
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_2;
+		else if (a_bloco == "3")
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_3;
+		else if (a_bloco == "4")
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_4;
+		else if (a_bloco == "5")
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_5;
+		else if (a_bloco == "6")
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_6;
+		else if (a_bloco == "7")
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_7;
+		else if (a_bloco == "8")
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_8;
+
+		return idUsinaNaoSimulada;
+
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::getIdUsinaNaoSimulada_from_nome_or_bloco: \n" + std::string(erro.what())); }
+
+}

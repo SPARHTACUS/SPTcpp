@@ -3681,12 +3681,15 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 		// Variável Potência Usina Nao Simulada PN
 		//
 
-		for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada(IdUsinaNaoSimulada_Nenhum + 1); idUsinaNaoSimulada < IdUsinaNaoSimulada_Excedente; idUsinaNaoSimulada++) {
+		const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.getMenorId(a_idSubmercado, IdUsinaNaoSimulada());
+		const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.getMaiorId(a_idSubmercado, IdUsinaNaoSimulada());
+
+		for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.incr(a_idSubmercado, idUsinaNaoSimulada)) {
 
 			if (getVarDecisao_PNseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idUsinaNaoSimulada) > -1)
 				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idUsinaNaoSimulada), posEquAD, 1.0);
 
-		} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada(IdUsinaNaoSimulada_Nenhum + 1); idUsinaNaoSimulada < IdUsinaNaoSimulada_Excedente; idUsinaNaoSimulada++) {
+		} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.incr(a_idSubmercado, idUsinaNaoSimulada)) { {
 
 		//USINAS EOLICAS 
 		for (IdUsinaEolica idUsinaEolica = IdUsinaEolica_1; idUsinaEolica < a_maiorIdUsinaEolica; idUsinaEolica++)
@@ -4070,8 +4073,10 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 			// PRODUCAO_USINA_NAO_SIMULADA
 			if (true) {
 
+				const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.getMenorId(a_idSubmercado, IdUsinaNaoSimulada());
 				const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.getMaiorId(a_idSubmercado, IdUsinaNaoSimulada());
-				for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada(IdUsinaNaoSimulada_Nenhum + 1); idUsinaNaoSimulada < IdUsinaNaoSimulada_Excedente; idUsinaNaoSimulada++) {
+
+				for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.incr(a_idSubmercado, idUsinaNaoSimulada)) {
 
 					if (getVarDecisao_PNseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idUsinaNaoSimulada) > -1) {
 
@@ -4089,7 +4094,7 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 
 					} // if (getVarDecisao_PNseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idUsinaNaoSimulada) > -1){
 
-				} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada(IdUsinaNaoSimulada_Nenhum + 1); idUsinaNaoSimulada < IdUsinaNaoSimulada_Excedente; idUsinaNaoSimulada++) {
+				} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.incr(a_idSubmercado, idUsinaNaoSimulada)) {
 
 			} // if (true) {
 
@@ -4972,6 +4977,7 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 			return;
 
+		/*
 		SmartEnupla<IdSubmercado, SmartEnupla<int, IdUsinaNaoSimulada>> usinaNaoSimulada_total(a_dados.getMenorId(IdSubmercado()), std::vector<SmartEnupla<int, IdUsinaNaoSimulada>>(a_maiorIdSubmercado, SmartEnupla<int, IdUsinaNaoSimulada>()));
 
 		for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
@@ -4980,7 +4986,7 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 				usinaNaoSimulada_total.at(idSubmercado) = SmartEnupla<int, IdUsinaNaoSimulada>(1, a_dados.getIdObjetos(idSubmercado, IdUsinaNaoSimulada()));
 
 		}//for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
-
+		*/
 		auto start_clock = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> tempo;
 
@@ -5075,12 +5081,14 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 					// VARIAVEIS POTÊNCIA USINAS NÃO SIMULADAS (PN)
 					start_clock = std::chrono::high_resolution_clock::now();
 
-					for (int tipo_usina = 1; tipo_usina <= usinaNaoSimulada_total.at(idSubmercado).size(); tipo_usina++) {
-						IdUsinaNaoSimulada idUsinaNaoSimulada = usinaNaoSimulada_total.at(idSubmercado).at(tipo_usina);
+					const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.getMenorId(idSubmercado, IdUsinaNaoSimulada());
+					const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.getMaiorId(idSubmercado, IdUsinaNaoSimulada());
+
+					for(IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.incr(idSubmercado, idUsinaNaoSimulada)) {
 						addVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idSubmercado, idUsinaNaoSimulada, a_dados.getElementoMatriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_minima, a_periodo_estudo, idPatamarCarga, double()), a_dados.getElementoMatriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_maxima, a_periodo_estudo, idPatamarCarga, double()), 0.0);
 						if (getVarDecisao_PNseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado) < 0)
 							addVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado, 0.0, infinito, 0.0);
-					}
+					}//for(IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.incr(idSubmercado, idUsinaNaoSimulada)) {
 
 					tempo = std::chrono::high_resolution_clock::now() - start_clock;
 					a_tempoCriarVariaveis.variaveisUsinaNSimulada += tempo.count() / 60;

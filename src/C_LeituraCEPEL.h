@@ -208,6 +208,7 @@ private:
 	void atualizar_valores_periodos_horizonte_expandido_restricao_operativa_UHE(Dados& a_dados);
 
 	void atualizar_valores_periodos_horizonte_expandido_com_DadosEntradaMP_PRECONFIG(Dados& a_dados, std::string a_diretorio);
+	void atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados, std::string a_nomeArquivo);
 	
 	void atualiza_codigo_posto_acoplamento_ENA_regras_especiais(Dados& a_dados);
 	void defineHidreletricasMontanteNaCascataENA(Dados& a_dados);
@@ -309,6 +310,8 @@ private:
 
 	void instanciar_variavelAleatoria_x_idHidreletrica(Dados& a_dados, const IdHidreletrica a_idHidreletrica);
 
+	IdUsinaNaoSimulada getIdUsinaNaoSimulada_from_nome_or_bloco(const std::string a_nome, const std::string a_bloco);
+
 	////////////////////////////////////////////////////////////////
 	//Definição de Submercados e Intercambios 
 	//não declarados nos modelos oficiais (IV, ANDE)
@@ -385,7 +388,7 @@ private:
 	SmartEnupla<IdHidreletrica, IdSubmercado> lista_IdSubmercado_hidreletrica = SmartEnupla<IdHidreletrica, IdSubmercado>(IdHidreletrica(1), std::vector<IdSubmercado>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdSubmercado_Nenhum));
 
 	SmartEnupla<IdSubmercado, std::string> lista_submercado_mnemonico = SmartEnupla<IdSubmercado, std::string>(IdSubmercado(1), std::vector<std::string>(IdSubmercado(int(IdSubmercado_Excedente) - 1), ""));
-
+	
 	SmartEnupla<int, int> lista_codigo_ONS_hidreletrica_original;
 	SmartEnupla<int, int> lista_codigo_ONS_hidreletrica_jusante_original;
 
@@ -395,6 +398,10 @@ private:
 	//Listas necessárias para validação das hidrelétricas PreConfig
 	SmartEnupla<IdHidreletrica, IdHidreletrica> lista_jusante_hidreletrica = SmartEnupla<IdHidreletrica, IdHidreletrica>(IdHidreletrica(1), std::vector<IdHidreletrica>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdHidreletrica_Nenhum));        //Lista da jusante de cada hidrelétrica -> Somente para validação entre a configuração PD e CP
 	SmartEnupla<IdHidreletrica, IdHidreletrica> lista_jusante_desvio_hidreletrica = SmartEnupla<IdHidreletrica, IdHidreletrica>(IdHidreletrica(1), std::vector<IdHidreletrica>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), IdHidreletrica_Nenhum)); //Lista da jusante_desvio de cada hidrelétrica -> Somente para validação entre a configuração PD e CP
+
+	//Lista para as usinaNaoSimuladas necessária para compatibilizar/utiizar na leitura NW
+	SmartEnupla<IdUsinaNaoSimulada, int> lista_codigo_ONS_usina_nao_simulada = SmartEnupla<IdUsinaNaoSimulada, int>(IdUsinaNaoSimulada(1), std::vector<int>(IdUsinaNaoSimulada(int(IdUsinaNaoSimulada_Excedente) - 1), -1));
+
 
 	//////////////////////////////////
 

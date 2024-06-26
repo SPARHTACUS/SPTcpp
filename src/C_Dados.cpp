@@ -7183,8 +7183,9 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 
 			validaUsinaNaoSimuladaEmSubmercado(idSubmercado);
 
+			const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = getMenorId(idSubmercado, IdUsinaNaoSimulada());
 			const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = getMaiorId(idSubmercado, IdUsinaNaoSimulada());
-			for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada(1); idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; idUsinaNaoSimulada++) {
+			for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
 
 				if (vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)) {
 
@@ -7262,7 +7263,7 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 
 				} // if (vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)){
 
-			} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada_1; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; idUsinaNaoSimulada++) {
+			} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
 
 		} // for (IdSubmercado idSubmercado = getMenorId(IdSubmercado()); idSubmercado <= maiorIdSubmercado; vetorSubmercado.incr(idSubmercado)) {
 
@@ -7327,7 +7328,11 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 						impresso = true;
 
 						for (IdSubmercado idSubmercado = getMenorId(IdSubmercado()); idSubmercado <= maiorIdSubmercado; vetorSubmercado.incr(idSubmercado)) {
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada_1; idUsinaNaoSimulada <= getMaiorId(idSubmercado, IdUsinaNaoSimulada()); idUsinaNaoSimulada++) {
+
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = getMenorId(idSubmercado, IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = getMaiorId(idSubmercado, IdUsinaNaoSimulada());
+
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
 								if (vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada))
 									vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).clear(attVetorUsinaNaoSimulada_media);
 							}
@@ -10174,9 +10179,10 @@ void Dados::validaUsinaNaoSimuladaEmSubmercado(const IdSubmercado a_idSubmercado
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
+		const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = getMenorId(a_idSubmercado, IdUsinaNaoSimulada());
 		const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = getMaiorId(a_idSubmercado, IdUsinaNaoSimulada());
 
-		for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada(1); idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; idUsinaNaoSimulada++) {
+		for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; vetorSubmercado.att(a_idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
 
 			if (vetorSubmercado.att(a_idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)) {
 
@@ -10208,7 +10214,7 @@ void Dados::validaUsinaNaoSimuladaEmSubmercado(const IdSubmercado a_idSubmercado
 
 			} // if (vetorSubmercado.att(a_idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)){
 
-		} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada(1); idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; idUsinaNaoSimulada++) {
+		} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; vetorSubmercado.att(a_idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaUsinaNaoSimuladaEmSubmercado(" + getFullString(a_idSubmercado) + "): \n" + std::string(erro.what())); }
