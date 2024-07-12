@@ -3958,19 +3958,19 @@ IdUsinaNaoSimulada LeituraCEPEL::getIdUsinaNaoSimulada_from_nome_or_bloco(const 
 		if (a_nome.find("UFVMMGD") != std::string::npos || a_nome.find("UFVgd") != std::string::npos)
 			idUsinaNaoSimulada = IdUsinaNaoSimulada_UFV_MMGD;
 		else if (a_nome.find("PCHMMGD") != std::string::npos || a_nome.find("PCHgd") != std::string::npos)
-			idUsinaNaoSimulada = IdUsinaNaoSimulada_UHE_MMGD;
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_PCH_MMGD;
 		else if (a_nome.find("PCTMMGD") != std::string::npos || a_nome.find("PCTgd") != std::string::npos)
-			idUsinaNaoSimulada = IdUsinaNaoSimulada_UTE_MMGD;
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_PCT_MMGD;
 		else if (a_nome.find("EOLMMGD") != std::string::npos || a_nome.find("EOLgd") != std::string::npos)
-			idUsinaNaoSimulada = IdUsinaNaoSimulada_UEE_MMGD;
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_EOL_MMGD;
 		else if (a_nome.find("UFV") != std::string::npos)
 			idUsinaNaoSimulada = IdUsinaNaoSimulada_UFV;
 		else if (a_nome.find("PCH") != std::string::npos)
-			idUsinaNaoSimulada = IdUsinaNaoSimulada_UHE;
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_PCH;
 		else if (a_nome.find("PCT") != std::string::npos)
-			idUsinaNaoSimulada = IdUsinaNaoSimulada_UTE;
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_PCT;
 		else if (a_nome.find("EOL") != std::string::npos)
-			idUsinaNaoSimulada = IdUsinaNaoSimulada_UEE;
+			idUsinaNaoSimulada = IdUsinaNaoSimulada_EOL;
 		else if (a_bloco == "1")
 			idUsinaNaoSimulada = IdUsinaNaoSimulada_1;
 		else if (a_bloco == "2")

@@ -210,6 +210,8 @@ private:
 	void atualizar_valores_periodos_horizonte_expandido_com_DadosEntradaMP_PRECONFIG(Dados& a_dados, std::string a_diretorio);
 	void atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados, std::string a_nomeArquivo);
 	
+	void validar_horizonte_informacao_PD_pre_config(const Periodo a_periodo_inicial_PD, const Periodo a_periodo_final_PD);
+
 	void atualiza_codigo_posto_acoplamento_ENA_regras_especiais(Dados& a_dados);
 	void defineHidreletricasMontanteNaCascataENA(Dados& a_dados);
 

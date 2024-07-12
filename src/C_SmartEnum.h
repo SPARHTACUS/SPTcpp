@@ -992,7 +992,7 @@ DEFINE_SMART_ENUM(IdGeracaoEletrica, ID_GERACAO_ELETRICA)
 DEFINE_SMART_ENUM(IdProducaoUHE, ID_PRODUCAO_UHE)
 
 #define ID_USINA_NAO_SIMULADA(m)\
-    m(IdUsinaNaoSimulada, UEE) m(IdUsinaNaoSimulada, UFV) m(IdUsinaNaoSimulada, UHE) m(IdUsinaNaoSimulada, UTE) m(IdUsinaNaoSimulada, UEE_MMGD) m(IdUsinaNaoSimulada, UFV_MMGD) m(IdUsinaNaoSimulada, UHE_MMGD) m(IdUsinaNaoSimulada, UTE_MMGD) \
+    m(IdUsinaNaoSimulada, EOL) m(IdUsinaNaoSimulada, UFV) m(IdUsinaNaoSimulada, PCH) m(IdUsinaNaoSimulada, PCT) m(IdUsinaNaoSimulada, EOL_MMGD) m(IdUsinaNaoSimulada, UFV_MMGD) m(IdUsinaNaoSimulada, PCH_MMGD) m(IdUsinaNaoSimulada, PCT_MMGD) \
 	m(IdUsinaNaoSimulada, 1) m(IdUsinaNaoSimulada, 2) m(IdUsinaNaoSimulada, 3) m(IdUsinaNaoSimulada, 4) m(IdUsinaNaoSimulada, 5) m(IdUsinaNaoSimulada, 6) m(IdUsinaNaoSimulada, 7) m(IdUsinaNaoSimulada, 8) m(IdUsinaNaoSimulada, 9) m(IdUsinaNaoSimulada, 10)
 DEFINE_SMART_ENUM(IdUsinaNaoSimulada, ID_USINA_NAO_SIMULADA)
 

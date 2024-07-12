@@ -54,7 +54,10 @@ SmartEnupla<int, int> codigo_restricao_energia_armazenada;
 SmartEnupla<int, IdReservatorioEquivalente> idReservatorioEquivalente_restricao_energia_armazenada;
 
 ////////////////////////////////////////////////////////////////////////////////////////
-SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> percentual_duracao_patamar_carga_original; //Necessário para a donversão da parcela do corte das GNLs
+//SmartEnuplas auxiliares para a conversão
+SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>                                 percentual_duracao_patamar_carga_original; //Necessário para a conversão da parcela do corte das GNLs
+SmartEnupla <IdSubmercado, SmartEnupla<Periodo, double>>                                  demanda_media_original; //Necessário para a conversão com a modulação informada na preConfig PD 
+SmartEnupla <IdSubmercado, SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>> geracao_usina_nao_simulada_media_original; //Necessário para a conversão com a modulação informada na preConfig PD 
 
 //////////////////////////////////////////////////////////////////////////////
 // Leitura cortes NEWAVE
@@ -678,7 +681,6 @@ void LeituraCEPEL::instanciar_variavelAleatoria_x_idHidreletrica(Dados& a_dados,
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_variavelAleatoria_x_idHidreletricas: \n" + std::string(erro.what())); }
 
 }
-
 
 bool LeituraCEPEL::criar_tendencia_temporal_com_vazoes_observadas_CP(const std::string a_diretorio, const std::string a_revisao)
 {
@@ -1820,7 +1822,6 @@ void LeituraCEPEL::instanciar_processo_estocastico_CP(Dados& a_dados) {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_processo_estocastico_CP: \n" + std::string(erro.what())); }
 
 }
-
 
 void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeArquivo)
 {
@@ -3101,6 +3102,10 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 					if (menemonico == "DP") {//Carga dos subsistemas					
 
 						try {
+
+							if(int(demanda_media_original.size()) == 0)//Inicializa vetor auxiliar para utilizar na conversão com modulação PD da demanda
+								demanda_media_original = SmartEnupla<IdSubmercado, SmartEnupla<Periodo, double>>(IdSubmercado(1), std::vector<SmartEnupla<Periodo, double>>(IdSubmercado(int(IdSubmercado_Excedente) - 1), SmartEnupla<Periodo, double>(horizonte_estudo_DECK, 0.0)));
+
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Campo 2 -  Número de identificação do estágio (em ordem crescente, máximo igual a 24).
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3272,6 +3277,21 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								duracao_horas_patamar.push_back(atof(atributo.c_str()));
 
 							}//if (line_size >= 119) {
+
+
+							if (true) {
+								//Necessário para a conversão com a modulação da demanda informada na preConfig PD 
+
+								const Periodo periodo_deck = horizonte_otimizacao_DC.at(idEstagio_demanda);
+
+								double demanda_media = 0.0;
+
+								for (int pos = 0; pos < int(demanda_patamar.size()); pos++)
+									demanda_media += demanda_patamar.at(pos) * percentual_duracao_patamar_carga_original.at(periodo_deck).at(IdPatamarCarga(pos + 1));
+
+								demanda_media_original.at(idSubmercado).at(periodo_deck) = demanda_media;
+
+							}//if (true) {
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Guarda informação nos Smart Elementos
@@ -3794,6 +3814,10 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 					if (menemonico == "PQ") {//Geração em pequenas usinas
 
 						try {
+
+							if (int(geracao_usina_nao_simulada_media_original.size()) == 0)//Inicializa vetor auxiliar para utilizar na conversão com modulação PD
+								geracao_usina_nao_simulada_media_original = SmartEnupla <IdSubmercado, SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>>(IdSubmercado(1), std::vector<SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>>(IdSubmercado(int(IdSubmercado_Excedente) - 1), SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>(IdUsinaNaoSimulada(1), std::vector<SmartEnupla<Periodo, double>>(IdUsinaNaoSimulada(int(IdUsinaNaoSimulada_Excedente) - 1), SmartEnupla<Periodo, double>(horizonte_estudo_DECK, 0.0)))));
+								
 							const int numero_submercados = getintFromChar(getString(a_dados.getMaiorId(IdSubmercado())).c_str());
 
 							if (inicializar_conteio_numero_usina_nao_simulado_por_submercado == true) {
@@ -3890,6 +3914,21 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							//Identifica o idUsinaNaoSimulada
 
 							const IdUsinaNaoSimulada idUsinaNaoSimulada = getIdUsinaNaoSimulada_from_nome_or_bloco(nome, "");
+
+							if (true) {
+								//Necessário para a conversão com a modulação da demanda informada na preConfig PD 								
+								for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+									if (periodo_deck >= horizonte_otimizacao_DC.at(idEstagio_registro)) {
+
+										double geracao_media = 0.0;
+										for (int pos = 0; pos < int(usinaNaoSimulada_potencia_gerada.size()); pos++)
+											geracao_media += usinaNaoSimulada_potencia_gerada.at(pos) * percentual_duracao_patamar_carga_original.at(periodo_deck).at(IdPatamarCarga(pos + 1));
+
+										geracao_usina_nao_simulada_media_original.at(idSubmercado).at(idUsinaNaoSimulada).at(periodo_deck) = geracao_media;
+									}//if (periodo_deck >= horizonte_otimizacao_DC.at(idEstagio_registro)) {
+								}//for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+							}//if (true) {
 
 							if (idEstagio_registro == IdEstagio_1 && !a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)) { //UsinaNaoSimulada não instanciada
 
@@ -20829,132 +20868,540 @@ void LeituraCEPEL::atualizar_valores_periodos_horizonte_expandido_com_DadosEntra
 
 }
 
-void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados, std::string a_nomeArquivo) {
+void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados, std::string a_diretorio) {
 
 	try {
 
-		//REFORMULAR
+		//************************************************************************************************
+		// Premissa:
+		//Informação Operacional pre-Config PD (valores absolutos) -> entra direito no Att do problema CP
+		//Informação Premissa pre-Config PD (valores p.u) -> Aplica modulação PD na previsão CP
+		//************************************************************************************************
+
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
 
-		int pos;
-		std::string line;
-		std::string atributo;
+		const Periodo periodo_final_PE_DECOMP = horizonte_otimizacao.at(horizonte_estudo.at(get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados)));
 
-		int registro_submercado = -1;
-		int registro_codigo_submercado = -1;
-		int registro_timestamp_inicial = -1;
-		int registro_timestamp_final = -1;
-		int registro_demanda = -1;
+		Dados dados_PD;
 
-		std::ifstream leituraArquivo(a_nomeArquivo);
+		EntradaSaidaDados entradaSaidaDados;
 
-		if (leituraArquivo.is_open()) {
+		entradaSaidaDados.setDiretorioEntrada(a_diretorio);
+		
+		//Arquivos operacional: Valor absoluto das variáveis
+		bool dadosPreConfig_submercado_operacional         = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_membro);
+		bool dadosPreConfig_usina_nao_simulada_operacional = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_membroMembro);
 
-			//Cabeçalho
-			std::getline(leituraArquivo, line);
+		//Arquivos premissa: Modulação em p.u (shaped) das variáveis
+		bool dadosPreConfig_submercado_premissa            = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_membro);
+		bool dadosPreConfig_usina_nao_simulada_premissa    = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_membroMembro);
 
-			int registro = 0;
+		if(dadosPreConfig_submercado_operacional && dadosPreConfig_submercado_premissa){ throw std::invalid_argument("Encontrado arquivo operacional e arquivo premissa da demanda, selecionar apenas um deles em: " + a_diretorio);}
+		if(dadosPreConfig_usina_nao_simulada_operacional && dadosPreConfig_usina_nao_simulada_premissa){ throw std::invalid_argument("Encontrado arquivo operacional e arquivo premissa das usinas nao simuladas, selecionar apenas um deles em: " + a_diretorio);}
 
-			while (line.size() > 0) {
-				pos = int(line.find(';'));
-				atributo = line.substr(0, pos).c_str();
-				atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+		//////////////////////////////////////////////////////////////
+		//SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga
+		//////////////////////////////////////////////////////////////
 
-				if (atributo == "submercado")
-					registro_submercado = registro;
+		if (dadosPreConfig_submercado_operacional) {
 
-				if (atributo == "codigo_submercado")
-					registro_codigo_submercado = registro;
+			const IdSubmercado menorIdSubmercado = a_dados.getMenorId(IdSubmercado());
+			const IdSubmercado maiorIdSubmercado = a_dados.getMaiorId(IdSubmercado());
 
-				if (atributo == "timestamp_inicial")
-					registro_timestamp_inicial = registro;
+			//Validação do horizonte_informacao_PD_pre_config
 
-				if (atributo == "timestamp_final")
-					registro_timestamp_final = registro;
+			for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
-				if (atributo == "demanda")
-					registro_demanda = registro;
-				
-				line = line.substr(pos + 1, int(line.length()));
-				registro++;
+				std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
 
-			}//while (line.size() > 0) {
+				const Periodo periodo_inicial_PD = periodos_PD.at(0);
+				const Periodo periodo_final_PD   = periodos_PD.at(int(periodos_PD.size())-1);
 
-			if (registro_submercado == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para submercado \n"); }
-			if (registro_codigo_submercado == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para codigo_submercado \n"); }
-			if (registro_timestamp_inicial == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para timestamp_inicial \n"); }
-			if (registro_timestamp_final == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para timestamp_final \n"); }
-			if (registro_demanda == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para demanda \n"); }
+				validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
 
-			//Informação
-			while (std::getline(leituraArquivo, line)) {
+			}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
-				registro = 0;
+			///////////////////////////////////
 
-				strNormalizada(line);
+			std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(menorIdSubmercado).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
 
-				while (int(line.length()) > 0) {
+			SmartEnupla<Periodo, bool> horizonte_info_PD;
 
-					////////////////////////////////
-					//Atributos
-					std::string submercado = "";
-					int         codigo_submercado = -1;
-					std::string timestamp_inicial = "";
-					std::string timestamp_final = "";
-					double      demanda = -1.0;
+			for (int pos = 0; pos < int(periodos_PD.size()); pos++)
+				horizonte_info_PD.addElemento(periodos_PD.at(pos), true);
 
-					////////////////////////////////
+			const Periodo periodo_inicial_PD = horizonte_info_PD.getIteradorInicial();
+			const Periodo periodo_final_PD = horizonte_info_PD.getIteradorFinal();
 
-					pos = int(line.find(';'));
-					atributo = line.substr(0, pos).c_str();
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+			///////////////////////////////////////
+			for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-					line = line.substr(pos + 1, int(line.length()));
+				for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
-					if (registro == registro_submercado) {
-						submercado = atributo;
-					}
-					else if (registro == registro_codigo_submercado) {
-						codigo_submercado = std::atoi(atributo.c_str());
-					}
-					else if (registro == registro_timestamp_inicial) {
-						timestamp_inicial = atributo;
+					const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-					}
-					else if (registro == registro_timestamp_final) {
-						timestamp_final = atributo;
-					}
-					else if (registro == registro_demanda) {
-						demanda = std::atof(atributo.c_str());
-					}
+					if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
 
-					//////////////////////////////////
-					//Validação da leitura
+						const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
-					if (submercado == "") { throw std::invalid_argument("Nao atualizado atributo submercado \n"); }
-					if (codigo_submercado == -1) { throw std::invalid_argument("Nao atualizado atributo codigo_submercado \n"); }
-					if (timestamp_inicial == "") { throw std::invalid_argument("Nao atualizado atributo timestamp_inicial \n"); }
-					if (timestamp_final == "") { throw std::invalid_argument("Nao atualizado atributo timestamp_final \n"); }
-					if (demanda == -1.0) { throw std::invalid_argument("Nao atualizado atributo demanda \n"); }
+						for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
-					//////////////////////////////////
-					
-					
-					
-					
-					
-					registro++;
+							const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado).getIterador2Final(AttMatrizSubmercado_demanda, periodo_PD, IdPatamarCarga());
 
-				}//while (int(line.length()) > 0) {
+							if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
+								throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD ");
 
-			}//while (std::getline(leituraArquivo, line)) {
+							const double demanda_PD = dados_PD.vetorSubmercado.att(idSubmercado).getElementoMatriz(AttMatrizSubmercado_demanda, periodo_PD, maiorIdPatamarCarga, double());
+							a_dados.vetorSubmercado.att(idSubmercado).setElemento(AttMatrizSubmercado_demanda, periodo, maiorIdPatamarCarga, demanda_PD);
 
-		}//if (leituraArquivo.is_open()) {
+						}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+					}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+				}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+			}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+		}//if (dadosPreConfig_submercado_operacional) {
+
+		/////////////////////////////////////////////////////////////////////////////
+		//SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga
+		/////////////////////////////////////////////////////////////////////////////
+
+		if (dadosPreConfig_usina_nao_simulada_operacional) {
+
+			const IdSubmercado menorIdSubmercado = a_dados.getMenorId(IdSubmercado());
+			const IdSubmercado maiorIdSubmercado = a_dados.getMaiorId(IdSubmercado());
+
+			//Validação do horizonte_informacao_PD_pre_config
+
+			for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+				const IdUsinaNaoSimulada menorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
+				const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+
+				for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
+
+					std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).getMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+
+					const Periodo periodo_inicial_PD = periodos_PD.at(0);
+					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
+
+					validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+
+				}//for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
+
+			}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+			///////////////////////////////////
+
+			std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(menorIdSubmercado).vetorUsinaNaoSimulada.att(IdUsinaNaoSimulada(1)).getMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+
+			SmartEnupla<Periodo, bool> horizonte_info_PD;
+
+			for (int pos = 0; pos < int(periodos_PD.size()); pos++)
+				horizonte_info_PD.addElemento(periodos_PD.at(pos), true);
+
+			const Periodo periodo_inicial_PD = horizonte_info_PD.getIteradorInicial();
+			const Periodo periodo_final_PD = horizonte_info_PD.getIteradorFinal();
+
+			/////////////////////////////////////////
+
+			for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+				for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+					const double sobreposicao = periodo.sobreposicao(periodo_PD);
+
+					if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+						const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+
+						for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+							const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado).getIterador2Final(AttMatrizSubmercado_demanda, periodo_PD, IdPatamarCarga());
+
+							if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
+								throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD ");
+
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Podem existir diferenças nos Ids entre o CP e o PD, portanto, vai ser realizada a seguinte lógica:
+							//Zera para o período P a info de todos os Ids_CP, depois cria novos Ids_CP (se necessário) e atualiza a info com os Ids_PD
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+
+							///////////////////////////////////////////////////////////////////////////////
+							//1. Zera a informação dos idsCP (para o periodo avaliado)
+							///////////////////////////////////////////////////////////////////////////////
+
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+
+								//Zera a info do CP
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+									const double valor = 0.0;
+									//////////////////////////////////////////
+									//AttMatrizUsinaNaoSimulada_potencia_minima
+									//////////////////////////////////////////
+									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, idPatamarCarga, valor);
+
+									//////////////////////////////////////////
+									//AttMatrizUsinaNaoSimulada_potencia_maxima
+									//////////////////////////////////////////
+									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, idPatamarCarga, valor);
+								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+							}//for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada_MP; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+
+							///////////////////////////////////////////////////////////////////////////////
+							//2. Atualiza info do CP com o PD
+							// Percorre os Ids_PD (se necessário cria novos Ids_CP) e atualiza a informação
+							///////////////////////////////////////////////////////////////////////////////
+
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
+
+								const IdUsinaNaoSimulada idUsinaNaoSimulada = idUsinaNaoSimulada_PD;
+
+								//Instancia Ids_CP que não existem
+								if (!a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)) {
+
+									UsinaNaoSimulada usinaNaoSimulada;
+
+									usinaNaoSimulada.setAtributo(AttComumUsinaNaoSimulada_idUsinaNaoSimulada, idUsinaNaoSimulada);
+
+									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.add(usinaNaoSimulada);
+
+									SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+
+									for (Periodo periodo_aux = horizonte_estudo.getIteradorInicial(); periodo_aux <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_aux)) {
+
+										const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo_aux);
+										matriz_zero.setElemento(periodo_aux, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+
+									}//for (Periodo periodo_aux = horizonte_estudo.getIteradorInicial(); periodo_aux <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_aux)) {
+
+									/////////////////////////////////////
+
+									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_potencia_minima, matriz_zero);
+									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, matriz_zero);
+
+
+								}//if (!a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)) {
+
+								//Atualiza info CP com PD
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+									//////////////////////////////////////////
+									//AttMatrizUsinaNaoSimulada_potencia_minima
+									//////////////////////////////////////////
+									double valor = dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).getElementoMatriz(AttMatrizUsinaNaoSimulada_potencia_minima, periodo_PD, idPatamarCarga, double());
+									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, idPatamarCarga, valor);
+
+									//////////////////////////////////////////
+									//AttMatrizUsinaNaoSimulada_potencia_maxima
+									//////////////////////////////////////////
+									valor = dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).getElementoMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo_PD, idPatamarCarga, double());
+									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, idPatamarCarga, valor);
+
+								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+							}//for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
+
+						}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+					}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+				}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+			}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+		}//if (dadosPreConfig_usina_nao_simulada_operacional) {
+
+		//////////////////////////////////////////////////////////////
+		//SUBMERCADO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga
+		//////////////////////////////////////////////////////////////
+
+		if (dadosPreConfig_submercado_premissa) {
+
+			const IdSubmercado menorIdSubmercado = a_dados.getMenorId(IdSubmercado());
+			const IdSubmercado maiorIdSubmercado = a_dados.getMaiorId(IdSubmercado());
+
+			//Validação do horizonte_informacao_PD_pre_config
+
+			for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+				std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+
+				const Periodo periodo_inicial_PD = periodos_PD.at(0);
+				const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
+
+				validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+
+			}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+			///////////////////////////////////
+
+			std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(menorIdSubmercado).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+
+			SmartEnupla<Periodo, bool> horizonte_info_PD;
+
+			for (int pos = 0; pos < int(periodos_PD.size()); pos++)
+				horizonte_info_PD.addElemento(periodos_PD.at(pos), true);
+
+			const Periodo periodo_inicial_PD = horizonte_info_PD.getIteradorInicial();
+			const Periodo periodo_final_PD = horizonte_info_PD.getIteradorFinal();
+
+			for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+				for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+					const double sobreposicao = periodo.sobreposicao(periodo_PD);
+
+					if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+						const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+
+						for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+							//////////////////////////////////////////////////////////////
+							//Identifica o periodo_deck para mapear o valor_medio_deck
+
+							double valor_medio = -99999.0;
+
+							for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+								const double sobreposicao_com_deck = periodo.sobreposicao(periodo_deck);
+
+								if (sobreposicao_com_deck == 1.0) {
+									valor_medio = demanda_media_original.at(idSubmercado).at(periodo_deck);
+									break;
+								}
+
+							}//for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+							if(valor_medio == -99999.0)
+								throw std::invalid_argument("dadosPreConfig_submercado_premissa - Nao encontrada sobreposicao com o horizonte do deck do periodo: " + getString(periodo));
+
+							//////////////////////////////////////////////////////////////
+
+							const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado).getIterador2Final(AttMatrizSubmercado_demanda, periodo_PD, IdPatamarCarga());
+
+							if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
+								throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
+
+							const double pu_demanda = dados_PD.vetorSubmercado.att(idSubmercado).getElementoMatriz(AttMatrizSubmercado_percentual_variacao_patamar_carga, periodo_PD, maiorIdPatamarCarga, double());
+							a_dados.vetorSubmercado.att(idSubmercado).setElemento(AttMatrizSubmercado_demanda, periodo, maiorIdPatamarCarga, pu_demanda * valor_medio);
+
+						}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+					}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+				}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+			}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+		}//if (dadosPreConfig_submercado_operacional) {
+
+		//////////////////////////////////////////////////////////////////////////////
+		//SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga
+		//////////////////////////////////////////////////////////////////////////////
+
+		if (dadosPreConfig_usina_nao_simulada_premissa) {
+
+			const IdSubmercado menorIdSubmercado = a_dados.getMenorId(IdSubmercado());
+			const IdSubmercado maiorIdSubmercado = a_dados.getMaiorId(IdSubmercado());
+
+			//Validação do horizonte_informacao_PD_pre_config
+
+			for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+				std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+
+				const Periodo periodo_inicial_PD = periodos_PD.at(0);
+				const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
+
+				validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+
+			}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+			///////////////////////////////////
+
+			std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(menorIdSubmercado).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+
+			SmartEnupla<Periodo, bool> horizonte_info_PD;
+
+			for (int pos = 0; pos < int(periodos_PD.size()); pos++)
+				horizonte_info_PD.addElemento(periodos_PD.at(pos), true);
+
+			const Periodo periodo_inicial_PD = horizonte_info_PD.getIteradorInicial();
+			const Periodo periodo_final_PD = horizonte_info_PD.getIteradorFinal();
+
+			for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+				for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+					const double sobreposicao = periodo.sobreposicao(periodo_PD);
+
+					if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+						const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+
+						for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+							///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Podem existir um grupo de IdsCP que vão ser modulados com um mesmo IdPD (ex: EOL e EOL_gd -> modulação da EOL)
+							//1. Zerar as fontes do IdsCP
+							//2. Atualiza o valor realizando um somatório
+
+							///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+
+
+							///////////////////////////////////////////////////////////////////////////////
+							//1. Zera a informação dos idsCP (para o periodo avaliado)
+							///////////////////////////////////////////////////////////////////////////////
+
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+
+								//Zera a info do CP
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+									const double valor = 0.0;
+									//////////////////////////////////////////
+									//AttMatrizUsinaNaoSimulada_potencia_minima
+									//////////////////////////////////////////
+									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, idPatamarCarga, valor);
+
+									//////////////////////////////////////////
+									//AttMatrizUsinaNaoSimulada_potencia_maxima
+									//////////////////////////////////////////
+									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, idPatamarCarga, valor);
+								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+							}//for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada_MP; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+
+							///////////////////////////////////////////////////////////////////////////////
+							//2. Atualiza info do CP com o PD
+							// Se não existe a modulação PD para uma geração CP -> throw exceção
+							// (exceto para EOL_MMGD / PCT_MMGD / PCH_MMGD 
+							//  alocadas com a modulação da EOL / PCT / PCH respectivamente)
+							///////////////////////////////////////////////////////////////////////////////
+
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+
+								//////////////////////////////////////////////////////////////
+								//Identifica o periodo_deck para mapear o valor_medio_deck
+
+								double valor_medio = -99999.0;
+
+								for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+									const double sobreposicao_com_deck = periodo.sobreposicao(periodo_deck);
+
+									if (sobreposicao_com_deck == 1.0) {
+										valor_medio = geracao_usina_nao_simulada_media_original.at(idSubmercado).at(idUsinaNaoSimulada).at(periodo_deck);
+										break;
+									}
+
+								}//for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+								if (valor_medio == -99999.0)
+									throw std::invalid_argument("dadosPreConfig_usina_nao_simulada_premissa - Nao encontrada sobreposicao com o horizonte do deck do periodo: " + getString(periodo));
+
+								//////////////////////////////////////////////////////////////
+
+								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado).getIterador2Final(AttMatrizSubmercado_demanda, periodo_PD, IdPatamarCarga());
+
+								if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
+									throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
+
+
+								IdUsinaNaoSimulada idUsinaNaoSimuladaPD = IdUsinaNaoSimulada_Nenhum;
+
+								if (dados_PD.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada))
+									idUsinaNaoSimuladaPD = idUsinaNaoSimulada;
+								else if (idUsinaNaoSimulada == IdUsinaNaoSimulada_EOL_MMGD && dados_PD.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(IdUsinaNaoSimulada_EOL_MMGD))
+									idUsinaNaoSimuladaPD = IdUsinaNaoSimulada_EOL;
+								else if (idUsinaNaoSimulada == IdUsinaNaoSimulada_PCT_MMGD && dados_PD.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(IdUsinaNaoSimulada_PCT_MMGD))
+									idUsinaNaoSimuladaPD = IdUsinaNaoSimulada_PCT;
+								else if (idUsinaNaoSimulada == IdUsinaNaoSimulada_PCH_MMGD && dados_PD.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(IdUsinaNaoSimulada_PCH_MMGD))
+									idUsinaNaoSimuladaPD = IdUsinaNaoSimulada_PCH;
+								else
+									throw std::invalid_argument("Nao carregada informacao PD da modulacao para o idUsinaNaoSimulada: " + getString(idUsinaNaoSimulada));
+
+								const double pu_geracao = dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimuladaPD).getElementoMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, periodo_PD, maiorIdPatamarCarga, double());		
+								const double valor_anterior = a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).getElementoVetor(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, maiorIdPatamarCarga, double());
+								const double valor_novo = valor_anterior + pu_geracao * valor_medio;
+
+								a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, maiorIdPatamarCarga, valor_novo);
+								a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, maiorIdPatamarCarga, valor_novo);
+
+
+							}//for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+
+						}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+
+					}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+				}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+			}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+		}//if (dadosPreConfig_usina_nao_simulada_premissa) {
+
 
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG: \n" + std::string(erro.what())); }
+
+}
+
+void LeituraCEPEL::validar_horizonte_informacao_PD_pre_config(const Periodo a_periodo_inicial_PD, const Periodo a_periodo_final_PD) {
+
+	try {
+
+		//*********************************************************************************************************
+		//Validação do período da info da PD (Não é aceita informação do PD sem ser uma semana operativa completa):
+		//(i)  o período inicial da info PD deve coincidir com a algum período inicial deck
+		//(ii) o período final da info PD deve coincidir com a algum período final deck
+		//*********************************************************************************************************
+
+		bool is_periodo_inicial_PD_valido = false;
+		bool is_periodo_final_PD_valido = false;
+
+		const Periodo periodo_inicial_PD_TESTE = Periodo(TipoPeriodo_minuto, a_periodo_inicial_PD);
+		const Periodo periodo_final_PD_TESTE = Periodo(TipoPeriodo_minuto, a_periodo_final_PD + 1);
+
+		for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+			if (Periodo(TipoPeriodo_minuto, periodo_deck) == periodo_inicial_PD_TESTE)
+				is_periodo_inicial_PD_valido = true;
+
+			if (Periodo(TipoPeriodo_minuto, periodo_deck + 1) == periodo_final_PD_TESTE)
+				is_periodo_final_PD_valido = true;
+
+			if (is_periodo_inicial_PD_valido && is_periodo_final_PD_valido)
+				break;
+
+		}//for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+
+		if (!is_periodo_inicial_PD_valido)
+			throw std::invalid_argument("Periodo inicial dos dados dadosPreConfig_PD deve coincidir com o inicio de uma semana operativa");
+
+		if (!is_periodo_final_PD_valido)
+			throw std::invalid_argument("Periodo final dos dados dadosPreConfig_PD deve coincidir com o fim de uma semana operativa");
+
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::validar_horizonte_informacao_PD_pre_config: \n" + std::string(erro.what())); }
 
 }
 
@@ -21075,7 +21522,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		////////////////////////////////////
 		//Pre-config da programação diária
 		////////////////////////////////////
-		atualizar_valores_com_DadosEntradaPD_PRECONFIG(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG" + "//DadosEntradaPD_PRECONFIG//DemandaSubmercados.csv");
+		atualizar_valores_com_DadosEntradaPD_PRECONFIG(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG" + "//DadosEntradaPD_PRECONFIG");
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Lê volumes metas (se existir relato.rvX e relato2.rvX) e turbinamento_maximo (se existir relato.rvX)
