@@ -56,8 +56,9 @@ SmartEnupla<int, IdReservatorioEquivalente> idReservatorioEquivalente_restricao_
 ////////////////////////////////////////////////////////////////////////////////////////
 //SmartEnuplas auxiliares para a conversão
 SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>                                 percentual_duracao_patamar_carga_original; //Necessário para a conversão da parcela do corte das GNLs
-SmartEnupla <IdSubmercado, SmartEnupla<Periodo, double>>                                  demanda_media_original; //Necessário para a conversão com a modulação informada na preConfig PD 
-SmartEnupla <IdSubmercado, SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>> geracao_usina_nao_simulada_media_original; //Necessário para a conversão com a modulação informada na preConfig PD 
+SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>                                 percentual_duracao_patamar_carga_deck; //Necessário para a conversão com a modulação informada na preConfig PD 
+SmartEnupla <IdSubmercado, SmartEnupla<Periodo, double>>                                  demanda_media_deck; //Necessário para a conversão com a modulação informada na preConfig PD 
+SmartEnupla <IdSubmercado, SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>> geracao_usina_nao_simulada_media_deck; //Necessário para a conversão com a modulação informada na preConfig PD 
 
 //////////////////////////////////////////////////////////////////////////////
 // Leitura cortes NEWAVE
@@ -1838,9 +1839,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
 		//Parâmetros para registros BE (Bacias especiais) e PQ (pequenas usinas)
-		bool inicializar_conteio_numero_usina_nao_simulado_por_submercado = true;
-
-		SmartEnupla<IdSubmercado, SmartEnupla <Periodo, int>> conteio_numero_usina_nao_simulado_por_submercado;
+		SmartEnupla<IdSubmercado, SmartEnupla<IdUsinaNaoSimulada, SmartEnupla <Periodo, int>>> conteio_numero_usina_nao_simulado_por_submercado;
 
 		SmartEnupla<IdHidreletrica, SmartEnupla <Periodo, double>> desvio_registro_DA(a_dados.getMenorId(IdHidreletrica()), std::vector<SmartEnupla<Periodo, double>>(int(a_dados.getMaiorId(IdHidreletrica()) - a_dados.getMenorId(IdHidreletrica())) + 1, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0)));
 
@@ -3103,8 +3102,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 						try {
 
-							if(int(demanda_media_original.size()) == 0)//Inicializa vetor auxiliar para utilizar na conversão com modulação PD da demanda
-								demanda_media_original = SmartEnupla<IdSubmercado, SmartEnupla<Periodo, double>>(IdSubmercado(1), std::vector<SmartEnupla<Periodo, double>>(IdSubmercado(int(IdSubmercado_Excedente) - 1), SmartEnupla<Periodo, double>(horizonte_estudo_DECK, 0.0)));
+							if(int(demanda_media_deck.size()) == 0)//Inicializa vetor auxiliar para utilizar na conversão com modulação PD da demanda
+								demanda_media_deck = SmartEnupla<IdSubmercado, SmartEnupla<Periodo, double>>(IdSubmercado(1), std::vector<SmartEnupla<Periodo, double>>(IdSubmercado(int(IdSubmercado_Excedente) - 1), SmartEnupla<Periodo, double>(horizonte_estudo_DECK, 0.0)));
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Campo 2 -  Número de identificação do estágio (em ordem crescente, máximo igual a 24).
@@ -3280,16 +3279,34 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 
 							if (true) {
-								//Necessário para a conversão com a modulação da demanda informada na preConfig PD 
+								//Necessário para a conversão com a modulação da demanda informada na preConfig PD
 
 								const Periodo periodo_deck = horizonte_otimizacao_DC.at(idEstagio_demanda);
 
+								if (idSubmercado == IdSubmercado(1)) {
+
+									const int size_duracao_horas_patamar = int(duracao_horas_patamar.size());
+
+									std::vector<double> percentual_duracao_patamar;
+
+									double horasTotais = 0;
+
+									for (int pos = 0; pos < size_duracao_horas_patamar; pos++)
+										horasTotais += duracao_horas_patamar.at(pos);
+
+									for (int pos = 0; pos < size_duracao_horas_patamar; pos++)
+										percentual_duracao_patamar.push_back(duracao_horas_patamar.at(pos) * std::pow(horasTotais, -1));
+
+									percentual_duracao_patamar_carga_deck.addElemento(periodo_deck, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, percentual_duracao_patamar));
+								}//if (idSubmercado == IdSubmercado(1)) {
+								//////////////
+								
 								double demanda_media = 0.0;
 
 								for (int pos = 0; pos < int(demanda_patamar.size()); pos++)
-									demanda_media += demanda_patamar.at(pos) * percentual_duracao_patamar_carga_original.at(periodo_deck).at(IdPatamarCarga(pos + 1));
+									demanda_media += demanda_patamar.at(pos) * percentual_duracao_patamar_carga_deck.at(periodo_deck).at(IdPatamarCarga(pos + 1));
 
-								demanda_media_original.at(idSubmercado).at(periodo_deck) = demanda_media;
+								demanda_media_deck.at(idSubmercado).at(periodo_deck) = demanda_media;
 
 							}//if (true) {
 
@@ -3632,19 +3649,11 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 					if (menemonico == "BE") {//Geração em bacias especiais/pequenas bacias
 
 						try {
+
+							if (int(conteio_numero_usina_nao_simulado_por_submercado.size()) == 0)//Necessário para a alocação de várias uninaNaoSimuladas não identificadas em uma única uninaNaoSimulada
+								conteio_numero_usina_nao_simulado_por_submercado = SmartEnupla <IdSubmercado, SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, int>>>(IdSubmercado(1), std::vector<SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, int>>>(IdSubmercado(int(IdSubmercado_Excedente) - 1), SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, int>>(IdUsinaNaoSimulada(1), std::vector<SmartEnupla<Periodo, int>>(IdUsinaNaoSimulada(int(IdUsinaNaoSimulada_Excedente) - 1), SmartEnupla<Periodo, int>(horizonte_estudo, 0)))));
+
 							const int numero_submercados = getintFromChar(getString(a_dados.getMaiorId(IdSubmercado())).c_str());
-
-							if (inicializar_conteio_numero_usina_nao_simulado_por_submercado == true) {
-
-								SmartEnupla <Periodo, int> vetor_zero(horizonte_estudo, 0);
-
-								for (IdSubmercado idSubmercado = IdSubmercado(0); idSubmercado < IdSubmercado(IdSubmercado_Excedente); idSubmercado++)
-									conteio_numero_usina_nao_simulado_por_submercado.addElemento(idSubmercado, vetor_zero);
-
-								inicializar_conteio_numero_usina_nao_simulado_por_submercado = false;
-
-							}//if (inicializar_conteio_numero_usina_nao_simulado_por_submercado == true) {
-
 
 							//Esta geração vai ser considerada dentro das UsinaNaoSimulada
 
@@ -3771,7 +3780,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 										if (periodo >= horizonte_otimizacao_DC.at(idEstagio_bacia_especial)) {
 
-											if (conteio_numero_usina_nao_simulado_por_submercado.at(idSubmercado).getElemento(periodo) == 0 && periodo.sobreposicao(horizonte_otimizacao_DC.at(idEstagio_bacia_especial)) > 0) {
+											if (conteio_numero_usina_nao_simulado_por_submercado.at(idSubmercado).at(idUsinaNaoSimulada).getElemento(periodo) == 0 && periodo.sobreposicao(horizonte_otimizacao_DC.at(idEstagio_bacia_especial)) > 0) {
 												valor = usinaNaoSimulada_potencia_gerada.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1);
 											}//if (conteio == 0) {
 											else {
@@ -3797,7 +3806,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								double sobreposicao = periodo.sobreposicao(horizonte_otimizacao_DC.at(idEstagio_bacia_especial));
 
 								if (sobreposicao > 0) {
-									conteio_numero_usina_nao_simulado_por_submercado.at(idSubmercado).setElemento(periodo, conteio_numero_usina_nao_simulado_por_submercado.at(idSubmercado).getElemento(periodo) + 1);
+									conteio_numero_usina_nao_simulado_por_submercado.at(idSubmercado).at(idUsinaNaoSimulada).setElemento(periodo, conteio_numero_usina_nao_simulado_por_submercado.at(idSubmercado).at(idUsinaNaoSimulada).getElemento(periodo) + 1);
 									sobreposicao_encontrada = true;
 								}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_bacia_especial)) {
 
@@ -3815,21 +3824,14 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 						try {
 
-							if (int(geracao_usina_nao_simulada_media_original.size()) == 0)//Inicializa vetor auxiliar para utilizar na conversão com modulação PD
-								geracao_usina_nao_simulada_media_original = SmartEnupla <IdSubmercado, SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>>(IdSubmercado(1), std::vector<SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>>(IdSubmercado(int(IdSubmercado_Excedente) - 1), SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>(IdUsinaNaoSimulada(1), std::vector<SmartEnupla<Periodo, double>>(IdUsinaNaoSimulada(int(IdUsinaNaoSimulada_Excedente) - 1), SmartEnupla<Periodo, double>(horizonte_estudo_DECK, 0.0)))));
+							if (int(conteio_numero_usina_nao_simulado_por_submercado.size()) == 0)//Necessário para a alocação de várias uninaNaoSimuladas não identificadas em uma única uninaNaoSimulada
+								conteio_numero_usina_nao_simulado_por_submercado = SmartEnupla <IdSubmercado, SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, int>>>(IdSubmercado(1), std::vector<SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, int>>>(IdSubmercado(int(IdSubmercado_Excedente) - 1), SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, int>>(IdUsinaNaoSimulada(1), std::vector<SmartEnupla<Periodo, int>>(IdUsinaNaoSimulada(int(IdUsinaNaoSimulada_Excedente) - 1), SmartEnupla<Periodo, int>(horizonte_estudo, 0)))));
+
+
+							if (int(geracao_usina_nao_simulada_media_deck.size()) == 0)//Inicializa vetor auxiliar para utilizar na conversão com modulação PD
+								geracao_usina_nao_simulada_media_deck = SmartEnupla <IdSubmercado, SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>>(IdSubmercado(1), std::vector<SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>>(IdSubmercado(int(IdSubmercado_Excedente) - 1), SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>(IdUsinaNaoSimulada(1), std::vector<SmartEnupla<Periodo, double>>(IdUsinaNaoSimulada(int(IdUsinaNaoSimulada_Excedente) - 1), SmartEnupla<Periodo, double>(horizonte_estudo_DECK, 0.0)))));
 								
 							const int numero_submercados = getintFromChar(getString(a_dados.getMaiorId(IdSubmercado())).c_str());
-
-							if (inicializar_conteio_numero_usina_nao_simulado_por_submercado == true) {
-
-								SmartEnupla <Periodo, int> vetor_zero(horizonte_estudo, 0);
-
-								for (IdSubmercado idSubmercado = IdSubmercado(1); idSubmercado < IdSubmercado(IdSubmercado_Excedente); idSubmercado++)
-									conteio_numero_usina_nao_simulado_por_submercado.addElemento(idSubmercado, vetor_zero);
-
-								inicializar_conteio_numero_usina_nao_simulado_por_submercado = false;
-
-							}//if (inicializar_conteio_numero_usina_nao_simulado_por_submercado == true) {
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Campo 2 -  Nome
@@ -3922,9 +3924,9 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 										double geracao_media = 0.0;
 										for (int pos = 0; pos < int(usinaNaoSimulada_potencia_gerada.size()); pos++)
-											geracao_media += usinaNaoSimulada_potencia_gerada.at(pos) * percentual_duracao_patamar_carga_original.at(periodo_deck).at(IdPatamarCarga(pos + 1));
+											geracao_media += usinaNaoSimulada_potencia_gerada.at(pos) * percentual_duracao_patamar_carga_deck.at(periodo_deck).at(IdPatamarCarga(pos + 1));
 
-										geracao_usina_nao_simulada_media_original.at(idSubmercado).at(idUsinaNaoSimulada).at(periodo_deck) = geracao_media;
+										geracao_usina_nao_simulada_media_deck.at(idSubmercado).at(idUsinaNaoSimulada).at(periodo_deck) = geracao_media;
 									}//if (periodo_deck >= horizonte_otimizacao_DC.at(idEstagio_registro)) {
 								}//for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
 
@@ -3973,7 +3975,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 										if (periodo >= horizonte_otimizacao_DC.at(idEstagio_registro)) {
 
 
-											if (conteio_numero_usina_nao_simulado_por_submercado.at(idSubmercado).getElemento(periodo) == 0 && periodo.sobreposicao(horizonte_otimizacao_DC.at(idEstagio_registro))) {
+											if (conteio_numero_usina_nao_simulado_por_submercado.at(idSubmercado).at(idUsinaNaoSimulada).getElemento(periodo) == 0 && periodo.sobreposicao(horizonte_otimizacao_DC.at(idEstagio_registro))) {
 												valor = usinaNaoSimulada_potencia_gerada.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1);
 											}//if (conteio == 0) {
 											else {
@@ -4000,7 +4002,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								double sobreposicao = periodo.sobreposicao(horizonte_otimizacao_DC.at(idEstagio_registro));
 
 								if (sobreposicao > 0) {
-									conteio_numero_usina_nao_simulado_por_submercado.at(idSubmercado).setElemento(periodo, conteio_numero_usina_nao_simulado_por_submercado.at(idSubmercado).getElemento(periodo) + 1);
+									conteio_numero_usina_nao_simulado_por_submercado.at(idSubmercado).at(idUsinaNaoSimulada).setElemento(periodo, conteio_numero_usina_nao_simulado_por_submercado.at(idSubmercado).at(idUsinaNaoSimulada).getElemento(periodo) + 1);
 									sobreposicao_encontrada = true;
 								}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_bacia_especial)) {
 
@@ -20872,11 +20874,13 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 	try {
 
-		//************************************************************************************************
+		//*************************************************************************************************************************************************
 		// Premissa:
 		//Informação Operacional pre-Config PD (valores absolutos) -> entra direito no Att do problema CP
 		//Informação Premissa pre-Config PD (valores p.u) -> Aplica modulação PD na previsão CP
-		//************************************************************************************************
+		// 
+		// Condição: periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo() (e.g. um periodo_PD horário não sobreescreve informação a um periodo semanal)
+		//*************************************************************************************************************************************************
 
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
@@ -20907,25 +20911,25 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 		if (dadosPreConfig_submercado_operacional) {
 
-			const IdSubmercado menorIdSubmercado = a_dados.getMenorId(IdSubmercado());
-			const IdSubmercado maiorIdSubmercado = a_dados.getMaiorId(IdSubmercado());
+			const IdSubmercado menorIdSubmercado_PD = dados_PD.getMenorId(IdSubmercado());
+			const IdSubmercado maiorIdSubmercado_PD = dados_PD.getMaiorId(IdSubmercado());
 
 			//Validação do horizonte_informacao_PD_pre_config
 
-			for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+			for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-				std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+				std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
 
 				const Periodo periodo_inicial_PD = periodos_PD.at(0);
 				const Periodo periodo_final_PD   = periodos_PD.at(int(periodos_PD.size())-1);
 
 				validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
 
-			}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+			}//for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
 			///////////////////////////////////
 
-			std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(menorIdSubmercado).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+			std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(menorIdSubmercado_PD).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
 
 			SmartEnupla<Periodo, bool> horizonte_info_PD;
 
@@ -20946,17 +20950,17 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
-						for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+						for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-							const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado).getIterador2Final(AttMatrizSubmercado_demanda, periodo_PD, IdPatamarCarga());
+							const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getIterador2Final(AttMatrizSubmercado_demanda, periodo_PD, IdPatamarCarga());
 
 							if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
 								throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD ");
 
-							const double demanda_PD = dados_PD.vetorSubmercado.att(idSubmercado).getElementoMatriz(AttMatrizSubmercado_demanda, periodo_PD, maiorIdPatamarCarga, double());
-							a_dados.vetorSubmercado.att(idSubmercado).setElemento(AttMatrizSubmercado_demanda, periodo, maiorIdPatamarCarga, demanda_PD);
+							const double demanda_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getElementoMatriz(AttMatrizSubmercado_demanda, periodo_PD, maiorIdPatamarCarga, double());
+							a_dados.vetorSubmercado.att(idSubmercado_PD).setElemento(AttMatrizSubmercado_demanda, periodo, maiorIdPatamarCarga, demanda_PD);
 
-						}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+						}//for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
 					}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
 
@@ -20972,32 +20976,36 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 		if (dadosPreConfig_usina_nao_simulada_operacional) {
 
-			const IdSubmercado menorIdSubmercado = a_dados.getMenorId(IdSubmercado());
-			const IdSubmercado maiorIdSubmercado = a_dados.getMaiorId(IdSubmercado());
+			const IdSubmercado menorIdSubmercado_PD = dados_PD.getMenorId(IdSubmercado());
+			const IdSubmercado maiorIdSubmercado_PD = dados_PD.getMaiorId(IdSubmercado());
 
 			//Validação do horizonte_informacao_PD_pre_config
 
-			for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+			for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-				const IdUsinaNaoSimulada menorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
-				const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+				const IdUsinaNaoSimulada menorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getMenorId(IdUsinaNaoSimulada());
+				const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getMaiorId(IdUsinaNaoSimulada());
 
-				for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
+				if (menorIdUsinaNaoSimulada_PD > IdUsinaNaoSimulada_Nenhum) {
 
-					std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).getMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+					for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; dados_PD.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
 
-					const Periodo periodo_inicial_PD = periodos_PD.at(0);
-					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
+						std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).getMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
 
-					validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+						const Periodo periodo_inicial_PD = periodos_PD.at(0);
+						const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-				}//for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
+						validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
 
-			}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+					}//for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
+
+				}//if (menorIdUsinaNaoSimulada_PD > IdUsinaNaoSimulada_Nenhum) {
+
+			}//for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
 			///////////////////////////////////
 
-			std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(menorIdSubmercado).vetorUsinaNaoSimulada.att(IdUsinaNaoSimulada(1)).getMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+			std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(menorIdSubmercado_PD).vetorUsinaNaoSimulada.att(dados_PD.vetorSubmercado.att(menorIdSubmercado_PD).getMenorId(IdUsinaNaoSimulada())).getMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
 
 			SmartEnupla<Periodo, bool> horizonte_info_PD;
 
@@ -21019,9 +21027,19 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
-						for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+						for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-							const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado).getIterador2Final(AttMatrizSubmercado_demanda, periodo_PD, IdPatamarCarga());
+							//**********************************************************
+							//IdsSubmercados_PD são um subconjunto do IdsSubmercados_CP
+							//**********************************************************
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado_PD).getMenorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado_PD).getMaiorId(IdUsinaNaoSimulada());
+
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getMenorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getMaiorId(IdUsinaNaoSimulada());
+
+
+							const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(menorIdUsinaNaoSimulada_PD).getIterador2Final(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo_PD, IdPatamarCarga());
 
 							if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
 								throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD ");
@@ -21031,87 +21049,83 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							//Zera para o período P a info de todos os Ids_CP, depois cria novos Ids_CP (se necessário) e atualiza a info com os Ids_PD
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
-							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+							if (menorIdUsinaNaoSimulada_PD > IdUsinaNaoSimulada_Nenhum) {
 
-							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
-							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+								///////////////////////////////////////////////////////////////////////////////
+								//1. Zera a informação dos idsCP (para o periodo avaliado)
+								///////////////////////////////////////////////////////////////////////////////
 
-							///////////////////////////////////////////////////////////////////////////////
-							//1. Zera a informação dos idsCP (para o periodo avaliado)
-							///////////////////////////////////////////////////////////////////////////////
+								for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
 
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+									//Zera a info do CP
+									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+										const double valor = 0.0;
+										//////////////////////////////////////////
+										//AttMatrizUsinaNaoSimulada_potencia_minima
+										//////////////////////////////////////////
+										a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, idPatamarCarga, valor);
 
-								//Zera a info do CP
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-									const double valor = 0.0;
-									//////////////////////////////////////////
-									//AttMatrizUsinaNaoSimulada_potencia_minima
-									//////////////////////////////////////////
-									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, idPatamarCarga, valor);
+										//////////////////////////////////////////
+										//AttMatrizUsinaNaoSimulada_potencia_maxima
+										//////////////////////////////////////////
+										a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, idPatamarCarga, valor);
+									}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-									//////////////////////////////////////////
-									//AttMatrizUsinaNaoSimulada_potencia_maxima
-									//////////////////////////////////////////
-									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, idPatamarCarga, valor);
-								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+								}//for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada_MP; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
 
-							}//for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada_MP; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+								///////////////////////////////////////////////////////////////////////////////
+								//2. Atualiza info do CP com o PD
+								// Percorre os Ids_PD (se necessário cria novos Ids_CP) e atualiza a informação
+								///////////////////////////////////////////////////////////////////////////////
 
-							///////////////////////////////////////////////////////////////////////////////
-							//2. Atualiza info do CP com o PD
-							// Percorre os Ids_PD (se necessário cria novos Ids_CP) e atualiza a informação
-							///////////////////////////////////////////////////////////////////////////////
+								for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; dados_PD.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
 
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
+									//Instancia Ids_CP que não existem
+									if (!a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada_PD)) {
 
-								const IdUsinaNaoSimulada idUsinaNaoSimulada = idUsinaNaoSimulada_PD;
+										UsinaNaoSimulada usinaNaoSimulada;
 
-								//Instancia Ids_CP que não existem
-								if (!a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)) {
+										usinaNaoSimulada.setAtributo(AttComumUsinaNaoSimulada_idUsinaNaoSimulada, idUsinaNaoSimulada_PD);
 
-									UsinaNaoSimulada usinaNaoSimulada;
+										a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.add(usinaNaoSimulada);
 
-									usinaNaoSimulada.setAtributo(AttComumUsinaNaoSimulada_idUsinaNaoSimulada, idUsinaNaoSimulada);
+										SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
 
-									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.add(usinaNaoSimulada);
+										for (Periodo periodo_aux = horizonte_estudo.getIteradorInicial(); periodo_aux <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_aux)) {
 
-									SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+											const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo_aux);
+											matriz_zero.setElemento(periodo_aux, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
 
-									for (Periodo periodo_aux = horizonte_estudo.getIteradorInicial(); periodo_aux <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_aux)) {
+										}//for (Periodo periodo_aux = horizonte_estudo.getIteradorInicial(); periodo_aux <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_aux)) {
 
-										const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo_aux);
-										matriz_zero.setElemento(periodo_aux, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+										/////////////////////////////////////
 
-									}//for (Periodo periodo_aux = horizonte_estudo.getIteradorInicial(); periodo_aux <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_aux)) {
-
-									/////////////////////////////////////
-
-									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_potencia_minima, matriz_zero);
-									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, matriz_zero);
+										a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).setMatriz(AttMatrizUsinaNaoSimulada_potencia_minima, matriz_zero);
+										a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).setMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, matriz_zero);
 
 
-								}//if (!a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)) {
+									}//if (!a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)) {
 
-								//Atualiza info CP com PD
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+									//Atualiza info CP com PD
+									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-									//////////////////////////////////////////
-									//AttMatrizUsinaNaoSimulada_potencia_minima
-									//////////////////////////////////////////
-									double valor = dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).getElementoMatriz(AttMatrizUsinaNaoSimulada_potencia_minima, periodo_PD, idPatamarCarga, double());
-									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, idPatamarCarga, valor);
+										//////////////////////////////////////////
+										//AttMatrizUsinaNaoSimulada_potencia_minima
+										//////////////////////////////////////////
+										double valor = dados_PD.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).getElementoMatriz(AttMatrizUsinaNaoSimulada_potencia_minima, periodo_PD, idPatamarCarga, double());
+										a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, idPatamarCarga, valor);
 
-									//////////////////////////////////////////
-									//AttMatrizUsinaNaoSimulada_potencia_maxima
-									//////////////////////////////////////////
-									valor = dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).getElementoMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo_PD, idPatamarCarga, double());
-									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, idPatamarCarga, valor);
+										//////////////////////////////////////////
+										//AttMatrizUsinaNaoSimulada_potencia_maxima
+										//////////////////////////////////////////
+										valor = dados_PD.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).getElementoMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo_PD, idPatamarCarga, double());
+										a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, idPatamarCarga, valor);
 
-								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+									}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-							}//for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
+								}//for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
+
+							}//if (menorIdUsinaNaoSimulada_PD > IdUsinaNaoSimulada_Nenhum) {
 
 						}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
@@ -21129,25 +21143,25 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 		if (dadosPreConfig_submercado_premissa) {
 
-			const IdSubmercado menorIdSubmercado = a_dados.getMenorId(IdSubmercado());
-			const IdSubmercado maiorIdSubmercado = a_dados.getMaiorId(IdSubmercado());
+			const IdSubmercado menorIdSubmercado_PD = dados_PD.getMenorId(IdSubmercado());
+			const IdSubmercado maiorIdSubmercado_PD = dados_PD.getMaiorId(IdSubmercado());
 
 			//Validação do horizonte_informacao_PD_pre_config
 
-			for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+			for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-				std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+				std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getMatriz(AttMatrizSubmercado_percentual_variacao_patamar_carga, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
 
 				const Periodo periodo_inicial_PD = periodos_PD.at(0);
 				const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
 				validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
 
-			}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+			}//for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
 			///////////////////////////////////
 
-			std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(menorIdSubmercado).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+			std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(menorIdSubmercado_PD).getMatriz(AttMatrizSubmercado_percentual_variacao_patamar_carga, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
 
 			SmartEnupla<Periodo, bool> horizonte_info_PD;
 
@@ -21167,7 +21181,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
-						for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+						for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
 							//////////////////////////////////////////////////////////////
 							//Identifica o periodo_deck para mapear o valor_medio_deck
@@ -21179,7 +21193,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 								const double sobreposicao_com_deck = periodo.sobreposicao(periodo_deck);
 
 								if (sobreposicao_com_deck == 1.0) {
-									valor_medio = demanda_media_original.at(idSubmercado).at(periodo_deck);
+									valor_medio = demanda_media_deck.at(idSubmercado_PD).at(periodo_deck);
 									break;
 								}
 
@@ -21190,15 +21204,15 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							//////////////////////////////////////////////////////////////
 
-							const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado).getIterador2Final(AttMatrizSubmercado_demanda, periodo_PD, IdPatamarCarga());
+							const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getIterador2Final(AttMatrizSubmercado_percentual_variacao_patamar_carga, periodo_PD, IdPatamarCarga());
 
 							if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
 								throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
 
-							const double pu_demanda = dados_PD.vetorSubmercado.att(idSubmercado).getElementoMatriz(AttMatrizSubmercado_percentual_variacao_patamar_carga, periodo_PD, maiorIdPatamarCarga, double());
-							a_dados.vetorSubmercado.att(idSubmercado).setElemento(AttMatrizSubmercado_demanda, periodo, maiorIdPatamarCarga, pu_demanda * valor_medio);
+							const double pu_demanda = dados_PD.vetorSubmercado.att(idSubmercado_PD).getElementoMatriz(AttMatrizSubmercado_percentual_variacao_patamar_carga, periodo_PD, maiorIdPatamarCarga, double());
+							a_dados.vetorSubmercado.att(idSubmercado_PD).setElemento(AttMatrizSubmercado_demanda, periodo, maiorIdPatamarCarga, pu_demanda * valor_medio);
 
-						}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+						}//for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
 					}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
 
@@ -21206,7 +21220,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 			}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-		}//if (dadosPreConfig_submercado_operacional) {
+		}//if (dadosPreConfig_submercado_premissa) {
 
 		//////////////////////////////////////////////////////////////////////////////
 		//SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga
@@ -21214,25 +21228,36 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 		if (dadosPreConfig_usina_nao_simulada_premissa) {
 
-			const IdSubmercado menorIdSubmercado = a_dados.getMenorId(IdSubmercado());
-			const IdSubmercado maiorIdSubmercado = a_dados.getMaiorId(IdSubmercado());
+			const IdSubmercado menorIdSubmercado_PD = dados_PD.getMenorId(IdSubmercado());
+			const IdSubmercado maiorIdSubmercado_PD = dados_PD.getMaiorId(IdSubmercado());
 
 			//Validação do horizonte_informacao_PD_pre_config
 
-			for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+			for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-				std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+				const IdUsinaNaoSimulada menorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getMenorId(IdUsinaNaoSimulada());
+				const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getMaiorId(IdUsinaNaoSimulada());
 
-				const Periodo periodo_inicial_PD = periodos_PD.at(0);
-				const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
+				if (menorIdUsinaNaoSimulada_PD > IdUsinaNaoSimulada_Nenhum) {
 
-				validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+					for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; dados_PD.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
 
-			}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+						std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).getMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+
+						const Periodo periodo_inicial_PD = periodos_PD.at(0);
+						const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
+
+						validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+
+					}//for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = menorIdUsinaNaoSimulada_PD; idUsinaNaoSimulada_PD <= maiorIdUsinaNaoSimulada_PD; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
+
+				}//if (menorIdUsinaNaoSimulada_PD > IdUsinaNaoSimulada_Nenhum) {
+
+			}//for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
 			///////////////////////////////////
 
-			std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(menorIdSubmercado).getMatriz(AttMatrizSubmercado_demanda, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+			std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.att(menorIdSubmercado_PD).vetorUsinaNaoSimulada.att(dados_PD.vetorSubmercado.att(menorIdSubmercado_PD).getMenorId(IdUsinaNaoSimulada())).getMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
 
 			SmartEnupla<Periodo, bool> horizonte_info_PD;
 
@@ -21252,7 +21277,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
-						for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+						for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
 							///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Podem existir um grupo de IdsCP que vão ser modulados com um mesmo IdPD (ex: EOL e EOL_gd -> modulação da EOL)
@@ -21261,95 +21286,98 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
-							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado_PD).getMenorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.att(idSubmercado_PD).getMaiorId(IdUsinaNaoSimulada());
 
-							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMenorId(IdUsinaNaoSimulada());
-							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getMenorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getMaiorId(IdUsinaNaoSimulada());
 
+							if (menorIdUsinaNaoSimulada_PD > IdUsinaNaoSimulada_Nenhum) {
 
-							///////////////////////////////////////////////////////////////////////////////
-							//1. Zera a informação dos idsCP (para o periodo avaliado)
-							///////////////////////////////////////////////////////////////////////////////
+								///////////////////////////////////////////////////////////////////////////////
+								//1. Zera a informação dos idsCP (para o periodo avaliado)
+								///////////////////////////////////////////////////////////////////////////////
 
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+								for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
 
-								//Zera a info do CP
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-									const double valor = 0.0;
-									//////////////////////////////////////////
-									//AttMatrizUsinaNaoSimulada_potencia_minima
-									//////////////////////////////////////////
-									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, idPatamarCarga, valor);
+									//Zera a info do CP
+									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+										const double valor = 0.0;
+										//////////////////////////////////////////
+										//AttMatrizUsinaNaoSimulada_potencia_minima
+										//////////////////////////////////////////
+										a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, idPatamarCarga, valor);
 
-									//////////////////////////////////////////
-									//AttMatrizUsinaNaoSimulada_potencia_maxima
-									//////////////////////////////////////////
-									a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, idPatamarCarga, valor);
-								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+										//////////////////////////////////////////
+										//AttMatrizUsinaNaoSimulada_potencia_maxima
+										//////////////////////////////////////////
+										a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, idPatamarCarga, valor);
+									}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-							}//for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada_MP; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+								}//for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada_MP; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
 
-							///////////////////////////////////////////////////////////////////////////////
-							//2. Atualiza info do CP com o PD
-							// Se não existe a modulação PD para uma geração CP -> throw exceção
-							// (exceto para EOL_MMGD / PCT_MMGD / PCH_MMGD 
-							//  alocadas com a modulação da EOL / PCT / PCH respectivamente)
-							///////////////////////////////////////////////////////////////////////////////
+								///////////////////////////////////////////////////////////////////////////////
+								//2. Atualiza info do CP com o PD
+								// Se não existe a modulação PD para uma geração CP -> throw exceção
+								// (exceto para EOL_MMGD / PCT_MMGD / PCH_MMGD 
+								//  alocadas com a modulação da EOL / PCT / PCH respectivamente)
+								///////////////////////////////////////////////////////////////////////////////
 
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+								for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
 
-								//////////////////////////////////////////////////////////////
-								//Identifica o periodo_deck para mapear o valor_medio_deck
+									//////////////////////////////////////////////////////////////
+									//Identifica o periodo_deck para mapear o valor_medio_deck
 
-								double valor_medio = -99999.0;
+									double valor_medio = -99999.0;
 
-								for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+									for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
 
-									const double sobreposicao_com_deck = periodo.sobreposicao(periodo_deck);
+										const double sobreposicao_com_deck = periodo.sobreposicao(periodo_deck);
 
-									if (sobreposicao_com_deck == 1.0) {
-										valor_medio = geracao_usina_nao_simulada_media_original.at(idSubmercado).at(idUsinaNaoSimulada).at(periodo_deck);
-										break;
-									}
+										if (sobreposicao_com_deck == 1.0) {
+											valor_medio = geracao_usina_nao_simulada_media_deck.at(idSubmercado_PD).at(idUsinaNaoSimulada).at(periodo_deck);
+											break;
+										}
 
-								}//for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+									}//for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
 
-								if (valor_medio == -99999.0)
-									throw std::invalid_argument("dadosPreConfig_usina_nao_simulada_premissa - Nao encontrada sobreposicao com o horizonte do deck do periodo: " + getString(periodo));
+									if (valor_medio == -99999.0)
+										throw std::invalid_argument("dadosPreConfig_usina_nao_simulada_premissa - Nao encontrada sobreposicao com o horizonte do deck do periodo: " + getString(periodo));
 
-								//////////////////////////////////////////////////////////////
+									//////////////////////////////////////////////////////////////
 
-								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado).getIterador2Final(AttMatrizSubmercado_demanda, periodo_PD, IdPatamarCarga());
+									const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(menorIdUsinaNaoSimulada_PD).getIterador2Final(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, periodo_PD, IdPatamarCarga());
 
-								if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
-									throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
-
-
-								IdUsinaNaoSimulada idUsinaNaoSimuladaPD = IdUsinaNaoSimulada_Nenhum;
-
-								if (dados_PD.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada))
-									idUsinaNaoSimuladaPD = idUsinaNaoSimulada;
-								else if (idUsinaNaoSimulada == IdUsinaNaoSimulada_EOL_MMGD && dados_PD.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(IdUsinaNaoSimulada_EOL_MMGD))
-									idUsinaNaoSimuladaPD = IdUsinaNaoSimulada_EOL;
-								else if (idUsinaNaoSimulada == IdUsinaNaoSimulada_PCT_MMGD && dados_PD.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(IdUsinaNaoSimulada_PCT_MMGD))
-									idUsinaNaoSimuladaPD = IdUsinaNaoSimulada_PCT;
-								else if (idUsinaNaoSimulada == IdUsinaNaoSimulada_PCH_MMGD && dados_PD.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(IdUsinaNaoSimulada_PCH_MMGD))
-									idUsinaNaoSimuladaPD = IdUsinaNaoSimulada_PCH;
-								else
-									throw std::invalid_argument("Nao carregada informacao PD da modulacao para o idUsinaNaoSimulada: " + getString(idUsinaNaoSimulada));
-
-								const double pu_geracao = dados_PD.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimuladaPD).getElementoMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, periodo_PD, maiorIdPatamarCarga, double());		
-								const double valor_anterior = a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).getElementoVetor(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, maiorIdPatamarCarga, double());
-								const double valor_novo = valor_anterior + pu_geracao * valor_medio;
-
-								a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, maiorIdPatamarCarga, valor_novo);
-								a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, maiorIdPatamarCarga, valor_novo);
+									if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
+										throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
 
 
-							}//for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+									IdUsinaNaoSimulada idUsinaNaoSimulada_PD = IdUsinaNaoSimulada_Nenhum;
 
-						}//for (IdSubmercado idSubmercado = menorIdSubmercado; idSubmercado <= maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
+									if (dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada))
+										idUsinaNaoSimulada_PD = idUsinaNaoSimulada;
+									else if (idUsinaNaoSimulada == IdUsinaNaoSimulada_EOL_MMGD && dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorUsinaNaoSimulada.isInstanciado(IdUsinaNaoSimulada_EOL))
+										idUsinaNaoSimulada_PD = IdUsinaNaoSimulada_EOL;
+									else if (idUsinaNaoSimulada == IdUsinaNaoSimulada_PCT_MMGD && dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorUsinaNaoSimulada.isInstanciado(IdUsinaNaoSimulada_PCT))
+										idUsinaNaoSimulada_PD = IdUsinaNaoSimulada_PCT;
+									else if (idUsinaNaoSimulada == IdUsinaNaoSimulada_PCH_MMGD && dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorUsinaNaoSimulada.isInstanciado(IdUsinaNaoSimulada_PCH))
+										idUsinaNaoSimulada_PD = IdUsinaNaoSimulada_PCH;
+									else
+										throw std::invalid_argument("Nao carregada informacao PD da modulacao para o idUsinaNaoSimulada: " + getString(idUsinaNaoSimulada));
+
+									const double pu_geracao = dados_PD.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada_PD).getElementoMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, periodo_PD, maiorIdPatamarCarga, double());
+									const double valor_anterior = a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).getElementoVetor(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, maiorIdPatamarCarga, double());
+									const double valor_novo = valor_anterior + pu_geracao * valor_medio;
+
+									a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, maiorIdPatamarCarga, valor_novo);
+									a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, maiorIdPatamarCarga, valor_novo);
+
+
+								}//for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+
+							}//if (menorIdUsinaNaoSimulada_PD > IdUsinaNaoSimulada_Nenhum) {
+
+						}//for (IdSubmercado idSubmercado_PD = menorIdSubmercado_PD; idSubmercado_PD <= maiorIdSubmercado_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
 					}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
 
