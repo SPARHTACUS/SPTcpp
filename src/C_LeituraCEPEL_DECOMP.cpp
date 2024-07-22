@@ -14172,6 +14172,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			int periodo_acoplamento = 0; //Inicializa com este valor por ser parte da lógica
 
 			if (a_nomeArquivo_cortes.find("nwlistcf") != std::string::npos) {
+				//No nwlistcf.rel o período se refer ao estágio onde os cortes são colocados no modelo de otimização 
+				// (p.ex, Periodo: 10, significa a FCF que deve ser acoplada no mês outubro significando o custo de novembro em diante)
+				//Informação validada com o arquivo fcfnwn.rvX (saída do modelo DC)
 
 				is_arquivo_fcfnwn = false;
 
