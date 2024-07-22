@@ -21041,18 +21041,17 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getMenorId(IdUsinaNaoSimulada());
 							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).getMaiorId(IdUsinaNaoSimulada());
 
-
-							const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(menorIdUsinaNaoSimulada_PD).getIterador2Final(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo_PD, IdPatamarCarga());
-
-							if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
-								throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD ");
-
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Podem existir diferenças nos Ids entre o CP e o PD, portanto, vai ser realizada a seguinte lógica:
 							//Zera para o período P a info de todos os Ids_CP, depois cria novos Ids_CP (se necessário) e atualiza a info com os Ids_PD
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 							if (menorIdUsinaNaoSimulada_PD > IdUsinaNaoSimulada_Nenhum) {
+
+								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.att(idSubmercado_PD).vetorUsinaNaoSimulada.att(menorIdUsinaNaoSimulada_PD).getIterador2Final(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo_PD, IdPatamarCarga());
+
+								if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
+									throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD ");
 
 								///////////////////////////////////////////////////////////////////////////////
 								//1. Zera a informação dos idsCP (para o periodo avaliado)
