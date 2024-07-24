@@ -16023,7 +16023,7 @@ void LeituraCEPEL::atualizar_vetores_premissas_calculo_produtibilidades(Dados& a
 						a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(attVetorReservatorio.at(pos), SmartEnupla<Periodo, double>(a_horizonte_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getAtributo(attComumReservatorio.at(pos), double())));
 					else {
 
-						SmartEnupla<Periodo, double> nova_enupla;
+						SmartEnupla<Periodo, double> nova_enupla(a_horizonte_alvo, 0.0);
 
 						for (Periodo periodo_alvo = a_horizonte_alvo.getIteradorInicial(); periodo_alvo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo_alvo)) {
 
@@ -16032,18 +16032,30 @@ void LeituraCEPEL::atualizar_vetores_premissas_calculo_produtibilidades(Dados& a
 							if (periodo_alvo >= periodo_inicial_horizonte_estudo) {
 
 								bool is_sobreposicao_encontrada = false;
+								double soma_sobreposicao = 0.0;
+								double valor_aux = 0.0;
 								for (Periodo periodo = periodo_inicial_horizonte_estudo; periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
 									const double sobreposicao = periodo_alvo.sobreposicao(periodo);
 
-									if (sobreposicao == 1.0) {
-										is_sobreposicao_encontrada = true;
-										nova_enupla.addElemento(periodo_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(attVetorReservatorio.at(pos), periodo, double()));
-										break;
-									}//if (sobreposicao == 1.0) {
-									else if (sobreposicao > 0.0)
-										throw std::invalid_argument("Periodo_alvo: " + getString(periodo_alvo) + "deve ser contido em sua totalidade pelo periodo do horizonte de estudo : " + getString(periodo));
+									if (sobreposicao > 0.0) {
 
+										const double valor = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(attVetorReservatorio.at(pos), periodo, double());
+
+										if (soma_sobreposicao == 0.0)
+											valor_aux = valor;
+
+										if(valor_aux != valor){ throw std::invalid_argument("Os valores no horizonte de estudo com sobreposicao devem ser iguais para o periodo : " + getString(periodo_alvo));}
+
+										is_sobreposicao_encontrada = true;
+										soma_sobreposicao += sobreposicao;
+										nova_enupla.at(periodo_alvo) += valor * sobreposicao;
+									}//if (sobreposicao > 0.0) {
+
+									if (is_sobreposicao_encontrada && sobreposicao == 0.0) {//Evita percorrer todo o horizonte							
+										if (!doubleCompara(1e-6, soma_sobreposicao, 1.0)) { throw std::invalid_argument("Soma sobreposicao deve ser 1.0 para o periodo : " + getString(periodo_alvo)); }					
+										break;
+									}//if (is_sobreposicao_encontrada && sobreposicao == 0.0) {
 
 								}//for (Periodo periodo = periodo_inicial_horizonte_estudo; periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -16052,7 +16064,7 @@ void LeituraCEPEL::atualizar_vetores_premissas_calculo_produtibilidades(Dados& a
 
 							}
 							else
-								nova_enupla.addElemento(periodo_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(attVetorReservatorio.at(pos), periodo_inicial_horizonte_estudo, double()));
+								nova_enupla.at(periodo_alvo) = a_dados.vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).getElementoVetor(attVetorReservatorio.at(pos), periodo_inicial_horizonte_estudo, double());
 
 						}//for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
 
@@ -16075,7 +16087,7 @@ void LeituraCEPEL::atualizar_vetores_premissas_calculo_produtibilidades(Dados& a
 						a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(attVetorHidreletrica.at(pos), SmartEnupla<Periodo, double>(a_horizonte_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).getAtributo(attComumHidreletrica.at(pos), double())));
 					else {
 
-						SmartEnupla<Periodo, double> nova_enupla;
+						SmartEnupla<Periodo, double> nova_enupla(a_horizonte_alvo, 0.0);
 
 						for (Periodo periodo_alvo = a_horizonte_alvo.getIteradorInicial(); periodo_alvo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo_alvo)) {
 
@@ -16084,18 +16096,30 @@ void LeituraCEPEL::atualizar_vetores_premissas_calculo_produtibilidades(Dados& a
 							if (periodo_alvo >= periodo_inicial_horizonte_estudo) {
 
 								bool is_sobreposicao_encontrada = false;
+								double soma_sobreposicao = 0.0;
+								double valor_aux = 0.0;
 								for (Periodo periodo = periodo_inicial_horizonte_estudo; periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
 									const double sobreposicao = periodo_alvo.sobreposicao(periodo);
 
-									if (sobreposicao == 1.0) {
-										is_sobreposicao_encontrada = true;
-										nova_enupla.addElemento(periodo_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(attVetorHidreletrica.at(pos), periodo, double()));
-										break;
-									}//if (sobreposicao == 1.0) {
-									else if (sobreposicao > 0.0)
-										throw std::invalid_argument("Periodo_alvo: " + getString(periodo_alvo) + "deve ser contido em sua totalidade pelo periodo do horizonte de estudo : " + getString(periodo));
+									if (sobreposicao > 0.0) {
 
+										const double valor = a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(attVetorHidreletrica.at(pos), periodo, double());
+
+										if (soma_sobreposicao == 0.0)
+											valor_aux = valor;
+
+										if (valor_aux != valor) { throw std::invalid_argument("Os valores no horizonte de estudo com sobreposicao devem ser iguais para o periodo : " + getString(periodo_alvo)); }
+
+										is_sobreposicao_encontrada = true;
+										soma_sobreposicao += sobreposicao;
+										nova_enupla.at(periodo_alvo) += valor * sobreposicao;
+									}//if (sobreposicao > 0.0) {
+
+									if (is_sobreposicao_encontrada && sobreposicao == 0.0) {//Evita percorrer todo o horizonte							
+										if (!doubleCompara(1e-6, soma_sobreposicao, 1.0)) { throw std::invalid_argument("Soma sobreposicao deve ser 1.0 para o periodo : " + getString(periodo_alvo)); }
+										break;
+									}//if (is_sobreposicao_encontrada && sobreposicao == 0.0) {
 
 								}//for (Periodo periodo = periodo_inicial_horizonte_estudo; periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -16104,11 +16128,12 @@ void LeituraCEPEL::atualizar_vetores_premissas_calculo_produtibilidades(Dados& a
 
 							}
 							else
-								nova_enupla.addElemento(periodo_alvo, a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(attVetorHidreletrica.at(pos), periodo_inicial_horizonte_estudo, double()));
+								nova_enupla.at(periodo_alvo) = a_dados.vetorHidreletrica.att(idHidreletrica).getElementoVetor(attVetorHidreletrica.at(pos), periodo_inicial_horizonte_estudo, double());
 
 						}//for (Periodo periodo = a_horizonte_alvo.getIteradorInicial(); periodo <= a_horizonte_alvo.getIteradorFinal(); a_horizonte_alvo.incrementarIterador(periodo)) {
 
 						a_dados.vetorHidreletrica.att(idHidreletrica).setVetor(attVetorHidreletrica.at(pos), nova_enupla);
+
 
 					}//else {
 
@@ -18941,7 +18966,7 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 				if (a_dados.vetorHidreletrica.att(a_dados.getMenorId(IdHidreletrica())).getSizeVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR) == 0) {
 					atualizar_vetores_premissas_calculo_produtibilidades(a_dados, SmartEnupla<Periodo, bool>(horizonte_estudo, true));
-					calcular_produtibilidade_EAR_acumulada_por_usina(a_dados, SmartEnupla<Periodo, bool>(horizonte_estudo, true));//produtibilidade_EAR é estática e calculada com as premissas do 1° período do estudo
+					calcular_produtibilidade_EAR_acumulada_por_usina(a_dados,SmartEnupla<Periodo, bool>(horizonte_estudo, true));//produtibilidade_EAR é estática e calculada com as premissas do 1° período do estudo
 				}
 					
 				
