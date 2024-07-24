@@ -3523,7 +3523,7 @@ void Dados::validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, cons
 
 		} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
-				//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//2. Calcula a produtibilidade_ENA com os periodos do horizonte do processo estocástico
 		// Premissa: Por padrão o vetor produtibilidade_ENA é construído despois da tendência com períodos diários
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3562,6 +3562,8 @@ void Dados::validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, cons
 			}//if (true) {
 
 			//////////////////////////
+			//Premissa: a lógica está pensada para poder utilizar processos estocásticos com discretizações menores ou iguais à forma que "realiza" a produtibilidade_ENA (geralmente, depende do canal_fuga_medio que tem realizações S/S/S.../M)
+			//Se um periodo_alvo tem sobreposicao com vários periodos do horizonte_produtibilidade_ENA -> exceção! (p.ex criar um processo estocástico com período mensal tendo uma discretização produtibilidade_ENA semanal)
 
 			for (IdHidreletrica idUHE = menorIdHidreletrica; idUHE <= maiorIdHidreletrica; vetorHidreletrica.incr(idUHE)) {
 
@@ -3576,13 +3578,26 @@ void Dados::validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, cons
 
 					for (Periodo periodo_alvo = produtibilidade_ENA_alvo.getIteradorInicial(); periodo_alvo <= produtibilidade_ENA_alvo.getIteradorFinal(); produtibilidade_ENA_alvo.incrementarIterador(periodo_alvo)) {
 
-						double soma_sobreposicao = 0.0;
+						int numero_sobreposicoes = 0;
 						bool is_sobreposicao_encontrada = false;
 
 						for (Periodo periodo_base = produtibilidade_ENA_base.getIteradorInicial(); periodo_base <= produtibilidade_ENA_base.getIteradorFinal(); produtibilidade_ENA_base.incrementarIterador(periodo_base)) {
 
 							const double sobreposicao = periodo_alvo.sobreposicao(periodo_base);
 
+							if (sobreposicao == 1.0) {
+
+								is_sobreposicao_encontrada = true;
+								numero_sobreposicoes++;
+
+								produtibilidade_ENA_alvo.setElemento(periodo_alvo, produtibilidade_ENA_base.at(periodo_base));
+
+							}//if (sobreposicao == 1.0) {
+
+							if (is_sobreposicao_encontrada && sobreposicao == 0.0)//Evita percorrer o horizonte todo
+								break;
+
+							/*
 							if (sobreposicao > 0.0) {
 								is_sobreposicao_encontrada = true;
 								soma_sobreposicao += sobreposicao;
@@ -3602,8 +3617,12 @@ void Dados::validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, cons
 								break;
 
 							}//if (is_sobreposicao_encontrada && sobreposicao == 0.0) {
+							*/
 
 						}//for (Periodo periodo_base = produtibilidade_ENA_base.getIteradorInicial(); periodo_base <= produtibilidade_ENA_base.getIteradorFinal(); produtibilidade_ENA_base.incrementarIterador(periodo_base)) {
+
+						if(!is_sobreposicao_encontrada){ throw std::invalid_argument("Nao encontrado em horizonte_produtibilidade_ENA o periodo alvo: " + getString(periodo_alvo)); }
+						else if(numero_sobreposicoes > 1) { throw std::invalid_argument("Multiplos periodos com sobreposicao no horizonte_produtibilidade_ENA do periodo alvo: " + getString(periodo_alvo)); }
 
 					}//for (Periodo periodo_alvo = produtibilidade_ENA_alvo.getIteradorInicial(); periodo_alvo <= produtibilidade_ENA_alvo.getIteradorFinal(); produtibilidade_ENA_alvo.incrementarIterador(periodo_alvo)) {
 

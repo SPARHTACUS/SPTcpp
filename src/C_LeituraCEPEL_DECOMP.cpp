@@ -14078,7 +14078,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		/////////////////////////////////////////////////////
 		//Define horizontes de interesse
 
-		SmartEnupla <Periodo, bool> horizonte_tendencia_mais_estudo_MENOR_DISCRETIZACAO; //Iteradores os periodos da tendencia_temporal + horizonte_estudo (tipo períodos a conveniência, podem ser diários ou 30 min, dependendo do estudo): Premissa de menor discretização para impressão do vetor produtibilidade_ENA
 		SmartEnupla <Periodo, bool> horizonte_tendencia_mais_processo_estocastico; //Vai conter nos iteradores os periodos da tendencia_temporal + processo estocástico
 		//SmartEnupla <Periodo, bool> horizonte_tendencia_mais_estudo; //Vai conter nos iteradores os periodos da tendencia_temporal + horizonte de estudo (para cálculo das premissas necessárias do cálculo das produtibilidades EAR e ENA)
 
@@ -14086,33 +14085,10 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		const SmartEnupla <Periodo, double> tendencia_temporal = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(IdVariavelAleatoria_1).vetorVariavelAleatoriaInterna.att(IdVariavelAleatoriaInterna_1).getVetor(AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 
 		for (Periodo periodo = tendencia_temporal.getIteradorInicial(); periodo <= tendencia_temporal.getIteradorFinal(); tendencia_temporal.incrementarIterador(periodo)) {
-			horizonte_tendencia_mais_estudo_MENOR_DISCRETIZACAO.addElemento(periodo, true);
 			horizonte_tendencia_mais_processo_estocastico.addElemento(periodo, true);
 			//horizonte_tendencia_mais_estudo.addElemento(periodo, true);
 
 		}
-
-		//horizonte_tendencia_mais_estudo_MENOR_DISCRETIZACAO: Por padrão discretiza o horizonte_estudo em periodos_diarios mas se tiver um periodo_estudo com discretização ainda menor então discretiza em períodos de 30 min
-
-		TipoPeriodo tipoPeriodo_MENOR_DISCRETIZACAO = TipoPeriodo_diario;
-
-		for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
-
-			if (periodo.getTipoPeriodo() > tipoPeriodo_MENOR_DISCRETIZACAO) {//Exemplo: TipoPeriodo_meia_hora > TipoPeriodo_diario -> True 
-				tipoPeriodo_MENOR_DISCRETIZACAO = TipoPeriodo_meia_hora;
-				break;
-			}//if (periodo.getTipoPeriodo() > tipoPeriodo_MENOR_DISCRETIZACAO) {
-
-		}//for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
-
-		const Periodo periodo_inicial_MENOR_DISCRETIZACAO = Periodo(tipoPeriodo_MENOR_DISCRETIZACAO, a_horizonte_estudo.getIteradorInicial().getDia(), a_horizonte_estudo.getIteradorInicial().getMes(), a_horizonte_estudo.getIteradorInicial().getAno());
-		const Periodo periodo_final_MENOR_DISCRETIZACAO = Periodo(tipoPeriodo_MENOR_DISCRETIZACAO, a_horizonte_estudo.getIteradorFinal() + 1);
-
-
-		for (Periodo periodo_aux = periodo_inicial_MENOR_DISCRETIZACAO; periodo_aux < periodo_final_MENOR_DISCRETIZACAO; periodo_aux++)
-			horizonte_tendencia_mais_estudo_MENOR_DISCRETIZACAO.addElemento(periodo_aux, true);
-
-		//////
 
 		//Adiciona os periodos do processo estocástico (incluídos os períodos da extensão do horizonte)
 		for (Periodo periodo = horizonte_processo_estocastico.getIteradorInicial(); periodo <= horizonte_processo_estocastico.getIteradorFinal(); horizonte_processo_estocastico.incrementarIterador(periodo)) 
@@ -14135,12 +14111,12 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		//2 Cálculo da produtibilidade_EAR acumulada por usina (aporte em cada REE)
 		//////////////////////////////////////////////////////////////////////////////////
 
-		atualizar_vetores_premissas_calculo_produtibilidades(a_dados, horizonte_tendencia_mais_estudo_MENOR_DISCRETIZACAO);
+		atualizar_vetores_premissas_calculo_produtibilidades(a_dados, horizonte_tendencia_mais_processo_estocastico);
 
 		if (a_dados.vetorHidreletrica.att(a_dados.getMenorId(IdHidreletrica())).getSizeVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR) == 0)//Pode ter sido instanciado para o cálculo das produtibilidade_acumulada_EAR em restrições de energia armazenada RHV
-			calcular_produtibilidade_EAR_acumulada_por_usina(a_dados, horizonte_tendencia_mais_estudo_MENOR_DISCRETIZACAO);
+			calcular_produtibilidade_EAR_acumulada_por_usina(a_dados, SmartEnupla<Periodo, bool>(a_horizonte_estudo, true)); //produtibilidade_EAR é estática e calculada com as premissas do 1° período do estudo
 		
-		calcular_produtibilidade_ENA_por_usina_por_periodo(a_dados, horizonte_tendencia_mais_estudo_MENOR_DISCRETIZACAO);
+		calcular_produtibilidade_ENA_por_usina_por_periodo(a_dados, horizonte_tendencia_mais_processo_estocastico);
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//3 Cálculo da ENA x REE x cenário x período
@@ -18965,7 +18941,7 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 				if (a_dados.vetorHidreletrica.att(a_dados.getMenorId(IdHidreletrica())).getSizeVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR) == 0) {
 					atualizar_vetores_premissas_calculo_produtibilidades(a_dados, SmartEnupla<Periodo, bool>(horizonte_estudo, true));
-					calcular_produtibilidade_EAR_acumulada_por_usina(a_dados, SmartEnupla<Periodo, bool>(horizonte_estudo, true));
+					calcular_produtibilidade_EAR_acumulada_por_usina(a_dados, SmartEnupla<Periodo, bool>(horizonte_estudo, true));//produtibilidade_EAR é estática e calculada com as premissas do 1° período do estudo
 				}
 					
 				
