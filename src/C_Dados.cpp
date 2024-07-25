@@ -8596,7 +8596,8 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 					}
 
 					if (periodo_prob_realizacao.sobreposicao(periodo_residuo) > 0.0) {
-						probabilidade_realizacao.incrementarIterador(periodo_prob_realizacao); //refazer
+						if(periodo_prob_realizacao <= probabilidade_realizacao.getIteradorFinal())
+							probabilidade_realizacao.incrementarIterador(periodo_prob_realizacao); //refazer
 					}
 
 					coeficiente_linear_auto_correlacao.incrementarIterador(periodo_coef_linear);

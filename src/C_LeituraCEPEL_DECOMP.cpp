@@ -308,17 +308,16 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 			//2.Periodos que pertencem ao horizonte COM extensão
 			////////////////////////////////////////////////////
 
-			const Periodo periodo_final_DC = horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal());
+			const Periodo periodo_extensao = Periodo(TipoPeriodo_mensal, horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal())+1);
 
 			for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
 
 				const Periodo periodo_otimizacao = horizonte_otimizacao.getElemento(idEstagio_otimizacao);
 
-				if (periodo_otimizacao > periodo_final_DC) {
+				if (periodo_otimizacao >= periodo_extensao) {
 					horizonte_processo_estocastico.addElemento(periodo_otimizacao, true);
 					numero_realizacoes_por_periodo_atualizado.addElemento(periodo_otimizacao, a_dados.getElementoVetor(AttVetorDados_numero_aberturas, idEstagio_otimizacao, int()));
-
-				}//if (periodo_otimizacao > periodo_final_DC) {
+				}//if (periodo_otimizacao > periodo_extensao) {
 
 			}//for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
 
