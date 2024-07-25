@@ -13380,16 +13380,16 @@ void LeituraCEPEL::define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados)
 
 						double afluencia = vazao_no_posto.at(no).at(posto - 1);
 
-						if (!is_first_sobreposicao)
+						if (!is_first_sobreposicao && (idEstagio_DC == horizonte_otimizacao_DC.getIteradorFinal()))
 							afluencia = 0.0;
 
 						IdRealizacao idRealizacao = IdRealizacao_1;
 
-						if (idEstagio_DC == horizonte_otimizacao_DC.getIteradorFinal() && is_first_sobreposicao)
+						if (is_first_sobreposicao && idEstagio_DC == horizonte_otimizacao_DC.getIteradorFinal())
 							idRealizacao = IdRealizacao(no - numero_estagios_DC + 2); //Cada registro do último estágio é uma realização
 
 
-						if(is_first_sobreposicao || (!is_first_sobreposicao && (no - numero_estagios_DC + 1 == 0)))
+						if (is_first_sobreposicao || (!is_first_sobreposicao && (no - numero_estagios_DC + 1 == 0)) || (!is_first_sobreposicao && (idEstagio_DC < horizonte_otimizacao_DC.getIteradorFinal())))
 							a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(lista_hidreletrica_IdVariavelAleatoria.at(idHidreletrica)).addElemento(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_processo_estocastico, idRealizacao, afluencia);
 
 					}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
@@ -13596,7 +13596,7 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 							double coeficiente_linear_auto_correlacao = 0.0;
 
-							if (!is_first_sobreposicao)
+							if (!is_first_sobreposicao and idEstagio_DC == horizonte_otimizacao_DC.getIteradorFinal())
 								coeficiente_linear_auto_correlacao = 1.0;
 
 							a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.att(idVariavelAleatoria).addElemento(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo, 1, coeficiente_linear_auto_correlacao);
