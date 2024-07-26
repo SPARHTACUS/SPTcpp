@@ -2108,12 +2108,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				const double afluencia_117 = get_afluencia_natural_posto(a_dados, a_periodoPE, 117, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 				const double afluencia_301 = get_afluencia_natural_posto(a_dados, a_periodoPE, 301, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
-
-				bool is_periodo_inicial = false;
-				if (a_periodoPE == vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo()))
-					is_periodo_inicial = true;
-
-				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, is_periodo_inicial);
+				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo(TipoPeriodo_semanal, vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
 
 				//*************************************************************************
 				// VAZ(318) = VAZ(116)+0.1*(VAZ(161)-VAZ(117)-VAZ(301))+VAZ(117)+VAZ(301)
@@ -2418,11 +2413,8 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 
 				///////
 
-				bool is_periodo_inicial = false;
-				if (a_periodoPE == vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo()))
-					is_periodo_inicial = true;
+				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo(TipoPeriodo_semanal, vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
 
-				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, is_periodo_inicial);
 
 				if (idMes_alvo == IdMes_1) {
 
@@ -2597,11 +2589,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				//////////
 				//-VAZ(292)
 				//////////
-				bool is_periodo_inicial = false;
-				if (a_periodoPE == vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo()))
-					is_periodo_inicial = true;
-
-				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, is_periodo_inicial);
+				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo(TipoPeriodo_semanal, vetorProcessoEstocastico.att(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
 
 				if (idMes_alvo == IdMes_1) {
 
@@ -3015,17 +3003,15 @@ double ModeloOtimizacao::get_afluencia_natural_posto(Dados& a_dados, const Perio
 
 }
 
-IdMes ModeloOtimizacao::get_IdMes_operativo(const Periodo a_periodo, const bool is_periodo_inicial)
+IdMes ModeloOtimizacao::get_IdMes_operativo(const Periodo a_periodoPE, const Periodo a_periodo_inicial_semanal)
 {
 	try {
 
-		if (a_periodo.getTipoPeriodo() > TipoPeriodo_semanal)
-			throw std::invalid_argument("Nao implementada regra para periodos com duracao menor a TipoPeriodo_semanal \n");
+		Periodo periodo_teste = a_periodoPE;
 
-		Periodo periodo_teste = a_periodo;
-
-		if (is_periodo_inicial)//Para garantir que a primeira semana operativa corresponda ao mês operativo
-			periodo_teste++;
+		if (a_periodoPE.sobreposicao(a_periodo_inicial_semanal) > 0) {//Para garantir que a primeira semana operativa corresponda ao mês operativo			
+			periodo_teste = Periodo(TipoPeriodo_semanal, periodo_teste) + 1;		
+		}
 
 		return periodo_teste.getMes();
 
