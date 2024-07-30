@@ -1006,7 +1006,7 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 					break;
 				horizonte_estudo_limitado.addElemento(periodo, horizonte_estudo.at(periodo));
 			}
-			setVetor(AttVetorDados_horizonte_estudo, horizonte_estudo_limitado);
+			setVetor_forced(AttVetorDados_horizonte_estudo, horizonte_estudo_limitado);
 		}
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
@@ -1203,7 +1203,7 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 
 			} // while (true) {
 
-			setMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, desagio_acumulado_horizonte_estudo);
+			setMatriz_forced(AttMatrizDados_desagio_acumulado_horizonte_estudo, desagio_acumulado_horizonte_estudo);
 
 		} // if (true) {
 
@@ -1314,12 +1314,12 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 		if (getAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco()) == TipoAversaoRisco_CVAR) {
 
 			if (getSizeVetor(AttVetorDados_alpha_CVAR) == 0) {
-				setVetor(AttVetorDados_alpha_CVAR, SmartEnupla<IdEstagio, double>(estagio_inicial, std::vector<double>(estagio_final, getAtributo(AttComumDados_alpha_CVAR, double()))));
+				setVetor_forced(AttVetorDados_alpha_CVAR, SmartEnupla<IdEstagio, double>(estagio_inicial, std::vector<double>(estagio_final, getAtributo(AttComumDados_alpha_CVAR, double()))));
 				calculo_att_operacionais = true;
 			}
 
 			if (getSizeVetor(AttVetorDados_lambda_CVAR) == 0) {
-				setVetor(AttVetorDados_lambda_CVAR, SmartEnupla<IdEstagio, double>(estagio_inicial, std::vector<double>(estagio_final, getAtributo(AttComumDados_lambda_CVAR, double()))));
+				setVetor_forced(AttVetorDados_lambda_CVAR, SmartEnupla<IdEstagio, double>(estagio_inicial, std::vector<double>(estagio_final, getAtributo(AttComumDados_lambda_CVAR, double()))));
 				calculo_att_operacionais = true;
 			}
 
@@ -1482,13 +1482,13 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 						MPI_Recv(&barreira, 1, MPI_INT, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 				}
 
-				setVetor(AttVetorDados_numero_aberturas, SmartEnupla<IdEstagio, int>());
-				setVetor(AttVetorDados_numero_aberturas_solucao_proxy, SmartEnupla<IdEstagio, int>());
-				setVetor(AttVetorDados_cortes_multiplos, SmartEnupla<IdEstagio, int>());
-				setVetor(AttVetorDados_lambda_CVAR, SmartEnupla<IdEstagio, double>());
-				setVetor(AttVetorDados_alpha_CVAR, SmartEnupla<IdEstagio, double>());
+				setVetor_forced(AttVetorDados_numero_aberturas, SmartEnupla<IdEstagio, int>());
+				setVetor_forced(AttVetorDados_numero_aberturas_solucao_proxy, SmartEnupla<IdEstagio, int>());
+				setVetor_forced(AttVetorDados_cortes_multiplos, SmartEnupla<IdEstagio, int>());
+				setVetor_forced(AttVetorDados_lambda_CVAR, SmartEnupla<IdEstagio, double>());
+				setVetor_forced(AttVetorDados_alpha_CVAR, SmartEnupla<IdEstagio, double>());
 
-				setMatriz(AttMatrizDados_percentual_duracao_patamar_carga, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>());
+				setMatriz_forced(AttMatrizDados_percentual_duracao_patamar_carga, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>());
 
 				a_entradaSaidaDados.setDiretorioEntrada(a_diretorio_att_operacional);
 				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, TipoAcessoInstancia_direto);
@@ -1557,20 +1557,20 @@ void Dados::validacao_operacional_Intercambio_Hidraulico(EntradaSaidaDados a_ent
 					vazao = getElementoMatriz(idIntercambioHidraulico, AttMatrizIntercambioHidraulico_vazao, posicaoNivel, posicaoDesnivel, double());
 				}
 
-				vetorIntercambioHidraulico.att(idIntercambioHidraulico).setVetor(AttVetorIntercambioHidraulico_desvio_agua_minimo, SmartEnupla<Periodo, double>(horizonte_estudo, vazao));
-				vetorIntercambioHidraulico.att(idIntercambioHidraulico).setVetor(AttVetorIntercambioHidraulico_desvio_agua_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, vazao));
+				vetorIntercambioHidraulico.att(idIntercambioHidraulico).setVetor_forced(AttVetorIntercambioHidraulico_desvio_agua_minimo, SmartEnupla<Periodo, double>(horizonte_estudo, vazao));
+				vetorIntercambioHidraulico.att(idIntercambioHidraulico).setVetor_forced(AttVetorIntercambioHidraulico_desvio_agua_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, vazao));
 				recarregar_atributo = true;
 
 			}//	if ((getAtributo(idIntercambioHidraulico, AttComumIntercambioHidraulico_tipo_intercambio_hidraulico, TipoIntercambioHidraulico()) == TipoIntercambioHidraulico_pereira_barreto) && ((getSizeVetor(idIntercambioHidraulico, AttVetorIntercambioHidraulico_desvio_agua_maximo) == 0) || (getSizeVetor(idIntercambioHidraulico, AttVetorIntercambioHidraulico_desvio_agua_minimo) == 0))) {
 
 
 			if ((getSizeVetor(idIntercambioHidraulico, AttVetorIntercambioHidraulico_desvio_agua_minimo) == 0)) {
-				vetorIntercambioHidraulico.att(idIntercambioHidraulico).setVetor(AttVetorIntercambioHidraulico_desvio_agua_minimo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idIntercambioHidraulico, AttComumIntercambioHidraulico_desvio_agua_minimo, double())));
+				vetorIntercambioHidraulico.att(idIntercambioHidraulico).setVetor_forced(AttVetorIntercambioHidraulico_desvio_agua_minimo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idIntercambioHidraulico, AttComumIntercambioHidraulico_desvio_agua_minimo, double())));
 				recarregar_atributo = true;
 			}
 
 			if ((getSizeVetor(idIntercambioHidraulico, AttVetorIntercambioHidraulico_desvio_agua_maximo) == 0)) {
-				vetorIntercambioHidraulico.att(idIntercambioHidraulico).setVetor(AttVetorIntercambioHidraulico_desvio_agua_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idIntercambioHidraulico, AttComumIntercambioHidraulico_desvio_agua_maximo, double())));
+				vetorIntercambioHidraulico.att(idIntercambioHidraulico).setVetor_forced(AttVetorIntercambioHidraulico_desvio_agua_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idIntercambioHidraulico, AttComumIntercambioHidraulico_desvio_agua_maximo, double())));
 				recarregar_atributo = true;
 			}
 
@@ -1691,17 +1691,17 @@ void Dados::validacao_operacional_UsinasElevatorias(EntradaSaidaDados a_entradaS
 		for (IdUsinaElevatoria idUsinaElevatoria = IdUsinaElevatoria_1; idUsinaElevatoria <= maiorIdUsinaElevatoria; idUsinaElevatoria++) {
 
 			if ((getSizeVetor(idUsinaElevatoria, AttVetorUsinaElevatoria_fator_disponibilidade) == 0)) {
-				vetorUsinaElevatoria.att(idUsinaElevatoria).setVetor(AttVetorUsinaElevatoria_fator_disponibilidade, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idUsinaElevatoria, AttComumUsinaElevatoria_fator_disponibilidade, double())));
+				vetorUsinaElevatoria.att(idUsinaElevatoria).setVetor_forced(AttVetorUsinaElevatoria_fator_disponibilidade, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idUsinaElevatoria, AttComumUsinaElevatoria_fator_disponibilidade, double())));
 				recarregar_atributo = true;
 			}
 
 			if ((getSizeVetor(idUsinaElevatoria, AttVetorUsinaElevatoria_vazao_bombeada_minima) == 0)) {
-				vetorUsinaElevatoria.att(idUsinaElevatoria).setVetor(AttVetorUsinaElevatoria_vazao_bombeada_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idUsinaElevatoria, AttComumUsinaElevatoria_vazao_bombeada_minima, double())));
+				vetorUsinaElevatoria.att(idUsinaElevatoria).setVetor_forced(AttVetorUsinaElevatoria_vazao_bombeada_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idUsinaElevatoria, AttComumUsinaElevatoria_vazao_bombeada_minima, double())));
 				recarregar_atributo = true;
 			}
 
 			if ((getSizeVetor(idUsinaElevatoria, AttVetorUsinaElevatoria_vazao_bombeada_maxima) == 0)) {
-				vetorUsinaElevatoria.att(idUsinaElevatoria).setVetor(AttVetorUsinaElevatoria_vazao_bombeada_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idUsinaElevatoria, AttComumUsinaElevatoria_vazao_bombeada_maxima, double())));
+				vetorUsinaElevatoria.att(idUsinaElevatoria).setVetor_forced(AttVetorUsinaElevatoria_vazao_bombeada_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idUsinaElevatoria, AttComumUsinaElevatoria_vazao_bombeada_maxima, double())));
 				recarregar_atributo = true;
 			}
 
@@ -1910,23 +1910,54 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 		// VALIDA AS TERMEL�TRICAS 
 		validaTermeletrica();
 
+		// ID PROCESSO
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+
+		const int numProcessos = arranjoResolucao.vetorProcesso.numObjetos();
+
+		const int numIdTermPorProcesso = vetorTermeletrica.numObjetos() / numProcessos;
+
+
 		//MAIOR ID TERMELETRICA
-		const IdTermeletrica maiorIdTermeletrica = getMaiorId(IdTermeletrica());
-		const IdTermeletrica menorIdTermeletrica = getMenorId(IdTermeletrica());
+		int numIdTerm_before = 0;
+		for (IdProcesso idProcesso_comp = IdProcesso_mestre; idProcesso_comp < idProcesso; idProcesso_comp++) {
+			numIdTerm_before += numIdTermPorProcesso;
+			if (idProcesso_comp <= IdProcesso(vetorTermeletrica.numObjetos() - (numIdTermPorProcesso * numProcessos)))
+				numIdTerm_before++;
+		}
+
+		int numIdTermProcesso = numIdTermPorProcesso;
+		if (idProcesso <= IdProcesso(vetorTermeletrica.numObjetos() - (numIdTermPorProcesso * numProcessos)))
+			numIdTermProcesso++;
+
+		IdTermeletrica menorIdTermeletrica = IdTermeletrica_Nenhum;
+		IdTermeletrica maiorIdTermeletrica = IdTermeletrica_Nenhum;
+
+		int cont = 0;
+		for (IdTermeletrica idTermeletrica = getMenorId(IdTermeletrica()); idTermeletrica <= getMaiorId(IdTermeletrica()); vetorTermeletrica.incr(idTermeletrica)) {
+			if (cont == numIdTerm_before)
+				menorIdTermeletrica = idTermeletrica;
+			else if ((cont - numIdTerm_before) == numIdTermProcesso) {
+				maiorIdTermeletrica = idTermeletrica;
+				break;
+			}
+			cont++;
+		}
+
+		menorIdTermeletrica = getMenorId(IdTermeletrica());
+		maiorIdTermeletrica = getMaiorId(IdTermeletrica());
 
 		const int numIdTermeletrica = int(maiorIdTermeletrica - menorIdTermeletrica) + 1;
 
-		bool recarregar_AttVetorReservatorio_PorIdMes = false;
-		bool recarregar_AttVetorReservatorio_PorPeriodo = false;
 		bool recarregar_AttVetorTermeletrica_PorPeriodo = false;
 		bool recarregar_AttVetorTermeletrica_PorInteiro = false;
 		bool recarregar_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga = false;
 		bool recarregar_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga = false;
 		bool recarregar_AttVetorUnidadeUTE_PorPeriodo = false;
 		bool recarregar_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga = false;
+
 		bool impresso_AttComumUnidadeUTE = false;
 		bool impresso_AttComumTermeletrica = false;
-
 		std::vector<bool> impresso_AttVetorTermeletrica_PorPeriodo(3, false);
 		std::vector<bool> impresso_AttVetorTermeletrica_PorInteiro(2, false);
 		std::vector<bool> impresso_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga(2, false);
@@ -1942,9 +1973,6 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>> preencher_AttVetorUnidadeUTE(menorIdTermeletrica, std::vector<SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>>(numIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>()));
 		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>> preencher_AttMatrizUnidadeUTE(menorIdTermeletrica, std::vector< SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>>(numIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>()));
-
-		// ID PROCESSO
-		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		// HORIZONTE DE ESTUDO 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
@@ -2015,7 +2043,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 						throw std::invalid_argument("O atributo " + getFullString(AttComumTermeletrica_tipo_detalhamento_producao) + " nao deve ser " + getFullString(tipo_detalhamento_producao) + " caso nao sejam informadas unidades em " + getFullString(idTermeletrica) + ".");
 
 					preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_tipo_detalhamento_producao) = sim_operacional;
-					vetorTermeletrica.att(idTermeletrica).setVetor(AttVetorTermeletrica_tipo_detalhamento_producao, SmartEnupla<Periodo, TipoDetalhamentoProducaoTermeletrica>(horizonte_estudo, tipo_detalhamento_producao));
+					vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_tipo_detalhamento_producao, SmartEnupla<Periodo, TipoDetalhamentoProducaoTermeletrica>(horizonte_estudo, tipo_detalhamento_producao));
 
 				} // if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao) == 0) {
 
@@ -2124,7 +2152,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 						if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_fator_de_capacidade) == 0) {
 							preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_fator_de_capacidade) = sim_premissa;
-							vetorTermeletrica.att(idTermeletrica).setVetor(AttVetorTermeletrica_fator_de_capacidade, SmartEnupla<Periodo, double>(vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina), getAtributo(idTermeletrica, AttComumTermeletrica_fator_de_capacidade, double())));
+							vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_fator_de_capacidade, SmartEnupla<Periodo, double>(vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina), getAtributo(idTermeletrica, AttComumTermeletrica_fator_de_capacidade, double())));
 						}
 						else
 							preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_fator_de_capacidade) = nao_premissa_informado;
@@ -2404,7 +2432,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 							// AttVetorTermeletrica_indisponibilidade_forcada
 
 							if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_indisponibilidade_forcada) == 0) {
-								vetorTermeletrica.att(idTermeletrica).setVetor(AttVetorTermeletrica_indisponibilidade_forcada, SmartEnupla<Periodo, double>(disponibilidade_unidade, getAtributo(idTermeletrica, AttComumTermeletrica_indisponibilidade_forcada, double())));
+								vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_indisponibilidade_forcada, SmartEnupla<Periodo, double>(disponibilidade_unidade, getAtributo(idTermeletrica, AttComumTermeletrica_indisponibilidade_forcada, double())));
 								preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_indisponibilidade_forcada) = sim_premissa;
 							}
 							else
@@ -2413,7 +2441,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 							// AttVetorTermeletrica_indisponibilidade_programada
 
 							if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_indisponibilidade_programada) == 0) {
-								vetorTermeletrica.att(idTermeletrica).setVetor(AttVetorTermeletrica_indisponibilidade_programada, SmartEnupla<Periodo, double>(disponibilidade_unidade, getAtributo(idTermeletrica, AttComumTermeletrica_indisponibilidade_programada, double())));
+								vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_indisponibilidade_programada, SmartEnupla<Periodo, double>(disponibilidade_unidade, getAtributo(idTermeletrica, AttComumTermeletrica_indisponibilidade_programada, double())));
 								preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_indisponibilidade_programada) = sim_premissa;
 							}
 							else
@@ -2753,7 +2781,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 				// -------------------------------------------
 
 				if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional)) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) == 0))
-					vetorTermeletrica.att(idTermeletrica).setMatriz(AttMatrizTermeletrica_potencia_minima, potencia_minima_termeletrica);
+					vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_potencia_minima, potencia_minima_termeletrica);
 
 				// -------------------------------------------
 				//
@@ -2762,7 +2790,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 				// -------------------------------------------
 
 				if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional)) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) == 0))
-					vetorTermeletrica.att(idTermeletrica).setMatriz(AttMatrizTermeletrica_potencia_maxima, potencia_maxima_termeletrica);
+					vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_potencia_maxima, potencia_maxima_termeletrica);
 
 
 				// -----------------------------------
@@ -2803,7 +2831,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 					} // for (Periodo periodo = disponibilidade_termeletrica.getIteradorInicial(); periodo <= disponibilidade_termeletrica.getIteradorFinal(); disponibilidade_termeletrica.incrementarIterador(periodo)) {
 
-					vetorTermeletrica.att(idTermeletrica).setVetor(AttVetorTermeletrica_disponibilidade, disponibilidade_termeletrica);
+					vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_disponibilidade, disponibilidade_termeletrica);
 
 				} // if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)) {
 
@@ -2841,7 +2869,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 						} // for (Periodo periodo = vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
 
-						vetorTermeletrica.att(idTermeletrica).setMatriz(AttMatrizTermeletrica_potencia_disponivel_maxima, potencia_disponivel_maxima);
+						vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_potencia_disponivel_maxima, potencia_disponivel_maxima);
 
 					} // if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) == sim_operacional)) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) == 0)) {
 
@@ -2877,7 +2905,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 						} // for (Periodo periodo = vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
 
-						vetorTermeletrica.att(idTermeletrica).setMatriz(AttMatrizTermeletrica_potencia_disponivel_minima, potencia_disponivel_minima);
+						vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_potencia_disponivel_minima, potencia_disponivel_minima);
 
 					} // if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) == sim_operacional))) {
 
@@ -2958,7 +2986,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 					} // if (a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int()) > 0) {
 
-					vetorTermeletrica.att(idTermeletrica).setMatriz(AttMatrizTermeletrica_custo_de_operacao, custo_de_operacao_termeletrica);
+					vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_custo_de_operacao, custo_de_operacao_termeletrica);
 				}
 
 				validarTermeletricaComandada(idTermeletrica, preencher_AttVetorTermeletrica.at(idTermeletrica), preencher_AttMatrizTermeletrica.at(idTermeletrica), a_imprimir_atributos_sem_recarregar);
@@ -3470,7 +3498,7 @@ void Dados::validaDefluencia() {
 				defluencia.setAtributo(AttComumDefluencia_tipo_elemento_jusante, TipoElementoJusante_usina);
 
 				vetorHidreletrica.att(idHidreletrica).vetorDefluencia.add(defluencia);
-				vetorHidreletrica.att(idHidreletrica).vetorDefluencia.att(IdDefluencia_passada).setVetor(AttVetorDefluencia_vazao_defluencia, SmartEnupla<Periodo, double>(horizonte_defluencia_passada, 0.0));
+				vetorHidreletrica.att(idHidreletrica).vetorDefluencia.att(IdDefluencia_passada).setVetor_forced(AttVetorDefluencia_vazao_defluencia, SmartEnupla<Periodo, double>(horizonte_defluencia_passada, 0.0));
 
 			}//else if(getAtributo(idHidreletrica, AttComumHidreletrica_tempo_viagem_agua, int()) > 0) {
 
@@ -3611,7 +3639,7 @@ void Dados::validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, cons
 					////////////////////////////////////////////////////////////////
 					//Atualiza AttVetorReservatorioEquivalente_produtibilidade_ENA
 					////////////////////////////////////////////////////////////////
-					vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.att(idREE).setVetor(AttVetorReservatorioEquivalente_produtibilidade_ENA, produtibilidade_ENA_alvo);
+					vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.att(idREE).setVetor_forced(AttVetorReservatorioEquivalente_produtibilidade_ENA, produtibilidade_ENA_alvo);
 
 				}//for (IdReservatorioEquivalente idREE = getMenorId(idUHE, IdReservatorioEquivalente()); idREE <= getMaiorId(idUHE, IdReservatorioEquivalente()); vetorHidreletrica.att(idUHE).vetorReservatorioEquivalente.incr(idREE)) {
 
@@ -4077,21 +4105,21 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 
 					if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_morto_completo) == 0) {
-						vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_morto_completo, SmartEnupla<Periodo, int>(horizonte_estudo, 1));
+						vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor_forced(AttVetorReservatorio_volume_morto_completo, SmartEnupla<Periodo, int>(horizonte_estudo, 1));
 						preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_volume_morto_completo) = sim_premissa;
 					}
 					else
 						preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_volume_morto_completo) = nao_operacional_informado;
 
 					if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_enchendo_volume_morto) == 0) {
-						vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_enchendo_volume_morto, SmartEnupla<Periodo, int>(horizonte_estudo, 1));
+						vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor_forced(AttVetorReservatorio_enchendo_volume_morto, SmartEnupla<Periodo, int>(horizonte_estudo, 1));
 						preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_enchendo_volume_morto) = sim_operacional;
 					}
 					else
 						preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_enchendo_volume_morto) = nao_operacional_informado;
 
 					if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo) == 0) {
-						vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_minimo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_volume_minimo, double())));
+						vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor_forced(AttVetorReservatorio_volume_minimo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_volume_minimo, double())));
 						preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_volume_minimo) = sim_operacional;
 					}
 					else
@@ -4128,19 +4156,19 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 						if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_maximo) == 0) {
 							preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_volume_maximo) = sim_premissa;
-							vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_volume_maximo, double())));
+							vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor_forced(AttVetorReservatorio_volume_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_volume_maximo, double())));
 						}
 						else
 							preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_volume_maximo) = nao_premissa_informado;
 
 						if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_percentual_volume_util_maximo) == 0) {
-							vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_percentual_volume_util_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_percentual_volume_util_maximo, double())));
+							vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor_forced(AttVetorReservatorio_percentual_volume_util_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_percentual_volume_util_maximo, double())));
 							preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_percentual_volume_util_maximo) = sim_premissa;
 						}
 						else
 							preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_percentual_volume_util_maximo) = nao_premissa_informado;
 
-						vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_util_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
+						vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor_forced(AttVetorReservatorio_volume_util_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
 
 						for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -4187,7 +4215,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 							preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_percentual_volume_util_minimo) = nao_premissa_informado;
 					
 						else {
-							vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_percentual_volume_util_minimo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_percentual_volume_util_minimo, double())));
+							vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor_forced(AttVetorReservatorio_percentual_volume_util_minimo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_percentual_volume_util_minimo, double())));
 							preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_percentual_volume_util_minimo) = sim_premissa;
 						}
 					
@@ -4326,7 +4354,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 							throw std::invalid_argument("Necessario atributo " + getFullString(AttVetorReservatorio_poli_cota_area_4) + " para calculo de evaporacao");
 
 						if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_evaporacao) == 0) {
-							vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor(AttVetorReservatorio_evaporacao, SmartEnupla<IdMes, double>(IdMes_1, std::vector<double>(IdMes_12, getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_evaporacao, double()))));
+							vetorHidreletrica.att(idHidreletrica).vetorReservatorio.att(IdReservatorio_1).setVetor_forced(AttVetorReservatorio_evaporacao, SmartEnupla<IdMes, double>(IdMes_1, std::vector<double>(IdMes_12, getAtributo(idHidreletrica, IdReservatorio_1, AttComumReservatorio_evaporacao, double()))));
 							preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_evaporacao) = sim_premissa;
 						}
 						else
@@ -4416,7 +4444,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 						throw std::invalid_argument("O atributo " + getFullString(AttComumHidreletrica_tipo_detalhamento_producao) + " nao deve ser " + getFullString(tipo_detalhamento_producao) + " caso nao sejam informadas unidades na hidreletrica.");
 
 					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_tipo_detalhamento_producao) = sim_operacional;
-					vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_tipo_detalhamento_producao, SmartEnupla<Periodo, TipoDetalhamentoProducaoHidreletrica>(horizonte_estudo, tipo_detalhamento_producao));
+					vetorHidreletrica.att(idHidreletrica).setVetor_forced(AttVetorHidreletrica_tipo_detalhamento_producao, SmartEnupla<Periodo, TipoDetalhamentoProducaoHidreletrica>(horizonte_estudo, tipo_detalhamento_producao));
 
 				} // if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_tipo_detalhamento_producao) == 0) {
 
@@ -4644,7 +4672,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				// 
 
 				if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_defluente_minima) == 0) {
-					vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_vazao_defluente_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_defluente_minima, double())));
+					vetorHidreletrica.att(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_defluente_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_defluente_minima, double())));
 					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = sim_operacional;
 				}
 				else
@@ -4659,7 +4687,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				// 
 
 				if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_defluente_maxima) == 0) {
-					vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_vazao_defluente_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_defluente_maxima, double())));
+					vetorHidreletrica.att(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_defluente_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_defluente_maxima, double())));
 					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = sim_operacional;
 				}
 				else
@@ -4674,7 +4702,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 				if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_retirada) == 0) {
 
-					vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_vazao_retirada, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_retirada, double())));
+					vetorHidreletrica.att(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_retirada, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_retirada, double())));
 					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_retirada) = sim_operacional;
 				}
 				else
@@ -5260,7 +5288,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 								// AttVetorHidreletrica_indisponibilidade_forcada
 
 								if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_indisponibilidade_forcada) == 0) {
-									vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_indisponibilidade_forcada, SmartEnupla<Periodo, double>(disponibilidade_unidade, getAtributo(idHidreletrica, AttComumHidreletrica_indisponibilidade_forcada, double())));
+									vetorHidreletrica.att(idHidreletrica).setVetor_forced(AttVetorHidreletrica_indisponibilidade_forcada, SmartEnupla<Periodo, double>(disponibilidade_unidade, getAtributo(idHidreletrica, AttComumHidreletrica_indisponibilidade_forcada, double())));
 									preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_indisponibilidade_forcada) = sim_premissa;
 								}
 								else
@@ -5269,7 +5297,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 								// AttVetorHidreletrica_indisponibilidade_programada
 
 								if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_indisponibilidade_programada) == 0) {
-									vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_indisponibilidade_programada, SmartEnupla<Periodo, double>(disponibilidade_unidade, getAtributo(idHidreletrica, AttComumHidreletrica_indisponibilidade_programada, double())));
+									vetorHidreletrica.att(idHidreletrica).setVetor_forced(AttVetorHidreletrica_indisponibilidade_programada, SmartEnupla<Periodo, double>(disponibilidade_unidade, getAtributo(idHidreletrica, AttComumHidreletrica_indisponibilidade_programada, double())));
 									preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_indisponibilidade_programada) = sim_premissa;
 								}
 								else
@@ -5633,7 +5661,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 					// -------------------------------------------
 
 					if ((preencher_AttMatrizConjuntoHidraulico.at(idHidreletrica).at(idConjuntoHidraulico).at(AttMatrizConjuntoHidraulico_potencia_minima) == sim_premissa) || (preencher_AttMatrizConjuntoHidraulico.at(idHidreletrica).at(idConjuntoHidraulico).at(AttMatrizConjuntoHidraulico_potencia_minima) == sim_operacional))
-						vetorHidreletrica.att(idHidreletrica).vetorConjuntoHidraulico.att(idConjuntoHidraulico).setMatriz(AttMatrizConjuntoHidraulico_potencia_minima, potencia_minima_conjunto);
+						vetorHidreletrica.att(idHidreletrica).vetorConjuntoHidraulico.att(idConjuntoHidraulico).setMatriz_forced(AttMatrizConjuntoHidraulico_potencia_minima, potencia_minima_conjunto);
 
 					// -------------------------------------------
 					//
@@ -5655,7 +5683,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 					// -------------------------------------------
 
 					if ((preencher_AttMatrizConjuntoHidraulico.at(idHidreletrica).at(idConjuntoHidraulico).at(AttMatrizConjuntoHidraulico_potencia_maxima) == sim_premissa) || (preencher_AttMatrizConjuntoHidraulico.at(idHidreletrica).at(idConjuntoHidraulico).at(AttMatrizConjuntoHidraulico_potencia_maxima) == sim_operacional))
-						vetorHidreletrica.att(idHidreletrica).vetorConjuntoHidraulico.att(idConjuntoHidraulico).setMatriz(AttMatrizConjuntoHidraulico_potencia_maxima, potencia_maxima_conjunto);
+						vetorHidreletrica.att(idHidreletrica).vetorConjuntoHidraulico.att(idConjuntoHidraulico).setMatriz_forced(AttMatrizConjuntoHidraulico_potencia_maxima, potencia_maxima_conjunto);
 
 					// -------------------------------------------
 					//
@@ -5678,7 +5706,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 					// ----------------------------------------------
 
 					if ((preencher_AttVetorConjuntoHidraulico.at(idHidreletrica).at(idConjuntoHidraulico).at(AttVetorConjuntoHidraulico_vazao_turbinada_minima) == sim_premissa) || (preencher_AttVetorConjuntoHidraulico.at(idHidreletrica).at(idConjuntoHidraulico).at(AttVetorConjuntoHidraulico_vazao_turbinada_minima) == sim_operacional))
-						vetorHidreletrica.att(idHidreletrica).vetorConjuntoHidraulico.att(idConjuntoHidraulico).setVetor(AttVetorConjuntoHidraulico_vazao_turbinada_minima, vazao_turbinada_minima_conjunto);
+						vetorHidreletrica.att(idHidreletrica).vetorConjuntoHidraulico.att(idConjuntoHidraulico).setVetor_forced(AttVetorConjuntoHidraulico_vazao_turbinada_minima, vazao_turbinada_minima_conjunto);
 
 
 
@@ -5700,7 +5728,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 					// ----------------------------------------------
 
 					if ((preencher_AttVetorConjuntoHidraulico.at(idHidreletrica).at(idConjuntoHidraulico).at(AttVetorConjuntoHidraulico_vazao_turbinada_maxima) == sim_premissa) || (preencher_AttVetorConjuntoHidraulico.at(idHidreletrica).at(idConjuntoHidraulico).at(AttVetorConjuntoHidraulico_vazao_turbinada_maxima) == sim_operacional))
-						vetorHidreletrica.att(idHidreletrica).vetorConjuntoHidraulico.att(idConjuntoHidraulico).setVetor(AttVetorConjuntoHidraulico_vazao_turbinada_maxima, vazao_turbinada_maxima_conjunto);
+						vetorHidreletrica.att(idHidreletrica).vetorConjuntoHidraulico.att(idConjuntoHidraulico).setVetor_forced(AttVetorConjuntoHidraulico_vazao_turbinada_maxima, vazao_turbinada_maxima_conjunto);
 
 					// ----------------------------------------------
 					//
@@ -5743,7 +5771,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 							else
 								disponibilidade_conjunto.at(periodo) = 0.0;
 						}
-						vetorHidreletrica.att(idHidreletrica).vetorConjuntoHidraulico.att(idConjuntoHidraulico).setVetor(AttVetorConjuntoHidraulico_disponibilidade, disponibilidade_conjunto);
+						vetorHidreletrica.att(idHidreletrica).vetorConjuntoHidraulico.att(idConjuntoHidraulico).setVetor_forced(AttVetorConjuntoHidraulico_disponibilidade, disponibilidade_conjunto);
 
 					} // if ((preencher_AttVetorConjuntoHidraulico.at(idHidreletrica).at(idConjuntoHidraulico).at(AttVetorConjuntoHidraulico_disponibilidade) == sim_premissa) || (preencher_AttVetorConjuntoHidraulico.at(idHidreletrica).at(idConjuntoHidraulico).at(AttVetorConjuntoHidraulico_disponibilidade) == sim_operacional)) {
 
@@ -5796,7 +5824,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				// -------------------------------------
 
 				if ((preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_potencia_minima) == sim_operacional))
-					vetorHidreletrica.att(idHidreletrica).setMatriz(AttMatrizHidreletrica_potencia_minima, potencia_minima_hidreletrica);
+					vetorHidreletrica.att(idHidreletrica).setMatriz_forced(AttMatrizHidreletrica_potencia_minima, potencia_minima_hidreletrica);
 
 
 				// -------------------------------------
@@ -5806,7 +5834,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				// -------------------------------------
 
 				if ((preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_potencia_maxima) == sim_operacional))
-					vetorHidreletrica.att(idHidreletrica).setMatriz(AttMatrizHidreletrica_potencia_maxima, potencia_maxima_hidreletrica);
+					vetorHidreletrica.att(idHidreletrica).setMatriz_forced(AttMatrizHidreletrica_potencia_maxima, potencia_maxima_hidreletrica);
 
 
 				// CONDI��O PARA QUANDO A HIDRELETRICA ESTA ENCHENDO VOLUME MORTO
@@ -5822,7 +5850,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				// ----------------------------------------
 
 				if ((preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_turbinada_minima) == sim_premissa) || (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_turbinada_minima) == sim_operacional))
-					vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_vazao_turbinada_minima, vazao_turbinada_minima_hidreletrica);
+					vetorHidreletrica.att(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_turbinada_minima, vazao_turbinada_minima_hidreletrica);
 
 
 				// ----------------------------------------
@@ -5832,7 +5860,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				// ---------------------------------------
 
 				if ((preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_turbinada_maxima) == sim_premissa) || (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_turbinada_maxima) == sim_operacional))
-					vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_vazao_turbinada_maxima, vazao_turbinada_maxima_hidreletrica);
+					vetorHidreletrica.att(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_turbinada_maxima, vazao_turbinada_maxima_hidreletrica);
 
 
 
@@ -5870,7 +5898,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 					} // for (Periodo periodo = disponibilidade_hidreletrica.getIteradorInicial(); periodo <= disponibilidade_hidreletrica.getIteradorFinal(); disponibilidade_hidreletrica.incrementarIterador(periodo)) {
 
-					vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_disponibilidade, disponibilidade_hidreletrica);
+					vetorHidreletrica.att(idHidreletrica).setVetor_forced(AttVetorHidreletrica_disponibilidade, disponibilidade_hidreletrica);
 
 				} // if ((preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_disponibilidade) == sim_operacional)) {
 
@@ -5968,7 +5996,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 						} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-						vetorHidreletrica.att(idHidreletrica).setMatriz(AttMatrizHidreletrica_vazao_turbinada_disponivel_maxima, vazao_turbinada_disponivel_maxima);
+						vetorHidreletrica.att(idHidreletrica).setMatriz_forced(AttMatrizHidreletrica_vazao_turbinada_disponivel_maxima, vazao_turbinada_disponivel_maxima);
 
 					} // if (((preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_vazao_turbinada_disponivel_maxima) == sim_premissa) || (preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_vazao_turbinada_disponivel_maxima) == sim_operacional)) && (getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_vazao_turbinada_disponivel_maxima) == 0)) {
 
@@ -6003,7 +6031,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 						} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-						vetorHidreletrica.att(idHidreletrica).setMatriz(AttMatrizHidreletrica_vazao_turbinada_disponivel_minima, vazao_turbinada_disponivel_minima);
+						vetorHidreletrica.att(idHidreletrica).setMatriz_forced(AttMatrizHidreletrica_vazao_turbinada_disponivel_minima, vazao_turbinada_disponivel_minima);
 
 					} // if (((preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_vazao_turbinada_disponivel_minima) == sim_premissa) || (preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_vazao_turbinada_disponivel_minima) == sim_operacional))) {
 
@@ -6071,7 +6099,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 						} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-						vetorHidreletrica.att(idHidreletrica).setMatriz(AttMatrizHidreletrica_vazao_defluente_maxima, vazao_defluente_maxima_porPatamar);
+						vetorHidreletrica.att(idHidreletrica).setMatriz_forced(AttMatrizHidreletrica_vazao_defluente_maxima, vazao_defluente_maxima_porPatamar);
 
 					} // if (((preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_vazao_defluente_disponivel_maxima) == sim_premissa) || (preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_vazao_defluente_disponivel_maxima) == sim_operacional)) && (getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_vazao_defluente_disponivel_maxima) == 0)) {
 
@@ -6104,7 +6132,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 						} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-						vetorHidreletrica.att(idHidreletrica).setMatriz(AttMatrizHidreletrica_vazao_defluente_minima, vazao_defluente_minima_porPatamar);
+						vetorHidreletrica.att(idHidreletrica).setMatriz_forced(AttMatrizHidreletrica_vazao_defluente_minima, vazao_defluente_minima_porPatamar);
 
 					} // if (((preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_vazao_defluente_disponivel_minima) == sim_premissa) || (preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_vazao_defluente_disponivel_minima) == sim_operacional))) {
 
@@ -6170,7 +6198,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 						} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-						vetorHidreletrica.att(idHidreletrica).setMatriz(AttMatrizHidreletrica_potencia_disponivel_maxima, potencia_disponivel_maxima);
+						vetorHidreletrica.att(idHidreletrica).setMatriz_forced(AttMatrizHidreletrica_potencia_disponivel_maxima, potencia_disponivel_maxima);
 
 					} // if (((preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_potencia_disponivel_maxima) == sim_premissa) || (preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_potencia_disponivel_maxima) == sim_operacional)) && (getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_maxima) == 0)) {
 
@@ -6206,7 +6234,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 						} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-						vetorHidreletrica.att(idHidreletrica).setMatriz(AttMatrizHidreletrica_potencia_disponivel_minima, potencia_disponivel_minima);
+						vetorHidreletrica.att(idHidreletrica).setMatriz_forced(AttMatrizHidreletrica_potencia_disponivel_minima, potencia_disponivel_minima);
 
 					} // if (((preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_potencia_disponivel_minima) == sim_premissa) || (preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_potencia_disponivel_minima) == sim_operacional))) {
 
@@ -7059,7 +7087,7 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 				calcular_atributos_operacionais_submercado = true;
 
 				if (getSizeVetor(idSubmercado, AttVetorSubmercado_demanda) == 0)
-					vetorSubmercado.att(idSubmercado).setVetor(AttVetorSubmercado_demanda, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idSubmercado, AttComumSubmercado_demanda, double())));
+					vetorSubmercado.att(idSubmercado).setVetor_forced(AttVetorSubmercado_demanda, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idSubmercado, AttComumSubmercado_demanda, double())));
 
 				bool preencher_percentual_variacao_patamar_carga = false;
 				if (getSize1Matriz(idSubmercado, AttMatrizSubmercado_percentual_variacao_patamar_carga) == 0)
@@ -7123,14 +7151,14 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 					if (getSize1Matriz(idSubmercado, idPatamarDeficit, AttMatrizPatamarDeficit_percentual) == 0) {
 						preencher_percentual = true;
 						if (getSizeVetor(idSubmercado, idPatamarDeficit, AttVetorPatamarDeficit_percentual) == 0)
-							vetorSubmercado.att(idSubmercado).vetorPatamarDeficit.att(idPatamarDeficit).setVetor(AttVetorPatamarDeficit_percentual, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idSubmercado, idPatamarDeficit, AttComumPatamarDeficit_percentual, double())));
+							vetorSubmercado.att(idSubmercado).vetorPatamarDeficit.att(idPatamarDeficit).setVetor_forced(AttVetorPatamarDeficit_percentual, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idSubmercado, idPatamarDeficit, AttComumPatamarDeficit_percentual, double())));
 					}
 
 					bool preencher_custo = false;
 					if (getSize1Matriz(idSubmercado, idPatamarDeficit, AttMatrizPatamarDeficit_custo) == 0) {
 						preencher_custo = true;
 						if (getSizeVetor(idSubmercado, idPatamarDeficit, AttVetorPatamarDeficit_custo) == 0)
-							vetorSubmercado.att(idSubmercado).vetorPatamarDeficit.att(idPatamarDeficit).setVetor(AttVetorPatamarDeficit_custo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idSubmercado, idPatamarDeficit, AttComumPatamarDeficit_custo, double())));
+							vetorSubmercado.att(idSubmercado).vetorPatamarDeficit.att(idPatamarDeficit).setVetor_forced(AttVetorPatamarDeficit_custo, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idSubmercado, idPatamarDeficit, AttComumPatamarDeficit_custo, double())));
 					}
 
 					for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
@@ -7202,14 +7230,14 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 						if (getSize1Matriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_minima) == 0) {
 							preencher_potencia_minima = true;
 							if (getSizeVetor(idSubmercado, idUsinaNaoSimulada, AttVetorUsinaNaoSimulada_potencia_minima) == 0)
-								vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setVetor(AttVetorUsinaNaoSimulada_potencia_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idSubmercado, idUsinaNaoSimulada, AttComumUsinaNaoSimulada_potencia_minima, double())));
+								vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setVetor_forced(AttVetorUsinaNaoSimulada_potencia_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idSubmercado, idUsinaNaoSimulada, AttComumUsinaNaoSimulada_potencia_minima, double())));
 						}
 
 						bool preencher_potencia_maxima = false;
 						if (getSize1Matriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_maxima) == 0) {
 							preencher_potencia_maxima = true;
 							if (getSizeVetor(idSubmercado, idUsinaNaoSimulada, AttVetorUsinaNaoSimulada_potencia_maxima) == 0)
-								vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setVetor(AttVetorUsinaNaoSimulada_potencia_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idSubmercado, idUsinaNaoSimulada, AttComumUsinaNaoSimulada_potencia_maxima, double())));
+								vetorSubmercado.att(idSubmercado).vetorUsinaNaoSimulada.att(idUsinaNaoSimulada).setVetor_forced(AttVetorUsinaNaoSimulada_potencia_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idSubmercado, idUsinaNaoSimulada, AttComumUsinaNaoSimulada_potencia_maxima, double())));
 						}
 
 						for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
@@ -7496,14 +7524,14 @@ void Dados::validacao_operacional_Intercambio(EntradaSaidaDados a_entradaSaidaDa
 				if (getSize1Matriz(idIntercambio, AttMatrizIntercambio_potencia_minima) == 0) {
 					preencher_potencia_minima = true;
 					if (getSizeVetor(idIntercambio, AttVetorIntercambio_potencia_minima) == 0)
-						vetorIntercambio.att(idIntercambio).setVetor(AttVetorIntercambio_potencia_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idIntercambio, AttComumIntercambio_potencia_minima, double())));
+						vetorIntercambio.att(idIntercambio).setVetor_forced(AttVetorIntercambio_potencia_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idIntercambio, AttComumIntercambio_potencia_minima, double())));
 				}
 
 				bool preencher_potencia_maxima = false;
 				if (getSize1Matriz(idIntercambio, AttMatrizIntercambio_potencia_maxima) == 0) {
 					preencher_potencia_maxima = true;
 					if (getSizeVetor(idIntercambio, AttVetorIntercambio_potencia_maxima) == 0)
-						vetorIntercambio.att(idIntercambio).setVetor(AttVetorIntercambio_potencia_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idIntercambio, AttComumIntercambio_potencia_maxima, double())));
+						vetorIntercambio.att(idIntercambio).setVetor_forced(AttVetorIntercambio_potencia_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idIntercambio, AttComumIntercambio_potencia_maxima, double())));
 				}
 
 				bool preencher_percentual_variacao_patamar_carga = false;
@@ -7947,14 +7975,14 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 				if (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_minima) == 0) {
 					preencher_potencia_minima = true;
 					if (getSizeVetor(idRestricaoEletrica, AttVetorRestricaoEletrica_potencia_minima) == 0)
-						vetorRestricaoEletrica.att(idRestricaoEletrica).setVetor(AttVetorRestricaoEletrica_potencia_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoEletrica, AttComumRestricaoEletrica_potencia_minima, double())));
+						vetorRestricaoEletrica.att(idRestricaoEletrica).setVetor_forced(AttVetorRestricaoEletrica_potencia_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoEletrica, AttComumRestricaoEletrica_potencia_minima, double())));
 				}
 
 				bool preencher_potencia_maxima = false;
 				if (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_maxima) == 0) {
 					preencher_potencia_maxima = true;
 					if (getSizeVetor(idRestricaoEletrica, AttVetorRestricaoEletrica_potencia_maxima) == 0)
-						vetorRestricaoEletrica.att(idRestricaoEletrica).setVetor(AttVetorRestricaoEletrica_potencia_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoEletrica, AttComumRestricaoEletrica_potencia_maxima, double())));
+						vetorRestricaoEletrica.att(idRestricaoEletrica).setVetor_forced(AttVetorRestricaoEletrica_potencia_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoEletrica, AttComumRestricaoEletrica_potencia_maxima, double())));
 				}
 
 
@@ -8001,7 +8029,7 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 					calcular_att_operacionais_elemento_sistema = true;
 
 					if (getSizeVetor(idRestricaoEletrica, idElementoSistema, AttVetorElementoSistema_fator_participacao) == 0)
-						vetorRestricaoEletrica.att(idRestricaoEletrica).vetorElementoSistema.att(idElementoSistema).setVetor(AttVetorElementoSistema_fator_participacao, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoEletrica, idElementoSistema, AttComumElementoSistema_fator_participacao, double())));
+						vetorRestricaoEletrica.att(idRestricaoEletrica).vetorElementoSistema.att(idElementoSistema).setVetor_forced(AttVetorElementoSistema_fator_participacao, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoEletrica, idElementoSistema, AttComumElementoSistema_fator_participacao, double())));
 
 					for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -8261,14 +8289,14 @@ void Dados::validacao_operacional_AgrupamentoIntercambio(EntradaSaidaDados a_ent
 				if (getSize1Matriz(idAgrupamentoIntercambio, AttMatrizAgrupamentoIntercambio_potencia_minima) == 0) {
 					preencher_potencia_minima = true;
 					if (getSizeVetor(idAgrupamentoIntercambio, AttVetorAgrupamentoIntercambio_potencia_minima) == 0)
-						vetorAgrupamentoIntercambio.att(idAgrupamentoIntercambio).setVetor(AttVetorAgrupamentoIntercambio_potencia_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idAgrupamentoIntercambio, AttComumAgrupamentoIntercambio_potencia_minima, double())));
+						vetorAgrupamentoIntercambio.att(idAgrupamentoIntercambio).setVetor_forced(AttVetorAgrupamentoIntercambio_potencia_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idAgrupamentoIntercambio, AttComumAgrupamentoIntercambio_potencia_minima, double())));
 				}
 
 				bool preencher_potencia_maxima = false;
 				if (getSize1Matriz(idAgrupamentoIntercambio, AttMatrizAgrupamentoIntercambio_potencia_maxima) == 0) {
 					preencher_potencia_maxima = true;
 					if (getSizeVetor(idAgrupamentoIntercambio, AttVetorAgrupamentoIntercambio_potencia_maxima) == 0)
-						vetorAgrupamentoIntercambio.att(idAgrupamentoIntercambio).setVetor(AttVetorAgrupamentoIntercambio_potencia_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idAgrupamentoIntercambio, AttComumAgrupamentoIntercambio_potencia_maxima, double())));
+						vetorAgrupamentoIntercambio.att(idAgrupamentoIntercambio).setVetor_forced(AttVetorAgrupamentoIntercambio_potencia_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idAgrupamentoIntercambio, AttComumAgrupamentoIntercambio_potencia_maxima, double())));
 				}
 
 
@@ -9551,13 +9579,13 @@ bool Dados::validaFuncaoProducaoHidreletrica(FuncaoProducaoHidreletrica& a_funca
 			vetorHidreletrica.att(a_idHidreletrica).vetorFuncaoProducaoHidreletrica.att(IdFuncaoProducaoHidreletrica_1).setAtributo(AttComumFuncaoProducaoHidreletrica_percentual_volume, 1.0);
 
 		if (getSizeVetor(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttVetorFuncaoProducaoHidreletrica_percentual_volume_minimo) == 0)
-			vetorHidreletrica.att(a_idHidreletrica).vetorFuncaoProducaoHidreletrica.att(IdFuncaoProducaoHidreletrica_1).setVetor(AttVetorFuncaoProducaoHidreletrica_percentual_volume_minimo, SmartEnupla<Periodo, double>(a_horizonte_estudo, getAtributo(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttComumFuncaoProducaoHidreletrica_percentual_volume, double())));
+			vetorHidreletrica.att(a_idHidreletrica).vetorFuncaoProducaoHidreletrica.att(IdFuncaoProducaoHidreletrica_1).setVetor_forced(AttVetorFuncaoProducaoHidreletrica_percentual_volume_minimo, SmartEnupla<Periodo, double>(a_horizonte_estudo, getAtributo(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttComumFuncaoProducaoHidreletrica_percentual_volume, double())));
 
 		if (getSizeVetor(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttVetorFuncaoProducaoHidreletrica_percentual_volume_maximo) == 0)
-			vetorHidreletrica.att(a_idHidreletrica).vetorFuncaoProducaoHidreletrica.att(IdFuncaoProducaoHidreletrica_1).setVetor(AttVetorFuncaoProducaoHidreletrica_percentual_volume_maximo, SmartEnupla<Periodo, double>(a_horizonte_estudo, getAtributo(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttComumFuncaoProducaoHidreletrica_percentual_volume, double())));
+			vetorHidreletrica.att(a_idHidreletrica).vetorFuncaoProducaoHidreletrica.att(IdFuncaoProducaoHidreletrica_1).setVetor_forced(AttVetorFuncaoProducaoHidreletrica_percentual_volume_maximo, SmartEnupla<Periodo, double>(a_horizonte_estudo, getAtributo(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttComumFuncaoProducaoHidreletrica_percentual_volume, double())));
 
 		if (getSizeVetor(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttVetorFuncaoProducaoHidreletrica_volume_minimo) == 0) {
-			vetorHidreletrica.att(a_idHidreletrica).vetorFuncaoProducaoHidreletrica.att(IdFuncaoProducaoHidreletrica_1).setVetor(AttVetorFuncaoProducaoHidreletrica_volume_minimo, SmartEnupla<Periodo, double>(a_horizonte_estudo, double(0.0)));
+			vetorHidreletrica.att(a_idHidreletrica).vetorFuncaoProducaoHidreletrica.att(IdFuncaoProducaoHidreletrica_1).setVetor_forced(AttVetorFuncaoProducaoHidreletrica_volume_minimo, SmartEnupla<Periodo, double>(a_horizonte_estudo, double(0.0)));
 
 			for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
 				double volume = getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo, double()) + getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, periodo, double());
@@ -9577,7 +9605,7 @@ bool Dados::validaFuncaoProducaoHidreletrica(FuncaoProducaoHidreletrica& a_funca
 
 
 		if (getSizeVetor(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttVetorFuncaoProducaoHidreletrica_volume_maximo) == 0) {
-			vetorHidreletrica.att(a_idHidreletrica).vetorFuncaoProducaoHidreletrica.att(IdFuncaoProducaoHidreletrica_1).setVetor(AttVetorFuncaoProducaoHidreletrica_volume_maximo, SmartEnupla<Periodo, double>(a_horizonte_estudo, double(0.0)));
+			vetorHidreletrica.att(a_idHidreletrica).vetorFuncaoProducaoHidreletrica.att(IdFuncaoProducaoHidreletrica_1).setVetor_forced(AttVetorFuncaoProducaoHidreletrica_volume_maximo, SmartEnupla<Periodo, double>(a_horizonte_estudo, double(0.0)));
 
 			for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
 				const double volumeMaximo = getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo, double()) + getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, periodo, double());
@@ -10140,16 +10168,20 @@ void Dados::validaSubmercado(const IdSubmercado a_idSubmercado) {
 				if (maiorIdPatamarCargaReferencia != maiorIdPatamarCarga)
 					throw std::invalid_argument("O maior PatamarCarga no Submercado " + getString(a_idSubmercado) + " deve ser igual ao cadastrado em Dados.");
 
-				double percentualVariacaoPonderado = 0.0;
+				if (maiorIdPatamarCarga > IdPatamarCarga_1) {
 
-				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-					const double percentual_duracao = getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, double());
-					const double percentual_variacao = getElementoMatriz(a_idSubmercado, AttMatrizSubmercado_percentual_variacao_patamar_carga, periodo, idPatamarCarga, double());
-					percentualVariacaoPonderado += percentual_duracao * percentual_variacao;
-				} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+					double percentualVariacaoPonderado = 0.0;
 
-				if ((!doubleCompara(0.02, percentualVariacaoPonderado, 1.0)) && (percentualVariacaoPonderado != 0.0))
-					throw std::invalid_argument("A ponderacao da Duracao pela Variacao do patamar de carga em " + getString(periodo) + " no Submercado " + getString(a_idSubmercado) + " difere de 1.0 dada a precisao de 0.02.");
+					for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+						const double percentual_duracao = getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, double());
+						const double percentual_variacao = getElementoMatriz(a_idSubmercado, AttMatrizSubmercado_percentual_variacao_patamar_carga, periodo, idPatamarCarga, double());
+						percentualVariacaoPonderado += percentual_duracao * percentual_variacao;
+					} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+					if ((!doubleCompara(0.02, percentualVariacaoPonderado, 1.0)) && (percentualVariacaoPonderado != 0.0))
+						throw std::invalid_argument("A ponderacao da Duracao pela Variacao do patamar de carga em " + getString(periodo) + " no Submercado " + getString(a_idSubmercado) + " difere de 1.0 dada a precisao de 0.02.");
+
+				}
 
 			} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -10536,7 +10568,7 @@ void Dados::adicionarTendenciaHidrologicaHistorica() {
 					const double incremental_historico = getElementoVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico, periodo_tendencia_hidrologica_historica - p, double());
 					incremental_tendencia.addElemento(periodoInicialHorizonte - lag_inicial - p, incremental_historico);
 				} // for (int p = numero_estacoes; p >= lag_inicial; p--) {
-				vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).setVetor(AttVetorAfluencia_incremental_tendencia, incremental_tendencia);
+				vetorHidreletrica.att(idHidreletrica).vetorAfluencia.att(IdAfluencia_vazao_afluente).setVetor_forced(AttVetorAfluencia_incremental_tendencia, incremental_tendencia);
 			} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 
 		} // if (getAtributo(AttComumDados_tipo_tendencia_hidrologica, TipoTendenciaEstocastica()) == TipoTendenciaEstocastica_historico) {
@@ -11245,14 +11277,14 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior) == 0) {
 					preencher_limite_inferior = true;
 					if (getSizeVetor(idRestricaoOperativaUHE, AttVetorRestricaoOperativaUHE_limite_inferior) == 0)
-						vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setVetor(AttVetorRestricaoOperativaUHE_limite_inferior, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_limite_inferior, double())));
+						vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setVetor_forced(AttVetorRestricaoOperativaUHE_limite_inferior, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_limite_inferior, double())));
 				}
 
 				bool preencher_limite_superior = false;
 				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior) == 0) {
 					preencher_limite_superior = true;
 					if (getSizeVetor(idRestricaoOperativaUHE, AttVetorRestricaoOperativaUHE_limite_superior) == 0)
-						vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setVetor(AttVetorRestricaoOperativaUHE_limite_superior, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_limite_superior, double())));
+						vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setVetor_forced(AttVetorRestricaoOperativaUHE_limite_superior, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_limite_superior, double())));
 				}
 
 				for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
@@ -11278,7 +11310,7 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 			} // if ((getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior) == 0) || (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior) == 0)) {
 
 			if (getSizeVetor(idRestricaoOperativaUHE, AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior) == 0) {
-				vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setVetor(AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_limite_superior_folga_inferior, double())));
+				vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).setVetor_forced(AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_limite_superior_folga_inferior, double())));
 			}//if (getSizeVetor(AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior) == 0) {
 
 			const IdElementoSistema maiorIdElementoSistema = getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
@@ -11290,7 +11322,7 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 					calcular_att_operacionais_elemento_sistema = true;
 
 					if (getSizeVetor(idRestricaoOperativaUHE, idElementoSistema, AttVetorElementoSistema_fator_participacao) == 0)
-						vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).vetorElementoSistema.att(idElementoSistema).setVetor(AttVetorElementoSistema_fator_participacao, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, idElementoSistema, AttComumElementoSistema_fator_participacao, double())));
+						vetorRestricaoOperativaUHE.att(idRestricaoOperativaUHE).vetorElementoSistema.att(idElementoSistema).setVetor_forced(AttVetorElementoSistema_fator_participacao, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, idElementoSistema, AttComumElementoSistema_fator_participacao, double())));
 
 					for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -11697,7 +11729,7 @@ void Dados::instanciaCotaJusanteUsinaJusante() {
 
 			//AttVetorHidreletrica_cota_montante_usina_jusante
 			if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_cota_montante_usina_jusante) > 0) {
-				vetorHidreletrica.att(idHidreletrica).setVetor(AttVetorHidreletrica_cota_montante_usina_jusante, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
+				vetorHidreletrica.att(idHidreletrica).setVetor_forced(AttVetorHidreletrica_cota_montante_usina_jusante, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
 				IdHidreletrica idHidreletricaJusante = getAtributo(idHidreletrica, AttComumHidreletrica_jusante, IdHidreletrica());
 
 				if (IdHidreletrica_Nenhum != idHidreletricaJusante) {

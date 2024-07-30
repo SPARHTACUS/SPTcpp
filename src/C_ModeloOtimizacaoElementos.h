@@ -116,10 +116,13 @@ std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_#
 std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
              Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>());\
 std::string getNome##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) ){\
+std::string name; \
 if (vetorEstagio.att(a_IdEstagio_1).getSolver(a_TSS)->isNomeSimplificado()) \
-	return std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_STRING_ELEMENTO)); \
+	name = std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_STRING_ELEMENTO)); \
 else \
-	return std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_FULL_STRING_ELEMENTO)); \
+	name = std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_FULL_STRING_ELEMENTO)); \
+std::replace(name.begin(), name.end(),':','_'); \
+return name; \
 };\
 int get##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
 	try{ return int(idx_##Elem##_##Nome##_##Nro.at(a_TSS) Valores(AT_A_ITERS) AT_CONST_##Nro##_10 .at(IdRealizacao_1).at(IdCenario_1)); } \
