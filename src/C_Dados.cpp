@@ -1935,17 +1935,14 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 		int cont = 0;
 		for (IdTermeletrica idTermeletrica = getMenorId(IdTermeletrica()); idTermeletrica <= getMaiorId(IdTermeletrica()); vetorTermeletrica.incr(idTermeletrica)) {
-			if (cont == numIdTerm_before)
+			cont++;
+			if (cont == numIdTerm_before + 1)
 				menorIdTermeletrica = idTermeletrica;
 			else if ((cont - numIdTerm_before) == numIdTermProcesso) {
 				maiorIdTermeletrica = idTermeletrica;
 				break;
 			}
-			cont++;
 		}
-
-		menorIdTermeletrica = getMenorId(IdTermeletrica());
-		maiorIdTermeletrica = getMaiorId(IdTermeletrica());
 
 		const int numIdTermeletrica = int(maiorIdTermeletrica - menorIdTermeletrica) + 1;
 
@@ -1974,10 +1971,20 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>> preencher_AttVetorUnidadeUTE(menorIdTermeletrica, std::vector<SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>>(numIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>()));
 		SmartEnupla<IdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>> preencher_AttMatrizUnidadeUTE(menorIdTermeletrica, std::vector< SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>>(numIdTermeletrica, SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>()));
 
+
+		SmartEnupla<IdTermeletrica, SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, double>>>  vetor_zero(menorIdTermeletrica, std::vector<SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, double>>>(numIdTermeletrica, 
+			                        SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, double>>(TipoDetalhamentoProducaoTermeletrica(1), std::vector<SmartEnupla<Periodo, double>>(TipoDetalhamentoProducaoTermeletrica(TipoDetalhamentoProducaoTermeletrica_Excedente - 1), 
+										                                              SmartEnupla<Periodo, double>()))));
+
+		SmartEnupla<IdTermeletrica, SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>> matriz_zero(menorIdTermeletrica, std::vector<SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>>(numIdTermeletrica, 
+			                        SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>(TipoDetalhamentoProducaoTermeletrica(1), std::vector<SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>(TipoDetalhamentoProducaoTermeletrica(TipoDetalhamentoProducaoTermeletrica_Excedente - 1), 
+										                                              SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>()))));
+
+
 		// HORIZONTE DE ESTUDO 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
-		const SmartEnupla<Periodo, double> vetor_zero(horizonte_estudo, 0.0);
+		//const SmartEnupla<Periodo, double> vetor_zero(horizonte_estudo, 0.0);
 
 		const int numeroPeriodos = getSizeVetor(AttVetorDados_horizonte_estudo);
 
@@ -2003,1001 +2010,954 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 		} // for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
 
+
+
 		for (IdTermeletrica idTermeletrica = menorIdTermeletrica; idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
 
-			if (true) {
-				//if (getAtributo(idTermeletrica, AttComumTermeletrica_considerar_usina, bool())) {
 
-				const IdUnidadeUTE maiorIdUnidadeUTE = getMaiorId(idTermeletrica, IdUnidadeUTE());
+			const IdUnidadeUTE maiorIdUnidadeUTE = getMaiorId(idTermeletrica, IdUnidadeUTE());
 
-				bool termeletrica_com_unidade = false;
-				if (maiorIdUnidadeUTE != IdUnidadeUTE_Nenhum)
-					termeletrica_com_unidade = true;
+			bool termeletrica_com_unidade = false;
+			if (maiorIdUnidadeUTE != IdUnidadeUTE_Nenhum)
+				termeletrica_com_unidade = true;
 
 
-				// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-				//
-				//                                                                                   TERMEL�TRICA
-				//
-				// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			//
+			//                                                                                   TERMEL�TRICA
+			//
+			// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-				preencher_AttVetorTermeletrica.at(idTermeletrica) = SmartEnupla<AttVetorTermeletrica, PreencherAtributo>(AttVetorTermeletrica(AttVetorTermeletrica_Nenhum + 1), std::vector<PreencherAtributo>(AttVetorTermeletrica(AttVetorTermeletrica_Excedente - 1), nao_sem_utilizacao));
-				preencher_AttMatrizTermeletrica.at(idTermeletrica) = SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>(AttMatrizTermeletrica(AttMatrizTermeletrica_Nenhum + 1), std::vector<PreencherAtributo>(AttMatrizTermeletrica(AttMatrizTermeletrica_Excedente - 1), nao_sem_utilizacao));
+			preencher_AttVetorTermeletrica.at(idTermeletrica) = SmartEnupla<AttVetorTermeletrica, PreencherAtributo>(AttVetorTermeletrica(AttVetorTermeletrica_Nenhum + 1), std::vector<PreencherAtributo>(AttVetorTermeletrica(AttVetorTermeletrica_Excedente - 1), nao_sem_utilizacao));
+			preencher_AttMatrizTermeletrica.at(idTermeletrica) = SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>(AttMatrizTermeletrica(AttMatrizTermeletrica_Nenhum + 1), std::vector<PreencherAtributo>(AttMatrizTermeletrica(AttMatrizTermeletrica_Excedente - 1), nao_sem_utilizacao));
 
 
 
 
-				// ------------------------------------
-				//
-				// AttVetorTermeletrica_tipo_detalhamento_producao
-				//
-				// ------------------------------------
-				// 
+			// ------------------------------------
+			//
+			// AttVetorTermeletrica_tipo_detalhamento_producao
+			//
+			// ------------------------------------
+			// 
 
 
-				if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao) == 0) {
+			if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao) == 0) {
 
-					const TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao = getAtributo(idTermeletrica, AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica());
+				const TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao = getAtributo(idTermeletrica, AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica());
 
-					if ((tipo_detalhamento_producao != TipoDetalhamentoProducaoTermeletrica_sem_producao) && (!termeletrica_com_unidade))
-						throw std::invalid_argument("O atributo " + getFullString(AttComumTermeletrica_tipo_detalhamento_producao) + " nao deve ser " + getFullString(tipo_detalhamento_producao) + " caso nao sejam informadas unidades em " + getFullString(idTermeletrica) + ".");
+				if ((tipo_detalhamento_producao != TipoDetalhamentoProducaoTermeletrica_sem_producao) && (!termeletrica_com_unidade))
+					throw std::invalid_argument("O atributo " + getFullString(AttComumTermeletrica_tipo_detalhamento_producao) + " nao deve ser " + getFullString(tipo_detalhamento_producao) + " caso nao sejam informadas unidades em " + getFullString(idTermeletrica) + ".");
 
-					preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_tipo_detalhamento_producao) = sim_operacional;
-					vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_tipo_detalhamento_producao, SmartEnupla<Periodo, TipoDetalhamentoProducaoTermeletrica>(horizonte_estudo, tipo_detalhamento_producao));
+				preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_tipo_detalhamento_producao) = sim_operacional;
+				vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_tipo_detalhamento_producao, SmartEnupla<Periodo, TipoDetalhamentoProducaoTermeletrica>(horizonte_estudo, tipo_detalhamento_producao));
 
-				} // if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao) == 0) {
+			} // if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao) == 0) {
 
-				else if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao) > 0)
-					preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_tipo_detalhamento_producao) = nao_operacional_informado;
+			else if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao) > 0)
+				preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_tipo_detalhamento_producao) = nao_operacional_informado;
 
 
-				SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, double>>  vetor_zero(TipoDetalhamentoProducaoTermeletrica(1), std::vector<SmartEnupla<Periodo, double>>(TipoDetalhamentoProducaoTermeletrica(TipoDetalhamentoProducaoTermeletrica_Excedente - 1), SmartEnupla<Periodo, double>()));
-				SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>> matriz_zero(TipoDetalhamentoProducaoTermeletrica(1), std::vector<SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>(TipoDetalhamentoProducaoTermeletrica(TipoDetalhamentoProducaoTermeletrica_Excedente - 1), SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>()));
+			for (TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao = TipoDetalhamentoProducaoTermeletrica(1); tipo_detalhamento_producao < TipoDetalhamentoProducaoTermeletrica_Excedente; tipo_detalhamento_producao++) {
 
-				for (TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao = TipoDetalhamentoProducaoTermeletrica(1); tipo_detalhamento_producao < TipoDetalhamentoProducaoTermeletrica_Excedente; tipo_detalhamento_producao++) {
+				int contador_encontro = 0;
+				bool tipo_encontrado = false;
 
-					int contador_encontro = 0;
-					bool tipo_encontrado = false;
+				for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
-					for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
+					const TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao_carregado = getElementoVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao, periodo, TipoDetalhamentoProducaoTermeletrica());
 
-						const TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao_carregado = getElementoVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao, periodo, TipoDetalhamentoProducaoTermeletrica());
+					const SmartEnupla<IdPatamarCarga, double> vetor_zero_patamar(IdPatamarCarga_1, std::vector<double>(getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()), 0.0));
 
-						const SmartEnupla<IdPatamarCarga, double> vetor_zero_patamar(IdPatamarCarga_1, std::vector<double>(getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()), 0.0));
-
-						if ((tipo_detalhamento_producao == tipo_detalhamento_producao_carregado) && (!tipo_encontrado)) {
-							tipo_encontrado = true;
-							contador_encontro++;
-							if (contador_encontro > 1)
-								throw std::invalid_argument("Os elementos de " + getFullString(AttVetorTermeletrica_tipo_detalhamento_producao) + " devem ser informados em blocos, sem repeticao de blocos ao longo do horizonte.");
-							vetor_zero.at(tipo_detalhamento_producao).addElemento(periodo, 0.0);
-							matriz_zero.at(tipo_detalhamento_producao).addElemento(periodo, vetor_zero_patamar);
-						}
-
-						else if ((tipo_detalhamento_producao == tipo_detalhamento_producao_carregado) && (tipo_encontrado)) {
-							vetor_zero.at(tipo_detalhamento_producao).addElemento(periodo, 0.0);
-							matriz_zero.at(tipo_detalhamento_producao).addElemento(periodo, vetor_zero_patamar);
-						}
-
-						else if (tipo_detalhamento_producao != tipo_detalhamento_producao_carregado)
-							tipo_encontrado = false;
-
-					} // for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
-
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() > 0) {
-						if ((tipo_detalhamento_producao == TipoDetalhamentoProducaoTermeletrica_sem_producao) && (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() != horizonte_estudo.size()))
-							throw std::invalid_argument("Os elementos " + getFullString(TipoDetalhamentoProducaoTermeletrica_sem_producao) + " de " + getFullString(AttVetorTermeletrica_tipo_detalhamento_producao) + " quando informados devem constar em todo o horizonte.");
+					if ((tipo_detalhamento_producao == tipo_detalhamento_producao_carregado) && (!tipo_encontrado)) {
+						tipo_encontrado = true;
+						contador_encontro++;
+						if (contador_encontro > 1)
+							throw std::invalid_argument("Os elementos de " + getFullString(AttVetorTermeletrica_tipo_detalhamento_producao) + " devem ser informados em blocos, sem repeticao de blocos ao longo do horizonte.");
+						vetor_zero.at(idTermeletrica).at(tipo_detalhamento_producao).addElemento(periodo, 0.0);
+						matriz_zero.at(idTermeletrica).at(tipo_detalhamento_producao).addElemento(periodo, vetor_zero_patamar);
 					}
 
-				} // for (TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao = TipoDetalhamentoProducaoTermeletrica(1); tipo_detalhamento_producao < TipoDetalhamentoProducaoTermeletrica_Excedente; tipo_detalhamento_producao++) {
-
-
-				// -------------------------------------
-				//
-				// AttMatrizTermeletrica_potencia_util
-				//
-				// -------------------------------------
-				SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_util_termeletrica;
-
-				if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_util) == 0) {
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() < horizonte_estudo.size()) {
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_util) = sim_operacional;
-						potencia_util_termeletrica = matriz_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina);
+					else if ((tipo_detalhamento_producao == tipo_detalhamento_producao_carregado) && (tipo_encontrado)) {
+						vetor_zero.at(idTermeletrica).at(tipo_detalhamento_producao).addElemento(periodo, 0.0);
+						matriz_zero.at(idTermeletrica).at(tipo_detalhamento_producao).addElemento(periodo, vetor_zero_patamar);
 					}
+
+					else if (tipo_detalhamento_producao != tipo_detalhamento_producao_carregado)
+						tipo_encontrado = false;
+
+				} // for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() > 0) {
+					if ((tipo_detalhamento_producao == TipoDetalhamentoProducaoTermeletrica_sem_producao) && (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() != horizonte_estudo.size()))
+						throw std::invalid_argument("Os elementos " + getFullString(TipoDetalhamentoProducaoTermeletrica_sem_producao) + " de " + getFullString(AttVetorTermeletrica_tipo_detalhamento_producao) + " quando informados devem constar em todo o horizonte.");
 				}
-				else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_util) > 0) {
 
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() >= horizonte_estudo.size())
-						throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_util) + " nao deve ser informado em " + getFullString(idTermeletrica));
-					else
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_util) = nao_operacional_informado;
-
-				} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_util) > 0) {
+			} // for (TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao = TipoDetalhamentoProducaoTermeletrica(1); tipo_detalhamento_producao < TipoDetalhamentoProducaoTermeletrica_Excedente; tipo_detalhamento_producao++) {
 
 
+			// -------------------------------------
+			//
+			// AttMatrizTermeletrica_potencia_util
+			//
+			// -------------------------------------
+			SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_util_termeletrica;
 
-				// -------------------------------------
-				//
-				// AttMatrizTermeletrica_potencia_disponivel_minima
-				//
-				// -------------------------------------
-
-				if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima) == 0) && (termeletrica_com_unidade)) {
-
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0)
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) = sim_operacional;
-
-				} // if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima) == 0) && (termeletrica_com_unidade)) {
-
-				else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima) > 0) {
-
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() >= horizonte_estudo.size())
-						throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_minima) + " nao deve ser informado em " + getFullString(idTermeletrica));
-					else
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) = nao_operacional_informado;
-
-				} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima) > 0) {
-
-
-				// -------------------------------------
-				//
-				// AttMatrizTermeletrica_potencia_disponivel_maxima
-				//
-				// -------------------------------------
-
-				if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) == 0) && (termeletrica_com_unidade)) {
-
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) = sim_operacional;
-
-						if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_fator_de_capacidade) == 0) {
-							preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_fator_de_capacidade) = sim_premissa;
-							vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_fator_de_capacidade, SmartEnupla<Periodo, double>(vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina), getAtributo(idTermeletrica, AttComumTermeletrica_fator_de_capacidade, double())));
-						}
-						else
-							preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_fator_de_capacidade) = nao_premissa_informado;
-
-					} // if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
-
-				} // if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) == 0) && (termeletrica_com_unidade)) {
-
-				else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) > 0) {
-
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() >= horizonte_estudo.size())
-						throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_maxima) + " nao deve ser informado em " + getFullString(idTermeletrica));
-					else
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) = nao_operacional_informado;
-
-				} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) > 0) {
-
-
-				// -------------------------------------
-				//
-				// AttMatrizTermeletrica_potencia_disponivel_comandada
-				//
-				// -------------------------------------
-
-
-				if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada) > 0) {
-
-					if (getAtributo(idTermeletrica, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int()) == 0)
-						throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_comandada) + " nao deve ser informado em " + getFullString(idTermeletrica) + " de " + getFullString(AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada) + " zero.");
-
-					if (getAtributo(AttComumDados_estagio_inicial, IdEstagio()) > IdEstagio_1)
-						throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_comandada) + " nao deve ser informado em " + getFullString(idTermeletrica) + " pois estudo inicia em " + getFullString(getAtributo(AttComumDados_estagio_inicial, IdEstagio())) + ".");
-
-					const Periodo periodo_inicial_potencia_disponivel_comandada = getIterador1Inicial(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
-					const Periodo periodo_final_potencia_disponivel_comandada = getIterador1Final(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
-
-					if (((periodo_inicial_potencia_disponivel_comandada <= periodo_estudo_inicial) || (periodo_inicial_potencia_disponivel_comandada.sobreposicao(periodo_estudo_inicial) > 0.0)) && \
-						((periodo_final_potencia_disponivel_comandada >= periodo_estudo_inicial) || (periodo_final_potencia_disponivel_comandada.sobreposicao(periodo_estudo_inicial) > 0.0))) {
-					}
-					else
-						throw std::invalid_argument("O periodo inicial do atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_comandada) + " em " + getFullString(idTermeletrica) + " deve iniciar com horizonte de estudo.");
-
-					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_comandada) = nao_operacional_informado;
-
-				} // if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada) > 0) {
-
-
-				// -----------------------------------------------
-				//
-				// AttMatrizTermeletrica_potencia_disponivel_meta
-				//
-				// ----------------------------------------------
-				// 
-
-				if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_meta) > 0) && (getAtributo(AttComumDados_tipo_estudo, TipoEstudo()) == TipoEstudo_simulacao)) {
-					if (getAtributo(AttComumDados_numero_cenarios, int()) != getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_meta))
-						throw std::invalid_argument("Numero de cenarios em " + getFullString(AttMatrizTermeletrica_potencia_disponivel_meta) + " diferente de " + getFullString(AttComumDados_numero_cenarios));
-					//preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_meta) = nao_operacional_informado;
+			if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_util) == 0) {
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() < horizonte_estudo.size()) {
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_util) = sim_operacional;
+					potencia_util_termeletrica = matriz_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina);
 				}
-				else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_meta) > 0)
-					throw std::invalid_argument("Atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_meta) + " em " + getFullString(idTermeletrica) + " nao compativel com " + getFullString(getAtributo(AttComumDados_tipo_estudo, TipoEstudo())));
+			}
+			else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_util) > 0) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() >= horizonte_estudo.size())
+					throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_util) + " nao deve ser informado em " + getFullString(idTermeletrica));
+				else
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_util) = nao_operacional_informado;
+
+			} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_util) > 0) {
 
 
-				// -------------------------------------
-				//
-				// AttMatrizTermeletrica_potencia_minima
-				//
-				// -------------------------------------
 
-				SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_minima_termeletrica;
+			// -------------------------------------
+			//
+			// AttMatrizTermeletrica_potencia_disponivel_minima
+			//
+			// -------------------------------------
 
-				if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) == 0) && (termeletrica_com_unidade)) {
+			if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima) == 0) && (termeletrica_com_unidade)) {
 
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) = sim_operacional;
-						potencia_minima_termeletrica = matriz_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina);
-					} // if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0)
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) = sim_operacional;
 
-				} // if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) == 0) && (termeletrica_com_unidade)) {
+			} // if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima) == 0) && (termeletrica_com_unidade)) {
 
-				else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) > 0) {
+			else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima) > 0) {
 
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() >= horizonte_estudo.size())
-						throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_minima) + " nao deve ser informado em " + getFullString(idTermeletrica));
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() >= horizonte_estudo.size())
+					throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_minima) + " nao deve ser informado em " + getFullString(idTermeletrica));
+				else
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) = nao_operacional_informado;
+
+			} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima) > 0) {
+
+
+			// -------------------------------------
+			//
+			// AttMatrizTermeletrica_potencia_disponivel_maxima
+			//
+			// -------------------------------------
+
+			if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) == 0) && (termeletrica_com_unidade)) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) = sim_operacional;
+
+					if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_fator_de_capacidade) == 0) {
+						preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_fator_de_capacidade) = sim_premissa;
+						vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_fator_de_capacidade, SmartEnupla<Periodo, double>(vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina), getAtributo(idTermeletrica, AttComumTermeletrica_fator_de_capacidade, double())));
+					}
 					else
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) = nao_operacional_informado;
+						preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_fator_de_capacidade) = nao_premissa_informado;
 
-				} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) > 0) {
+				} // if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
 
-				// -------------------------------------
+			} // if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) == 0) && (termeletrica_com_unidade)) {
+
+			else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) > 0) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() >= horizonte_estudo.size())
+					throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_maxima) + " nao deve ser informado em " + getFullString(idTermeletrica));
+				else
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) = nao_operacional_informado;
+
+			} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) > 0) {
+
+
+			// -------------------------------------
+			//
+			// AttMatrizTermeletrica_potencia_disponivel_comandada
+			//
+			// -------------------------------------
+
+
+			if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada) > 0) {
+
+				if (getAtributo(idTermeletrica, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int()) == 0)
+					throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_comandada) + " nao deve ser informado em " + getFullString(idTermeletrica) + " de " + getFullString(AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada) + " zero.");
+
+				if (getAtributo(AttComumDados_estagio_inicial, IdEstagio()) > IdEstagio_1)
+					throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_comandada) + " nao deve ser informado em " + getFullString(idTermeletrica) + " pois estudo inicia em " + getFullString(getAtributo(AttComumDados_estagio_inicial, IdEstagio())) + ".");
+
+				const Periodo periodo_inicial_potencia_disponivel_comandada = getIterador1Inicial(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
+				const Periodo periodo_final_potencia_disponivel_comandada = getIterador1Final(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
+
+				if (((periodo_inicial_potencia_disponivel_comandada <= periodo_estudo_inicial) || (periodo_inicial_potencia_disponivel_comandada.sobreposicao(periodo_estudo_inicial) > 0.0)) && \
+					((periodo_final_potencia_disponivel_comandada >= periodo_estudo_inicial) || (periodo_final_potencia_disponivel_comandada.sobreposicao(periodo_estudo_inicial) > 0.0))) {
+				}
+				else
+					throw std::invalid_argument("O periodo inicial do atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_comandada) + " em " + getFullString(idTermeletrica) + " deve iniciar com horizonte de estudo.");
+
+				preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_comandada) = nao_operacional_informado;
+
+			} // if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada) > 0) {
+
+
+			// -----------------------------------------------
+			//
+			// AttMatrizTermeletrica_potencia_disponivel_meta
+			//
+			// ----------------------------------------------
+			// 
+
+			if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_meta) > 0) && (getAtributo(AttComumDados_tipo_estudo, TipoEstudo()) == TipoEstudo_simulacao)) {
+				if (getAtributo(AttComumDados_numero_cenarios, int()) != getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_meta))
+					throw std::invalid_argument("Numero de cenarios em " + getFullString(AttMatrizTermeletrica_potencia_disponivel_meta) + " diferente de " + getFullString(AttComumDados_numero_cenarios));
+				//preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_meta) = nao_operacional_informado;
+			}
+			else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_meta) > 0)
+				throw std::invalid_argument("Atributo " + getFullString(AttMatrizTermeletrica_potencia_disponivel_meta) + " em " + getFullString(idTermeletrica) + " nao compativel com " + getFullString(getAtributo(AttComumDados_tipo_estudo, TipoEstudo())));
+
+
+			// -------------------------------------
+			//
+			// AttMatrizTermeletrica_potencia_minima
+			//
+			// -------------------------------------
+
+			SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_minima_termeletrica;
+
+			if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) == 0) && (termeletrica_com_unidade)) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) = sim_operacional;
+					potencia_minima_termeletrica = matriz_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina);
+				} // if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
+
+			} // if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) == 0) && (termeletrica_com_unidade)) {
+
+			else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) > 0) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() >= horizonte_estudo.size())
+					throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_minima) + " nao deve ser informado em " + getFullString(idTermeletrica));
+				else
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) = nao_operacional_informado;
+
+			} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) > 0) {
+
+			// -------------------------------------
+			//
+			// AttMatrizTermeletrica_potencia_maxima
+			//
+			// -------------------------------------
+
+			SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_maxima_termeletrica;
+
+			if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) == 0) && (termeletrica_com_unidade)) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) = sim_premissa;
+					potencia_maxima_termeletrica = matriz_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina);
+				} // if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) = sim_operacional;
+					potencia_maxima_termeletrica = matriz_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
+				}
+
+			} // if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) == 0) && (termeletrica_com_unidade)) {
+
+			else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) > 0) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() >= horizonte_estudo.size())
+					throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_maxima) + " nao deve ser informado em " + getFullString(idTermeletrica));
+				else if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) = nao_operacional_informado;
+				else
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) = nao_premissa_informado;
+
+			} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) > 0) {
+
+
+			// -------------------------------------
+			//
+			// AttMatrizTermeletrica_custo_de_operacao
+			//
+			// -------------------------------------
+
+			SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> custo_de_operacao_termeletrica;
+
+			if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_custo_de_operacao) == 0) && (termeletrica_com_unidade)) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
+
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) = sim_operacional;
+
+					custo_de_operacao_termeletrica = matriz_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina);
+
+				} // if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
+
+			} // if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_custo_de_operacao) == 0) && (termeletrica_com_unidade)) {
+
+			else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_custo_de_operacao) > 0) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0)
+					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) = nao_operacional_informado;
+
+				else
+					throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_custo_de_operacao) + " nao deve ser informado em " + getFullString(idTermeletrica));
+
+			} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_custo_de_operacao) > 0) {
+
+
+			// ------------------------------------
+			//
+			// AttVetorTermeletrica_disponibilidade
+			//
+			// ------------------------------------
+			// 
+
+			SmartEnupla<Periodo, double> disponibilidade_termeletrica;
+
+			if ((getSizeVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade) == 0) && (termeletrica_com_unidade)) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
+
+					preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) = sim_operacional;
+
+					disponibilidade_termeletrica = vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina);
+
+				} // if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
+
+			} // if ((getSizeVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade) == 0) && (termeletrica_com_unidade)) {
+
+			else if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade) > 0) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0)
+					preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) = nao_operacional_informado;
+
+				else
+					throw std::invalid_argument("O atributo " + getFullString(AttVetorTermeletrica_disponibilidade) + " nao deve ser informado em " + getFullString(idTermeletrica));
+
+			} // else if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade) > 0) {
+
+			// ------------------------------------------------
+			//
+			// AttComumTermeletrica_penalidade_violacao_potencia
+			//
+			// ------------------------------------------------
+
+			if (getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_potencia, double()) == 0.0) {
+
+				const IdSubmercado idSubmercado = getAtributo(idTermeletrica, AttComumTermeletrica_submercado, IdSubmercado());
+
+				const double custo_deficit = getElementoMatriz(idSubmercado, IdPatamarDeficit_1, AttMatrizPatamarDeficit_custo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga_1, double());
+
+				vetorTermeletrica.att(idTermeletrica).setAtributo(AttComumTermeletrica_penalidade_violacao_potencia, 1.5 * custo_deficit);
+
+			}//if (getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_potencia_minima, double()) == 0.0) {
+
+
+			// ------------------------------------------------
+			//
+			// AttComumTermeletrica_penalidade_violacao_comando
+			//
+			// ------------------------------------------------
+
+			if (getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_comando, double()) == 0.0) {
+
+				const IdSubmercado idSubmercado = getAtributo(idTermeletrica, AttComumTermeletrica_submercado, IdSubmercado());
+
+				const double custo_deficit = getElementoMatriz(idSubmercado, IdPatamarDeficit_1, AttMatrizPatamarDeficit_custo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga_1, double());
+
+				vetorTermeletrica.att(idTermeletrica).setAtributo(AttComumTermeletrica_penalidade_violacao_comando, custo_deficit);
+
+			}//if (getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_potencia_minima, double()) == 0.0) {
+
+			// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+			//
+			//                                                                                            UnidadeUTE
+			//
+			// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+			preencher_AttVetorUnidadeUTE.at(idTermeletrica) = SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>();
+			preencher_AttMatrizUnidadeUTE.at(idTermeletrica) = SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>();
+
+			if (maiorIdUnidadeUTE == IdUnidadeUTE_Nenhum) {
+
+				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
+					throw std::invalid_argument("Para " + getFullString(TipoDetalhamentoProducaoTermeletrica_por_unidade) + " deve haver ao menos uma unidade termeletrica.");
+
+			} // if (maiorIdUnidadeUTE == IdUnidadeUTE_Nenhum) {
+
+
+
+			for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= maiorIdUnidadeUTE; idUnidadeUTE++) {
+
+				preencher_AttVetorUnidadeUTE.at(idTermeletrica).addElemento(idUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>(AttVetorUnidadeUTE(AttVetorUnidadeUTE_Nenhum + 1), std::vector<PreencherAtributo>(AttVetorUnidadeUTE(AttVetorUnidadeUTE_Excedente - 1), nao_sem_utilizacao)));
+				preencher_AttMatrizUnidadeUTE.at(idTermeletrica).addElemento(idUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>(AttMatrizUnidadeUTE(AttMatrizUnidadeUTE_Nenhum + 1), std::vector<PreencherAtributo>(AttMatrizUnidadeUTE(AttMatrizUnidadeUTE_Excedente - 1), nao_sem_utilizacao)));
+
+
+				// ----------------------------------
 				//
-				// AttMatrizTermeletrica_potencia_maxima
+				// AttVetorUnidadeUTE_disponibilidade
 				//
-				// -------------------------------------
+				// ----------------------------------
 
-				SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_maxima_termeletrica;
+				if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade) == 0) {
 
-				if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) == 0) && (termeletrica_com_unidade)) {
+					SmartEnupla<Periodo, double> disponibilidade_unidade;
 
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) = sim_premissa;
-						potencia_maxima_termeletrica = matriz_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina);
-					} // if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
-
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) = sim_operacional;
-						potencia_maxima_termeletrica = matriz_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
+					if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
+						preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) = sim_operacional;
+						disponibilidade_unidade = vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
 					}
 
-				} // if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) == 0) && (termeletrica_com_unidade)) {
-
-				else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) > 0) {
-
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_sem_producao).size() >= horizonte_estudo.size())
-						throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_potencia_maxima) + " nao deve ser informado em " + getFullString(idTermeletrica));
-					else if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) = nao_operacional_informado;
-					else
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) = nao_premissa_informado;
-
-				} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) > 0) {
-
-
-				// -------------------------------------
-				//
-				// AttMatrizTermeletrica_custo_de_operacao
-				//
-				// -------------------------------------
-
-				SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> custo_de_operacao_termeletrica;
-
-				if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_custo_de_operacao) == 0) && (termeletrica_com_unidade)) {
-
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
-
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) = sim_operacional;
-
-						custo_de_operacao_termeletrica = matriz_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina);
-
-					} // if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
-
-				} // if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_custo_de_operacao) == 0) && (termeletrica_com_unidade)) {
-
-				else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_custo_de_operacao) > 0) {
-
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0)
-						preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) = nao_operacional_informado;
-
-					else
-						throw std::invalid_argument("O atributo " + getFullString(AttMatrizTermeletrica_custo_de_operacao) + " nao deve ser informado em " + getFullString(idTermeletrica));
-
-				} // else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_custo_de_operacao) > 0) {
-
-
-				// ------------------------------------
-				//
-				// AttVetorTermeletrica_disponibilidade
-				//
-				// ------------------------------------
-				// 
-
-				SmartEnupla<Periodo, double> disponibilidade_termeletrica;
-
-				if ((getSizeVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade) == 0) && (termeletrica_com_unidade)) {
-
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
-
-						preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) = sim_operacional;
-
-						disponibilidade_termeletrica = vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina);
-
-					} // if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
-
-				} // if ((getSizeVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade) == 0) && (termeletrica_com_unidade)) {
-
-				else if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade) > 0) {
-
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0)
-						preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) = nao_operacional_informado;
-
-					else
-						throw std::invalid_argument("O atributo " + getFullString(AttVetorTermeletrica_disponibilidade) + " nao deve ser informado em " + getFullString(idTermeletrica));
-
-				} // else if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade) > 0) {
-
-				// ------------------------------------------------
-				//
-				// AttComumTermeletrica_penalidade_violacao_potencia
-				//
-				// ------------------------------------------------
-
-				if (getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_potencia, double()) == 0.0) {
-
-					const IdSubmercado idSubmercado = getAtributo(idTermeletrica, AttComumTermeletrica_submercado, IdSubmercado());
-
-					const double custo_deficit = getElementoMatriz(idSubmercado, IdPatamarDeficit_1, AttMatrizPatamarDeficit_custo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga_1, double());
-
-					vetorTermeletrica.att(idTermeletrica).setAtributo(AttComumTermeletrica_penalidade_violacao_potencia, 1.5 * custo_deficit);
-
-				}//if (getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_potencia_minima, double()) == 0.0) {
-
-
-				// ------------------------------------------------
-				//
-				// AttComumTermeletrica_penalidade_violacao_comando
-				//
-				// ------------------------------------------------
-
-				if (getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_comando, double()) == 0.0) {
-
-					const IdSubmercado idSubmercado = getAtributo(idTermeletrica, AttComumTermeletrica_submercado, IdSubmercado());
-
-					const double custo_deficit = getElementoMatriz(idSubmercado, IdPatamarDeficit_1, AttMatrizPatamarDeficit_custo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga_1, double());
-
-					vetorTermeletrica.att(idTermeletrica).setAtributo(AttComumTermeletrica_penalidade_violacao_comando, custo_deficit);
-
-				}//if (getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_potencia_minima, double()) == 0.0) {
-
-				// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-				//
-				//                                                                                            UnidadeUTE
-				//
-				// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-				preencher_AttVetorUnidadeUTE.at(idTermeletrica) = SmartEnupla<IdUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>>();
-				preencher_AttMatrizUnidadeUTE.at(idTermeletrica) = SmartEnupla<IdUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>>();
-
-				if (maiorIdUnidadeUTE == IdUnidadeUTE_Nenhum) {
-
-					if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
-						throw std::invalid_argument("Para " + getFullString(TipoDetalhamentoProducaoTermeletrica_por_unidade) + " deve haver ao menos uma unidade termeletrica.");
-
-				} // if (maiorIdUnidadeUTE == IdUnidadeUTE_Nenhum) {
-
-
-
-				for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= maiorIdUnidadeUTE; idUnidadeUTE++) {
-
-					preencher_AttVetorUnidadeUTE.at(idTermeletrica).addElemento(idUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>(AttVetorUnidadeUTE(AttVetorUnidadeUTE_Nenhum + 1), std::vector<PreencherAtributo>(AttVetorUnidadeUTE(AttVetorUnidadeUTE_Excedente - 1), nao_sem_utilizacao)));
-					preencher_AttMatrizUnidadeUTE.at(idTermeletrica).addElemento(idUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>(AttMatrizUnidadeUTE(AttMatrizUnidadeUTE_Nenhum + 1), std::vector<PreencherAtributo>(AttMatrizUnidadeUTE(AttMatrizUnidadeUTE_Excedente - 1), nao_sem_utilizacao)));
-
-
-					// ----------------------------------
-					//
-					// AttVetorUnidadeUTE_disponibilidade
-					//
-					// ----------------------------------
-
-					if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade) == 0) {
-
-						SmartEnupla<Periodo, double> disponibilidade_unidade;
-
-						if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
-							preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) = sim_operacional;
-							disponibilidade_unidade = vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
-						}
-
-						else if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)) {
-							preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) = sim_premissa;
-							disponibilidade_unidade = SmartEnupla<Periodo, double>(disponibilidade_termeletrica, 0.0);
-						}
-
-						else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional)) {
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) = sim_premissa;
-							for (Periodo periodo = potencia_minima_termeletrica.getIteradorInicial(); periodo <= potencia_minima_termeletrica.getIteradorFinal(); potencia_minima_termeletrica.incrementarIterador(periodo))
-								disponibilidade_unidade.addElemento(periodo, 0.0);
-						}
-
-						else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional)) {
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = sim_premissa;
-							for (Periodo periodo = potencia_maxima_termeletrica.getIteradorInicial(); periodo <= potencia_maxima_termeletrica.getIteradorFinal(); potencia_maxima_termeletrica.incrementarIterador(periodo))
-								disponibilidade_unidade.addElemento(periodo, 0.0);
-						}
-
-						if ((preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) == sim_premissa) || (preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) == sim_operacional)) {
-
-							// AttVetorTermeletrica_indisponibilidade_forcada
-
-							if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_indisponibilidade_forcada) == 0) {
-								vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_indisponibilidade_forcada, SmartEnupla<Periodo, double>(disponibilidade_unidade, getAtributo(idTermeletrica, AttComumTermeletrica_indisponibilidade_forcada, double())));
-								preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_indisponibilidade_forcada) = sim_premissa;
-							}
-							else
-								preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_indisponibilidade_forcada) = nao_premissa_informado;
-
-							// AttVetorTermeletrica_indisponibilidade_programada
-
-							if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_indisponibilidade_programada) == 0) {
-								vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_indisponibilidade_programada, SmartEnupla<Periodo, double>(disponibilidade_unidade, getAtributo(idTermeletrica, AttComumTermeletrica_indisponibilidade_programada, double())));
-								preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_indisponibilidade_programada) = sim_premissa;
-							}
-							else
-								preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_indisponibilidade_programada) = nao_premissa_informado;
-
-							for (Periodo periodo = disponibilidade_unidade.getIteradorInicial(); periodo <= disponibilidade_unidade.getIteradorFinal(); disponibilidade_unidade.incrementarIterador(periodo)) {
-
-								const double indisponibilidade_forcada = getElementoVetor(idTermeletrica, AttVetorTermeletrica_indisponibilidade_forcada, periodo, double());
-								const double indisponibilidade_programada = getElementoVetor(idTermeletrica, AttVetorTermeletrica_indisponibilidade_programada, periodo, double());
-								double disponibilidade = (1.0 - indisponibilidade_forcada) * (1.0 - indisponibilidade_programada);
-
-								if (disponibilidade < 0)
-									disponibilidade = -disponibilidade;
-
-								if (doubleCompara(0.0, disponibilidade))
-									disponibilidade = 0.0;
-								else if (doubleCompara(1.0, disponibilidade))
-									disponibilidade = 1.0;
-
-								vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttVetorUnidadeUTE_disponibilidade, periodo, disponibilidade);
-
-							} // for (Periodo periodo = disponibilidade_unidade.getIteradorInicial(); periodo <= disponibilidade_unidade.getIteradorFinal(); disponibilidade_unidade.incrementarIterador(periodo)) {
-
-						} // if ((preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) == sim_premissa) || (preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) == sim_operacional)) {
-
-					} // if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade) == 0) {
-
-					else if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade) > 0) {
-
-						if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
-							preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) = nao_operacional_informado;
-
-						else if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional))
-							preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) = nao_premissa_informado;
-
-						else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional))
-							preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) = nao_premissa_informado;
-
-						else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional))
-							preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) = nao_premissa_informado;
-
-						else
-							throw std::invalid_argument("O atributo " + getFullString(AttVetorUnidadeUTE_disponibilidade) + " nao deve ser informado em " + getFullString(idTermeletrica) + " " + getFullString(idUnidadeUTE));
-
-					} // else if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade) > 0) {
-
-
-
-					// -------------------------------------
-					//
-					// AttMatrizUnidadeUTE_potencia_util
-					//
-					// -------------------------------------	
-					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_util_unidade;
-
-					if ((vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() != 0) && (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util) == 0)) {
-						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_util) = sim_operacional;
-						potencia_util_unidade = matriz_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
+					else if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)) {
+						preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) = sim_premissa;
+						disponibilidade_unidade = SmartEnupla<Periodo, double>(disponibilidade_termeletrica, 0.0);
 					}
 
-					// -----------------------------------
-					//
-					// AttMatrizUnidadeUTE_potencia_disponivel_minima
-					//
-					// -----------------------------------
+					else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional)) {
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) = sim_premissa;
+						for (Periodo periodo = potencia_minima_termeletrica.getIteradorInicial(); periodo <= potencia_minima_termeletrica.getIteradorFinal(); potencia_minima_termeletrica.incrementarIterador(periodo))
+							disponibilidade_unidade.addElemento(periodo, 0.0);
+					}
 
-					if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima) > 0) {
+					else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional)) {
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = sim_premissa;
+						for (Periodo periodo = potencia_maxima_termeletrica.getIteradorInicial(); periodo <= potencia_maxima_termeletrica.getIteradorFinal(); potencia_maxima_termeletrica.incrementarIterador(periodo))
+							disponibilidade_unidade.addElemento(periodo, 0.0);
+					}
 
-						if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_disponivel_minima) = nao_operacional_informado;
+					if ((preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) == sim_premissa) || (preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) == sim_operacional)) {
 
-						/*	else
-								throw std::invalid_argument("O atributo " + getFullString(AttMatrizUnidadeUTE_potencia_disponivel_minima) + " nao deve ser informado em " + getFullString(idTermeletrica)  + " " + getFullString(idUnidadeUTE));*/
+						// AttVetorTermeletrica_indisponibilidade_forcada
 
-					} // else if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima) > 0) {
-
-
-					// -----------------------------------
-					//
-					// AttMatrizUnidadeUTE_potencia_disponivel_maxima
-					//
-					// -----------------------------------
-
-					if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima) > 0) {
-
-						if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_disponivel_maxima) = nao_operacional_informado;
-
-						/*	else
-								throw std::invalid_argument("O atributo " + getFullString(AttMatrizUnidadeUTE_potencia_disponivel_maxima) + " nao deve ser informado em " + getFullString(idTermeletrica) +  " " + getFullString(idUnidadeUTE));*/
-
-					} // else if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima) > 0) {
-
-
-					// -----------------------------------
-					//
-					// AttMatrizUnidadeUTE_potencia_minima
-					//
-					// -----------------------------------
-					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_minima_unidade;
-
-					if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima) == 0) {
-
-						if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) = sim_operacional;
-							potencia_minima_unidade = matriz_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
+						if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_indisponibilidade_forcada) == 0) {
+							vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_indisponibilidade_forcada, SmartEnupla<Periodo, double>(disponibilidade_unidade, getAtributo(idTermeletrica, AttComumTermeletrica_indisponibilidade_forcada, double())));
+							preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_indisponibilidade_forcada) = sim_premissa;
 						}
-
-						else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional)) {
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) = sim_premissa;
-							potencia_minima_unidade = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(potencia_minima_termeletrica, SmartEnupla<IdPatamarCarga, double>());
-							for (Periodo periodo = potencia_minima_unidade.getIteradorInicial(); periodo <= potencia_minima_unidade.getIteradorFinal(); potencia_minima_unidade.incrementarIterador(periodo))
-								potencia_minima_unidade.at(periodo) = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()), 0.0));
-						}
-
-						if ((preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) == sim_premissa) || (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) == sim_operacional)) {
-
-							for (Periodo periodo = potencia_minima_unidade.getIteradorInicial(); periodo <= potencia_minima_unidade.getIteradorFinal(); potencia_minima_unidade.incrementarIterador(periodo)) {
-
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
-
-									if (getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade, periodo, double()) > 0.0)
-										vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_potencia_minima, double()));
-									else
-										vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, 0.0);
-
-								} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
-
-							} // for (Periodo periodo = potencia_minima_unidade.getIteradorInicial(); periodo <= potencia_minima_unidade.getIteradorFinal(); potencia_minima_unidade.incrementarIterador(periodo)) {
-
-						} // if ((preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) == sim_premissa) || (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) == sim_operacional)) {
-
-					} // if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima) == 0) {
-
-					else if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima) > 0) {
-
-						if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) = nao_operacional_informado;
-
-						else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional))
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) = nao_premissa_informado;
-
 						else
-							throw std::invalid_argument("O atributo " + getFullString(AttMatrizUnidadeUTE_potencia_minima) + " nao deve ser informado em " + getFullString(idTermeletrica) + " " + getFullString(idUnidadeUTE));
+							preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_indisponibilidade_forcada) = nao_premissa_informado;
 
-					} // else if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima) > 0) {
+						// AttVetorTermeletrica_indisponibilidade_programada
 
-					if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional)) {
-						for (Periodo periodo = potencia_minima_termeletrica.getIteradorInicial(); periodo <= potencia_minima_termeletrica.getIteradorFinal(); potencia_minima_termeletrica.incrementarIterador(periodo)) {
-							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
-								potencia_minima_termeletrica.at(periodo).at(idPatamarCarga) += getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, double());
+						if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_indisponibilidade_programada) == 0) {
+							vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_indisponibilidade_programada, SmartEnupla<Periodo, double>(disponibilidade_unidade, getAtributo(idTermeletrica, AttComumTermeletrica_indisponibilidade_programada, double())));
+							preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_indisponibilidade_programada) = sim_premissa;
 						}
-					} // if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional)) {
-
-
-					// -----------------------------------
-					//
-					// AttMatrizUnidadeUTE_potencia_maxima
-					//
-					// -----------------------------------
-					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_maxima_unidade;
-
-					if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima) == 0) {
-
-						if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
-							if (getAtributo(idTermeletrica, AttComumTermeletrica_representacao_discreta_producao, bool()))
-								preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = sim_operacional;
-							else
-								preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = sim_premissa;
-							potencia_maxima_unidade = matriz_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
-						}
-
-						else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional)) {
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = sim_premissa;
-							potencia_maxima_unidade = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(potencia_maxima_termeletrica, SmartEnupla<IdPatamarCarga, double>());
-							for (Periodo periodo = potencia_maxima_unidade.getIteradorInicial(); periodo <= potencia_maxima_unidade.getIteradorFinal(); potencia_maxima_unidade.incrementarIterador(periodo))
-								potencia_maxima_unidade.at(periodo) = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()), 0.0));
-
-						}
-
-						else if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)) {
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = sim_premissa;
-							for (Periodo periodo = disponibilidade_termeletrica.getIteradorInicial(); periodo <= disponibilidade_termeletrica.getIteradorFinal(); disponibilidade_termeletrica.incrementarIterador(periodo))
-								potencia_maxima_unidade.addElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(1, 0.0)));
-						}
-
-						if ((preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) == sim_premissa) || (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) == sim_operacional)) {
-
-							for (Periodo periodo = potencia_maxima_unidade.getIteradorInicial(); periodo <= potencia_maxima_unidade.getIteradorFinal(); potencia_maxima_unidade.incrementarIterador(periodo)) {
-
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
-
-									if (getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade, periodo, double()) > 0.0)
-										vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_potencia_maxima, double()));
-									else
-										vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, 0.0);
-
-								} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
-
-							} // for (Periodo periodo = potencia_maxima_unidade.getIteradorInicial(); periodo <= potencia_maxima_unidade.getIteradorFinal(); potencia_maxima_unidade.incrementarIterador(periodo)) {
-
-						} // if ((preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) == sim_premissa) || (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) == sim_operacional)) {
-
-					} // if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima) == 0) {
-
-					else if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima) > 0) {
-
-						if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
-							if (getAtributo(idTermeletrica, AttComumTermeletrica_representacao_discreta_producao, bool()))
-								preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = nao_operacional_informado;
-							else
-								preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = nao_premissa_informado;
-						}
-
-						else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional))
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = nao_premissa_informado;
-
-						else if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional))
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = nao_premissa_informado;
-
 						else
-							throw std::invalid_argument("O atributo " + getFullString(AttMatrizUnidadeUTE_potencia_maxima) + " nao deve ser informado em " + getFullString(idTermeletrica) + " " + getFullString(idUnidadeUTE));
+							preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_indisponibilidade_programada) = nao_premissa_informado;
 
-					} // else if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima) > 0) {
+						for (Periodo periodo = disponibilidade_unidade.getIteradorInicial(); periodo <= disponibilidade_unidade.getIteradorFinal(); disponibilidade_unidade.incrementarIterador(periodo)) {
 
-					if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional)) {
-						for (Periodo periodo = potencia_maxima_termeletrica.getIteradorInicial(); periodo <= potencia_maxima_termeletrica.getIteradorFinal(); potencia_maxima_termeletrica.incrementarIterador(periodo)) {
-							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
-								potencia_maxima_termeletrica.at(periodo).at(idPatamarCarga) += getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double());
-						}
-					} // if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional)) {
+							const double indisponibilidade_forcada = getElementoVetor(idTermeletrica, AttVetorTermeletrica_indisponibilidade_forcada, periodo, double());
+							const double indisponibilidade_programada = getElementoVetor(idTermeletrica, AttVetorTermeletrica_indisponibilidade_programada, periodo, double());
+							double disponibilidade = (1.0 - indisponibilidade_forcada) * (1.0 - indisponibilidade_programada);
 
+							if (disponibilidade < 0)
+								disponibilidade = -disponibilidade;
 
+							if (doubleCompara(0.0, disponibilidade))
+								disponibilidade = 0.0;
+							else if (doubleCompara(1.0, disponibilidade))
+								disponibilidade = 1.0;
 
-					// --------------------------------------
-					//
-					// AttVetorUnidadeUTE_custo_de_operacao
-					//
-					// --------------------------------------
+							vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttVetorUnidadeUTE_disponibilidade, periodo, disponibilidade);
 
-					if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_custo_de_operacao) == 0) {
+						} // for (Periodo periodo = disponibilidade_unidade.getIteradorInicial(); periodo <= disponibilidade_unidade.getIteradorFinal(); disponibilidade_unidade.incrementarIterador(periodo)) {
 
-						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> custo_de_operacao_unidade;
+					} // if ((preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) == sim_premissa) || (preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) == sim_operacional)) {
 
-						if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) = sim_operacional;
-							custo_de_operacao_unidade = matriz_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
-						}
+				} // if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade) == 0) {
 
-						else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_operacional)) {
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) = sim_premissa;
-							custo_de_operacao_unidade = matriz_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina);
-						}
+				else if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade) > 0) {
 
-						if ((preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) == sim_operacional) || (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) == sim_premissa)) {
+					if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
+						preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) = nao_operacional_informado;
 
-							for (Periodo periodo = custo_de_operacao_unidade.getIteradorInicial(); periodo <= custo_de_operacao_unidade.getIteradorFinal(); custo_de_operacao_unidade.incrementarIterador(periodo)) {
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
-									vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_custo_de_operacao, periodo, idPatamarCarga, getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_custo_de_operacao, double()));
-							}
+					else if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional))
+						preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) = nao_premissa_informado;
 
-						} // if ((preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) == sim_operacional) || (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) == sim_premissa)) {
+					else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional))
+						preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) = nao_premissa_informado;
 
-					} // if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_custo_de_operacao) == 0) {
+					else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional))
+						preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_disponibilidade) = nao_premissa_informado;
 
-					if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_custo_de_operacao) > 0) {
+					else
+						throw std::invalid_argument("O atributo " + getFullString(AttVetorUnidadeUTE_disponibilidade) + " nao deve ser informado em " + getFullString(idTermeletrica) + " " + getFullString(idUnidadeUTE));
 
-						if (vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) = nao_operacional_informado;
-
-						else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_operacional))
-							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) = nao_premissa_informado;
-
-						else
-							throw std::invalid_argument("O atributo " + getFullString(AttMatrizUnidadeUTE_custo_de_operacao) + " nao deve ser informado em " + getFullString(idTermeletrica) + " " + getFullString(idUnidadeUTE));
-
-					} // if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_custo_de_operacao) > 0) {
-
-
-					if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_operacional)) {
-						for (Periodo periodo = custo_de_operacao_termeletrica.getIteradorInicial(); periodo <= custo_de_operacao_termeletrica.getIteradorFinal(); custo_de_operacao_termeletrica.incrementarIterador(periodo)) {
-							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
-								custo_de_operacao_termeletrica.at(periodo).at(idPatamarCarga) += getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_custo_de_operacao, periodo, idPatamarCarga, double());
-						}
-					} // if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_operacional)){
-
-
-					////TRAJETORIA DE ACIONAMENTO E DESLIGAMENTO
-
-					if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_acionamento) > 0)
-						preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_rampa_acionamento) = nao_operacional_informado;
-
-					if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_desligamento) > 0)
-						preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_rampa_desligamento) = nao_operacional_informado;
+				} // else if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade) > 0) {
 
 
 
-
-					// ----------------------------------
-					//
-					// Preencher disponibilidade_termeletrica
-					//
-					// ----------------------------------
-
-					if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)) {
-						for (Periodo periodo = disponibilidade_termeletrica.getIteradorInicial(); periodo <= disponibilidade_termeletrica.getIteradorFinal(); disponibilidade_termeletrica.incrementarIterador(periodo)) {
-
-							double potencia_maxima_unidade = 0.0;
-
-							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
-								potencia_maxima_unidade += getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double()) * getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, double());
-
-							disponibilidade_termeletrica.at(periodo) += getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade, periodo, double()) * potencia_maxima_unidade;
-						}
-					} // if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)){
-
-
-					// -----------------------------------
-					//
-					// AttMatrizUnidadeUTE_potencia_util
-					//
-					// -----------------------------------
-
-					if (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_util) == sim_operacional)
-						if ((getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima) > 0) && (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima) > 0))
-							for (Periodo periodo = vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).getIterador1Inicial(AttMatrizUnidadeUTE_potencia_maxima, Periodo()); periodo <= vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).getIterador1Final(AttMatrizUnidadeUTE_potencia_maxima, Periodo()); horizonte_estudo.incrementarIterador(periodo))
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
-									vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_potencia_util, periodo, idPatamarCarga, (getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double()) - getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, double())));
-
-				} // for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= maiorIdUnidadeUTE; idUnidadeUTE++) {
-
-
-				// -------------------------------------------
+				// -------------------------------------
 				//
-				// AttMatrizTermeletrica_potencia_minima
+				// AttMatrizUnidadeUTE_potencia_util
 				//
-				// -------------------------------------------
+				// -------------------------------------	
+				SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_util_unidade;
 
-				if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional)) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) == 0))
-					vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_potencia_minima, potencia_minima_termeletrica);
+				if ((vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() != 0) && (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util) == 0)) {
+					preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_util) = sim_operacional;
+					potencia_util_unidade = matriz_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
+				}
 
-				// -------------------------------------------
+				// -----------------------------------
 				//
-				// AttMatrizTermeletrica_potencia_maxima
+				// AttMatrizUnidadeUTE_potencia_disponivel_minima
 				//
-				// -------------------------------------------
+				// -----------------------------------
 
-				if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional)) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) == 0))
-					vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_potencia_maxima, potencia_maxima_termeletrica);
+				if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima) > 0) {
+
+					if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_disponivel_minima) = nao_operacional_informado;
+
+					/*	else
+							throw std::invalid_argument("O atributo " + getFullString(AttMatrizUnidadeUTE_potencia_disponivel_minima) + " nao deve ser informado em " + getFullString(idTermeletrica)  + " " + getFullString(idUnidadeUTE));*/
+
+				} // else if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima) > 0) {
 
 
 				// -----------------------------------
 				//
-				// AttMatrizTermeletrica_potencia_util
+				// AttMatrizUnidadeUTE_potencia_disponivel_maxima
 				//
 				// -----------------------------------
 
-				if (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_util) == sim_operacional)
-					if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) > 0) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) > 0))
-						for (Periodo periodo = vetorTermeletrica.att(idTermeletrica).getIterador1Inicial(AttMatrizTermeletrica_potencia_maxima, Periodo()); periodo <= vetorTermeletrica.att(idTermeletrica).getIterador1Final(AttMatrizTermeletrica_potencia_maxima, Periodo()); horizonte_estudo.incrementarIterador(periodo))
-							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
-								vetorTermeletrica.att(idTermeletrica).addElemento(AttMatrizTermeletrica_potencia_util, periodo, idPatamarCarga, (getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima, periodo, idPatamarCarga, double()) - getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima, periodo, idPatamarCarga, double())));
+				if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima) > 0) {
+
+					if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_disponivel_maxima) = nao_operacional_informado;
+
+					/*	else
+							throw std::invalid_argument("O atributo " + getFullString(AttMatrizUnidadeUTE_potencia_disponivel_maxima) + " nao deve ser informado em " + getFullString(idTermeletrica) +  " " + getFullString(idUnidadeUTE));*/
+
+				} // else if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima) > 0) {
 
 
-				// ------------------------------------
+				// -----------------------------------
 				//
-				// AttVetorTermeletrica_disponibilidade
+				// AttMatrizUnidadeUTE_potencia_minima
 				//
-				// ------------------------------------
+				// -----------------------------------
+				SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_minima_unidade;
 
-				if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)) {
+				if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima) == 0) {
 
-					for (Periodo periodo = disponibilidade_termeletrica.getIteradorInicial(); periodo <= disponibilidade_termeletrica.getIteradorFinal(); disponibilidade_termeletrica.incrementarIterador(periodo)) {
+					if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) = sim_operacional;
+						potencia_minima_unidade = matriz_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
+					}
 
-						double potencia_maxima = 0.0;
+					else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional)) {
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) = sim_premissa;
+						potencia_minima_unidade = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(potencia_minima_termeletrica, SmartEnupla<IdPatamarCarga, double>());
+						for (Periodo periodo = potencia_minima_unidade.getIteradorInicial(); periodo <= potencia_minima_unidade.getIteradorFinal(); potencia_minima_unidade.incrementarIterador(periodo))
+							potencia_minima_unidade.at(periodo) = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()), 0.0));
+					}
 
-						for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= getMaiorId(idTermeletrica, IdUnidadeUTE()); idUnidadeUTE++) {
-							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
-								potencia_maxima += getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double()) * getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, double());
-						}
+					if ((preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) == sim_premissa) || (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) == sim_operacional)) {
 
-						if (potencia_maxima > 0.0)
-							disponibilidade_termeletrica.at(periodo) /= potencia_maxima;
-
-						else
-							disponibilidade_termeletrica.at(periodo) = 0.0;
-
-					} // for (Periodo periodo = disponibilidade_termeletrica.getIteradorInicial(); periodo <= disponibilidade_termeletrica.getIteradorFinal(); disponibilidade_termeletrica.incrementarIterador(periodo)) {
-
-					vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_disponibilidade, disponibilidade_termeletrica);
-
-				} // if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)) {
-
-				if (true) {
-
-					// -------------------------------------------
-					//
-					// AttMatrizTermeletrica_potencia_disponivel_maxima
-					//
-					// -------------------------------------------
-
-					if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) == sim_operacional)) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) == 0)) {
-
-						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_disponivel_maxima(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
-
-						for (Periodo periodo = vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
-
-							const IdPatamarCarga maiorIdPatamarCarga = getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
-
-							const double disponibilidade = getElementoVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade, periodo, double());
-							const double fator_de_capacidade = getElementoVetor(idTermeletrica, AttVetorTermeletrica_fator_de_capacidade, periodo, double());
-
-							potencia_disponivel_maxima.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
-
-							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-
-								const double potencia_minima = getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima, periodo, idPatamarCarga, double());
-								const double potencia_util = getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_util, periodo, idPatamarCarga, double());
-
-								const double potencia_maxima = potencia_minima + potencia_util;
-
-								potencia_disponivel_maxima.at(periodo).at(idPatamarCarga) = potencia_maxima * disponibilidade * fator_de_capacidade;
-
-							} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-
-						} // for (Periodo periodo = vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
-
-						vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_potencia_disponivel_maxima, potencia_disponivel_maxima);
-
-					} // if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) == sim_operacional)) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) == 0)) {
-
-
-					// -------------------------------------------
-					//
-					// AttMatrizTermeletrica_potencia_disponivel_minima
-					//
-					// -------------------------------------------
-
-					if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) == sim_operacional))) {
-
-						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_disponivel_minima(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
-
-						for (Periodo periodo = vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
-
-							const IdPatamarCarga maiorIdPatamarCarga = getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
-
-							const double disponibilidade = getElementoVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade, periodo, double());
-
-							potencia_disponivel_minima.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
-
-							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-
-								const double potencia_minima = getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima, periodo, idPatamarCarga, double());
-
-								potencia_disponivel_minima.at(periodo).at(idPatamarCarga) = potencia_minima * disponibilidade;
-
-								if (potencia_disponivel_minima.at(periodo).at(idPatamarCarga) > getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, double()))
-									potencia_disponivel_minima.at(periodo).at(idPatamarCarga) = getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, double());
-
-							} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-
-						} // for (Periodo periodo = vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
-
-						vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_potencia_disponivel_minima, potencia_disponivel_minima);
-
-					} // if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) == sim_operacional))) {
-
-					std::vector<IdRestricaoEletrica> vetor_idRestricaoEletrica_comUTE;
-
-					if ((getAtributo(AttComumDados_nao_utilizar_restricoes_simples_em_restricoes_eletricas, bool())) && (a_imprimir_atributos_sem_recarregar)) {
-						for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= getMaiorId(IdRestricaoEletrica()); idRestricaoEletrica++) {
-							if ((getAtributo(idRestricaoEletrica, IdElementoSistema_1, AttComumElementoSistema_termeletrica, IdTermeletrica()) == idTermeletrica) && (getAtributo(idRestricaoEletrica, IdElementoSistema_1, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()) == TipoVariavelRestricaoOperativa_Nenhum) && (isRestricaoEletrica_simples(idRestricaoEletrica)))
-								vetor_idRestricaoEletrica_comUTE.push_back(idRestricaoEletrica);
-						}
-					} // if (getAtributo(AttComumDados_nao_utilizar_restricoes_simples_em_restricoes_eletricas, bool())) {
-
-					if (vetor_idRestricaoEletrica_comUTE.size() > 0) {
-
-						for (Periodo periodo = vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
+						for (Periodo periodo = potencia_minima_unidade.getIteradorInicial(); periodo <= potencia_minima_unidade.getIteradorFinal(); potencia_minima_unidade.incrementarIterador(periodo)) {
 
 							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
 
-								for (int pos = 0; pos < int(vetor_idRestricaoEletrica_comUTE.size()); pos++) {
+								if (getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade, periodo, double()) > 0.0)
+									vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_potencia_minima, double()));
+								else
+									vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, 0.0);
 
-									if (getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, double()) > getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima, periodo, idPatamarCarga, double()))
-										vetorTermeletrica.att(idTermeletrica).setElemento(AttMatrizTermeletrica_potencia_disponivel_minima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, double()));
+							} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
 
-									if (getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double()) < getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, double()))
-										vetorTermeletrica.att(idTermeletrica).setElemento(AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double()));
+						} // for (Periodo periodo = potencia_minima_unidade.getIteradorInicial(); periodo <= potencia_minima_unidade.getIteradorFinal(); potencia_minima_unidade.incrementarIterador(periodo)) {
 
-								}//for (int pos = 0; pos < int(vetor_idRestricaoEletrica_comUTE.size()); pos++) {
+					} // if ((preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) == sim_premissa) || (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) == sim_operacional)) {
 
-							} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+				} // if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima) == 0) {
 
-						} // for (Periodo periodo = vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
-					} // if (vetor_idRestricaoOperativaUHE_comUHE_vazao_defluente.size() > 0) {
+				else if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima) > 0) {
 
-				} // if (true){
+					if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) = nao_operacional_informado;
 
-				
-				// ----------------------------------------
+					else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional))
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_minima) = nao_premissa_informado;
+
+					else
+						throw std::invalid_argument("O atributo " + getFullString(AttMatrizUnidadeUTE_potencia_minima) + " nao deve ser informado em " + getFullString(idTermeletrica) + " " + getFullString(idUnidadeUTE));
+
+				} // else if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima) > 0) {
+
+				if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional)) {
+					for (Periodo periodo = potencia_minima_termeletrica.getIteradorInicial(); periodo <= potencia_minima_termeletrica.getIteradorFinal(); potencia_minima_termeletrica.incrementarIterador(periodo)) {
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
+							potencia_minima_termeletrica.at(periodo).at(idPatamarCarga) += getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, double());
+					}
+				} // if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional)) {
+
+
+				// -----------------------------------
 				//
-				// AttVetorTermeletrica_custo_de_operacao
+				// AttMatrizUnidadeUTE_potencia_maxima
 				//
-				// ---------------------------------------
-				/*
+				// -----------------------------------
+				SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_maxima_unidade;
+
+				if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima) == 0) {
+
+					if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
+						if (getAtributo(idTermeletrica, AttComumTermeletrica_representacao_discreta_producao, bool()))
+							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = sim_operacional;
+						else
+							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = sim_premissa;
+						potencia_maxima_unidade = matriz_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
+					}
+
+					else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional)) {
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = sim_premissa;
+						potencia_maxima_unidade = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(potencia_maxima_termeletrica, SmartEnupla<IdPatamarCarga, double>());
+						for (Periodo periodo = potencia_maxima_unidade.getIteradorInicial(); periodo <= potencia_maxima_unidade.getIteradorFinal(); potencia_maxima_unidade.incrementarIterador(periodo))
+							potencia_maxima_unidade.at(periodo) = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()), 0.0));
+
+					}
+
+					else if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)) {
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = sim_premissa;
+						for (Periodo periodo = disponibilidade_termeletrica.getIteradorInicial(); periodo <= disponibilidade_termeletrica.getIteradorFinal(); disponibilidade_termeletrica.incrementarIterador(periodo))
+							potencia_maxima_unidade.addElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(1, 0.0)));
+					}
+
+					if ((preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) == sim_premissa) || (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) == sim_operacional)) {
+
+						for (Periodo periodo = potencia_maxima_unidade.getIteradorInicial(); periodo <= potencia_maxima_unidade.getIteradorFinal(); potencia_maxima_unidade.incrementarIterador(periodo)) {
+
+							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
+
+								if (getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade, periodo, double()) > 0.0)
+									vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_potencia_maxima, double()));
+								else
+									vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, 0.0);
+
+							} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
+
+						} // for (Periodo periodo = potencia_maxima_unidade.getIteradorInicial(); periodo <= potencia_maxima_unidade.getIteradorFinal(); potencia_maxima_unidade.incrementarIterador(periodo)) {
+
+					} // if ((preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) == sim_premissa) || (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) == sim_operacional)) {
+
+				} // if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima) == 0) {
+
+				else if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima) > 0) {
+
+					if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
+						if (getAtributo(idTermeletrica, AttComumTermeletrica_representacao_discreta_producao, bool()))
+							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = nao_operacional_informado;
+						else
+							preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = nao_premissa_informado;
+					}
+
+					else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional))
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = nao_premissa_informado;
+
+					else if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional))
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_maxima) = nao_premissa_informado;
+
+					else
+						throw std::invalid_argument("O atributo " + getFullString(AttMatrizUnidadeUTE_potencia_maxima) + " nao deve ser informado em " + getFullString(idTermeletrica) + " " + getFullString(idUnidadeUTE));
+
+				} // else if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima) > 0) {
+
+				if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional)) {
+					for (Periodo periodo = potencia_maxima_termeletrica.getIteradorInicial(); periodo <= potencia_maxima_termeletrica.getIteradorFinal(); potencia_maxima_termeletrica.incrementarIterador(periodo)) {
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
+							potencia_maxima_termeletrica.at(periodo).at(idPatamarCarga) += getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double());
+					}
+				} // if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional)) {
+
+
+
+				// --------------------------------------
+				//
+				// AttVetorUnidadeUTE_custo_de_operacao
+				//
+				// --------------------------------------
+
+				if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_custo_de_operacao) == 0) {
+
+					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> custo_de_operacao_unidade;
+
+					if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) = sim_operacional;
+						custo_de_operacao_unidade = matriz_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
+					}
+
+					else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_operacional)) {
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) = sim_premissa;
+						custo_de_operacao_unidade = matriz_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina);
+					}
+
+					if ((preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) == sim_operacional) || (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) == sim_premissa)) {
+
+						for (Periodo periodo = custo_de_operacao_unidade.getIteradorInicial(); periodo <= custo_de_operacao_unidade.getIteradorFinal(); custo_de_operacao_unidade.incrementarIterador(periodo)) {
+							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
+								vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_custo_de_operacao, periodo, idPatamarCarga, getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_custo_de_operacao, double()));
+						}
+
+					} // if ((preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) == sim_operacional) || (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) == sim_premissa)) {
+
+				} // if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_custo_de_operacao) == 0) {
+
+				if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_custo_de_operacao) > 0) {
+
+					if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0)
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) = nao_operacional_informado;
+
+					else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_operacional))
+						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) = nao_premissa_informado;
+
+					else
+						throw std::invalid_argument("O atributo " + getFullString(AttMatrizUnidadeUTE_custo_de_operacao) + " nao deve ser informado em " + getFullString(idTermeletrica) + " " + getFullString(idUnidadeUTE));
+
+				} // if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_custo_de_operacao) > 0) {
+
+
 				if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_operacional)) {
+					for (Periodo periodo = custo_de_operacao_termeletrica.getIteradorInicial(); periodo <= custo_de_operacao_termeletrica.getIteradorFinal(); custo_de_operacao_termeletrica.incrementarIterador(periodo)) {
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
+							custo_de_operacao_termeletrica.at(periodo).at(idPatamarCarga) += getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_custo_de_operacao, periodo, idPatamarCarga, double());
+					}
+				} // if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_operacional)){
 
-					//
-					// Anula custo de opera��o em caso de potencia_disponivel_pre_comandada
-					//
 
-					if (getAtributo(idTermeletrica, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int()) > 0) {
+				////TRAJETORIA DE ACIONAMENTO E DESLIGAMENTO
 
-						const SmartEnupla<Periodo, double> potencia_disponivel_pre_comandada = getVetor(idTermeletrica, AttVetorTermeletrica_potencia_disponivel_pre_comandada, Periodo(), double());
+				if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_acionamento) > 0)
+					preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_rampa_acionamento) = nao_operacional_informado;
 
-						if (potencia_disponivel_pre_comandada.size() > 0) {
+				if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_desligamento) > 0)
+					preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_rampa_desligamento) = nao_operacional_informado;
 
-							for (Periodo periodo_estudo = horizonte_estudo.getIteradorInicial(); periodo_estudo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_estudo)) {
 
-								double percentual_valor = 1.0;
 
-								for (Periodo periodo_pre_comando = potencia_disponivel_pre_comandada.getIteradorInicial(); periodo_pre_comando <= potencia_disponivel_pre_comandada.getIteradorFinal(); potencia_disponivel_pre_comandada.incrementarIterador(periodo_pre_comando)) {
 
-									const double sobreposicao = periodo_estudo.sobreposicao(periodo_pre_comando);
-									if (sobreposicao > 0.0)
-										percentual_valor -= sobreposicao;
+				// ----------------------------------
+				//
+				// Preencher disponibilidade_termeletrica
+				//
+				// ----------------------------------
 
-								} // for (Periodo periodo_pre_comando = potencia_disponivel_pre_comandada.getIteradorInicial(); periodo_pre_comando <= potencia_disponivel_pre_comandada.getIteradorFinal(); potencia_disponivel_pre_comandada.incrementarIterador(periodo_pre_comando)) {
+				if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)) {
+					for (Periodo periodo = disponibilidade_termeletrica.getIteradorInicial(); periodo <= disponibilidade_termeletrica.getIteradorFinal(); disponibilidade_termeletrica.incrementarIterador(periodo)) {
 
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(idTermeletrica, AttMatrizTermeletrica_custo_de_operacao, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
+						double potencia_maxima_unidade = 0.0;
 
-									const double custo_de_operacao = custo_de_operacao_termeletrica.at(periodo_estudo).at(idPatamarCarga) * percentual_valor;
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
+							potencia_maxima_unidade += getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double()) * getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, double());
 
-									custo_de_operacao_termeletrica.at(periodo_estudo).at(idPatamarCarga) = custo_de_operacao;
+						disponibilidade_termeletrica.at(periodo) += getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade, periodo, double()) * potencia_maxima_unidade;
+					}
+				} // if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)){
 
-								} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(idTermeletrica, AttMatrizTermeletrica_custo_de_operacao, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
 
-							} // for (Periodo periodo_estudo = horizonte_estudo.getIteradorInicial(); periodo_estudo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_estudo)) {
+				// -----------------------------------
+				//
+				// AttMatrizUnidadeUTE_potencia_util
+				//
+				// -----------------------------------
 
-						} // if (potencia_disponivel_pre_comandada.size() > 0) {
+				if (preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_potencia_util) == sim_operacional)
+					if ((getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima) > 0) && (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima) > 0))
+						for (Periodo periodo = vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).getIterador1Inicial(AttMatrizUnidadeUTE_potencia_maxima, Periodo()); periodo <= vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).getIterador1Final(AttMatrizUnidadeUTE_potencia_maxima, Periodo()); horizonte_estudo.incrementarIterador(periodo))
+							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
+								vetorTermeletrica.att(idTermeletrica).vetorUnidadeUTE.att(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_potencia_util, periodo, idPatamarCarga, (getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double()) - getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, double())));
 
-					} // if (a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int()) > 0) {
+			} // for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= maiorIdUnidadeUTE; idUnidadeUTE++) {
 
-					vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_custo_de_operacao, custo_de_operacao_termeletrica);
-				}
 
-				validarTermeletricaComandada(idTermeletrica, preencher_AttVetorTermeletrica.at(idTermeletrica), preencher_AttMatrizTermeletrica.at(idTermeletrica), a_imprimir_atributos_sem_recarregar);
-				*/
+			// -------------------------------------------
+			//
+			// AttMatrizTermeletrica_potencia_minima
+			//
+			// -------------------------------------------
+
+			if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_minima) == sim_operacional)) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) == 0))
+				vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_potencia_minima, potencia_minima_termeletrica);
+
+			// -------------------------------------------
+			//
+			// AttMatrizTermeletrica_potencia_maxima
+			//
+			// -------------------------------------------
+
+			if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) == sim_operacional)) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) == 0))
+				vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_potencia_maxima, potencia_maxima_termeletrica);
+
+
+			// -----------------------------------
+			//
+			// AttMatrizTermeletrica_potencia_util
+			//
+			// -----------------------------------
+
+			if (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_util) == sim_operacional)
+				if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) > 0) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima) > 0))
+					for (Periodo periodo = vetorTermeletrica.att(idTermeletrica).getIterador1Inicial(AttMatrizTermeletrica_potencia_maxima, Periodo()); periodo <= vetorTermeletrica.att(idTermeletrica).getIterador1Final(AttMatrizTermeletrica_potencia_maxima, Periodo()); horizonte_estudo.incrementarIterador(periodo))
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
+							vetorTermeletrica.att(idTermeletrica).addElemento(AttMatrizTermeletrica_potencia_util, periodo, idPatamarCarga, (getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima, periodo, idPatamarCarga, double()) - getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima, periodo, idPatamarCarga, double())));
+
+
+			// ------------------------------------
+			//
+			// AttVetorTermeletrica_disponibilidade
+			//
+			// ------------------------------------
+
+			if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)) {
+
+				for (Periodo periodo = disponibilidade_termeletrica.getIteradorInicial(); periodo <= disponibilidade_termeletrica.getIteradorFinal(); disponibilidade_termeletrica.incrementarIterador(periodo)) {
+
+					double potencia_maxima = 0.0;
+
+					for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= getMaiorId(idTermeletrica, IdUnidadeUTE()); idUnidadeUTE++) {
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
+							potencia_maxima += getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double()) * getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, double());
+					}
+
+					if (potencia_maxima > 0.0)
+						disponibilidade_termeletrica.at(periodo) /= potencia_maxima;
+
+					else
+						disponibilidade_termeletrica.at(periodo) = 0.0;
+
+				} // for (Periodo periodo = disponibilidade_termeletrica.getIteradorInicial(); periodo <= disponibilidade_termeletrica.getIteradorFinal(); disponibilidade_termeletrica.incrementarIterador(periodo)) {
+
+				vetorTermeletrica.att(idTermeletrica).setVetor_forced(AttVetorTermeletrica_disponibilidade, disponibilidade_termeletrica);
+
+			} // if ((preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_premissa) || (preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_disponibilidade) == sim_operacional)) {
+
+			if (true) {
+
+				// -------------------------------------------
+				//
+				// AttMatrizTermeletrica_potencia_disponivel_maxima
+				//
+				// -------------------------------------------
+
+				if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) == sim_operacional)) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) == 0)) {
+
+					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_disponivel_maxima(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+
+					for (Periodo periodo = vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
+
+						const IdPatamarCarga maiorIdPatamarCarga = getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
+
+						const double disponibilidade = getElementoVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade, periodo, double());
+						const double fator_de_capacidade = getElementoVetor(idTermeletrica, AttVetorTermeletrica_fator_de_capacidade, periodo, double());
+
+						potencia_disponivel_maxima.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+							const double potencia_minima = getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima, periodo, idPatamarCarga, double());
+							const double potencia_util = getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_util, periodo, idPatamarCarga, double());
+
+							const double potencia_maxima = potencia_minima + potencia_util;
+
+							potencia_disponivel_maxima.at(periodo).at(idPatamarCarga) = potencia_maxima * disponibilidade * fator_de_capacidade;
+
+						} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+					} // for (Periodo periodo = vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
+
+					vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_potencia_disponivel_maxima, potencia_disponivel_maxima);
+
+				} // if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_maxima) == sim_operacional)) && (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima) == 0)) {
+
+
+				// -------------------------------------------
+				//
+				// AttMatrizTermeletrica_potencia_disponivel_minima
+				//
+				// -------------------------------------------
+
+				if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) == sim_operacional))) {
+
+					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_disponivel_minima(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+
+					for (Periodo periodo = vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
+
+						const IdPatamarCarga maiorIdPatamarCarga = getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
+
+						const double disponibilidade = getElementoVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade, periodo, double());
+
+						potencia_disponivel_minima.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+							const double potencia_minima = getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima, periodo, idPatamarCarga, double());
+
+							potencia_disponivel_minima.at(periodo).at(idPatamarCarga) = potencia_minima * disponibilidade;
+
+							if (potencia_disponivel_minima.at(periodo).at(idPatamarCarga) > getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, double()))
+								potencia_disponivel_minima.at(periodo).at(idPatamarCarga) = getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, double());
+
+						} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+					} // for (Periodo periodo = vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
+
+					vetorTermeletrica.att(idTermeletrica).setMatriz_forced(AttMatrizTermeletrica_potencia_disponivel_minima, potencia_disponivel_minima);
+
+				} // if (((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_disponivel_minima) == sim_operacional))) {
+
+				std::vector<IdRestricaoEletrica> vetor_idRestricaoEletrica_comUTE;
+
+				if ((getAtributo(AttComumDados_nao_utilizar_restricoes_simples_em_restricoes_eletricas, bool())) && (a_imprimir_atributos_sem_recarregar)) {
+					for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= getMaiorId(IdRestricaoEletrica()); idRestricaoEletrica++) {
+						if ((getAtributo(idRestricaoEletrica, IdElementoSistema_1, AttComumElementoSistema_termeletrica, IdTermeletrica()) == idTermeletrica) && (getAtributo(idRestricaoEletrica, IdElementoSistema_1, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()) == TipoVariavelRestricaoOperativa_Nenhum) && (isRestricaoEletrica_simples(idRestricaoEletrica)))
+							vetor_idRestricaoEletrica_comUTE.push_back(idRestricaoEletrica);
+					}
+				} // if (getAtributo(AttComumDados_nao_utilizar_restricoes_simples_em_restricoes_eletricas, bool())) {
+
+				if (vetor_idRestricaoEletrica_comUTE.size() > 0) {
+
+					for (Periodo periodo = vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
+
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
+
+							for (int pos = 0; pos < int(vetor_idRestricaoEletrica_comUTE.size()); pos++) {
+
+								if (getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, double()) > getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima, periodo, idPatamarCarga, double()))
+									vetorTermeletrica.att(idTermeletrica).setElemento(AttMatrizTermeletrica_potencia_disponivel_minima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, double()));
+
+								if (getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double()) < getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, double()))
+									vetorTermeletrica.att(idTermeletrica).setElemento(AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double()));
+
+							}//for (int pos = 0; pos < int(vetor_idRestricaoEletrica_comUTE.size()); pos++) {
+
+						} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+					} // for (Periodo periodo = vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorInicial(); periodo <= vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).getIteradorFinal(); vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).incrementarIterador(periodo)) {
+				} // if (vetor_idRestricaoOperativaUHE_comUHE_vazao_defluente.size() > 0) {
+
+			} // if (true){
+
+		} // } // for (IdTermeletrica idTermeletrica = maiorIdTermeletrica; idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
+				
 				// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 				//
 				//                                                                                            Impress�o de Atributos
 				//
 				// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-				if (idProcesso == IdProcesso_mestre) {
+		for (IdProcesso idProcesso_comp = IdProcesso_mestre; idProcesso_comp <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_comp++) {
+
+			if (idProcesso_comp == idProcesso) {
+
+				for (IdTermeletrica idTermeletrica = menorIdTermeletrica; idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
 
 					// --------------------
 					//
@@ -3082,7 +3042,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 								a_entradaSaidaDados.setAppendArquivo(impresso_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga.at(1));
 
 								const Periodo periodo_comandada_inicial = getIterador1Inicial(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
-								const Periodo periodo_comandada_final   = getIterador1Final(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
+								const Periodo periodo_comandada_final = getIterador1Final(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
 
 								a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("TERMELETRICA_COMANDO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idTermeletrica, *this, periodo_comandada_inicial, periodo_comandada_final, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, attMatrizTermeletrica);
 								impresso_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga.at(1) = true;
@@ -3162,7 +3122,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 						//
 						// ------------------
 
-						if ((vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) && (a_imprimir_atributos_sem_recarregar)) {
+						if ((vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) && (a_imprimir_atributos_sem_recarregar)) {
 
 							a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
@@ -3173,7 +3133,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 							a_entradaSaidaDados.imprimirArquivoCSV_AttComum("TERMELETRICA_UNIDADE_AttComumOperacional.csv", idTermeletrica, idUnidadeUTE, *this, lista_TERMELETRICA_CONJUNTO_UNIDADE_AttComumOperacional);
 							impresso_AttComumUnidadeUTE = true;
 
-						} // if ((vetor_zero.at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) && (a_imprimir_atributos_sem_recarregar)) {
+						} // if ((vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) && (a_imprimir_atributos_sem_recarregar)) {
 
 						// --------------------------
 						//
@@ -3273,14 +3233,153 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 					} //for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= maiorIdUnidadeUTE; idUnidadeUTE++) {
 
-				} //if (idProcesso == IdProcesso_mestre) {
+				} // for (IdTermeletrica idTermeletrica = getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
+
+				for (IdProcesso idProcesso_send = IdProcesso_mestre; idProcesso_send <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_send++) {
+					if (idProcesso_send != idProcesso_comp) {
+
+						int vlr = 0;
+
+						vlr = int(recarregar_AttVetorTermeletrica_PorPeriodo);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(recarregar_AttVetorTermeletrica_PorInteiro);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(recarregar_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(recarregar_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(recarregar_AttVetorUnidadeUTE_PorPeriodo);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(recarregar_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(impresso_AttComumTermeletrica);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(impresso_AttComumUnidadeUTE);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
 
 
-			} //if (getAtributo(idTermeletrica, AttComumTermeletrica_considerar_usina, bool())) {
+						for (int i = 0; i < int(impresso_AttVetorTermeletrica_PorPeriodo.size()); i++) {
+							vlr = int(impresso_AttVetorTermeletrica_PorPeriodo.at(i));
+							MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+						}
 
+						for (int i = 0; i < int(impresso_AttVetorTermeletrica_PorInteiro.size()); i++) {
+							vlr = int(impresso_AttVetorTermeletrica_PorInteiro.at(i));
+							MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+						}
 
-		} // for (IdTermeletrica idTermeletrica = getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
+						for (int i = 0; i < int(impresso_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga.size()); i++) {
+							vlr = int(impresso_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga.at(i));
+							MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+						}
 
+						for (int i = 0; i < int(impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga.size()); i++) {
+							vlr = int(impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga.at(i));
+							MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+						}
+
+						for (int i = 0; i < int(impresso_AttMatrizTermeletrica_PorIdCenarioPorPeriodo.size()); i++) {
+							vlr = int(impresso_AttMatrizTermeletrica_PorIdCenarioPorPeriodo.at(i));
+							MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+						}
+
+						for (int i = 0; i < int(impresso_AttVetorUnidadeUTE_PorInteiro.size()); i++) {
+							vlr = int(impresso_AttVetorUnidadeUTE_PorInteiro.at(i));
+							MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+						}
+
+						for (int i = 0; i < int(impresso_AttVetorUnidadeUTE_PorPeriodo.size()); i++) {
+							vlr = int(impresso_AttVetorUnidadeUTE_PorPeriodo.at(i));
+							MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+						}
+
+						for (int i = 0; i < int(impresso_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga.size()); i++) {
+							vlr = int(impresso_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga.at(i));
+							MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+						}
+
+					}
+				}
+
+			}
+			else {
+
+				int vlr = 0;
+
+				MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				recarregar_AttVetorTermeletrica_PorPeriodo = bool(vlr);
+
+				MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				recarregar_AttVetorTermeletrica_PorInteiro = bool(vlr);
+
+				MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				recarregar_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga = bool(vlr);
+
+				MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				recarregar_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga = bool(vlr);
+
+				MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				recarregar_AttVetorUnidadeUTE_PorPeriodo = bool(vlr);
+
+				MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				recarregar_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga = bool(vlr);
+
+				MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				impresso_AttComumTermeletrica = bool(vlr);
+
+				MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				impresso_AttComumUnidadeUTE = bool(vlr);
+
+				for (int i = 0; i < int(impresso_AttVetorTermeletrica_PorPeriodo.size()); i++) {
+					MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					impresso_AttVetorTermeletrica_PorPeriodo.at(i) = bool(vlr);
+				}
+
+				for (int i = 0; i < int(impresso_AttVetorTermeletrica_PorInteiro.size()); i++) {
+					MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					impresso_AttVetorTermeletrica_PorInteiro.at(i) = bool(vlr);
+				}
+
+				for (int i = 0; i < int(impresso_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga.size()); i++) {
+					MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					impresso_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga.at(i) = bool(vlr);
+				}
+
+				for (int i = 0; i < int(impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga.size()); i++) {
+					MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga.at(i) = bool(vlr);
+				}
+
+				for (int i = 0; i < int(impresso_AttMatrizTermeletrica_PorIdCenarioPorPeriodo.size()); i++) {
+					MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					impresso_AttMatrizTermeletrica_PorIdCenarioPorPeriodo.at(i) = bool(vlr);
+				}
+
+				for (int i = 0; i < int(impresso_AttVetorUnidadeUTE_PorInteiro.size()); i++) {
+					MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					impresso_AttVetorUnidadeUTE_PorInteiro.at(i) = bool(vlr);
+				}
+
+				for (int i = 0; i < int(impresso_AttVetorUnidadeUTE_PorPeriodo.size()); i++) {
+					MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					impresso_AttVetorUnidadeUTE_PorPeriodo.at(i) = bool(vlr);
+				}
+
+				for (int i = 0; i < int(impresso_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga.size()); i++) {
+					MPI_Recv(&vlr, 1, MPI_INT, getRank(idProcesso_comp), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					impresso_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga.at(i) = bool(vlr);
+				}
+
+			}
+
+		} // for (IdProcesso idProcesso_comp = IdProcesso_mestre; idProcesso_comp < arranjoResolucao.vetorProcesso.getMaiorId(); idProcesso_comp++) {
 
 		// VALIDA AS UNIDADES TERMEL�TRICAS
 		validaUnidadeUTE();
@@ -3328,7 +3427,6 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("TERMELETRICA_UNIDADE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembroMembro);
 
 		} // (!a_imprimir_atributos_sem_recarregar) {
-
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validacao_operacional_Termeletrica(a_entradaSaidaDados, " + a_diretorio_att_operacional + "," + a_diretorio_att_premissa + "," + getString(a_imprimir_atributos_sem_recarregar) + "): \n" + std::string(erro.what())); }
