@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -195,7 +195,7 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;GRB;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;PWFWIN</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;PWFWIN</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(MSMPI_INC);$(GUROBI_INC64);..\ThirdParty\lsZollen;..\ThirdParty\libseq_beta_04.21.01\src;..\ThirdParty\COIN\Clp\src;..\ThirdParty\COIN\CoinUtils\src;..\ThirdParty\COIN\Cbc\src;..\ThirdParty\COIN\Osi\src\Osi;..\ThirdParty\COIN\Clp\src\OsiClp;..\ThirdParty\COIN\Cgl\src\CglAllDifferent;..\ThirdParty\COIN\Cgl\src\CglBKClique;..\ThirdParty\COIN\Cgl\src\CglClique;..\ThirdParty\COIN\Cgl\src\CglCliqueStrengthening;..\ThirdParty\COIN\Cgl\src\CglCommon;..\ThirdParty\COIN\Cgl\src\CglDuplicateRow;..\ThirdParty\COIN\Cgl\src\CglFlowCover;..\ThirdParty\COIN\Cgl\src\CglGMI;..\ThirdParty\COIN\Cgl\src\CglGomory;..\ThirdParty\COIN\Cgl\src\CglKnapsackCover;..\ThirdParty\COIN\Cgl\src\CglLandP;..\ThirdParty\COIN\Cgl\src\CglLiftAndProject;..\ThirdParty\COIN\Cgl\src\CglMixedIntegerRounding;..\ThirdParty\COIN\Cgl\src\CglMixedIntegerRounding2;..\ThirdParty\COIN\Cgl\src\CglOddHole;..\ThirdParty\COIN\Cgl\src\CglOddWheel;..\ThirdParty\COIN\Cgl\src\CglPreProcess;..\ThirdParty\COIN\Cgl\src\CglProbing;..\ThirdParty\COIN\Cgl\src\CglRedSplit;..\ThirdParty\COIN\Cgl\src\CglRedSplit2;..\ThirdParty\COIN\Cgl\src\CglResidualCapacity;..\ThirdParty\COIN\Cgl\src\CglSimpleRounding;..\ThirdParty\COIN\Cgl\src\CglTwomir;..\ThirdParty\COIN\Cgl\src\CglZeroHalf</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

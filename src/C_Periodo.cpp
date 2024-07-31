@@ -945,7 +945,7 @@ std::string normStringMin(const IdMin a_idMin) {
 std::string Periodo::str() const {
 
 	if ((tipoPeriodo == TipoPeriodo_minuto) || (tipoPeriodo == TipoPeriodo_meia_hora))
-		return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + ":00-" + getString(tipoPeriodo));
+		return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + "-" + getString(tipoPeriodo));
 
 	else if ((hora == IdHor_0) && (minuto == IdMin_0)) {
 
@@ -965,7 +965,7 @@ std::string Periodo::str() const {
 
 	} // else if ((hora == IdHor_0) && (minuto == IdMin_0)) {
 
-	return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + ":00-" + getString(tipoPeriodo));
+	return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + ":-" + getString(tipoPeriodo));
 
 } // std::string Periodo::str() const{
 
