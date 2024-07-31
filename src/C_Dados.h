@@ -208,7 +208,7 @@ public:
 
 	void validaIntercambio();
 
-	void validaTermeletrica();
+	void validaTermeletrica(const IdTermeletrica a_menorIdTermeletrica, const IdTermeletrica a_maiorIdTermeletrica);
 
 	void validaBaciaHidrografica();
 
@@ -217,8 +217,6 @@ public:
 	void validaUsinaElevatoria();
 
 	void validaContrato();
-
-	void validaUnidadeUTE();
 
 	void validacao_operacional_Dados(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
@@ -260,17 +258,11 @@ public:
 
 	int isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(ProcessoEstocastico& a_processo_estocastico, const IdProcessoEstocastico a_tipo_processo_estocastico);
 
-	void validaHidreletrica();
+	void validaHidreletrica(const IdHidreletrica a_menorIdHidreletrica, const IdHidreletrica a_maiorIdHidreletrica);
 
 	void validaPatamarDeficitEmSubmercado();
 
 	void validaPatamarDeficitEmSubmercado(const IdSubmercado a_idSubmercado);
-
-	void validaConjuntoHidraulicoEmHidreletrica();
-
-	void validaUnidadeUHE();
-
-	void validaReservatorioEmHidreletrica();
 
 	bool validaFuncaoProducaoHidreletrica(FuncaoProducaoHidreletrica& a_funcaoProducaoHidreletrica, SmartEnupla<Periodo, double> a_horizonte_estudo, const IdHidreletrica a_idHidreletrica, const IdConjuntoHidraulico a_idConjuntoHidraulico, const IdUnidadeUHE a_idUnidadeUHE, SmartEnupla<AttVetorFuncaoProducaoHidreletrica, PreencherAtributo>& a_preencher_AttVetorFuncaoProducaoHidreletrica, SmartEnupla<AttMatrizFuncaoProducaoHidreletrica, PreencherAtributo>& a_preencher_AttMatrizFuncaoProducaoHidreletrica, SmartEnupla<AttVetorHidreletrica, PreencherAtributo>& a_preencher_AttVetorHidreletrica, SmartEnupla<AttVetorReservatorio, PreencherAtributo>& a_preencher_AttVetorReservatorio);
 
@@ -306,8 +298,6 @@ public:
 	void adicionarTendenciaHidrologicaHistorica();
 
 	void valida_preconfig_hidraulica(const SmartEnupla<IdHidreletrica, IdHidreletrica> a_lista_jusante_hidreletrica, const SmartEnupla<IdHidreletrica, IdHidreletrica> a_lista_jusante_desvio_hidreletrica);
-
-	void validaDefluencia();
 
 	void valida_considerar_tempo_viagem_agua(const IdHidreletrica a_idHidreletrica);
 
