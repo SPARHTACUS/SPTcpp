@@ -287,7 +287,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 				if (getString(TipoIterador1()) == getString(Periodo())){ \
 					if (getSizeMatriz() > 0){ \
 						for (TipoIterador1 iter = iterador1Inicial; iter <= iterador1Final; matriz.incrementarIterador(iter)) \
-							vetor_auxiliar_iter1.addElemento(iter, true); \
+							vetor_auxiliar_iter1.adddElemento(iter, true); \
 					} \
 					else{ \
 						std::vector<std::vector<std::string>> vetorRetorno; \
@@ -306,7 +306,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 				iterador1Final   = getIterador1Final(TipoIterador1()); \
 				if (getString(TipoIterador1()) == getString(Periodo())){ \
 					for (TipoIterador1 iter = iterador1Inicial; iter <= iterador1Final; matriz.incrementarIterador(iter)) \
-						vetor_auxiliar_iter1.addElemento(iter, true); \
+						vetor_auxiliar_iter1.adddElemento(iter, true); \
 				} \
 				else \
 					vetor_auxiliar_iter1 = SmartEnupla<TipoIterador1, bool>(iterador1Inicial, std::vector<bool>(int(iterador1Final - iterador1Inicial) + 1, true)); \
@@ -331,14 +331,14 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 				TipoIterador1 iter1_primeiro; \
 				for (TipoIterador1 iter = getIterador1Inicial(TipoIterador1()); iter <= getIterador1Final(TipoIterador1()); matriz.incrementarIterador(iter)){ \
 					if (getSizeMatriz(iter) > 0){ \
-						for (TipoIterador2 iter2 = getIterador2Inicial(iter, TipoIterador2()); iter2 <= getIterador2Final(iter, TipoIterador2()); matriz.at(iter).incrementarIterador(iter2)){ \
+						for (TipoIterador2 iter2 = getIterador2Inicial(iter, TipoIterador2()); iter2 <= getIterador2Final(iter, TipoIterador2()); matriz.att(iter).incrementarIterador(iter2)){ \
 							if ((vetor_auxiliar_iter2.size() == 0) || (iter == iter1_primeiro)){ \
-								vetor_auxiliar_iter2.addElemento(iter2, true); \
+								vetor_auxiliar_iter2.adddElemento(iter2, true); \
 								iter1_primeiro = iter; \
 							} \
 							else{ \
 								if (vetor_auxiliar_iter2.isProximoIterador(iter2)) \
-									vetor_auxiliar_iter2.addElemento(iter2, true); \
+									vetor_auxiliar_iter2.adddElemento(iter2, true); \
 								else {\
 									bool iter2_found = false; \
 									for (TipoIterador2 iter2_local = vetor_auxiliar_iter2.getIteradorInicial(); iter2_local <= vetor_auxiliar_iter2.getIteradorFinal(); vetor_auxiliar_iter2.incrementarIterador(iter2_local)) { \
@@ -438,7 +438,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 								if ((iter2 < iterador2Inicial_local) || (iter2 > iterador2Final_local)) \
 									matrizRetorno.at(i1 + espacoCabecalho).at(i2 + espacoAtributo + espacoIterador1) = ""; \
 								else \
-									matrizRetorno.at(i1 + espacoCabecalho).at(i2 + espacoAtributo + espacoIterador1) = getString(dados.at(iter1).getElemento(iter2)); \
+									matrizRetorno.at(i1 + espacoCabecalho).at(i2 + espacoAtributo + espacoIterador1) = getString(dados.att(iter1).gettElemento(iter2)); \
 								i2++; \
 							}\
 						} \
@@ -491,8 +491,8 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 				const TipoIterador2 iteradorInicial = a_valores.getIteradorInicial(); \
 				const TipoIterador2 iteradorFinal   = a_valores.getIteradorFinal(); \
 				for (TipoIterador2 iterador = iteradorInicial; iterador <= iteradorFinal; iterador++) { \
-					if (a_valores.at(iterador) < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
-					else if (a_valores.at(iterador) > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
+					if (a_valores.att(iterador) < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
+					else if (a_valores.att(iterador) > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
 				} \
 				dados.at(a_iterador1) = a_valores; \
 			} \
@@ -555,11 +555,11 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 			const TipoIterador1 iterador1Inicial = a_matriz.getIteradorInicial(); \
 			const TipoIterador1 iterador1Final   = a_matriz.getIteradorFinal(); \
 			for (TipoIterador1 iter1 = iterador1Inicial; iter1 <= iterador1Final; a_matriz.incrementarIterador(iter1)){ \
-				if (a_matriz.at(iter1).size() > 0){ \
-					const TipoIterador2 iterador2Inicial = a_matriz.at(iter1).getIteradorInicial(); \
-					const TipoIterador2 iterador2Final   = a_matriz.at(iter1).getIteradorFinal(); \
-					for (TipoIterador2 iter2 = iterador2Inicial; iter2 <= iterador2Final; a_matriz.at(iter1).incrementarIterador(iter2)){ \
-						TipoValor valor = a_matriz.at(iter1).at(iter2); \
+				if (a_matriz.att(iter1).size() > 0){ \
+					const TipoIterador2 iterador2Inicial = a_matriz.att(iter1).getIteradorInicial(); \
+					const TipoIterador2 iterador2Final   = a_matriz.att(iter1).getIteradorFinal(); \
+					for (TipoIterador2 iter2 = iterador2Inicial; iter2 <= iterador2Final; a_matriz.att(iter1).incrementarIterador(iter2)){ \
+						TipoValor valor = a_matriz.att(iter1).att(iter2); \
 						if (valor < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
 						else if (valor > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
 					} \

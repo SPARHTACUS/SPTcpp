@@ -730,7 +730,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 
 		template<typename TListasIdxElem, typename TIt>
-		std::vector<TIt> alocConteudoIter(TListasIdxElem& a_listasIdxElem, const TIt a_it) {
+		std::vector<TIt> alocConteudoIter(TListasIdxElem& a_listasIdxElem, TIt &a_it) {
 			try {
 
 				// Inicializa Lista
@@ -741,7 +741,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				else if (a_listasIdxElem.getIteradorFinal() < a_it) {
 					for (TIt it = a_listasIdxElem.getIteradorFinal(); it < a_it; a_listasIdxElem.incrementarIteradorMinimo(it))
 						if (it >= a_listasIdxElem.getIteradorFinal() + 1)
-							a_listasIdxElem.addElemento(it, a_listasIdxElem.getTipoElemento());
+							a_listasIdxElem.adddElementoVoid(it);
 					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
 				}
 
@@ -749,7 +749,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				else if (a_it < a_listasIdxElem.getIteradorInicial()) {
 					for (TIt it = a_listasIdxElem.getIteradorInicial(); it >= a_it + 1; a_listasIdxElem.decrementarIteradorMinimo(it))
 						if (it < a_listasIdxElem.getIteradorInicial())
-							a_listasIdxElem.addElemento(it, a_listasIdxElem.getTipoElemento());
+							a_listasIdxElem.adddElementoVoid(it);
 					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
 				}
 
@@ -763,7 +763,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		};
 
 		template<typename TListasIdxElem, typename TIt>
-		void tratConteudoIter(TListasIdxElem& a_listasIdxElem, const TIt a_it) {
+		void tratConteudoIter(TListasIdxElem& a_listasIdxElem, TIt a_it) {
 			try {
 
 		        const std::vector<TIt> iteradores_multiplos = alocConteudoIter(a_listasIdxElem, a_it);
@@ -776,14 +776,14 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 						throw std::invalid_argument("Nao foi possivel alocar conteudo devido a existencia de multiplos iteradores com elementos em " + getString(iteradores_multiplos.at(i)));
 				}
 
-				a_listasIdxElem.alterarValorSeAlterarIterador(a_it, a_listasIdxElem.getTipoElemento());
+				//a_listasIdxElem.alterarValorSeAlterarIterador(a_it, a_listasIdxElem.getTipoElemento());
 
 			}
 			catch (const std::exception& erro) { throw std::invalid_argument("tratConteudoIter(a_listasIdxElem," + getFullString(a_it) + "): \n" + std::string(erro.what())); }
 		};
 		
 		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11, typename TIt12>
-		void addConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11, const TIt12 a_it12) {
+		void addConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11, TIt12 a_it12) {
 
 			try {
 
@@ -818,21 +818,21 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if (a_lIdx.size() == 0)
 					return false;
 
-				const TIt1 it1 = a_idEstagio;
+				TIt1 it1 = a_idEstagio;
 
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.att(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
+					if (a_lArmz.att(it1).size() > 0) {
 
 						double vlrNorm = 1.0;
 
 						if ((!a_isPrimal) && (a_lNorm.size() > 0))
-							vlrNorm = a_lNorm.at(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+							vlrNorm = a_lNorm.att(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-						varredurasIters(a_lArmz.at(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+						varredurasIters(a_lArmz.att(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.att(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 					}
 				}
 
@@ -855,23 +855,23 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if (a_lIdx.size() == 0)
 					return false;
 
-				const TIt1 it1 = a_idEstagio;
+				TIt1 it1 = a_idEstagio;
 
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.att(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
+					if (a_lArmz.att(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.att(it1).getIteradorInicial(); it2 <= a_lArmz.att(it1).getIteradorFinal(); a_lArmz.att(it1).incrementarIterador(it2)) {
+							if (a_lArmz.att(it1).att(it2).size() > 0) {
 
 								double vlrNorm = 1.0;
 
 								if ((!a_isPrimal) && (a_lNorm.size() > 0))
-									vlrNorm = a_lNorm.at(it1).at(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+									vlrNorm = a_lNorm.att(it1).att(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-								varredurasIters(a_lArmz.at(it1).at(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+								varredurasIters(a_lArmz.att(it1).att(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.att(it1).att(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 							}
 						}
 					}
@@ -896,25 +896,25 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if (a_lIdx.size() == 0)
 					return false;
 
-				const TIt1 it1 = a_idEstagio;
+				TIt1 it1 = a_idEstagio;
 
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.att(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
+					if (a_lArmz.att(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.att(it1).getIteradorInicial(); it2 <= a_lArmz.att(it1).getIteradorFinal(); a_lArmz.att(it1).incrementarIterador(it2)) {
+							if (a_lArmz.att(it1).att(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.att(it1).att(it2).getIteradorInicial(); it3 <= a_lArmz.att(it1).att(it2).getIteradorFinal(); a_lArmz.att(it1).att(it2).incrementarIterador(it3)) {
+									if (a_lArmz.att(it1).att(it2).att(it3).size() > 0) {
 
 										double vlrNorm = 1.0;
 
 										if ((!a_isPrimal) && (a_lNorm.size() > 0))
-											vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+											vlrNorm = a_lNorm.att(it1).att(it2).att(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-										varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+										varredurasIters(a_lArmz.att(it1).att(it2).att(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.att(it1).att(it2).att(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 									}
 								}
 							}
@@ -941,27 +941,27 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if (a_lIdx.size() == 0)
 					return false;
 
-				const TIt1 it1 = a_idEstagio;
+				TIt1 it1 = a_idEstagio;
 
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.att(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
+					if (a_lArmz.att(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.att(it1).getIteradorInicial(); it2 <= a_lArmz.att(it1).getIteradorFinal(); a_lArmz.att(it1).incrementarIterador(it2)) {
+							if (a_lArmz.att(it1).att(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.att(it1).att(it2).getIteradorInicial(); it3 <= a_lArmz.att(it1).att(it2).getIteradorFinal(); a_lArmz.att(it1).att(it2).incrementarIterador(it3)) {
+									if (a_lArmz.att(it1).att(it2).att(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.att(it1).att(it2).att(it3).getIteradorInicial(); it4 <= a_lArmz.att(it1).att(it2).att(it3).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).incrementarIterador(it4)) {
+											if (a_lArmz.att(it1).att(it2).att(it3).att(it4).size() > 0) {
 
 												double vlrNorm = 1.0;
 
 												if ((!a_isPrimal) && (a_lNorm.size() > 0))
-													vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+													vlrNorm = a_lNorm.att(it1).att(it2).att(it3).att(it4).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-												varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+												varredurasIters(a_lArmz.att(it1).att(it2).att(it3).att(it4).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.att(it1).att(it2).att(it3).att(it4).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 											}
 										}
 									}
@@ -990,29 +990,29 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if (a_lIdx.size() == 0)
 					return false;
 
-				const TIt1 it1 = a_idEstagio;
+				TIt1 it1 = a_idEstagio;
 
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.att(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
-												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
-													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
+					if (a_lArmz.att(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.att(it1).getIteradorInicial(); it2 <= a_lArmz.att(it1).getIteradorFinal(); a_lArmz.att(it1).incrementarIterador(it2)) {
+							if (a_lArmz.att(it1).att(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.att(it1).att(it2).getIteradorInicial(); it3 <= a_lArmz.att(it1).att(it2).getIteradorFinal(); a_lArmz.att(it1).att(it2).incrementarIterador(it3)) {
+									if (a_lArmz.att(it1).att(it2).att(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.att(it1).att(it2).att(it3).getIteradorInicial(); it4 <= a_lArmz.att(it1).att(it2).att(it3).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).incrementarIterador(it4)) {
+											if (a_lArmz.att(it1).att(it2).att(it3).att(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.att(it1).att(it2).att(it3).att(it4).getIteradorInicial(); it5 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).incrementarIterador(it5)) {
+													if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).size() > 0) {
 
 														double vlrNorm = 1.0;
 
 														if ((!a_isPrimal) && (a_lNorm.size() > 0))
-															vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+															vlrNorm = a_lNorm.att(it1).att(it2).att(it3).att(it4).att(it5).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-														varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+														varredurasIters(a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).at(1).at(1).at(1).at(1).at(1), a_lIdx.att(it1).att(it2).att(it3).att(it4).att(it5).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 													}
 												}
 											}
@@ -1043,31 +1043,31 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if (a_lIdx.size() == 0)
 					return false;
 
-				const TIt1 it1 = a_idEstagio;
+				TIt1 it1 = a_idEstagio;
 
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.att(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
-												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
-													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
-														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
-															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
+					if (a_lArmz.att(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.att(it1).getIteradorInicial(); it2 <= a_lArmz.att(it1).getIteradorFinal(); a_lArmz.att(it1).incrementarIterador(it2)) {
+							if (a_lArmz.att(it1).att(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.att(it1).att(it2).getIteradorInicial(); it3 <= a_lArmz.att(it1).att(it2).getIteradorFinal(); a_lArmz.att(it1).att(it2).incrementarIterador(it3)) {
+									if (a_lArmz.att(it1).att(it2).att(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.att(it1).att(it2).att(it3).getIteradorInicial(); it4 <= a_lArmz.att(it1).att(it2).att(it3).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).incrementarIterador(it4)) {
+											if (a_lArmz.att(it1).att(it2).att(it3).att(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.att(it1).att(it2).att(it3).att(it4).getIteradorInicial(); it5 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).incrementarIterador(it5)) {
+													if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).getIteradorInicial(); it6 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).incrementarIterador(it6)) {
+															if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).size() > 0) {
 
 																double vlrNorm = 1.0;
 
 																if ((!a_isPrimal) && (a_lNorm.size() > 0))
-																	vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+																	vlrNorm = a_lNorm.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-																varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																varredurasIters(a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).at(1).at(1).at(1).at(1), a_lIdx.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 															}
 														}
 													}
@@ -1100,33 +1100,33 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if (a_lIdx.size() == 0)
 					return false;
 
-				const TIt1 it1 = a_idEstagio;
+				TIt1 it1 = a_idEstagio;
 
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.att(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
-												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
-													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
-														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
-															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
-																for (TIt7 it7 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorInicial(); it7 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).incrementarIterador(it7)) {
-																	if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).size() > 0) {
+					if (a_lArmz.att(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.att(it1).getIteradorInicial(); it2 <= a_lArmz.att(it1).getIteradorFinal(); a_lArmz.att(it1).incrementarIterador(it2)) {
+							if (a_lArmz.att(it1).att(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.att(it1).att(it2).getIteradorInicial(); it3 <= a_lArmz.att(it1).att(it2).getIteradorFinal(); a_lArmz.att(it1).att(it2).incrementarIterador(it3)) {
+									if (a_lArmz.att(it1).att(it2).att(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.att(it1).att(it2).att(it3).getIteradorInicial(); it4 <= a_lArmz.att(it1).att(it2).att(it3).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).incrementarIterador(it4)) {
+											if (a_lArmz.att(it1).att(it2).att(it3).att(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.att(it1).att(it2).att(it3).att(it4).getIteradorInicial(); it5 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).incrementarIterador(it5)) {
+													if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).getIteradorInicial(); it6 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).incrementarIterador(it6)) {
+															if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).size() > 0) {
+																for (TIt7 it7 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).getIteradorInicial(); it7 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).incrementarIterador(it7)) {
+																	if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).size() > 0) {
 
 																		double vlrNorm = 1.0;
 
 																		if ((!a_isPrimal) && (a_lNorm.size() > 0))
-																			vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+																			vlrNorm = a_lNorm.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-																		varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																		varredurasIters(a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).at(1).at(1).at(1), a_lIdx.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 																	}
 																}
 															}
@@ -1161,35 +1161,35 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if (a_lIdx.size() == 0)
 					return false;
 
-				const TIt1 it1 = a_idEstagio;
+				TIt1 it1 = a_idEstagio;
 
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.att(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
-												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
-													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
-														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
-															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
-																for (TIt7 it7 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorInicial(); it7 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).incrementarIterador(it7)) {
-																	if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).size() > 0) {
-																		for (TIt8 it8 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorInicial(); it8 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).incrementarIterador(it8)) {
-																			if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).size() > 0) {
+					if (a_lArmz.att(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.att(it1).getIteradorInicial(); it2 <= a_lArmz.att(it1).getIteradorFinal(); a_lArmz.att(it1).incrementarIterador(it2)) {
+							if (a_lArmz.att(it1).att(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.att(it1).att(it2).getIteradorInicial(); it3 <= a_lArmz.att(it1).att(it2).getIteradorFinal(); a_lArmz.att(it1).att(it2).incrementarIterador(it3)) {
+									if (a_lArmz.att(it1).att(it2).att(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.att(it1).att(it2).att(it3).getIteradorInicial(); it4 <= a_lArmz.att(it1).att(it2).att(it3).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).incrementarIterador(it4)) {
+											if (a_lArmz.att(it1).att(it2).att(it3).att(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.att(it1).att(it2).att(it3).att(it4).getIteradorInicial(); it5 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).incrementarIterador(it5)) {
+													if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).getIteradorInicial(); it6 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).incrementarIterador(it6)) {
+															if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).size() > 0) {
+																for (TIt7 it7 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).getIteradorInicial(); it7 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).incrementarIterador(it7)) {
+																	if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).size() > 0) {
+																		for (TIt8 it8 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).getIteradorInicial(); it8 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).incrementarIterador(it8)) {
+																			if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).size() > 0) {
 
 																				double vlrNorm = 1.0;
 
 																				if ((!a_isPrimal) && (a_lNorm.size() > 0))
-																					vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+																					vlrNorm = a_lNorm.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-																				varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																				varredurasIters(a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).at(1).at(1), a_lIdx.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 																			}
 																		}
 																	}
@@ -1226,37 +1226,37 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if (a_lIdx.size() == 0)
 					return false;
 
-				const TIt1 it1 = a_idEstagio;
+				TIt1 it1 = a_idEstagio;
 
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.att(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
-												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
-													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
-														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
-															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
-																for (TIt7 it7 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorInicial(); it7 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).incrementarIterador(it7)) {
-																	if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).size() > 0) {
-																		for (TIt8 it8 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorInicial(); it8 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).incrementarIterador(it8)) {
-																			if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).size() > 0) {
-																				for (TIt9 it9 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).getIteradorInicial(); it9 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).incrementarIterador(it9)) {
-																					if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).size() > 0) {
+					if (a_lArmz.att(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.att(it1).getIteradorInicial(); it2 <= a_lArmz.att(it1).getIteradorFinal(); a_lArmz.att(it1).incrementarIterador(it2)) {
+							if (a_lArmz.att(it1).att(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.att(it1).att(it2).getIteradorInicial(); it3 <= a_lArmz.att(it1).att(it2).getIteradorFinal(); a_lArmz.att(it1).att(it2).incrementarIterador(it3)) {
+									if (a_lArmz.att(it1).att(it2).att(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.att(it1).att(it2).att(it3).getIteradorInicial(); it4 <= a_lArmz.att(it1).att(it2).att(it3).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).incrementarIterador(it4)) {
+											if (a_lArmz.att(it1).att(it2).att(it3).att(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.att(it1).att(it2).att(it3).att(it4).getIteradorInicial(); it5 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).incrementarIterador(it5)) {
+													if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).getIteradorInicial(); it6 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).incrementarIterador(it6)) {
+															if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).size() > 0) {
+																for (TIt7 it7 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).getIteradorInicial(); it7 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).incrementarIterador(it7)) {
+																	if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).size() > 0) {
+																		for (TIt8 it8 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).getIteradorInicial(); it8 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).incrementarIterador(it8)) {
+																			if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).size() > 0) {
+																				for (TIt9 it9 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).getIteradorInicial(); it9 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).incrementarIterador(it9)) {
+																					if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).att(it9).size() > 0) {
 
 																						double vlrNorm = 1.0;
 
 																						if ((!a_isPrimal) && (a_lNorm.size() > 0))
-																							vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(1).at(IdRealizacao_1).at(IdCenario_1);
+																							vlrNorm = a_lNorm.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).att(it9).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-																						varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																						varredurasIters(a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).att(it9).at(1), a_lIdx.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).att(it9).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 
 																					}
 																				}
@@ -1296,39 +1296,39 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if (a_lIdx.size() == 0)
 					return false;
 
-				const TIt1 it1 = a_idEstagio;
+				TIt1 it1 = a_idEstagio;
 
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.att(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
-												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
-													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
-														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
-															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
-																for (TIt7 it7 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorInicial(); it7 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).incrementarIterador(it7)) {
-																	if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).size() > 0) {
-																		for (TIt8 it8 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorInicial(); it8 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).incrementarIterador(it8)) {
-																			if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).size() > 0) {
-																				for (TIt9 it9 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).getIteradorInicial(); it9 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).incrementarIterador(it9)) {
-																					if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).size() > 0) {
-																						for (TIt10 it10 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).getIteradorInicial(); it10 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).incrementarIterador(it10)) {
-																							if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10).size() > 0) {
+					if (a_lArmz.att(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.att(it1).getIteradorInicial(); it2 <= a_lArmz.att(it1).getIteradorFinal(); a_lArmz.att(it1).incrementarIterador(it2)) {
+							if (a_lArmz.att(it1).att(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.att(it1).att(it2).getIteradorInicial(); it3 <= a_lArmz.att(it1).att(it2).getIteradorFinal(); a_lArmz.att(it1).att(it2).incrementarIterador(it3)) {
+									if (a_lArmz.att(it1).att(it2).att(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.att(it1).att(it2).att(it3).getIteradorInicial(); it4 <= a_lArmz.att(it1).att(it2).att(it3).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).incrementarIterador(it4)) {
+											if (a_lArmz.att(it1).att(it2).att(it3).att(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.att(it1).att(it2).att(it3).att(it4).getIteradorInicial(); it5 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).incrementarIterador(it5)) {
+													if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).getIteradorInicial(); it6 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).incrementarIterador(it6)) {
+															if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).size() > 0) {
+																for (TIt7 it7 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).getIteradorInicial(); it7 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).incrementarIterador(it7)) {
+																	if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).size() > 0) {
+																		for (TIt8 it8 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).getIteradorInicial(); it8 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).incrementarIterador(it8)) {
+																			if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).size() > 0) {
+																				for (TIt9 it9 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).getIteradorInicial(); it9 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).incrementarIterador(it9)) {
+																					if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).att(it9).size() > 0) {
+																						for (TIt10 it10 = a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).att(it9).getIteradorInicial(); it10 <= a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).att(it9).getIteradorFinal(); a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).att(it9).incrementarIterador(it10)) {
+																							if (a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).att(it9).att(it10).size() > 0) {
 
 																								double vlrNorm = 1.0;
 
 																								if ((!a_isPrimal) && (a_lNorm.size() > 0))
-																									vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10).at(IdRealizacao_1).at(IdCenario_1);
+																									vlrNorm = a_lNorm.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).att(it9).att(it10).at(IdRealizacao_1).at(IdCenario_1);
 																								
-																								varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																								varredurasIters(a_lArmz.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).att(it9).att(it10), a_lIdx.att(it1).att(it2).att(it3).att(it4).att(it5).att(it6).att(it7).att(it8).att(it9).att(it10), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 
 																							}
 																						}
