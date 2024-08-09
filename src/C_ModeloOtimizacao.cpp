@@ -49,8 +49,8 @@ ModeloOtimizacao::ModeloOtimizacao(const IdModeloOtimizacao a_idModeloOtimizacao
 			std::string diretorio_att_premissas = "";
 			diretorio_att_premissas = a_entradaSaidaDados.getDiretorioEntrada() + "//Otimizacao//AtributosPremissasSPT";
 
-			a_entradaSaidaDados.carregarArquivoCSV_AttComum("HIDRELETRICA_AttComumOperacional.csv", a_dados, TipoAcessoInstancia_membro);
-			a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_REE_AttVetorPremissa_produtibilidade_ENA.csv", a_dados, TipoAcessoInstancia_membroMembro);
+			a_entradaSaidaDados.carregarArquivoCSV_AttComum("HIDRELETRICA_AttComumOperacional.csv", a_dados, TipoAcessoInstancia_m1);
+			a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_REE_AttVetorPremissa_produtibilidade_ENA.csv", a_dados, TipoAcessoInstancia_m2);
 
 			a_dados.validaProdutibilidadeENA(a_entradaSaidaDados, diretorio_att_premissas, vetorProcessoEstocastico.att(maiorIdProcessoEstocastico));
 
@@ -3893,10 +3893,10 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 				estagio_aux.setAtributo(AttComumEstagio_idEstagio, idEstagio);
 				vetorEstagio_aux.add(estagio_aux);
 				a_entradaSaidaDados.carregarArquivoCSV_AttComum(getFullString(idEstagio) + "_estagio.csv", vetorEstagio_aux.att(idEstagio), TipoAcessoInstancia_direto);
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor(getFullString(idEstagio) + "_corteBenders_rhs.csv", vetorEstagio_aux.att(idEstagio), TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor(getFullString(idEstagio) + "_corteBenders_rhs.csv", vetorEstagio_aux.att(idEstagio), TipoAcessoInstancia_m1);
 				vetorEstagio_aux.att(idEstagio).carregarEstadosCortesBenders(a_entradaSaidaDados.getDiretorioEntrada() + "//" + getFullString(idEstagio) + "_corteBenders_estado.csv");
 				vetorEstagio_aux.att(idEstagio).carregarCoeficientesCortesBenders(a_entradaSaidaDados.getDiretorioEntrada() + "//" + getFullString(idEstagio) + "_corteBenders_coeficientes.csv");
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum(getFullString(idEstagio) + "_estado.csv", vetorEstagio_aux.att(idEstagio), TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum(getFullString(idEstagio) + "_estado.csv", vetorEstagio_aux.att(idEstagio), TipoAcessoInstancia_m1);
 			} // if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
 		} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
@@ -4458,7 +4458,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPreEstudo(const IdProc
 		Estagio estagio_auxiliar;
 		while (true) {
 
-			estado_valores_carregados = a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir(std::string("estado_valores_" + getFullString(a_idIteracao) + ".csv"), estagio, TipoAcessoInstancia_membro);
+			estado_valores_carregados = a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir(std::string("estado_valores_" + getFullString(a_idIteracao) + ".csv"), estagio, TipoAcessoInstancia_m1);
 
 			if (estado_valores_carregados) {
 				if (a_idProcesso == IdProcesso_mestre)
@@ -4640,9 +4640,9 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 			} // if (true) {
 
 			if (estagio_carregado_sem_iterador)
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum(prefixo + "estado.csv", estagio, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum(prefixo + "estado.csv", estagio, TipoAcessoInstancia_m1);
 			else
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum(prefixo + "estado_" + getFullString(arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao())) + ".csv", estagio, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum(prefixo + "estado_" + getFullString(arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao())) + ".csv", estagio, TipoAcessoInstancia_m1);
 
 
 			idEstagio_futuro = IdEstagio(estagio_final + 1);
@@ -4838,7 +4838,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 								carregar_conversao_ENA = true;
 							
 							if (carregar_conversao_ENA) {
-								if (!a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_REE_conversao_ENA_acoplamento.csv", a_dados, TipoAcessoInstancia_membroMembro))
+								if (!a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_REE_conversao_ENA_acoplamento.csv", a_dados, TipoAcessoInstancia_m2))
 									throw std::invalid_argument("Nao foi possivel carregar arquivo HIDRELETRICA_REE_conversao_ENA_acoplamento.csv necessario para conversao de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 								is_conversao_ENA_carregado = true;
 
@@ -6298,19 +6298,19 @@ void ModeloOtimizacao::instanciarProcessoEstocastico(Dados& a_dados, EntradaSaid
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_probabilidade_realizacao) + ".csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_direto);
 		
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("VARIAVEL_ALEATORIA_AttComumOperacional.csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("VARIAVEL_ALEATORIA_AttComumOperacional.csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_" + getString(AttVetorVariavelAleatoria_tipo_relaxacao) + ".csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_" + getString(AttVetorVariavelAleatoria_tipo_relaxacao) + ".csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_residuo_espaco_amostral) + ".csv",            vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_residuo_espaco_amostral) + ".csv",            vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_m1);
 		
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) + ".csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) + ".csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_coeficiente_participacao) + ".csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_coeficiente_participacao) + ".csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_tendencia_temporal) + ".csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_tendencia_temporal) + ".csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_m2);
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) + ".csv", vetorProcessoEstocastico.att(tipo_processo_estocastico_hidrologico), TipoAcessoInstancia_direto);
 

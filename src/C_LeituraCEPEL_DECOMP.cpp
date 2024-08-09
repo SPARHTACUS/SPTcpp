@@ -20236,18 +20236,18 @@ void LeituraCEPEL::atualizar_valores_periodos_horizonte_expandido_com_DadosEntra
 		entradaSaidaDados.setDiretorioEntrada(a_diretorio);
 		bool dadosPreConfig_horizonte_estudo                 = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("DADOS_AttVetorOperacional_PorPeriodo.csv", dados_MP, TipoAcessoInstancia_direto);
 		bool dadosPreConfig_percentual_duracao_patamar_carga = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("DADOS_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_MP, TipoAcessoInstancia_direto);
-		entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("SUBMERCADO_AttComumOperacional.csv", dados_MP, TipoAcessoInstancia_membro);
-		bool dadosPreConfig_submercado                       = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_MP, TipoAcessoInstancia_membro);
-		entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("INTERCAMBIO_AttComumOperacional.csv", dados_MP, TipoAcessoInstancia_membro);
-		bool dadosPreConfig_intercambio = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_MP, TipoAcessoInstancia_membro);
-		bool dadosPreConfig_patamar_deficit                  = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_PATAMAR_DEFICIT_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_MP, TipoAcessoInstancia_membroMembro);
-		bool dadosPreConfig_usina_nao_simulada               = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_MP, TipoAcessoInstancia_membroMembro);
+		entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("SUBMERCADO_AttComumOperacional.csv", dados_MP, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_submercado                       = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_MP, TipoAcessoInstancia_m1);
+		entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("INTERCAMBIO_AttComumOperacional.csv", dados_MP, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_intercambio = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_MP, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_patamar_deficit                  = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_PATAMAR_DEFICIT_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_MP, TipoAcessoInstancia_m2);
+		bool dadosPreConfig_usina_nao_simulada               = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_MP, TipoAcessoInstancia_m2);
 		
-		entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_AttComumOperacional.csv", dados_MP, TipoAcessoInstancia_membro);
-		entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv", dados_MP, TipoAcessoInstancia_membroMembro);
-		bool dadosPreConfig_hidreletrica_premissa = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AttVetorPremissa_PorPeriodo.csv", dados_MP, TipoAcessoInstancia_membro);
-		bool dadosPreConfig_reservatorio_premissa            = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv", dados_MP, TipoAcessoInstancia_membroMembro);
-		bool dadosPreConfig_reservatorio_operacional         = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv", dados_MP, TipoAcessoInstancia_membroMembro);
+		entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_AttComumOperacional.csv", dados_MP, TipoAcessoInstancia_m1);
+		entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv", dados_MP, TipoAcessoInstancia_m2);
+		bool dadosPreConfig_hidreletrica_premissa = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AttVetorPremissa_PorPeriodo.csv", dados_MP, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_reservatorio_premissa            = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv", dados_MP, TipoAcessoInstancia_m2);
+		bool dadosPreConfig_reservatorio_operacional         = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv", dados_MP, TipoAcessoInstancia_m2);
 		
 
 		//////////////////////////////////////////////////////////////
@@ -20904,12 +20904,12 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		entradaSaidaDados.setDiretorioEntrada(a_diretorio);
 		
 		//Arquivos operacional: Valor absoluto das variáveis
-		bool dadosPreConfig_submercado_operacional         = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_membro);
-		bool dadosPreConfig_usina_nao_simulada_operacional = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_membroMembro);
+		bool dadosPreConfig_submercado_operacional         = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_usina_nao_simulada_operacional = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m2);
 
 		//Arquivos premissa: Modulação em p.u (shaped) das variáveis
-		bool dadosPreConfig_submercado_premissa            = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_membro);
-		bool dadosPreConfig_usina_nao_simulada_premissa    = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_membroMembro);
+		bool dadosPreConfig_submercado_premissa            = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_usina_nao_simulada_premissa    = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m2);
 
 		if(dadosPreConfig_submercado_operacional && dadosPreConfig_submercado_premissa){ throw std::invalid_argument("Encontrado arquivo operacional e arquivo premissa da demanda, selecionar apenas um deles em: " + a_diretorio);}
 		if(dadosPreConfig_usina_nao_simulada_operacional && dadosPreConfig_usina_nao_simulada_premissa){ throw std::invalid_argument("Encontrado arquivo operacional e arquivo premissa das usinas nao simuladas, selecionar apenas um deles em: " + a_diretorio);}

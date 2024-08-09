@@ -9,10 +9,10 @@
 
 #define TIPO_ACESSO_INSTANCIA(m)\
 	m(TipoAcessoInstancia, direto)\
-	m(TipoAcessoInstancia, membro)\
-	m(TipoAcessoInstancia, membroMembro)\
-	m(TipoAcessoInstancia, membroMembroMembro) \
-	m(TipoAcessoInstancia, membroMembroMembroMembro) 
+	m(TipoAcessoInstancia, m1)\
+	m(TipoAcessoInstancia, m2)\
+	m(TipoAcessoInstancia, m3) \
+	m(TipoAcessoInstancia, m4) 
 DEFINE_SMART_ENUM(TipoAcessoInstancia, TIPO_ACESSO_INSTANCIA)
 
 
@@ -87,6 +87,7 @@ public:
 
 	// AttMatriz
 	void carregarArquivoCSV_AttMatriz(const std::string a_nomeArquivo, SmartDados &a_objetoDados, const TipoAcessoInstancia a_tipoAcesso)const;
+	void carregarArquivoCSV_AttMatriz_new(const std::string a_nomeArquivo, SmartDados &a_objetoDados, const TipoAcessoInstancia a_tipoAcesso)const;
 	bool carregarArquivoCSV_AttMatriz_seExistir(const std::string a_nomeArquivo, SmartDados &a_objetoDados, const TipoAcessoInstancia a_tipoAcesso)const;
 
 
@@ -308,12 +309,12 @@ public:
 
 #endif 
 
+
 // AttComum Direto
 
 inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, SmartDados & a_objetoDados)const{
 	imprimirArquivoCSV_AttComum_(a_nomeArquivo, "", "", "", "", a_objetoDados, std::vector<std::string>());
 }
-
 
 
 template<typename TipoAtributo>
@@ -690,3 +691,5 @@ inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_
 		vetorAttMatrizStr.at(i) = getString(a_attMatriz.at(i));
 	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), getFullString(a_membroMembroMembroMembro), a_objetoDados, getString(a_iterador1Inicial), getString(a_iterador1Final), getString(a_iterador2Inicial), getString(a_iterador2Final), vetorAttMatrizStr);
 }
+
+

@@ -86,6 +86,26 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::addElemento(" + getString(a_vlr) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoValor a_vlr) {
 
+	void addElemento(SmartEnupla<TipoIterador, TipoValor> &a_vlr) {
+		try {
+			if (a_vlr.size() == 0)
+				return;
+			else if (size() == 0) {
+				*this = a_vlr;
+				return;
+			}
+
+			if (TipoIterador(getIteradorFinal() + 1) == a_vlr.getIteradorInicial()) {
+				for (TipoIterador it = a_vlr.getIteradorInicial(); it <= a_vlr.getIteradorFinal(); it++)
+					addElemento(it, a_vlr.getElemento(it));
+				return;
+			}
+
+			throw std::invalid_argument("Argument not sequential");
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::addElemento(): \n" + std::string(erro.what())); }
+	}; // void addElemento(TipoValor a_vlr) {
+
 	void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 		try {
 
@@ -1305,6 +1325,51 @@ public:
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::addElemento(" + getString(a_vlr) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoValor a_vlr) {
 
+	void addElemento(SmartEnupla<Periodo, TipoValor> &a_vlr) {
+
+		try {
+
+			if (a_vlr.size() == 0)
+				return;
+			else if (size() == 0) {
+				*this = a_vlr;
+				return;
+			}
+
+			if (Periodo(TipoPeriodo_minuto, getIteradorFinal() + 1) != Periodo(TipoPeriodo_minuto, a_vlr.getIteradorInicial()))
+				throw std::invalid_argument("Argument not sequential");
+
+			while (true) {
+				if (list_structPeriod.size() == 0)
+					break;
+				else if (!list_structPeriod.at(list_structPeriod.size() - 1).isEmpty())
+					break;
+				else
+					list_structPeriod.erase(list_structPeriod.end());
+			} // while (true) {
+
+			std::vector<StructPeriod> lista_arg = a_vlr.getListaStructPeriod();
+
+			while (true) {
+				if (lista_arg.size() == 0)
+					break;
+				else if (!lista_arg.at(0).isEmpty())
+					break;
+				else
+					lista_arg.erase(lista_arg.begin());
+			} // while (true) {
+
+			const std::vector<TipoValor> elem_arg = a_vlr.getElementos();
+
+			list_structPeriod.insert(list_structPeriod.end(), lista_arg.begin(), lista_arg.end());
+			vlr.insert(vlr.end(), elem_arg.begin(), elem_arg.end());
+
+			updateStructIdx();
+
+		} // try{
+		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::addElemento(): \n" + std::string(erro.what())); }
+	}; // void addElemento(Periodo a_iter, TipoValor a_vlr) {
+
 	void addElemento(Periodo a_itr, const TipoValor a_vlr) {
 
 		try {
@@ -1312,7 +1377,7 @@ public:
 			return adddElemento(a_itr, a_vlr);
 
 		} // try{
-		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::addElemento(" + getString(a_itr) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::addElemento(" + getString(a_itr) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(Periodo a_iter, TipoValor a_vlr) {
 
 	void adddElemento(Periodo &a_itr, const TipoValor a_vlr) {

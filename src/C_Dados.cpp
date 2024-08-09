@@ -172,34 +172,34 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 		validacao_operacional_Dados(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
-
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		//
 		//                                                                        Carregar Arquivos de Submercado
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum("SUBMERCADO_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum("SUBMERCADO_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("SUBMERCADO_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("SUBMERCADO_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
+
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 		// Patamar Deficit
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("SUBMERCADO_PATAMAR_DEFICIT_AttComumOperacional.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("SUBMERCADO_PATAMAR_DEFICIT_AttComumOperacional.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("SUBMERCADO_PATAMAR_DEFICIT_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("SUBMERCADO_PATAMAR_DEFICIT_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_PATAMAR_DEFICIT_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_PATAMAR_DEFICIT_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
 
 		// Usina Nao Simulada
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
 
 		validacao_operacional_Submercado(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -209,12 +209,12 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum("INTERCAMBIO_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum("INTERCAMBIO_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("INTERCAMBIO_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("INTERCAMBIO_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("INTERCAMBIO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("INTERCAMBIO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 		validacao_operacional_Intercambio(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -225,25 +225,25 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum("TERMELETRICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum("TERMELETRICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_UNIDADE_AttVetorPremissa_PorInteiro.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_UNIDADE_AttVetorPremissa_PorInteiro.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_COMANDO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_COMANDO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 		if (tipo_estudo == TipoEstudo_simulacao)
-			a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_AttMatrizOperacional_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+			a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_AttMatrizOperacional_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("TERMELETRICA_UNIDADE_AttComumOperacional.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("TERMELETRICA_UNIDADE_AttComumOperacional.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_UNIDADE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_UNIDADE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_UNIDADE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_UNIDADE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
 
 
 		validacao_operacional_Termeletrica(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
@@ -256,35 +256,35 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum("HIDRELETRICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum("HIDRELETRICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AttVetorOperacional_PorEstacao.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AttVetorOperacional_PorEstacao.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 		if (tipo_estudo == TipoEstudo_simulacao)
-			a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_AttMatrizOperacional_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+			a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_AttMatrizOperacional_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
 
 		// Afluencia
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
 		std::string diretorio_importacao_pre_estudo = getAtributo(AttComumDados_diretorio_importacao_pre_estudo, std::string());
 		if (!strCompara(diretorio_importacao_pre_estudo, "nenhum"))
 			a_entradaSaidaDados.setDiretorioEntrada(diretorio_importacao_pre_estudo);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_AFLUENCIA_AttMatrizPremissa_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_AFLUENCIA_AttMatrizPremissa_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
 		a_entradaSaidaDados.setDiretorioEntrada(getAtributo(AttComumDados_diretorio_entrada_dados, std::string()));
 
 		// Reservatorio
 
-		volume_inicial_carregado_from_operacional = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv", *this, TipoAcessoInstancia_membroMembro);
-		volume_inicial_carregado_from_premissa    = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumPremissa.csv", *this, TipoAcessoInstancia_membroMembro);
+		volume_inicial_carregado_from_operacional = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv", *this, TipoAcessoInstancia_m2);
+		volume_inicial_carregado_from_premissa    = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumPremissa.csv", *this, TipoAcessoInstancia_m2);
 
 		if (getAtributo(AttComumDados_estagio_inicial, IdEstagio()) == IdEstagio_1) {
 			if (volume_inicial_carregado_from_operacional && volume_inicial_carregado_from_premissa)
@@ -297,53 +297,53 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 				throw std::invalid_argument("Nenhum dos arquivos HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv, HIDRELETRICA_RESERVATORIO_AttComumPremissa.csv deve ser carregado quando " + getFullString(AttComumDados_estagio_inicial) + " for maior que " + getFullString(IdEstagio_1));
 		}
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorIdMes.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorIdMes.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
 		if (tipo_estudo == TipoEstudo_simulacao)
-			a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_RESERVATORIO_AttMatrizOperacional_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
+			a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_RESERVATORIO_AttMatrizOperacional_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
 		// Conjunto Hidraulico
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_CONJUNTO_AttComumOperacional.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_CONJUNTO_AttComumOperacional.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_CONJUNTO_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_CONJUNTO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_CONJUNTO_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_CONJUNTO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_CONJUNTO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_CONJUNTO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
 
 		// Unidade Hidraulica
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_CONJUNTO_UNIDADE_AttComumOperacional.csv", *this, TipoAcessoInstancia_membroMembroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_CONJUNTO_UNIDADE_AttComumOperacional.csv", *this, TipoAcessoInstancia_m3);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_CONJUNTO_UNIDADE_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembroMembro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_CONJUNTO_UNIDADE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_CONJUNTO_UNIDADE_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m3);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_CONJUNTO_UNIDADE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m3);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_CONJUNTO_UNIDADE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_CONJUNTO_UNIDADE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m3);
 
 
 		//FPH
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_FPH_AttVetorPremissa_PorInteiro.csv", *this, TipoAcessoInstancia_membroMembro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_FPH_AttVetorPremissa_PorInteiro.csv", *this, TipoAcessoInstancia_m2);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_CONJUNTO_FPH_AttVetorPremissa_PorInteiro.csv", *this, TipoAcessoInstancia_membroMembroMembro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_CONJUNTO_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_membroMembroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_CONJUNTO_FPH_AttVetorPremissa_PorInteiro.csv", *this, TipoAcessoInstancia_m3);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_CONJUNTO_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_m3);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_CONJUNTO_UNIDADE_FPH_AttVetorPremissa_PorInteiro.csv", *this, TipoAcessoInstancia_membroMembroMembroMembro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_CONJUNTO_UNIDADE_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_membroMembroMembroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_CONJUNTO_UNIDADE_FPH_AttVetorPremissa_PorInteiro.csv", *this, TipoAcessoInstancia_m4);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_CONJUNTO_UNIDADE_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_m4);
 
 		//Deflu�ncia passada
 		if (getAtributo(AttComumDados_estagio_inicial, IdEstagio()) == IdEstagio_1)
-			a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
+			a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 		else {
-			if (a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro))
+			if (a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m2))
 				throw std::invalid_argument("O arquivo HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv nao deve ser carregado quando " + getFullString(AttComumDados_estagio_inicial) + " for maior que " + getFullString(IdEstagio_1));
 		}
 
 		//produtibilidade_ENA (para valorar as afluências em energia -> acoplamento com cortes em termos da energia natural afluente -ENA)
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_REE_AttVetorPremissa_produtibilidade_ENA.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_REE_AttVetorPremissa_produtibilidade_ENA.csv", *this, TipoAcessoInstancia_m2);
 
 		validacao_operacional_Hidreletrica(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -354,9 +354,9 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("BACIA_HIDROGRAFICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("BACIA_HIDROGRAFICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("BACIA_HIDROGRAFICA_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("BACIA_HIDROGRAFICA_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_m1);
 
 		validacao_operacional_BaciaHidrografica(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -366,20 +366,20 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_ELETRICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_ELETRICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("RESTRICAO_ELETRICA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("RESTRICAO_ELETRICA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_ELETRICA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_ELETRICA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 		// ElementoSistema
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
 
 		validacao_operacional_RestricaoEletrica(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -391,11 +391,11 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("INTERCAMBIO_HIDRAULICO_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("INTERCAMBIO_HIDRAULICO_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("INTERCAMBIO_HIDRAULICO_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("INTERCAMBIO_HIDRAULICO_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("INTERCAMBIO_HIDRAULICO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("INTERCAMBIO_HIDRAULICO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
 		validacao_operacional_Intercambio_Hidraulico(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -407,16 +407,16 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 		
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 		// ElementoSistema
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membroMembro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m2);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
 
 		validacao_operacional_RestricaoOperativaUHE(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -428,11 +428,11 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("AGRUPAMENTO_INTERCAMBIO_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_membro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("AGRUPAMENTO_INTERCAMBIO_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("AGRUPAMENTO_INTERCAMBIO_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("AGRUPAMENTO_INTERCAMBIO_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("AGRUPAMENTO_INTERCAMBIO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("AGRUPAMENTO_INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("AGRUPAMENTO_INTERCAMBIO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("AGRUPAMENTO_INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 		validacao_operacional_AgrupamentoIntercambio(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -442,9 +442,9 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("USINA_ELEVATORIA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("USINA_ELEVATORIA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("USINA_ELEVATORIA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("USINA_ELEVATORIA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
 		validacao_operacional_UsinasElevatorias(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -454,11 +454,11 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("CONTRATO_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("CONTRATO_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("CONTRATO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("CONTRATO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("CONTRATO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("CONTRATO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 		validacao_operacional_Contrato(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -469,9 +469,9 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("DEMANDA_ESPECIAL_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("DEMANDA_ESPECIAL_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("DEMANDA_ESPECIAL_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("DEMANDA_ESPECIAL_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 		validacao_operacional_DemandaEspecial(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -482,9 +482,9 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("USINA_EOLICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("USINA_EOLICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("USINA_EOLICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("USINA_EOLICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 		validacao_operacional_Eolica(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -496,7 +496,7 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-		bool mapeamento_cenarios_aberturas = a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("ESTRUTURA_RESOLUCAO_AttMatrizOperacional_PorCenarioPorEstagio.csv", *this, TipoAcessoInstancia_membroMembroMembro);
+		bool mapeamento_cenarios_aberturas = a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("ESTRUTURA_RESOLUCAO_AttMatrizOperacional_PorCenarioPorEstagio.csv", *this, TipoAcessoInstancia_m3);
 
 		if (!mapeamento_cenarios_aberturas)
 			definirCenariosPorProcessosEmArranjoResolucao();
@@ -517,15 +517,15 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_direto);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_" + getString(AttVetorVariavelAleatoria_tipo_relaxacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_residuo_espaco_amostral) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_" + getString(AttVetorVariavelAleatoria_tipo_relaxacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_residuo_espaco_amostral) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_m1);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv", processoEstocastico_hidrologico, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_coeficiente_participacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_coeficiente_participacao) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_tendencia_temporal) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_membroMembro);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_" + getString(AttVetorVariavelAleatoriaInterna_tendencia_temporal) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_m2);
 
 		a_entradaSaidaDados.setDiretorioEntrada(diretorio_entrada);
 
@@ -1612,11 +1612,11 @@ void Dados::validacao_operacional_Intercambio_Hidraulico(EntradaSaidaDados a_ent
 			if (recarregar_atributo) {
 				a_entradaSaidaDados.setDiretorioEntrada(a_diretorio_att_operacional);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum("INTERCAMBIO_HIDRAULICO_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum("INTERCAMBIO_HIDRAULICO_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("INTERCAMBIO_HIDRAULICO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("INTERCAMBIO_HIDRAULICO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("INTERCAMBIO_HIDRAULICO_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("INTERCAMBIO_HIDRAULICO_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_m1);
 
 			}//if (recarregar_atributo) {
 
@@ -1850,11 +1850,11 @@ void Dados::validacao_operacional_UsinasElevatorias(EntradaSaidaDados a_entradaS
 
 				a_entradaSaidaDados.setDiretorioEntrada(a_diretorio_att_operacional);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("USINA_ELEVATORIA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("USINA_ELEVATORIA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("USINA_ELEVATORIA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("USINA_ELEVATORIA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("USINA_ELEVATORIA_AttMatrizOperacional_PorPeriodoPorIdPatamar.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("USINA_ELEVATORIA_AttMatrizOperacional_PorPeriodoPorIdPatamar.csv", *this, TipoAcessoInstancia_m1);
 
 			}//if (recarregar_atributo) {
 
@@ -3373,22 +3373,22 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 			a_entradaSaidaDados.setDiretorioEntrada(a_diretorio_att_operacional);
 
 			if (recarregar_AttVetorTermeletrica_PorPeriodo)
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("TERMELETRICA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("TERMELETRICA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
 			if (recarregar_AttVetorTermeletrica_PorInteiro)
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("TERMELETRICA_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("TERMELETRICA_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_m1);
 
 			if (recarregar_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga)
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("TERMELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("TERMELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 			if (recarregar_AttMatrizTermeletrica_COMANDO_PorPeriodoPorIdPatamarCarga)
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("TERMELETRICA_COMANDO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("TERMELETRICA_COMANDO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 			if (recarregar_AttVetorUnidadeUTE_PorPeriodo)
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("TERMELETRICA_UNIDADE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("TERMELETRICA_UNIDADE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m3);
 
 			if (recarregar_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga)
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("TERMELETRICA_UNIDADE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("TERMELETRICA_UNIDADE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m3);
 
 		} // (!a_imprimir_atributos_sem_recarregar) {
 
@@ -7325,37 +7325,37 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 			a_entradaSaidaDados.setDiretorioEntrada(a_diretorio_att_operacional);
 
 			if (recarregar_AttVetorReservatorio_PorPeriodo)
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
 			if (recarregar_AttVetorHidreletrica_PorPeriodo)
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
 			if (recarregar_AttVetorHidreletrica_PorInteiro)
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_m1);
 
 			if (recarregar_AttMatrizHidreletrica_PorPeriodoPorIdPatamarCarga)
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 			if (recarregar_AttMatrizFuncaoProducaoHidreletrica_por_usina)
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_membroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_m2);
 
 			if (recarregar_AttVetorConjuntoHidraulico_PorPeriodo)
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_CONJUNTO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_CONJUNTO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
 			if (recarregar_AttMatrizConjuntoHidraulico_PorPeriodoPorIdPatamarCarga)
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_CONJUNTO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_CONJUNTO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
 
 			if (recarregar_AttMatrizFuncaoProducaoHidreletrica_por_conjunto)
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_CONJUNTO_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_membroMembroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_CONJUNTO_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_m3);
 
 			if (recarregar_AttVetorUnidadeUHE_PorPeriodo)
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_CONJUNTO_UNIDADE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membroMembroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_CONJUNTO_UNIDADE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m3);
 
 			if (recarregar_AttMatrizUnidadeUHE_PorPeriodoPorIdPatamarCarga)
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_CONJUNTO_UNIDADE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_CONJUNTO_UNIDADE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m3);
 
 			if (recarregar_AttMatrizFuncaoProducaoHidreletrica_por_unidade)
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_CONJUNTO_UNIDADE_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_membroMembroMembroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_CONJUNTO_UNIDADE_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_m4);
 
 		} // (!a_imprimir_atributos_sem_recarregar) {
 
@@ -7784,13 +7784,13 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 				//		
 				a_entradaSaidaDados.setDiretorioEntrada(a_diretorio_att_operacional);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum("SUBMERCADO_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum("SUBMERCADO_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("SUBMERCADO_PATAMAR_DEFICIT_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("SUBMERCADO_PATAMAR_DEFICIT_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
 
 			} // if (!a_imprimir_atributos_sem_recarregar) {
 
@@ -8026,9 +8026,9 @@ void Dados::validacao_operacional_Intercambio(EntradaSaidaDados a_entradaSaidaDa
 				//		
 				a_entradaSaidaDados.setDiretorioEntrada(a_diretorio_att_operacional);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum("INTERCAMBIO_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum("INTERCAMBIO_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 			} // if (!a_imprimir_atributos_sem_recarregar) {
 
@@ -8087,7 +8087,7 @@ void Dados::validacao_operacional_BaciaHidrografica(EntradaSaidaDados a_entradaS
 				//		
 				a_entradaSaidaDados.setDiretorioEntrada(a_diretorio_att_operacional);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum("BACIA_HIDROGRAFICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum("BACIA_HIDROGRAFICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
 			} // if (!a_imprimir_atributos_sem_recarregar) {
 
@@ -8544,17 +8544,17 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 				//		
 				a_entradaSaidaDados.setDiretorioEntrada(a_diretorio_att_operacional);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_ELETRICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_ELETRICA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("RESTRICAO_ELETRICA_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("RESTRICAO_ELETRICA_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 				// Elemento Sistema
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m2);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
 
 			} // if (!a_imprimir_atributos_sem_recarregar) {
 
@@ -8712,11 +8712,11 @@ void Dados::validacao_operacional_AgrupamentoIntercambio(EntradaSaidaDados a_ent
 				//		
 				a_entradaSaidaDados.setDiretorioEntrada(a_diretorio_att_operacional);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum("AGRUPAMENTO_INTERCAMBIO_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum("AGRUPAMENTO_INTERCAMBIO_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("AGRUPAMENTO_INTERCAMBIO_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("AGRUPAMENTO_INTERCAMBIO_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("AGRUPAMENTO_INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("AGRUPAMENTO_INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 			} // if (!a_imprimir_atributos_sem_recarregar) {
 
@@ -11798,19 +11798,19 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 				//		
 				a_entradaSaidaDados.setDiretorioEntrada(a_diretorio_att_operacional);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_m1);
 				
-				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttVetor("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
 
 				// Elemento Sistema
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttComumOperacional.csv", *this, TipoAcessoInstancia_membroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m2);
 
-				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_membroMembro);
+				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
 
 			} // if (!a_imprimir_atributos_sem_recarregar) {
 

@@ -1010,6 +1010,79 @@ Valor getElementoVetor(const Id##Membro a_membro, const IdMembroMembro a_membroM
 	try { return vetor##Membro.att(a_membro).getElementoVetor(a_membroMembro, a_membroMembroMembro, a_membroMembroMembroMembro, a_atributo, a_iterador, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getElementoVetor(" + getString(a_membro) + "," + getString(a_membroMembro) + "," + getString(a_membroMembroMembro) + "," + getString(a_membroMembroMembroMembro) + "," + getString(a_atributo) + "," + getString(a_iterador) + ",Valor): \n" + std::string(erro.what())); } \
 }; \
+bool addDadoAttMatriz##Membro(const std::string a_membro, const std::string a_idMembro, const std::vector<std::string> &a_iter1, const std::vector<std::string> &a_iter2, const std::string &a_att, const std::vector<std::vector<std::string>> &a_vlr){ \
+	try{ \
+		if (strCompara(a_membro, std::string(#Membro))){ \
+			if ((a_iter1.size() > 0) && (a_iter2.size() > 0) && (a_vlr.size() > 0)){ \
+				const Id##Membro id##Membro = getId####Membro##FromChar(a_idMembro.c_str()); \
+				if (!vetor##Membro.isInstanciado(id##Membro)){ \
+					Membro objeto##Membro; \
+					objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idMembro); \
+					vetor##Membro.add(objeto##Membro);\
+				} \
+				vetor##Membro.att(id##Membro).addDadoAttMatriz(a_iter1, a_iter2, a_att, a_vlr); \
+				vetor##Membro.att(id##Membro).validacaoDadosAttMatriz(std::vector<std::string>{a_att}); \
+				return true; \
+			} \
+			else \
+				throw std::invalid_argument("Faltando informacoes dos argumentos a_iter1, a_iter2 e a_vlr"); \
+		} \
+		else \
+			return false; \
+	}\
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadosAttMatriz" + std::string(#Membro) + "():\n" + std::string(erro.what())); } \
+}; \
+bool addDadoAttMatriz##Membro##_Membro(const std::string a_membro, const std::string a_idMembro, const std::string a_membroMembro, const std::string a_idMembroMembro, const std::vector<std::string> &a_iter1, const std::vector<std::string> &a_iter2, const std::string &a_att, const std::vector<std::vector<std::string>> &a_vlr){ \
+	try{ \
+		if (strCompara(a_membro, std::string(#Membro))){ \
+			const Id##Membro id##Membro = getId####Membro##FromChar(a_idMembro.c_str()); \
+			if (!vetor##Membro.isInstanciado(id##Membro)){ \
+				Membro objeto##Membro; \
+				objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idMembro); \
+				vetor##Membro.add(objeto##Membro);\
+			} \
+			vetor##Membro.att(id##Membro).addDadoAttMatrizMembro(a_membroMembro, a_idMembroMembro, a_iter1, a_iter2, a_att, a_vlr); \
+			return true; \
+		} \
+		else \
+			return false; \
+	}\
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttMatriz" + std::string(#Membro) + "_Membro():\n" + std::string(erro.what())); } \
+}; \
+bool addDadoAttMatriz##Membro##_MembroMembro(const std::string a_membro, const std::string a_idMembro, const std::string a_membroMembro, const std::string a_idMembroMembro, const std::string a_membroMembroMembro, const std::string a_idMembroMembroMembro, const std::vector<std::string> &a_iter1, const std::vector<std::string> &a_iter2, const std::string &a_att, const std::vector<std::vector<std::string>> &a_vlr){ \
+	try{ \
+		if (strCompara(a_membro, std::string(#Membro))){ \
+			const Id##Membro id##Membro = getId####Membro##FromChar(a_idMembro.c_str()); \
+			if (!vetor##Membro.isInstanciado(id##Membro)){ \
+				Membro objeto##Membro; \
+				objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idMembro); \
+				vetor##Membro.add(objeto##Membro);\
+			} \
+			vetor##Membro.att(id##Membro).addDadoAttMatrizMembroMembro(a_membroMembro, a_idMembroMembro, a_membroMembroMembro, a_idMembroMembroMembro, a_iter1, a_iter2, a_att, a_vlr); \
+			return true; \
+		} \
+		else \
+			return false; \
+	}\
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttMatriz" + std::string(#Membro) + "_MembroMembro():\n" + std::string(erro.what())); } \
+}; \
+bool addDadoAttMatriz##Membro##_MembroMembroMembro(const std::string a_membro, const std::string a_idMembro, const std::string a_membroMembro, const std::string a_idMembroMembro, const std::string a_membroMembroMembro, const std::string a_idMembroMembroMembro, const std::string a_membroMembroMembroMembro, const std::string a_idMembroMembroMembroMembro, const std::vector<std::string> &a_iter1, const std::vector<std::string> &a_iter2, const std::string &a_att, const std::vector<std::vector<std::string>> &a_vlr){ \
+	try{ \
+		if (strCompara(a_membro, std::string(#Membro))){ \
+			const Id##Membro id##Membro = getId####Membro##FromChar(a_idMembro.c_str()); \
+			if (!vetor##Membro.isInstanciado(id##Membro)){ \
+				Membro objeto##Membro; \
+				objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idMembro); \
+				vetor##Membro.add(objeto##Membro);\
+			} \
+			vetor##Membro.att(id##Membro).addDadoAttMatrizMembroMembroMembro(a_membroMembro, a_idMembroMembro, a_membroMembroMembro, a_idMembroMembroMembro, a_membroMembroMembroMembro, a_idMembroMembroMembroMembro, a_iter1, a_iter2, a_att, a_vlr); \
+			return true; \
+		} \
+		else \
+			return false; \
+	}\
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttMatriz" + std::string(#Membro) + "_MembroMembroMembro():\n" + std::string(erro.what())); } \
+}; \
 bool addDadoAttMatriz##Membro(const std::string a_membro, const std::string a_idMembro, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2){ \
 	try{ \
 		if (strCompara(a_membro, std::string(#Membro))){ \
@@ -1519,6 +1592,22 @@ if (matrizRetorno.size() > 0) \
 // AttMatriz
 //
 
+#define DEFINE2_addDadoAttMatrizMembro(Classe, Membro)\
+if (addDadoAttMatriz##Membro(a_membro, a_idMembro, a_iter1, a_iter2, a_att, a_vlr)) \
+	return; 
+
+#define DEFINE2_addDadoAttMatrizMembroMembro(Classe, Membro)\
+if (addDadoAttMatriz##Membro##_Membro(a_membro, a_idMembro, a_membroMembro, a_idMembroMembro, a_iter1, a_iter2, a_att, a_vlr)) \
+	return; 
+
+#define DEFINE2_addDadoAttMatrizMembroMembroMembro(Classe, Membro)\
+if (addDadoAttMatriz##Membro##_MembroMembro(a_membro, a_idMembro, a_membroMembro, a_idMembroMembro, a_membroMembroMembro, a_idMembroMembroMembro, a_iter1, a_iter2, a_att, a_vlr)) \
+	return; 
+
+#define DEFINE2_addDadoAttMatrizMembroMembroMembroMembro(Classe, Membro)\
+if (addDadoAttMatriz##Membro##_MembroMembroMembro(a_membro, a_idMembro, a_membroMembro, a_idMembroMembro, a_membroMembroMembro, a_idMembroMembroMembro, a_membroMembroMembroMembro, a_idMembroMembroMembroMembro, a_iter1, a_iter2, a_att, a_vlr)) \
+	return; 
+
 #define DEFINE_addDadoAttMatrizMembro(Classe, Membro)\
 if (addDadoAttMatriz##Membro(a_membro, a_idMembro, a_iterador1, a_iterador2, a_attMatriz, a_valor, a_alocacao_1, a_alocacao_2)) \
 	return; 
@@ -1676,6 +1765,34 @@ virtual std::vector<std::vector<std::string>> getDadosAttVetorMembroMembroMembro
 		throw std::invalid_argument("Membro nao encontrado."); \
 	}\
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getDadosAttVetorMembroMembroMembroMembro:(" + getString(a_incluirCabecalho) + "," + a_membro + "," + a_idMembro + "," + a_membroMembro + "," + a_idMembroMembro + "," + a_membroMembroMembro + "," + a_idMembroMembroMembro + "," + a_membroMembroMembroMembro + "," + a_idMembroMembroMembroMembro + "," + a_iteradorInicial + "," + a_iteradorFinal + ",a_vetorAttVetor):\n" + std::string(erro.what())); }\
+}; \
+virtual void addDadoAttMatrizMembro(const std::string a_membro, const std::string a_idMembro, const std::vector<std::string>& a_iter1, const std::vector<std::string>& a_iter2, const std::string& a_att, const std::vector<std::vector<std::string>>& a_vlr){ \
+	try{ \
+		valores(DEFINE2_addDadoAttMatrizMembro) \
+		throw std::invalid_argument("Membro nao encontrado."); \
+	}\
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadosAttMatrizMembro:():\n" + std::string(erro.what())); }\
+}; \
+virtual void addDadoAttMatrizMembroMembro(const std::string a_membro, const std::string a_idMembro, const std::string a_membroMembro, const std::string a_idMembroMembro, const std::vector<std::string>& a_iter1, const std::vector<std::string>& a_iter2, const std::string& a_att, const std::vector<std::vector<std::string>>& a_vlr) {\
+	try { \
+		valores(DEFINE2_addDadoAttMatrizMembroMembro) \
+		throw std::invalid_argument("Membro ou Membro Filho nao encontrados."); \
+	}\
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadosAttMatrizMembroMembro:():\n" + std::string(erro.what())); }\
+}; \
+virtual void addDadoAttMatrizMembroMembroMembro(const std::string a_membro, const std::string a_idMembro, const std::string a_membroMembro, const std::string a_idMembroMembro, const std::string a_membroMembroMembro, const std::string a_idMembroMembroMembro, const std::vector<std::string>& a_iter1, const std::vector<std::string>& a_iter2, const std::string& a_att, const std::vector<std::vector<std::string>>& a_vlr) {\
+	try { \
+		valores(DEFINE2_addDadoAttMatrizMembroMembroMembro) \
+		throw std::invalid_argument("Membro ou Membro Filho nao encontrados."); \
+	}\
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadosAttMatrizMembroMembroMembro:():\n" + std::string(erro.what())); }\
+}; \
+virtual void addDadoAttMatrizMembroMembroMembroMembro(const std::string a_membro, const std::string a_idMembro, const std::string a_membroMembro, const std::string a_idMembroMembro, const std::string a_membroMembroMembro, const std::string a_idMembroMembroMembro, const std::string a_membroMembroMembroMembro, const std::string a_idMembroMembroMembroMembro, const std::vector<std::string>& a_iter1, const std::vector<std::string>& a_iter2, const std::string& a_att, const std::vector<std::vector<std::string>>& a_vlr) {\
+	try { \
+		valores(DEFINE2_addDadoAttMatrizMembroMembroMembroMembro) \
+		throw std::invalid_argument("Membro ou Membro Filho nao encontrados."); \
+	}\
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttMatrizMembroMembroMembroMembro:():\n" + std::string(erro.what())); }\
 }; \
 virtual void addDadoAttMatrizMembro(const std::string a_membro, const std::string a_idMembro, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2){ \
 	try{ \

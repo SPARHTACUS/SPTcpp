@@ -204,6 +204,32 @@ public:
 	//
 	// AttMatriz
 	//
+	
+
+	virtual void addDadoAttMatriz(const std::vector<std::string>& a_iter1, const std::vector<std::string>& a_iter2, const std::string& a_att, const std::vector<std::vector<std::string>>& a_vlr) {
+		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::addDadoAttMatriz(): \n" + std::string(erro.what())); }
+	};
+
+	virtual void addDadoAttMatrizMembro(const std::string a_membro, const std::string a_idMembro, const std::vector<std::string>& a_iter1, const std::vector<std::string>& a_iter2, const std::string& a_att, const std::vector<std::vector<std::string>>& a_vlr) {
+		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizMembro(): \n" + std::string(erro.what())); }
+	};
+
+	virtual void addDadoAttMatrizMembroMembro(const std::string a_membro, const std::string a_idMembro, const std::string a_membroMembro, const std::string a_idMembroMembro, const std::vector<std::string>& a_iter1, const std::vector<std::string>& a_iter2, const std::string& a_att, const std::vector<std::vector<std::string>>& a_vlr) {
+		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizMembroMembro(): \n" + std::string(erro.what())); }
+	};
+
+	virtual void addDadoAttMatrizMembroMembroMembro(const std::string a_membro, const std::string a_idMembro, const std::string a_membroMembro, const std::string a_idMembroMembro, const std::string a_membroMembroMembro, const std::string a_idMembroMembroMembro, const std::vector<std::string>& a_iter1, const std::vector<std::string>& a_iter2, const std::string& a_att, const std::vector<std::vector<std::string>>& a_vlr) {
+		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizMembroMembroMembro(): \n" + std::string(erro.what())); }
+	};
+
+	virtual void addDadoAttMatrizMembroMembroMembroMembro(const std::string a_membro, const std::string a_idMembro, const std::string a_membroMembro, const std::string a_idMembroMembro, const std::string a_membroMembroMembro, const std::string a_idMembroMembroMembro, const std::string a_membroMembroMembroMembro, const std::string a_idMembroMembroMembroMembro, const std::vector<std::string>& a_iter1, const std::vector<std::string>& a_iter2, const std::string& a_att, const std::vector<std::vector<std::string>>& a_vlr) {
+		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizMembroMembroMembroMembro(): \n" + std::string(erro.what())); }
+	};
 
 	virtual void addDadoAttMatriz(const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor) {
 		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
