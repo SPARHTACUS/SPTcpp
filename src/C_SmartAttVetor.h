@@ -60,41 +60,12 @@ DEFINE_OPERADOR_SMART_ENUM_MAIS_MAIS(SmartAtributo##Classe) \
 
 
 #define DEFINE_METODOS_AttVetor(Classe, Atributo) \
-virtual void addDadoAttVetor(const std::string a_idMembro, const std::string a_iterador, const std::string a_atributo, const std::string a_vlrDado){  \
-	try { addDadoAttVetor(a_idMembro, a_iterador, a_atributo, a_vlrDado, 1); } \
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttVetor(" + a_idMembro + "," + a_iterador + "," + a_atributo + ","  + a_vlrDado + "): \n" + std::string(erro.what())); }\
-}; \
-virtual void addDadoAttVetor(const std::string a_idMembro, const std::string a_iterador, const std::string a_atributo, const std::string a_vlrDado, const int a_alocacao){  \
-	try { \
-		if ((a_iterador == "") && (a_vlrDado == "")) { \
-			validacaoDadosAttVetor(std::vector<std::string>{a_atributo}); \
-			return;  \
-		} \
-		else if (getIdObjeto() != getId##Classe##FromChar(a_idMembro.c_str())) \
-			throw std::invalid_argument("Inconsistencia na alocacao de dados. Membro Argumento - " + a_idMembro + " - Membro Destino - " + getString(getIdObjeto())); \
-		else { \
-			const Atributo##Classe atributo = get##Atributo##Classe##FromChar(a_atributo.c_str()); \
-			addElementoFromString(atributo, a_iterador, a_vlrDado, a_alocacao); \
-		} \
+virtual void addDadoAttVetor(const std::vector<std::string> &a_iter, const std::string &a_att, const std::vector<std::string> & a_vlr){  \
+	try {\
+		const Atributo##Classe att = get##Atributo##Classe##FromChar(a_att.c_str()); \
+		lista##Atributo##Classe.at(att)->addVetorFromString(a_iter, a_vlr);\
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttVetor(" + a_idMembro + "," + a_iterador + "," + a_atributo + ","  + a_vlrDado + "," + getFullString(a_alocacao) + "): \n" + std::string(erro.what())); }\
-}; \
-virtual void addDadoAttVetor(const std::string a_iterador, const std::string a_atributo, const std::string a_vlrDado){  \
-	try { addDadoAttVetor(a_iterador, a_atributo, a_vlrDado, 1); } \
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttVetor(" + a_iterador + "," + a_atributo + ","  + a_vlrDado + "): \n" + std::string(erro.what())); }\
-}; \
-virtual void addDadoAttVetor(const std::string a_iterador, const std::string a_atributo, const std::string a_vlrDado, const int a_alocacao){  \
-	try { \
-		if ((a_iterador == "") && (a_vlrDado == "")) { \
-			validacaoDadosAttVetor(std::vector<std::string>{a_atributo}); \
-			return;  \
-		} \
-		else { \
-			const Atributo##Classe atributo = get##Atributo##Classe##FromChar(a_atributo.c_str()); \
-			addElementoFromString(atributo, a_iterador, a_vlrDado, a_alocacao); \
-		} \
-	} \
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttVetor(" + a_iterador + "," + a_atributo + ","  + a_vlrDado + "," + getFullString(a_alocacao) + "): \n" + std::string(erro.what())); }\
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttVetor(): \n" + std::string(erro.what())); }\
 }; \
 virtual std::vector<std::vector<std::string>> getDadosAttVetor(const bool a_incluirIteradores, const std::string a_iteradorInicial, const std::string a_iteradorFinal, const bool a_incluirAtributo, const std::vector<std::string> a_atributo){  \
 	try { \
@@ -219,21 +190,21 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 		}\
 		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + "_Struct::addElemento(" + getString(a_iterador) + "," + getString(a_valor) + "): \n" + std::string(erro.what())); }\
 	};\
-	virtual bool addElementoFromString(const std::string a_iterador, const std::string a_valor) { \
-		try{ return addElementoFromString(a_iterador, a_valor, 1); }\
-		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + "_Struct::addElementoFromString(" + a_iterador + "," + a_valor + "): \n" + std::string(erro.what())); }\
-	};\
-	virtual bool addElementoFromString(const std::string a_iterador, const std::string a_valor, const int a_alocacao) { \
+	virtual bool addVetorFromString(const std::vector<std::string> &a_iter, const std::vector<std::string> &a_vlr) { \
 		try{ \
-			if (getSizeVetor() == 0) { dados = SmartEnupla<TipoIterador,TipoValor>(a_alocacao); }; \
-			if (strCompara(a_valor.c_str(), "NaN") || strCompara(a_valor.c_str(), "-nan(ind)")) { throw std::invalid_argument("Valor NaN."); }\
-			const TipoValor valor = get##TipoValor##FromChar(a_valor.c_str());\
-			if (valor < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
-			else if (valor > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
-			else { dados.addElemento(get##TipoIterador##FromChar(a_iterador.c_str()), valor); } \
-			return true;\
+			SmartEnupla<TipoIterador, TipoValor> enupla(int(a_vlr.size()));\
+			for (int it = 0; it < int(a_vlr.size()); it++) \
+				enupla.addElemento(get##TipoIterador##FromChar(a_iter.at(it).c_str()), get##TipoValor##FromChar(a_vlr.at(it).c_str()));\
+			if (getSizeVetor() == 0) \
+				setVetor(enupla);\
+			else{\
+				SmartEnupla<TipoIterador, TipoValor> enupla_prev = dados;\
+				enupla_prev.addElemento(enupla);\
+				setVetor(enupla_prev);\
+			}\
+			return true; \
 		}\
-		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + "_Struct::addElementoFromString(" + a_iterador + "," + a_valor + "," + getFullString(a_alocacao) + "): \n" + std::string(erro.what())); }\
+		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + "_Struct::addVetorFromString(): \n" + std::string(erro.what())); }\
 	};\
 	virtual std::vector<std::vector<std::string>> getStringsFromElementos(const bool a_incluirAtributo, const bool a_incluirIteradores, const std::string a_iteradorInicial, const std::string a_iteradorFinal) const { \
 		try{ \
@@ -433,6 +404,7 @@ struct Atributo##Classe##_Struct{\
 \
 	virtual ~Atributo##Classe##_Struct(){}; \
 \
+	virtual bool addVetorFromString(const std::vector<std::string> &a_iter, const std::vector<std::string> &a_vlr) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addVetorFromString(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool addElementoFromString(const std::string a_iterador, const std::string a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElementoFromString(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool addElementoFromString(const std::string a_iterador, const std::string a_valor, const int a_alocacao) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElementoFromString(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool clear()                                                                        { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::clear(): \nEstrutura de dados nao definida."); return false; }; \

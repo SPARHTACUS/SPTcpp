@@ -66,7 +66,7 @@ Id##Classe getIdObjeto()const{ \
 	try { return lista##Atributo##Classe.at(Atributo##Classe##_id##Classe)->getAtributo(Id##Classe()); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIdObjeto(): \n" + std::string(erro.what())); }\
 }; \
-virtual void addDadosAttComum(const std::string a_idMembro, const std::vector<std::string> &a_atributo, const std::vector<std::string> &a_vlrDado){  \
+virtual void addDadosAttComum(const std::string a_idM1, const std::vector<std::string> &a_atributo, const std::vector<std::string> &a_vlrDado){  \
 	std::string atributoStr = ""; \
 	std::string vlrDadoStr  = ""; \
 	try { \
@@ -76,7 +76,7 @@ virtual void addDadosAttComum(const std::string a_idMembro, const std::vector<st
 		if ((numAtributos == 0) || (a_vlrDado.size() == 0)) { throw std::invalid_argument("Agumentos a_atributo e a_vlrDados sem valores."); } \
 		else if (numAtributos != int(a_vlrDado.size())) { throw std::invalid_argument("Vetores de atributos e valores de diferente tamanhos."); } \
 		else { \
-			setAtributoFromString(atributo, a_idMembro); \
+			setAtributoFromString(atributo, a_idM1); \
 			atributosLidos.at(atributo) = true; \
 			for (int i = 0; i < numAtributos; i++) { \
 				atributoStr = a_atributo.at(i); \

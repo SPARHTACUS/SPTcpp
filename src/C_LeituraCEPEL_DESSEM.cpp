@@ -1363,7 +1363,7 @@ void LeituraCEPEL::leitura_RESPOT_201904_DES16(Dados& a_dados, const std::string
 
 					if (sizeReservaMinima == 0) {
 						for (Periodo periodo = getPeriodoInicialResticao(periodo_inicial, horizonte_estudo); periodo <= getPeriodoFinalResticao(periodo_final_estudo, horizonte_estudo); horizonte_estudo.incrementarIterador(periodo)) {
-							a_dados.addDadoAttVetorMembro(getFullString(ReservaPotencia()), getString(idReservaPotencia.at(0)), periodo.str(), "reserva_minima", "0", 1);
+							//a_dados.addDadoAttVetorM1(getFullString(ReservaPotencia()), getString(idReservaPotencia.at(0)), periodo.str(), "reserva_minima", "0", 1);
 						}
 					}
 

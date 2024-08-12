@@ -164,16 +164,16 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 
 		std::string membro = "";
 		std::string membroMembro = "";
-		std::string membroMembroMembro = "";
-		std::string membroMembroMembroMembro = "";
+		std::string membroM2 = "";
+		std::string membroM3 = "";
 
 		std::vector<std::string> vetorValores;
 		std::vector<std::string> vetorAttComuns;
 
 		std::vector<std::string> vetorIdMembro;
-		std::vector<std::string> vetorIdMembroMembro;
-		std::vector<std::string> vetorIdMembroMembroMembro;
-		std::vector<std::string> vetorIdMembroMembroMembroMembro;
+		std::vector<std::string> vetorIdM2;
+		std::vector<std::string> vetorIdM3;
+		std::vector<std::string> vetorIdM4;
 
 		if (a_tipoAcesso == TipoAcessoInstancia_direto) {
 
@@ -191,10 +191,10 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 				membroMembro = cabecalho.at(1);
 
 			if (a_tipoAcesso >= TipoAcessoInstancia_m3)
-				membroMembroMembro = cabecalho.at(2);
+				membroM2 = cabecalho.at(2);
 
 			if (a_tipoAcesso >= TipoAcessoInstancia_m4)
-				membroMembroMembroMembro = cabecalho.at(3);
+				membroM3 = cabecalho.at(3);
 
 			vetorAttComuns = std::vector<std::string>(cabecalho.begin() + numMinColunas - 1, cabecalho.end());
 
@@ -241,47 +241,47 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 
 			} // if (a_tipoAcesso >= TipoAcessoInstancia_m1) {
 
-			std::string idMembroMembro = "";
+			std::string idM2 = "";
 
 			if (a_tipoAcesso >= TipoAcessoInstancia_m2) {
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
 
-				idMembroMembro = valor;
+				idM2 = valor;
 
-				if (!findStringNoVetor(idMembroMembro, vetorIdMembroMembro))
-					vetorIdMembroMembro.push_back(idMembroMembro);
+				if (!findStringNoVetor(idM2, vetorIdM2))
+					vetorIdM2.push_back(idM2);
 
 				pos = linha.find(separadorCSV);
 				linha = linha.substr(pos + 1, linha.length());
 
 			} // if (a_tipoAcesso >= TipoAcessoInstancia_m2) {
 
-			std::string idMembroMembroMembro = "";
+			std::string idM3 = "";
 
 			if (a_tipoAcesso >= TipoAcessoInstancia_m3) {
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
 
-				idMembroMembroMembro = valor;
+				idM3 = valor;
 
-				if (!findStringNoVetor(idMembroMembroMembro, vetorIdMembroMembroMembro))
-					vetorIdMembroMembroMembro.push_back(idMembroMembroMembro);
+				if (!findStringNoVetor(idM3, vetorIdM3))
+					vetorIdM3.push_back(idM3);
 
 				pos = linha.find(separadorCSV);
 				linha = linha.substr(pos + 1, linha.length());
 			} // if (a_tipoAcesso >= TipoAcessoInstancia_m3) {
 
-			std::string idMembroMembroMembroMembro = "";
+			std::string idM4 = "";
 
 			if (a_tipoAcesso >= TipoAcessoInstancia_m4) {
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
 
-				idMembroMembroMembroMembro = valor;
+				idM4 = valor;
 
-				if (!findStringNoVetor(idMembroMembroMembroMembro, vetorIdMembroMembroMembroMembro))
-					vetorIdMembroMembroMembroMembro.push_back(idMembroMembroMembroMembro);
+				if (!findStringNoVetor(idM4, vetorIdM4))
+					vetorIdM4.push_back(idM4);
 
 				pos = linha.find(separadorCSV);
 				linha = linha.substr(pos + 1, linha.length());
@@ -298,15 +298,15 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 					membroMembro = membroMembro.substr(2, membroMembro.size() - 2);
 			} // if (membroMembro.size() > 2) {
 
-			if (membroMembroMembro.size() > 2) {
-				if (membroMembroMembro.substr(0, 2) == "id")
-					membroMembroMembro = membroMembroMembro.substr(2, membroMembroMembro.size() - 2);
-			} // if (membroMembroMembro.size() > 2) {
+			if (membroM2.size() > 2) {
+				if (membroM2.substr(0, 2) == "id")
+					membroM2 = membroM2.substr(2, membroM2.size() - 2);
+			} // if (membroM2.size() > 2) {
 
-			if (membroMembroMembroMembro.size() > 2) {
-				if (membroMembroMembroMembro.substr(0, 2) == "id")
-					membroMembroMembroMembro = membroMembroMembroMembro.substr(2, membroMembroMembroMembro.size() - 2);
-			} // if (membroMembroMembroMembro.size() > 2) {
+			if (membroM3.size() > 2) {
+				if (membroM3.substr(0, 2) == "id")
+					membroM3 = membroM3.substr(2, membroM3.size() - 2);
+			} // if (membroM3.size() > 2) {
 
 
 			if (a_tipoAcesso == TipoAcessoInstancia_direto) {
@@ -345,13 +345,13 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 					throw std::invalid_argument("Numero de colunas no cabecalho diferente do numero de valores na linha " + std::to_string(lin) + ".");
 
 				if (a_tipoAcesso == TipoAcessoInstancia_m1)
-					a_objetoDados.addDadosAttComumMembro(membro, idMembro, vetorAttComuns, vetorValores);
+					a_objetoDados.addDadosAttComumM1(membro, idMembro, vetorAttComuns, vetorValores);
 				else if (a_tipoAcesso == TipoAcessoInstancia_m2)
-					a_objetoDados.addDadosAttComumMembroMembro(membro, idMembro, membroMembro, idMembroMembro, vetorAttComuns, vetorValores);
+					a_objetoDados.addDadosAttComumM2(membro, idMembro, membroMembro, idM2, vetorAttComuns, vetorValores);
 				else if (a_tipoAcesso == TipoAcessoInstancia_m3)
-					a_objetoDados.addDadosAttComumMembroMembroMembro(membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, vetorAttComuns, vetorValores);
+					a_objetoDados.addDadosAttComumM3(membro, idMembro, membroMembro, idM2, membroM2, idM3, vetorAttComuns, vetorValores);
 				else if (a_tipoAcesso == TipoAcessoInstancia_m4)
-					a_objetoDados.addDadosAttComumMembroMembroMembroMembro(membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, membroMembroMembroMembro, idMembroMembroMembroMembro, vetorAttComuns, vetorValores);
+					a_objetoDados.addDadosAttComumM4(membro, idMembro, membroMembro, idM2, membroM2, idM3, membroM3, idM4, vetorAttComuns, vetorValores);
 
 				lin++;
 
@@ -372,13 +372,13 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 		if (a_tipoAcesso == TipoAcessoInstancia_direto)
 			a_objetoDados.validacaoDadosAttComum();
 		else if (a_tipoAcesso == TipoAcessoInstancia_m1)
-			a_objetoDados.validacaoDadosAttComumMembro(membro, vetorIdMembro);
+			a_objetoDados.validacaoDadosAttComumM1(membro, vetorIdMembro);
 		else if (a_tipoAcesso == TipoAcessoInstancia_m2)
-			a_objetoDados.validacaoDadosAttComumMembroMembro(membro, vetorIdMembro, membroMembro, vetorIdMembroMembro);
+			a_objetoDados.validacaoDadosAttComumM2(membro, vetorIdMembro, membroMembro, vetorIdM2);
 		else if (a_tipoAcesso == TipoAcessoInstancia_m3)
-			a_objetoDados.validacaoDadosAttComumMembroMembroMembro(membro, vetorIdMembro, membroMembro, vetorIdMembroMembro, membroMembroMembro, vetorIdMembroMembroMembro);
+			a_objetoDados.validacaoDadosAttComumM3(membro, vetorIdMembro, membroMembro, vetorIdM2, membroM2, vetorIdM3);
 		else if (a_tipoAcesso == TipoAcessoInstancia_m4)
-			a_objetoDados.validacaoDadosAttComumMembroMembroMembroMembro(membro, vetorIdMembro, membroMembro, vetorIdMembroMembro, membroMembroMembro, vetorIdMembroMembroMembro, membroMembroMembroMembro, vetorIdMembroMembroMembroMembro);
+			a_objetoDados.validacaoDadosAttComumM4(membro, vetorIdMembro, membroMembro, vetorIdM2, membroM2, vetorIdM3, membroM3, vetorIdM4);
 
 		if (imprimirNaTela)
 			std::cout << "Sucesso na leitura de " << caminhoArquivo << std::endl;
@@ -475,66 +475,68 @@ void EntradaSaidaDados::carregarArquivoCSV_AttVetor(const std::string a_nomeArqu
 
 			pos = linha.find(separadorCSV);
 
+			if (pos == 0)
+				break;
+
 			valor = linha.substr(0, pos).c_str();
+
+			if (valor.size() == 0)
+				break;
 
 			cabecalho.push_back(valor);
 
 			linha = linha.substr(pos + 1, linha.length());
-
-			if (linha == "")
-				break;
 
 		} // while (pos != string::npos) {
 
 		if (cabecalho.size() < numMinColunas)
 			throw std::invalid_argument("O cabecalho do arquivo deve possuir pelo menos " + std::to_string(numMinColunas) + " colunas.");
 
-		std::string membro                   = "";
-		std::string membroMembro             = "";
-		std::string membroMembroMembro       = "";
-		std::string membroMembroMembroMembro = "";
+		std::string m1 = "";
+		std::string m2 = "";
+		std::string m3 = "";
+		std::string m4 = "";
+		std::string attVetor = "";
 
 		if (a_tipoAcesso >= TipoAcessoInstancia_m1)
-			membro = cabecalho.at(0);
+			m1 = cabecalho.at(0);
 
 		if (a_tipoAcesso >= TipoAcessoInstancia_m2) 
-			membroMembro = cabecalho.at(1);
+			m2 = cabecalho.at(1);
 
 		if (a_tipoAcesso >= TipoAcessoInstancia_m3) 
-			membroMembroMembro = cabecalho.at(2);
+			m3 = cabecalho.at(2);
 
 		if (a_tipoAcesso >= TipoAcessoInstancia_m4)
-			membroMembroMembroMembro = cabecalho.at(3);
+			m4 = cabecalho.at(3);
 
-		if (membro.size() > 2) {
-			if (membro.substr(0, 2) == "id")
-				membro = membro.substr(2, membro.size() - 2);
-		} // if (membro.size() > 2) {
+		if (m1.size() > 2) {
+			if (m1.substr(0, 2) == "id")
+				m1 = m1.substr(2, m1.size() - 2);
+		} // if (m1.size() > 2) {
 
-		if (membroMembro.size() > 2) {
-			if (membroMembro.substr(0, 2) == "id")
-				membroMembro = membroMembro.substr(2, membroMembro.size() - 2);
-		} // if (membroMembro.size() > 2) {
+		if (m2.size() > 2) {
+			if (m2.substr(0, 2) == "id")
+				m2 = m2.substr(2, m2.size() - 2);
+		} // if (m2.size() > 2) {
 
-		if (membroMembroMembro.size() > 2) {
-			if (membroMembroMembro.substr(0, 2) == "id")
-				membroMembroMembro = membroMembroMembro.substr(2, membroMembroMembro.size() - 2);
-		} // if (membroMembroMembro.size() > 2) {
+		if (m3.size() > 2) {
+			if (m3.substr(0, 2) == "id")
+				m3 = m3.substr(2, m3.size() - 2);
+		} // if (m3.size() > 2) {
 
-		if (membroMembroMembroMembro.size() > 2) {
-			if (membroMembroMembroMembro.substr(0, 2) == "id")
-				membroMembroMembroMembro = membroMembroMembroMembro.substr(2, membroMembroMembroMembro.size() - 2);
-		} // if (membroMembroMembroMembro.size() > 2) {
+		if (m4.size() > 2) {
+			if (m4.substr(0, 2) == "id")
+				m4 = m4.substr(2, m4.size() - 2);
+		} // if (m4.size() > 2) {
 
-		const std::vector<std::string> vetorIteradores(cabecalho.begin() + numMinColunas - 1, cabecalho.end());
-		std::vector<std::string> vetorValores;
+		const std::vector<std::string> vetorIter(cabecalho.begin() + numMinColunas - 1, cabecalho.end());
+		std::vector<std::string> vector_data;
 		std::vector<std::string> vetorAttVetor;
-		std::vector<std::string> vetorIdMembro;
-		std::vector<std::string> vetorIdMembroMembro;
-		std::vector<std::string> vetorIdMembroMembroMembro;
-		std::vector<std::string> vetorIdMembroMembroMembroMembro;
-
-		std::string attVetor = "";
+		std::vector<std::string> vetorIdM1;
+		std::vector<std::string> vetorIdM2;
+		std::vector<std::string> vetorIdM3;
+		std::vector<std::string> vetorIdM4;
 
 		// Leitura dados do arquivo
 		lin = 2;
@@ -564,113 +566,105 @@ void EntradaSaidaDados::carregarArquivoCSV_AttVetor(const std::string a_nomeArqu
 					break;
 			} // if (fimDeArquivo != "") {
 
-			std::string idMembro = "";
-
+			std::string idM1 = "";
 			if (a_tipoAcesso >= TipoAcessoInstancia_m1) {
-				idMembro = valor;
-
-				if (!findStringNoVetor(idMembro, vetorIdMembro))
-					vetorIdMembro.push_back(idMembro);
-
-				pos = linha.find(separadorCSV);
+				idM1 = valor;
 				linha = linha.substr(pos + 1, linha.length());
 			}
 
-			std::string idMembroMembro = "";
-
+			std::string idM2 = "";
 			if (a_tipoAcesso >= TipoAcessoInstancia_m2) {
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
-
-				idMembroMembro = valor;
-
-				if (!findStringNoVetor(idMembroMembro, vetorIdMembroMembro))
-					vetorIdMembroMembro.push_back(idMembroMembro);
-
-				pos = linha.find(separadorCSV);
+				idM2 = valor;
 				linha = linha.substr(pos + 1, linha.length());
-
 			} // if (a_tipoAcesso >= TipoAcessoInstancia_m2) {
 
-			std::string idMembroMembroMembro = "";
-
+			std::string idM3 = "";
 			if (a_tipoAcesso >= TipoAcessoInstancia_m3) {
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
-
-				idMembroMembroMembro = valor;
-
-				if (!findStringNoVetor(idMembroMembroMembro, vetorIdMembroMembroMembro))
-					vetorIdMembroMembroMembro.push_back(idMembroMembroMembro);
-
-				pos = linha.find(separadorCSV);
+				idM3 = valor;
 				linha = linha.substr(pos + 1, linha.length());
 			} // if (a_tipoAcesso >= TipoAcessoInstancia_m3) {
 
-			std::string idMembroMembroMembroMembro = "";
-
+			std::string idM4 = "";
 			if (a_tipoAcesso >= TipoAcessoInstancia_m4) {
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
-
-				idMembroMembroMembroMembro = valor;
-
-				if (!findStringNoVetor(idMembroMembroMembroMembro, vetorIdMembroMembroMembroMembro))
-					vetorIdMembroMembroMembroMembro.push_back(idMembroMembroMembroMembro);
-
-				pos = linha.find(separadorCSV);
+				idM4 = valor;
 				linha = linha.substr(pos + 1, linha.length());
 			} // if (a_tipoAcesso >= TipoAcessoInstancia_m4) {
 
-			pos = linha.find(separadorCSV);
-			valor = linha.substr(0, pos).c_str();
+			if (a_tipoAcesso > TipoAcessoInstancia_direto) {
+				pos = linha.find(separadorCSV);
+				valor = linha.substr(0, pos).c_str();
+			}
 
 			attVetor = valor;
-
-			if (!findStringNoVetor(attVetor, vetorAttVetor))
-				vetorAttVetor.push_back(attVetor);
-
-			pos = linha.find(separadorCSV);
 			linha = linha.substr(pos + 1, linha.length());
+
+			vector_data.reserve(vetorIter.size());
 
 			pos = 0;
 			while (pos != std::string::npos) {
 
+				if (linha.size() == 0)
+					break;
+
 				pos = linha.find(separadorCSV);
+
+				if (pos == 0)
+					break;
 
 				valor = linha.substr(0, pos).c_str();
 
-				if (valor != ""	)
-					vetorValores.push_back(valor);
+				if (valor.size() == 0)
+					break;
+
+				vector_data.push_back(valor);
 
 				linha = linha.substr(pos + 1, linha.length());
 
-				if (linha == "")
-					break;
-
 			} // while (pos != string::npos) {
 
-			if (vetorIteradores.size() < vetorValores.size())
+			if (vetorIter.size() < vector_data.size())
 				throw std::invalid_argument("Numero de colunas no cabecalho menor que o numero de valores na linha " + std::to_string(lin) + ".");
 
-			const int numero_elementos = int(vetorValores.size());
+			if (a_tipoAcesso == TipoAcessoInstancia_direto)
+				a_objetoDados.addDadoAttVetor(vetorIter, attVetor, vector_data);
+			else if (a_tipoAcesso == TipoAcessoInstancia_m1)
+				a_objetoDados.addDadoAttVetorM1(m1, idM1, vetorIter, attVetor, vector_data);
+			else if (a_tipoAcesso == TipoAcessoInstancia_m2)
+				a_objetoDados.addDadoAttVetorM2(m1, idM1, m2, idM2, vetorIter, attVetor, vector_data);
+			else if (a_tipoAcesso == TipoAcessoInstancia_m3)
+				a_objetoDados.addDadoAttVetorM3(m1, idM1, m2, idM2, m3, idM3, vetorIter, attVetor, vector_data);
+			else if (a_tipoAcesso == TipoAcessoInstancia_m4)
+				a_objetoDados.addDadoAttVetorM4(m1, idM1, m2, idM2, m3, idM3, m4, idM4, vetorIter, attVetor, vector_data);
 
-			for (int i = 0; i < numero_elementos; i++) {
-				if (a_tipoAcesso == TipoAcessoInstancia_direto)
-					a_objetoDados.addDadoAttVetor(vetorIteradores.at(i), attVetor, vetorValores.at(i), numero_elementos);
-				else if (a_tipoAcesso == TipoAcessoInstancia_m1)
-					a_objetoDados.addDadoAttVetorMembro(membro, idMembro, vetorIteradores.at(i), attVetor, vetorValores.at(i), numero_elementos);
-				else if (a_tipoAcesso == TipoAcessoInstancia_m2)
-					a_objetoDados.addDadoAttVetorMembroMembro(membro, idMembro, membroMembro, idMembroMembro, vetorIteradores.at(i), attVetor, vetorValores.at(i), numero_elementos);
-				else if (a_tipoAcesso == TipoAcessoInstancia_m3)
-					a_objetoDados.addDadoAttVetorMembroMembroMembro(membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, vetorIteradores.at(i), attVetor, vetorValores.at(i), numero_elementos);
-				else if (a_tipoAcesso == TipoAcessoInstancia_m4)
-					a_objetoDados.addDadoAttVetorMembroMembroMembroMembro(membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, membroMembroMembroMembro, idMembroMembroMembroMembro, vetorIteradores.at(i), attVetor, vetorValores.at(i), numero_elementos);
-			} // for (int i = 0; i < int(vetorValores.size()); i++) {
+			if (idM1.size() > 0)
+				if (!findStringNoVetor(idM1, vetorIdM1))
+					vetorIdM1.push_back(idM1);
+
+			if (idM2.size() > 0)
+				if (!findStringNoVetor(idM2, vetorIdM2))
+					vetorIdM2.push_back(idM2);
+
+			if (idM3.size() > 0)
+				if (!findStringNoVetor(idM3, vetorIdM3))
+					vetorIdM3.push_back(idM3);
+
+			if (idM4.size() > 0)
+				if (!findStringNoVetor(idM4, vetorIdM4))
+					vetorIdM4.push_back(idM4);
+
+			if (attVetor.size() > 0)
+				if (!findStringNoVetor(attVetor, vetorAttVetor))
+					vetorAttVetor.push_back(attVetor);
 
 			lin++;
 
-			vetorValores.clear();
+			vector_data = std::vector<std::string>();
 
 		} // while (lin < numLinhas) {
 
@@ -678,13 +672,13 @@ void EntradaSaidaDados::carregarArquivoCSV_AttVetor(const std::string a_nomeArqu
 		if (a_tipoAcesso == TipoAcessoInstancia_direto)
 			a_objetoDados.validacaoDadosAttVetor(vetorAttVetor);
 		else if (a_tipoAcesso == TipoAcessoInstancia_m1)
-			a_objetoDados.validacaoDadosAttVetorMembro(membro, vetorIdMembro, vetorAttVetor);
+			a_objetoDados.validacaoDadosAttVetorM1(m1, vetorIdM1, vetorAttVetor);
 		else if (a_tipoAcesso == TipoAcessoInstancia_m2)
-			a_objetoDados.validacaoDadosAttVetorMembroMembro(membro, vetorIdMembro, membroMembro, vetorIdMembroMembro, vetorAttVetor);
+			a_objetoDados.validacaoDadosAttVetorM2(m1, vetorIdM1, m2, vetorIdM2, vetorAttVetor);
 		else if (a_tipoAcesso == TipoAcessoInstancia_m3)
-			a_objetoDados.validacaoDadosAttVetorMembroMembroMembro(membro, vetorIdMembro, membroMembro, vetorIdMembroMembro, membroMembroMembro, vetorIdMembroMembroMembro, vetorAttVetor);
+			a_objetoDados.validacaoDadosAttVetorM3(m1, vetorIdM1, m2, vetorIdM2, m3, vetorIdM3, vetorAttVetor);
 		else if (a_tipoAcesso == TipoAcessoInstancia_m4)
-			a_objetoDados.validacaoDadosAttVetorMembroMembroMembroMembro(membro, vetorIdMembro, membroMembro, vetorIdMembroMembro, membroMembroMembro, vetorIdMembroMembroMembro, membroMembroMembroMembro, vetorIdMembroMembroMembroMembro, vetorAttVetor);
+			a_objetoDados.validacaoDadosAttVetorM4(m1, vetorIdM1, m2, vetorIdM2, m3, vetorIdM3, m4, vetorIdM4, vetorAttVetor);
 
 		leituraArquivo.close();
 		leituraArquivo.clear();
@@ -728,314 +722,6 @@ bool EntradaSaidaDados::carregarArquivoCSV_AttVetor_seExistir(const std::string 
 
 } // void EntradaSaidaDados::carregarArquivoCSV_AttVetor_seExistir(const std::string a_nomeArquivo, SmartDados & a_objetoDados, const TipoAcessoInstancia a_tipoAcesso) const{
 
-
-
-void EntradaSaidaDados::carregarArquivoCSV_AttMatriz_new(const std::string a_nomeArquivo, SmartDados &a_objetoDados, const TipoAcessoInstancia a_tipoAcesso)const {
-
-	std::string caminhoArquivo = diretorioEntrada + "//" + a_nomeArquivo;
-	if (diretorioEntrada == "")
-		caminhoArquivo = a_nomeArquivo;;
-
-	try {
-
-		if (a_tipoAcesso == TipoAcessoInstancia_Nenhum)
-			throw std::invalid_argument("Necessario informar o argumento Tipo de Acesso a Instancia.");
-
-		int numMinColunas = 0;
-
-		if (a_tipoAcesso == TipoAcessoInstancia_direto)
-			numMinColunas = 3;
-		else if (a_tipoAcesso == TipoAcessoInstancia_m1)
-			numMinColunas = 4;
-		else if (a_tipoAcesso == TipoAcessoInstancia_m2)
-			numMinColunas = 5;
-		else if (a_tipoAcesso == TipoAcessoInstancia_m3)
-			numMinColunas = 6;
-		else if (a_tipoAcesso == TipoAcessoInstancia_m4)
-			numMinColunas = 7;
-		else
-			throw std::invalid_argument("Argumento Tipo de Acesso a Instancia invalido.");
-
-		std::ifstream leituraArquivo;
-
-		leituraArquivo.open(caminhoArquivo.c_str(), std::ios_base::in);
-
-		if (!leituraArquivo.is_open())
-			throw std::invalid_argument("Nao foi possivel abrir o arquivo.");
-
-		char linhaChar[numCaract];
-
-		std::string   linha; // Linha de dados lida do arquivo.
-		std::string   valor; // Valor retirado da linha de dados do arquivo.
-
-		int lin; // Posição da linha da informação ao longo do arquivo de dados.
-		size_t pos; // Posição da coluna da informação ao longo da linha de dados.
-
-		std::vector<std::string> cabecalho;
-
-		// Leitura do Cabeçalho
-		leituraArquivo.getline(linhaChar, numCaract);
-		linha = linhaChar;
-
-		strNormalizada(linha);
-
-		pos = 0;
-		while (pos != std::string::npos) {
-
-			pos = linha.find(separadorCSV);
-
-			valor = linha.substr(0, pos).c_str();
-
-			cabecalho.push_back(valor);
-
-			linha = linha.substr(pos + 1, linha.length());
-
-			if (linha == "")
-				break;
-
-		} // while (pos != string::npos) {
-
-		if (cabecalho.size() < numMinColunas)
-			throw std::invalid_argument("O cabecalho do arquivo deve possuir pelo menos " + std::to_string(numMinColunas) + " colunas.");
-
-		std::string membro = "";
-		std::string membroMembro = "";
-		std::string membroMembroMembro = "";
-		std::string membroMembroMembroMembro = "";
-
-		if (a_tipoAcesso >= TipoAcessoInstancia_m1)
-			membro = cabecalho.at(0);
-
-		if (a_tipoAcesso >= TipoAcessoInstancia_m2)
-			membroMembro = cabecalho.at(1);
-
-		if (a_tipoAcesso >= TipoAcessoInstancia_m3)
-			membroMembroMembro = cabecalho.at(2);
-
-		if (a_tipoAcesso >= TipoAcessoInstancia_m4)
-			membroMembroMembroMembro = cabecalho.at(3);
-
-		if (membro.size() > 2) {
-			if (membro.substr(0, 2) == "id")
-				membro = membro.substr(2, membro.size() - 2);
-		} // if (membro.size() > 2) {
-
-		if (membroMembro.size() > 2) {
-			if (membroMembro.substr(0, 2) == "id")
-				membroMembro = membroMembro.substr(2, membroMembro.size() - 2);
-		} // if (membroMembro.size() > 2) {
-
-		if (membroMembroMembro.size() > 2) {
-			if (membroMembroMembro.substr(0, 2) == "id")
-				membroMembroMembro = membroMembroMembro.substr(2, membroMembroMembro.size() - 2);
-		} // if (membroMembroMembro.size() > 2) {
-
-		if (membroMembroMembroMembro.size() > 2) {
-			if (membroMembroMembroMembro.substr(0, 2) == "id")
-				membroMembroMembroMembro = membroMembroMembroMembro.substr(2, membroMembroMembroMembro.size() - 2);
-		} // if (membroMembroMembroMembro.size() > 2) {
-
-		const std::vector<std::string> vetorIteradores2(cabecalho.begin() + numMinColunas - 1, cabecalho.end());
-		std::vector<std::string> vetorValores;
-		std::vector<std::string> vetorAttMatriz;
-		std::vector<std::string> vetorIdMembro;
-		std::vector<std::string> vetorIdMembroMembro;
-		std::vector<std::string> vetorIdMembroMembroMembro;
-		std::vector<std::string> vetorIdMembroMembroMembroMembro;
-
-		// Leitura dados do arquivo
-		lin = 2;
-		while (lin < numLinhas) {
-
-			leituraArquivo.getline(linhaChar, numCaract);
-			linha = linhaChar;
-
-			strNormalizada(linha);
-
-			valor = linha;
-
-			pos = valor.find(separadorCSV);
-
-			if (pos == std::string::npos) {
-				if (fimDeArquivo != "") {
-					if (!strCompara(valor, fimDeArquivo))
-						std::cout << "Aviso! Arquivo " + caminhoArquivo + " nao finalizado com FIM" << std::endl;
-				} // if (fimDeArquivo != "") {
-				break;
-			} // if (pos != string::npos) {
-
-			valor = linha.substr(0, pos).c_str();
-
-			if (fimDeArquivo != "") {
-				if (strCompara(valor, fimDeArquivo))
-					break;
-			} // if (fimDeArquivo != "") {
-
-			std::string idMembro = "";
-
-			if (a_tipoAcesso >= TipoAcessoInstancia_m1) {
-				idMembro = valor;
-
-				if (!findStringNoVetor(idMembro, vetorIdMembro))
-					vetorIdMembro.push_back(idMembro);
-
-				pos = linha.find(separadorCSV);
-				linha = linha.substr(pos + 1, linha.length());
-			}
-
-			std::string idMembroMembro = "";
-
-			if (a_tipoAcesso >= TipoAcessoInstancia_m2) {
-				pos = linha.find(separadorCSV);
-				valor = linha.substr(0, pos).c_str();
-
-				idMembroMembro = valor;
-
-				if (!findStringNoVetor(idMembroMembro, vetorIdMembroMembro))
-					vetorIdMembroMembro.push_back(idMembroMembro);
-
-				pos = linha.find(separadorCSV);
-				linha = linha.substr(pos + 1, linha.length());
-
-			} // if (a_tipoAcesso >= TipoAcessoInstancia_m2) {
-
-			std::string idMembroMembroMembro = "";
-
-			if (a_tipoAcesso >= TipoAcessoInstancia_m3) {
-				pos = linha.find(separadorCSV);
-				valor = linha.substr(0, pos).c_str();
-
-				idMembroMembroMembro = valor;
-
-				if (!findStringNoVetor(idMembroMembroMembro, vetorIdMembroMembroMembro))
-					vetorIdMembroMembroMembro.push_back(idMembroMembroMembro);
-
-				pos = linha.find(separadorCSV);
-				linha = linha.substr(pos + 1, linha.length());
-
-			} // if (a_tipoAcesso >= TipoAcessoInstancia_m3) {
-
-			std::string idMembroMembroMembroMembro = "";
-
-			if (a_tipoAcesso >= TipoAcessoInstancia_m4) {
-				pos = linha.find(separadorCSV);
-				valor = linha.substr(0, pos).c_str();
-
-				idMembroMembroMembroMembro = valor;
-
-				if (!findStringNoVetor(idMembroMembroMembroMembro, vetorIdMembroMembroMembroMembro))
-					vetorIdMembroMembroMembroMembro.push_back(idMembroMembroMembroMembro);
-
-				pos = linha.find(separadorCSV);
-				linha = linha.substr(pos + 1, linha.length());
-			} // if (a_tipoAcesso >= TipoAcessoInstancia_m4) {
-
-			pos = linha.find(separadorCSV);
-			valor = linha.substr(0, pos).c_str();
-
-			const std::string attMatriz = valor;
-
-			if (!findStringNoVetor(attMatriz, vetorAttMatriz))
-				vetorAttMatriz.push_back(attMatriz);
-
-			pos = linha.find(separadorCSV);
-			linha = linha.substr(pos + 1, linha.length());
-
-			pos = linha.find(separadorCSV);
-			valor = linha.substr(0, pos).c_str();
-
-			const std::string iterador1 = valor;
-
-			pos = linha.find(separadorCSV);
-			linha = linha.substr(pos + 1, linha.length());
-
-			int pos_inicial = 0;
-
-			pos = 0;
-			while (pos != std::string::npos) {
-
-				pos = linha.find(separadorCSV);
-
-				valor = linha.substr(0, pos).c_str();
-
-				vetorValores.push_back(valor);
-
-				linha = linha.substr(pos + 1, linha.length());
-
-				if (linha == "")
-					break;
-
-			} // while (pos != string::npos) {
-
-			if (vetorIteradores2.size() < vetorValores.size())
-				throw std::invalid_argument("Numero de colunas no cabecalho menor que o numero de valores na linha " + std::to_string(lin) + ".");
-
-			if (vetorValores.size() == 0) {
-				if (a_tipoAcesso == TipoAcessoInstancia_direto)
-					a_objetoDados.addDadoAttMatriz(iterador1, "", attMatriz, "", 1, 1);
-				else if (a_tipoAcesso == TipoAcessoInstancia_m1)
-					a_objetoDados.addDadoAttMatrizMembro(membro, idMembro, iterador1, "", attMatriz, "", 1, 1);
-				else if (a_tipoAcesso == TipoAcessoInstancia_m2)
-					a_objetoDados.addDadoAttMatrizMembroMembro(membro, idMembro, membroMembro, idMembroMembro, iterador1, "", attMatriz, "", 1, 1);
-				else if (a_tipoAcesso == TipoAcessoInstancia_m3)
-					a_objetoDados.addDadoAttMatrizMembroMembroMembro(membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, iterador1, "", attMatriz, "", 1, 1);
-				else if (a_tipoAcesso == TipoAcessoInstancia_m4)
-					a_objetoDados.addDadoAttMatrizMembroMembroMembroMembro(membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, membroMembroMembroMembro, idMembroMembroMembroMembro, iterador1, "", attMatriz, "", 1, 1);
-			} // if (vetorValores.size() == 0) {
-
-			else {
-
-				for (int i = 0; i < int(vetorValores.size()); i++) {
-
-					if (vetorValores.at(i) != "") {
-
-						if (a_tipoAcesso == TipoAcessoInstancia_direto)
-							a_objetoDados.addDadoAttMatriz(iterador1, vetorIteradores2.at(i), attMatriz, vetorValores.at(i), 1, int(vetorValores.size()));
-						else if (a_tipoAcesso == TipoAcessoInstancia_m1)
-							a_objetoDados.addDadoAttMatrizMembro(membro, idMembro, iterador1, vetorIteradores2.at(i), attMatriz, vetorValores.at(i), 1, int(vetorValores.size()));
-						else if (a_tipoAcesso == TipoAcessoInstancia_m2)
-							a_objetoDados.addDadoAttMatrizMembroMembro(membro, idMembro, membroMembro, idMembroMembro, iterador1, vetorIteradores2.at(i), attMatriz, vetorValores.at(i), 1, int(vetorValores.size()));
-						else if (a_tipoAcesso == TipoAcessoInstancia_m3)
-							a_objetoDados.addDadoAttMatrizMembroMembroMembro(membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, iterador1, vetorIteradores2.at(i), attMatriz, vetorValores.at(i), 1, int(vetorValores.size()));
-						else if (a_tipoAcesso == TipoAcessoInstancia_m4)
-							a_objetoDados.addDadoAttMatrizMembroMembroMembroMembro(membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, membroMembroMembroMembro, idMembroMembroMembroMembro, iterador1, vetorIteradores2.at(i), attMatriz, vetorValores.at(i), 1, int(vetorValores.size()));
-
-					} // if (vetorValores.at(i) != "") {
-
-				} // for (int i = 0; i < int(vetorValores.size()); i++) {
-
-			}
-
-			lin++;
-
-			vetorValores.clear();
-
-		} // while (lin < numLinhas) {
-
-		// Metodos são chamados para validação pós-leitura.
-		if (a_tipoAcesso == TipoAcessoInstancia_direto)
-			a_objetoDados.validacaoDadosAttMatriz(vetorAttMatriz);
-		else if (a_tipoAcesso == TipoAcessoInstancia_m1)
-			a_objetoDados.validacaoDadosAttMatrizMembro(membro, vetorIdMembro, vetorAttMatriz);
-		else if (a_tipoAcesso == TipoAcessoInstancia_m2)
-			a_objetoDados.validacaoDadosAttMatrizMembroMembro(membro, vetorIdMembro, membroMembro, vetorIdMembroMembro, vetorAttMatriz);
-		else if (a_tipoAcesso == TipoAcessoInstancia_m3)
-			a_objetoDados.validacaoDadosAttMatrizMembroMembroMembro(membro, vetorIdMembro, membroMembro, vetorIdMembroMembro, membroMembroMembro, vetorIdMembroMembroMembro, vetorAttMatriz);
-		else if (a_tipoAcesso == TipoAcessoInstancia_m4)
-			a_objetoDados.validacaoDadosAttMatrizMembroMembroMembroMembro(membro, vetorIdMembro, membroMembro, vetorIdMembroMembro, membroMembroMembro, vetorIdMembroMembroMembro, membroMembroMembroMembro, vetorIdMembroMembroMembroMembro, vetorAttMatriz);
-
-		leituraArquivo.close();
-		leituraArquivo.clear();
-
-		if (imprimirNaTela)
-			std::cout << "Sucesso na leitura de " << caminhoArquivo << std::endl;
-
-	} // try
-
-	catch (const std::ifstream::failure& erro) { throw std::invalid_argument("EntradaSaidaDados::carregarArquivoCSV_AttMatriz(" + caminhoArquivo + ",a_objetoDados): \nErro de Integridade do Arquivo." + std::string(erro.what())); }
-	catch (const std::exception& erro) { throw std::invalid_argument("EntradaSaidaDados::carregarArquivoCSV_AttMatriz(" + caminhoArquivo + ",a_objetoDados): \n" + std::string(erro.what())); }
-
-} // void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(string a_nomeArquivo, SmartDados* a_objetoDados, const TipoAcessoInstancia a_tipoAcesso){
 
 void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArquivo, SmartDados& a_objetoDados, const TipoAcessoInstancia a_tipoAcesso)const {
 
@@ -1151,7 +837,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 		std::vector<std::string> vetorIdM3;
 		std::vector<std::string> vetorIdM4;
 
-		const int num_alloc_data = 100;
+		const int num_alloc_data = 1000;
 		std::vector<std::vector<std::string>> vector_data;
 		std::vector<std::string> vectorIter1;
 		const std::vector<std::string> vectorIter2(cabecalho.begin() + numMinColunas - 1, cabecalho.end());
@@ -1226,6 +912,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 			}
 
 			const std::string attMatriz = valor;
+			linha = linha.substr(pos + 1, linha.length());
 
 			if (!strCompara(idM1, last_idM1) || !strCompara(idM2, last_idM2) || !strCompara(idM3, last_idM3) || !strCompara(idM4, last_idM4) || !strCompara(attMatriz, last_attMatriz)) {
 
@@ -1233,13 +920,13 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 					if (a_tipoAcesso == TipoAcessoInstancia_direto)
 						a_objetoDados.addDadoAttMatriz(vectorIter1, vectorIter2, last_attMatriz, vector_data);
 					else if (a_tipoAcesso == TipoAcessoInstancia_m1)
-						a_objetoDados.addDadoAttMatrizMembro(m1, last_idM1, vectorIter1, vectorIter2, last_attMatriz, vector_data);
+						a_objetoDados.addDadoAttMatrizM1(m1, last_idM1, vectorIter1, vectorIter2, last_attMatriz, vector_data);
 					else if (a_tipoAcesso == TipoAcessoInstancia_m2)
-						a_objetoDados.addDadoAttMatrizMembroMembro(m1, last_idM1, m2, last_idM2, vectorIter1, vectorIter2, last_attMatriz, vector_data);
+						a_objetoDados.addDadoAttMatrizM2(m1, last_idM1, m2, last_idM2, vectorIter1, vectorIter2, last_attMatriz, vector_data);
 					else if (a_tipoAcesso == TipoAcessoInstancia_m3)
-						a_objetoDados.addDadoAttMatrizMembroMembroMembro(m1, last_idM1, m2, last_idM2, m3, last_idM3, vectorIter1, vectorIter2, last_attMatriz, vector_data);
+						a_objetoDados.addDadoAttMatrizM3(m1, last_idM1, m2, last_idM2, m3, last_idM3, vectorIter1, vectorIter2, last_attMatriz, vector_data);
 					else if (a_tipoAcesso == TipoAcessoInstancia_m4)
-						a_objetoDados.addDadoAttMatrizMembroMembroMembroMembro(m1, last_idM1, m2, last_idM2, m3, last_idM3, m4, last_idM4, vectorIter1, vectorIter2, last_attMatriz, vector_data);
+						a_objetoDados.addDadoAttMatrizM4(m1, last_idM1, m2, last_idM2, m3, last_idM3, m4, last_idM4, vectorIter1, vectorIter2, last_attMatriz, vector_data);
 				} // if (last_attMatriz.size() > 0) {
 
 				if (idM1.size() > 0)
@@ -1278,9 +965,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 
 			vector_data.push_back(std::vector<std::string>());
 			const int idx = int(vector_data.size() - 1);
-			vector_data.at(idx).reserve(cabecalho.size() - numMinColunas + 1);
-
-			linha = linha.substr(pos + 1, linha.length());
+			vector_data.at(idx).reserve(vectorIter2.size());
 
 			pos = linha.find(separadorCSV);
 			valor = linha.substr(0, pos).c_str();
@@ -1318,26 +1003,26 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 			if (a_tipoAcesso == TipoAcessoInstancia_direto)
 				a_objetoDados.addDadoAttMatriz(vectorIter1, vectorIter2, last_attMatriz, vector_data);
 			else if (a_tipoAcesso == TipoAcessoInstancia_m1)
-				a_objetoDados.addDadoAttMatrizMembro(m1, last_idM1, vectorIter1, vectorIter2, last_attMatriz, vector_data);
+				a_objetoDados.addDadoAttMatrizM1(m1, last_idM1, vectorIter1, vectorIter2, last_attMatriz, vector_data);
 			else if (a_tipoAcesso == TipoAcessoInstancia_m2)
-				a_objetoDados.addDadoAttMatrizMembroMembro(m1, last_idM1, m2, last_idM2, vectorIter1, vectorIter2, last_attMatriz, vector_data);
+				a_objetoDados.addDadoAttMatrizM2(m1, last_idM1, m2, last_idM2, vectorIter1, vectorIter2, last_attMatriz, vector_data);
 			else if (a_tipoAcesso == TipoAcessoInstancia_m3)
-				a_objetoDados.addDadoAttMatrizMembroMembroMembro(m1, last_idM1, m2, last_idM2, m3, last_idM3, vectorIter1, vectorIter2, last_attMatriz, vector_data);
+				a_objetoDados.addDadoAttMatrizM3(m1, last_idM1, m2, last_idM2, m3, last_idM3, vectorIter1, vectorIter2, last_attMatriz, vector_data);
 			else if (a_tipoAcesso == TipoAcessoInstancia_m4)
-				a_objetoDados.addDadoAttMatrizMembroMembroMembroMembro(m1, last_idM1, m2, last_idM2, m3, last_idM3, m4, last_idM4, vectorIter1, vectorIter2, last_attMatriz, vector_data);
+				a_objetoDados.addDadoAttMatrizM4(m1, last_idM1, m2, last_idM2, m3, last_idM3, m4, last_idM4, vectorIter1, vectorIter2, last_attMatriz, vector_data);
 		} // if (vector_data.size() > 0) {
 
 		// Metodos são chamados para validação pós-leitura.
 		if (a_tipoAcesso == TipoAcessoInstancia_direto)
 			a_objetoDados.validacaoDadosAttMatriz(vetorAttMatriz);
 		else if (a_tipoAcesso == TipoAcessoInstancia_m1)
-			a_objetoDados.validacaoDadosAttMatrizMembro(m1, vetorIdM1, vetorAttMatriz);
+			a_objetoDados.validacaoDadosAttMatrizM1(m1, vetorIdM1, vetorAttMatriz);
 		else if (a_tipoAcesso == TipoAcessoInstancia_m2)
-			a_objetoDados.validacaoDadosAttMatrizMembroMembro(m1, vetorIdM1, m2, vetorIdM2, vetorAttMatriz);
+			a_objetoDados.validacaoDadosAttMatrizM2(m1, vetorIdM1, m2, vetorIdM2, vetorAttMatriz);
 		else if (a_tipoAcesso == TipoAcessoInstancia_m3)
-			a_objetoDados.validacaoDadosAttMatrizMembroMembroMembro(m1, vetorIdM1, m2, vetorIdM2, m3, vetorIdM3, vetorAttMatriz);
+			a_objetoDados.validacaoDadosAttMatrizM3(m1, vetorIdM1, m2, vetorIdM2, m3, vetorIdM3, vetorAttMatriz);
 		else if (a_tipoAcesso == TipoAcessoInstancia_m4)
-			a_objetoDados.validacaoDadosAttMatrizMembroMembroMembroMembro(m1, vetorIdM1, m2, vetorIdM2, m3, vetorIdM3, m4, vetorIdM4, vetorAttMatriz);
+			a_objetoDados.validacaoDadosAttMatrizM4(m1, vetorIdM1, m2, vetorIdM2, m3, vetorIdM3, m4, vetorIdM4, vetorAttMatriz);
 
 		leituraArquivo.close();
 		leituraArquivo.clear();
@@ -1498,7 +1183,7 @@ std::string EntradaSaidaDados::sequenciarNomeArquivoImpressao(const std::string 
 } // std::string EntradaSaidaDados::sequenciarNomeArquivoImpressao(const std::string a_nome_arquivo, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso) {
 
 
-void EntradaSaidaDados::imprimirArquivoCSV_AttComum_(const std::string a_nomeArquivo, const std::string a_membro, const std::string a_membroMembro, const std::string a_membroMembroMembro, const std::string a_membroMembroMembroMembro, SmartDados & a_objetoDados, const std::vector<std::string> a_vetorAttComum)const {
+void EntradaSaidaDados::imprimirArquivoCSV_AttComum_(const std::string a_nomeArquivo, const std::string a_m1, const std::string a_m2, const std::string a_m3, const std::string a_m4, SmartDados & a_objetoDados, const std::vector<std::string> a_vetorAttComum)const {
 
 	std::string caminhoArquivo = diretorioSaida + "//" + a_nomeArquivo;
 	if (diretorioSaida == "")
@@ -1511,46 +1196,46 @@ void EntradaSaidaDados::imprimirArquivoCSV_AttComum_(const std::string a_nomeArq
 		std::string membro = "";
 		std::string idMembro = "";
 
-		getMembroIdMembro(a_membro, membro, idMembro);
+		getMembroIdMembro(a_m1, membro, idMembro);
 
-		if ((a_membro != "") && ((membro == "") || (idMembro == "")))
+		if ((a_m1 != "") && ((membro == "") || (idMembro == "")))
 			throw std::invalid_argument("Membro ou IdMembro invalidos.");
 
 		std::string membroMembro = "";
-		std::string idMembroMembro = "";
+		std::string idM2 = "";
 
-		getMembroIdMembro(a_membroMembro, membroMembro, idMembroMembro);
+		getMembroIdMembro(a_m2, membroMembro, idM2);
 
-		if ((a_membroMembro != "") && ((membroMembro == "") || (idMembroMembro == "")))
-			throw std::invalid_argument("MembroMembro ou IdMembroMembro invalidos.");
+		if ((a_m2 != "") && ((membroMembro == "") || (idM2 == "")))
+			throw std::invalid_argument("M2 ou IdM2 invalidos.");
 
-		std::string membroMembroMembro = "";
-		std::string idMembroMembroMembro = "";
+		std::string membroM2 = "";
+		std::string idM3 = "";
 
-		getMembroIdMembro(a_membroMembroMembro, membroMembroMembro, idMembroMembroMembro);
+		getMembroIdMembro(a_m3, membroM2, idM3);
 
-		if ((a_membroMembroMembro != "") && ((membroMembroMembro == "") || (idMembroMembroMembro == "")))
-			throw std::invalid_argument("MembroMembroMembro ou IdMembroMembroMembro invalidos.");
+		if ((a_m3 != "") && ((membroM2 == "") || (idM3 == "")))
+			throw std::invalid_argument("M3 ou IdM3 invalidos.");
 
-		std::string membroMembroMembroMembro = "";
-		std::string idMembroMembroMembroMembro = "";
+		std::string membroM3 = "";
+		std::string idM4 = "";
 
-		getMembroIdMembro(a_membroMembroMembroMembro, membroMembroMembroMembro, idMembroMembroMembroMembro);
+		getMembroIdMembro(a_m4, membroM3, idM4);
 
-		if ((a_membroMembroMembroMembro != "") && ((membroMembroMembroMembro == "") || (idMembroMembroMembroMembro == "")))
-			throw std::invalid_argument("MembroMembroMembroMembro ou IdMembroMembroMembroMembro invalidos.");
+		if ((a_m4 != "") && ((membroM3 == "") || (idM4 == "")))
+			throw std::invalid_argument("M4 ou IdM4 invalidos.");
 
 		TipoAcessoInstancia tipoAcessoInstancia = TipoAcessoInstancia_Nenhum;
 
-		if      ((membro == "") && (membroMembro == "") && (membroMembroMembro == "") && (membroMembroMembroMembro == ""))
+		if      ((membro == "") && (membroMembro == "") && (membroM2 == "") && (membroM3 == ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_direto;
-		else if ((membro != "") && (membroMembro == "") && (membroMembroMembro == "") && (membroMembroMembroMembro == ""))
+		else if ((membro != "") && (membroMembro == "") && (membroM2 == "") && (membroM3 == ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_m1;
-		else if ((membro != "") && (membroMembro != "") && (membroMembroMembro == "") && (membroMembroMembroMembro == ""))
+		else if ((membro != "") && (membroMembro != "") && (membroM2 == "") && (membroM3 == ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_m2;
-		else if ((membro != "") && (membroMembro != "") && (membroMembroMembro != "") && (membroMembroMembroMembro == ""))
+		else if ((membro != "") && (membroMembro != "") && (membroM2 != "") && (membroM3 == ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_m3;
-		else if ((membro != "") && (membroMembro != "") && (membroMembroMembro != "") && (membroMembroMembroMembro != ""))
+		else if ((membro != "") && (membroMembro != "") && (membroM2 != "") && (membroM3 != ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_m4;
 		else
 			throw std::invalid_argument("Acesso a instancia invalido.");
@@ -1563,13 +1248,13 @@ void EntradaSaidaDados::imprimirArquivoCSV_AttComum_(const std::string a_nomeArq
 		if (tipoAcessoInstancia == TipoAcessoInstancia_direto)
 			matrizDados = a_objetoDados.getDadosAttComum(incluirCabecalho, a_vetorAttComum);
 		else if (tipoAcessoInstancia == TipoAcessoInstancia_m1)
-			matrizDados = a_objetoDados.getDadosAttComumMembro(incluirCabecalho, membro, idMembro, a_vetorAttComum);
+			matrizDados = a_objetoDados.getDadosAttComumM1(incluirCabecalho, membro, idMembro, a_vetorAttComum);
 		else if (tipoAcessoInstancia == TipoAcessoInstancia_m2)
-			matrizDados = a_objetoDados.getDadosAttComumMembroMembro(incluirCabecalho, membro, idMembro, membroMembro, idMembroMembro, a_vetorAttComum);
+			matrizDados = a_objetoDados.getDadosAttComumM2(incluirCabecalho, membro, idMembro, membroMembro, idM2, a_vetorAttComum);
 		else if (tipoAcessoInstancia == TipoAcessoInstancia_m3)
-			matrizDados = a_objetoDados.getDadosAttComumMembroMembroMembro(incluirCabecalho, membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, a_vetorAttComum);
+			matrizDados = a_objetoDados.getDadosAttComumM3(incluirCabecalho, membro, idMembro, membroMembro, idM2, membroM2, idM3, a_vetorAttComum);
 		else if (tipoAcessoInstancia == TipoAcessoInstancia_m4)
-			matrizDados = a_objetoDados.getDadosAttComumMembroMembroMembroMembro(incluirCabecalho, membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, membroMembroMembroMembro, idMembroMembroMembroMembro, a_vetorAttComum);
+			matrizDados = a_objetoDados.getDadosAttComumM4(incluirCabecalho, membro, idMembro, membroMembro, idM2, membroM2, idM3, membroM3, idM4, a_vetorAttComum);
 
 		const int numLin = int(matrizDados.size());
 		if (numLin == 0)
@@ -1646,13 +1331,13 @@ void EntradaSaidaDados::imprimirArquivoCSV_AttComum_(const std::string a_nomeArq
 
 	} // try
 
-	catch (const std::ifstream::failure& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_AttComum_(" + caminhoArquivo + "," + a_membro + "," + a_membroMembro + "," + a_membroMembroMembro + "," + a_membroMembroMembroMembro + ",a_objetoDados,a_vetorAttComum): \nErro de Integridade do Arquivo." + std::string(erro.what())); }
-	catch (const std::exception& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_AttComum_(" + caminhoArquivo + ", " + a_membro + ", " + a_membroMembro + ", " + a_membroMembroMembro + "," + a_membroMembroMembroMembro + ", a_objetoDados,a_vetorAttComum) : \n" + std::string(erro.what())); }
+	catch (const std::ifstream::failure& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_AttComum_(" + caminhoArquivo + "," + a_m1 + "," + a_m2 + "," + a_m3 + "," + a_m4 + ",a_objetoDados,a_vetorAttComum): \nErro de Integridade do Arquivo." + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_AttComum_(" + caminhoArquivo + ", " + a_m1 + ", " + a_m2 + ", " + a_m3 + "," + a_m4 + ", a_objetoDados,a_vetorAttComum) : \n" + std::string(erro.what())); }
 
-} // void EntradaSaidaDados::imprimirArquivoCSV_AttComum_(const std::string a_nomeArquivo, std::string a_membro, std::string a_membroMembro, std::string a_membroMembroMembro, SmartDados & a_objetoDados, const std::string a_attComum){
+} // void EntradaSaidaDados::imprimirArquivoCSV_AttComum_(const std::string a_nomeArquivo, std::string a_m1, std::string a_m2, std::string a_m3, SmartDados & a_objetoDados, const std::string a_attComum){
 
 
-void EntradaSaidaDados::imprimirArquivoCSV_AttVetor_(const std::string a_nomeArquivo, const std::string a_membro, const std::string a_membroMembro, const std::string a_membroMembroMembro, const std::string a_membroMembroMembroMembro, SmartDados & a_objetoDados, const std::string a_iteradorInicial, const std::string a_iteradorFinal, const std::vector<std::string> a_vetorAttVetor)const {
+void EntradaSaidaDados::imprimirArquivoCSV_AttVetor_(const std::string a_nomeArquivo, const std::string a_m1, const std::string a_m2, const std::string a_m3, const std::string a_m4, SmartDados & a_objetoDados, const std::string a_iteradorInicial, const std::string a_iteradorFinal, const std::vector<std::string> a_vetorAttVetor)const {
 
 	std::string caminhoArquivo = diretorioSaida + "//" + a_nomeArquivo;
 	if (diretorioSaida == "")
@@ -1665,46 +1350,46 @@ void EntradaSaidaDados::imprimirArquivoCSV_AttVetor_(const std::string a_nomeArq
 		std::string membro   = "";
 		std::string idMembro = "";
 			
-		getMembroIdMembro(a_membro, membro, idMembro);
+		getMembroIdMembro(a_m1, membro, idMembro);
 
-		if ((a_membro != "") && ((membro == "") || (idMembro == "")))
+		if ((a_m1 != "") && ((membro == "") || (idMembro == "")))
 			throw std::invalid_argument("Membro ou IdMembro invalidos.");
 
 		std::string membroMembro   = "";
-		std::string idMembroMembro = "";
+		std::string idM2 = "";
 
-		getMembroIdMembro(a_membroMembro, membroMembro, idMembroMembro);
+		getMembroIdMembro(a_m2, membroMembro, idM2);
 
-		if ((a_membroMembro != "") && ((membroMembro == "") || (idMembroMembro == "")))
-			throw std::invalid_argument("MembroMembro ou IdMembroMembro invalidos.");
+		if ((a_m2 != "") && ((membroMembro == "") || (idM2 == "")))
+			throw std::invalid_argument("M2 ou IdM2 invalidos.");
 
-		std::string membroMembroMembro   = "";
-		std::string idMembroMembroMembro = "";
+		std::string membroM2   = "";
+		std::string idM3 = "";
 
-		getMembroIdMembro(a_membroMembroMembro, membroMembroMembro, idMembroMembroMembro);
+		getMembroIdMembro(a_m3, membroM2, idM3);
 
-		if ((a_membroMembroMembro != "") && ((membroMembroMembro == "") || (idMembroMembroMembro == "")))
-			throw std::invalid_argument("MembroMembroMembro ou IdMembroMembroMembro invalidos.");
+		if ((a_m3 != "") && ((membroM2 == "") || (idM3 == "")))
+			throw std::invalid_argument("M3 ou IdM3 invalidos.");
 
-		std::string membroMembroMembroMembro = "";
-		std::string idMembroMembroMembroMembro = "";
+		std::string membroM3 = "";
+		std::string idM4 = "";
 
-		getMembroIdMembro(a_membroMembroMembroMembro, membroMembroMembroMembro, idMembroMembroMembroMembro);
+		getMembroIdMembro(a_m4, membroM3, idM4);
 
-		if ((a_membroMembroMembroMembro != "") && ((membroMembroMembroMembro == "") || (idMembroMembroMembroMembro == "")))
-			throw std::invalid_argument("MembroMembroMembroMembro ou IdMembroMembroMembroMembro invalidos.");
+		if ((a_m4 != "") && ((membroM3 == "") || (idM4 == "")))
+			throw std::invalid_argument("M4 ou IdM4 invalidos.");
 
 		TipoAcessoInstancia tipoAcessoInstancia = TipoAcessoInstancia_Nenhum;
 
-		if ((membro == "") && (membroMembro == "") && (membroMembroMembro == "") && (membroMembroMembroMembro == ""))
+		if ((membro == "") && (membroMembro == "") && (membroM2 == "") && (membroM3 == ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_direto;
-		else if ((membro != "") && (membroMembro == "") && (membroMembroMembro == "") && (membroMembroMembroMembro == ""))
+		else if ((membro != "") && (membroMembro == "") && (membroM2 == "") && (membroM3 == ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_m1;
-		else if ((membro != "") && (membroMembro != "") && (membroMembroMembro == "") && (membroMembroMembroMembro == ""))
+		else if ((membro != "") && (membroMembro != "") && (membroM2 == "") && (membroM3 == ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_m2;
-		else if ((membro != "") && (membroMembro != "") && (membroMembroMembro != "") && (membroMembroMembroMembro == ""))
+		else if ((membro != "") && (membroMembro != "") && (membroM2 != "") && (membroM3 == ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_m3;
-		else if ((membro != "") && (membroMembro != "") && (membroMembroMembro != "") && (membroMembroMembroMembro != ""))
+		else if ((membro != "") && (membroMembro != "") && (membroM2 != "") && (membroM3 != ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_m4;
 		else
 			throw std::invalid_argument("Acesso a instancia invalido.");
@@ -1717,13 +1402,13 @@ void EntradaSaidaDados::imprimirArquivoCSV_AttVetor_(const std::string a_nomeArq
 		if (tipoAcessoInstancia == TipoAcessoInstancia_direto)
 			matrizDados = a_objetoDados.getDadosAttVetor(incluirCabecalho, a_iteradorInicial, a_iteradorFinal, true, a_vetorAttVetor);
 		else if (tipoAcessoInstancia == TipoAcessoInstancia_m1)
-			matrizDados = a_objetoDados.getDadosAttVetorMembro(incluirCabecalho, membro, idMembro, a_iteradorInicial, a_iteradorFinal, true, a_vetorAttVetor);
+			matrizDados = a_objetoDados.getDadosAttVetorM1(incluirCabecalho, membro, idMembro, a_iteradorInicial, a_iteradorFinal, true, a_vetorAttVetor);
 		else if (tipoAcessoInstancia == TipoAcessoInstancia_m2)
-			matrizDados = a_objetoDados.getDadosAttVetorMembroMembro(incluirCabecalho, membro, idMembro, membroMembro, idMembroMembro, a_iteradorInicial, a_iteradorFinal, true, a_vetorAttVetor);
+			matrizDados = a_objetoDados.getDadosAttVetorM2(incluirCabecalho, membro, idMembro, membroMembro, idM2, a_iteradorInicial, a_iteradorFinal, true, a_vetorAttVetor);
 		else if (tipoAcessoInstancia == TipoAcessoInstancia_m3)
-			matrizDados = a_objetoDados.getDadosAttVetorMembroMembroMembro(incluirCabecalho, membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, a_iteradorInicial, a_iteradorFinal, true, a_vetorAttVetor);
+			matrizDados = a_objetoDados.getDadosAttVetorM3(incluirCabecalho, membro, idMembro, membroMembro, idM2, membroM2, idM3, a_iteradorInicial, a_iteradorFinal, true, a_vetorAttVetor);
 		else if (tipoAcessoInstancia == TipoAcessoInstancia_m4)
-			matrizDados = a_objetoDados.getDadosAttVetorMembroMembroMembroMembro(incluirCabecalho, membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, membroMembroMembroMembro, idMembroMembroMembroMembro, a_iteradorInicial, a_iteradorFinal, true, a_vetorAttVetor);
+			matrizDados = a_objetoDados.getDadosAttVetorM4(incluirCabecalho, membro, idMembro, membroMembro, idM2, membroM2, idM3, membroM3, idM4, a_iteradorInicial, a_iteradorFinal, true, a_vetorAttVetor);
 
 		const int numLin = int(matrizDados.size());
 		if (numLin == 0)
@@ -1814,13 +1499,13 @@ void EntradaSaidaDados::imprimirArquivoCSV_AttVetor_(const std::string a_nomeArq
 
 	} // try
 
-	catch (const std::ifstream::failure& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_AttVetor_(" + caminhoArquivo + "," + a_membro + "," + a_membroMembro + "," + a_membroMembroMembro + "," + a_membroMembroMembroMembro + ",a_objetoDados," + a_iteradorInicial + "," + a_iteradorFinal + ",a_vetorAttVetor): \nErro de Integridade do Arquivo." + std::string(erro.what())); }
-	catch (const std::exception& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_AttVetor_(" + caminhoArquivo + "," + a_membro + "," + a_membroMembro + "," + a_membroMembroMembro + "," + a_membroMembroMembroMembro + ",a_objetoDados," + a_iteradorInicial + "," + a_iteradorFinal + ",a_vetorAttVetor): \n" + std::string(erro.what())); }
+	catch (const std::ifstream::failure& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_AttVetor_(" + caminhoArquivo + "," + a_m1 + "," + a_m2 + "," + a_m3 + "," + a_m4 + ",a_objetoDados," + a_iteradorInicial + "," + a_iteradorFinal + ",a_vetorAttVetor): \nErro de Integridade do Arquivo." + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_AttVetor_(" + caminhoArquivo + "," + a_m1 + "," + a_m2 + "," + a_m3 + "," + a_m4 + ",a_objetoDados," + a_iteradorInicial + "," + a_iteradorFinal + ",a_vetorAttVetor): \n" + std::string(erro.what())); }
 
-} // void EntradaSaidaDados::imprimirArquivoCSV_AttVetor_(const std::string a_nomeArquivo, const std::string a_membro, const std::string a_membroMembro, const std::string a_membroMembroMembro, SmartDados & a_objetoDados, const std::string a_iteradorInicial, const std::string a_iteradorFinal, const std::string a_attVetor){
+} // void EntradaSaidaDados::imprimirArquivoCSV_AttVetor_(const std::string a_nomeArquivo, const std::string a_m1, const std::string a_m2, const std::string a_m3, SmartDados & a_objetoDados, const std::string a_iteradorInicial, const std::string a_iteradorFinal, const std::string a_attVetor){
 
 
-void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz_(const std::string a_nomeArquivo, const std::string a_membro, const std::string a_membroMembro, const std::string a_membroMembroMembro, const std::string a_membroMembroMembroMembro, SmartDados & a_objetoDados, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const std::vector<std::string> a_vetorAttMatriz)const {
+void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz_(const std::string a_nomeArquivo, const std::string a_m1, const std::string a_m2, const std::string a_m3, const std::string a_m4, SmartDados & a_objetoDados, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const std::vector<std::string> a_vetorAttMatriz)const {
 
 	std::string caminhoArquivo = diretorioSaida + "//" + a_nomeArquivo;
 	if (diretorioSaida == "")
@@ -1833,46 +1518,46 @@ void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz_(const std::string a_nomeAr
 		std::string membro = "";
 		std::string idMembro = "";
 
-		getMembroIdMembro(a_membro, membro, idMembro);
+		getMembroIdMembro(a_m1, membro, idMembro);
 
-		if ((a_membro != "") && ((membro == "") || (idMembro == "")))
+		if ((a_m1 != "") && ((membro == "") || (idMembro == "")))
 			throw std::invalid_argument("Membro ou IdMembro invalidos.");
 
 		std::string membroMembro = "";
-		std::string idMembroMembro = "";
+		std::string idM2 = "";
 
-		getMembroIdMembro(a_membroMembro, membroMembro, idMembroMembro);
+		getMembroIdMembro(a_m2, membroMembro, idM2);
 
-		if ((a_membroMembro != "") && ((membroMembro == "") || (idMembroMembro == "")))
-			throw std::invalid_argument("MembroMembro ou IdMembroMembro invalidos.");
+		if ((a_m2 != "") && ((membroMembro == "") || (idM2 == "")))
+			throw std::invalid_argument("M2 ou IdM2 invalidos.");
 
-		std::string membroMembroMembro = "";
-		std::string idMembroMembroMembro = "";
+		std::string membroM2 = "";
+		std::string idM3 = "";
 
-		getMembroIdMembro(a_membroMembroMembro, membroMembroMembro, idMembroMembroMembro);
+		getMembroIdMembro(a_m3, membroM2, idM3);
 
-		if ((a_membroMembroMembro != "") && ((membroMembroMembro == "") || (idMembroMembroMembro == "")))
-			throw std::invalid_argument("MembroMembroMembro ou IdMembroMembroMembro invalidos.");
+		if ((a_m3 != "") && ((membroM2 == "") || (idM3 == "")))
+			throw std::invalid_argument("M3 ou IdM3 invalidos.");
 
-		std::string membroMembroMembroMembro = "";
-		std::string idMembroMembroMembroMembro = "";
+		std::string membroM3 = "";
+		std::string idM4 = "";
 
-		getMembroIdMembro(a_membroMembroMembroMembro, membroMembroMembroMembro, idMembroMembroMembroMembro);
+		getMembroIdMembro(a_m4, membroM3, idM4);
 
-		if ((a_membroMembroMembroMembro != "") && ((membroMembroMembroMembro == "") || (idMembroMembroMembroMembro == "")))
-			throw std::invalid_argument("MembroMembroMembroMembro ou IdMembroMembroMembroMembro invalidos.");
+		if ((a_m4 != "") && ((membroM3 == "") || (idM4 == "")))
+			throw std::invalid_argument("M4 ou IdM4 invalidos.");
 
 		TipoAcessoInstancia tipoAcessoInstancia = TipoAcessoInstancia_Nenhum;
 
-		if ((membro == "") && (membroMembro == "") && (membroMembroMembro == "") && (membroMembroMembroMembro == ""))
+		if ((membro == "") && (membroMembro == "") && (membroM2 == "") && (membroM3 == ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_direto;
-		else if ((membro != "") && (membroMembro == "") && (membroMembroMembro == "") && (membroMembroMembroMembro == ""))
+		else if ((membro != "") && (membroMembro == "") && (membroM2 == "") && (membroM3 == ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_m1;
-		else if ((membro != "") && (membroMembro != "") && (membroMembroMembro == "") && (membroMembroMembroMembro == ""))
+		else if ((membro != "") && (membroMembro != "") && (membroM2 == "") && (membroM3 == ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_m2;
-		else if ((membro != "") && (membroMembro != "") && (membroMembroMembro != "") && (membroMembroMembroMembro == ""))
+		else if ((membro != "") && (membroMembro != "") && (membroM2 != "") && (membroM3 == ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_m3;
-		else if ((membro != "") && (membroMembro != "") && (membroMembroMembro != "") && (membroMembroMembroMembro != ""))
+		else if ((membro != "") && (membroMembro != "") && (membroM2 != "") && (membroM3 != ""))
 			tipoAcessoInstancia = TipoAcessoInstancia_m4;
 		else
 			throw std::invalid_argument("Acesso a instancia invalido.");
@@ -1885,13 +1570,13 @@ void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz_(const std::string a_nomeAr
 		if (tipoAcessoInstancia == TipoAcessoInstancia_direto)
 			matrizDados = a_objetoDados.getDadosAttMatriz(incluirCabecalho, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, true, a_vetorAttMatriz);
 		else if (tipoAcessoInstancia == TipoAcessoInstancia_m1)
-			matrizDados = a_objetoDados.getDadosAttMatrizMembro(incluirCabecalho, membro, idMembro, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, true, a_vetorAttMatriz);
+			matrizDados = a_objetoDados.getDadosAttMatrizM1(incluirCabecalho, membro, idMembro, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, true, a_vetorAttMatriz);
 		else if (tipoAcessoInstancia == TipoAcessoInstancia_m2)
-			matrizDados = a_objetoDados.getDadosAttMatrizMembroMembro(incluirCabecalho, membro, idMembro, membroMembro, idMembroMembro, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, true, a_vetorAttMatriz);
+			matrizDados = a_objetoDados.getDadosAttMatrizM2(incluirCabecalho, membro, idMembro, membroMembro, idM2, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, true, a_vetorAttMatriz);
 		else if (tipoAcessoInstancia == TipoAcessoInstancia_m3)
-			matrizDados = a_objetoDados.getDadosAttMatrizMembroMembroMembro(incluirCabecalho, membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, true, a_vetorAttMatriz);
+			matrizDados = a_objetoDados.getDadosAttMatrizM3(incluirCabecalho, membro, idMembro, membroMembro, idM2, membroM2, idM3, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, true, a_vetorAttMatriz);
 		else if (tipoAcessoInstancia == TipoAcessoInstancia_m4)
-			matrizDados = a_objetoDados.getDadosAttMatrizMembroMembroMembroMembro(incluirCabecalho, membro, idMembro, membroMembro, idMembroMembro, membroMembroMembro, idMembroMembroMembro, membroMembroMembroMembro, idMembroMembroMembroMembro, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, true, a_vetorAttMatriz);
+			matrizDados = a_objetoDados.getDadosAttMatrizM4(incluirCabecalho, membro, idMembro, membroMembro, idM2, membroM2, idM3, membroM3, idM4, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, true, a_vetorAttMatriz);
 
 		const int numLin = int(matrizDados.size());
 		if (numLin == 0)
@@ -1989,10 +1674,10 @@ void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz_(const std::string a_nomeAr
 
 	} // try
 
-	catch (const std::ifstream::failure& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_AttMatriz_(" + caminhoArquivo + "," + a_membro + "," + a_membroMembro + "," + a_membroMembroMembro + "," + a_membroMembroMembroMembro + ",a_objetoDados," + a_iterador1Inicial + "," + a_iterador1Final + "," + a_iterador2Inicial + "," + a_iterador2Final + ",a_vetorAttMatriz): \nErro de Integridade do Arquivo." + std::string(erro.what())); }
-	catch (const std::exception& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_AttMatriz_(" + caminhoArquivo + "," + a_membro + "," + a_membroMembro + "," + a_membroMembroMembro + "," + a_membroMembroMembroMembro + ",a_objetoDados," + a_iterador1Inicial + "," + a_iterador1Final + "," + a_iterador2Inicial + "," + a_iterador2Final + ",a_vetorAttMatriz): \n" + std::string(erro.what())); }
+	catch (const std::ifstream::failure& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_AttMatriz_(" + caminhoArquivo + "," + a_m1 + "," + a_m2 + "," + a_m3 + "," + a_m4 + ",a_objetoDados," + a_iterador1Inicial + "," + a_iterador1Final + "," + a_iterador2Inicial + "," + a_iterador2Final + ",a_vetorAttMatriz): \nErro de Integridade do Arquivo." + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_AttMatriz_(" + caminhoArquivo + "," + a_m1 + "," + a_m2 + "," + a_m3 + "," + a_m4 + ",a_objetoDados," + a_iterador1Inicial + "," + a_iterador1Final + "," + a_iterador2Inicial + "," + a_iterador2Final + ",a_vetorAttMatriz): \n" + std::string(erro.what())); }
 
-} // void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz_(const std::string a_nomeArquivo, const std::string a_membro, const std::string a_membroMembro, const std::string a_membroMembroMembro, SmartDados & a_objetoDados, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const std::string a_attMatriz){
+} // void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz_(const std::string a_nomeArquivo, const std::string a_m1, const std::string a_m2, const std::string a_m3, SmartDados & a_objetoDados, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const std::string a_attMatriz){
 
 
 void EntradaSaidaDados::imprimirConsolidacaoHorizontalCSV(const std::string a_nome_arquivo_resultante, const std::vector<std::string>& a_lista_arquivos_originais, const int a_numero_colunas_suprimir, const bool a_apagar_arquivos_originais) const{
@@ -2243,11 +1928,11 @@ void EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(const std::string a_nomeA
 } // void EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(const std::string a_nomeArquivo, const std::vector<std::vector<std::string>>& a_matriz_string, const bool a_incluir_cabecalho) const{
 
 
-void EntradaSaidaDados::getMembroIdMembro(const std::string a_string, std::string & a_membro, std::string & a_idMembro)const {
+void EntradaSaidaDados::getMembroIdMembro(const std::string a_string, std::string & a_m1, std::string & a_idM1)const {
 
 	if (a_string.empty()) {
-		a_membro   = "";
-		a_idMembro = "";
+		a_m1   = "";
+		a_idM1 = "";
 		return;
 	} // if (a_string.empty()) {
 
@@ -2257,15 +1942,15 @@ void EntradaSaidaDados::getMembroIdMembro(const std::string a_string, std::strin
 	pos_  = a_string.find("_");
 
 	if ((posId == std::string::npos) || (pos_ == std::string::npos)) {
-		a_membro   = "";
-		a_idMembro = "";
+		a_m1   = "";
+		a_idM1 = "";
 	}
 
 	else {
-		a_membro   = a_string.substr(posId + 2, pos_ - 2);
-		a_idMembro = a_string.substr(pos_ + 1, a_string.length());
+		a_m1   = a_string.substr(posId + 2, pos_ - 2);
+		a_idM1 = a_string.substr(pos_ + 1, a_string.length());
 	}
 
-} // void EntradaSaidaDados::getMembroIdMembro(const std::string a_string, std::string & a_membro, std::string & a_idMembro){
+} // void EntradaSaidaDados::getMembroIdMembro(const std::string a_string, std::string & a_m1, std::string & a_idM1){
 
 
