@@ -170,7 +170,7 @@ friend class LeituraCEPEL;\
 					} \
 				} \
             } \
-			att(a_idObjeto).esvaziar(); \
+			at(a_idObjeto).esvaziar(); \
 			vetorObjeto.at(a_idObjeto) = std::vector<Membro>(); \
 			numero_objetos--;\
 		}\
@@ -184,12 +184,12 @@ friend class LeituraCEPEL;\
 		}\
 		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::Vetor" + std::string(#Membro) + "::set(Id" + std::string(#Membro) + "_" + getString(a_objeto.getIdObjeto()) + "): \n" + std::string(erro.what())); }\
 	};\
-	Membro at(const Id##Membro a_idObjeto)const{\
+	Membro& at(const Id##Membro a_idObjeto){\
 		try { \
 			if (!isInstanciado(a_idObjeto)) \
 				throw std::invalid_argument("Objeto nao instanciado."); \
 			return vetorObjeto.at(a_idObjeto).at(0); \
-			}\
+		 }\
 		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::Vetor" + std::string(#Membro) + "::at(Id" + std::string(#Membro) + "_" + getString(a_idObjeto) + "): \n" + std::string(erro.what())); }\
 	};\
 	bool isInstanciado(const Id##Membro a_idObjeto) const{ \
@@ -204,14 +204,6 @@ friend class LeituraCEPEL;\
 		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::Vetor" + std::string(#Membro) + "::isInstanciado(" + getFullString(a_idObjeto) + "): \n" + std::string(erro.what())); }\
 	};\
 	private:\
-	Membro& att(const Id##Membro a_idObjeto){\
-		try { \
-			if (!isInstanciado(a_idObjeto)) \
-				throw std::invalid_argument("Objeto nao instanciado."); \
-			return vetorObjeto.at(a_idObjeto).at(0); \
-		 }\
-		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::Vetor" + std::string(#Membro) + "::att(Id" + std::string(#Membro) + "_" + getString(a_idObjeto) + "): \n" + std::string(erro.what())); }\
-	};\
 	std::vector<std::vector<Membro>> vetorObjeto;\
 	Id##Membro maiorId;\
 	Id##Membro menorId;\
@@ -277,8 +269,8 @@ bool addDadosAttComum##Membro(const std::string a_m1, const std::string a_idM1, 
 					objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
 					vetor##Membro.add(objeto##Membro);\
 				} \
-				vetor##Membro.att(id##Membro).addDadosAttComum(a_idM1, a_vetorAttComuns, a_vetorValores); \
-				vetor##Membro.att(id##Membro).validacaoDadosAttComum(); \
+				vetor##Membro.at(id##Membro).addDadosAttComum(a_idM1, a_vetorAttComuns, a_vetorValores); \
+				vetor##Membro.at(id##Membro).validacaoDadosAttComum(); \
 				return true; \
 			} \
 		} \
@@ -299,7 +291,7 @@ bool addDadosAttComum##Membro##_Membro(const std::string a_m1, const std::string
 					objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
 					vetor##Membro.add(objeto##Membro); \
 				} \
-				vetor##Membro.att(id##Membro).addDadosAttComumM1(a_m2, a_idM2, a_vetorAttComuns, a_vetorValores); \
+				vetor##Membro.at(id##Membro).addDadosAttComumM1(a_m2, a_idM2, a_vetorAttComuns, a_vetorValores); \
 				return true; \
 			} \
 		} \
@@ -320,7 +312,7 @@ bool addDadosAttComum##Membro##_M2(const std::string a_m1, const std::string a_i
 					objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
 					vetor##Membro.add(objeto##Membro); \
 				} \
-				vetor##Membro.att(id##Membro).addDadosAttComumM2(a_m2, a_idM2, a_m3, a_idM3, a_vetorAttComuns, a_vetorValores); \
+				vetor##Membro.at(id##Membro).addDadosAttComumM2(a_m2, a_idM2, a_m3, a_idM3, a_vetorAttComuns, a_vetorValores); \
 				return true; \
 			} \
 		} \
@@ -341,7 +333,7 @@ bool addDadosAttComum##Membro##_M3(const std::string a_m1, const std::string a_i
 					objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
 					vetor##Membro.add(objeto##Membro); \
 				} \
-				vetor##Membro.att(id##Membro).addDadosAttComumM3(a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_vetorAttComuns, a_vetorValores); \
+				vetor##Membro.at(id##Membro).addDadosAttComumM3(a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_vetorAttComuns, a_vetorValores); \
 				return true; \
 			} \
 		} \
@@ -367,9 +359,9 @@ std::vector<std::vector<std::string>> getDadosAttComum##Membro(const bool a_incl
 			if (vetorIdMembro.size() > 0){ \
 				for (int i = 0; i < int(vetorIdMembro.size()); i++) {\
 					if (i == 0) \
-						dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttComum(a_incluirCabecalho, a_vetorAttComum); \
+						dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttComum(a_incluirCabecalho, a_vetorAttComum); \
 					else \
-						dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttComum(false, a_vetorAttComum); \
+						dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttComum(false, a_vetorAttComum); \
 					matrizRetorno.insert(matrizRetorno.end(), dados.begin(), dados.end()); \
 				} \
 				return matrizRetorno; \
@@ -399,7 +391,7 @@ std::vector<std::vector<std::string>> getDadosAttComum##Membro##_Membro(const bo
 			if (vetorIdMembro.size() > 0){ \
 				for (int i = 0; i < int(vetorIdMembro.size()); i++) {\
 					if (primeiroDado == false) {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttComumM1(a_incluirCabecalho, a_m2, a_idM2, a_vetorAttComum); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttComumM1(a_incluirCabecalho, a_m2, a_idM2, a_vetorAttComum); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++){\
 								if ((lin == 0) && (a_incluirCabecalho)) \
@@ -412,7 +404,7 @@ std::vector<std::vector<std::string>> getDadosAttComum##Membro##_Membro(const bo
 						} \
 					} \
 					else {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttComumM1(false, a_m2, a_idM2, a_vetorAttComum); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttComumM1(false, a_m2, a_idM2, a_vetorAttComum); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++)\
 								dados.at(lin).insert(dados.at(lin).begin(), getString(getAtributo(vetorIdMembro.at(i), AttComum##Membro##_id##Membro, Id##Membro())));\
@@ -447,7 +439,7 @@ std::vector<std::vector<std::string>> getDadosAttComum##Membro##_M2(const bool a
 			if (vetorIdMembro.size() > 0){ \
 				for (int i = 0; i < int(vetorIdMembro.size()); i++) {\
 					if (primeiroDado == false) {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttComumM2(a_incluirCabecalho, a_m2, a_idM2, a_m3, a_idM3, a_vetorAttComum); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttComumM2(a_incluirCabecalho, a_m2, a_idM2, a_m3, a_idM3, a_vetorAttComum); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++){\
 								if ((lin == 0) && (a_incluirCabecalho)) \
@@ -460,7 +452,7 @@ std::vector<std::vector<std::string>> getDadosAttComum##Membro##_M2(const bool a
 						} \
 					} \
 					else {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttComumM2(false, a_m2, a_idM2, a_m3, a_idM3, a_vetorAttComum); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttComumM2(false, a_m2, a_idM2, a_m3, a_idM3, a_vetorAttComum); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++)\
 								dados.at(lin).insert(dados.at(lin).begin(), getString(getAtributo(vetorIdMembro.at(i), AttComum##Membro##_id##Membro, Id##Membro())));\
@@ -495,7 +487,7 @@ std::vector<std::vector<std::string>> getDadosAttComum##Membro##_M3(const bool a
 			if (vetorIdMembro.size() > 0){ \
 				for (int i = 0; i < int(vetorIdMembro.size()); i++) {\
 					if (primeiroDado == false) {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttComumM3(a_incluirCabecalho, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_vetorAttComum); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttComumM3(a_incluirCabecalho, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_vetorAttComum); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++){\
 								if ((lin == 0) && (a_incluirCabecalho)) \
@@ -508,7 +500,7 @@ std::vector<std::vector<std::string>> getDadosAttComum##Membro##_M3(const bool a
 						} \
 					} \
 					else {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttComumM3(false, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_vetorAttComum); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttComumM3(false, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_vetorAttComum); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++)\
 								dados.at(lin).insert(dados.at(lin).begin(), getString(getAtributo(vetorIdMembro.at(i), AttComum##Membro##_id##Membro, Id##Membro())));\
@@ -528,22 +520,22 @@ std::vector<std::vector<std::string>> getDadosAttComum##Membro##_M3(const bool a
 }; \
 template<typename Atributo, typename Valor> \
 Valor getAtributo(const Id##Membro a_m1, const Atributo a_atributo, const Valor a_valor){ \
-	try { return vetor##Membro.att(a_m1).getAtributo(a_atributo, a_valor); } \
+	try { return vetor##Membro.at(a_m1).getAtributo(a_atributo, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getAtributo(" + getString(a_m1) + "," + getString(a_atributo) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename Atributo, typename Valor> \
 Valor getAtributo(const Id##Membro a_m1, const IdM2 a_m2, const Atributo a_atributo, const Valor a_valor){ \
-	try { return vetor##Membro.att(a_m1).getAtributo(a_m2, a_atributo, a_valor); } \
+	try { return vetor##Membro.at(a_m1).getAtributo(a_m2, a_atributo, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getAtributo(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_atributo) +  "): \n" + std::string(erro.what())); } \
 }; \
 template<typename IdM2, typename IdM3, typename Atributo, typename Valor> \
 Valor getAtributo(const Id##Membro a_m1, const IdM2 a_m2, const IdM3 a_m3, const Atributo a_atributo, const Valor a_valor) { \
-	try { return vetor##Membro.att(a_m1).getAtributo(a_m2, a_m3, a_atributo, a_valor); } \
+	try { return vetor##Membro.at(a_m1).getAtributo(a_m2, a_m3, a_atributo, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getAtributo(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "," + getString(a_atributo) + "): \n" + std::string(erro.what())); } \
 }; \
 template<typename IdM2, typename IdM3, typename IdM4, typename Atributo, typename Valor> \
 Valor getAtributo(const Id##Membro a_m1, const IdM2 a_m2, const IdM3 a_m3, const IdM4 a_m4, const Atributo a_atributo, const Valor a_valor) { \
-	try { return vetor##Membro.att(a_m1).getAtributo(a_m2, a_m3, a_m4, a_atributo, a_valor); } \
+	try { return vetor##Membro.at(a_m1).getAtributo(a_m2, a_m3, a_m4, a_atributo, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getAtributo(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "," + getString(a_m4) + "," + getString(a_atributo) + "): \n" + std::string(erro.what())); } \
 }; \
 bool addDadoAttVetor##Membro(const std::string a_m1, const std::string a_idM1, const std::vector<std::string> &a_iterador, const std::string &a_attVetor, const std::vector<std::string> &a_valor){ \
@@ -558,8 +550,8 @@ bool addDadoAttVetor##Membro(const std::string a_m1, const std::string a_idM1, c
 					objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
 					vetor##Membro.add(objeto##Membro);\
 				} \
-				vetor##Membro.att(id##Membro).addDadoAttVetor(a_iterador, a_attVetor, a_valor); \
-				vetor##Membro.att(id##Membro).validacaoDadosAttVetor(std::vector<std::string>{a_attVetor}); \
+				vetor##Membro.at(id##Membro).addDadoAttVetor(a_iterador, a_attVetor, a_valor); \
+				vetor##Membro.at(id##Membro).validacaoDadosAttVetor(std::vector<std::string>{a_attVetor}); \
 				return true; \
 			} \
 		} \
@@ -580,7 +572,7 @@ bool addDadoAttVetor##Membro##_Membro(const std::string a_m1, const std::string 
 					objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
 					vetor##Membro.add(objeto##Membro);\
 				} \
-				vetor##Membro.att(id##Membro).addDadoAttVetorM1(a_m2, a_idM2, a_iterador, a_attVetor, a_valor); \
+				vetor##Membro.at(id##Membro).addDadoAttVetorM1(a_m2, a_idM2, a_iterador, a_attVetor, a_valor); \
 				return true; \
 			} \
 		} \
@@ -601,7 +593,7 @@ bool addDadoAttVetor##Membro##_M2(const std::string a_m1, const std::string a_id
 					objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
 					vetor##Membro.add(objeto##Membro);\
 				} \
-				vetor##Membro.att(id##Membro).addDadoAttVetorM2(a_m2, a_idM2, a_m3, a_idM3, a_iterador, a_attVetor, a_valor); \
+				vetor##Membro.at(id##Membro).addDadoAttVetorM2(a_m2, a_idM2, a_m3, a_idM3, a_iterador, a_attVetor, a_valor); \
 				return true; \
 			} \
 		} \
@@ -622,7 +614,7 @@ bool addDadoAttVetor##Membro##_M3(const std::string a_m1, const std::string a_id
 					objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
 					vetor##Membro.add(objeto##Membro);\
 				} \
-				vetor##Membro.att(id##Membro).addDadoAttVetorM3(a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iterador, a_attVetor, a_valor); \
+				vetor##Membro.at(id##Membro).addDadoAttVetorM3(a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iterador, a_attVetor, a_valor); \
 				return true; \
 			} \
 		} \
@@ -649,12 +641,12 @@ std::vector<std::vector<std::string>> getDadosAttVetor##Membro(const bool a_incl
 				for (int i = 0; i < int(vetorIdMembro.size()); i++) {\
 					const std::string idMembroStr = getString(getAtributo(vetorIdMembro.at(i), AttComum##Membro##_id##Membro, Id##Membro())); \
 					if (i == 0){ \
-						dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttVetor(a_incluirCabecalho, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
+						dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttVetor(a_incluirCabecalho, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
 						if (a_incluirCabecalho) \
 							dados.at(0).insert(dados.at(0).begin(), std::string("id" + std::string(#Membro))); \
 					} \
 					else\
-						dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttVetor(false, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
+						dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttVetor(false, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
 					for (int k = 0; k < int(dados.size()); k++){ \
 						if ((k == 0) && (i == 0) && (a_incluirCabecalho)){} \
 						else \
@@ -689,7 +681,7 @@ std::vector<std::vector<std::string>> getDadosAttVetor##Membro##_Membro(const bo
 			if (vetorIdMembro.size() > 0){ \
 				for (int i = 0; i < int(vetorIdMembro.size()); i++) {\
 					if (primeiroDado == false) {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttVetorM1(a_incluirCabecalho, a_m2, a_idM2, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttVetorM1(a_incluirCabecalho, a_m2, a_idM2, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++){\
 								if ((lin == 0) && (a_incluirCabecalho)) \
@@ -702,7 +694,7 @@ std::vector<std::vector<std::string>> getDadosAttVetor##Membro##_Membro(const bo
 						} \
 					} \
 					else {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttVetorM1(false, a_m2, a_idM2, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttVetorM1(false, a_m2, a_idM2, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++)\
 								dados.at(lin).insert(dados.at(lin).begin(), getString(getAtributo(vetorIdMembro.at(i), AttComum##Membro##_id##Membro, Id##Membro())));\
@@ -737,7 +729,7 @@ std::vector<std::vector<std::string>> getDadosAttVetor##Membro##_M2(const bool a
 			if (vetorIdMembro.size() > 0){ \
 				for (int i = 0; i < int(vetorIdMembro.size()); i++) {\
 					if (primeiroDado == false) {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttVetorM2(a_incluirCabecalho, a_m2, a_idM2, a_m3, a_idM3, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttVetorM2(a_incluirCabecalho, a_m2, a_idM2, a_m3, a_idM3, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++){\
 								if ((lin == 0) && (a_incluirCabecalho)) \
@@ -750,7 +742,7 @@ std::vector<std::vector<std::string>> getDadosAttVetor##Membro##_M2(const bool a
 						} \
 					} \
 					else {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttVetorM2(false, a_m2, a_idM2, a_m3, a_idM3, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttVetorM2(false, a_m2, a_idM2, a_m3, a_idM3, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++)\
 								dados.at(lin).insert(dados.at(lin).begin(), getString(getAtributo(vetorIdMembro.at(i), AttComum##Membro##_id##Membro, Id##Membro())));\
@@ -785,7 +777,7 @@ std::vector<std::vector<std::string>> getDadosAttVetor##Membro##_M3(const bool a
 			if (vetorIdMembro.size() > 0){ \
 				for (int i = 0; i < int(vetorIdMembro.size()); i++) {\
 					if (primeiroDado == false) {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttVetorM3(a_incluirCabecalho, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttVetorM3(a_incluirCabecalho, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++){\
 								if ((lin == 0) && (a_incluirCabecalho)) \
@@ -798,7 +790,7 @@ std::vector<std::vector<std::string>> getDadosAttVetor##Membro##_M3(const bool a
 						} \
 					} \
 					else {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttVetorM3(false, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttVetorM3(false, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iteradorInicial, a_iteradorFinal, a_incluirAtributo, a_vetorAttVetor); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++)\
 								dados.at(lin).insert(dados.at(lin).begin(), getString(getAtributo(vetorIdMembro.at(i), AttComum##Membro##_id##Membro, Id##Membro())));\
@@ -843,7 +835,7 @@ std::vector<Id##Membro> getIdObjetos(const Id##Membro a_m1, const Atributo a_atr
 };\
 template<typename AttVetor, typename TipoIterador, typename TipoValor> \
 SmartEnupla<TipoIterador,TipoValor> getVetor(const Id##Membro a_idM1, const AttVetor a_attVetor, const TipoIterador a_iterador, const TipoValor a_tipoValor){ \
-	try { return vetor##Membro.att(a_idM1).getVetor(a_attVetor, a_iterador, a_tipoValor); } \
+	try { return vetor##Membro.at(a_idM1).getVetor(a_attVetor, a_iterador, a_tipoValor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getVetor(" + getString(a_idM1) + getString(a_attVetor) + ",a_iterador,a_tipoValor): \n" + std::string(erro.what())); } \
 };\
 int numObjetos(const Membro a_m1){ \
@@ -852,162 +844,162 @@ int numObjetos(const Membro a_m1){ \
 };\
 template<typename Atributo> \
 int getSizeVetor(const Id##Membro a_m1, const Atributo a_atributo){ \
-	try { return vetor##Membro.att(a_m1).getSizeVetor(a_atributo); } \
+	try { return vetor##Membro.at(a_m1).getSizeVetor(a_atributo); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getSizeVetor(" + getString(a_m1) + "," + getString(a_atributo) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador> \
 Iterador getIteradorInicial(const Id##Membro a_m1, const Atributo a_atributo, const Iterador a_iterador){ \
-	try { return vetor##Membro.att(a_m1).getIteradorInicial(a_atributo, a_iterador); } \
+	try { return vetor##Membro.at(a_m1).getIteradorInicial(a_atributo, a_iterador); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIteradorInicial(" + getString(a_m1) + "," + getString(a_atributo) + "," + getString(a_iterador) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador> \
 Iterador getIteradorFinal(const Id##Membro a_m1, const Atributo a_atributo, const Iterador a_iterador){ \
-	try { return vetor##Membro.att(a_m1).getIteradorFinal(a_atributo, a_iterador); } \
+	try { return vetor##Membro.at(a_m1).getIteradorFinal(a_atributo, a_iterador); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIteradorFinal(" + getString(a_m1) + "," + getString(a_atributo) + "," + getString(a_iterador) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador, typename Valor> \
 Valor getElementoVetor(const Id##Membro a_m1, const Atributo a_atributo, const Iterador a_iterador, const Valor a_valor){ \
-	try { return vetor##Membro.att(a_m1).getElementoVetor(a_atributo, a_iterador, a_valor); } \
+	try { return vetor##Membro.at(a_m1).getElementoVetor(a_atributo, a_iterador, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getElementoVetor(" + getString(a_m1) + "," + getString(a_atributo) + "," + getString(a_iterador) + ",Valor): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2> \
 IdM2 getMaiorId(const Id##Membro a_m1, const IdM2 a_m2){ \
-	try { return vetor##Membro.att(a_m1).getMaiorId(a_m2); } \
+	try { return vetor##Membro.at(a_m1).getMaiorId(a_m2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMaiorId(" + getString(a_m1) + "," + getString(a_m2) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2> \
 void incr(const Id##Membro a_m1, IdM2 &a_m2){ \
-	try { vetor##Membro.att(a_m1).incr(a_m2); } \
+	try { vetor##Membro.at(a_m1).incr(a_m2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::incr(" + getString(a_m1) + "," + getString(a_m2) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2> \
 IdM2 getMenorId(const Id##Membro a_m1, const IdM2 a_m2){ \
-	try { return vetor##Membro.att(a_m1).getMenorId(a_m2); } \
+	try { return vetor##Membro.at(a_m1).getMenorId(a_m2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMenorId(" + getString(a_m1) + "," + getString(a_m2) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2> \
 bool isInstanciado(const Id##Membro a_m1, const IdM2 a_m2){ \
-	try { return vetor##Membro.att(a_m1).isInstanciado(a_m2); } \
+	try { return vetor##Membro.at(a_m1).isInstanciado(a_m2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::isInstanciado(" + getString(a_m1) + "," + getString(a_m2) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2> \
 std::vector<IdM2> getIdObjetos(const Id##Membro a_m1, const IdM2 a_m2){ \
-	try { return vetor##Membro.att(a_m1).getIdObjetos(a_m2); } \
+	try { return vetor##Membro.at(a_m1).getIdObjetos(a_m2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIdObjetos(" + getString(a_m1) + "," + getString(a_m2) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename Atributo, typename Valor> \
 std::vector<IdM2> getIdObjetos(const Id##Membro a_m1, const IdM2 a_m2, const Atributo a_atributo, const Valor a_valor){ \
-	try { return vetor##Membro.att(a_m1).getIdObjetos(a_m2, a_atributo, a_valor); } \
+	try { return vetor##Membro.at(a_m1).getIdObjetos(a_m2, a_atributo, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIdObjetos(" + getString(a_m1) + "," + getString(a_m2) + "," + getFullString(a_atributo) + "," + getFullString(a_valor) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename AttVetor, typename TipoIterador, typename TipoValor> \
 SmartEnupla<TipoIterador,TipoValor> getVetor(const Id##Membro a_idM1, const IdM2 a_idM2, const AttVetor a_attVetor, const TipoIterador a_iterador, const TipoValor a_tipoValor){ \
-	try { return vetor##Membro.att(a_idM1).getVetor(a_idM2, a_attVetor, a_iterador, a_tipoValor); } \
+	try { return vetor##Membro.at(a_idM1).getVetor(a_idM2, a_attVetor, a_iterador, a_tipoValor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getVetor(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_attVetor) + ",a_iterador,a_tipoValor): \n" + std::string(erro.what())); } \
 };\
 template<typename M2> \
 int numObjetos(const Id##Membro a_idM1, const M2 a_m2){ \
-	try { return vetor##Membro.att(a_idM1).numObjetos(a_m2); } \
+	try { return vetor##Membro.at(a_idM1).numObjetos(a_m2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::numObjetos(" + getString(a_idM1) + "," + getString(a_m2) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename Atributo> \
 int getSizeVetor(const Id##Membro a_m1, const IdM2 a_m2, const Atributo a_atributo){ \
-	try { return vetor##Membro.att(a_m1).getSizeVetor(a_m2, a_atributo); } \
+	try { return vetor##Membro.at(a_m1).getSizeVetor(a_m2, a_atributo); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getSizeVetor(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_atributo) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename Atributo, typename Iterador> \
 Iterador getIteradorInicial(const Id##Membro a_m1, const IdM2 a_m2, const Atributo a_atributo, const Iterador a_iterador){ \
-	try { return vetor##Membro.att(a_m1).getIteradorInicial(a_m2, a_atributo, a_iterador); } \
+	try { return vetor##Membro.at(a_m1).getIteradorInicial(a_m2, a_atributo, a_iterador); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIteradorInicial(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_atributo) + "," + getString(a_iterador) + "): \n" + std::string(erro.what())); } \
 }; \
 template<typename IdM2, typename Atributo, typename Iterador> \
 Iterador getIteradorFinal(const Id##Membro a_m1, const IdM2 a_m2, const Atributo a_atributo, const Iterador a_iterador){ \
-	try { return vetor##Membro.att(a_m1).getIteradorFinal(a_m2, a_atributo, a_iterador); } \
+	try { return vetor##Membro.at(a_m1).getIteradorFinal(a_m2, a_atributo, a_iterador); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIteradorFinal(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_atributo) + "," + getString(a_iterador) + "): \n" + std::string(erro.what())); } \
 }; \
 template<typename IdM2, typename Atributo, typename Iterador, typename Valor> \
 Valor getElementoVetor(const Id##Membro a_m1, const IdM2 a_m2, const Atributo a_atributo, const Iterador a_iterador, const Valor a_valor){ \
-	try { return vetor##Membro.att(a_m1).getElementoVetor(a_m2, a_atributo, a_iterador, a_valor); } \
+	try { return vetor##Membro.at(a_m1).getElementoVetor(a_m2, a_atributo, a_iterador, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getElementoVetor(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_atributo) + "," + getString(a_iterador) + ",Valor): \n" + std::string(erro.what())); } \
 }; \
 template<typename IdM2, typename IdM3> \
 IdM3 getMaiorId(const Id##Membro a_m1, const IdM2 a_m2, const IdM3 a_m3){ \
-	try { return vetor##Membro.att(a_m1).getMaiorId(a_m2, a_m3); } \
+	try { return vetor##Membro.at(a_m1).getMaiorId(a_m2, a_m3); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMaiorId(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename IdM3> \
 IdM3 getMenorId(const Id##Membro a_m1, const IdM2 a_m2, const IdM3 a_m3){ \
-	try { return vetor##Membro.att(a_m1).getMenorId(a_m2, a_m3); } \
+	try { return vetor##Membro.at(a_m1).getMenorId(a_m2, a_m3); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMenorId(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename IdM3, typename AttVetor, typename TipoIterador, typename TipoValor> \
 SmartEnupla<TipoIterador,TipoValor> getVetor(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const AttVetor a_attVetor, const TipoIterador a_iterador, const TipoValor a_tipoValor){ \
-	try { return vetor##Membro.att(a_idM1).getVetor(a_idM2, a_idM3, a_attVetor, a_iterador, a_tipoValor); } \
+	try { return vetor##Membro.at(a_idM1).getVetor(a_idM2, a_idM3, a_attVetor, a_iterador, a_tipoValor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getVetor(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_attVetor) + ",a_iterador,a_tipoValor): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename M3> \
 int numObjetos(const Id##Membro a_idM1, const IdM2 a_idM2, const M3 a_m3){ \
-	try { return vetor##Membro.att(a_idM1).numObjetos(a_idM2, a_m3); } \
+	try { return vetor##Membro.at(a_idM1).numObjetos(a_idM2, a_m3); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::numObjetos(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_m3) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename IdM3, typename Atributo> \
 int getSizeVetor(const Id##Membro a_m1, const IdM2 a_m2, const IdM3 a_m3, const Atributo a_atributo){ \
-	try { return vetor##Membro.att(a_m1).getSizeVetor(a_m2, a_m3, a_atributo); } \
+	try { return vetor##Membro.at(a_m1).getSizeVetor(a_m2, a_m3, a_atributo); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getSizeVetor(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "," + getString(a_atributo) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename IdM3, typename Atributo, typename Iterador> \
 Iterador getIteradorInicial(const Id##Membro a_m1, const IdM2 a_m2, const IdM3 a_m3, const Atributo a_atributo, const Iterador a_iterador) { \
-	try { return vetor##Membro.att(a_m1).getIteradorInicial(a_m2, a_m3, a_atributo, a_iterador); } \
+	try { return vetor##Membro.at(a_m1).getIteradorInicial(a_m2, a_m3, a_atributo, a_iterador); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIteradorInicial(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "," + getString(a_atributo) + "," + getString(a_iterador) + "): \n" + std::string(erro.what())); } \
 }; \
 template<typename IdM2, typename IdM3, typename Atributo, typename Iterador> \
 Iterador getIteradorFinal(const Id##Membro a_m1, const IdM2 a_m2, const IdM3 a_m3, const Atributo a_atributo, const Iterador a_iterador) { \
-	try { return vetor##Membro.att(a_m1).getIteradorFinal(a_m2, a_m3, a_atributo, a_iterador); } \
+	try { return vetor##Membro.at(a_m1).getIteradorFinal(a_m2, a_m3, a_atributo, a_iterador); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIteradorFinal(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "," + getString(a_atributo) + "," + getString(a_iterador) + "): \n" + std::string(erro.what())); } \
 }; \
 template<typename IdM2, typename IdM3, typename Atributo, typename Iterador, typename Valor> \
 Valor getElementoVetor(const Id##Membro a_m1, const IdM2 a_m2, const IdM3 a_m3, const Atributo a_atributo, const Iterador a_iterador, const Valor a_valor) { \
-	try { return vetor##Membro.att(a_m1).getElementoVetor(a_m2, a_m3, a_atributo, a_iterador, a_valor); } \
+	try { return vetor##Membro.at(a_m1).getElementoVetor(a_m2, a_m3, a_atributo, a_iterador, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getElementoVetor(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "," + getString(a_atributo) + "," + getString(a_iterador) + ",Valor): \n" + std::string(erro.what())); } \
 }; \
 template<typename Id##M2, typename IdM3, typename IdM4> \
 IdM4 getMaiorId(const Id##Membro a_m1, const Id##M2 a_m2, const IdM3 a_m3, const IdM4 a_m4){ \
-	try { return vetor##Membro.att(a_m1).getMaiorId(a_m2, a_m3, a_m4); } \
+	try { return vetor##Membro.at(a_m1).getMaiorId(a_m2, a_m3, a_m4); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMaiorId(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "," + getString(a_m4) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Id##M2, typename IdM3, typename IdM4> \
 IdM4 getMenorId(const Id##Membro a_m1, const Id##M2 a_m2, const IdM3 a_m3, const IdM4 a_m4){ \
-	try { return vetor##Membro.att(a_m1).getMenorId(a_m2, a_m3, a_m4); } \
+	try { return vetor##Membro.at(a_m1).getMenorId(a_m2, a_m3, a_m4); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMenorId(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "," + getString(a_m4) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename IdM3, typename IdM4, typename AttVetor, typename TipoIterador, typename TipoValor> \
 SmartEnupla<TipoIterador,TipoValor> getVetor(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const IdM4 a_idM4, const AttVetor a_attVetor, const TipoIterador a_iterador, const TipoValor a_tipoValor){ \
-	try { return vetor##Membro.att(a_idM1).getVetor(a_idM2, a_idM3, a_idM4, a_attVetor, a_iterador, a_tipoValor); } \
+	try { return vetor##Membro.at(a_idM1).getVetor(a_idM2, a_idM3, a_idM4, a_attVetor, a_iterador, a_tipoValor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getVetor(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_idM4) + "," + getString(a_attVetor) + ",a_iterador,a_tipoValor): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename IdM3, typename M4> \
 int numObjetos(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const M4 a_m4){ \
-	try { return vetor##Membro.att(a_idM1).numObjetos(a_idM2, a_idM3, a_m4); } \
+	try { return vetor##Membro.at(a_idM1).numObjetos(a_idM2, a_idM3, a_m4); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::numObjetos(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_m4) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Id##M2, typename IdM3, typename IdM4, typename Atributo> \
 int getSizeVetor(const Id##Membro a_m1, const IdM2 a_m2, const IdM3 a_m3, const IdM4 a_m4, const Atributo a_atributo){ \
-	try { return vetor##Membro.att(a_m1).getSizeVetor(a_m2, a_m3, a_m4, a_atributo); } \
+	try { return vetor##Membro.at(a_m1).getSizeVetor(a_m2, a_m3, a_m4, a_atributo); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getSizeVetor(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "," + getString(a_m4) + "," + getString(a_atributo) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Id##M2, typename IdM3, typename IdM4, typename Atributo, typename Iterador> \
 Iterador getIteradorInicial(const Id##Membro a_m1, const IdM2 a_m2, const IdM3 a_m3, const IdM4 a_m4, const Atributo a_atributo, const Iterador a_iterador) { \
-	try { return vetor##Membro.att(a_m1).getIteradorInicial(a_m2, a_m3, a_m4, a_atributo, a_iterador); } \
+	try { return vetor##Membro.at(a_m1).getIteradorInicial(a_m2, a_m3, a_m4, a_atributo, a_iterador); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIteradorInicial(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "," + getString(a_m4) + "," + getString(a_atributo) + "," + getString(a_iterador) + "): \n" + std::string(erro.what())); } \
 }; \
 template<typename Id##M2, typename IdM3, typename IdM4, typename Atributo, typename Iterador> \
 Iterador getIteradorFinal(const Id##Membro a_m1, const IdM2 a_m2, const IdM3 a_m3, const IdM4 a_m4, const Atributo a_atributo, const Iterador a_iterador) { \
-	try { return vetor##Membro.att(a_m1).getIteradorFinal(a_m2, a_m3, a_m4, a_atributo, a_iterador); } \
+	try { return vetor##Membro.at(a_m1).getIteradorFinal(a_m2, a_m3, a_m4, a_atributo, a_iterador); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIteradorFinal(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "," + getString(a_m4) + "," + getString(a_atributo) + "," + getString(a_iterador) + "): \n" + std::string(erro.what())); } \
 }; \
 template<typename Id##M2, typename IdM3, typename IdM4, typename Atributo, typename Iterador, typename Valor> \
 Valor getElementoVetor(const Id##Membro a_m1, const IdM2 a_m2, const IdM3 a_m3, const IdM4 a_m4, const Atributo a_atributo, const Iterador a_iterador, const Valor a_valor) { \
-	try { return vetor##Membro.att(a_m1).getElementoVetor(a_m2, a_m3, a_m4, a_atributo, a_iterador, a_valor); } \
+	try { return vetor##Membro.at(a_m1).getElementoVetor(a_m2, a_m3, a_m4, a_atributo, a_iterador, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getElementoVetor(" + getString(a_m1) + "," + getString(a_m2) + "," + getString(a_m3) + "," + getString(a_m4) + "," + getString(a_atributo) + "," + getString(a_iterador) + ",Valor): \n" + std::string(erro.what())); } \
 }; \
 bool addDadoAttMatriz##Membro(const std::string a_m1, const std::string a_idM1, const std::vector<std::string> &a_iter1, const std::vector<std::string> &a_iter2, const std::string &a_att, const std::vector<std::vector<std::string>> &a_vlr){ \
@@ -1020,8 +1012,8 @@ bool addDadoAttMatriz##Membro(const std::string a_m1, const std::string a_idM1, 
 					objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
 					vetor##Membro.add(objeto##Membro);\
 				} \
-				vetor##Membro.att(id##Membro).addDadoAttMatriz(a_iter1, a_iter2, a_att, a_vlr); \
-				vetor##Membro.att(id##Membro).validacaoDadosAttMatriz(std::vector<std::string>{a_att}); \
+				vetor##Membro.at(id##Membro).addDadoAttMatriz(a_iter1, a_iter2, a_att, a_vlr); \
+				vetor##Membro.at(id##Membro).validacaoDadosAttMatriz(std::vector<std::string>{a_att}); \
 				return true; \
 			} \
 			else \
@@ -1041,7 +1033,7 @@ bool addDadoAttMatriz##Membro##_Membro(const std::string a_m1, const std::string
 				objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
 				vetor##Membro.add(objeto##Membro);\
 			} \
-			vetor##Membro.att(id##Membro).addDadoAttMatrizM1(a_m2, a_idM2, a_iter1, a_iter2, a_att, a_vlr); \
+			vetor##Membro.at(id##Membro).addDadoAttMatrizM1(a_m2, a_idM2, a_iter1, a_iter2, a_att, a_vlr); \
 			return true; \
 		} \
 		else \
@@ -1058,7 +1050,7 @@ bool addDadoAttMatriz##Membro##_M2(const std::string a_m1, const std::string a_i
 				objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
 				vetor##Membro.add(objeto##Membro);\
 			} \
-			vetor##Membro.att(id##Membro).addDadoAttMatrizM2(a_m2, a_idM2, a_m3, a_idM3, a_iter1, a_iter2, a_att, a_vlr); \
+			vetor##Membro.at(id##Membro).addDadoAttMatrizM2(a_m2, a_idM2, a_m3, a_idM3, a_iter1, a_iter2, a_att, a_vlr); \
 			return true; \
 		} \
 		else \
@@ -1075,87 +1067,13 @@ bool addDadoAttMatriz##Membro##_M3(const std::string a_m1, const std::string a_i
 				objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
 				vetor##Membro.add(objeto##Membro);\
 			} \
-			vetor##Membro.att(id##Membro).addDadoAttMatrizM3(a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iter1, a_iter2, a_att, a_vlr); \
+			vetor##Membro.at(id##Membro).addDadoAttMatrizM3(a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iter1, a_iter2, a_att, a_vlr); \
 			return true; \
 		} \
 		else \
 			return false; \
 	}\
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttMatriz" + std::string(#Membro) + "_M3():\n" + std::string(erro.what())); } \
-}; \
-bool addDadoAttMatriz##Membro(const std::string a_m1, const std::string a_idM1, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2){ \
-	try{ \
-		if (strCompara(a_m1, std::string(#Membro))){ \
-			if (((a_iterador1 != "") && (a_iterador2 != "") && (a_valor != "")) || \
-                ((a_iterador1 != "") && (a_iterador2 == "") && (a_valor == ""))){ \
-				const Id##Membro id##Membro = getId####Membro##FromChar(a_idM1.c_str()); \
-				if (!vetor##Membro.isInstanciado(id##Membro)){ \
-					Membro objeto##Membro; \
-					objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
-					vetor##Membro.add(objeto##Membro);\
-				} \
-				vetor##Membro.att(id##Membro).addDadoAttMatriz(a_iterador1, a_iterador2, a_attMatriz, a_valor, a_alocacao_1, a_alocacao_2); \
-				vetor##Membro.att(id##Membro).validacaoDadosAttMatriz(std::vector<std::string>{a_attMatriz}); \
-				return true; \
-			} \
-			else \
-				throw std::invalid_argument("Faltando informacoes dos argumentos a_iterador1, a_iterador2 e a_valor"); \
-		} \
-		else \
-			return false; \
-	}\
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadosAttMatriz" + std::string(#Membro) + "(" + a_m1 + "," + a_idM1 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "):\n" + std::string(erro.what())); } \
-}; \
-bool addDadoAttMatriz##Membro##_Membro(const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2){ \
-	try{ \
-		if (strCompara(a_m1, std::string(#Membro))){ \
-			const Id##Membro id##Membro = getId####Membro##FromChar(a_idM1.c_str()); \
-			if (!vetor##Membro.isInstanciado(id##Membro)){ \
-				Membro objeto##Membro; \
-				objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
-				vetor##Membro.add(objeto##Membro);\
-			} \
-			vetor##Membro.att(id##Membro).addDadoAttMatrizM1(a_m2, a_idM2, a_iterador1, a_iterador2, a_attMatriz, a_valor, a_alocacao_1, a_alocacao_2); \
-			return true; \
-		} \
-		else \
-			return false; \
-	}\
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttMatriz" + std::string(#Membro) + "_Membro("  + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "):\n" + std::string(erro.what())); } \
-}; \
-bool addDadoAttMatriz##Membro##_M2(const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_m3, const std::string a_idM3, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2){ \
-	try{ \
-		if (strCompara(a_m1, std::string(#Membro))){ \
-			const Id##Membro id##Membro = getId####Membro##FromChar(a_idM1.c_str()); \
-			if (!vetor##Membro.isInstanciado(id##Membro)){ \
-				Membro objeto##Membro; \
-				objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
-				vetor##Membro.add(objeto##Membro);\
-			} \
-			vetor##Membro.att(id##Membro).addDadoAttMatrizM2(a_m2, a_idM2, a_m3, a_idM3, a_iterador1, a_iterador2, a_attMatriz, a_valor, a_alocacao_1, a_alocacao_2); \
-			return true; \
-		} \
-		else \
-			return false; \
-	}\
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttMatriz" + std::string(#Membro) + "_M2("  + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_m3 + "," + a_idM3 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor +  "):\n" + std::string(erro.what())); } \
-}; \
-bool addDadoAttMatriz##Membro##_M3(const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_m3, const std::string a_idM3, const std::string a_m4, const std::string a_idM4, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2){ \
-	try{ \
-		if (strCompara(a_m1, std::string(#Membro))){ \
-			const Id##Membro id##Membro = getId####Membro##FromChar(a_idM1.c_str()); \
-			if (!vetor##Membro.isInstanciado(id##Membro)){ \
-				Membro objeto##Membro; \
-				objeto##Membro.setAtributoFromString(AttComum##Membro##_id##Membro, a_idM1); \
-				vetor##Membro.add(objeto##Membro);\
-			} \
-			vetor##Membro.att(id##Membro).addDadoAttMatrizM3(a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iterador1, a_iterador2, a_attMatriz, a_valor, a_alocacao_1, a_alocacao_2); \
-			return true; \
-		} \
-		else \
-			return false; \
-	}\
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttMatriz" + std::string(#Membro) + "_M3("  + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_m3 + "," + a_idM3 + "," + a_m4 + "," + a_idM4 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor +  "):\n" + std::string(erro.what())); } \
 }; \
 std::vector<std::vector<std::string>> getDadosAttMatriz##Membro(const bool a_incluirCabecalho, const std::string a_m1, const std::string a_idM1, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const bool a_incluirAtributo, const std::vector<std::string> a_vetorAttMatriz){ \
 	try{ \
@@ -1175,12 +1093,12 @@ std::vector<std::vector<std::string>> getDadosAttMatriz##Membro(const bool a_inc
 				for (int i = 0; i < int(vetorIdMembro.size()); i++) {\
 					const std::string idMembroStr = getString(getAtributo(vetorIdMembro.at(i), AttComum##Membro##_id##Membro, Id##Membro())); \
 					if (i == 0){ \
-						dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttMatriz(a_incluirCabecalho, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
+						dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttMatriz(a_incluirCabecalho, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
 						if (a_incluirCabecalho) \
 							dados.at(0).insert(dados.at(0).begin(), std::string("id" + std::string(#Membro))); \
 					} \
 					else\
-						dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttMatriz(false, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
+						dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttMatriz(false, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
 					for (int k = 0; k < int(dados.size()); k++){ \
 						if ((k == 0) && (i == 0) && (a_incluirCabecalho)){} \
 						else \
@@ -1215,7 +1133,7 @@ std::vector<std::vector<std::string>> getDadosAttMatriz##Membro##_Membro(const b
 			if (vetorIdMembro.size() > 0){ \
 				for (int i = 0; i < int(vetorIdMembro.size()); i++) {\
 					if (primeiroDado == false) {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttMatrizM1(a_incluirCabecalho, a_m2, a_idM2, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttMatrizM1(a_incluirCabecalho, a_m2, a_idM2, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++){\
 								if ((lin == 0) && (a_incluirCabecalho)) \
@@ -1228,7 +1146,7 @@ std::vector<std::vector<std::string>> getDadosAttMatriz##Membro##_Membro(const b
 						} \
 					} \
 					else {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttMatrizM1(false, a_m2, a_idM2, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttMatrizM1(false, a_m2, a_idM2, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++)\
 								dados.at(lin).insert(dados.at(lin).begin(), getString(getAtributo(vetorIdMembro.at(i), AttComum##Membro##_id##Membro, Id##Membro())));\
@@ -1263,7 +1181,7 @@ std::vector<std::vector<std::string>> getDadosAttMatriz##Membro##_M2(const bool 
 			if (vetorIdMembro.size() > 0){ \
 				for (int i = 0; i < int(vetorIdMembro.size()); i++) {\
 					if (primeiroDado == false) {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttMatrizM2(a_incluirCabecalho, a_m2, a_idM2, a_m3, a_idM3, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttMatrizM2(a_incluirCabecalho, a_m2, a_idM2, a_m3, a_idM3, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++){\
 								if ((lin == 0) && (a_incluirCabecalho)) \
@@ -1276,7 +1194,7 @@ std::vector<std::vector<std::string>> getDadosAttMatriz##Membro##_M2(const bool 
 						} \
 					} \
 					else {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttMatrizM2(false, a_m2, a_idM2, a_m3, a_idM3, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttMatrizM2(false, a_m2, a_idM2, a_m3, a_idM3, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++)\
 								dados.at(lin).insert(dados.at(lin).begin(), getString(getAtributo(vetorIdMembro.at(i), AttComum##Membro##_id##Membro, Id##Membro())));\
@@ -1311,7 +1229,7 @@ std::vector<std::vector<std::string>> getDadosAttMatriz##Membro##_M3(const bool 
 			if (vetorIdMembro.size() > 0){ \
 				for (int i = 0; i < int(vetorIdMembro.size()); i++) {\
 					if (primeiroDado == false) {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttMatrizM3(a_incluirCabecalho, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttMatrizM3(a_incluirCabecalho, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++){\
 								if ((lin == 0) && (a_incluirCabecalho)) \
@@ -1324,7 +1242,7 @@ std::vector<std::vector<std::string>> getDadosAttMatriz##Membro##_M3(const bool 
 						} \
 					} \
 					else {\
-						std::vector<std::vector<std::string>> dados = vetor##Membro.att(vetorIdMembro.at(i)).getDadosAttMatrizM3(false, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
+						std::vector<std::vector<std::string>> dados = vetor##Membro.at(vetorIdMembro.at(i)).getDadosAttMatrizM3(false, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, a_incluirAtributo, a_vetorAttMatriz); \
 						if (dados.at(0).size() > 0){ \
 							for (int lin = 0; lin < int(dados.size()); lin++)\
 								dados.at(lin).insert(dados.at(lin).begin(), getString(getAtributo(vetorIdMembro.at(i), AttComum##Membro##_id##Membro, Id##Membro())));\
@@ -1344,167 +1262,167 @@ std::vector<std::vector<std::string>> getDadosAttMatriz##Membro##_M3(const bool 
 }; \
 template<typename Atributo, typename Iterador1> \
 Iterador1 getIterador1Inicial(const Id##Membro a_idM1, const Atributo a_atributo, const Iterador1 a_iterador1){ \
-	try { return vetor##Membro.att(a_idM1).getIterador1Inicial(a_atributo, a_iterador1); } \
+	try { return vetor##Membro.at(a_idM1).getIterador1Inicial(a_atributo, a_iterador1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador1Inicial(" + getString(a_idM1) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1> \
 Iterador1 getIterador1Final(const Id##Membro a_idM1, const Atributo a_atributo, const Iterador1 a_iterador1){ \
-	try { return vetor##Membro.att(a_idM1).getIterador1Final(a_atributo, a_iterador1); } \
+	try { return vetor##Membro.at(a_idM1).getIterador1Final(a_atributo, a_iterador1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador1Final(" + getString(a_idM1) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename IdM2> \
 Iterador1 getIterador1Inicial(const Id##Membro a_idM1, const IdM2 a_idM2, const Atributo a_atributo, const Iterador1 a_iterador1){ \
-	try { return vetor##Membro.att(a_idM1).getIterador1Inicial(a_idM2, a_atributo, a_iterador1); } \
+	try { return vetor##Membro.at(a_idM1).getIterador1Inicial(a_idM2, a_atributo, a_iterador1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador1Inicial(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename IdM2> \
 Iterador1 getIterador1Final(const Id##Membro a_idM1, const IdM2 a_idM2, const Atributo a_atributo, const Iterador1 a_iterador1){ \
-	try { return vetor##Membro.att(a_idM1).getIterador1Final(a_idM2, a_atributo, a_iterador1); } \
+	try { return vetor##Membro.at(a_idM1).getIterador1Final(a_idM2, a_atributo, a_iterador1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador1Final(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename IdM2, typename IdM3> \
 Iterador1 getIterador1Inicial(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const Atributo a_atributo, const Iterador1 a_iterador1){ \
-	try { return vetor##Membro.att(a_idM1).getIterador1Inicial(a_idM2, a_idM3, a_atributo, a_iterador1); } \
+	try { return vetor##Membro.at(a_idM1).getIterador1Inicial(a_idM2, a_idM3, a_atributo, a_iterador1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador1Inicial(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename IdM2, typename IdM3> \
 Iterador1 getIterador1Final(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const Atributo a_atributo, const Iterador1 a_iterador1){ \
-	try { return vetor##Membro.att(a_idM1).getIterador1Final(a_idM2, a_idM3, a_atributo, a_iterador1); } \
+	try { return vetor##Membro.at(a_idM1).getIterador1Final(a_idM2, a_idM3, a_atributo, a_iterador1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador1Final(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename IdM2, typename IdM3, typename IdM4> \
 Iterador1 getIterador1Inicial(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const IdM4 a_idM4, const Atributo a_atributo, const Iterador1 a_iterador1){ \
-	try { return vetor##Membro.att(a_idM1).getIterador1Inicial(a_idM2, a_idM3, a_idM4, a_atributo, a_iterador1); } \
+	try { return vetor##Membro.at(a_idM1).getIterador1Inicial(a_idM2, a_idM3, a_idM4, a_atributo, a_iterador1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador1Inicial(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_idM4) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename IdM2, typename IdM3, typename IdM4> \
 Iterador1 getIterador1Final(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const IdM4 a_idM4, const Atributo a_atributo, const Iterador1 a_iterador1){ \
-	try { return vetor##Membro.att(a_idM1).getIterador1Final(a_idM2, a_idM3, a_idM4, a_atributo, a_iterador1); } \
+	try { return vetor##Membro.at(a_idM1).getIterador1Final(a_idM2, a_idM3, a_idM4, a_atributo, a_iterador1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador1Final(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_idM4) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename Iterador2> \
 Iterador2 getIterador2Inicial(const Id##Membro a_idM1, const Atributo a_atributo, const Iterador1 a_iterador1, const Iterador2 a_iterador2) { \
-	try { return vetor##Membro.att(a_idM1).getIterador2Inicial(a_atributo, a_iterador1, a_iterador2); } \
+	try { return vetor##Membro.at(a_idM1).getIterador2Inicial(a_atributo, a_iterador1, a_iterador2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador2Inicial(" + getString(a_idM1) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename Iterador2> \
 Iterador2 getIterador2Final(const Id##Membro a_idM1, const Atributo a_atributo, const Iterador1 a_iterador1, const Iterador2 a_iterador2){ \
-	try { return vetor##Membro.att(a_idM1).getIterador2Final(a_atributo, a_iterador1, a_iterador2); } \
+	try { return vetor##Membro.at(a_idM1).getIterador2Final(a_atributo, a_iterador1, a_iterador2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador2Final(" + getString(a_idM1) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename Iterador2, typename IdM2> \
 Iterador2 getIterador2Inicial(const Id##Membro a_idM1, const IdM2 a_idM2, const Atributo a_atributo, const Iterador1 a_iterador1, const Iterador2 a_iterador2){ \
-	try { return vetor##Membro.att(a_idM1).getIterador2Inicial(a_idM2, a_atributo, a_iterador1, a_iterador2); } \
+	try { return vetor##Membro.at(a_idM1).getIterador2Inicial(a_idM2, a_atributo, a_iterador1, a_iterador2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador2Inicial(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename Iterador2, typename IdM2> \
 Iterador2 getIterador2Final(const Id##Membro a_idM1, const IdM2 a_idM2, const Atributo a_atributo, const Iterador1 a_iterador1, const Iterador2 a_iterador2){ \
-	try { return vetor##Membro.att(a_idM1).getIterador2Final(a_idM2, a_atributo, a_iterador1, a_iterador2); } \
+	try { return vetor##Membro.at(a_idM1).getIterador2Final(a_idM2, a_atributo, a_iterador1, a_iterador2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador2Final(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename Iterador2, typename IdM2, typename IdM3> \
 Iterador2 getIterador2Inicial(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const Atributo a_atributo, const Iterador1 a_iterador1, const Iterador2 a_iterador2){ \
-	try { return vetor##Membro.att(a_idM1).getIterador2Inicial(a_idM2, a_idM3, a_atributo, a_iterador1, a_iterador2); } \
+	try { return vetor##Membro.at(a_idM1).getIterador2Inicial(a_idM2, a_idM3, a_atributo, a_iterador1, a_iterador2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador2Inicial(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename Iterador2, typename IdM2, typename IdM3> \
 Iterador2 getIterador2Final(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const Atributo a_atributo, const Iterador1 a_iterador1, const Iterador2 a_iterador2){ \
-	try { return vetor##Membro.att(a_idM1).getIterador2Final(a_idM2, a_idM3, a_atributo, a_iterador1, a_iterador2); } \
+	try { return vetor##Membro.at(a_idM1).getIterador2Final(a_idM2, a_idM3, a_atributo, a_iterador1, a_iterador2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador2Final(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename Iterador2, typename IdM2, typename IdM3, typename IdM4> \
 Iterador2 getIterador2Inicial(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const IdM4 a_idM4, const Atributo a_atributo, const Iterador1 a_iterador1, const Iterador2 a_iterador2){ \
-	try { return vetor##Membro.att(a_idM1).getIterador2Inicial(a_idM2, a_idM3, a_idM4, a_atributo, a_iterador1, a_iterador2); } \
+	try { return vetor##Membro.at(a_idM1).getIterador2Inicial(a_idM2, a_idM3, a_idM4, a_atributo, a_iterador1, a_iterador2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador2Inicial(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_idM4) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename Iterador2, typename IdM2, typename IdM3, typename IdM4> \
 Iterador2 getIterador2Final(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const IdM4 a_idM4, const Atributo a_atributo, const Iterador1 a_iterador1, const Iterador2 a_iterador2){ \
-	try { return vetor##Membro.att(a_idM1).getIterador2Final(a_idM2, a_idM3, a_idM4, a_atributo, a_iterador1, a_iterador2); } \
+	try { return vetor##Membro.at(a_idM1).getIterador2Final(a_idM2, a_idM3, a_idM4, a_atributo, a_iterador1, a_iterador2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIterador2Final(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_idM4) + "," + getString(a_atributo) + ",a_iterador1): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename Iterador2, typename Valor> \
 Valor getElementoMatriz(const Id##Membro a_m1, const Atributo a_atributo, const Iterador1 a_iterador1, const Iterador2 a_iterador2, const Valor a_valor){ \
-	try { return vetor##Membro.att(a_m1).getElementoMatriz(a_atributo, a_iterador1, a_iterador2, a_valor); } \
+	try { return vetor##Membro.at(a_m1).getElementoMatriz(a_atributo, a_iterador1, a_iterador2, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getElementoMatriz(" + getString(a_m1) + "," + getString(a_atributo) + "," + getString(a_iterador1) + "," + getString(a_iterador2) + ",Valor): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename Iterador2, typename Valor, typename IdM2> \
 Valor getElementoMatriz(const Id##Membro a_idM1, const IdM2 a_idM2, const Atributo a_atributo, const Iterador1 a_iterador1, const Iterador2 a_iterador2, const Valor a_valor){ \
-	try { return vetor##Membro.att(a_idM1).getElementoMatriz(a_idM2, a_atributo, a_iterador1, a_iterador2, a_valor); } \
+	try { return vetor##Membro.at(a_idM1).getElementoMatriz(a_idM2, a_atributo, a_iterador1, a_iterador2, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getElementoMatriz(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_atributo) + "," + getString(a_iterador1) + "," + getString(a_iterador2) + ",Valor): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename Iterador2, typename Valor, typename IdM2, typename IdM3> \
 Valor getElementoMatriz(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const Atributo a_atributo, const Iterador1 a_iterador1, const Iterador2 a_iterador2, const Valor a_valor){ \
-	try { return vetor##Membro.att(a_idM1).getElementoMatriz(a_idM2, a_idM3, a_atributo, a_iterador1, a_iterador2, a_valor); } \
+	try { return vetor##Membro.at(a_idM1).getElementoMatriz(a_idM2, a_idM3, a_atributo, a_iterador1, a_iterador2, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getElementoMatriz(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_atributo) + "," + getString(a_iterador1) + "," + getString(a_iterador2) + ",Valor): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename Iterador2, typename Valor, typename IdM2, typename IdM3, typename IdM4> \
 Valor getElementoMatriz(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const IdM4 a_idM4, const Atributo a_atributo, const Iterador1 a_iterador1, const Iterador2 a_iterador2, const Valor a_valor){ \
-	try { return vetor##Membro.att(a_idM1).getElementoMatriz(a_idM2, a_idM3, a_idM4, a_atributo, a_iterador1, a_iterador2, a_valor); } \
+	try { return vetor##Membro.at(a_idM1).getElementoMatriz(a_idM2, a_idM3, a_idM4, a_atributo, a_iterador1, a_iterador2, a_valor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getElementoMatriz(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_idM4) + "," + getString(a_atributo) + "," + getString(a_iterador1) + "," + getString(a_iterador2) + ",Valor): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo> \
 int getSize1Matriz(const Id##Membro a_idM1, const Atributo a_atributo){ \
-	try { return vetor##Membro.att(a_idM1).getSizeMatriz(a_atributo); } \
+	try { return vetor##Membro.at(a_idM1).getSizeMatriz(a_atributo); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getSizeMatriz(" + getString(a_idM1) + "," + getString(a_atributo) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename IdM2> \
 int getSize1Matriz(const Id##Membro a_idM1, const IdM2 a_idM2, const Atributo a_atributo){ \
-	try { return vetor##Membro.att(a_idM1).getSize1Matriz(a_idM2, a_atributo); } \
+	try { return vetor##Membro.at(a_idM1).getSize1Matriz(a_idM2, a_atributo); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getSizeMatriz(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_atributo) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename IdM2, typename IdM3> \
 int getSize1Matriz(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const Atributo a_atributo){ \
-	try { return vetor##Membro.att(a_idM1).getSize1Matriz(a_idM2, a_idM3, a_atributo); } \
+	try { return vetor##Membro.at(a_idM1).getSize1Matriz(a_idM2, a_idM3, a_atributo); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getSizeMatriz(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_atributo) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename IdM2, typename IdM3, typename IdM4> \
 int getSize1Matriz(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const IdM4 a_idM4, const Atributo a_atributo){ \
-	try { return vetor##Membro.att(a_idM1).getSize1Matriz(a_idM2, a_idM3, a_idM4, a_atributo); } \
+	try { return vetor##Membro.at(a_idM1).getSize1Matriz(a_idM2, a_idM3, a_idM4, a_atributo); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getSizeMatriz(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_idM4) + "," + getString(a_atributo) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1> \
 int getSize2Matriz(const Id##Membro a_idM1, const Atributo a_atributo, Iterador1 a_iterador1){ \
-	try { return vetor##Membro.att(a_idM1).getSizeMatriz(a_atributo, a_iterador1); } \
+	try { return vetor##Membro.at(a_idM1).getSizeMatriz(a_atributo, a_iterador1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getSizeMatriz(" + getString(a_idM1) + "," + getString(a_atributo) + "," + getString(a_iterador1) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename IdM2> \
 int getSize2Matriz(const Id##Membro a_idM1, const IdM2 a_idM2, const Atributo a_atributo, Iterador1 a_iterador1){ \
-	try { return vetor##Membro.att(a_idM1).getSize2Matriz(a_idM2, a_atributo, a_iterador1); } \
+	try { return vetor##Membro.at(a_idM1).getSize2Matriz(a_idM2, a_atributo, a_iterador1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getSizeMatriz(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_atributo) + "," + getString(a_iterador1) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename IdM2, typename IdM3> \
 int getSize2Matriz(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const Atributo a_atributo, Iterador1 a_iterador1){ \
-	try { return vetor##Membro.att(a_idM1).getSize2Matriz(a_idM2, a_idM3, a_atributo, a_iterador1); } \
+	try { return vetor##Membro.at(a_idM1).getSize2Matriz(a_idM2, a_idM3, a_atributo, a_iterador1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getSizeMatriz(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_atributo) + "," + getString(a_iterador1) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename Atributo, typename Iterador1, typename IdM2, typename IdM3, typename IdM4> \
 int getSize2Matriz(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const IdM4 a_idM4, const Atributo a_atributo, Iterador1 a_iterador1){ \
-	try { return vetor##Membro.att(a_idM1).getSize2Matriz(a_idM2, a_idM3, a_idM4, a_atributo, a_iterador1); } \
+	try { return vetor##Membro.at(a_idM1).getSize2Matriz(a_idM2, a_idM3, a_idM4, a_atributo, a_iterador1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getSizeMatriz(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_idM4) + "," + getString(a_atributo) + "," + getString(a_iterador1) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename AttMatriz, typename TipoIterador1, typename TipoIterador2, typename TipoValor> \
 SmartEnupla<TipoIterador2, TipoValor> getElementosMatriz(const Id##Membro a_idM1, const AttMatriz a_attMatriz, const TipoIterador1 a_iterador1, const TipoIterador2 a_iterador2, const TipoValor a_tipoValor){ \
-	try { return vetor##Membro.att(a_idM1).getElementosMatriz(a_attMatriz, a_iterador1, a_iterador2, a_tipoValor); } \
+	try { return vetor##Membro.at(a_idM1).getElementosMatriz(a_attMatriz, a_iterador1, a_iterador2, a_tipoValor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getElementosMatriz(" + getString(a_idM1) + "," + getString(a_attMatriz) + ",a_iterador1,a_iterador2,a_tipoValor): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename AttMatriz, typename TipoIterador1, typename TipoIterador2, typename TipoValor> \
 SmartEnupla<TipoIterador2, TipoValor> getElementosMatriz(const Id##Membro a_idM1, const IdM2 a_idM2, const AttMatriz a_attMatriz, const TipoIterador1 a_iterador1, const TipoIterador2 a_iterador2, const TipoValor a_tipoValor){ \
-	try { return vetor##Membro.att(a_idM1).getElementosMatriz(a_idM2, a_attMatriz, a_iterador1, a_iterador2, a_tipoValor); } \
+	try { return vetor##Membro.at(a_idM1).getElementosMatriz(a_idM2, a_attMatriz, a_iterador1, a_iterador2, a_tipoValor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getElementosMatriz(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_attMatriz) + ",a_iterador1,a_iterador2,a_tipoValor): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM3, typename IdM2, typename AttMatriz, typename TipoIterador1, typename TipoIterador2, typename TipoValor> \
 SmartEnupla<TipoIterador2, TipoValor> getElementosMatriz(const Id##Membro a_idM1, const IdM2 a_idM2, const IdM3 a_idM3, const AttMatriz a_attMatriz, const TipoIterador1 a_iterador1, const TipoIterador2 a_iterador2, const TipoValor a_tipoValor){ \
-	try { return vetor##Membro.att(a_idM1).getElementosMatriz(a_idM2, a_idM3, a_attMatriz, a_iterador1, a_iterador2, a_tipoValor); } \
+	try { return vetor##Membro.at(a_idM1).getElementosMatriz(a_idM2, a_idM3, a_attMatriz, a_iterador1, a_iterador2, a_tipoValor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getElementosMatriz(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_idM3) + "," + getString(a_attMatriz) + ",a_iterador1,a_iterador2,a_tipoValor): \n" + std::string(erro.what())); } \
 };\
 template<typename AttMatriz, typename TipoIterador1, typename TipoIterador2, typename TipoValor> \
 SmartEnupla<TipoIterador1, SmartEnupla<TipoIterador2, TipoValor>> getMatriz(const Id##Membro a_idM1, const AttMatriz a_attMatriz, const TipoIterador1 a_iterador1, const TipoIterador2 a_iterador2, const TipoValor a_tipoValor){ \
-	try { return vetor##Membro.att(a_idM1).getMatriz(a_attMatriz, a_iterador1, a_iterador2, a_tipoValor); } \
+	try { return vetor##Membro.at(a_idM1).getMatriz(a_attMatriz, a_iterador1, a_iterador2, a_tipoValor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMatriz(" + getString(a_idM1) + "," + getString(a_attMatriz) + ",a_iterador1,a_iterador2,a_tipoValor): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2, typename AttMatriz, typename TipoIterador1, typename TipoIterador2, typename TipoValor> \
 SmartEnupla<TipoIterador1, SmartEnupla<TipoIterador2, TipoValor>> getMatriz(const Id##Membro a_idM1, const IdM2 a_idM2, const AttMatriz a_attMatriz, const TipoIterador1 a_iterador1, const TipoIterador2 a_iterador2, const TipoValor a_tipoValor){ \
-	try { return vetor##Membro.att(a_idM1).getMatriz(a_idM2, a_attMatriz, a_iterador1, a_iterador2, a_tipoValor); } \
+	try { return vetor##Membro.at(a_idM1).getMatriz(a_idM2, a_attMatriz, a_iterador1, a_iterador2, a_tipoValor); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMatriz(" + getString(a_idM1) + "," + getString(a_idM2) + "," + getString(a_attMatriz) + ",a_iterador1,a_iterador2,a_tipoValor): \n" + std::string(erro.what())); } \
 };\
 
@@ -1606,22 +1524,6 @@ if (addDadoAttMatriz##Membro##_M2(a_m1, a_idM1, a_m2, a_idM2, a_m3, a_idM3, a_it
 
 #define DEFINE2_addDadoAttMatrizM4(Classe, Membro)\
 if (addDadoAttMatriz##Membro##_M3(a_m1, a_idM1, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iter1, a_iter2, a_att, a_vlr)) \
-	return; 
-
-#define DEFINE_addDadoAttMatrizM1(Classe, Membro)\
-if (addDadoAttMatriz##Membro(a_m1, a_idM1, a_iterador1, a_iterador2, a_attMatriz, a_valor, a_alocacao_1, a_alocacao_2)) \
-	return; 
-
-#define DEFINE_addDadoAttMatrizM2(Classe, Membro)\
-if (addDadoAttMatriz##Membro##_Membro(a_m1, a_idM1, a_m2, a_idM2, a_iterador1, a_iterador2, a_attMatriz, a_valor, a_alocacao_1, a_alocacao_2)) \
-	return; 
-
-#define DEFINE_addDadoAttMatrizM3(Classe, Membro)\
-if (addDadoAttMatriz##Membro##_M2(a_m1, a_idM1, a_m2, a_idM2, a_m3, a_idM3, a_iterador1, a_iterador2, a_attMatriz, a_valor, a_alocacao_1, a_alocacao_2)) \
-	return; 
-
-#define DEFINE_addDadoAttMatrizM4(Classe, Membro)\
-if (addDadoAttMatriz##Membro##_M3(a_m1, a_idM1, a_m2, a_idM2, a_m3, a_idM3, a_m4, a_idM4, a_iterador1, a_iterador2, a_attMatriz, a_valor, a_alocacao_1, a_alocacao_2)) \
 	return; 
 
 #define DEFINE_getDadosAttMatrizM1(Classe, Membro)\
@@ -1793,34 +1695,6 @@ virtual void addDadoAttMatrizM4(const std::string a_m1, const std::string a_idM1
 		throw std::invalid_argument("Membro ou Membro Filho nao encontrados."); \
 	}\
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttMatrizM4:():\n" + std::string(erro.what())); }\
-}; \
-virtual void addDadoAttMatrizM1(const std::string a_m1, const std::string a_idM1, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2){ \
-	try{ \
-		valores(DEFINE_addDadoAttMatrizM1) \
-		throw std::invalid_argument("Membro nao encontrado."); \
-	}\
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadosAttMatrizM1:(" + a_m1 + "," + a_idM1 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "):\n" + std::string(erro.what())); }\
-}; \
-virtual void addDadoAttMatrizM2(const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2) {\
-	try { \
-		valores(DEFINE_addDadoAttMatrizM2) \
-		throw std::invalid_argument("Membro ou Membro Filho nao encontrados."); \
-	}\
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadosAttMatrizM2:(" + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "):\n" + std::string(erro.what())); }\
-}; \
-virtual void addDadoAttMatrizM3(const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_m3, const std::string a_idM3, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2) {\
-	try { \
-		valores(DEFINE_addDadoAttMatrizM3) \
-		throw std::invalid_argument("Membro ou Membro Filho nao encontrados."); \
-	}\
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadosAttMatrizM3:(" + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_m3 + "," + a_idM3 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "):\n" + std::string(erro.what())); }\
-}; \
-virtual void addDadoAttMatrizM4(const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_m3, const std::string a_idM3, const std::string a_m4, const std::string a_idM4, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2) {\
-	try { \
-		valores(DEFINE_addDadoAttMatrizM4) \
-		throw std::invalid_argument("Membro ou Membro Filho nao encontrados."); \
-	}\
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttMatrizM4:(" + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_m3 + "," + a_idM3 + "," + a_m4 + "," + a_idM4 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "):\n" + std::string(erro.what())); }\
 }; \
 virtual std::vector<std::vector<std::string>> getDadosAttMatrizM1(const bool a_incluirCabecalho, const std::string a_m1, const std::string a_idM1, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const bool a_incluirAtributo, const std::vector<std::string> a_vetorAttMatriz){ \
 	try{ \

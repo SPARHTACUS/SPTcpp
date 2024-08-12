@@ -248,20 +248,20 @@ inline void ProcessoEstocastico::addSeriesTemporais(const TipoVariavelAleatoria 
 		for (int iter = 1; iter <= a_lista_tipo_variavel_aleatoria_interna.getIteradorFinal(); iter++) {
 			const IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna(iter);
 
-			if (vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.isInstanciado(idVariavelAleatoriaInterna))
+			if (vetorVariavelAleatoria.at(idVariavelAleatoria).vetorVariavelAleatoriaInterna.isInstanciado(idVariavelAleatoriaInterna))
 				throw std::invalid_argument("Variavel aleatoria interna ja instanciada " + getFullString(idVariavelAleatoriaInterna) + " " + getAtributo(idVariavelAleatoria, idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_nome, std::string()));
 
 			VariavelAleatoriaInterna variavelAleatoriaInterna;
 			variavelAleatoriaInterna.setAtributo(AttComumVariavelAleatoriaInterna_idVariavelAleatoriaInterna, idVariavelAleatoriaInterna);
 			variavelAleatoriaInterna.setAtributo(AttComumVariavelAleatoriaInterna_nome, getFullString(a_lista_tipo_variavel_aleatoria_interna.getElemento(iter)));
 
-			vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.add(variavelAleatoriaInterna);
+			vetorVariavelAleatoria.at(idVariavelAleatoria).vetorVariavelAleatoriaInterna.add(variavelAleatoriaInterna);
 
-			vetorVariavelAleatoria.att(idVariavelAleatoria).addSerieTemporalVariavelAleatoriaInterna(idVariavelAleatoriaInterna, a_series_temporais.at(iter));
+			vetorVariavelAleatoria.at(idVariavelAleatoria).addSerieTemporalVariavelAleatoriaInterna(idVariavelAleatoriaInterna, a_series_temporais.at(iter));
 
 		} // for (int iter = 1; iter <= a_lista_variavel_aleatoria_interna.getIteradorFinal(); iter++) {
 
-		vetorVariavelAleatoria.att(idVariavelAleatoria).calcularSerieTemporal();
+		vetorVariavelAleatoria.at(idVariavelAleatoria).calcularSerieTemporal();
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::addSeriesTemporais(" + getFullString(a_tipo_variavel_aleatoria) + ",a_lista_tipo_variavel_aleatoria_interna,a_series_temporais): \n" + std::string(erro.what())); }
@@ -296,14 +296,14 @@ inline void ProcessoEstocastico::addTendenciasTemporais(const TipoVariavelAleato
 		for (int iter = 1; iter <= a_lista_tipo_variavel_aleatoria_interna.getIteradorFinal(); iter++) {
 			const IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna(iter);
 
-			if (!vetorVariavelAleatoria.att(idVariavelAleatoria).vetorVariavelAleatoriaInterna.isInstanciado(idVariavelAleatoriaInterna))
+			if (!vetorVariavelAleatoria.at(idVariavelAleatoria).vetorVariavelAleatoriaInterna.isInstanciado(idVariavelAleatoriaInterna))
 				throw std::invalid_argument("Variavel aleatoria interna nao instanciada " + getFullString(idVariavelAleatoriaInterna));
 
-			vetorVariavelAleatoria.att(idVariavelAleatoria).addTendenciaTemporalVariavelAleatoriaInterna(idVariavelAleatoriaInterna, a_tendencias_temporais.at(iter));
+			vetorVariavelAleatoria.at(idVariavelAleatoria).addTendenciaTemporalVariavelAleatoriaInterna(idVariavelAleatoriaInterna, a_tendencias_temporais.at(iter));
 
 		} // for (int iter = 1; iter <= a_lista_tipo_variavel_aleatoria_interna.getIteradorFinal(); iter++) {
 
-		vetorVariavelAleatoria.att(idVariavelAleatoria).calcularTendenciaTemporal();
+		vetorVariavelAleatoria.at(idVariavelAleatoria).calcularTendenciaTemporal();
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::addTendenciasTemporais(" + getFullString(a_tipo_variavel_aleatoria) + ",a_lista_tipo_variavel_aleatoria_interna,a_tendencias_temporais): \n" + std::string(erro.what())); }

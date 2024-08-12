@@ -196,26 +196,6 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizM4(): \n" + std::string(erro.what())); }
 	};
 
-	virtual void addDadoAttMatriz(const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor) {
-		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::addDadoAttMatriz(" + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "): \n" + std::string(erro.what())); }
-	};
-
-	virtual void addDadoAttMatriz(const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2) {
-		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
-		catch (const std::exception & erro) { throw std::invalid_argument("SmartDados::addDadoAttMatriz(" + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "): \n" + std::string(erro.what())); }
-	};
-
-	virtual void addDadoAttMatriz(const std::string a_idM1, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor) {
-		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::addDadoAttMatriz(" + a_idM1 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "): \n" + std::string(erro.what())); }
-	};
-
-	virtual void addDadoAttMatriz(const std::string a_idM1, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2) {
-		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
-		catch (const std::exception & erro) { throw std::invalid_argument("SmartDados::addDadoAttMatriz(" + a_idM1 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "): \n" + std::string(erro.what())); }
-	};
-
 	virtual void validacaoDadosAttMatriz(const std::vector<std::string> &a_vetorAttMatriz) {};
 
 	virtual std::vector<std::vector<std::string>> getDadosAttMatriz(const bool a_incluirIteradores, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const bool a_incluirAtributo, const std::vector<std::string> a_vetorAttMatriz) const{
@@ -223,14 +203,6 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::getDadosAttMatriz(" + getString(a_incluirIteradores) + "," + a_iterador1Inicial + "," + a_iterador1Final + "," + a_iterador2Inicial + "," + a_iterador2Final + "," + getString(a_incluirAtributo) + ",a_attMatriz): \n" + std::string(erro.what())); }
 	};
 
-	virtual void addDadoAttMatrizM1(const std::string a_m1, const std::string a_idM1, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor) {
-		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizM1(" + a_m1 + "," + a_idM1 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "): \n" + std::string(erro.what())); }
-	};
-	virtual void addDadoAttMatrizM1(const std::string a_m1, const std::string a_idM1, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2) {
-		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
-		catch (const std::exception & erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizM1(" + a_m1 + "," + a_idM1 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "," + getString(a_alocacao_1) + "," + getString(a_alocacao_2) + "): \n" + std::string(erro.what())); }
-	};
 	virtual void validacaoDadosAttMatrizM1(const std::string a_m1, const std::vector<std::string> &a_vetorIdMembro, const std::vector<std::string> &a_vetorAttMatriz) {};
 
 	virtual std::vector<std::vector<std::string>> getDadosAttMatrizM1(const bool a_incluirIteradores, const std::string a_m1, const std::string a_idM1, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const bool a_incluirAtributo, const std::vector<std::string> a_vetorAttMatriz) {
@@ -238,14 +210,6 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::getDadosAttMatriz(" + getString(a_incluirIteradores) + "," + a_m1 + "," + a_idM1 + "," + a_iterador1Inicial + "," + a_iterador1Final + "," + a_iterador2Inicial + "," + a_iterador2Final + "," + getString(a_incluirAtributo) + ",a_attMatriz): \n" + std::string(erro.what())); }
 	};
 
-	virtual void addDadoAttMatrizM2(const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor) {
-		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizM2(" + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "): \n" + std::string(erro.what())); }
-	};
-	virtual void addDadoAttMatrizM2(const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2) {
-		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
-		catch (const std::exception & erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizM2(" + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "): \n" + std::string(erro.what())); }
-	};
 	virtual void validacaoDadosAttMatrizM2(const std::string a_m1, const std::vector<std::string> &a_vetorIdMembro, const std::string a_m2, const std::vector<std::string> &a_vetorIdM2, const std::vector<std::string> &a_vetorAttMatriz) {};
 
 	virtual std::vector<std::vector<std::string>> getDadosAttMatrizM2(const bool a_incluirIteradores, const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const bool a_incluirAtributo, const std::vector<std::string> a_vetorAttMatriz) {
@@ -253,14 +217,6 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::getDadosAttMatriz(" + getString(a_incluirIteradores) + "," + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_iterador1Inicial + "," + a_iterador1Final + "," + a_iterador2Inicial + "," + a_iterador2Final + "," + getString(a_incluirAtributo) + ",a_attMatriz): \n" + std::string(erro.what())); }
 	};
 
-	virtual void addDadoAttMatrizM3(const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_m3, const std::string a_idM3, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor) {
-		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizM3(" + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_m3 + "," + a_idM3 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "): \n" + std::string(erro.what())); }
-	};
-	virtual void addDadoAttMatrizM3(const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_m3, const std::string a_idM3, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2) {
-		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
-		catch (const std::exception & erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizM3(" + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_m3 + "," + a_idM3 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "): \n" + std::string(erro.what())); }
-	};
 	virtual void validacaoDadosAttMatrizM3(const std::string a_m1, const std::vector<std::string> &a_vetorIdMembro, const std::string a_m2, const std::vector<std::string> &a_vetorIdM2, const std::string a_m3, const std::vector<std::string> &a_vetorIdM3, const std::vector<std::string> &a_vetorAttMatriz) {};
 
 	virtual std::vector<std::vector<std::string>> getDadosAttMatrizM3(const bool a_incluirIteradores, const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_m3, const std::string a_idM3, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const bool a_incluirAtributo, const std::vector<std::string> a_vetorAttMatriz) {
@@ -268,14 +224,6 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::getDadosAttMatrizM3(" + getString(a_incluirIteradores) + "," + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_m3 + "," + a_idM3 + "," + a_iterador1Inicial + "," + a_iterador1Final + "," + a_iterador2Inicial + "," + a_iterador2Final + "," + getString(a_incluirAtributo) + ",a_attMatriz): \n" + std::string(erro.what())); }
 	};
 
-	virtual void addDadoAttMatrizM4(const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_m3, const std::string a_idM3, const std::string a_m4, const std::string a_idM4, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor) {
-		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizM4(" + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_m3 + "," + a_idM3 + "," + a_m4 + "," + a_idM4 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "): \n" + std::string(erro.what())); }
-	};
-	virtual void addDadoAttMatrizM4(const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_m3, const std::string a_idM3, const std::string a_m4, const std::string a_idM4, const std::string a_iterador1, const std::string a_iterador2, const std::string a_attMatriz, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2) {
-		try { throw std::invalid_argument("Estrutura de adicao de dados nao definida."); }
-		catch (const std::exception & erro) { throw std::invalid_argument("SmartDados::addDadoAttMatrizM4(" + a_m1 + "," + a_idM1 + "," + a_m2 + "," + a_idM2 + "," + a_m3 + "," + a_idM3 + "," + a_m4 + "," + a_idM4 + "," + a_iterador1 + "," + a_iterador2 + "," + a_attMatriz + "," + a_valor + "): \n" + std::string(erro.what())); }
-	};
 	virtual void validacaoDadosAttMatrizM4(const std::string a_m1, const std::vector<std::string> &a_vetorIdMembro, const std::string a_m2, const std::vector<std::string> &a_vetorIdM2, const std::string a_m3, const std::vector<std::string> &a_vetorIdM3, const std::string a_m4, const std::vector<std::string> &a_vetorIdM4, const std::vector<std::string> &a_vetorAttMatriz) {};
 
 	virtual std::vector<std::vector<std::string>> getDadosAttMatrizM4(const bool a_incluirIteradores, const std::string a_m1, const std::string a_idM1, const std::string a_m2, const std::string a_idM2, const std::string a_m3, const std::string a_idM3, const std::string a_m4, const std::string a_idM4, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const bool a_incluirAtributo, const std::vector<std::string> a_vetorAttMatriz) {

@@ -117,7 +117,7 @@ std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_#
              Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>());\
 std::string getNome##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) ){\
 std::string name; \
-if (vetorEstagio.att(a_IdEstagio_1).getSolver(a_TSS)->isNomeSimplificado()) \
+if (vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->isNomeSimplificado()) \
 	name = std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_STRING_ELEMENTO)); \
 else \
 	name = std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_FULL_STRING_ELEMENTO)); \
@@ -141,7 +141,7 @@ int add##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) DEC
 	try{ \
 		if (get##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS)) > -1) \
 			throw std::invalid_argument("Conteudo ja existente."); \
-		double id##Elem = double(vetorEstagio.att(a_IdEstagio_1).getSolver(a_TSS)-> DECLARAR_ADD_ELEMENTO_##Elem##_2 getNome##Elem##_##Nome(a_TSS Valores(ARGS_ITERS)))); \
+		double id##Elem = double(vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)-> DECLARAR_ADD_ELEMENTO_##Elem##_2 getNome##Elem##_##Nome(a_TSS Valores(ARGS_ITERS)))); \
 		addConteudoIters_12(idx_##Elem##_##Nome##_##Nro.at(a_TSS), id##Elem Valores(ARGS_ITERS) ARGS_CONST_##Nro##_10, IdRealizacao_1, IdCenario_1 ); \
 		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)){ \
 			is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS) = true;\

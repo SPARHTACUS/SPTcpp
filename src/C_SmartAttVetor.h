@@ -220,7 +220,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 				if (getString(TipoIterador()) == getString(Periodo())){ \
 					if (getSizeVetor() > 0){ \
 						for (TipoIterador iter = iteradorInicial; iter <= iteradorFinal; vetor.incrementarIterador(iter)) \
-							vetor_auxiliar_iterador.addElemento(iter, true); \
+							vetor_auxiliar_iterador.addElemento_rIt(iter, true); \
 					} \
 					else {\
 						std::vector<std::vector<std::string>> vetorRetorno; \
@@ -239,7 +239,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 				iteradorFinal   = getIteradorFinal(TipoIterador()); \
 				if (getString(TipoIterador()) == getString(Periodo())){ \
 					for (TipoIterador iter = iteradorInicial; iter <= iteradorFinal; vetor.incrementarIterador(iter)) \
-						vetor_auxiliar_iterador.addElemento(iter, true); \
+						vetor_auxiliar_iterador.addElemento_rIt(iter, true); \
 				} \
 				else \
 					vetor_auxiliar_iterador = SmartEnupla<TipoIterador, bool>(iteradorInicial, std::vector<bool>(int(iteradorFinal - iteradorInicial) + 1, true)); \
@@ -267,7 +267,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 					if ((iter < iteradorInicial_local) || (iter > iteradorFinal_local))\
 						vetorRetorno.at(numLinhas-1).at(espacoAtributo + i) = ""; \
 					else \
-						vetorRetorno.at(numLinhas-1).at(espacoAtributo + i) = getString(dados.getElemento(iter)); \
+						vetorRetorno.at(numLinhas-1).at(espacoAtributo + i) = getString(dados.getElemento_rIt(iter)); \
 					if (a_incluirIteradores) \
 						vetorRetorno.at(0).at(espacoAtributo + i) = getString(iter); \
 					i++; \
@@ -328,7 +328,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 			const TipoIterador iteradorInicial = a_vetor.getIteradorInicial(); \
 			const TipoIterador iteradorFinal   = a_vetor.getIteradorFinal(); \
 			for (TipoIterador iter = iteradorInicial; iter <= iteradorFinal; a_vetor.incrementarIterador(iter)){ \
-				TipoValor valor = a_vetor.at(iter); \
+				TipoValor valor = a_vetor.at_rIt(iter); \
 				if (valor < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
 				else if (valor > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
 			} \

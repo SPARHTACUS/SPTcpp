@@ -68,31 +68,6 @@ virtual void addDadoAttMatriz(const std::vector<std::string> &a_iter1, const std
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "(" + getFullString(getIdObjeto()) + ")::addDadoAttMatriz(): \n" + std::string(erro.what())); }\
 }; \
-virtual void addDadoAttMatriz(const std::string a_iterador1, const std::string a_iterador2, const std::string a_atributo, const std::string a_vlrDado){  \
-	addDadoAttMatriz(a_iterador1, a_iterador2, a_atributo, a_vlrDado, 1, 1);\
-};\
-virtual void addDadoAttMatriz(const std::string a_iterador1, const std::string a_iterador2, const std::string a_atributo, const std::string a_vlrDado, const int a_alocacao_1, const int a_alocacao_2){  \
-	try { \
-		const Atributo##Classe atributo = get##Atributo##Classe##FromChar(a_atributo.c_str()); \
-		if ((a_iterador1 != "") && (a_iterador2 == "") && (a_vlrDado == "")) \
-			addElementoFromString(atributo, a_iterador1, a_iterador2, a_vlrDado); \
-		else if ((a_iterador1 == "") && (a_iterador2 == "") && (a_vlrDado == "")) \
-			validacaoDadosAttMatriz(std::vector<std::string>{a_atributo}); \
-		else if ((a_iterador1 == "") || (a_iterador2 == "") || (a_vlrDado == "")) \
-			throw std::invalid_argument("Argumentos invalidos"); \
-		else \
-			addElementoFromString(atributo, a_iterador1, a_iterador2, a_vlrDado, a_alocacao_1, a_alocacao_2); \
-	} \
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "(" + getFullString(getIdObjeto()) + ")::addDadoAttMatriz(" + a_iterador1 + "," + a_iterador2 + "," + a_atributo + ","  + a_vlrDado + "): \n" + std::string(erro.what())); }\
-}; \
-void addElementoFromString(const Atributo##Classe a_tipoAtributo, const std::string a_iterador1, const std::string a_iterador2, const std::string a_valor){  \
-	try { lista##Atributo##Classe.at(a_tipoAtributo)->addElementoFromString(a_iterador1, a_iterador2, a_valor); } \
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "(" + getFullString(getIdObjeto()) + ")::addElementoFromString(" + std::string(#Atributo)  + "_" + getString(a_tipoAtributo) + "," + a_iterador1 + "," + a_iterador2 + "," + a_valor + "): \n" + std::string(erro.what())); }\
-}; \
-void addElementoFromString(const Atributo##Classe a_tipoAtributo, const std::string a_iterador1, const std::string a_iterador2, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2){  \
-	try { lista##Atributo##Classe.at(a_tipoAtributo)->addElementoFromString(a_iterador1, a_iterador2, a_valor, a_alocacao_1, a_alocacao_2); } \
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "(" + getFullString(getIdObjeto()) + ")::addElementoFromString(" + std::string(#Atributo)  + "_" + getString(a_tipoAtributo) + "," + a_iterador1 + "," + a_iterador2 + "," + a_valor + "): \n" + std::string(erro.what())); }\
-}; \
 virtual std::vector<std::vector<std::string>> getDadosAttMatriz(const bool a_incluirCabecalho, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, bool a_incluirAtributo, const std::vector<std::string> a_atributo)const{  \
 	try { \
 		if (a_atributo.size() == 0) {  throw std::invalid_argument("Necessario informar um atributo AttMatriz."); } \
@@ -270,36 +245,6 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 		}\
 		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + "_Struct::addElemento(" + getString(a_iterador1) + "): \n" + std::string(erro.what())); }\
 	};\
-	virtual bool addElementoFromString(const std::string a_iterador1, const std::string a_iterador2, const std::string a_valor) { \
-		try{ \
-			if ((a_iterador1 != "") && (a_iterador2 == "") && (a_valor == "")) \
-				 addElemento(get##TIter1##FromChar(a_iterador1.c_str())); \
-			else { \
-				if (strCompara(a_valor.c_str(), "NaN") || strCompara(a_valor.c_str(), "-nan(ind)")) { throw std::invalid_argument("Valor NaN."); }\
-				const TVlr valor = get##TVlr##FromChar(a_valor.c_str());\
-				if (valor < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
-				else if (valor > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
-				else { addElemento(get##TIter1##FromChar(a_iterador1.c_str()), get##TIter2##FromChar(a_iterador2.c_str()), valor); } \
-			} \
-			return true;\
-		}\
-		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + "_Struct::addElementoFromString(" + a_iterador1 + "," + a_iterador2 + "," + a_valor + "): \n" + std::string(erro.what())); }\
-	};\
-	virtual bool addElementoFromString(const std::string a_iterador1, const std::string a_iterador2, const std::string a_valor, const int a_alocacao_1, const int a_alocacao_2) { \
-		try{ \
-			if ((a_iterador1 != "") && (a_iterador2 == "") && (a_valor == "")) \
-				 addElemento(get##TIter1##FromChar(a_iterador1.c_str())); \
-			else { \
-				if (strCompara(a_valor.c_str(), "NaN") || strCompara(a_valor.c_str(), "-nan(ind)")) { throw std::invalid_argument("Valor NaN."); }\
-				const TVlr valor = get##TVlr##FromChar(a_valor.c_str());\
-				if (valor < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
-				else if (valor > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
-				else { addElemento(get##TIter1##FromChar(a_iterador1.c_str()), get##TIter2##FromChar(a_iterador2.c_str()), valor, a_alocacao_1, a_alocacao_2); } \
-			} \
-			return true;\
-		}\
-		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + "_Struct::addElementoFromString(" + a_iterador1 + "," + a_iterador2 + "," + a_valor + "): \n" + std::string(erro.what())); }\
-	};\
 	virtual std::vector<std::vector<std::string>> getStringsFromElementos(const bool a_incluirAtributo, const bool a_incluirCabecalho, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final) const { \
 		try{ \
 			TIter1 iterador1Inicial; \
@@ -314,7 +259,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 				if (getString(TIter1()) == getString(Periodo())){ \
 					if (getSizeMatriz() > 0){ \
 						for (TIter1 iter = iterador1Inicial; iter <= iterador1Final; matriz.incrementarIterador(iter)) \
-							vetor_auxiliar_iter1.adddElemento(iter, true); \
+							vetor_auxiliar_iter1.addElemento_rIt(iter, true); \
 					} \
 					else{ \
 						std::vector<std::vector<std::string>> vetorRetorno; \
@@ -333,7 +278,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 				iterador1Final   = getIterador1Final(TIter1()); \
 				if (getString(TIter1()) == getString(Periodo())){ \
 					for (TIter1 iter = iterador1Inicial; iter <= iterador1Final; matriz.incrementarIterador(iter)) \
-						vetor_auxiliar_iter1.adddElemento(iter, true); \
+						vetor_auxiliar_iter1.addElemento_rIt(iter, true); \
 				} \
 				else \
 					vetor_auxiliar_iter1 = SmartEnupla<TIter1, bool>(iterador1Inicial, std::vector<bool>(int(iterador1Final - iterador1Inicial) + 1, true)); \
@@ -358,14 +303,14 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 				TIter1 iter1_primeiro; \
 				for (TIter1 iter = getIterador1Inicial(TIter1()); iter <= getIterador1Final(TIter1()); matriz.incrementarIterador(iter)){ \
 					if (getSizeMatriz(iter) > 0){ \
-						for (TIter2 iter2 = getIterador2Inicial(iter, TIter2()); iter2 <= getIterador2Final(iter, TIter2()); matriz.att(iter).incrementarIterador(iter2)){ \
+						for (TIter2 iter2 = getIterador2Inicial(iter, TIter2()); iter2 <= getIterador2Final(iter, TIter2()); matriz.at_rIt(iter).incrementarIterador(iter2)){ \
 							if ((vetor_auxiliar_iter2.size() == 0) || (iter == iter1_primeiro)){ \
-								vetor_auxiliar_iter2.adddElemento(iter2, true); \
+								vetor_auxiliar_iter2.addElemento_rIt(iter2, true); \
 								iter1_primeiro = iter; \
 							} \
 							else{ \
 								if (vetor_auxiliar_iter2.isProximoIterador(iter2)) \
-									vetor_auxiliar_iter2.adddElemento(iter2, true); \
+									vetor_auxiliar_iter2.addElemento_rIt(iter2, true); \
 								else {\
 									bool iter2_found = false; \
 									for (TIter2 iter2_local = vetor_auxiliar_iter2.getIteradorInicial(); iter2_local <= vetor_auxiliar_iter2.getIteradorFinal(); vetor_auxiliar_iter2.incrementarIterador(iter2_local)) { \
@@ -465,7 +410,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 								if ((iter2 < iterador2Inicial_local) || (iter2 > iterador2Final_local)) \
 									matrizRetorno.at(i1 + espacoCabecalho).at(i2 + espacoAtributo + espacoIterador1) = ""; \
 								else \
-									matrizRetorno.at(i1 + espacoCabecalho).at(i2 + espacoAtributo + espacoIterador1) = getString(dados.att(iter1).gettElemento(iter2)); \
+									matrizRetorno.at(i1 + espacoCabecalho).at(i2 + espacoAtributo + espacoIterador1) = getString(dados.at_rIt(iter1).getElemento_rIt(iter2)); \
 								i2++; \
 							}\
 						} \
@@ -518,8 +463,8 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 				const TIter2 iteradorInicial = a_valores.getIteradorInicial(); \
 				const TIter2 iteradorFinal   = a_valores.getIteradorFinal(); \
 				for (TIter2 iterador = iteradorInicial; iterador <= iteradorFinal; iterador++) { \
-					if (a_valores.att(iterador) < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
-					else if (a_valores.att(iterador) > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
+					if (a_valores.at_rIt(iterador) < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
+					else if (a_valores.at_rIt(iterador) > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
 				} \
 				dados.at(a_iterador1) = a_valores; \
 			} \
@@ -582,11 +527,11 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 			const TIter1 iterador1Inicial = a_matriz.getIteradorInicial(); \
 			const TIter1 iterador1Final   = a_matriz.getIteradorFinal(); \
 			for (TIter1 iter1 = iterador1Inicial; iter1 <= iterador1Final; a_matriz.incrementarIterador(iter1)){ \
-				if (a_matriz.att(iter1).size() > 0){ \
-					const TIter2 iterador2Inicial = a_matriz.att(iter1).getIteradorInicial(); \
-					const TIter2 iterador2Final   = a_matriz.att(iter1).getIteradorFinal(); \
-					for (TIter2 iter2 = iterador2Inicial; iter2 <= iterador2Final; a_matriz.att(iter1).incrementarIterador(iter2)){ \
-						TVlr valor = a_matriz.att(iter1).att(iter2); \
+				if (a_matriz.at_rIt(iter1).size() > 0){ \
+					const TIter2 iterador2Inicial = a_matriz.at_rIt(iter1).getIteradorInicial(); \
+					const TIter2 iterador2Final   = a_matriz.at_rIt(iter1).getIteradorFinal(); \
+					for (TIter2 iter2 = iterador2Inicial; iter2 <= iterador2Final; a_matriz.at_rIt(iter1).incrementarIterador(iter2)){ \
+						TVlr valor = a_matriz.at_rIt(iter1).at_rIt(iter2); \
 						if (valor < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
 						else if (valor > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
 					} \

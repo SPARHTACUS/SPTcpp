@@ -109,6 +109,15 @@ public:
 	void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 		try {
 
+			return addElemento_rIt(a_iter, a_vlr);
+
+		} // try{
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::addElemento(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
+	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
+
+	void addElemento_rIt(TipoIterador &a_iter, TipoValor a_vlr) {
+		try {
+
 			if (size() == 0) {
 				if (a_iter < getFromChar(TipoIterador(), "min"))
 					throw std::invalid_argument("O iterador Inicial deve ser maior ou igual a " + getFullString(getFromChar(TipoIterador(), "min")));
@@ -131,28 +140,20 @@ public:
 				smartEnupla.insert(smartEnupla.begin(), a_vlr);
 			}
 			else
-				throw std::invalid_argument("Argumento Iterador - " + getFullString(a_iter) + " - nao sequencial ao Iterador inicial: " + getFullString(getIteradorInicial()) +  " ou Iterador final: " + getFullString(getIteradorFinal()) + " da Smartenupla.");
+				throw std::invalid_argument("Argumento Iterador - " + getFullString(a_iter) + " - nao sequencial ao Iterador inicial: " + getFullString(getIteradorInicial()) + " ou Iterador final: " + getFullString(getIteradorFinal()) + " da Smartenupla.");
+
 
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::addElemento(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::addElemento_rIt(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 
-	void adddElemento(TipoIterador a_iter, TipoValor a_vlr) {
+	void addElementoVoid_rIt(TipoIterador &a_iter) {
 		try {
 
-			return addElemento(a_iter, a_vlr);
+			return addElemento_rIt(a_iter, TipoValor());
 
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::adddElemento(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
-	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
-
-	void adddElementoVoid(TipoIterador a_iter) {
-		try {
-
-			return adddElemento(a_iter, TipoValor());
-
-		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::adddElementoVoid(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::addElementoVoid_rIt(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 
 	void setElemento(TipoIterador a_iter, TipoValor a_vlr) {
@@ -162,11 +163,11 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::setElemento(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 
-	void settElemento(TipoIterador a_iter, TipoValor a_vlr) {
+	void setElemento_rIt(TipoIterador a_iter, TipoValor a_vlr) {
 		try {
 			smartEnupla.at(getIndice(a_iter)) = a_vlr;
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::settElemento(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::setElemento_rIt(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 
 	void setElementoFromStr(TipoIterador a_iter, std::string a_vlr) {
@@ -183,11 +184,11 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getElemento(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 
-	TipoValor gettElemento(TipoIterador a_iter)const {
+	TipoValor getElemento_rIt(TipoIterador &a_iter)const {
 		try {
 			return smartEnupla.at(getIndice(a_iter));
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::gettElemento(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getElemento_rIt(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 
 	TipoValor getTipoElemento()const {
@@ -204,11 +205,11 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::at(" + getFullString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 
-	TipoValor att(TipoIterador &a_iter)const {
+	TipoValor at_rIt(TipoIterador &a_iter)const {
 		try {
 			return smartEnupla.at(getIndice(a_iter));
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::att(" + getFullString(a_iter) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::at_rIt(" + getFullString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 
 	TipoValor& at(TipoIterador a_iter) {
@@ -218,11 +219,11 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::at(" + getFullString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 
-	TipoValor& att(TipoIterador &a_iter) {
+	TipoValor& at_rIt(TipoIterador &a_iter) {
 		try {
 			return smartEnupla.at(getIndice(a_iter));
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::att(" + getFullString(a_iter) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::at_rIt(" + getFullString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 
 	void alterarValorSeAlterarIterador(const TipoIterador a_iter, const TipoValor a_vlr) {
@@ -1374,13 +1375,13 @@ public:
 
 		try {
 
-			return adddElemento(a_itr, a_vlr);
+			return addElemento_rIt(a_itr, a_vlr);
 
 		} // try{
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::addElemento(" + getString(a_itr) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(Periodo a_iter, TipoValor a_vlr) {
 
-	void adddElemento(Periodo &a_itr, const TipoValor a_vlr) {
+	void addElemento_rIt(Periodo &a_itr, const TipoValor a_vlr) {
 
 		try {
 
@@ -1575,11 +1576,11 @@ public:
 			throw std::invalid_argument("Error adding element.");
 
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::adddElemento(" + getString(a_itr) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::addElemento_rIt(" + getString(a_itr) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(Periodo a_iter, TipoValor a_vlr) {
 
 
-	void adddElementoVoid(Periodo& a_itr) {
+	void addElementoVoid_rIt(Periodo& a_itr) {
 
 	}; // void addElemento(Periodo a_iter, TipoValor a_vlr) {
 
@@ -1925,13 +1926,13 @@ public:
 	void setElemento(Periodo a_iter, const TipoValor a_vlr) {
 		try { 
 			
-			settElemento(a_iter, a_vlr);
+			setElemento_rIt(a_iter, a_vlr);
 
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::setElemento(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
 	}; // void setElemento(Periodo a_iter, TipoValor a_vlr) {
 
-	void settElemento(Periodo &a_iter, const TipoValor a_vlr) {
+	void setElemento_rIt(Periodo &a_iter, const TipoValor a_vlr) {
 		try {
 
 			//////////////////////////////////////////////////
@@ -1948,25 +1949,25 @@ public:
 				vlr.at(pos_idx.at(1)) = a_vlr;
 
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::settElemento(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::setElemento_rIt(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
 	}; // void setElemento(Periodo a_iter, TipoValor a_vlr) {
 
 	void setElementoFromStr(Periodo a_iter, const std::string a_vlr) {
 		try {
 
-			settElementoFromStr(a_iter,a_vlr);
+			setElemento_rItFromStr(a_iter,a_vlr);
 
 		} // try{
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::setElemento(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 
-	void settElementoFromStr(Periodo &a_iter, const std::string a_vlr) {
+	void setElemento_rItFromStr(Periodo &a_iter, const std::string a_vlr) {
 		try {
 
-			settElemento(a_iter, getFromString(TipoValor(), a_vlr));
+			setElemento_rIt(a_iter, getFromString(TipoValor(), a_vlr));
 
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::settElemento(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::setElemento_rIt(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
 	}; // void addElemento(TipoIterador a_iter, TipoValor a_vlr) {
 
 
@@ -1980,19 +1981,19 @@ public:
 	TipoValor getElemento(Periodo a_iter)const {
 		try { 
 			
-			return gettElemento(a_iter);
+			return getElemento_rIt(a_iter);
 		
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::getElemento(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // TipoValor getElemento(Periodo a_iter)const {
 
-	TipoValor gettElemento(Periodo &a_iter)const {
+	TipoValor getElemento_rIt(Periodo &a_iter)const {
 		try {
 
-			return att(a_iter);
+			return at_rIt(a_iter);
 
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::gettElemento(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getElemento_rIt(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // TipoValor getElemento(Periodo a_iter)const {
 
 	TipoValor& at(Periodo a_iter) {
@@ -2011,7 +2012,7 @@ public:
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::at(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // TipoValor at(Periodo a_iter)const {
 
-	TipoValor& att(Periodo &a_iter) {
+	TipoValor& at_rIt(Periodo &a_iter) {
 		try {
 
 			std::vector<int> pos_idx = getPosIdxStruct(a_iter);
@@ -2024,7 +2025,7 @@ public:
 				return vlr.at(pos_idx.at(1));
 
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::att(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::at_rIt(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // TipoValor at(Periodo a_iter)const {
 
 	TipoValor at(Periodo a_iter) const {
@@ -2043,7 +2044,7 @@ public:
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::at(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // TipoValor at(Periodo a_iter)const {
 
-	TipoValor att(Periodo &a_iter) const {
+	TipoValor at_rIt(Periodo &a_iter) const {
 		try {
 
 			std::vector<int> pos_idx = getPosIdxStruct(a_iter);
@@ -2056,7 +2057,7 @@ public:
 				return vlr.at(pos_idx.at(1));
 
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::att(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::at_rIt(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
 	}; // TipoValor at(Periodo a_iter)const {
 
 	void random_shuffle() {
