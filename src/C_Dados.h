@@ -111,6 +111,7 @@
       m(Dados,  AttComum,                  custo_acumulado_penalizacao_volume_util_minimo,            double,           0,         max,             0,      nao) \
       m(Dados,  AttComum,               taxa_considerar_tempo_viagem_agua,                            double,           0,           1,           0.2,      nao) \
       m(Dados,  AttComum,                     tipo_processamento_paralelo,         TipoProcessamentoParalelo,         min,         max,   por_cenario,      nao) \
+      m(Dados,  AttComum,                                 imprimir_info_media,                          bool,         min,         max,           nao,      nao) \
       m(Dados,  AttComum,              imprimir_cortes_NW_com_reducao_estados,                          bool,         min,         max,           nao,      nao) \
       m(Dados,  AttComum,                          considerar_variaveis_folga,                          bool,         min,         max,           sim,      nao)
 

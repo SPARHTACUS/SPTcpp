@@ -1730,7 +1730,7 @@ void Dados::validacao_operacional_UsinasElevatorias(EntradaSaidaDados a_entradaS
 
 				const AttVetorUsinaElevatoria attVetorUsinaElevatoria_media = getAttVetorUsinaElevatoriaFromChar(std::string(getString(attMatrizUsinaElevatoria) + "_media").c_str());
 
-				if (attVetorUsinaElevatoria_media != AttVetorUsinaElevatoria_Nenhum) {
+				if ((attVetorUsinaElevatoria_media != AttVetorUsinaElevatoria_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz = getMatriz(idUsinaElevatoria, attMatrizUsinaElevatoria, Periodo(), IdPatamarCarga(), double());
 
@@ -1790,7 +1790,7 @@ void Dados::validacao_operacional_UsinasElevatorias(EntradaSaidaDados a_entradaS
 
 					const AttVetorUsinaElevatoria attVetorUsinaElevatoria_media = getAttVetorUsinaElevatoriaFromChar(std::string(getString(attMatrizUsinaElevatoria) + "_media").c_str());
 
-					if (attVetorUsinaElevatoria_media != AttVetorUsinaElevatoria_Nenhum) {
+					if ((attVetorUsinaElevatoria_media != AttVetorUsinaElevatoria_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 						a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
 
@@ -2910,7 +2910,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 						const AttVetorTermeletrica attVetorTermeletrica_media = getAttVetorTermeletricaFromChar(std::string(getString(attMatrizTermeletrica) + "_media").c_str());
 
-						if (attVetorTermeletrica_media != AttVetorTermeletrica_Nenhum) {
+						if ((attVetorTermeletrica_media != AttVetorTermeletrica_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 							SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz = getMatriz(idTermeletrica, attMatrizTermeletrica, Periodo(), IdPatamarCarga(), double());
 
@@ -3064,7 +3064,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 							const AttVetorTermeletrica attVetorTermeletrica_media = getAttVetorTermeletricaFromChar(std::string(getString(attMatrizTermeletrica) + "_media").c_str());
 
-							if (attVetorTermeletrica_media != AttVetorTermeletrica_Nenhum) {
+							if ((attVetorTermeletrica_media != AttVetorTermeletrica_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 								a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
 
@@ -6279,7 +6279,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 					const AttVetorHidreletrica attVetorHidreletrica_media = getAttVetorHidreletricaFromChar(std::string(getString(attMatrizHidreletrica) + "_media").c_str());
 
-					if (attVetorHidreletrica_media != AttVetorHidreletrica_Nenhum) {
+					if ((attVetorHidreletrica_media != AttVetorHidreletrica_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz = getMatriz(idHidreletrica, attMatrizHidreletrica, Periodo(), IdPatamarCarga(), double());
 
@@ -6537,7 +6537,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 								const AttVetorHidreletrica attVetorHidreletrica_media = getAttVetorHidreletricaFromChar(std::string(getString(attMatrizHidreletrica) + "_media").c_str());
 
-								if (attVetorHidreletrica_media != AttVetorHidreletrica_Nenhum) {
+								if ((attVetorHidreletrica_media != AttVetorHidreletrica_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 									a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
 
@@ -7428,7 +7428,7 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 
 				const AttVetorSubmercado attVetorSubmercado_media = getAttVetorSubmercadoFromChar(std::string(getString(attMatrizSubmercado) + "_media").c_str());
 
-				if (attVetorSubmercado_media != AttVetorSubmercado_Nenhum) {
+				if ((attVetorSubmercado_media != AttVetorSubmercado_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz = getMatriz(idSubmercado, attMatrizSubmercado, Periodo(), IdPatamarCarga(), double());
 
@@ -7499,7 +7499,7 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 
 					const AttVetorPatamarDeficit attVetorPatamarDeficit_media = getAttVetorPatamarDeficitFromChar(std::string(getString(attMatrizPatamarDeficit) + "_media").c_str());
 
-					if (attVetorPatamarDeficit_media != AttVetorPatamarDeficit_Nenhum) {
+					if ((attVetorPatamarDeficit_media != AttVetorPatamarDeficit_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz = getMatriz(idSubmercado, idPatamarDeficit, attMatrizPatamarDeficit, Periodo(), IdPatamarCarga(), double());
 
@@ -7581,7 +7581,7 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 
 						const AttVetorUsinaNaoSimulada attVetorUsinaNaoSimulada_media = getAttVetorUsinaNaoSimuladaFromChar(std::string(getString(attMatrizUsinaNaoSimulada) + "_media").c_str());
 
-						if (attVetorUsinaNaoSimulada_media != AttVetorUsinaNaoSimulada_Nenhum) {
+						if ((attVetorUsinaNaoSimulada_media != AttVetorUsinaNaoSimulada_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 							SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz = getMatriz(idSubmercado, idUsinaNaoSimulada, attMatrizUsinaNaoSimulada, Periodo(), IdPatamarCarga(), double());
 
@@ -7616,7 +7616,7 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 
 					const AttVetorSubmercado attVetorSubmercado_media = getAttVetorSubmercadoFromChar(std::string(getString(attMatrizSubmercado) + "_media").c_str());
 
-					if (attVetorSubmercado_media != AttVetorSubmercado_Nenhum) {
+					if ((attVetorSubmercado_media != AttVetorSubmercado_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 						a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
 
@@ -7638,7 +7638,7 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 
 					const AttVetorPatamarDeficit attVetorPatamarDeficit_media = getAttVetorPatamarDeficitFromChar(std::string(getString(attMatrizPatamarDeficit) + "_media").c_str());
 
-					if (attVetorPatamarDeficit_media != AttVetorPatamarDeficit_Nenhum) {
+					if ((attVetorPatamarDeficit_media != AttVetorPatamarDeficit_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 						a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
 						a_entradaSaidaDados.setAppendArquivo(impresso);
@@ -7660,7 +7660,7 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 
 					const AttVetorUsinaNaoSimulada attVetorUsinaNaoSimulada_media = getAttVetorUsinaNaoSimuladaFromChar(std::string(getString(attMatrizUsinaNaoSimulada) + "_media").c_str());
 
-					if (attVetorUsinaNaoSimulada_media != AttVetorUsinaNaoSimulada_Nenhum) {
+					if ((attVetorUsinaNaoSimulada_media != AttVetorUsinaNaoSimulada_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 						a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
 
@@ -7918,7 +7918,7 @@ void Dados::validacao_operacional_Intercambio(EntradaSaidaDados a_entradaSaidaDa
 
 				const AttVetorIntercambio attVetorIntercambio_media = getAttVetorIntercambioFromChar(std::string(getString(attMatrizIntercambio) + "_media").c_str());
 
-				if (attVetorIntercambio_media != AttVetorIntercambio_Nenhum) {
+				if ((attVetorIntercambio_media != AttVetorIntercambio_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz = getMatriz(idIntercambio, attMatrizIntercambio, Periodo(), IdPatamarCarga(), double());
 
@@ -7948,7 +7948,7 @@ void Dados::validacao_operacional_Intercambio(EntradaSaidaDados a_entradaSaidaDa
 
 				const AttVetorIntercambio attVetorIntercambio_media = getAttVetorIntercambioFromChar(std::string(getString(attMatrizIntercambio) + "_media").c_str());
 
-				if (attVetorIntercambio_media != AttVetorIntercambio_Nenhum) {
+				if ((attVetorIntercambio_media != AttVetorIntercambio_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 					a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
 
@@ -8367,7 +8367,7 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 
 				const AttVetorRestricaoEletrica attVetorRestricaoEletrica_media = getAttVetorRestricaoEletricaFromChar(std::string(getString(attMatrizRestricaoEletrica) + "_media").c_str());
 
-				if (attVetorRestricaoEletrica_media != AttVetorRestricaoEletrica_Nenhum) {
+				if ((attVetorRestricaoEletrica_media != AttVetorRestricaoEletrica_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz = getMatriz(idRestricaoEletrica, attMatrizRestricaoEletrica, Periodo(), IdPatamarCarga(), double());
 
@@ -8403,7 +8403,7 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 
 						const AttVetorRestricaoEletrica attVetorRestricaoEletrica_media = getAttVetorRestricaoEletricaFromChar(std::string(getString(attMatrizRestricaoEletrica) + "_media").c_str());
 
-						if (attVetorRestricaoEletrica_media != AttVetorRestricaoEletrica_Nenhum) {
+						if ((attVetorRestricaoEletrica_media != AttVetorRestricaoEletrica_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 							a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
 
@@ -11622,7 +11622,7 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 
 				const AttVetorRestricaoOperativaUHE attVetorRestricaoOperativaUHE_media = getAttVetorRestricaoOperativaUHEFromChar(std::string(getString(attMatrizRestricaoOperativaUHE) + "_media").c_str());
 
-				if (attVetorRestricaoOperativaUHE_media != AttVetorRestricaoOperativaUHE_Nenhum) {
+				if ((attVetorRestricaoOperativaUHE_media != AttVetorRestricaoOperativaUHE_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz = getMatriz(idRestricaoOperativaUHE, attMatrizRestricaoOperativaUHE, Periodo(), IdPatamarCarga(), double());
 
@@ -11658,7 +11658,7 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 
 						const AttVetorRestricaoOperativaUHE attVetorRestricaoOperativaUHE_media = getAttVetorRestricaoOperativaUHEFromChar(std::string(getString(attMatrizRestricaoOperativaUHE) + "_media").c_str());
 
-						if (attVetorRestricaoOperativaUHE_media != AttVetorRestricaoOperativaUHE_Nenhum) {
+						if ((attVetorRestricaoOperativaUHE_media != AttVetorRestricaoOperativaUHE_Nenhum) && getAtributo(AttComumDados_imprimir_info_media, bool())) {
 
 							a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
 
