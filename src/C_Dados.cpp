@@ -172,6 +172,30 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 		validacao_operacional_Dados(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
+
+		SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+
+		Periodo periodo8 = Periodo(19, 8, 2023);
+		Periodo periodo7 = Periodo(21, 8, 2023);
+		Periodo periodo6 = Periodo(20, 8, 2023);
+		Periodo periodo5 = Periodo(18, 8, 2023);
+		Periodo periodo4 = Periodo(24, 8, 2023);
+		Periodo periodo3 = Periodo(25, 8, 2023);
+		Periodo periodo2 = Periodo(23, 8, 2023);
+		Periodo periodo1 = Periodo(22, 8, 2023);
+
+		horizonte_estudo.addElemento(periodo1, IdEstagio_381);
+		horizonte_estudo.addElemento(periodo2, IdEstagio_382);
+		horizonte_estudo.addElemento(periodo3, IdEstagio_383);
+		horizonte_estudo.addElemento(periodo4, IdEstagio_384);
+		horizonte_estudo.addElemento(periodo5, IdEstagio_385);
+		horizonte_estudo.addElemento(periodo6, IdEstagio_386);
+		horizonte_estudo.addElemento(periodo7, IdEstagio_387);
+		horizonte_estudo.addElemento(periodo8, IdEstagio_388);
+
+
+
+
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		//
 		//                                                                        Carregar Arquivos de Submercado
@@ -1923,6 +1947,9 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 		std::vector<bool> impresso_AttVetorUnidadeUTE_PorPeriodo(2, false);
 		std::vector<bool> impresso_AttMatrizUnidadeUTE_PorPeriodoPorIdPatamarCarga(2, false);
 
+		// HORIZONTE DE ESTUDO 
+		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+
 		// SMART ENUPLA AUXILIARES
 		SmartEnupla<IdTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>> preencher_AttVetorTermeletrica(menorIdTermeletrica, std::vector<SmartEnupla<AttVetorTermeletrica, PreencherAtributo>>(numIdTermeletrica, SmartEnupla<AttVetorTermeletrica, PreencherAtributo>()));
 		SmartEnupla<IdTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>> preencher_AttMatrizTermeletrica(menorIdTermeletrica, std::vector<SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>>(numIdTermeletrica, SmartEnupla<AttMatrizTermeletrica, PreencherAtributo>()));
@@ -1933,15 +1960,13 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 		SmartEnupla<IdTermeletrica, SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, double>>>  vetor_zero(menorIdTermeletrica, std::vector<SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, double>>>(numIdTermeletrica, 
 			                        SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, double>>(TipoDetalhamentoProducaoTermeletrica(1), std::vector<SmartEnupla<Periodo, double>>(TipoDetalhamentoProducaoTermeletrica(TipoDetalhamentoProducaoTermeletrica_Excedente - 1), 
-										                                              SmartEnupla<Periodo, double>()))));
+										                                              SmartEnupla<Periodo, double>(horizonte_estudo.size())))));
 
 		SmartEnupla<IdTermeletrica, SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>> matriz_zero(menorIdTermeletrica, std::vector<SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>>(numIdTermeletrica, 
 			                        SmartEnupla<TipoDetalhamentoProducaoTermeletrica, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>(TipoDetalhamentoProducaoTermeletrica(1), std::vector<SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>(TipoDetalhamentoProducaoTermeletrica(TipoDetalhamentoProducaoTermeletrica_Excedente - 1), 
-										                                              SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>()))));
+										                                              SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo.size())))));
 
 
-		// HORIZONTE DE ESTUDO 
-		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
 		//const SmartEnupla<Periodo, double> vetor_zero(horizonte_estudo, 0.0);
 
@@ -2026,9 +2051,8 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 					const TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao_carregado = getElementoVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao, periodo, TipoDetalhamentoProducaoTermeletrica());
 
-					const SmartEnupla<IdPatamarCarga, double> vetor_zero_patamar(IdPatamarCarga_1, std::vector<double>(getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()), 0.0));
-
 					if ((tipo_detalhamento_producao == tipo_detalhamento_producao_carregado) && (!tipo_encontrado)) {
+						const SmartEnupla<IdPatamarCarga, double> vetor_zero_patamar(IdPatamarCarga_1, std::vector<double>(getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()), 0.0));
 						tipo_encontrado = true;
 						contador_encontro++;
 						if (contador_encontro > 1)
@@ -2038,6 +2062,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 					}
 
 					else if ((tipo_detalhamento_producao == tipo_detalhamento_producao_carregado) && (tipo_encontrado)) {
+						const SmartEnupla<IdPatamarCarga, double> vetor_zero_patamar(IdPatamarCarga_1, std::vector<double>(getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()), 0.0));
 						vetor_zero.at(idTermeletrica).at(tipo_detalhamento_producao).addElemento_rIt(periodo, 0.0);
 						matriz_zero.at(idTermeletrica).at(tipo_detalhamento_producao).addElemento_rIt(periodo, vetor_zero_patamar);
 					}
@@ -4064,11 +4089,11 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 		SmartEnupla<IdHidreletrica, SmartEnupla<TipoDetalhamentoProducaoHidreletrica, SmartEnupla<Periodo, double>>>  vetor_zero(menorIdHidreletrica, std::vector<SmartEnupla<TipoDetalhamentoProducaoHidreletrica, SmartEnupla<Periodo, double>>>(numIdHidreletrica, 
 			                        SmartEnupla<TipoDetalhamentoProducaoHidreletrica, SmartEnupla<Periodo, double>>(TipoDetalhamentoProducaoHidreletrica(1), std::vector<SmartEnupla<Periodo, double>>(TipoDetalhamentoProducaoHidreletrica(TipoDetalhamentoProducaoHidreletrica_Excedente - 1), 
-										                                              SmartEnupla<Periodo, double>()))));
+										                                              SmartEnupla<Periodo, double>(horizonte_estudo.size())))));
 
 		SmartEnupla<IdHidreletrica, SmartEnupla<TipoDetalhamentoProducaoHidreletrica, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>> matriz_zero(menorIdHidreletrica, std::vector<SmartEnupla<TipoDetalhamentoProducaoHidreletrica, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>>(numIdHidreletrica, 
 			                        SmartEnupla<TipoDetalhamentoProducaoHidreletrica, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>(TipoDetalhamentoProducaoHidreletrica(1), std::vector<SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>(TipoDetalhamentoProducaoHidreletrica(TipoDetalhamentoProducaoHidreletrica_Excedente - 1), 
-										                                              SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>()))));
+										                                              SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo.size())))));
 
 
 		for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
@@ -9827,7 +9852,7 @@ void Dados::calcularDeterminacaoEspacialFromHistoricoAfluenciaNatural(EntradaSai
 
 
 
-bool Dados::validaFuncaoProducaoHidreletrica(FuncaoProducaoHidreletrica& a_funcaoProducaoHidreletrica, SmartEnupla<Periodo, double> a_horizonte_estudo, const IdHidreletrica a_idHidreletrica, const IdConjuntoHidraulico a_idConjuntoHidraulico, const IdUnidadeUHE a_idUnidadeUHE, SmartEnupla<AttVetorFuncaoProducaoHidreletrica, PreencherAtributo>& a_preencher_AttVetorFuncaoProducaoHidreletrica, SmartEnupla<AttMatrizFuncaoProducaoHidreletrica, PreencherAtributo>& a_preencher_AttMatrizFuncaoProducaoHidreletrica, SmartEnupla<AttVetorHidreletrica, PreencherAtributo>& a_preencher_AttVetorHidreletrica, SmartEnupla<AttVetorReservatorio, PreencherAtributo>& a_preencher_AttVetorReservatorio) {
+bool Dados::validaFuncaoProducaoHidreletrica(FuncaoProducaoHidreletrica& a_funcaoProducaoHidreletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo, const IdHidreletrica a_idHidreletrica, const IdConjuntoHidraulico a_idConjuntoHidraulico, const IdUnidadeUHE a_idUnidadeUHE, SmartEnupla<AttVetorFuncaoProducaoHidreletrica, PreencherAtributo>& a_preencher_AttVetorFuncaoProducaoHidreletrica, SmartEnupla<AttMatrizFuncaoProducaoHidreletrica, PreencherAtributo>& a_preencher_AttMatrizFuncaoProducaoHidreletrica, SmartEnupla<AttVetorHidreletrica, PreencherAtributo>& a_preencher_AttVetorHidreletrica, SmartEnupla<AttVetorReservatorio, PreencherAtributo>& a_preencher_AttVetorReservatorio) {
 
 	try {
 
@@ -11145,7 +11170,7 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 		SmartEnupla<IdEstagio, int> agrupar_aberturas(estagio_inicial, std::vector<int>(int(estagio_final - estagio_inicial) + 1, 0));
 
-		SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> mapeamento_espaco_amostral = processoEstocastico_hidrologico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao());
+		const SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> mapeamento_espaco_amostral = processoEstocastico_hidrologico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao());
 		SmartEnupla<IdEstagio, Periodo> periodos(estagio_inicial, std::vector<Periodo>(int(estagio_final - estagio_inicial) + 1, Periodo()));
 		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
@@ -11200,8 +11225,8 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 									if (arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()) != IdCenario_Nenhum) {
 										for (IdCenario idCenario = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()); idCenario <= arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario()); idCenario++) {
 											for (IdEstagio idEstagio_past = estagio_inicial; idEstagio_past <= idEstagio; idEstagio_past++) {
-												if ((IdAbertura(processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario_iteracao, periodos.at(idEstagio_past), IdRealizacao())) !=
-													IdAbertura(processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, periodos.at(idEstagio_past), IdRealizacao()))))
+												if (IdAbertura(mapeamento_espaco_amostral.at(idCenario_iteracao).at_rIt(periodos.at(idEstagio_past))) !=
+													IdAbertura(mapeamento_espaco_amostral.at(idCenario).at_rIt(periodos.at(idEstagio_past))))
 													break;
 												else if ((idEstagio_past == IdEstagio(idEstagio - 1)) && (idCenario < idCenario_mesmo_passado))
 													idCenario_mesmo_passado = idCenario;
@@ -11337,7 +11362,7 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 											// Em caso de cortes_multiplos == 1, preenche-se com a abertura do mapeamento do espaço amostral.
 											if (cortes_multiplos == 1) {
-												const IdAbertura idAbertura = IdAbertura(processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario_estado, periodos.at(idEstagio), IdRealizacao()));
+												const IdAbertura idAbertura = IdAbertura(mapeamento_espaco_amostral.at(idCenario_estado).at_rIt(periodos.at(idEstagio)));
 
 												map_menor_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
 												map_maior_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;

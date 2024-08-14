@@ -180,7 +180,6 @@ int main(int argc, char *argv[]) {
 			const IdMetodoSolucao idMetodoSolucao = dados.getAtributo(AttComumDados_tipo_metodo_solucao, IdMetodoSolucao());
 
 
-
 			//
 			// OTIMIZACAO
 			//

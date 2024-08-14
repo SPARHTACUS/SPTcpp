@@ -193,7 +193,7 @@ public:
 
 	int posStructPeriod = -1;
 	int idxStructPeriod = -1;
-	int codStructPeriod = 0;
+	std::string codStructPeriod;
 
 	TipoPeriodo getTipoPeriodo() const;
 

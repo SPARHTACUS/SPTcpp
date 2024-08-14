@@ -4074,7 +4074,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 							else if (nome.at(0) == "VarDecisaoYP") {
 
-								const Periodo periodo = Periodo(nome.at(2));
+								Periodo periodo = Periodo(nome.at(2));
 
 								const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(3).c_str());
 
@@ -4083,7 +4083,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 								const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(4).c_str());
 
-								const Periodo periodo_lag = Periodo(nome.at(5));
+								Periodo periodo_lag = Periodo(nome.at(5));
 
 								const double grau_liberdade = getdoubleFromChar(nome.at(6).c_str());
 
@@ -4674,7 +4674,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 				
 				if (nome.at(0) == "VarDecisaoZP0_VF_FINF") {
 				
-					const Periodo periodo_penalizacao(nome.at(2));
+					Periodo periodo_penalizacao(nome.at(2));
 
 					const int varZP0_VF_FINF = criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(a_TSS, a_dados, idEstagio, periodo_penalizacao);
 
@@ -4727,9 +4727,9 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 				else if (nome.at(0) == "VarDecisaoYP") {
 
-					const Periodo periodo = Periodo(nome.at(2));
+					Periodo periodo = Periodo(nome.at(2));
 
-					const Periodo periodo_lag = Periodo(nome.at(3));
+					Periodo periodo_lag = Periodo(nome.at(3));
 
 					const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(4).c_str());
 
@@ -4951,8 +4951,8 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 				else if (nome.at(0) == "VarDecisaoQDEFLAG") {
 
-					const Periodo periodo = Periodo(nome.at(2));
-					const Periodo periodo_lag = Periodo(nome.at(3));
+					Periodo periodo = Periodo(nome.at(2));
+					Periodo periodo_lag = Periodo(nome.at(3));
 					const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(4).c_str());
 
 					if (periodo.getTipoPeriodo() != periodo_lag.getTipoPeriodo())
@@ -4974,7 +4974,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 				else if (nome.at(0) == "VarDecisaoPTDISPCOM") {
 
-					const Periodo periodo_comando = Periodo(nome.at(2));
+					Periodo periodo_comando = Periodo(nome.at(2));
 					const IdTermeletrica idTermeletrica = getIdTermeletricaFromChar(nome.at(3).c_str());
 
 					const double potencia_minima_disponivel = getdoubleFromChar(nome.at(4).c_str());

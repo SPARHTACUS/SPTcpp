@@ -730,85 +730,68 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 
 		template<typename TListasIdxElem, typename TIt>
-		std::vector<TIt> alocConteudoIter(TListasIdxElem& a_listasIdxElem, TIt &a_it) {
+		void alocConteudoIter(TListasIdxElem& a_listasIdxElem, TIt &a_it) {
 			try {
 
 				// Inicializa Lista
 				if (a_listasIdxElem.size() == 0)
-					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
+					a_listasIdxElem.addElemento_rIt(a_it, a_listasIdxElem.getTipoElemento());
 
 				// Alocação do final da lista até iterador informado
 				else if (a_listasIdxElem.getIteradorFinal() < a_it) {
-					for (TIt it = a_listasIdxElem.getIteradorFinal(); it < a_it; a_listasIdxElem.incrementarIteradorMinimo(it))
-						if (it >= a_listasIdxElem.getIteradorFinal() + 1)
-							a_listasIdxElem.addElementoVoid_rIt(it);
-					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
+					if (!a_listasIdxElem.canSparse()) {
+						for (TIt it = a_listasIdxElem.getIteradorFinal(); it < a_it; a_listasIdxElem.incrementarIterador(it))
+							if (it >= TIt(a_listasIdxElem.getIteradorFinal() + 1))
+								a_listasIdxElem.addElemento(it, a_listasIdxElem.getTipoElemento());
+					}
+					a_listasIdxElem.addElemento_rIt(a_it, a_listasIdxElem.getTipoElemento());
 				}
 
 				// Alocação do início da lista até o iterador informado
 				else if (a_it < a_listasIdxElem.getIteradorInicial()) {
-					for (TIt it = a_listasIdxElem.getIteradorInicial(); it >= a_it + 1; a_listasIdxElem.decrementarIteradorMinimo(it))
-						if (it < a_listasIdxElem.getIteradorInicial())
-							a_listasIdxElem.addElementoVoid_rIt(it);
-					a_listasIdxElem.addElemento(a_it, a_listasIdxElem.getTipoElemento());
+					if (!a_listasIdxElem.canSparse()) {
+						for (TIt it = a_listasIdxElem.getIteradorInicial(); it >= a_it + 1; a_listasIdxElem.decrementarIterador(it))
+							if (it < a_listasIdxElem.getIteradorInicial())
+								a_listasIdxElem.addElemento(it, a_listasIdxElem.getTipoElemento());
+					}
+					a_listasIdxElem.addElemento_rIt(a_it, a_listasIdxElem.getTipoElemento());
 				}
-
-				if (!a_listasIdxElem.isIteradorValido(a_it))
-					return a_listasIdxElem.getIteradores(a_it);
-
-				return std::vector<TIt>();
+				else if (a_listasIdxElem.canSparse()) {
+					if (!a_listasIdxElem.isIteradorValido(a_it))
+						a_listasIdxElem.addElemento_rIt(a_it, a_listasIdxElem.getTipoElemento());
+				}
 
 			}
 			catch (const std::exception& erro) { throw std::invalid_argument("alocConteudoIter(a_listasIdxElem," + getFullString(a_it) + "): \n" + std::string(erro.what())); }
 		};
 
-		template<typename TListasIdxElem, typename TIt>
-		void tratConteudoIter(TListasIdxElem& a_listasIdxElem, TIt a_it) {
-			try {
-
-		        const std::vector<TIt> iteradores_multiplos = alocConteudoIter(a_listasIdxElem, a_it);
-
-				if (iteradores_multiplos.size() <= 1)
-					return;
-
-				for (int i = 0; i < int(iteradores_multiplos.size()); i++) {
-					if (a_listasIdxElem.at(iteradores_multiplos.at(i)).size() > 0)
-						throw std::invalid_argument("Nao foi possivel alocar conteudo devido a existencia de multiplos iteradores com elementos em " + getString(iteradores_multiplos.at(i)));
-				}
-
-				//a_listasIdxElem.alterarValorSeAlterarIterador(a_it, a_listasIdxElem.getTipoElemento());
-
-			}
-			catch (const std::exception& erro) { throw std::invalid_argument("tratConteudoIter(a_listasIdxElem," + getFullString(a_it) + "): \n" + std::string(erro.what())); }
-		};
 		
 		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11, typename TIt12>
-		void addConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11, TIt12 a_it12) {
+		void addConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, TIt11 a_it11, TIt12 a_it12) {
 
 			try {
 
-				tratConteudoIter(a_listasIdxElem, a_it1);
-				tratConteudoIter(a_listasIdxElem.at(a_it1), a_it2);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2), a_it3);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3), a_it4);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4), a_it5);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5), a_it6);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6), a_it7);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7), a_it8);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8), a_it9);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9), a_it10);
-				tratConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10), a_it11);
-				if (alocConteudoIter(a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11), a_it12).size() > 1)
-					throw std::invalid_argument("Multiplos iteradores na ultima camada.");
+				alocConteudoIter(a_listasIdxElem, a_it1);
+				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1), a_it2);
+				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1).at_rIt(a_it2), a_it3);
+				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1).at_rIt(a_it2).at_rIt(a_it3), a_it4);
+				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1).at_rIt(a_it2).at_rIt(a_it3).at_rIt(a_it4), a_it5);
+				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1).at_rIt(a_it2).at_rIt(a_it3).at_rIt(a_it4).at_rIt(a_it5), a_it6);
+				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1).at_rIt(a_it2).at_rIt(a_it3).at_rIt(a_it4).at_rIt(a_it5).at_rIt(a_it6), a_it7);
+				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1).at_rIt(a_it2).at_rIt(a_it3).at_rIt(a_it4).at_rIt(a_it5).at_rIt(a_it6).at_rIt(a_it7), a_it8);
+				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1).at_rIt(a_it2).at_rIt(a_it3).at_rIt(a_it4).at_rIt(a_it5).at_rIt(a_it6).at_rIt(a_it7).at_rIt(a_it8), a_it9);
+				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1).at_rIt(a_it2).at_rIt(a_it3).at_rIt(a_it4).at_rIt(a_it5).at_rIt(a_it6).at_rIt(a_it7).at_rIt(a_it8).at_rIt(a_it9), a_it10);
+				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1).at_rIt(a_it2).at_rIt(a_it3).at_rIt(a_it4).at_rIt(a_it5).at_rIt(a_it6).at_rIt(a_it7).at_rIt(a_it8).at_rIt(a_it9).at_rIt(a_it10), a_it11);
+				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1).at_rIt(a_it2).at_rIt(a_it3).at_rIt(a_it4).at_rIt(a_it5).at_rIt(a_it6).at_rIt(a_it7).at_rIt(a_it8).at_rIt(a_it9).at_rIt(a_it10).at_rIt(a_it11), a_it12);
 
-				a_listasIdxElem.at(a_it1).at(a_it2).at(a_it3).at(a_it4).at(a_it5).at(a_it6).at(a_it7).at(a_it8).at(a_it9).at(a_it10).at(a_it11).setElemento(a_it12, a_conteudo);
+				a_listasIdxElem.at_rIt(a_it1).at_rIt(a_it2).at_rIt(a_it3).at_rIt(a_it4).at_rIt(a_it5).at_rIt(a_it6).at_rIt(a_it7).at_rIt(a_it8).at_rIt(a_it9).at_rIt(a_it10).at_rIt(a_it11).setElemento(a_it12, a_conteudo);
 
 			}
 			catch (const std::exception& erro) { throw std::invalid_argument("addConteudoIters_12(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "," + getFullString(a_it12) + "): \n" + std::string(erro.what())); }
 		};
 
 		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_1(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		bool varredurasIters_1(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -823,16 +806,16 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.at_rIt(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
+					if (a_lArmz.at_rIt(it1).size() > 0) {
 
 						double vlrNorm = 1.0;
 
 						if ((!a_isPrimal) && (a_lNorm.size() > 0))
-							vlrNorm = a_lNorm.at(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+							vlrNorm = a_lNorm.at_rIt(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-						varredurasIters(a_lArmz.at(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+						varredurasIters(a_lArmz.at_rIt(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at_rIt(it1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 					}
 				}
 
@@ -845,7 +828,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		} // bool varredurasIters_1(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_2(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		bool varredurasIters_2(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -860,18 +843,18 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.at_rIt(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
+					if (a_lArmz.at_rIt(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at_rIt(it1).getIteradorInicial(); it2 <= a_lArmz.at_rIt(it1).getIteradorFinal(); a_lArmz.at_rIt(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at_rIt(it1).at_rIt(it2).size() > 0) {
 
 								double vlrNorm = 1.0;
 
 								if ((!a_isPrimal) && (a_lNorm.size() > 0))
-									vlrNorm = a_lNorm.at(it1).at(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+									vlrNorm = a_lNorm.at_rIt(it1).at_rIt(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-								varredurasIters(a_lArmz.at(it1).at(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+								varredurasIters(a_lArmz.at_rIt(it1).at_rIt(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at_rIt(it1).at_rIt(it2).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 							}
 						}
 					}
@@ -886,7 +869,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		} // bool varredurasIters_3(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_3(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		bool varredurasIters_3(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -901,20 +884,20 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.at_rIt(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
+					if (a_lArmz.at_rIt(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at_rIt(it1).getIteradorInicial(); it2 <= a_lArmz.at_rIt(it1).getIteradorFinal(); a_lArmz.at_rIt(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at_rIt(it1).at_rIt(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorInicial(); it3 <= a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).size() > 0) {
 
 										double vlrNorm = 1.0;
 
 										if ((!a_isPrimal) && (a_lNorm.size() > 0))
-											vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+											vlrNorm = a_lNorm.at_rIt(it1).at_rIt(it2).at_rIt(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-										varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+										varredurasIters(a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at_rIt(it1).at_rIt(it2).at_rIt(it3).at(1).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 									}
 								}
 							}
@@ -931,7 +914,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		} // bool varredurasIters_3(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_4(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		bool varredurasIters_4(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -946,22 +929,22 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.at_rIt(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
+					if (a_lArmz.at_rIt(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at_rIt(it1).getIteradorInicial(); it2 <= a_lArmz.at_rIt(it1).getIteradorFinal(); a_lArmz.at_rIt(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at_rIt(it1).at_rIt(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorInicial(); it3 <= a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorInicial(); it4 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).size() > 0) {
 
 												double vlrNorm = 1.0;
 
 												if ((!a_isPrimal) && (a_lNorm.size() > 0))
-													vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+													vlrNorm = a_lNorm.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at(1).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-												varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+												varredurasIters(a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at(1).at(1).at(1).at(1).at(1).at(1), a_lIdx.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at(1).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 											}
 										}
 									}
@@ -980,7 +963,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		} // bool varredurasIters_4(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_5(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		bool varredurasIters_5(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -995,24 +978,24 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.at_rIt(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
-												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
-													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
+					if (a_lArmz.at_rIt(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at_rIt(it1).getIteradorInicial(); it2 <= a_lArmz.at_rIt(it1).getIteradorFinal(); a_lArmz.at_rIt(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at_rIt(it1).at_rIt(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorInicial(); it3 <= a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorInicial(); it4 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).getIteradorInicial(); it5 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).incrementarIterador(it5)) {
+													if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).size() > 0) {
 
 														double vlrNorm = 1.0;
 
 														if ((!a_isPrimal) && (a_lNorm.size() > 0))
-															vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+															vlrNorm = a_lNorm.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at(1).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-														varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(1).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+														varredurasIters(a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at(1).at(1).at(1).at(1).at(1), a_lIdx.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at(1).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 													}
 												}
 											}
@@ -1033,7 +1016,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		} // bool varredurasIters_5(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_6(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		bool varredurasIters_6(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -1048,26 +1031,26 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.at_rIt(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
-												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
-													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
-														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
-															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
+					if (a_lArmz.at_rIt(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at_rIt(it1).getIteradorInicial(); it2 <= a_lArmz.at_rIt(it1).getIteradorFinal(); a_lArmz.at_rIt(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at_rIt(it1).at_rIt(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorInicial(); it3 <= a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorInicial(); it4 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).getIteradorInicial(); it5 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).incrementarIterador(it5)) {
+													if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).getIteradorInicial(); it6 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).incrementarIterador(it6)) {
+															if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).size() > 0) {
 
 																double vlrNorm = 1.0;
 
 																if ((!a_isPrimal) && (a_lNorm.size() > 0))
-																	vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+																	vlrNorm = a_lNorm.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at(1).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-																varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(1).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																varredurasIters(a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at(1).at(1).at(1).at(1), a_lIdx.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at(1).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 															}
 														}
 													}
@@ -1090,7 +1073,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		} // bool varredurasIters_6(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_7(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		bool varredurasIters_7(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -1105,28 +1088,28 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.at_rIt(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
-												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
-													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
-														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
-															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
-																for (TIt7 it7 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorInicial(); it7 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).incrementarIterador(it7)) {
-																	if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).size() > 0) {
+					if (a_lArmz.at_rIt(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at_rIt(it1).getIteradorInicial(); it2 <= a_lArmz.at_rIt(it1).getIteradorFinal(); a_lArmz.at_rIt(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at_rIt(it1).at_rIt(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorInicial(); it3 <= a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorInicial(); it4 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).getIteradorInicial(); it5 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).incrementarIterador(it5)) {
+													if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).getIteradorInicial(); it6 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).incrementarIterador(it6)) {
+															if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).size() > 0) {
+																for (TIt7 it7 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).getIteradorInicial(); it7 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).incrementarIterador(it7)) {
+																	if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).size() > 0) {
 
 																		double vlrNorm = 1.0;
 
 																		if ((!a_isPrimal) && (a_lNorm.size() > 0))
-																			vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+																			vlrNorm = a_lNorm.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at(1).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-																		varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(1).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																		varredurasIters(a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at(1).at(1).at(1), a_lIdx.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at(1).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 																	}
 																}
 															}
@@ -1151,7 +1134,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		} // bool varredurasIters_7(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_8(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		bool varredurasIters_8(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -1166,30 +1149,30 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.at_rIt(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
-												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
-													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
-														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
-															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
-																for (TIt7 it7 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorInicial(); it7 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).incrementarIterador(it7)) {
-																	if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).size() > 0) {
-																		for (TIt8 it8 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorInicial(); it8 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).incrementarIterador(it8)) {
-																			if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).size() > 0) {
+					if (a_lArmz.at_rIt(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at_rIt(it1).getIteradorInicial(); it2 <= a_lArmz.at_rIt(it1).getIteradorFinal(); a_lArmz.at_rIt(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at_rIt(it1).at_rIt(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorInicial(); it3 <= a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorInicial(); it4 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).getIteradorInicial(); it5 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).incrementarIterador(it5)) {
+													if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).getIteradorInicial(); it6 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).incrementarIterador(it6)) {
+															if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).size() > 0) {
+																for (TIt7 it7 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).getIteradorInicial(); it7 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).incrementarIterador(it7)) {
+																	if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).size() > 0) {
+																		for (TIt8 it8 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).getIteradorInicial(); it8 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).incrementarIterador(it8)) {
+																			if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).size() > 0) {
 
 																				double vlrNorm = 1.0;
 
 																				if ((!a_isPrimal) && (a_lNorm.size() > 0))
-																					vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
+																					vlrNorm = a_lNorm.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at(1).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-																				varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(1).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																				varredurasIters(a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at(1).at(1), a_lIdx.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at(1).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 																			}
 																		}
 																	}
@@ -1216,7 +1199,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		} // bool varredurasIters_8(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_9(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		bool varredurasIters_9(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -1231,32 +1214,32 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.at_rIt(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
-												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
-													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
-														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
-															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
-																for (TIt7 it7 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorInicial(); it7 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).incrementarIterador(it7)) {
-																	if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).size() > 0) {
-																		for (TIt8 it8 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorInicial(); it8 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).incrementarIterador(it8)) {
-																			if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).size() > 0) {
-																				for (TIt9 it9 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).getIteradorInicial(); it9 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).incrementarIterador(it9)) {
-																					if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).size() > 0) {
+					if (a_lArmz.at_rIt(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at_rIt(it1).getIteradorInicial(); it2 <= a_lArmz.at_rIt(it1).getIteradorFinal(); a_lArmz.at_rIt(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at_rIt(it1).at_rIt(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorInicial(); it3 <= a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorInicial(); it4 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).getIteradorInicial(); it5 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).incrementarIterador(it5)) {
+													if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).getIteradorInicial(); it6 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).incrementarIterador(it6)) {
+															if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).size() > 0) {
+																for (TIt7 it7 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).getIteradorInicial(); it7 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).incrementarIterador(it7)) {
+																	if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).size() > 0) {
+																		for (TIt8 it8 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).getIteradorInicial(); it8 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).incrementarIterador(it8)) {
+																			if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).size() > 0) {
+																				for (TIt9 it9 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).getIteradorInicial(); it9 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).incrementarIterador(it9)) {
+																					if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at_rIt(it9).size() > 0) {
 
 																						double vlrNorm = 1.0;
 
 																						if ((!a_isPrimal) && (a_lNorm.size() > 0))
-																							vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(1).at(IdRealizacao_1).at(IdCenario_1);
+																							vlrNorm = a_lNorm.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at_rIt(it9).at(1).at(IdRealizacao_1).at(IdCenario_1);
 
-																						varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(1), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																						varredurasIters(a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at_rIt(it9).at(1), a_lIdx.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at_rIt(it9).at(1), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 
 																					}
 																				}
@@ -1286,7 +1269,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		} // bool varredurasIters_9(TListasIdxElem& a_listasIdxElem, const bool a_isVar, const bool a_isPrimal, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 		template<typename TListasArmzElem, typename TListasIdxElem, typename TListasNormElem, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10>
-		bool varredurasIters_10(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
+		bool varredurasIters_10(TListasArmzElem& a_lArmz, const TListasIdxElem& a_lIdx, const TListasNormElem& a_lNorm, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdIteracao a_idIteracao, const bool a_isVar, const bool a_isPrimal, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, const IdRealizacao a_idRealizacao, const IdCenario a_idCenario) {
 
 			try {
 
@@ -1301,34 +1284,34 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 				if ((a_lIdx.getIteradorInicial() <= it1) && (it1 <= a_lIdx.getIteradorFinal())) {
 
 					if (a_lArmz.size() == 0)
-						a_lArmz.addElemento(it1, a_lIdx.at(it1));
+						a_lArmz.addElemento(it1, a_lIdx.at_rIt(it1));
 
-					if (a_lArmz.at(it1).size() > 0) {
-						for (TIt2 it2 = a_lArmz.at(it1).getIteradorInicial(); it2 <= a_lArmz.at(it1).getIteradorFinal(); a_lArmz.at(it1).incrementarIterador(it2)) {
-							if (a_lArmz.at(it1).at(it2).size() > 0) {
-								for (TIt3 it3 = a_lArmz.at(it1).at(it2).getIteradorInicial(); it3 <= a_lArmz.at(it1).at(it2).getIteradorFinal(); a_lArmz.at(it1).at(it2).incrementarIterador(it3)) {
-									if (a_lArmz.at(it1).at(it2).at(it3).size() > 0) {
-										for (TIt4 it4 = a_lArmz.at(it1).at(it2).at(it3).getIteradorInicial(); it4 <= a_lArmz.at(it1).at(it2).at(it3).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).incrementarIterador(it4)) {
-											if (a_lArmz.at(it1).at(it2).at(it3).at(it4).size() > 0) {
-												for (TIt5 it5 = a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorInicial(); it5 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).incrementarIterador(it5)) {
-													if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).size() > 0) {
-														for (TIt6 it6 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorInicial(); it6 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).incrementarIterador(it6)) {
-															if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).size() > 0) {
-																for (TIt7 it7 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorInicial(); it7 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).incrementarIterador(it7)) {
-																	if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).size() > 0) {
-																		for (TIt8 it8 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorInicial(); it8 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).incrementarIterador(it8)) {
-																			if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).size() > 0) {
-																				for (TIt9 it9 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).getIteradorInicial(); it9 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).incrementarIterador(it9)) {
-																					if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).size() > 0) {
-																						for (TIt10 it10 = a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).getIteradorInicial(); it10 <= a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).getIteradorFinal(); a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).incrementarIterador(it10)) {
-																							if (a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10).size() > 0) {
+					if (a_lArmz.at_rIt(it1).size() > 0) {
+						for (TIt2 it2 = a_lArmz.at_rIt(it1).getIteradorInicial(); it2 <= a_lArmz.at_rIt(it1).getIteradorFinal(); a_lArmz.at_rIt(it1).incrementarIterador(it2)) {
+							if (a_lArmz.at_rIt(it1).at_rIt(it2).size() > 0) {
+								for (TIt3 it3 = a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorInicial(); it3 <= a_lArmz.at_rIt(it1).at_rIt(it2).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).incrementarIterador(it3)) {
+									if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).size() > 0) {
+										for (TIt4 it4 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorInicial(); it4 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).incrementarIterador(it4)) {
+											if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).size() > 0) {
+												for (TIt5 it5 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).getIteradorInicial(); it5 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).incrementarIterador(it5)) {
+													if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).size() > 0) {
+														for (TIt6 it6 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).getIteradorInicial(); it6 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).incrementarIterador(it6)) {
+															if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).size() > 0) {
+																for (TIt7 it7 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).getIteradorInicial(); it7 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).incrementarIterador(it7)) {
+																	if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).size() > 0) {
+																		for (TIt8 it8 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).getIteradorInicial(); it8 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).incrementarIterador(it8)) {
+																			if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).size() > 0) {
+																				for (TIt9 it9 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).getIteradorInicial(); it9 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).incrementarIterador(it9)) {
+																					if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at_rIt(it9).size() > 0) {
+																						for (TIt10 it10 = a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at_rIt(it9).getIteradorInicial(); it10 <= a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at_rIt(it9).getIteradorFinal(); a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at_rIt(it9).incrementarIterador(it10)) {
+																							if (a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at_rIt(it9).at_rIt(it10).size() > 0) {
 
 																								double vlrNorm = 1.0;
 
 																								if ((!a_isPrimal) && (a_lNorm.size() > 0))
-																									vlrNorm = a_lNorm.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10).at(IdRealizacao_1).at(IdCenario_1);
+																									vlrNorm = a_lNorm.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at_rIt(it9).at_rIt(it10).at(IdRealizacao_1).at(IdCenario_1);
 																								
-																								varredurasIters(a_lArmz.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), a_lIdx.at(it1).at(it2).at(it3).at(it4).at(it5).at(it6).at(it7).at(it8).at(it9).at(it10), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
+																								varredurasIters(a_lArmz.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at_rIt(it9).at_rIt(it10), a_lIdx.at_rIt(it1).at_rIt(it2).at_rIt(it3).at_rIt(it4).at_rIt(it5).at_rIt(it6).at_rIt(it7).at_rIt(it8).at_rIt(it9).at_rIt(it10), vlrNorm, a_TSS, a_idEstagio, a_idIteracao, a_isVar, a_isPrimal, a_idRealizacao, a_idCenario);
 
 																							}
 																						}
@@ -1420,7 +1403,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		}
 
 		template<typename TListasIdxElem, typename TConteudo, typename TIt1, typename TIt2, typename TIt3, typename TIt4, typename TIt5, typename TIt6, typename TIt7, typename TIt8, typename TIt9, typename TIt10, typename TIt11, typename TIt12>
-		bool getConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo &a_conteudo, const TIt1 a_it1, const TIt2 a_it2, const TIt3 a_it3, const TIt4 a_it4, const TIt5 a_it5, const TIt6 a_it6, const TIt7 a_it7, const TIt8 a_it8, const TIt9 a_it9, const TIt10 a_it10, const TIt11 a_it11, const TIt12 a_it12) {
+		bool getConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo &a_conteudo, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, TIt11 a_it11, TIt12 a_it12) {
 
 			try {
 
@@ -1468,102 +1451,102 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		void instanciarProcessoEstocastico(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados);
 
-		int criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_penalizacao);
-		int criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo_lag);
-		int criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo_lag, const double a_grau_liberdade, std::vector<IdHidreletrica> a_idHidreletrica = std::vector<IdHidreletrica>());
-		int criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdPatamarCarga a_idPatamarCarga, const IdTermeletrica a_idTermeletrica, const double a_potencia_disponivel_minima, const double a_potencia_disponivel_maxima);
+		int criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_penalizacao);
+		int criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdHidreletrica a_idHidreletrica, Periodo &a_periodo_lag);
+		int criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, Periodo &a_periodo_lag, const double a_grau_liberdade, std::vector<IdHidreletrica> a_idHidreletrica = std::vector<IdHidreletrica>());
+		int criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdPatamarCarga a_idPatamarCarga, const IdTermeletrica a_idTermeletrica, const double a_potencia_disponivel_minima, const double a_potencia_disponivel_maxima);
 
 		void criarModeloOtimizacao(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados);
 
-		void criarVariaveisTermeletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdTermeletrica a_maiorIdTermeletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
+		void criarVariaveisTermeletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo, const IdTermeletrica a_maiorIdTermeletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
 
-		void criarVariaveisContrato(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdContrato a_maiorIdContrato, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
+		void criarVariaveisContrato(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo, const IdContrato a_maiorIdContrato, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
 
-		void criarVariaveisEolicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdUsinaEolica a_maiorIdUsinaEolica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
+		void criarVariaveisEolicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo, const IdUsinaEolica a_maiorIdUsinaEolica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
 
-		void criarVariaveisDemandaEspecial(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdDemandaEspecial a_maiorIdDemandaEspecial, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
+		void criarVariaveisDemandaEspecial(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo, const IdDemandaEspecial a_maiorIdDemandaEspecial, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
 
 		void criarVariaveisHidraulicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio);
-		void criarVariaveisHidraulicas_porPatamar(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo);
+		void criarVariaveisHidraulicas_porPatamar(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo);
 
 		void criarVariaveisAssociadasHorizonteEstudo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdDemandaEspecial a_maiorIdDemandaEspecial, const IdUsinaEolica a_maiorIdUsinaEolica, const IdContrato a_maiorIdContrato, const IdSubmercado a_maiorIdSubmercado, const IdIntercambio a_maiorIdIntercambio, \
 			const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const IdTermeletrica a_maiorIdTermeletrica, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, \
-			const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const SmartEnupla<Periodo, double>a_horizonte_estudo_estagio, TempoVariaveis& a_tempoCriarVariaveis);
+			const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const SmartEnupla<Periodo, double>&a_horizonte_estudo_estagio, TempoVariaveis& a_tempoCriarVariaveis);
 
-		void criarRestricoesEvaporacao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const Periodo a_proximo_periodo_estudo);
+		void criarRestricoesEvaporacao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica, Periodo &a_proximo_periodo_estudo);
 
-		void criarVariaveisAssociadasHorizonteOtimizacao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_estagio_final, const IdEstagio a_estagio_inicial, const Periodo a_periodo_otimizacao);
+		void criarVariaveisAssociadasHorizonteOtimizacao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_estagio_final, const IdEstagio a_estagio_inicial, Periodo &a_periodo_otimizacao);
 
 		void criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidrologico(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio);
 
-		void criarRestricoesPotenciaHidraulicaDisponivel(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
+		void criarRestricoesPotenciaHidraulicaDisponivel(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
 
-		void criarRestricoesVolumeUtil_e_Penalidade(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica);
+		void criarRestricoesVolumeUtil_e_Penalidade(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica);
 
-		void criarRestricoesFuncaoProducaoHidreletrica(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const SmartEnupla<Periodo, double>a_horizonte_estudo_estagio, const Periodo a_periodo_estudo);
+		void criarRestricoesFuncaoProducaoHidreletrica(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const SmartEnupla<Periodo, double>&a_horizonte_estudo_estagio, Periodo &a_periodo_estudo);
 
-		void criarRestricoesProducaoTermeletrica_porProdutibilidade(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdTermeletrica a_maiorIdTermeletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
+		void criarRestricoesProducaoTermeletrica_porProdutibilidade(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo, const IdTermeletrica a_maiorIdTermeletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
 
-		void criarVariaveisVolume(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const SmartEnupla<Periodo, double> &a_horizonte_estudo_estagio, const SmartEnupla<Periodo, IdEstagio> &a_horizonte_estudo_vetor);
+		void criarVariaveisVolume(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const SmartEnupla<Periodo, double> &a_horizonte_estudo_estagio, const SmartEnupla<Periodo, IdEstagio> &a_horizonte_estudo_vetor);
 
-		void criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdSubmercado a_maiorIdSubmercado, \
+		void criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdSubmercado a_maiorIdSubmercado, \
 			const IdIntercambio a_maiorIdIntercambio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const IdTermeletrica a_maiorIdTermeletrica, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, \
-			const IdHidreletrica a_maiorIdHidreletrica, const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const Periodo a_periodo_otimizacao, const IdPatamarCarga a_idPatamarCarga);
+			const IdHidreletrica a_maiorIdHidreletrica, const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, Periodo &a_periodo_otimizacao, const IdPatamarCarga a_idPatamarCarga);
 
-		void criarRestricoesCustoPenalidade_periodoEstudo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdHidreletrica a_maiorIdHidreletrica);
+		void criarRestricoesCustoPenalidade_periodoEstudo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdHidreletrica a_maiorIdHidreletrica);
 
-		void criarRestricoesBombeamentoHidraulico(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga, const IdUsinaElevatoria a_idUsinaElevatoria);
+		void criarRestricoesBombeamentoHidraulico(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga, const IdUsinaElevatoria a_idUsinaElevatoria);
 
-		void criarRestricoesTurbinamentoHidraulico(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga);
+		void criarRestricoesTurbinamentoHidraulico(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga);
 
-		void criarRestricoesVazaoDefluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga);
+		void criarRestricoesVazaoDefluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga);
 
-		void criarRestricoesVazaoDesviada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga);
+		void criarRestricoesVazaoDesviada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga);
 
-		void criarRestricoesVazaoRetirada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga);
+		void criarRestricoesVazaoRetirada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga);
 
-		void criarRestricoesVazaoBombeada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdUsinaElevatoria a_idUsinaElevatoria, const IdPatamarCarga a_idPatamarCarga);
+		void criarRestricoesVazaoBombeada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdUsinaElevatoria a_idUsinaElevatoria, const IdPatamarCarga a_idPatamarCarga);
 
-		void criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga);
+		void criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, Periodo &a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga);
 
-		void criarRestricoesAgrupamentoIntercambio(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdAgrupamentoIntercambio a_maiorIdAgrupamentoIntercambio, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga);
+		void criarRestricoesAgrupamentoIntercambio(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdAgrupamentoIntercambio a_maiorIdAgrupamentoIntercambio, Periodo &a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga);
 
 		void criarRestricoesCorteBendersEmCustoFuturo(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio);
 		void criarRestricoesCorteBendersEmCustoTotal(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio);
 
-		void criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_estagio_final, const IdHidreletrica a_maiorIdHidreletrica, const Periodo a_periodo_otimizacao, const SmartEnupla<Periodo, double> a_horizonte_estudo_estagio, const  IdProcessoEstocastico a_tipo_processo_estocastico_hidrologico);
+		void criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_estagio_final, const IdHidreletrica a_maiorIdHidreletrica, Periodo &a_periodo_otimizacao, const SmartEnupla<Periodo, double> &a_horizonte_estudo_estagio, const  IdProcessoEstocastico a_tipo_processo_estocastico_hidrologico);
 
-		void criarRestricoesCustoValorPresente_periodo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo);
+		void criarRestricoesCustoValorPresente_periodo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo);
 
-		void criarRestricoesCusto_periodo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo);
+		void criarRestricoesCusto_periodo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo);
 
-		void criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdSubmercado a_maiorIdSubmercado, const IdTermeletrica a_maiorIdTermeletrica, const IdPatamarCarga a_idPatamarCarga);
+		void criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdSubmercado a_maiorIdSubmercado, const IdTermeletrica a_maiorIdTermeletrica, const IdPatamarCarga a_idPatamarCarga);
 
-		void criarRestricoesProducaoMedia(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdSubmercado a_idSubmercado, const IdIntercambio a_maiorIdIntercambio, const IdTermeletrica a_maiorIdTermeletrica, const IdHidreletrica a_maiorIdHidreletrica, const IdPatamarCarga a_idPatamarCarga);
+		void criarRestricoesProducaoMedia(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdSubmercado a_idSubmercado, const IdIntercambio a_maiorIdIntercambio, const IdTermeletrica a_maiorIdTermeletrica, const IdHidreletrica a_maiorIdHidreletrica, const IdPatamarCarga a_idPatamarCarga);
 
-		void criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, const Periodo a_periodo_acoplamento, const Periodo a_periodo_estudo, const Periodo a_periodo_otimizacao_final, const Periodo a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
+		void criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, Periodo &a_periodo_acoplamento, Periodo &a_periodo_estudo, Periodo &a_periodo_otimizacao_final, Periodo &a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
 
-		void criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, const Periodo a_periodo_acoplamento, const Periodo a_periodo_estudo, const Periodo a_periodo_otimizacao_final, const Periodo a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
+		void criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, Periodo &a_periodo_acoplamento, Periodo &a_periodo_estudo, Periodo &a_periodo_otimizacao_final, Periodo &a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
 
-		void criarRestricoesAtendimentoDemanda(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdUsinaEolica a_maiorIdUsinaEolica, const IdContrato a_maiorIdContrato, const IdSubmercado a_idSubmercado, const IdIntercambio a_maiorIdIntercambio, const IdTermeletrica a_maiorIdTermeletrica, const IdHidreletrica a_maiorIdHidreletrica, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const IdPatamarCarga a_idPatamarCarga);
+		void criarRestricoesAtendimentoDemanda(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdUsinaEolica a_maiorIdUsinaEolica, const IdContrato a_maiorIdContrato, const IdSubmercado a_idSubmercado, const IdIntercambio a_maiorIdIntercambio, const IdTermeletrica a_maiorIdTermeletrica, const IdHidreletrica a_maiorIdHidreletrica, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const IdPatamarCarga a_idPatamarCarga);
 
 		void formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados);
 
-		void criarRestricoesHidraulicaEspecial_vazao_afluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
+		void criarRestricoesHidraulicaEspecial_vazao_afluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio);
 
-		void criarRestricoesHidraulicaEspecial_vazao_defluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo);
+		void criarRestricoesHidraulicaEspecial_vazao_defluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo);
 
-		void criarRestricoesHidraulicaEspecial_volume_armazenado(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const SmartEnupla<Periodo, double>a_horizonte_estudo);
+		void criarRestricoesHidraulicaEspecial_volume_armazenado(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const SmartEnupla<Periodo, double>&a_horizonte_estudo);
 
-		void criarRestricoesHidraulicaEspecial_energia_armazenada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const SmartEnupla<Periodo, double>a_horizonte_estudo);
+		void criarRestricoesHidraulicaEspecial_energia_armazenada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const SmartEnupla<Periodo, double>&a_horizonte_estudo);
 
-		void criarRestricoesIntercambioHidraulicooRetiradaRelaxada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga, const IdIntercambioHidraulico a_idIntercambioHidraulico);
+		void criarRestricoesIntercambioHidraulicooRetiradaRelaxada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga, const IdIntercambioHidraulico a_idIntercambioHidraulico);
 
 		void setVolumeMeta(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const SmartEnupla<Periodo, double> &a_horizonte_estudo_estagio);
 
-		void criarRestricoesIntercambioRelaxado(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdIntercambio a_idIntercambio, const IdPatamarCarga a_idPatamarCarga);
+		void criarRestricoesIntercambioRelaxado(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdIntercambio a_idIntercambio, const IdPatamarCarga a_idPatamarCarga);
 
-		void zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdIntercambio a_maiorIdIntercambio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const IdTermeletrica a_maiorIdTermeletrica, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const SmartEnupla<Periodo, double>a_horizonte_estudo_estagio);
+		void zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdIntercambio a_maiorIdIntercambio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const IdTermeletrica a_maiorIdTermeletrica, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const SmartEnupla<Periodo, double>&a_horizonte_estudo_estagio);
 
 		IdHidreletrica getIdHidreletricaFromIdProcessoEstocasticoIdVariavelAleatoriaIdVariavelAleatoriaInterna(const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna);
 		std::vector<IdHidreletrica> getIdHidreletricaFromIdProcessoEstocasticoIdVariavelAleatoria(const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria);
@@ -1588,7 +1571,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		template<typename Valor>
 		struct GetNumeroHorasFromIterador <Periodo, Valor> {
-			static constexpr Valor getNumeroHoras(const Periodo a_periodo) {
+			static constexpr Valor getNumeroHoras(Periodo &a_periodo) {
 				try {
 					const int numero_horas = a_periodo.getHoras();
 					if (numero_horas == 0)
@@ -1602,7 +1585,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		template<typename Valor>
 		struct GetNumeroHorasFromIteradores <Periodo, IdPatamarCarga, Valor> {
-			static constexpr Valor getNumeroHoras(const Periodo a_periodo, const IdPatamarCarga a_idPatamarCarga, const ModeloOtimizacao* a_modeloOtimizacao) {
+			static constexpr Valor getNumeroHoras(Periodo &a_periodo, const IdPatamarCarga a_idPatamarCarga, const ModeloOtimizacao* a_modeloOtimizacao) {
 				try {
 					Valor numero_horas = Valor(a_periodo.getHoras());
 					if (numero_horas == 0.0)
