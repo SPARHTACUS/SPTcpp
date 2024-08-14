@@ -3249,6 +3249,7 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao == IdRealizacao_Nenhum)) {
 
+				VARIAVEL_DECISAO_1(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
@@ -3259,6 +3260,7 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 
 			else if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao != IdRealizacao_Nenhum)) {
 
+				VARIAVEL_DECISAO_1(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
@@ -3269,6 +3271,7 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao == IdRealizacao_Nenhum)) {
 
+					EQUACAO_LINEAR_1(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 					EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 					EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
 					EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
@@ -3285,6 +3288,7 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 
 			else if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao != IdRealizacao_Nenhum)) {
 
+					EQUACAO_LINEAR_1(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 					EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 					EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
 					EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
@@ -4334,22 +4338,22 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 
 		const Periodo periodo_otimizacao_estagio_final = getAtributo(estagio_final, AttComumEstagio_periodo_otimizacao, Periodo());
 
-		if (getVarDecisao_ZFseExistir(a_TSS, estagio_final, periodo_otimizacao_estagio_final) == -1) {
+		if (getVarDecisao_ZFseExistir(a_TSS, estagio_final) == -1) {
 
 			// Variável ZF
-			addVarDecisao_ZF(a_TSS, estagio_final, periodo_otimizacao_estagio_final, 0.0, vetorEstagio.at(estagio_final).getSolver(a_TSS)->getInfinito(), 0.0);
+			addVarDecisao_ZF(a_TSS, estagio_final, 0.0, vetorEstagio.at(estagio_final).getSolver(a_TSS)->getInfinito(), 0.0);
 
-			// Variável ZF em EquLinear_CUSTO_TOTAL
-			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, estagio_final, periodo_otimizacao_estagio_final), getEquLinear_CUSTO_TOTAL(a_TSS, estagio_final, periodo_otimizacao_estagio_final), -1.0);
+			// Variável ZF em EquLinear_ZT
+			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, estagio_final), getEquLinear_ZT(a_TSS, estagio_final), -1.0);
 
 			criarRestricoesCorteBendersEmCustoFuturo(a_TSS, estagio_final);
 
-			const int posEquZF = addEquLinear_CUSTO_FUTURO(a_TSS, estagio_final, periodo_otimizacao_estagio_final);
+			const int posEquZF = addEquLinear_ZF(a_TSS, estagio_final);
 
 			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setRHSRestricao(posEquZF, 0.0);
 
 			// Variável ZF
-			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, estagio_final, periodo_otimizacao_estagio_final), posEquZF, 1.0);
+			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, estagio_final), posEquZF, 1.0);
 
 			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao_corte; idRealizacao++) {
 				int varZF = getVarDecisao_ZFseExistir(a_TSS, estagio_final, periodo_otimizacao_estagio_final, idRealizacao);
@@ -4358,7 +4362,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 				vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(varZF, posEquZF, -(1.0 / double(maiorIdRealizacao_corte)));
 			}
 
-		} // if (getVarDecisao_ZFseExistir(estagio_final, periodo_otimizacao_estagio_final) == -1) {
+		} // if (getVarDecisao_ZFseExistir(estagio_final) == -1) {
 		 
 		const int numero_cortes = vetorEstagio.at(idEstagio_futuro).vetorCorteBenders.numObjetos();
 
@@ -5345,10 +5349,10 @@ double ModeloOtimizacao::otimizarProblema(const TipoSubproblemaSolver a_TSS, con
 
 						setElemento(AttVetorModeloOtimizacao_custo_total, a_idEstagio, 0.0);
 
-						if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo())) > -1)
+						if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio) > -1)
 							setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, 0.0);
 
-						if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo())) > -1)
+						if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1)
 							setElemento(AttVetorModeloOtimizacao_custo_futuro, a_idEstagio, 0.0);
 
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->resetar();
@@ -5503,11 +5507,11 @@ double ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS
 
 				setElemento(AttVetorModeloOtimizacao_custo_total, a_idEstagio, valorObjetivo);
 
-				if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo())) > -1)
-					setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZI(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo()))));
+				if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio) > -1)
+					setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZI(a_TSS, a_idEstagio)));
 
-				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo())) > -1)
-					setElemento(AttVetorModeloOtimizacao_custo_futuro, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZF(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo()))));
+				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1)
+					setElemento(AttVetorModeloOtimizacao_custo_futuro, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZF(a_TSS, a_idEstagio)));
 
 				return getCustoTotal(a_idEstagio);
 
@@ -5571,11 +5575,11 @@ double ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS
 
 				setElemento(AttVetorModeloOtimizacao_custo_total, a_idEstagio, valorObjetivo);
 
-				if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo())) > -1)
-					setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZI(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo()))));
+				if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio) > -1)
+					setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZI(a_TSS, a_idEstagio)));
 
-				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo())) > -1) {
-					double zf = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZF(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo())));
+				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1) {
+					double zf = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZF(a_TSS, a_idEstagio));
 					if ((zf > -0.1) && (zf < 0.0))
 						zf = 0.0;
 					setElemento(AttVetorModeloOtimizacao_custo_futuro, a_idEstagio, zf);
@@ -5605,10 +5609,10 @@ double ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS
 
 							setElemento(AttVetorModeloOtimizacao_custo_total, a_idEstagio, 0.0);
 
-							if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo())) > -1)
+							if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio) > -1)
 								setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, 0.0);
 
-							if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo())) > -1)
+							if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1)
 								setElemento(AttVetorModeloOtimizacao_custo_futuro, a_idEstagio, 0.0);
 
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->resetar();
@@ -5671,11 +5675,11 @@ bool ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS, 
 
 				setElemento(AttVetorModeloOtimizacao_custo_total, a_idEstagio, valorObjetivo);
 
-				if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo())) > -1)
-					setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZI(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo()))));
+				if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio) > -1)
+					setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZI(a_TSS, a_idEstagio)));
 
-				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo())) > -1) {
-					double zf = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZF(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo())));
+				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1) {
+					double zf = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZF(a_TSS, a_idEstagio));
 					if ((zf > -0.1) && (zf < 0.0))
 						zf = 0.0;
 					setElemento(AttVetorModeloOtimizacao_custo_futuro, a_idEstagio, zf);
@@ -5857,7 +5861,7 @@ void ModeloOtimizacao::calcularCustoPrimalViaSubproblemaMestre(const TipoSubprob
 
 				a_custo_individual = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(varZT_r);
 
-				const int varZT = getVarDecisao_ZT(a_TSS, a_idEstagio, getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo()));
+				const int varZT = getVarDecisao_ZT(a_TSS, a_idEstagio);
 
 				a_custo_geral = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(varZT);
 

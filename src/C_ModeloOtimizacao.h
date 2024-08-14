@@ -92,6 +92,33 @@ class EntradaSaidaDados;
 
 DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
+
+//
+// ITERADORES 1
+//
+
+#define ITERADORES_1_ESTAGIO(m)         m(1, IdEstagio)
+
+#define VARIAVEL_DECISAO_1(m)\
+	m(  VarDecisao,     ZP0,                      1,    ITERADORES_1_ESTAGIO,            sim,          nao,                nao)  \
+	m(  VarDecisao,     ZO0,                      1,    ITERADORES_1_ESTAGIO,            sim,          nao,                nao)  \
+	m(  VarDecisao,     ZT,                       1,    ITERADORES_1_ESTAGIO,            sim,          nao,                nao)  \
+	m(  VarDecisao,     ZI,                       1,    ITERADORES_1_ESTAGIO,            sim,          nao,                nao)  \
+	m(  VarDecisao,     ZP,                       1,    ITERADORES_1_ESTAGIO,            sim,          nao,                nao)  \
+	m(  VarDecisao,     ZF,                       1,    ITERADORES_1_ESTAGIO,            sim,          nao,                nao)  
+   //   Elemento,       Nome,               NroIter,    Iteradores,                      Impr.Primal,     Impr.Dual              NormDual
+
+#define EQUACAO_LINEAR_1(m)\
+	m(  EquLinear,     ZP0,                   1,    ITERADORES_1_ESTAGIO,       nao,         nao,                nao)  \
+	m(  EquLinear,     ZO0,                   1,    ITERADORES_1_ESTAGIO,       nao,         nao,                nao)  \
+	m(  EquLinear,     ZT,                    1,    ITERADORES_1_ESTAGIO,       nao,         nao,                nao)  \
+	m(  EquLinear,     ZT_MESTRE,             1,    ITERADORES_1_ESTAGIO,       nao,         nao,                nao)  \
+	m(  EquLinear,     ZI,                    1,    ITERADORES_1_ESTAGIO,       nao,         nao,                nao)  \
+	m(  EquLinear,     ZP,                    1,    ITERADORES_1_ESTAGIO,       nao,         nao,                nao)  \
+	m(  EquLinear,     ZF,                    1,    ITERADORES_1_ESTAGIO,       nao,         nao,                nao)  
+   //   Elemento,     Nome,                           NroIter,    Iteradores,                 Impr.Primal,    Impr.Dual              NormDual
+
+
 //
 // ITERADORES 2
 //
@@ -100,36 +127,23 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_2_ESTAGIO_VARIAVELESTADO(m)  m(1, IdEstagio) m(2, IdVariavelEstado)
 
 #define VARIAVEL_DECISAO_2(m)\
-	m(  VarDecisao,     ZP0,                      2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ZP0p,                     2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ZPp,                      2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ZO0,                      2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ZO0p,                     2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ZOp,                      2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ZO0_UTE,                  2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ZO0_DEFICIT,              2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ZT,                       2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ZI,                       2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ZP0_VF_FINF,              2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ZP0_VF_FINF_ADD,          2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ZP,                       2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
-	m(  VarDecisao,     ESTADO,                   2,    ITERADORES_2_ESTAGIO_VARIAVELESTADO,     sim,          nao,                nao)  \
-	m(  VarDecisao,     ZF,                       2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  
+	m(  VarDecisao,     ZP0_VF_FINF,             2,   ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
+	m(  VarDecisao,     ZP0_VF_FINF_ADD,         2,   ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
+	m(  VarDecisao,     ZO0,                     2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
+	m(  VarDecisao,     ZO,                      2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
+	m(  VarDecisao,     ZP0,                     2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
+	m(  VarDecisao,     ZP,                      2,    ITERADORES_2_ESTAGIO_PERIODO,            sim,          nao,                nao)  \
+	m(  VarDecisao,     ESTADO,                  2,    ITERADORES_2_ESTAGIO_VARIAVELESTADO,     sim,          nao,                nao)  
    //   Elemento,       Nome,               NroIter,    Iteradores,                      Impr.Primal,     Impr.Dual              NormDual
 
+
 #define EQUACAO_LINEAR_2(m)\
-	m(  EquLinear,     CUSTO_PENALIDADE_0,                  2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
-	m(  EquLinear,     CUSTO_PENALIDADE_0p,                 2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
-	m(  EquLinear,     CUSTO_PENALIDADE_p,                  2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
-	m(  EquLinear,     CUSTO_OPERACAO_0,                    2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
-	m(  EquLinear,     CUSTO_OPERACAO_0p,                   2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
-	m(  EquLinear,     CUSTO_OPERACAO_p,                    2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
-	m(  EquLinear,     CUSTO_TOTAL,                         2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
-	m(  EquLinear,     CUSTO_TOTAL_MESTRE,                  2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
-	m(  EquLinear,     CUSTO_IMEDIATO,                      2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
-	m(  EquLinear,     CUSTO_PENALIDADE_VOLUME_INFERIOR_0,  2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
-	m(  EquLinear,     CUSTO_PENALIDADE,                    2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
-	m(  EquLinear,     CUSTO_FUTURO,                        2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  
+	m(  EquLinear,     ZP0_VF_FINF,         2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
+	m(  EquLinear,     ZP0,                 2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
+	m(  EquLinear,     ZP,                  2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
+	m(  EquLinear,     ZO0,                 2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  \
+	m(  EquLinear,     ZO,                  2,    ITERADORES_2_ESTAGIO_PERIODO,       nao,         nao,                nao)  
+
    //   Elemento,     Nome,                           NroIter,    Iteradores,                 Impr.Primal,    Impr.Dual              NormDual
 
 //
@@ -141,8 +155,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_3_ESTAGIO_PERIODO_REALIZACAO(m)            m(1, IdEstagio) m(2, Periodo)        m(3, IdRealizacao)
 #define ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA(m)          m(1, IdEstagio) m(2, Periodo)        m(3, IdTermeletrica)
 #define ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA(m)          m(1, IdEstagio) m(2, Periodo)        m(3, IdHidreletrica)
-#define ITERADORES_3_ESTAGIO_HIDRELETRICA_PERIODO(m)          m(1, IdEstagio) m(2, IdHidreletrica) m(3, Periodo)
-#define ITERADORES_3_ESTAGIO_TERMELETRICA_PERIODO(m)          m(1, IdEstagio) m(2, IdTermeletrica) m(3, Periodo)
 #define ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO(m)            m(1, IdEstagio) m(2, Periodo)        m(3, IdSubmercado)
 #define ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE(m) m(1, IdEstagio) m(2, Periodo)        m(3, IdRestricaoOperativaUHE)
 #define ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA(m)       m(1, IdEstagio) m(2, Periodo)        m(3, IdUsinaElevatoria)
@@ -153,12 +165,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,   ZO,               3,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,              sim,          nao,                nao)  \
 	m(  VarDecisao,   ZF,               3,         ITERADORES_3_ESTAGIO_PERIODO_REALIZACAO,                sim,          nao,                nao)  \
 	m(  VarDecisao,   ZT,               3,         ITERADORES_3_ESTAGIO_PERIODO_REALIZACAO,                sim,          nao,                nao)  \
-	m(  VarDecisao,   ZO0_UTE,          3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao,                nao)  \
-	m(  VarDecisao,   ZOp_UTE,          3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao,                nao)  \
-	m(  VarDecisao,   ZO0p_UTE,         3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao,                nao)  \
-	m(  VarDecisao,   ZO0_DEFICIT,      3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao,                nao)  \
-	m(  VarDecisao,   ZO0p_DEFICIT,     3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao,                nao)  \
-	m(  VarDecisao,   ZOp_DEFICIT,      3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA,              sim,          nao,                nao)  \
 	m(  VarDecisao,   ZP0_VF_FINF,      3,         ITERADORES_3_ESTAGIO_PERIODO_PERIODO,                   sim,          nao,                nao)  \
 	m(  VarDecisao,   YH,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao,                nao)  \
 	m(  VarDecisao,   YHF,              3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,              sim,          nao,                nao)  \
@@ -198,9 +204,9 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
    //   Elemento,     Nome,       NroIter,         Iteradores,                                     Impr.Primal,     Impr.Dual              NormDual
 
 #define EQUACAO_LINEAR_3(m)\
-	m(  EquLinear,   CUSTO_PENALIDADE,                               3,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,       nao,  nao,                nao)  \
-	m(  EquLinear,   CUSTO_OPERACAO,                                 3,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,       nao,  nao,                nao)  \
-	m(  EquLinear,   CUSTO_PENALIDADE_VOLUME_INFERIOR_0,             3,   ITERADORES_3_ESTAGIO_PERIODO_PERIODO,            nao,  nao,                nao)  \
+	m(  EquLinear,   ZP,                                             3,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,       nao,  nao,                nao)  \
+	m(  EquLinear,   ZO,                                             3,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA,       nao,  nao,                nao)  \
+	m(  EquLinear,   ZP0_VF_FINF,                                    3,   ITERADORES_3_ESTAGIO_PERIODO_PERIODO,            nao,  nao,                nao)  \
 	m(  EquLinear,   VOLUME_MEDIO,                                   3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao,                nao)  \
 	m(  EquLinear,   AFLUENCIA_INCREMENTAL,                          3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA,       nao,  nao,                nao)  \
 	m(  EquLinear,   DEMANDA,                                        3,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO,         nao,  nao,                nao)  \
@@ -254,9 +260,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE(m)    m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdRestricaoOperativaUHE)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_INTERCAMBIOHIDRAULICO(m)    m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdIntercambioHidraulico)
 #define ITERADORES_4_ESTAGIO_PERIODO_REALIZACAO_CORTEBENDERS(m)               m(1, IdEstagio) m(2, Periodo) m(3, IdRealizacao)   m(4, IdCorteBenders)
-#define ITERADORES_4_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA(m) m(1, IdEstagio) m(2, Periodo) m(3, IdProcessoEstocastico) m(4, IdVariavelAleatoria)
-#define ITERADORES_4_ESTAGIO_PROCESSOESTOCASTICO_VARIAVELALEATORIA_PERIODO(m) m(1, IdEstagio) m(2, IdProcessoEstocastico) m(3, IdVariavelAleatoria) m(4, Periodo)
-#define ITERADORES_4_ESTAGIO_TERMELETRICA_INT_PERIODO(m)                      m(1, IdEstagio) m(2, IdTermeletrica) m(3, int) m(4, Periodo)
+
 
 
 #define VARIAVEL_DECISAO_4(m)\
@@ -1427,14 +1431,14 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 			catch (const std::exception& erro) { throw std::invalid_argument("getConteudoIters12(" + getFullString(a_it1) + "," + getFullString(a_it2) + "," + getFullString(a_it3) + "," + getFullString(a_it4) + "," + getFullString(a_it5) + "," + getFullString(a_it6) + "," + getFullString(a_it7) + "," + getFullString(a_it8) + "," + getFullString(a_it9) + "," + getFullString(a_it10) + "," + getFullString(a_it11) + "," + getFullString(a_it12) + "): \n" + std::string(erro.what())); }
 		};
 
+			VARIAVEL_DECISAO_1(DECLARAR_METODOS_ELEMENTO)
 			VARIAVEL_DECISAO_2(DECLARAR_METODOS_ELEMENTO)
-
 			VARIAVEL_DECISAO_3(DECLARAR_METODOS_ELEMENTO)
-
 			VARIAVEL_DECISAO_4(DECLARAR_METODOS_ELEMENTO)
 			VARIAVEL_DECISAO_5(DECLARAR_METODOS_ELEMENTO)
 			VARIAVEL_DECISAO_6(DECLARAR_METODOS_ELEMENTO)
 
+			EQUACAO_LINEAR_1(DECLARAR_METODOS_ELEMENTO)
 			EQUACAO_LINEAR_2(DECLARAR_METODOS_ELEMENTO)
 			EQUACAO_LINEAR_3(DECLARAR_METODOS_ELEMENTO)
 			EQUACAO_LINEAR_4(DECLARAR_METODOS_ELEMENTO)

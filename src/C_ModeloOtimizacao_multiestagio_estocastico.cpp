@@ -1372,18 +1372,18 @@ void ModeloOtimizacao::criarRestricoesVolumeUtil_e_Penalidade(const TipoSubprobl
 
 				if (getVarDecisao_ZP0_VF_FINFseExistir(a_TSS, a_idEstagio, periodo_otimizacao) == -1) {
 
-					addEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo_otimizacao);
+					addEquLinear_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao);
 
 					addVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao), getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo_otimizacao), 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao), getEquLinear_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao), 1.0);
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao), getEquLinear_CUSTO_PENALIDADE_0(a_TSS, a_idEstagio, periodo_otimizacao), -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao), getEquLinear_ZP0(a_TSS, a_idEstagio), -1.0);
 
 				} // if (getVarDecisao_ZP0_VF_FINFseExistir(a_TSS, a_idEstagio, periodo_otimizacao) == -1) {
 
 				const double valor_penalidade = a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_penalidade_volume_util_minimo, double()) * a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, a_periodo_estudo, double());
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo_otimizacao), -valor_penalidade);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), getEquLinear_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao), -valor_penalidade);
 
 			} // else {
 
@@ -1988,19 +1988,19 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 
 			try {
 
-				const int posEquZT = addEquLinear_CUSTO_TOTAL(a_TSS, a_idEstagio, a_periodo_otimizacao);
+				const int posEquZT = addEquLinear_ZT(a_TSS, a_idEstagio);
 
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZT, 0.0);
 
 				// Variável ZT
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZT, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio), posEquZT, 1.0);
 
 				// Variável ZI
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZI(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZT, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZI(a_TSS, a_idEstagio), posEquZT, -1.0);
 
 				// Variável ZF
-				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio, a_periodo_otimizacao) > -1)
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZT, -1.0);
+				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1)
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio), posEquZT, -1.0);
 
 
 			} // try{
@@ -2021,12 +2021,12 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 
 					const Periodo periodo_otimizacao_seguinte = getAtributo(idEstagio_seguinte, AttComumEstagio_periodo_otimizacao, Periodo());
 
-					const int posEquZF = addEquLinear_CUSTO_FUTURO(a_TSS, a_idEstagio, a_periodo_otimizacao);
+					const int posEquZF = addEquLinear_ZF(a_TSS, a_idEstagio);
 
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZF, 0.0);
 
 					// Variável ZF
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZF, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio), posEquZF, 1.0);
 
 					for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getAtributo(idEstagio_seguinte, AttComumEstagio_maiorIdRealizacao, IdRealizacao()); idRealizacao++) {
 
@@ -2055,18 +2055,18 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 
 			try {
 
-				const int posEquZI = addEquLinear_CUSTO_IMEDIATO(a_TSS, a_idEstagio, a_periodo_otimizacao);
+				const int posEquZI = addEquLinear_ZI(a_TSS, a_idEstagio);
 
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZI, 0.0);
 
 				// Variável ZI
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZI(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZI, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZI(a_TSS, a_idEstagio), posEquZI, 1.0);
 
 				// Variável ZP0
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZI, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0(a_TSS, a_idEstagio), posEquZI, -1.0);
 
 				// Variável ZO0
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZI, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0(a_TSS, a_idEstagio), posEquZI, -1.0);
 
 			} // try{
 			catch (const std::exception& erro) { throw std::invalid_argument("Restricao Custo Presente: \n" + std::string(erro.what())); }
@@ -2078,21 +2078,21 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 
 			try {
 
-				const int posEquZP0 = addEquLinear_CUSTO_PENALIDADE_0(a_TSS, a_idEstagio, a_periodo_otimizacao);
+				const int posEquZP0 = addEquLinear_ZP0(a_TSS, a_idEstagio);
 
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZP0, 0.0);
 
 				// Variável ZP0
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZP0, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0(a_TSS, a_idEstagio), posEquZP0, 1.0);
 
 				// Variável ZP0p
 				for (Periodo periodo_estudo = a_horizonte_estudo_estagio.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo_estagio.getIteradorFinal(); a_horizonte_estudo_estagio.incrementarIterador(periodo_estudo)) {
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0p(a_TSS, a_idEstagio, periodo_estudo), posEquZP0, -double(double(periodo_estudo.getSegundos()) / 3600.0));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0(a_TSS, a_idEstagio, periodo_estudo), posEquZP0, -double(double(periodo_estudo.getSegundos()) / 3600.0));
 				}
 
 			} // try{
-			catch (const std::exception& erro) { throw std::invalid_argument("Restricao CUSTO_PENALIDADE_0: \n" + std::string(erro.what())); }
+			catch (const std::exception& erro) { throw std::invalid_argument("Restricao ZP0: \n" + std::string(erro.what())); }
 
 
 			// ---------------------------------------------------------------------------------------------------------------------
@@ -2101,19 +2101,19 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 
 			try {
 
-				const int posEquZO0 = addEquLinear_CUSTO_OPERACAO_0(a_TSS, a_idEstagio, a_periodo_otimizacao);
+				const int posEquZO0 = addEquLinear_ZO0(a_TSS, a_idEstagio);
 
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZO0, 0.0);
 
 				// Variável ZO0
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZO0, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0(a_TSS, a_idEstagio), posEquZO0, 1.0);
 
 				// Variável ZO0p
 				for (Periodo periodo_estudo = a_horizonte_estudo_estagio.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo_estagio.getIteradorFinal(); a_horizonte_estudo_estagio.incrementarIterador(periodo_estudo))
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0p(a_TSS, a_idEstagio, periodo_estudo), posEquZO0, -double(double(periodo_estudo.getSegundos()) / 3600.0));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0(a_TSS, a_idEstagio, periodo_estudo), posEquZO0, -double(double(periodo_estudo.getSegundos()) / 3600.0));
 
 			} // try{
-			catch (const std::exception& erro) { throw std::invalid_argument("Restricao CUSTO_OPERACAO_0: \n" + std::string(erro.what())); }
+			catch (const std::exception& erro) { throw std::invalid_argument("Restricao ZO0: \n" + std::string(erro.what())); }
 
 		} // if (a_TSS != TipoSubproblemaSolver_mestre) {
 
@@ -2127,12 +2127,12 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 
 				const int multiplicidade_corte = a_dados.getElementoVetor(AttVetorDados_cortes_multiplos, a_idEstagio, int());
 
-				const int posEquZT = addEquLinear_CUSTO_TOTAL_MESTRE(a_TSS, a_idEstagio, a_periodo_otimizacao);
+				const int posEquZT = addEquLinear_ZT_MESTRE(a_TSS, a_idEstagio);
 
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZT, 0.0);
 
 				// Variável ZT
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZT, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio), posEquZT, 1.0);
 
 				for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getAtributo(a_idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()); idRealizacao++) {
 
@@ -2179,19 +2179,16 @@ void ModeloOtimizacao::criarRestricoesCusto_periodo(const TipoSubproblemaSolver 
 
 		if (true) {
 
-			const int posEquZPp = addEquLinear_CUSTO_PENALIDADE_p(a_TSS, a_idEstagio, a_periodo_estudo);
+			const int posEquZPp = addEquLinear_ZP(a_TSS, a_idEstagio, a_periodo_estudo);
 
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZPp, 0.0);
 
 			// Variável ZP Por PeriodoEstudo
-			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZPp(a_TSS, a_idEstagio, a_periodo_estudo), posEquZPp, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo), posEquZPp, 1.0);
 
 			// Variável ZP Por PeriodoEstudo Por PatamarCarga
 			for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++)
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga), posEquZPp, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double()));
-
-			// Variável ZP Por PeriodoEstudo (para variáveis que não dependem do patamar de carga, ex, restrições de volume mínimo, evaporação)
-			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo), posEquZPp, -1);
 
 		}
 
@@ -2201,12 +2198,12 @@ void ModeloOtimizacao::criarRestricoesCusto_periodo(const TipoSubproblemaSolver 
 
 		if (true) {
 
-			const int posEquZOp = addEquLinear_CUSTO_OPERACAO_p(a_TSS, a_idEstagio, a_periodo_estudo);
+			const int posEquZOp = addEquLinear_ZO(a_TSS, a_idEstagio, a_periodo_estudo);
 
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZOp, 0.0);
 
 			// Variável ZO Por PeriodoEstudo
-			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZOp(a_TSS, a_idEstagio, a_periodo_estudo), posEquZOp, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO(a_TSS, a_idEstagio, a_periodo_estudo), posEquZOp, 1.0);
 
 			// Variável ZO Por PeriodoEstudo Por PatamarCarga
 			for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++)
@@ -2237,15 +2234,15 @@ void ModeloOtimizacao::criarRestricoesCustoValorPresente_periodo(const TipoSubpr
 
 		if (true) {
 
-			const int posEquZP0p = addEquLinear_CUSTO_PENALIDADE_0p(a_TSS, a_idEstagio, a_periodo_estudo);
+			const int posEquZP0p = addEquLinear_ZP0(a_TSS, a_idEstagio, a_periodo_estudo);
 
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZP0p, 0.0);
 
 			// Variável ZP0p
-			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0p(a_TSS, a_idEstagio, a_periodo_estudo), posEquZP0p, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0(a_TSS, a_idEstagio, a_periodo_estudo), posEquZP0p, 1.0);
 
 			// Variável ZPp
-			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZPp(a_TSS, a_idEstagio, a_periodo_estudo), posEquZP0p, -a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo), posEquZP0p, -a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, a_periodo_estudo, double()));
 
 		}
 
@@ -2255,15 +2252,15 @@ void ModeloOtimizacao::criarRestricoesCustoValorPresente_periodo(const TipoSubpr
 
 		if (true) {
 
-			const int posEquZO0p = addEquLinear_CUSTO_OPERACAO_0p(a_TSS, a_idEstagio, a_periodo_estudo);
+			const int posEquZO0p = addEquLinear_ZO0(a_TSS, a_idEstagio, a_periodo_estudo);
 
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZO0p, 0.0);
 
 			// Variável ZO0p
-			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0p(a_TSS, a_idEstagio, a_periodo_estudo), posEquZO0p, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0(a_TSS, a_idEstagio, a_periodo_estudo), posEquZO0p, 1.0);
 
 			// Variável ZOp
-			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZOp(a_TSS, a_idEstagio, a_periodo_estudo), posEquZO0p, -a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO(a_TSS, a_idEstagio, a_periodo_estudo), posEquZO0p, -a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, a_periodo_estudo, double()));
 
 		}
 
@@ -3025,25 +3022,25 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteOtimizacao(const TipoSub
 			// Custo Total (ZT)
 			//
 
-			addVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao, 0.0, infinito, 1.0);
+			addVarDecisao_ZT(a_TSS, a_idEstagio, 0.0, infinito, 1.0);
 
 			//
 			// Custo Imediato (ZI)
 			//
 
-			addVarDecisao_ZI(a_TSS, a_idEstagio, a_periodo_otimizacao, 0.0, infinito, 0.0);
+			addVarDecisao_ZI(a_TSS, a_idEstagio, 0.0, infinito, 0.0);
 
 			//
 			// Custo Penalidade Valor Presente (ZP0)
 			//
 
-			addVarDecisao_ZP0(a_TSS, a_idEstagio, a_periodo_otimizacao, 0.0, infinito, 0.0);
+			addVarDecisao_ZP0(a_TSS, a_idEstagio, 0.0, infinito, 0.0);
 
 			//
 			// Custo Operacao  Valor Presente (ZO0)
 			//
 
-			addVarDecisao_ZO0(a_TSS, a_idEstagio, a_periodo_otimizacao, 0.0, infinito, 0.0);
+			addVarDecisao_ZO0(a_TSS, a_idEstagio, 0.0, infinito, 0.0);
 
 			//
 			// Custo Futuro (ZF)
@@ -3055,7 +3052,7 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteOtimizacao(const TipoSub
 
 				const int multiplicidade_corte = a_dados.getElementoVetor(AttVetorDados_cortes_multiplos, idEstagio_seguinte, int());
 
-				addVarDecisao_ZF(a_TSS, a_idEstagio, a_periodo_otimizacao, 0.0, infinito, 0.0);
+				addVarDecisao_ZF(a_TSS, a_idEstagio, 0.0, infinito, 0.0);
 
 				for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getAtributo(idEstagio_seguinte, AttComumEstagio_maiorIdRealizacao, IdRealizacao()); idRealizacao++) {
 					addVarDecisao_ZF(a_TSS, a_idEstagio, a_periodo_otimizacao, idRealizacao, 0.0, infinito, 0.0);
@@ -3075,7 +3072,7 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteOtimizacao(const TipoSub
 
 			const int multiplicidade_corte = a_dados.getElementoVetor(AttVetorDados_cortes_multiplos, a_idEstagio, int());
 
-			addVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao, 0.0, infinito, 0.0);
+			addVarDecisao_ZT(a_TSS, a_idEstagio, 0.0, infinito, 0.0);
 
 			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getAtributo(a_idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()); idRealizacao++) {
 				addVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao, idRealizacao, 0.0, infinito, 0.0);
@@ -4117,7 +4114,7 @@ void ModeloOtimizacao::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(c
 		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 			return;
 
-		const int posEquZO = addEquLinear_CUSTO_OPERACAO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga);
+		const int posEquZO = addEquLinear_ZO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga);
 
 		IdContrato maiorIdContrato = a_dados.getMaiorId(IdContrato());
 
@@ -4204,12 +4201,7 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo(const TipoSu
 		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 			return;
 
-		const int posEquZP = addEquLinear_CUSTO_PENALIDADE(a_TSS, a_idEstagio, a_periodo_estudo);
-
-		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZP, 0.0);
-
-		// Variável ZP
-		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo), posEquZP, 1.0);
+		const int posEquZP = getEquLinear_ZP(a_TSS, a_idEstagio, a_periodo_estudo);
 
 		// Variáveis Restrição Operativa UHE
 		for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= a_maiorIdRestricaoOperativaUHE; idRestricaoOperativaUHE++) {
@@ -4317,7 +4309,7 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 			return;
 
-		const int posEquZP = addEquLinear_CUSTO_PENALIDADE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga);
+		const int posEquZP = addEquLinear_ZP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga);
 
 		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZP, 0.0);
 
@@ -4996,20 +4988,18 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 		for (Periodo a_periodo_estudo = a_horizonte_estudo_estagio.getIteradorInicial(); a_periodo_estudo <= a_horizonte_estudo_estagio.getIteradorFinal(); a_horizonte_estudo_estagio.incrementarIterador(a_periodo_estudo)) {
 
 			// Custo Operacao Valor Presente (ZO0p) Por PeriodoEstudo
-			addVarDecisao_ZO0p(a_TSS, a_idEstagio, a_periodo_estudo, 0.0, infinito, 0.0);
+			addVarDecisao_ZO0(a_TSS, a_idEstagio, a_periodo_estudo, 0.0, infinito, 0.0);
 
 
 			// Custo Operacao (ZOp) Por PeriodoEstudo	
-			addVarDecisao_ZOp(a_TSS, a_idEstagio, a_periodo_estudo, 0.0, infinito, 0.0);
+			addVarDecisao_ZO(a_TSS, a_idEstagio, a_periodo_estudo, 0.0, infinito, 0.0);
 
 
 			// Custo Penalidade Valor Presente (ZP0p) Por PeriodoEstudo
-			addVarDecisao_ZP0p(a_TSS, a_idEstagio, a_periodo_estudo, 0.0, infinito, 0.0);
+			addVarDecisao_ZP0(a_TSS, a_idEstagio, a_periodo_estudo, 0.0, infinito, 0.0);
 
 
-			// Custo Penalidade (ZPp) Por PeriodoEstudo
-			addVarDecisao_ZPp(a_TSS, a_idEstagio, a_periodo_estudo, 0.0, infinito, 0.0);
-			
+		
 			// CUSTO DE PENALIDADE (ZP) POR PeriodoEstudo (contabiliza as penalidades das variáveis que não dependem do patamar de carga, ex, restrições de volume, evaporação)
 			addVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo, 0.0, infinito, 0.0);
 
@@ -6343,7 +6333,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FI
 					const int varZPO_VF_FINF = criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(a_TSS, a_dados, a_idEstagio, periodo_penalizacao);
 					
 					if (varZPO_VF_FINF > -1)
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZPO_VF_FINF, getEquLinear_CUSTO_PENALIDADE_0(a_TSS, a_idEstagio, periodo_otimizacao), -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZPO_VF_FINF, getEquLinear_ZP0(a_TSS, a_idEstagio), -1.0);
 
 					periodo_penalizacao = Periodo(TipoPeriodo_minuto, Periodo(TipoPeriodo_anual, periodo_penalizacao) + 1) - 1;
 
@@ -6417,33 +6407,33 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FI
 
 						if (getVarDecisao_ZP0_VF_FINFseExistir(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao) == -1) {
 
-							if (getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0seExistir(a_TSS, a_idEstagio, a_periodo_penalizacao) == -1) {
-								addEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, a_periodo_penalizacao);
+							if (getEquLinear_ZP0_VF_FINFseExistir(a_TSS, a_idEstagio, a_periodo_penalizacao) == -1) {
+								addEquLinear_ZP0_VF_FINF(a_TSS, a_idEstagio, a_periodo_penalizacao);
 
 								varZP0_VF_FINF = addVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, a_periodo_penalizacao, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF, getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, a_periodo_penalizacao), 1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF, getEquLinear_ZP0_VF_FINF(a_TSS, a_idEstagio, a_periodo_penalizacao), 1.0);
 
 								if (varZP0_VF_FINF_ant != -1) {
 									const int varZP0_VF_FINF_ADD = addVarDecisao_ZP0_VF_FINF_ADD(a_TSS, a_idEstagio, a_periodo_penalizacao, 0.0, 0.0, 0.0);
 									vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, a_periodo_penalizacao)), varZP0_VF_FINF_ADD, varZP0_VF_FINF_ant);
 
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF_ADD, getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, a_periodo_penalizacao), -1.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF_ADD, getEquLinear_ZP0_VF_FINF(a_TSS, a_idEstagio, a_periodo_penalizacao), -1.0);
 								}
 
-							} // if (getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0seExistir(a_TSS, a_idEstagio, a_periodo_penalizacao) == -1) {
+							} // if (getEquLinear_ZP0_VF_FINFseExistir(a_TSS, a_idEstagio, a_periodo_penalizacao) == -1) {
 
 							const int varZP0_VF_FINF_per = addVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
-							const int equZP0_VF_FINF_per = addEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao);
+							const int equZP0_VF_FINF_per = addEquLinear_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao);
 
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF_per, equZP0_VF_FINF_per, 1.0);
 
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF_per, getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, a_periodo_penalizacao), -1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF_per, getEquLinear_ZP0_VF_FINF(a_TSS, a_idEstagio, a_periodo_penalizacao), -1.0);
 
 						} // if (getVarDecisao_ZP0_VF_FINFseExistir(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao) == -1) {
 
 						const double valor_penalidade = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_volume_util_minimo, double()) * a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, periodo, double());
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo, idHidreletrica), getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao), -valor_penalidade);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo, idHidreletrica), getEquLinear_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao), -valor_penalidade);
 
 					} // if (getVarDecisao_VF_FINFseExistir(a_TSS, a_idEstagio, periodo, idHidreletrica) > -1) {
 				} // for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
