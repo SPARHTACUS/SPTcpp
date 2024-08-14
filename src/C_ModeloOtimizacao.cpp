@@ -4953,7 +4953,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 				// Defluencia viajante
 				//
 
-				else if (nome.at(0) == "VarDecisaoQDEFLAG") {
+				else if (nome.at(0) == "VarDecisaoQDLAG") {
 
 					Periodo periodo = Periodo(nome.at(2));
 					Periodo periodo_lag = Periodo(nome.at(3));
@@ -4968,13 +4968,13 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					if (tempo_viagem_agua_estado != tempo_viagem_agua)
 						throw std::invalid_argument("Tempo de viagem da agua " + getString(tempo_viagem_agua) + "h em " + getFullString(idHidreletrica) + " nao compativel com " + getString(tempo_viagem_agua_estado) + "h em " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 
-					const int varQDEFLAG = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(a_TSS, a_dados, idEstagio, periodo, idHidreletrica, periodo_lag);
-					if (varQDEFLAG == -1)
-						throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDEFLAG de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
+					const int varQDLAG = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDLAG(a_TSS, a_dados, idEstagio, periodo, idHidreletrica, periodo_lag);
+					if (varQDLAG == -1)
+						throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDLAG de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 					else
-						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varQDEFLAG);
+						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varQDLAG);
 
-				} // else if (nome.at(0) == "VarDecisaoQDEFLAG") {
+				} // else if (nome.at(0) == "VarDecisaoQDLAG") {
 
 				else if (nome.at(0) == "VarDecisaoPTDISPCOM") {
 
