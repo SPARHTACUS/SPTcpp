@@ -9,10 +9,10 @@
 
 #define TIPO_ACESSO_INSTANCIA(m)\
 	m(TipoAcessoInstancia, direto)\
-	m(TipoAcessoInstancia, membro)\
-	m(TipoAcessoInstancia, membroMembro)\
-	m(TipoAcessoInstancia, membroMembroMembro) \
-	m(TipoAcessoInstancia, membroMembroMembroMembro) 
+	m(TipoAcessoInstancia, m1)\
+	m(TipoAcessoInstancia, m2)\
+	m(TipoAcessoInstancia, m3) \
+	m(TipoAcessoInstancia, m4) 
 DEFINE_SMART_ENUM(TipoAcessoInstancia, TIPO_ACESSO_INSTANCIA)
 
 
@@ -37,13 +37,13 @@ private:
 	std::string diretorioSaida;
 	std::string diretorioEntrada;
 
-	void imprimirArquivoCSV_AttComum_(const std::string a_nomeArquivo, const std::string a_membro, const std::string a_membroMembro, const std::string a_membroMembroMembro, const std::string a_membroMembroMembroMembro, SmartDados &a_objetoDados, const std::vector<std::string> a_vetorAttComum)const;
+	void imprimirArquivoCSV_AttComum_(const std::string a_nomeArquivo, const std::string a_m1, const std::string a_m2, const std::string a_m3, const std::string a_m4, SmartDados &a_objetoDados, const std::vector<std::string> a_vetorAttComum)const;
 
-	void imprimirArquivoCSV_AttVetor_(const std::string a_nomeArquivo, const std::string a_membro, const std::string a_membroMembro, const std::string a_membroMembroMembro, const std::string a_membroMembroMembroMembro, SmartDados &a_objetoDados, const std::string a_iteradorInicial, const std::string a_iteradorFinal, const std::vector<std::string> a_vetorAttVetor)const;
+	void imprimirArquivoCSV_AttVetor_(const std::string a_nomeArquivo, const std::string a_m1, const std::string a_m2, const std::string a_m3, const std::string a_m4, SmartDados &a_objetoDados, const std::string a_iteradorInicial, const std::string a_iteradorFinal, const std::vector<std::string> a_vetorAttVetor)const;
 	
-	void imprimirArquivoCSV_AttMatriz_(const std::string a_nomeArquivo, const std::string a_membro, const std::string a_membroMembro, const std::string a_membroMembroMembro, const std::string a_membroMembroMembroMembro, SmartDados &a_objetoDados, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const std::vector<std::string> a_vetorAttVetor)const;
+	void imprimirArquivoCSV_AttMatriz_(const std::string a_nomeArquivo, const std::string a_m1, const std::string a_m2, const std::string a_m3, const std::string a_m4, SmartDados &a_objetoDados, const std::string a_iterador1Inicial, const std::string a_iterador1Final, const std::string a_iterador2Inicial, const std::string a_iterador2Final, const std::vector<std::string> a_vetorAttVetor)const;
 
-	void getMembroIdMembro(const std::string a_string, std::string &a_membro, std::string &a_idMembro)const;
+	void getMembroIdMembro(const std::string a_string, std::string &a_m1, std::string &a_idM1)const;
 
 public:
 
@@ -118,46 +118,46 @@ public:
 	// AttComum Membro
 
 	template<class Membro>
-	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, SmartDados &a_objetoDados)const;
+	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, SmartDados &a_objetoDados)const;
 
 	template<class Membro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, SmartDados &a_objetoDados, const TipoAtributo a_attComum)const;
+	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, SmartDados &a_objetoDados, const TipoAtributo a_attComum)const;
 
 	template<class Membro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attComum)const;
+	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attComum)const;
 
-	// AttComum MembroMembro
+	// AttComum M2
 
-	template<class Membro, class MembroMembro>
-	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados &a_objetoDados)const;
+	template<class Membro, class M2>
+	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados &a_objetoDados)const;
 
-	template<class Membro, class MembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados &a_objetoDados, const TipoAtributo a_attComum)const;
+	template<class Membro, class M2, typename TipoAtributo>
+	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados &a_objetoDados, const TipoAtributo a_attComum)const;
 
-	template<class Membro, class MembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attComum)const;
+	template<class Membro, class M2, typename TipoAtributo>
+	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attComum)const;
 
-	// AttComum MembroMembroMembro
+	// AttComum M3
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro>
-	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados &a_objetoDados)const;
+	template<class Membro, class M2, class M3>
+	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados &a_objetoDados)const;
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados &a_objetoDados, TipoAtributo a_attComum)const;
+	template<class Membro, class M2, class M3, typename TipoAtributo>
+	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados &a_objetoDados, TipoAtributo a_attComum)const;
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attComum)const;
+	template<class Membro, class M2, class M3, typename TipoAtributo>
+	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attComum)const;
 
-	// AttComum MembroMembroMembroMembro
+	// AttComum M4
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro>
-	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados &a_objetoDados)const;
+	template<class Membro, class M2, class M3, class M4>
+	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados &a_objetoDados)const;
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados &a_objetoDados, TipoAtributo a_attComum)const;
+	template<class Membro, class M2, class M3, class M4, typename TipoAtributo>
+	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados &a_objetoDados, TipoAtributo a_attComum)const;
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attComum)const;
+	template<class Membro, class M2, class M3, class M4, typename TipoAtributo>
+	void imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attComum)const;
 
 	// AttVetor
 
@@ -178,58 +178,58 @@ public:
 	// AttVetor Membro
 
 	template<class Membro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, SmartDados &a_objetoDados, const TipoAtributo a_attVetor)const;
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, SmartDados &a_objetoDados, const TipoAtributo a_attVetor)const;
 	
 	template<class Membro, typename TipoIterador, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const;
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const;
 
 	template<class Membro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const;
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const;
 	
 	template<class Membro, typename TipoIterador, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const;
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const;
 
-	// AttVetor MembroMembro
+	// AttVetor M2
 
-	template<class Membro, class MembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados &a_objetoDados, const TipoAtributo a_attVetor)const;
+	template<class Membro, class M2, typename TipoAtributo>
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados &a_objetoDados, const TipoAtributo a_attVetor)const;
 	
-	template<class Membro, class MembroMembro, typename TipoIterador, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const;
+	template<class Membro, class M2, typename TipoIterador, typename TipoAtributo>
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const;
 
-	template<class Membro, class MembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const;
+	template<class Membro, class M2, typename TipoAtributo>
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const;
 	
-	template<class Membro, class MembroMembro, typename TipoIterador, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const;
+	template<class Membro, class M2, typename TipoIterador, typename TipoAtributo>
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const;
 
-	// AttVetor MembroMembroMembro
+	// AttVetor M3
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados &a_objetoDados, const TipoAtributo a_attVetor)const;
+	template<class Membro, class M2, class M3, typename TipoAtributo>
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados &a_objetoDados, const TipoAtributo a_attVetor)const;
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoIterador, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const;
+	template<class Membro, class M2, class M3, typename TipoIterador, typename TipoAtributo>
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const;
 	
-	template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const;
+	template<class Membro, class M2, class M3, typename TipoAtributo>
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const;
 	
-	template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoIterador, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const;
+	template<class Membro, class M2, class M3, typename TipoIterador, typename TipoAtributo>
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const;
 
-	// AttVetor MembroMembroMembroMembro
+	// AttVetor M4
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados &a_objetoDados, const TipoAtributo a_attVetor)const;
+	template<class Membro, class M2, class M3, class M4, typename TipoAtributo>
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados &a_objetoDados, const TipoAtributo a_attVetor)const;
 	
-	template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoIterador, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const;
+	template<class Membro, class M2, class M3, class M4, typename TipoIterador, typename TipoAtributo>
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const;
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const;
+	template<class Membro, class M2, class M3, class M4, typename TipoAtributo>
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const;
 	
-	template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoIterador, typename TipoAtributo>
-	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const;
+	template<class Membro, class M2, class M3, class M4, typename TipoIterador, typename TipoAtributo>
+	void imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados &a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const;
 
 	// AttMatriz
 
@@ -250,70 +250,70 @@ public:
 	// AttMatriz Membro
 
 	template<class Membro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, SmartDados &a_objetoDados, const TipoAtributo a_attMatriz)const;
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, SmartDados &a_objetoDados, const TipoAtributo a_attMatriz)const;
 	
 	template<class Membro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const;
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const;
 
 	template<class Membro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const;
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const;
 	
 	template<class Membro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const;
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const;
 
-	// AttMatriz MembroMembro
+	// AttMatriz M2
 
-	template<class Membro, class MembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados &a_objetoDados, const TipoAtributo a_attMatriz)const;
+	template<class Membro, class M2, typename TipoAtributo>
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados &a_objetoDados, const TipoAtributo a_attMatriz)const;
 	
-	template<class Membro, class MembroMembro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const;
+	template<class Membro, class M2, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const;
 
-	template<class Membro, class MembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const;
+	template<class Membro, class M2, typename TipoAtributo>
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const;
 	
-	template<class Membro, class MembroMembro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const;
+	template<class Membro, class M2, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const;
 
-	// AttMatriz MembroMembroMembro
+	// AttMatriz M3
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados &a_objetoDados, const TipoAtributo a_attMatriz)const;
+	template<class Membro, class M2, class M3, typename TipoAtributo>
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados &a_objetoDados, const TipoAtributo a_attMatriz)const;
 	
-	template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const;
+	template<class Membro, class M2, class M3, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const;
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const;
+	template<class Membro, class M2, class M3, typename TipoAtributo>
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const;
 	
-	template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const;
+	template<class Membro, class M2, class M3, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const;
 
-	// AttMatriz MembroMembroMembroMembro
+	// AttMatriz M4
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados &a_objetoDados, const TipoAtributo a_attMatriz)const;
+	template<class Membro, class M2, class M3, class M4, typename TipoAtributo>
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados &a_objetoDados, const TipoAtributo a_attMatriz)const;
 	
-	template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const;
+	template<class Membro, class M2, class M3, class M4, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const;
 
-	template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const;
+	template<class Membro, class M2, class M3, class M4, typename TipoAtributo>
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados &a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const;
 	
-	template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const;
+	template<class Membro, class M2, class M3, class M4, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
+	void imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados &a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, const TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const;
 
 };
 
 
 #endif 
 
+
 // AttComum Direto
 
 inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, SmartDados & a_objetoDados)const{
 	imprimirArquivoCSV_AttComum_(a_nomeArquivo, "", "", "", "", a_objetoDados, std::vector<std::string>());
 }
-
 
 
 template<typename TipoAtributo>
@@ -333,81 +333,81 @@ inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_n
 // AttComum Membro
 
 template<class Membro>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, SmartDados & a_objetoDados)const{
-	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_membro), "", "", "", a_objetoDados, std::vector<std::string>());
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, SmartDados & a_objetoDados)const{
+	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_m1), "", "", "", a_objetoDados, std::vector<std::string>());
 }
 
 template<class Membro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, SmartDados & a_objetoDados, const TipoAtributo a_attComum)const{
-	imprimirArquivoCSV_AttComum(a_nomeArquivo, a_membro, a_objetoDados, std::vector<TipoAtributo>{a_attComum});
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, SmartDados & a_objetoDados, const TipoAtributo a_attComum)const{
+	imprimirArquivoCSV_AttComum(a_nomeArquivo, a_m1, a_objetoDados, std::vector<TipoAtributo>{a_attComum});
 }
 
 template<class Membro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attComum)const{
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attComum)const{
 	std::vector<std::string> vetorAttComumStr = std::vector<std::string>(a_attComum.size(), "");
 	for (int i = 0; i < int(a_attComum.size()); i++)
 		vetorAttComumStr.at(i) = getString(a_attComum.at(i));
-	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_membro), "", "", "", a_objetoDados, vetorAttComumStr);
+	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_m1), "", "", "", a_objetoDados, vetorAttComumStr);
 }
 
-// AttComum MembroMembro
+// AttComum M2
 
-template<class Membro, class MembroMembro>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados & a_objetoDados)const{
-	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), "", "", a_objetoDados, std::vector<std::string>());
+template<class Membro, class M2>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados & a_objetoDados)const{
+	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), "", "", a_objetoDados, std::vector<std::string>());
 }
 
-template<class Membro, class MembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados & a_objetoDados, const TipoAtributo a_attComum)const{
-	imprimirArquivoCSV_AttComum(a_nomeArquivo, a_membro, a_membroMembro, a_objetoDados, std::vector<TipoAtributo>{a_attComum});
+template<class Membro, class M2, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados & a_objetoDados, const TipoAtributo a_attComum)const{
+	imprimirArquivoCSV_AttComum(a_nomeArquivo, a_m1, a_m2, a_objetoDados, std::vector<TipoAtributo>{a_attComum});
 }
 
-template<class Membro, class MembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attComum)const{
+template<class Membro, class M2, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attComum)const{
 	std::vector<std::string> vetorAttComumStr = std::vector<std::string>(a_attComum.size(), "");
 	for (int i = 0; i < int(a_attComum.size()); i++)
 		vetorAttComumStr.at(i) = getString(a_attComum.at(i));
-	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), "", "", a_objetoDados, vetorAttComumStr);
+	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), "", "", a_objetoDados, vetorAttComumStr);
 }
 
-// AttComum MembroMembroMembro
+// AttComum M3
 
-template<class Membro, class MembroMembro, class MembroMembroMembro>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados & a_objetoDados)const{
-	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), "", a_objetoDados, std::vector<std::string>());
+template<class Membro, class M2, class M3>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados & a_objetoDados)const{
+	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), getFullString(a_m3), "", a_objetoDados, std::vector<std::string>());
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados & a_objetoDados, TipoAtributo a_attComum)const{
-	imprimirArquivoCSV_AttComum(a_nomeArquivo, a_membro, a_membroMembro, a_membroMembroMembro, a_objetoDados, std::vector<TipoAtributo>{a_attComum});
+template<class Membro, class M2, class M3, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados & a_objetoDados, TipoAtributo a_attComum)const{
+	imprimirArquivoCSV_AttComum(a_nomeArquivo, a_m1, a_m2, a_m3, a_objetoDados, std::vector<TipoAtributo>{a_attComum});
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attComum)const{
+template<class Membro, class M2, class M3, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attComum)const{
 	std::vector<std::string> vetorAttComumStr = std::vector<std::string>(a_attComum.size(), "");
 	for (int i = 0; i < int(a_attComum.size()); i++)
 		vetorAttComumStr.at(i) = getString(a_attComum.at(i));
-	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), "", a_objetoDados, vetorAttComumStr);
+	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), getFullString(a_m3), "", a_objetoDados, vetorAttComumStr);
 }
 
-// AttComum MembroMembroMembroMembro
+// AttComum M4
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados & a_objetoDados)const{
-	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), getFullString(a_membroMembroMembroMembro), a_objetoDados, std::vector<std::string>());
+template<class Membro, class M2, class M3, class M4>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados & a_objetoDados)const{
+	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), getFullString(a_m3), getFullString(a_m4), a_objetoDados, std::vector<std::string>());
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados & a_objetoDados, TipoAtributo a_attComum)const{
-	imprimirArquivoCSV_AttComum(a_nomeArquivo, a_membro, a_membroMembro, a_membroMembroMembro, a_membroMembroMembroMembro, a_objetoDados, std::vector<TipoAtributo>{a_attComum});
+template<class Membro, class M2, class M3, class M4, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados & a_objetoDados, TipoAtributo a_attComum)const{
+	imprimirArquivoCSV_AttComum(a_nomeArquivo, a_m1, a_m2, a_m3, a_m4, a_objetoDados, std::vector<TipoAtributo>{a_attComum});
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attComum)const{
+template<class Membro, class M2, class M3, class M4, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttComum(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attComum)const{
 	std::vector<std::string> vetorAttComumStr = std::vector<std::string>(a_attComum.size(), "");
 	for (int i = 0; i < int(a_attComum.size()); i++)
 		vetorAttComumStr.at(i) = getString(a_attComum.at(i));
-	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), getFullString(a_membroMembroMembroMembro), a_objetoDados, vetorAttComumStr);
+	imprimirArquivoCSV_AttComum_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), getFullString(a_m3), getFullString(a_m4), a_objetoDados, vetorAttComumStr);
 }
 
 
@@ -442,113 +442,113 @@ inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_n
 // AttVetor Membro
 
 template<class Membro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, SmartDados & a_objetoDados, const TipoAtributo a_attVetor)const{
-	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_membro, a_objetoDados, std::vector<TipoAtributo>{a_attVetor});
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, SmartDados & a_objetoDados, const TipoAtributo a_attVetor)const{
+	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_m1, a_objetoDados, std::vector<TipoAtributo>{a_attVetor});
 }
 
 template<class Membro, typename TipoIterador, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const{
-	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_membro, a_objetoDados, a_iteradorInicial, a_iteradorFinal, std::vector<TipoAtributo>{a_attVetor});
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const{
+	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_m1, a_objetoDados, a_iteradorInicial, a_iteradorFinal, std::vector<TipoAtributo>{a_attVetor});
 }
 
 template<class Membro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const{
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const{
 	std::vector<std::string> vetorAttVetorStr = std::vector<std::string>(a_attVetor.size(), "");
 	for (int i = 0; i < int(a_attVetor.size()); i++)
 		vetorAttVetorStr.at(i) = getString(a_attVetor.at(i));
-	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_membro), "", "", "", a_objetoDados, "", "", vetorAttVetorStr);
+	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_m1), "", "", "", a_objetoDados, "", "", vetorAttVetorStr);
 }
 
 template<class Membro, typename TipoIterador, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const{
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const{
 	std::vector<std::string> vetorAttVetorStr = std::vector<std::string>(a_attVetor.size(), "");
 	for (int i = 0; i < int(a_attVetor.size()); i++)
 		vetorAttVetorStr.at(i) = getString(a_attVetor.at(i));
-	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_membro), "", "", "", a_objetoDados, getString(a_iteradorInicial), getString(a_iteradorFinal), vetorAttVetorStr);
+	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_m1), "", "", "", a_objetoDados, getString(a_iteradorInicial), getString(a_iteradorFinal), vetorAttVetorStr);
 }
 
-// AttVetor MembroMembro
+// AttVetor M2
 
-template<class Membro, class MembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados & a_objetoDados, const TipoAtributo a_attVetor)const{
-	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_membro, a_membroMembro, a_objetoDados, std::vector<TipoAtributo>{a_attVetor});
+template<class Membro, class M2, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados & a_objetoDados, const TipoAtributo a_attVetor)const{
+	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_m1, a_m2, a_objetoDados, std::vector<TipoAtributo>{a_attVetor});
 }
 
-template<class Membro, class MembroMembro, typename TipoIterador, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const{
-	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_membro, a_membroMembro, a_objetoDados, a_iteradorInicial, a_iteradorFinal, std::vector<TipoAtributo>{a_attVetor});
+template<class Membro, class M2, typename TipoIterador, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const{
+	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_m1, a_m2, a_objetoDados, a_iteradorInicial, a_iteradorFinal, std::vector<TipoAtributo>{a_attVetor});
 }
 
-template<class Membro, class MembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const{
+template<class Membro, class M2, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const{
 	std::vector<std::string> vetorAttVetorStr = std::vector<std::string>(a_attVetor.size(), "");
 	for (int i = 0; i < int(a_attVetor.size()); i++)
 		vetorAttVetorStr.at(i) = getString(a_attVetor.at(i));
-	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), "", "", a_objetoDados, "", "", vetorAttVetorStr);
+	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), "", "", a_objetoDados, "", "", vetorAttVetorStr);
 }
 
-template<class Membro, class MembroMembro, typename TipoIterador, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const{
+template<class Membro, class M2, typename TipoIterador, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const{
 	std::vector<std::string> vetorAttVetorStr = std::vector<std::string>(a_attVetor.size(), "");
 	for (int i = 0; i < int(a_attVetor.size()); i++)
 		vetorAttVetorStr.at(i) = getString(a_attVetor.at(i));
-	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), "", "", a_objetoDados, getString(a_iteradorInicial), getString(a_iteradorFinal), vetorAttVetorStr);
+	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), "", "", a_objetoDados, getString(a_iteradorInicial), getString(a_iteradorFinal), vetorAttVetorStr);
 }
 
-// AttVetor MembroMembroMembro
+// AttVetor M3
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados & a_objetoDados, const TipoAtributo a_attVetor)const{
-	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_membro, a_membroMembro, a_membroMembroMembro, a_objetoDados, std::vector<TipoAtributo>{a_attVetor});
+template<class Membro, class M2, class M3, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados & a_objetoDados, const TipoAtributo a_attVetor)const{
+	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_m1, a_m2, a_m3, a_objetoDados, std::vector<TipoAtributo>{a_attVetor});
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoIterador, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const{
-	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_membro, a_membroMembro, a_membroMembroMembro, a_objetoDados, a_iteradorInicial, a_iteradorFinal, std::vector<TipoAtributo>{a_attVetor});
+template<class Membro, class M2, class M3, typename TipoIterador, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const{
+	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_m1, a_m2, a_m3, a_objetoDados, a_iteradorInicial, a_iteradorFinal, std::vector<TipoAtributo>{a_attVetor});
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const{
+template<class Membro, class M2, class M3, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const{
 	std::vector<std::string> vetorAttVetorStr = std::vector<std::string>(a_attVetor.size(), "");
 	for (int i = 0; i < int(a_attVetor.size()); i++)
 		vetorAttVetorStr.at(i) = getString(a_attVetor.at(i));
-	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), "", a_objetoDados, "", "", vetorAttVetorStr);
+	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), getFullString(a_m3), "", a_objetoDados, "", "", vetorAttVetorStr);
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoIterador, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const{
+template<class Membro, class M2, class M3, typename TipoIterador, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const{
 	std::vector<std::string> vetorAttVetorStr = std::vector<std::string>(a_attVetor.size(), "");
 	for (int i = 0; i < int(a_attVetor.size()); i++)
 		vetorAttVetorStr.at(i) = getString(a_attVetor.at(i));
-	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), "", a_objetoDados, getString(a_iteradorInicial), getString(a_iteradorFinal), vetorAttVetorStr);
+	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), getFullString(a_m3), "", a_objetoDados, getString(a_iteradorInicial), getString(a_iteradorFinal), vetorAttVetorStr);
 }
 
-// AttVetor MembroMembroMembroMembro
+// AttVetor M4
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados & a_objetoDados, const TipoAtributo a_attVetor)const{
-	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_membro, a_membroMembro, a_membroMembroMembro, a_membroMembroMembroMembro, a_objetoDados, std::vector<TipoAtributo>{a_attVetor});
+template<class Membro, class M2, class M3, class M4, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados & a_objetoDados, const TipoAtributo a_attVetor)const{
+	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_m1, a_m2, a_m3, a_m4, a_objetoDados, std::vector<TipoAtributo>{a_attVetor});
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoIterador, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const{
-	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_membro, a_membroMembro, a_membroMembroMembro, a_membroMembroMembroMembro, a_objetoDados, a_iteradorInicial, a_iteradorFinal, std::vector<TipoAtributo>{a_attVetor});
+template<class Membro, class M2, class M3, class M4, typename TipoIterador, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const TipoAtributo a_attVetor)const{
+	imprimirArquivoCSV_AttVetor(a_nomeArquivo, a_m1, a_m2, a_m3, a_m4, a_objetoDados, a_iteradorInicial, a_iteradorFinal, std::vector<TipoAtributo>{a_attVetor});
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const{
+template<class Membro, class M2, class M3, class M4, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attVetor)const{
 	std::vector<std::string> vetorAttVetorStr = std::vector<std::string>(a_attVetor.size(), "");
 	for (int i = 0; i < int(a_attVetor.size()); i++)
 		vetorAttVetorStr.at(i) = getString(a_attVetor.at(i));
-	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), getFullString(a_membroMembroMembroMembro), a_objetoDados, "", "", vetorAttVetorStr);
+	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), getFullString(a_m3), getFullString(a_m4), a_objetoDados, "", "", vetorAttVetorStr);
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoIterador, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const{
+template<class Membro, class M2, class M3, class M4, typename TipoIterador, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttVetor(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados & a_objetoDados, const TipoIterador a_iteradorInicial, const TipoIterador a_iteradorFinal, const std::vector<TipoAtributo> a_attVetor)const{
 	std::vector<std::string> vetorAttVetorStr = std::vector<std::string>(a_attVetor.size(), "");
 	for (int i = 0; i < int(a_attVetor.size()); i++)
 		vetorAttVetorStr.at(i) = getString(a_attVetor.at(i));
-	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), getFullString(a_membroMembroMembroMembro), a_objetoDados, getString(a_iteradorInicial), getString(a_iteradorFinal), vetorAttVetorStr);
+	imprimirArquivoCSV_AttVetor_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), getFullString(a_m3), getFullString(a_m4), a_objetoDados, getString(a_iteradorInicial), getString(a_iteradorFinal), vetorAttVetorStr);
 }
 
 // AttMatriz Direto
@@ -582,111 +582,113 @@ inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_
 // AttMatriz Membro
 
 template<class Membro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, SmartDados & a_objetoDados, const TipoAtributo a_attMatriz)const{
-	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_membro, a_objetoDados, std::vector<TipoAtributo>{a_attMatriz});
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, SmartDados & a_objetoDados, const TipoAtributo a_attMatriz)const{
+	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_m1, a_objetoDados, std::vector<TipoAtributo>{a_attMatriz});
 }
 
 template<class Membro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const{
-	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_membro, a_objetoDados, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, std::vector<TipoAtributo>{a_attMatriz});
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const{
+	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_m1, a_objetoDados, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, std::vector<TipoAtributo>{a_attMatriz});
 }
 
 template<class Membro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const{
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const{
 	std::vector<std::string> vetorAttMatrizStr = std::vector<std::string>(a_attMatriz.size(), "");
 	for (int i = 0; i < int(a_attMatriz.size()); i++)
 		vetorAttMatrizStr.at(i) = getString(a_attMatriz.at(i));
-	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_membro), "", "", "", a_objetoDados, "", "", "", "", vetorAttMatrizStr);
+	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_m1), "", "", "", a_objetoDados, "", "", "", "", vetorAttMatrizStr);
 }
 
 template<class Membro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const{
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const{
 	std::vector<std::string> vetorAttMatrizStr = std::vector<std::string>(a_attMatriz.size(), "");
 	for (int i = 0; i < int(a_attMatriz.size()); i++)
 		vetorAttMatrizStr.at(i) = getString(a_attMatriz.at(i));
-	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_membro), "", "", "", a_objetoDados, getString(a_iterador1Inicial), getString(a_iterador1Final), getString(a_iterador2Inicial), getString(a_iterador2Final), vetorAttMatrizStr);
+	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_m1), "", "", "", a_objetoDados, getString(a_iterador1Inicial), getString(a_iterador1Final), getString(a_iterador2Inicial), getString(a_iterador2Final), vetorAttMatrizStr);
 }
 
-// AttMatriz MembroMembro
+// AttMatriz M2
 
-template<class Membro, class MembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados & a_objetoDados, const TipoAtributo a_attMatriz)const{
-	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_membro, a_membroMembro, a_objetoDados, std::vector<TipoAtributo>{a_attMatriz});
+template<class Membro, class M2, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados & a_objetoDados, const TipoAtributo a_attMatriz)const{
+	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_m1, a_m2, a_objetoDados, std::vector<TipoAtributo>{a_attMatriz});
 }
 
-template<class Membro, class MembroMembro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const{
-	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_membro, a_membroMembro, a_objetoDados, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, std::vector<TipoAtributo>{a_attMatriz});
+template<class Membro, class M2, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const{
+	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_m1, a_m2, a_objetoDados, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, std::vector<TipoAtributo>{a_attMatriz});
 }
 
-template<class Membro, class MembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const{
+template<class Membro, class M2, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const{
 	std::vector<std::string> vetorAttMatrizStr = std::vector<std::string>(a_attMatriz.size(), "");
 	for (int i = 0; i < int(a_attMatriz.size()); i++)
 		vetorAttMatrizStr.at(i) = getString(a_attMatriz.at(i));
-	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), "", "", a_objetoDados, "", "", "", "", vetorAttMatrizStr);
+	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), "", "", a_objetoDados, "", "", "", "", vetorAttMatrizStr);
 }
 
-template<class Membro, class MembroMembro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const{
+template<class Membro, class M2, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const{
 	std::vector<std::string> vetorAttMatrizStr = std::vector<std::string>(a_attMatriz.size(), "");
 	for (int i = 0; i < int(a_attMatriz.size()); i++)
 		vetorAttMatrizStr.at(i) = getString(a_attMatriz.at(i));
-	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), "", "", a_objetoDados, getString(a_iterador1Inicial), getString(a_iterador1Final), getString(a_iterador2Inicial), getString(a_iterador2Final), vetorAttMatrizStr);
+	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), "", "", a_objetoDados, getString(a_iterador1Inicial), getString(a_iterador1Final), getString(a_iterador2Inicial), getString(a_iterador2Final), vetorAttMatrizStr);
 }
 
-// AttMatriz MembroMembroMembro
+// AttMatriz M3
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados & a_objetoDados, const TipoAtributo a_attMatriz)const{
-	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_membro, a_membroMembro, a_membroMembroMembro, a_objetoDados, std::vector<TipoAtributo>{a_attMatriz});
+template<class Membro, class M2, class M3, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados & a_objetoDados, const TipoAtributo a_attMatriz)const{
+	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_m1, a_m2, a_m3, a_objetoDados, std::vector<TipoAtributo>{a_attMatriz});
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const{
-	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_membro, a_membroMembro, a_membroMembroMembro, a_objetoDados, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, std::vector<TipoAtributo>{a_attMatriz});
+template<class Membro, class M2, class M3, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const{
+	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_m1, a_m2, a_m3, a_objetoDados, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, std::vector<TipoAtributo>{a_attMatriz});
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const{
+template<class Membro, class M2, class M3, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const{
 	std::vector<std::string> vetorAttMatrizStr = std::vector<std::string>(a_attMatriz.size(), "");
 	for (int i = 0; i < int(a_attMatriz.size()); i++)
 		vetorAttMatrizStr.at(i) = getString(a_attMatriz.at(i));
-	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), "", a_objetoDados, "", "", "", "", vetorAttMatrizStr);
+	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), getFullString(a_m3), "", a_objetoDados, "", "", "", "", vetorAttMatrizStr);
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const{
+template<class Membro, class M2, class M3, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const{
 	std::vector<std::string> vetorAttMatrizStr = std::vector<std::string>(a_attMatriz.size(), "");
 	for (int i = 0; i < int(a_attMatriz.size()); i++)
 		vetorAttMatrizStr.at(i) = getString(a_attMatriz.at(i));
-	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), "", a_objetoDados, getString(a_iterador1Inicial), getString(a_iterador1Final), getString(a_iterador2Inicial), getString(a_iterador2Final), vetorAttMatrizStr);
+	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), getFullString(a_m3), "", a_objetoDados, getString(a_iterador1Inicial), getString(a_iterador1Final), getString(a_iterador2Inicial), getString(a_iterador2Final), vetorAttMatrizStr);
 }
 
-// AttMatriz MembroMembroMembroMembro
+// AttMatriz M4
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados & a_objetoDados, const TipoAtributo a_attMatriz)const{
-	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_membro, a_membroMembro, a_membroMembroMembro, a_membroMembroMembroMembro, a_objetoDados, std::vector<TipoAtributo>{a_attMatriz});
+template<class Membro, class M2, class M3, class M4, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados & a_objetoDados, const TipoAtributo a_attMatriz)const{
+	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_m1, a_m2, a_m3, a_m4, a_objetoDados, std::vector<TipoAtributo>{a_attMatriz});
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const{
-	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_membro, a_membroMembro, a_membroMembroMembro, a_membroMembroMembroMembro, a_objetoDados, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, std::vector<TipoAtributo>{a_attMatriz});
+template<class Membro, class M2, class M3, class M4, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const TipoAtributo a_attMatriz)const{
+	imprimirArquivoCSV_AttMatriz(a_nomeArquivo, a_m1, a_m2, a_m3, a_m4, a_objetoDados, a_iterador1Inicial, a_iterador1Final, a_iterador2Inicial, a_iterador2Final, std::vector<TipoAtributo>{a_attMatriz});
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const{
+template<class Membro, class M2, class M3, class M4, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados & a_objetoDados, const std::vector<TipoAtributo> a_attMatriz)const{
 	std::vector<std::string> vetorAttMatrizStr = std::vector<std::string>(a_attMatriz.size(), "");
 	for (int i = 0; i < int(a_attMatriz.size()); i++)
 		vetorAttMatrizStr.at(i) = getString(a_attMatriz.at(i));
-	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), getFullString(a_membroMembroMembroMembro), a_objetoDados, "", "", "", "", vetorAttMatrizStr);
+	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), getFullString(a_m3), getFullString(a_m4), a_objetoDados, "", "", "", "", vetorAttMatrizStr);
 }
 
-template<class Membro, class MembroMembro, class MembroMembroMembro, class MembroMembroMembroMembro, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
-inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_membro, const MembroMembro a_membroMembro, const MembroMembroMembro a_membroMembroMembro, const MembroMembroMembroMembro a_membroMembroMembroMembro, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const{
+template<class Membro, class M2, class M3, class M4, typename TipoIterador1, typename TipoIterador2, typename TipoAtributo>
+inline void EntradaSaidaDados::imprimirArquivoCSV_AttMatriz(const std::string a_nomeArquivo, const Membro a_m1, const M2 a_m2, const M3 a_m3, const M4 a_m4, SmartDados & a_objetoDados, const TipoIterador1 a_iterador1Inicial, const TipoIterador1 a_iterador1Final, TipoIterador2 a_iterador2Inicial, const TipoIterador2 a_iterador2Final, const std::vector<TipoAtributo> a_attMatriz)const{
 	std::vector<std::string> vetorAttMatrizStr = std::vector<std::string>(a_attMatriz.size(), "");
 	for (int i = 0; i < int(a_attMatriz.size()); i++)
 		vetorAttMatrizStr.at(i) = getString(a_attMatriz.at(i));
-	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_membro), getFullString(a_membroMembro), getFullString(a_membroMembroMembro), getFullString(a_membroMembroMembroMembro), a_objetoDados, getString(a_iterador1Inicial), getString(a_iterador1Final), getString(a_iterador2Inicial), getString(a_iterador2Final), vetorAttMatrizStr);
+	imprimirArquivoCSV_AttMatriz_(a_nomeArquivo, getFullString(a_m1), getFullString(a_m2), getFullString(a_m3), getFullString(a_m4), a_objetoDados, getString(a_iterador1Inicial), getString(a_iterador1Final), getString(a_iterador2Inicial), getString(a_iterador2Final), vetorAttMatrizStr);
 }
+
+

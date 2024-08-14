@@ -38,7 +38,7 @@ DEFINE_SMART_ELEMENTO(MetodoSolucao, SMART_ELEMENTO_METODO_SOLUCAO)
 class MetodoSolucao : public SmartDados {
 public:
 
-	MetodoSolucao(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdMetodoSolucao a_idMetodoSolucao, ModeloOtimizacao &a_modeloOtimizacao);
+	MetodoSolucao(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdMetodoSolucao a_idMetodoSolucao, ModeloOtimizacao &a_modeloOtimizacao, Dados &a_dados);
 	MetodoSolucao(const MetodoSolucao &instanciaCopiar);
 	void esvaziar();
 	virtual ~MetodoSolucao();
@@ -47,10 +47,10 @@ public:
 
 private:
 
-	void executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao &a_modeloOtimizacao);
+	void executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao &a_modeloOtimizacao, Dados& a_dados);
 
-	void executarPDDE_forward (EntradaSaidaDados a_entradaSaidaDados, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, const bool a_simulacao, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao &a_modeloOtimizacao);
-	void executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDados, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao &a_modeloOtimizacao);
+	void executarPDDE_forward (EntradaSaidaDados a_entradaSaidaDados, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, const bool a_simulacao, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao &a_modeloOtimizacao, Dados& a_dados);
+	void executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDados, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao &a_modeloOtimizacao, Dados& a_dados);
 	
 	void executarPSD(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao& a_modeloOtimizacao);
 		

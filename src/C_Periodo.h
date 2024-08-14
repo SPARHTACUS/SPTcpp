@@ -191,7 +191,9 @@ public:
 	int getMinutos() const;
 	int getSegundos() const;
 
-	int estrutura = 0; //Atributo que mapea em qual estrutura dentro de da SmartEnupla <Periodo> se encontra o periodo. Valor = 0 significa que devem ser identificada a estrutura
+	int posStructPeriod = -1;
+	int idxStructPeriod = -1;
+	std::string codStructPeriod;
 
 	TipoPeriodo getTipoPeriodo() const;
 

@@ -33,11 +33,11 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 		const IdAgrupamentoIntercambio maiorIdAgrupamentoIntercambio = a_dados.getMaiorId(IdAgrupamentoIntercambio());
 
-		const Periodo periodo_otimizacao_inicial = getAtributo(AttComumModeloOtimizacao_periodo_otimizacao_inicial, Periodo());
-		const Periodo periodo_otimizacao_final = getAtributo(AttComumModeloOtimizacao_periodo_otimizacao_final, Periodo());
+		Periodo periodo_otimizacao_inicial = getAtributo(AttComumModeloOtimizacao_periodo_otimizacao_inicial, Periodo());
+		Periodo periodo_otimizacao_final = getAtributo(AttComumModeloOtimizacao_periodo_otimizacao_final, Periodo());
 
-		const Periodo periodo_estudo_inicial = getAtributo(AttComumModeloOtimizacao_periodo_estudo_inicial, Periodo());
-		const Periodo periodo_estudo_final = getAtributo(AttComumModeloOtimizacao_periodo_estudo_final, Periodo());
+		Periodo periodo_estudo_inicial = getAtributo(AttComumModeloOtimizacao_periodo_estudo_inicial, Periodo());
+		Periodo periodo_estudo_final = getAtributo(AttComumModeloOtimizacao_periodo_estudo_final, Periodo());
 
 		const IdProcessoEstocastico   tipo_processo_estocastico_hidrologico = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
 
@@ -66,24 +66,24 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 					vetorEstagio.add(estagio);
 				} // if (true) {
 
-				vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_periodo_otimizacao, periodo_otimizacao);
+				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_periodo_otimizacao, periodo_otimizacao);
 
-				vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_maiorIdRealizacao, IdRealizacao(a_dados.getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int())));
+				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_maiorIdRealizacao, IdRealizacao(a_dados.getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int())));
 
-				vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_cortes_multiplos, a_dados.getElementoVetor(AttVetorDados_cortes_multiplos, idEstagio, int()));
+				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_cortes_multiplos, a_dados.getElementoVetor(AttVetorDados_cortes_multiplos, idEstagio, int()));
 
-				vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_lambda_CVAR, a_dados.getElementoVetor(AttVetorDados_lambda_CVAR, idEstagio, double()));
-				vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_alpha_CVAR, a_dados.getElementoVetor(AttVetorDados_alpha_CVAR, idEstagio, double()));
+				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_lambda_CVAR, a_dados.getElementoVetor(AttVetorDados_lambda_CVAR, idEstagio, double()));
+				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_alpha_CVAR, a_dados.getElementoVetor(AttVetorDados_alpha_CVAR, idEstagio, double()));
 
-				vetorEstagio.att(idEstagio).selecaoSolucaoProxy(a_dados.getElementoVetor(AttVetorDados_numero_aberturas_solucao_proxy, idEstagio, int()));
+				vetorEstagio.at(idEstagio).selecaoSolucaoProxy(a_dados.getElementoVetor(AttVetorDados_numero_aberturas_solucao_proxy, idEstagio, int()));
 
 				if (idEstagio == idEstagio_acoplamento)
-					vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, 0);
+					vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, 0);
 				else
-					vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, getAtributo(AttComumModeloOtimizacao_selecao_cortes_nivel_dominancia, int()));
+					vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, getAtributo(AttComumModeloOtimizacao_selecao_cortes_nivel_dominancia, int()));
 
 				if (strCompara(getAtributo(AttComumModeloOtimizacao_diretorio_importacao_cortes, std::string()), "nenhum"))
-					vetorEstagio.att(idEstagio).vetorCorteBenders.alocar(getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()));
+					vetorEstagio.at(idEstagio).vetorCorteBenders.alocar(getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()));
 
 				for (Periodo periodo = horizonte_estudo_original.getIteradorInicial(); periodo <= horizonte_estudo_original.getIteradorFinal(); horizonte_estudo_original.incrementarIterador(periodo)) {
 					if (horizonte_estudo_original.at(periodo) == idEstagio)
@@ -203,14 +203,14 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 			// Instancia Solver
 
 			for (int i = 0; i < int(listaTipoSubproblemaSolver.size()); i++) {
-				vetorEstagio.att(idEstagio).instanciarSolver(listaTipoSubproblemaSolver.at(i), tipoSolver);
-				vetorEstagio.att(idEstagio).setAtributo(AttComumEstagio_tipo_solver, tipoSolver);
-				vetorEstagio.att(idEstagio).getSolver(listaTipoSubproblemaSolver.at(i))->exibirNaTela(a_dados.getAtributo(AttComumDados_exibir_na_tela_resultado_solver, bool()));
-				vetorEstagio.att(idEstagio).getSolver(listaTipoSubproblemaSolver.at(i))->setMetodoPadrao(a_dados.getAtributo(AttComumDados_metodo_solver, TipoMetodoSolver()));
-				vetorEstagio.att(idEstagio).getSolver(listaTipoSubproblemaSolver.at(i))->setToleranciaOtimalidade(a_dados.getAtributo(AttComumDados_tolerancia_otimalidade, double()));
-				vetorEstagio.att(idEstagio).getSolver(listaTipoSubproblemaSolver.at(i))->setToleranciaViabilidade(a_dados.getAtributo(AttComumDados_tolerancia_viabilidade, double()));
-				vetorEstagio.att(idEstagio).getSolver(listaTipoSubproblemaSolver.at(i))->setFocoNumerico(a_dados.getAtributo(AttComumDados_foco_numerico, int()));
-				//vetorEstagio.att(idEstagio).getSolver(listaTipoSubproblemaSolver.at(i))->setEscalonamento(a_dados.getAtributo(AttComumDados_escalonamento, int()));
+				vetorEstagio.at(idEstagio).instanciarSolver(listaTipoSubproblemaSolver.at(i), tipoSolver);
+				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_tipo_solver, tipoSolver);
+				vetorEstagio.at(idEstagio).getSolver(listaTipoSubproblemaSolver.at(i))->exibirNaTela(a_dados.getAtributo(AttComumDados_exibir_na_tela_resultado_solver, bool()));
+				vetorEstagio.at(idEstagio).getSolver(listaTipoSubproblemaSolver.at(i))->setMetodoPadrao(a_dados.getAtributo(AttComumDados_metodo_solver, TipoMetodoSolver()));
+				vetorEstagio.at(idEstagio).getSolver(listaTipoSubproblemaSolver.at(i))->setToleranciaOtimalidade(a_dados.getAtributo(AttComumDados_tolerancia_otimalidade, double()));
+				vetorEstagio.at(idEstagio).getSolver(listaTipoSubproblemaSolver.at(i))->setToleranciaViabilidade(a_dados.getAtributo(AttComumDados_tolerancia_viabilidade, double()));
+				vetorEstagio.at(idEstagio).getSolver(listaTipoSubproblemaSolver.at(i))->setFocoNumerico(a_dados.getAtributo(AttComumDados_foco_numerico, int()));
+				//vetorEstagio.at(idEstagio).getSolver(listaTipoSubproblemaSolver.at(i))->setEscalonamento(a_dados.getAtributo(AttComumDados_escalonamento, int()));
 
 				if (listaTipoSubproblemaSolver.at(i) != TipoSubproblemaSolver_mestre) {
 
@@ -225,7 +225,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 			SmartEnupla<Periodo, int> horizonte_processo_estocastico = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo(), int());
 
-			const Periodo periodo_otimizacao = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
+			Periodo periodo_otimizacao = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
 
 			const SmartEnupla<Periodo, double> horizonte_estudo_estagio = a_dados.getElementosMatriz(AttMatrizDados_percentual_duracao_horizonte_estudo, idEstagio, Periodo(), double());
 
@@ -529,7 +529,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 } // void ModeloOtimizacao::formularModeloOtimizacao(Dados &a_dados) {
 
 
-void ModeloOtimizacao::criarRestricoesAgrupamentoIntercambio(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdAgrupamentoIntercambio a_maiorIdAgrupamentoIntercambio, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga) {
+void ModeloOtimizacao::criarRestricoesAgrupamentoIntercambio(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdAgrupamentoIntercambio a_maiorIdAgrupamentoIntercambio, Periodo &a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga) {
 
 	try {
 
@@ -549,11 +549,11 @@ void ModeloOtimizacao::criarRestricoesAgrupamentoIntercambio(const TipoSubproble
 
 					const int posIneAI = addIneLinear_AGRUPAMENTO_INTERCAMBIO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idAgrupamentoIntercambio);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneAI, -potencia_maxima);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneAI, -potencia_maxima);
 
 					const int numero_intercambio = a_dados.getSizeVetor(idAgrupamentoIntercambio, AttVetorAgrupamentoIntercambio_intercambio);
 					for (int i = 1; i <= numero_intercambio; i++)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_dados.getElementoVetor(idAgrupamentoIntercambio, AttVetorAgrupamentoIntercambio_intercambio, i, IdIntercambio())), posIneAI, -a_dados.getElementoVetor(idAgrupamentoIntercambio, AttVetorAgrupamentoIntercambio_fator_ponderacao, i, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_dados.getElementoVetor(idAgrupamentoIntercambio, AttVetorAgrupamentoIntercambio_intercambio, i, IdIntercambio())), posIneAI, -a_dados.getElementoVetor(idAgrupamentoIntercambio, AttVetorAgrupamentoIntercambio_fator_ponderacao, i, double()));
 
 				} // if (potencia_maxima > 0.0){
 
@@ -567,7 +567,7 @@ void ModeloOtimizacao::criarRestricoesAgrupamentoIntercambio(const TipoSubproble
 }
 
 
-void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga) {
+void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, Periodo &a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga) {
 
 	try {
 
@@ -583,10 +583,10 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 
 				const int posIneRE = addIneLinear_RESTRICAO_ELETRICA_LIMITE_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoEletrica);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 				// Variável RE_FINF
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RE_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoEletrica), posIneRE, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RE_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoEletrica), posIneRE, 1.0);
 
 				const IdElementoSistema maiorElementoSistema = a_dados.getMaiorId(idRestricaoEletrica, IdElementoSistema());
 				for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorElementoSistema; idElementoSistema++) {
@@ -616,13 +616,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 								if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 
 									if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 								else {
 
 									if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//else {
 
@@ -635,13 +635,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 									if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 
 										if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidade) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidade), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidade), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 									else {
 
 										if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidade) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidade), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidade), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//else {
 
@@ -659,13 +659,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 								if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 
 									if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 								else {
 
 									if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//else {
 
@@ -682,13 +682,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 								if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 
 									if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 								else {
 
 									if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//else {
 
@@ -701,13 +701,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 									if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 
 										if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 									else {
 
 										if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//else {
 
@@ -724,14 +724,14 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 										if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 
 											if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto, idUnidade) > -1)
-												vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto, idUnidade), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+												vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto, idUnidade), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 
 										}//if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 										else {
 
 											if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto, idUnidade) > -1)
-												vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto, idUnidade), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+												vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto, idUnidade), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 										}//else {
 
@@ -759,13 +759,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 							if (a_dados.getAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, bool())) {
 
 								if (getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE) > -1)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 							}//if (a_dados.getAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, bool())) {
 							else {
 
 								if (getVarDecisao_PTseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE) > -1)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 							}//else {
 
@@ -782,13 +782,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 									if (a_dados.getAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, bool())) {
 
 										if (getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidade) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidade), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidade), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//if (a_dados.getAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, bool())) {
 									else {
 
 										if (getVarDecisao_PTseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidade) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidade), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidade), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//else {
 
@@ -801,13 +801,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 								if (a_dados.getAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, bool())) {
 
 									if (getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//if (a_dados.getAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, bool())) {
 								else {
 
 									if (getVarDecisao_PTseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//else {
 
@@ -820,7 +820,7 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 					// RESTRIÇÃO DE INTERCAMBIO
 					else if (idIntercambio != IdIntercambio_Nenhum) {
 						if (getVarDecisao_PIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio))
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posIneRE, a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 					}//else if (idIntercambio != IdIntercambio_Nenhum) {
 
@@ -828,10 +828,10 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 					else if (idContrato != IdContrato_Nenhum) {
 
 						if ((getVarDecisao_CEXPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato) > -1))
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CEXP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CEXP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 						else if ((getVarDecisao_CIMPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato) > -1))
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CIMP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CIMP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 						else
 							throw std::invalid_argument("Nao encontrado " + getFullString(idContrato) + " na " + getFullString(idRestricaoEletrica));
@@ -839,11 +839,11 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 
 					// DEMANDA ESPECIAL
 					else if (idDemandaEspecial != IdDemandaEspecial_Nenhum)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idDemandaEspecial), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idDemandaEspecial), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 					// DEMANDA ESPECIAL
 					else if (idUsinaEolica != IdUsinaEolica_Nenhum)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaEolica), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaEolica), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 					else
 						throw std::invalid_argument(getFullString(idElementoSistema) + " nao possui atributo valido para " + getFullString(idRestricaoEletrica));
@@ -858,10 +858,10 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 
 				const int posIneRE = addIneLinear_RESTRICAO_ELETRICA_LIMITE_SUPERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoEletrica);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 				// Variável RE_FSUP
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RE_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoEletrica), posIneRE, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RE_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoEletrica), posIneRE, 1.0);
 
 				const IdElementoSistema maiorElementoSistema = a_dados.getMaiorId(idRestricaoEletrica, IdElementoSistema());
 				for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorElementoSistema; idElementoSistema++) {
@@ -891,13 +891,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 								if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 
 									if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 								else {
 
 									if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//else {
 
@@ -910,13 +910,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 									if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 
 										if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidade) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidade), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidade), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 									else {
 
 										if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidade) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidade), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidade), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//else {
 
@@ -934,13 +934,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 								if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 
 									if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 								else {
 
 									if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//else {
 
@@ -957,13 +957,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 								if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 
 									if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 								else {
 
 									if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//else {
 
@@ -977,13 +977,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 									if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 
 										if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 									else {
 
 										if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//else {
 
@@ -1000,13 +1000,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 										if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 
 											if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto, idUnidade) > -1)
-												vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto, idUnidade), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+												vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto, idUnidade), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 										}//if (a_dados.getAtributo(AttComumDados_representar_potencia_hidro_disponivel_em_restricoes_hidraulicas, bool())) {
 										else {
 
 											if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto, idUnidade) > -1)
-												vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto, idUnidade), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+												vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjunto, idUnidade), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 										}//else {									
 
@@ -1035,13 +1035,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 							if (a_dados.getAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, bool())) {
 
 								if (getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE) > -1)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 							}//if (a_dados.getAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, bool())) {
 							else {
 
 								if (getVarDecisao_PTseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE) > -1)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 							}//else {					
 
@@ -1058,13 +1058,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 									if (a_dados.getAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, bool())) {
 
 										if (getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidade) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidade), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidade), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//if (a_dados.getAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, bool())) {
 									else {
 
 										if (getVarDecisao_PTseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidade) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidade), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidade), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//else {
 
@@ -1077,13 +1077,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 								if (a_dados.getAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, bool())) {
 
 									if (getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//if (a_dados.getAtributo(AttComumDados_representar_potencia_termo_disponivel_em_restricoes_hidraulicas, bool())) {
 								else {
 
 									if (getVarDecisao_PTseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}//else {
 
@@ -1097,7 +1097,7 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 					// RESTRIÇÃO DE INTERCAMBIO
 					else if (idIntercambio != IdIntercambio_Nenhum) {
 						if (getVarDecisao_PIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio))
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 					}//else if (idIntercambio != IdIntercambio_Nenhum) {
 
 
@@ -1105,10 +1105,10 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 					else if (idContrato != IdContrato_Nenhum) {
 
 						if ((getVarDecisao_CEXPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato) > -1))
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CEXP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CEXP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 						else if ((getVarDecisao_CIMPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato) > -1))
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CIMP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CIMP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 						else
 							throw std::invalid_argument("Nao encontrado " + getFullString(idContrato) + " na " + getFullString(idRestricaoEletrica));
@@ -1116,11 +1116,11 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 
 					// DEMANDA ESPECIAL
 					else if (idDemandaEspecial != IdDemandaEspecial_Nenhum)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idDemandaEspecial), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idDemandaEspecial), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 					// DEMANDA ESPECIAL
 					else if (idUsinaEolica != IdUsinaEolica_Nenhum)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaEolica), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaEolica), posIneRE, -a_dados.getElementoMatriz(idRestricaoEletrica, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 
 
@@ -1156,12 +1156,12 @@ void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoFuturo(const TipoSubpro
 		if (multiplicidade_corte == 0) {
 
 			const int posIneZF = addIneLinear_CB_ZF(a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1, IdCorteBenders_1);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneZF, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneZF, 0.0);
 
 			if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1) == -1)
-				addVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+				addVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1), posIneZF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1), posIneZF, 1.0);
 
 		} // if (multiplicidade_corte == 0) {
 
@@ -1171,12 +1171,12 @@ void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoFuturo(const TipoSubpro
 
 			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getAtributo(idEstagio_seguinte, AttComumEstagio_maiorIdRealizacao, IdRealizacao()); idRealizacao++) {
 				const int posIneZF = addIneLinear_CB_ZF(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao, IdCorteBenders_1);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneZF, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneZF, 0.0);
 
 				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao) == -1)
-					addVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+					addVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao), posIneZF, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao), posIneZF, 1.0);
 			} // for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getAtributo(a_idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()); idRealizacao++) {
 
 		} // if (multiplicidade_corte > 0) {
@@ -1200,12 +1200,12 @@ void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoTotal(const TipoSubprob
 		if (multiplicidade_corte == 0) {
 
 			const int posIneZT = addIneLinear_CB_ZT(a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1, IdCorteBenders_1);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneZT, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneZT, 0.0);
 
 			if (getVarDecisao_ZTseExistir(a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1) == -1)
-				addVarDecisao_ZT(a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+				addVarDecisao_ZT(a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1), posIneZT, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1), posIneZT, 1.0);
 
 		} // if (multiplicidade_corte == 0) {
 
@@ -1213,12 +1213,12 @@ void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoTotal(const TipoSubprob
 
 			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getAtributo(a_idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()); idRealizacao++) {
 				const int posIneZT = addIneLinear_CB_ZT(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao, IdCorteBenders_1);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneZT, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneZT, 0.0);
 
 				if (getVarDecisao_ZTseExistir(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao) == -1)
-					addVarDecisao_ZT(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+					addVarDecisao_ZT(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao), posIneZT, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao), posIneZT, 1.0);
 			} // for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getAtributo(a_idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()); idRealizacao++) {
 
 		} // if (multiplicidade_corte > 0) {
@@ -1229,7 +1229,7 @@ void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoTotal(const TipoSubprob
 }
 
 
-void ModeloOtimizacao::criarRestricoesVazaoBombeada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdUsinaElevatoria a_idUsinaElevatoria, const IdPatamarCarga a_idPatamarCarga) {
+void ModeloOtimizacao::criarRestricoesVazaoBombeada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdUsinaElevatoria a_idUsinaElevatoria, const IdPatamarCarga a_idPatamarCarga) {
 
 	try {
 
@@ -1240,13 +1240,13 @@ void ModeloOtimizacao::criarRestricoesVazaoBombeada(const TipoSubproblemaSolver 
 
 			const int posIneQBOM_FINF = addIneLinear_VAZAO_BOMBEADA_FOLGA_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQBOM_FINF, a_dados.getElementoVetor(a_idUsinaElevatoria, AttVetorUsinaElevatoria_vazao_bombeada_minima, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQBOM_FINF, a_dados.getElementoVetor(a_idUsinaElevatoria, AttVetorUsinaElevatoria_vazao_bombeada_minima, a_periodo_estudo, double()));
 
 			// Variável QBOM_FINF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posIneQBOM_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posIneQBOM_FINF, 1.0);
 
 			// Variável QBOM
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posIneQBOM_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posIneQBOM_FINF, 1.0);
 
 		} // if (getVarDecisao_QBOM_FINFseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria) > -1) {
 
@@ -1254,13 +1254,13 @@ void ModeloOtimizacao::criarRestricoesVazaoBombeada(const TipoSubproblemaSolver 
 
 			const int posIneQBOMDISP_FINF = addIneLinear_VAZAO_BOMBEADA_DISPONIVEL_FOLGA_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQBOMDISP_FINF, a_dados.getElementoMatriz(a_idUsinaElevatoria, AttMatrizUsinaElevatoria_vazao_bombeada_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQBOMDISP_FINF, a_dados.getElementoMatriz(a_idUsinaElevatoria, AttMatrizUsinaElevatoria_vazao_bombeada_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 			// Variável QBOMDISP_FINF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOMDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posIneQBOMDISP_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOMDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posIneQBOMDISP_FINF, 1.0);
 
 			// Variável QBOMDISP
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOMDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posIneQBOMDISP_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOMDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posIneQBOMDISP_FINF, 1.0);
 
 		} // if (getVarDecisao_QBOMDISP_FINFseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria) > -1) {
 
@@ -1269,13 +1269,13 @@ void ModeloOtimizacao::criarRestricoesVazaoBombeada(const TipoSubproblemaSolver 
 
 			const int posEquQBOMDISP = addEquLinear_VAZAO_BOMBEADA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQBOMDISP, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQBOMDISP, 0.0);
 
 			// QBOMDISP
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOMDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posEquQBOMDISP, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOMDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posEquQBOMDISP, 1.0);
 
 			// QBOM
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posEquQBOMDISP, -a_dados.getElementoVetor(a_idUsinaElevatoria, AttVetorUsinaElevatoria_fator_disponibilidade, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posEquQBOMDISP, -a_dados.getElementoVetor(a_idUsinaElevatoria, AttVetorUsinaElevatoria_fator_disponibilidade, a_periodo_estudo, double()));
 
 		}//if (getVarDecisao_QBOMDISPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria) > -1) {
 
@@ -1285,7 +1285,7 @@ void ModeloOtimizacao::criarRestricoesVazaoBombeada(const TipoSubproblemaSolver 
 }
 
 
-void ModeloOtimizacao::criarRestricoesVazaoRetirada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga) {
+void ModeloOtimizacao::criarRestricoesVazaoRetirada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga) {
 
 	try {
 
@@ -1296,13 +1296,13 @@ void ModeloOtimizacao::criarRestricoesVazaoRetirada(const TipoSubproblemaSolver 
 
 			const int posEquQOUT_FINF = addEquLinear_VAZAO_RETIRADA_FOLGA_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQOUT_FINF, a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_retirada, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQOUT_FINF, a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_retirada, a_periodo_estudo, double()));
 
 			// Variável QOUT_FINF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQOUT_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQOUT_FINF, 1.0);
 
 			// Variável QOUT
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQOUT_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQOUT_FINF, 1.0);
 
 		} // if (getVarDecisao_QOUT_FINFseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1) {
 
@@ -1312,7 +1312,7 @@ void ModeloOtimizacao::criarRestricoesVazaoRetirada(const TipoSubproblemaSolver 
 }
 
 
-void ModeloOtimizacao::criarRestricoesVazaoDesviada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga) {
+void ModeloOtimizacao::criarRestricoesVazaoDesviada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga) {
 
 	try {
 
@@ -1323,13 +1323,13 @@ void ModeloOtimizacao::criarRestricoesVazaoDesviada(const TipoSubproblemaSolver 
 
 			const int posEquQDES_FINF = addIneLinear_VAZAO_DESVIADA_FOLGA_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica()));
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQDES_FINF, a_dados.getElementoMatriz(a_idHidreletrica, AttMatrizHidreletrica_vazao_desviada_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQDES_FINF, a_dados.getElementoMatriz(a_idHidreletrica, AttMatrizHidreletrica_vazao_desviada_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 			// Variável QDES_FINF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posEquQDES_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posEquQDES_FINF, 1.0);
 
 			// Variável QDES
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posEquQDES_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posEquQDES_FINF, 1.0);
 
 		} // if (getVarDecisao_QDES_FINFseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())) > -1) {
 
@@ -1339,7 +1339,7 @@ void ModeloOtimizacao::criarRestricoesVazaoDesviada(const TipoSubproblemaSolver 
 }
 
 
-void ModeloOtimizacao::criarRestricoesVolumeUtil_e_Penalidade(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica) {
+void ModeloOtimizacao::criarRestricoesVolumeUtil_e_Penalidade(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica) {
 
 	try {
 
@@ -1350,19 +1350,20 @@ void ModeloOtimizacao::criarRestricoesVolumeUtil_e_Penalidade(const TipoSubprobl
 
 			const int posIneVF_FINF = addIneLinear_VOLUME_UTIL_FOLGA_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneVF_FINF, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_minimo, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneVF_FINF, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_minimo, a_periodo_estudo, double()));
 
 			// Variável VF_FINF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posIneVF_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posIneVF_FINF, 1.0);
 
 			// Variável VF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posIneVF_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posIneVF_FINF, 1.0);
 
 
 			const IdMes mes_penalizacao_volume_util_minimo = a_dados.getAtributo(AttComumDados_mes_penalizacao_volume_util_minimo, IdMes());
 			if (mes_penalizacao_volume_util_minimo != IdMes_Nenhum) {
+				Periodo periodo_penalizacao;
 				if (a_periodo_estudo == getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_estudo, a_idEstagio, Periodo()))
-					criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(a_TSS, a_dados, a_idEstagio, Periodo());
+					criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(a_TSS, a_dados, a_idEstagio, periodo_penalizacao);
 			}
 
 			else {
@@ -1373,16 +1374,16 @@ void ModeloOtimizacao::criarRestricoesVolumeUtil_e_Penalidade(const TipoSubprobl
 
 					addEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo_otimizacao);
 
-					addVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+					addVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao), getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo_otimizacao), 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao), getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo_otimizacao), 1.0);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao), getEquLinear_CUSTO_PENALIDADE_0(a_TSS, a_idEstagio, periodo_otimizacao), -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo_otimizacao), getEquLinear_CUSTO_PENALIDADE_0(a_TSS, a_idEstagio, periodo_otimizacao), -1.0);
 
 				} // if (getVarDecisao_ZP0_VF_FINFseExistir(a_TSS, a_idEstagio, periodo_otimizacao) == -1) {
 
 				const double valor_penalidade = a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_penalidade_volume_util_minimo, double()) * a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, a_periodo_estudo, double());
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo_otimizacao), -valor_penalidade);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo_otimizacao), -valor_penalidade);
 
 			} // else {
 
@@ -1395,7 +1396,7 @@ void ModeloOtimizacao::criarRestricoesVolumeUtil_e_Penalidade(const TipoSubprobl
 }
 
 
-void ModeloOtimizacao::criarRestricoesVazaoDefluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga) {
+void ModeloOtimizacao::criarRestricoesVazaoDefluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga) {
 
 	try {
 
@@ -1410,13 +1411,13 @@ void ModeloOtimizacao::criarRestricoesVazaoDefluente(const TipoSubproblemaSolver
 
 				const int posIneQDEF_FINF = addIneLinear_VAZAO_DEFLUENTE_FOLGA_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQDEF_FINF, a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_defluente_minima, a_periodo_estudo, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQDEF_FINF, a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_defluente_minima, a_periodo_estudo, double()));
 
 				// Variável QDEF_FINF
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posIneQDEF_FINF, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posIneQDEF_FINF, 1.0);
 
 				// Variável QDEF
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posIneQDEF_FINF, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posIneQDEF_FINF, 1.0);
 
 			} // if (getVarDecisao_QDEF_FINFseExistir(a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1){
 
@@ -1424,13 +1425,13 @@ void ModeloOtimizacao::criarRestricoesVazaoDefluente(const TipoSubproblemaSolver
 
 				const int posIneQDEF_FSUP = addIneLinear_VAZAO_DEFLUENTE_FOLGA_SUPERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQDEF_FSUP, -a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_defluente_maxima, a_periodo_estudo, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQDEF_FSUP, -a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_defluente_maxima, a_periodo_estudo, double()));
 
 				// Variável QDEF_FSUP
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posIneQDEF_FSUP, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posIneQDEF_FSUP, 1.0);
 
 				// Variável QDEF
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posIneQDEF_FSUP, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posIneQDEF_FSUP, -1.0);
 
 			} // if (getVarDecisao_QDEF_FSUPseExistir(a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1){
 
@@ -1442,13 +1443,13 @@ void ModeloOtimizacao::criarRestricoesVazaoDefluente(const TipoSubproblemaSolver
 
 			const int posIneQDEF_FINF = addIneLinear_VAZAO_DEFLUENTE_FOLGA_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQDEF_FINF, a_dados.getElementoMatriz(a_idHidreletrica, AttMatrizHidreletrica_vazao_defluente_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQDEF_FINF, a_dados.getElementoMatriz(a_idHidreletrica, AttMatrizHidreletrica_vazao_defluente_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 			// Variável QDEF_FINF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQDEF_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQDEF_FINF, 1.0);
 
 			// Variável QDEF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQDEF_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQDEF_FINF, 1.0);
 
 		} // if (getVarDecisao_QDEF_FINFseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1) {
 
@@ -1456,13 +1457,13 @@ void ModeloOtimizacao::criarRestricoesVazaoDefluente(const TipoSubproblemaSolver
 
 			const int posIneQDEF_FSUP = addIneLinear_VAZAO_DEFLUENTE_FOLGA_SUPERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQDEF_FSUP, -a_dados.getElementoMatriz(a_idHidreletrica, AttMatrizHidreletrica_vazao_defluente_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQDEF_FSUP, -a_dados.getElementoMatriz(a_idHidreletrica, AttMatrizHidreletrica_vazao_defluente_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 			// Variável QDEF_FSUP
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQDEF_FSUP, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQDEF_FSUP, 1.0);
 
 			// Variável QDEF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQDEF_FSUP, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQDEF_FSUP, -1.0);
 
 		} // if (getVarDecisao_QDEF_FSUPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1){
 
@@ -1472,7 +1473,7 @@ void ModeloOtimizacao::criarRestricoesVazaoDefluente(const TipoSubproblemaSolver
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarRestricoesvazaoDefluente(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_periodo_estudo) + "): \n" + std::string(erro.what())); }
 }
 
-void ModeloOtimizacao::criarRestricoesBombeamentoHidraulico(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga, const IdUsinaElevatoria a_idUsinaElevatoria) {
+void ModeloOtimizacao::criarRestricoesBombeamentoHidraulico(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga, const IdUsinaElevatoria a_idUsinaElevatoria) {
 
 	try {
 
@@ -1485,10 +1486,10 @@ void ModeloOtimizacao::criarRestricoesBombeamentoHidraulico(const TipoSubproblem
 		if (getVarDecisao_QBOMseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria) > -1) {
 
 			const int posEquBOM = addEquLinear_POTENCIA_BOMBEAMENTO_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBOM, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBOM, 0.0);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PBOMDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posEquBOM, 1.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posEquBOM, -a_dados.getAtributo(a_idUsinaElevatoria, AttComumUsinaElevatoria_taxa_de_consumo, double()) * a_dados.getElementoVetor(a_idUsinaElevatoria, AttVetorUsinaElevatoria_fator_disponibilidade, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PBOMDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posEquBOM, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idUsinaElevatoria), posEquBOM, -a_dados.getAtributo(a_idUsinaElevatoria, AttComumUsinaElevatoria_taxa_de_consumo, double()) * a_dados.getElementoVetor(a_idUsinaElevatoria, AttVetorUsinaElevatoria_fator_disponibilidade, a_periodo_estudo, double()));
 
 		} // if (getVarDecisao_QBOMseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria) > -1) {
 
@@ -1499,7 +1500,7 @@ void ModeloOtimizacao::criarRestricoesBombeamentoHidraulico(const TipoSubproblem
 }
 
 
-void ModeloOtimizacao::criarRestricoesIntercambioRelaxado(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdIntercambio a_idIntercambio, const IdPatamarCarga a_idPatamarCarga) {
+void ModeloOtimizacao::criarRestricoesIntercambioRelaxado(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdIntercambio a_idIntercambio, const IdPatamarCarga a_idPatamarCarga) {
 
 	try {
 
@@ -1514,13 +1515,13 @@ void ModeloOtimizacao::criarRestricoesIntercambioRelaxado(const TipoSubproblemaS
 
 			const int posInePI_FINF = addIneLinear_INTERCAMBIO_RELAXADO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambio);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePI_FINF, a_dados.getElementoMatriz(a_idIntercambio, AttMatrizIntercambio_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePI_FINF, a_dados.getElementoMatriz(a_idIntercambio, AttMatrizIntercambio_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 			// PI
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambio), posInePI_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambio), posInePI_FINF, 1.0);
 
 			// PI_FINF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambio), posInePI_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambio), posInePI_FINF, 1.0);
 
 		} // if (getVarDecisao_PI_FINFseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambio) > -1) {
 
@@ -1610,7 +1611,7 @@ std::vector<IdHidreletrica> ModeloOtimizacao::getIdHidreletricaFromIdProcessoEst
 }
 
 
-void ModeloOtimizacao::criarRestricoesTurbinamentoHidraulico(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga) {
+void ModeloOtimizacao::criarRestricoesTurbinamentoHidraulico(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga) {
 
 	try {
 
@@ -1630,13 +1631,13 @@ void ModeloOtimizacao::criarRestricoesTurbinamentoHidraulico(const TipoSubproble
 
 				const int posEquQTUR = addEquLinear_VAZAO_TURBINADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTUR, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTUR, 0.0);
 
 				// Variável Turbinamento Hidraulico QTUR
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQTUR, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQTUR, 1.0);
 
 				for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= a_dados.getMaiorId(a_idHidreletrica, IdConjuntoHidraulico()); idConjuntoHidraulico++)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTUR, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTUR, -1.0);
 
 			} // if ((tipo_detalhamento_producao == TipoDetalhamentoProducaoHidreletrica_por_conjunto) || (tipo_detalhamento_producao == TipoDetalhamentoProducaoHidreletrica_por_unidade)) {
 
@@ -1647,13 +1648,13 @@ void ModeloOtimizacao::criarRestricoesTurbinamentoHidraulico(const TipoSubproble
 
 			const int posIneQTUR_FINF = addIneLinear_VAZAO_TURBINADA_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQTUR_FINF, a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_turbinada_minima, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQTUR_FINF, a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_turbinada_minima, a_periodo_estudo, double()));
 
 			// Variável Turbinamento Hidraulico QTUR
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQTUR_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQTUR_FINF, 1.0);
 
 			// Variável Turbinamento Hidraulico Folga Minima QTUR_FINF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQTUR_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQTUR_FINF, 1.0);
 
 		} // if (getVarDecisao_QTUR_RELseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1){
 
@@ -1662,13 +1663,13 @@ void ModeloOtimizacao::criarRestricoesTurbinamentoHidraulico(const TipoSubproble
 
 			const int posIneQTURDISP_FINF = addIneLinear_VAZAO_TURBINADA_DISPONIVEL_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQTURDISP_FINF, a_dados.getElementoMatriz(a_idHidreletrica, AttMatrizHidreletrica_vazao_turbinada_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneQTURDISP_FINF, a_dados.getElementoMatriz(a_idHidreletrica, AttMatrizHidreletrica_vazao_turbinada_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 			// Variável Turbinamento Hidraulico QTURDISP
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQTURDISP_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQTURDISP_FINF, 1.0);
 
 			// Variável Turbinamento Hidraulico Folga Minima QTURDISP_FINF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQTURDISP_FINF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posIneQTURDISP_FINF, 1.0);
 
 		} // if (getVarDecisao_QTURDISP_RELseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1){
 
@@ -1677,23 +1678,23 @@ void ModeloOtimizacao::criarRestricoesTurbinamentoHidraulico(const TipoSubproble
 
 			const int posEquQTURDISP = addEquLinear_VAZAO_TURBINADA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTURDISP, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTURDISP, 0.0);
 
 			// Variável Turbinamento Hidraulico QTURDISP
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQTURDISP, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQTURDISP, 1.0);
 
 			if (tipo_detalhamento_producao == TipoDetalhamentoProducaoHidreletrica_por_usina)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQTURDISP, -a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_disponibilidade, a_periodo_estudo, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQTURDISP, -a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_disponibilidade, a_periodo_estudo, double()));
 
 			else if (tipo_detalhamento_producao == TipoDetalhamentoProducaoHidreletrica_por_conjunto) {
 				for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= a_dados.getMaiorId(a_idHidreletrica, IdConjuntoHidraulico()); idConjuntoHidraulico++)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTURDISP, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTURDISP, -1.0);
 			} // else if (tipo_detalhamento_producao == TipoDetalhamentoProducaoHidreletrica_por_conjunto) {
 
 			else if (tipo_detalhamento_producao == TipoDetalhamentoProducaoHidreletrica_por_unidade) {
 				for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= a_dados.getMaiorId(a_idHidreletrica, IdConjuntoHidraulico()); idConjuntoHidraulico++) {
 					for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(a_idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquQTURDISP, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquQTURDISP, -1.0);
 				}
 			} // else if (tipo_detalhamento_producao == TipoDetalhamentoProducaoHidreletrica_por_unidade) {
 
@@ -1712,13 +1713,13 @@ void ModeloOtimizacao::criarRestricoesTurbinamentoHidraulico(const TipoSubproble
 
 					const int posEquQTUR = addEquLinear_VAZAO_TURBINADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTUR, 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTUR, 0.0);
 
 					// Variável Turbinamento Hidraulico QTUR
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTUR, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTUR, 1.0);
 
 					for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(a_idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquQTUR, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquQTUR, -1.0);
 
 				} // if (tipo_detalhamento_producao == TipoDetalhamentoProducaoHidreletrica_por_unidade) {
 
@@ -1729,13 +1730,13 @@ void ModeloOtimizacao::criarRestricoesTurbinamentoHidraulico(const TipoSubproble
 
 				const int posEquQTUR_FINF = addEquLinear_VAZAO_TURBINADA_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTUR_FINF, a_dados.getElementoVetor(a_idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_vazao_turbinada_minima, a_periodo_estudo, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTUR_FINF, a_dados.getElementoVetor(a_idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_vazao_turbinada_minima, a_periodo_estudo, double()));
 
 				// Variável Turbinamento Hidraulico QTUR
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTUR_FINF, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTUR_FINF, -1.0);
 
 				// Variável Turbinamento Hidraulico Folga Minima QTUR_FINF
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTUR_FINF, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTUR_FINF, -1.0);
 
 			} // if (getVarDecisao_QTUR_FINFseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico) > -1) {
 
@@ -1744,12 +1745,12 @@ void ModeloOtimizacao::criarRestricoesTurbinamentoHidraulico(const TipoSubproble
 
 				const int posEquQTURDISP = addEquLinear_VAZAO_TURBINADA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTURDISP, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTURDISP, 0.0);
 
 				// Variável Turbinamento Hidraulico QTURDISP
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTURDISP, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTURDISP, 1.0);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTURDISP, -a_dados.getElementoVetor(a_idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_disponibilidade, a_periodo_estudo, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquQTURDISP, -a_dados.getElementoVetor(a_idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_disponibilidade, a_periodo_estudo, double()));
 
 			} // if (getVarDecisao_QTURDISPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico) > -1){
 
@@ -1764,13 +1765,13 @@ void ModeloOtimizacao::criarRestricoesTurbinamentoHidraulico(const TipoSubproble
 
 					const int posEquQTUR_FINF = addEquLinear_VAZAO_TURBINADA_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTUR_FINF, a_dados.getElementoVetor(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttVetorUnidadeUHE_vazao_turbinada_minima, a_periodo_estudo, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTUR_FINF, a_dados.getElementoVetor(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttVetorUnidadeUHE_vazao_turbinada_minima, a_periodo_estudo, double()));
 
 					// Variável Turbinamento Hidraulico QTUR
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquQTUR_FINF, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquQTUR_FINF, 1.0);
 
 					// Variável Turbinamento Hidraulico Folga Minima QTUR_FINF
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquQTUR_FINF, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquQTUR_FINF, 1.0);
 
 				} // if (getVarDecisao_QTUR_FINFseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1) {
 
@@ -1779,12 +1780,12 @@ void ModeloOtimizacao::criarRestricoesTurbinamentoHidraulico(const TipoSubproble
 
 					const int posEquQTURDISP = addEquLinear_VAZAO_TURBINADA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTURDISP, 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQTURDISP, 0.0);
 
 					// Variável Turbinamento Hidraulico QTURDISP
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquQTURDISP, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquQTURDISP, 1.0);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquQTURDISP, -a_dados.getElementoVetor(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttVetorUnidadeUHE_disponibilidade, a_periodo_estudo, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquQTURDISP, -a_dados.getElementoVetor(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttVetorUnidadeUHE_disponibilidade, a_periodo_estudo, double()));
 
 				} // if (getVarDecisao_QTURDISPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1){
 
@@ -1808,14 +1809,14 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 
 		const IdProcessoEstocastico idProcEstocastico = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
 
-		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
+		Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
 
 		SmartEnupla<Periodo, double> horizonte_estudo            = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_estudo, a_idEstagio, Periodo(), double());
 		SmartEnupla<Periodo, int> horizonte_processo_estocastico = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo(), int());
 
 		const TipoLagAutocorrelacao tipo_lag_autocorrelacao = getAtributo(idProcEstocastico, AttComumProcessoEstocastico_tipo_lag_autocorrelacao, TipoLagAutocorrelacao());
 
-		const double infinito = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
+		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
 		for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= getMaiorId(idProcEstocastico, IdVariavelAleatoria()); idVariavelAleatoria++) {
 
@@ -1837,9 +1838,9 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 				// varRP
 				const int varRP = addVarDecisao_RP(a_TSS, a_idEstagio, periodo_otimizacao, periodo_processo_estocastico, idProcEstocastico, idVariavelAleatoria, -infinito, infinito, 0.0);
 
-				vetorEstagio.att(a_idEstagio).addVariavelRealizacao(a_TSS, getNomeVarDecisao_RP(a_TSS, a_idEstagio, periodo_otimizacao, periodo_processo_estocastico, idProcEstocastico, idVariavelAleatoria), varRP, idProcEstocastico, idVariavelAleatoria, periodo_processo_estocastico, 1.0);
+				vetorEstagio.at(a_idEstagio).addVariavelRealizacao(a_TSS, getNomeVarDecisao_RP(a_TSS, a_idEstagio, periodo_otimizacao, periodo_processo_estocastico, idProcEstocastico, idVariavelAleatoria), varRP, idProcEstocastico, idVariavelAleatoria, periodo_processo_estocastico, 1.0);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varRP);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varRP);
 
 				// varYP
 				const int varYP = addVarDecisao_YP(a_TSS, a_idEstagio, periodo_otimizacao, periodo_processo_estocastico, idProcEstocastico, idVariavelAleatoria, -infinito, infinito, 0.0);
@@ -1847,11 +1848,11 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 				// Restricao YP (YP = RP + SOMA(fp*YPt-1))
 				const int posEquYP = addEquLinear_YP(a_TSS, a_idEstagio, periodo_otimizacao, periodo_processo_estocastico, idProcEstocastico, idVariavelAleatoria);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, posEquYP, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, posEquYP, 1.0);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRP, posEquYP, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRP, posEquYP, -1.0);
 
-				const double grau_liberdade_var_aleatoria = vetorProcessoEstocastico.att(idProcEstocastico).getGrauLiberdade(idVariavelAleatoria);
+				const double grau_liberdade_var_aleatoria = vetorProcessoEstocastico.at(idProcEstocastico).getGrauLiberdade(idVariavelAleatoria);
 
 				// Variável do Processo Estocástico Hidrológico YP lag = 0 ... lag = np
 				if (getSize1Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) > 0) {
@@ -1863,7 +1864,7 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 							Periodo periodo_lag = periodo_processo_estocastico - lag;
 
 							int var_YP_LAG = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, a_idEstagio, periodo_otimizacao, idProcEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade_var_aleatoria);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(var_YP_LAG, posEquYP, -getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_processo_estocastico, lag, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(var_YP_LAG, posEquYP, -getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_processo_estocastico, lag, double()));
 
 						} // if (getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_processo_estocastico, lag, double()) > 0.0){
 					} // for (int lag = 1; lag <= getSize2Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, periodo_processo_estocastico.getEstacao()); lag++) {
@@ -1896,13 +1897,13 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 							// Restricao Afluencia Incremental: definida por periodo estudo
 							const int posEquYH = addEquLinear_AFLUENCIA_INCREMENTAL(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica);
 
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquYH, -grau_liberdade * sobreposicao);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquYH, -grau_liberdade * sobreposicao);
 
 							// Variável YH
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYH, posEquYH, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYH, posEquYH, 1.0);
 
 							// Variável YP
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, posEquYH, -coeficiente_participacao * sobreposicao);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, posEquYH, -coeficiente_participacao * sobreposicao);
 
 							if (tipo_relaxacao != TipoRelaxacaoVariavelAleatoria_sem_relaxacao) {
 
@@ -1920,9 +1921,9 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 											else if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 												varYHF = addVarDecisao_YHF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica, 0.0, infinito, 100.0);
 
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYHF);
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYHF);
 
-											vetorEstagio.att(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeVarDecisao_YHF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), varYHF, idProcEstocastico, idVariavelAleatoria, idVarInt, periodo_processo_estocastico, sobreposicao, TipoValor_positivo, 1.0, 1.0);
+											vetorEstagio.at(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeVarDecisao_YHF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), varYHF, idProcEstocastico, idVariavelAleatoria, idVarInt, periodo_processo_estocastico, sobreposicao, TipoValor_positivo, 1.0, 1.0);
 
 										} // if (viabilidade_hidraulica) {
 
@@ -1934,7 +1935,7 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 
 									// Variável Afluencia Incremental Folga (YHF): definida por periodo estudo
 									if (varYHF > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYHF, posEquYH, -sobreposicao);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYHF, posEquYH, -sobreposicao);
 
 								} // if (true) {
 
@@ -1944,9 +1945,9 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 								if (varYPF == -1) {
 									if ((tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento) || (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao)) {
 										varYPF = addVarDecisao_YPF(a_TSS, a_idEstagio, periodo_otimizacao, periodo_processo_estocastico, idProcEstocastico, idVariavelAleatoria, 0.0, 0.0, 0.0);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYPF);
-										vetorEstagio.att(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeVarDecisao_YPF(a_TSS, a_idEstagio, periodo_otimizacao, periodo_processo_estocastico, idProcEstocastico, idVariavelAleatoria), varYPF, idProcEstocastico, idVariavelAleatoria, IdVariavelAleatoriaInterna_Nenhum, periodo_processo_estocastico, sobreposicao, TipoValor_positivo, 1.0, 1.0);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYPF, posEquYP, -1.0);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYPF);
+										vetorEstagio.at(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeVarDecisao_YPF(a_TSS, a_idEstagio, periodo_otimizacao, periodo_processo_estocastico, idProcEstocastico, idVariavelAleatoria), varYPF, idProcEstocastico, idVariavelAleatoria, IdVariavelAleatoriaInterna_Nenhum, periodo_processo_estocastico, sobreposicao, TipoValor_positivo, 1.0, 1.0);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYPF, posEquYP, -1.0);
 									}
 
 								} // if (varYPF == -1) {
@@ -1972,7 +1973,7 @@ void ModeloOtimizacao::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidro
 }
 
 
-void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_estagio_final, const IdHidreletrica a_maiorIdHidreletrica, const Periodo a_periodo_otimizacao, const SmartEnupla<Periodo, double> a_horizonte_estudo_estagio, const  IdProcessoEstocastico a_tipo_processo_estocastico_hidrologico) {
+void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_estagio_final, const IdHidreletrica a_maiorIdHidreletrica, Periodo &a_periodo_otimizacao, const SmartEnupla<Periodo, double> &a_horizonte_estudo_estagio, const  IdProcessoEstocastico a_tipo_processo_estocastico_hidrologico) {
 
 	try {
 
@@ -1989,17 +1990,17 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 
 				const int posEquZT = addEquLinear_CUSTO_TOTAL(a_TSS, a_idEstagio, a_periodo_otimizacao);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZT, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZT, 0.0);
 
 				// Variável ZT
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZT, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZT, 1.0);
 
 				// Variável ZI
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZI(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZT, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZI(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZT, -1.0);
 
 				// Variável ZF
 				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio, a_periodo_otimizacao) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZT, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZT, -1.0);
 
 
 			} // try{
@@ -2022,22 +2023,22 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 
 					const int posEquZF = addEquLinear_CUSTO_FUTURO(a_TSS, a_idEstagio, a_periodo_otimizacao);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZF, 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZF, 0.0);
 
 					// Variável ZF
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZF, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZF, 1.0);
 
 					for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getAtributo(idEstagio_seguinte, AttComumEstagio_maiorIdRealizacao, IdRealizacao()); idRealizacao++) {
 
 						if (multiplicidade_corte == 0) {//Single cut
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, a_periodo_otimizacao, idRealizacao), posEquZF, -1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, a_periodo_otimizacao, idRealizacao), posEquZF, -1.0);
 							break;
 						}
 						else if (multiplicidade_corte > 0) {//Multi cut
 
 							const double probabilidade_abertura = getElementoMatriz(a_tipo_processo_estocastico_hidrologico, AttMatrizProcessoEstocastico_probabilidade_realizacao, periodo_otimizacao_seguinte, idRealizacao, double());
 
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, a_periodo_otimizacao, idRealizacao), posEquZF, -probabilidade_abertura);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio, a_periodo_otimizacao, idRealizacao), posEquZF, -probabilidade_abertura);
 
 						}//else if (multiplicidade_corte > 0) {
 
@@ -2056,16 +2057,16 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 
 				const int posEquZI = addEquLinear_CUSTO_IMEDIATO(a_TSS, a_idEstagio, a_periodo_otimizacao);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZI, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZI, 0.0);
 
 				// Variável ZI
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZI(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZI, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZI(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZI, 1.0);
 
 				// Variável ZP0
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZI, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZI, -1.0);
 
 				// Variável ZO0
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZI, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZI, -1.0);
 
 			} // try{
 			catch (const std::exception& erro) { throw std::invalid_argument("Restricao Custo Presente: \n" + std::string(erro.what())); }
@@ -2079,15 +2080,15 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 
 				const int posEquZP0 = addEquLinear_CUSTO_PENALIDADE_0(a_TSS, a_idEstagio, a_periodo_otimizacao);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZP0, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZP0, 0.0);
 
 				// Variável ZP0
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZP0, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZP0, 1.0);
 
 				// Variável ZP0p
 				for (Periodo periodo_estudo = a_horizonte_estudo_estagio.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo_estagio.getIteradorFinal(); a_horizonte_estudo_estagio.incrementarIterador(periodo_estudo)) {
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0p(a_TSS, a_idEstagio, periodo_estudo), posEquZP0, -double(double(periodo_estudo.getSegundos()) / 3600.0));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0p(a_TSS, a_idEstagio, periodo_estudo), posEquZP0, -double(double(periodo_estudo.getSegundos()) / 3600.0));
 				}
 
 			} // try{
@@ -2102,14 +2103,14 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 
 				const int posEquZO0 = addEquLinear_CUSTO_OPERACAO_0(a_TSS, a_idEstagio, a_periodo_otimizacao);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZO0, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZO0, 0.0);
 
 				// Variável ZO0
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZO0, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZO0, 1.0);
 
 				// Variável ZO0p
 				for (Periodo periodo_estudo = a_horizonte_estudo_estagio.getIteradorInicial(); periodo_estudo <= a_horizonte_estudo_estagio.getIteradorFinal(); a_horizonte_estudo_estagio.incrementarIterador(periodo_estudo))
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0p(a_TSS, a_idEstagio, periodo_estudo), posEquZO0, -double(double(periodo_estudo.getSegundos()) / 3600.0));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0p(a_TSS, a_idEstagio, periodo_estudo), posEquZO0, -double(double(periodo_estudo.getSegundos()) / 3600.0));
 
 			} // try{
 			catch (const std::exception& erro) { throw std::invalid_argument("Restricao CUSTO_OPERACAO_0: \n" + std::string(erro.what())); }
@@ -2128,22 +2129,22 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 
 				const int posEquZT = addEquLinear_CUSTO_TOTAL_MESTRE(a_TSS, a_idEstagio, a_periodo_otimizacao);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZT, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZT, 0.0);
 
 				// Variável ZT
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZT, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao), posEquZT, 1.0);
 
 				for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getAtributo(a_idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()); idRealizacao++) {
 
 					if (multiplicidade_corte == 0){//Single cut{
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao, idRealizacao), posEquZT, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao, idRealizacao), posEquZT, -1.0);
 						break;
 					}
 					else if (multiplicidade_corte > 0) {//Multi cut
 
 						const double probabilidade_abertura = getElementoMatriz(a_tipo_processo_estocastico_hidrologico, AttMatrizProcessoEstocastico_probabilidade_realizacao, a_periodo_otimizacao, idRealizacao, double());
 
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao, idRealizacao), posEquZT, -probabilidade_abertura);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, a_periodo_otimizacao, idRealizacao), posEquZT, -probabilidade_abertura);
 
 					}//else if (multiplicidade_corte > 0) {
 
@@ -2160,7 +2161,7 @@ void ModeloOtimizacao::criarRestricoesCusto_Total_Imediato_Futuro(const TipoSubp
 }
 
 
-void ModeloOtimizacao::criarRestricoesCusto_periodo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo) {
+void ModeloOtimizacao::criarRestricoesCusto_periodo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo) {
 
 	try {
 
@@ -2180,17 +2181,17 @@ void ModeloOtimizacao::criarRestricoesCusto_periodo(const TipoSubproblemaSolver 
 
 			const int posEquZPp = addEquLinear_CUSTO_PENALIDADE_p(a_TSS, a_idEstagio, a_periodo_estudo);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZPp, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZPp, 0.0);
 
 			// Variável ZP Por PeriodoEstudo
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZPp(a_TSS, a_idEstagio, a_periodo_estudo), posEquZPp, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZPp(a_TSS, a_idEstagio, a_periodo_estudo), posEquZPp, 1.0);
 
 			// Variável ZP Por PeriodoEstudo Por PatamarCarga
 			for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga), posEquZPp, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga), posEquZPp, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double()));
 
 			// Variável ZP Por PeriodoEstudo (para variáveis que não dependem do patamar de carga, ex, restrições de volume mínimo, evaporação)
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo), posEquZPp, -1);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo), posEquZPp, -1);
 
 		}
 
@@ -2202,14 +2203,14 @@ void ModeloOtimizacao::criarRestricoesCusto_periodo(const TipoSubproblemaSolver 
 
 			const int posEquZOp = addEquLinear_CUSTO_OPERACAO_p(a_TSS, a_idEstagio, a_periodo_estudo);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZOp, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZOp, 0.0);
 
 			// Variável ZO Por PeriodoEstudo
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZOp(a_TSS, a_idEstagio, a_periodo_estudo), posEquZOp, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZOp(a_TSS, a_idEstagio, a_periodo_estudo), posEquZOp, 1.0);
 
 			// Variável ZO Por PeriodoEstudo Por PatamarCarga
 			for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga), posEquZOp, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga), posEquZOp, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double()));
 
 		}
 
@@ -2220,7 +2221,7 @@ void ModeloOtimizacao::criarRestricoesCusto_periodo(const TipoSubproblemaSolver 
 }
 
 
-void ModeloOtimizacao::criarRestricoesCustoValorPresente_periodo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo) {
+void ModeloOtimizacao::criarRestricoesCustoValorPresente_periodo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo) {
 
 	try {
 
@@ -2238,13 +2239,13 @@ void ModeloOtimizacao::criarRestricoesCustoValorPresente_periodo(const TipoSubpr
 
 			const int posEquZP0p = addEquLinear_CUSTO_PENALIDADE_0p(a_TSS, a_idEstagio, a_periodo_estudo);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZP0p, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZP0p, 0.0);
 
 			// Variável ZP0p
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0p(a_TSS, a_idEstagio, a_periodo_estudo), posEquZP0p, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP0p(a_TSS, a_idEstagio, a_periodo_estudo), posEquZP0p, 1.0);
 
 			// Variável ZPp
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZPp(a_TSS, a_idEstagio, a_periodo_estudo), posEquZP0p, -a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZPp(a_TSS, a_idEstagio, a_periodo_estudo), posEquZP0p, -a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, a_periodo_estudo, double()));
 
 		}
 
@@ -2256,13 +2257,13 @@ void ModeloOtimizacao::criarRestricoesCustoValorPresente_periodo(const TipoSubpr
 
 			const int posEquZO0p = addEquLinear_CUSTO_OPERACAO_0p(a_TSS, a_idEstagio, a_periodo_estudo);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZO0p, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZO0p, 0.0);
 
 			// Variável ZO0p
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0p(a_TSS, a_idEstagio, a_periodo_estudo), posEquZO0p, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO0p(a_TSS, a_idEstagio, a_periodo_estudo), posEquZO0p, 1.0);
 
 			// Variável ZOp
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZOp(a_TSS, a_idEstagio, a_periodo_estudo), posEquZO0p, -a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZOp(a_TSS, a_idEstagio, a_periodo_estudo), posEquZO0p, -a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, a_periodo_estudo, double()));
 
 		}
 
@@ -2273,7 +2274,7 @@ void ModeloOtimizacao::criarRestricoesCustoValorPresente_periodo(const TipoSubpr
 }
 
 
-void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
 
 	try {
 
@@ -2295,11 +2296,11 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 		if ((getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1) && (tipo_detalhamento_producao != TipoDetalhamentoProducaoHidreletrica_por_usina)) {
 
 			const int posEquPH = addEquLinear_POTENCIA_HIDRAULICA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPH, 0.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPH, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPH, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPH, 1.0);
 			for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= a_dados.getMaiorId(a_idHidreletrica, IdConjuntoHidraulico()); idConjuntoHidraulico++)
 				if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPH, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPH, -1.0);
 
 		} // if (getVarDecisao_PHseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1){
 
@@ -2309,10 +2310,10 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 
 			const int posEquPH_REL = addEquLinear_POTENCIA_HIDRAULICA_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPH_REL, 0.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPH_REL, 1.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPH_REL, -1.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPH_REL, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPH_REL, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPH_REL, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPH_REL, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPH_REL, -1.0);
 
 		} // if (getVarDecisao_PH_RELseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1) {
 
@@ -2321,22 +2322,22 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 
 			const int posEquPHDISP = addEquLinear_POTENCIA_HIDRAULICA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP, 0.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPHDISP, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPHDISP, 1.0);
 
 			if (tipo_detalhamento_producao == TipoDetalhamentoProducaoHidreletrica_por_usina) {
 
 				//if (a_dados.getAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, bool()))
-					//vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPHDISP, -1.0);
+					//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPHDISP, -1.0);
 				//else	
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPHDISP, -a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_disponibilidade, a_periodo_estudo, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPHDISP, -a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_disponibilidade, a_periodo_estudo, double()));
 
 			}
 
 			else {
 				for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= a_dados.getMaiorId(a_idHidreletrica, IdConjuntoHidraulico()); idConjuntoHidraulico++)
 					if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP, -1.0);
 			}
 
 		} // if (getVarDecisao_PHDISPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1) {
@@ -2346,10 +2347,10 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 
 			const int posEquPHDISP_REL = addEquLinear_POTENCIA_HIDRAULICA_DISPONIVEL_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP_REL, 0.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPHDISP_REL, 1.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPHDISP_REL, -1.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPHDISP_REL, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP_REL, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPHDISP_REL, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPHDISP_REL, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquPHDISP_REL, -1.0);
 
 		} // if (getVarDecisao_PHDISP_RELseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1) {
 
@@ -2364,12 +2365,12 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 
 				const int posEquPH = addEquLinear_POTENCIA_HIDRAULICA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPH, 0.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPH, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPH, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPH, 1.0);
 
 				for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(a_idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++)
 					if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPH, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPH, -1.0);
 
 			} // if (getVarDecisao_PHseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico) > -1){
 
@@ -2378,10 +2379,10 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 
 				const int posEquPH_REL = addEquLinear_POTENCIA_HIDRAULICA_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPH_REL, 0.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPH_REL, 1.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPH_REL, -1.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPH_REL, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPH_REL, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPH_REL, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPH_REL, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPH_REL, -1.0);
 
 			} // if (getVarDecisao_PH_RELseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico) > -1) {
 
@@ -2390,13 +2391,13 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 
 				const int posEquPHDISP = addEquLinear_POTENCIA_HIDRAULICA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP, 0.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP, 1.0);
 
 				if (a_dados.getAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, bool()))
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP, -1.0);
 				else
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP, -a_dados.getElementoVetor(a_idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_disponibilidade, a_periodo_estudo, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP, -a_dados.getElementoVetor(a_idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_disponibilidade, a_periodo_estudo, double()));
 
 			} // if (getVarDecisao_PHDISPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico) > -1) {
 
@@ -2404,12 +2405,12 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 
 				const int posEquPHDISP = addEquLinear_POTENCIA_HIDRAULICA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP, 0.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP, 1.0);
 
 				for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(a_idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++)
 					if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP, -1.0);
 
 			} // if (getVarDecisao_PHDISPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico) > -1) {
 
@@ -2418,10 +2419,10 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 
 				const int posEquPHDISP_REL = addEquLinear_POTENCIA_HIDRAULICA_DISPONIVEL_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP_REL, 0.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP_REL, 1.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP_REL, -1.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP_REL, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP_REL, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP_REL, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP_REL, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posEquPHDISP_REL, -1.0);
 
 			} // if (getVarDecisao_PHDISP_RELseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico) > -1) {
 
@@ -2439,10 +2440,10 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 
 					const int posEquPH_REL = addEquLinear_POTENCIA_HIDRAULICA_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPH_REL, 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPH_REL, 1.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPH_REL, -1.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPH_REL, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPH_REL, 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPH_REL, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPH_REL, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPH_REL, -1.0);
 
 				} // if (getVarDecisao_PH_RELseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1) {
 
@@ -2451,13 +2452,13 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 
 					const int posEquPHDISP = addEquLinear_POTENCIA_HIDRAULICA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP, 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP, 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP, 1.0);
 
 					if (a_dados.getAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, bool()))
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP, -1.0);
 					else
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP, -a_dados.getElementoVetor(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttVetorUnidadeUHE_disponibilidade, a_periodo_estudo, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP, -a_dados.getElementoVetor(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttVetorUnidadeUHE_disponibilidade, a_periodo_estudo, double()));
 
 				} // if (getVarDecisao_PHDISPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1) {
 
@@ -2466,10 +2467,10 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 
 					const int posEquPHDISP_REL = addEquLinear_POTENCIA_HIDRAULICA_DISPONIVEL_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP_REL, 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP_REL, 1.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP_REL, -1.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP_REL, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP_REL, 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP_REL, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP_REL, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquPHDISP_REL, -1.0);
 
 				} // if (getVarDecisao_PHDISP_RELseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1) {
 
@@ -2484,7 +2485,7 @@ void ModeloOtimizacao::criarRestricoesPotenciaHidraulicaDisponivel(const TipoSub
 }
 
 
-void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdTermeletrica a_maiorIdTermeletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo, const IdTermeletrica a_maiorIdTermeletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
 	try {
 
 		if (a_TSS == TipoSubproblemaSolver_mestre)
@@ -2512,19 +2513,19 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 				//EQUAÇÃO  POTÊNCIA GERADA (PT - PT_UTIL- POTENCIA_MINIMA*LIG_T == 0) 
 				const int posEquPT_UTIL = addEquLinear_POTENCIA_TERMICA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPT_UTIL, 0.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPT_UTIL, 1.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_UTIL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPT_UTIL, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPT_UTIL, 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPT_UTIL, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_UTIL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPT_UTIL, -1.0);
 
 				if (getVarDecisao_LIG_TseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPT_UTIL, -a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPT_UTIL, -a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 
 				if (a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()) > 0.0) {
 					const int posEquPT_REL = addEquLinear_POTENCIA_TERMICA_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPT_REL, 1.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPT_REL, -1.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPT_REL, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPT_REL, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPT_REL, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPT_REL, -1.0);
 				}
 
 
@@ -2532,16 +2533,16 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 					if (getVarDecisao_PTDISP_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1) {
 						const int posEquPTDISP_FINF = addIneLinear_POTENCIA_TERMICA_DISPONIVEL_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPTDISP_FINF, a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPTDISP_FINF, 1.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPTDISP_FINF, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPTDISP_FINF, a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPTDISP_FINF, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPTDISP_FINF, 1.0);
 					}
 
 					if (getVarDecisao_PTDISP_FSUPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1) {
 						const int posEquPTDISP_FSUP = addIneLinear_POTENCIA_TERMICA_DISPONIVEL_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPTDISP_FSUP, -a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPTDISP_FSUP, 1.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPTDISP_FSUP, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPTDISP_FSUP, -a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPTDISP_FSUP, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPTDISP_FSUP, -1.0);
 					}
 				}
 
@@ -2556,16 +2557,16 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 					const int posEquPTDISP = addEquLinear_POTENCIA_TERMICA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPTDISP, 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPTDISP, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPTDISP, 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPTDISP, 1.0);
 
 					if (tipo_detalhamento_producao == TipoDetalhamentoProducaoTermeletrica_por_usina)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPTDISP, -a_dados.getElementoVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade, a_periodo_estudo, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquPTDISP, -a_dados.getElementoVetor(idTermeletrica, AttVetorTermeletrica_disponibilidade, a_periodo_estudo, double()));
 
 					else {
 						for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= a_dados.getMaiorId(idTermeletrica, IdUnidadeUTE()); idUnidadeUTE++)
 							if (getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE) > -1)
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPTDISP, -1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPTDISP, -1.0);
 					}
 				}
 
@@ -2579,10 +2580,10 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 				const int equPTDISPCOM_pat = addEquLinear_POTENCIA_TERMICA_DISPONIVEL_COMANDADA_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISPCOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), equPTDISPCOM_pat, 1.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), equPTDISPCOM_pat, 1.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), equPTDISPCOM_pat, -1.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), equPTDISPCOM_pat, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISPCOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), equPTDISPCOM_pat, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), equPTDISPCOM_pat, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), equPTDISPCOM_pat, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), equPTDISPCOM_pat, -1.0);
 
 			} // if (getVarDecisao_PTDISPCOMseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1) {
 
@@ -2595,18 +2596,18 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 					//EQUAÇÃO  POTÊNCIA GERADA (PT - PT_UTIL- POTENCIA_UTIL*LIG_T == 0)
 					const int posEquPT_UTIL = addEquLinear_POTENCIA_TERMICA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPT_UTIL, 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPT_UTIL, 1.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_UTIL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPT_UTIL, -1.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPT_UTIL, -a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPT_UTIL, 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPT_UTIL, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_UTIL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPT_UTIL, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPT_UTIL, -a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 
 					// REPRESENTAÇÃO DISCRETA (COM VARIAVEL BINÁRIA)
 					if (a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_representacao_discreta_producao, bool())) {
 
 
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_ACIO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPT_UTIL, -1.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_DESL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPT_UTIL, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_ACIO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPT_UTIL, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_DESL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPT_UTIL, -1.0);
 
 
 						Periodo periodo_estudo_anterior = a_periodo_estudo;
@@ -2616,19 +2617,19 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 						int tOf = a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_t_of, int()) + int((a_dados.getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_acionamento) + a_dados.getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_desligamento)) / 2);
 
 						// SET VARIAVEIS COMO BINÁRIA
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setTipoVariavelBinaria(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE));
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setTipoVariavelBinaria(getVarDecisao_DESL_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE));
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setTipoVariavelBinaria(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setTipoVariavelBinaria(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setTipoVariavelBinaria(getVarDecisao_DESL_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setTipoVariavelBinaria(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE));
 
 
 						// RELAÇÃO ENTRE AS VARIAVEIS BINÁRIAS 
 						const int posEquVAR_BINARIAS = addEquLinear_RELACAO_VARIAVEIS_BINARIAS_TERMICA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquVAR_BINARIAS, 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquVAR_BINARIAS, 1.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquVAR_BINARIAS, -1.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquVAR_BINARIAS, -1.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquVAR_BINARIAS, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquVAR_BINARIAS, 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquVAR_BINARIAS, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquVAR_BINARIAS, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquVAR_BINARIAS, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquVAR_BINARIAS, 1.0);
 
 
 						// CONDIÇÕES INICIAIS
@@ -2636,29 +2637,29 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 						if (a_periodo_estudo == (a_horizonte_estudo_estagio.getIteradorInicial())) {
 
 							// SET VARIAVEIS BINÁRIAS
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setTipoVariavelBinaria(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE));
-							//vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setTipoVariavelBinaria(getVarDecisao_ACIO_T(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setTipoVariavelBinaria(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE));
+							//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setTipoVariavelBinaria(getVarDecisao_ACIO_T(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE));
 
 							// ESTADO DA UNIDADE NO PERIODO ANTERIOR AO ESTUDO (p0 -1)
 							if (a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_status, TipoStatusUnidadeUTE()) == TipoStatusUnidadeUTE_ligada) {
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 1.0);
-								//vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PT_UTIL(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_geracao_inicial, double()) - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
-								//vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_UTIL(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_geracao_inicial, double()) - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 1.0);
+								//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PT_UTIL(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_geracao_inicial, double()) - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+								//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_UTIL(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_geracao_inicial, double()) - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 							}
 
 							else if (a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_status, TipoStatusUnidadeUTE()) == TipoStatusUnidadeUTE_desligada) {
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
-								//vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PT_UTIL(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
-								//vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_UTIL(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+								//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PT_UTIL(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+								//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_UTIL(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
 							}
 
 							//	// VERIFICA SE A UNIDADE FOI ACIONADA NO PERIODO ANTERIOR AO ESTUDO (p0 - 1)
 							//	if (((a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_horas_neste_status, int()) == 1) || ((a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_horas_neste_status, int()) == 1) && (a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_min_neste_status, int()) == 30))) && (a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_status, TipoStatusUnidadeUTE()) == TipoStatusUnidadeUTE_ligada))
-							//		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_ACIO_T(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 1.0);
+							//		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_ACIO_T(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 1.0);
 
 							//	else
-							//		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_ACIO_T(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+							//		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_ACIO_T(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
 
 						}// if (a_periodo_estudo == (a_horizonte_estudo_estagio.getIteradorInicial())) {
 
@@ -2666,18 +2667,18 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 						//INEQUAÇÃO QUE ASSEGURA GERAÇÃO MINIMA QUANDO A UNIDADE É LIGADA  (PT_UTIL - POTENCIA_UTIL*LIG_T + POTENCIA_UTIL*ACIO_T <= 0) 
 						//*************************************************************************************************************************************************************
 						const int posInePT_PARTIDA = addIneLinear_POTENCIA_TERMELETRICA_PARTIDA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_PARTIDA, 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_UTIL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_PARTIDA, -1.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_PARTIDA, +a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_PARTIDA, 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_UTIL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_PARTIDA, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_PARTIDA, +a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
 
 						//
 						////INEQUAÇÃO QUE ASSEGURA GERAÇÃO MINIMA QUANDO A UNIDADE É LIGADA  (PT_UTIL - POTENCIA_UTIL*LIG_T + POTENCIA_UTIL*ACIO_T <= 0) 
 						////*************************************************************************************************************************************************************
 						//const int posInePT_PARTIDA = addIneLinear_POTENCIA_TERMELETRICA_PARTIDA(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
-						//vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_PARTIDA, 0.0);
-						//vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_UTIL(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_PARTIDA, - 1.0);
-						//vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(  a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_PARTIDA, + a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
-						//vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T( a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_PARTIDA, - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
+						//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_PARTIDA, 0.0);
+						//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_UTIL(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_PARTIDA, - 1.0);
+						//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(  a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_PARTIDA, + a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
+						//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T( a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_PARTIDA, - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
 
 
 						////INEQUAÇÃO QUE ASSEGURA GERAÇÃO MINIMA QUANDO A UNIDADE É DESLIGADA  
@@ -2685,21 +2686,21 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 						//if (tOn <= 1) {	// PARA UNIDADES COM TLIG <= 1 (PT_UTIL(p-1) - POTENCIA_UTIL*LIG_T(p-1) + POTENCIA_UTIL*DESL_T <= 0)				 				
 
 						//	const int posInePT_DESLIGAMENTO = addIneLinear_POTENCIA_TERMELETRICA_DESLIGAMENTO(a_idEstagio, a_periodo_estudo , a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
-						//	vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_DESLIGAMENTO, 0.0);
-						//	vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_UTIL(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO, - 1.0);
-						//	vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(  a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO,  a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
-						//	vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T( a_idEstagio,        a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO, - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
+						//	vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_DESLIGAMENTO, 0.0);
+						//	vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_UTIL(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO, - 1.0);
+						//	vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(  a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO,  a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
+						//	vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T( a_idEstagio,        a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO, - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
 						//												
 						//} //if (tOn <= 1) {					
 						//
 						//else if (tOn > 1) {	 // PARA UNIDADES COM TLIG > 1 (PT_UTIL(p-1) - POTENCIA_UTIL*LIG_T(p-1)  + POTENCIA_UTIL*ACIO_T(p-1) + POTENCIA_UTIL*DESL_T <= 0)
 						//	
 						//		const int posInePT_DESLIGAMENTO = addIneLinear_POTENCIA_TERMELETRICA_DESLIGAMENTO(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
-						//		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_DESLIGAMENTO, 0.0);
-						//		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_UTIL(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO, - 1.0);
-						//		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(  a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO, a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
-						//		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T( a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO, - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
-						//		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T( a_idEstagio,        a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO, - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
+						//		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_DESLIGAMENTO, 0.0);
+						//		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_UTIL(a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO, - 1.0);
+						//		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(  a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO, a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
+						//		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T( a_idEstagio, periodo_estudo_anterior, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO, - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
+						//		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T( a_idEstagio,        a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESLIGAMENTO, - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_periodo_estudo, a_idPatamarCarga, double()));
 
 						//} //else if (tOn > 1) {
 
@@ -2710,13 +2711,13 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 							// UPTIME
 							const int posIneUP_TIME = addIneLinear_TEMPO_MINIMO_LIGADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneUP_TIME, 0.0);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneUP_TIME, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneUP_TIME, 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneUP_TIME, 1.0);
 
 							// DOWNTIME
 							const int posIneDOWN_TIME = addIneLinear_TEMPO_MINIMO_DESLIGADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneDOWN_TIME, -1);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneDOWN_TIME, -1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneDOWN_TIME, -1);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneDOWN_TIME, -1.0);
 
 
 							Periodo periodo_inicial = a_horizonte_estudo_estagio.getIteradorInicial();
@@ -2726,8 +2727,8 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 									periodo_inicial = periodo_aux;
 
 							for (Periodo periodo = periodo_inicial; periodo <= a_periodo_estudo; a_horizonte_estudo_estagio.incrementarIterador(periodo)) {
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneUP_TIME, -1.0);
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneDOWN_TIME, -1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneUP_TIME, -1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneDOWN_TIME, -1.0);
 							}
 
 						}//if (a_periodo_estudo >= a_periodo_estudo + IdHor(tOn+1)) {
@@ -2737,18 +2738,18 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 							// UPTIME
 							const int posIneUP_TIME = addIneLinear_TEMPO_MINIMO_LIGADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneUP_TIME, 0.0);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneUP_TIME, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneUP_TIME, 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneUP_TIME, 1.0);
 
 
 							// DOWNTIME
 							const int posIneDOWN_TIME = addIneLinear_TEMPO_MINIMO_DESLIGADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneDOWN_TIME, -1);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneDOWN_TIME, -1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneDOWN_TIME, -1);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneDOWN_TIME, -1.0);
 
 							for (Periodo periodo = a_horizonte_estudo_estagio.getIteradorInicial(); periodo <= a_periodo_estudo; a_horizonte_estudo_estagio.incrementarIterador(periodo)) {
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneUP_TIME, -1.0);
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneDOWN_TIME, -1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneUP_TIME, -1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneDOWN_TIME, -1.0);
 							}
 
 						}// else if (a_periodo_estudo >= a_periodo_estudo + IdHor(tOn+1)) {
@@ -2768,11 +2769,11 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 									if (periodo_final <= a_horizonte_estudo_estagio.getIteradorFinal())
 										for (Periodo periodo = a_horizonte_estudo_estagio.getIteradorInicial(); periodo <= periodo_final; a_horizonte_estudo_estagio.incrementarIterador(periodo))
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 1.0);
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 1.0);
 
 									else if (periodo_final > a_horizonte_estudo_estagio.getIteradorFinal())
 										for (Periodo periodo = a_horizonte_estudo_estagio.getIteradorInicial(); periodo <= a_horizonte_estudo_estagio.getIteradorFinal(); a_horizonte_estudo_estagio.incrementarIterador(periodo))
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 1.0);
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_LIG_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 1.0);
 
 								}//if (a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_horas_neste_status, int()) <= tOn) {
 							}//if (a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_status, TipoStatusUnidadeUTE()) == TipoStatusUnidadeUTE_ligada) {
@@ -2787,11 +2788,11 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 									if (periodo_final <= a_horizonte_estudo_estagio.getIteradorFinal())
 										for (Periodo periodo = a_horizonte_estudo_estagio.getIteradorInicial(); periodo <= periodo_final; a_horizonte_estudo_estagio.incrementarIterador(periodo))
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_DESL_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_DESL_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
 
 									else if (periodo_final > a_horizonte_estudo_estagio.getIteradorFinal())
 										for (Periodo periodo = a_horizonte_estudo_estagio.getIteradorInicial(); periodo <= a_horizonte_estudo_estagio.getIteradorFinal(); a_horizonte_estudo_estagio.incrementarIterador(periodo))
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_DESL_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_DESL_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
 
 
 								}//if (a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_horas_neste_status, int()) <= tOf) {								
@@ -2807,7 +2808,7 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 						int numero_trajetorias = (a_dados.getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_acionamento));
 
 						if (numero_trajetorias == 0)
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_TRAJ_ACIO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_TRAJ_ACIO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
 
 						else {
 
@@ -2820,15 +2821,15 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 								if (periodoAux > periodoAcio_aux) { break; }
 								if (periodoAux <= periodoAcio_aux) { periodoAcio = periodoAux; }
 								if ((periodoAux < periodoAcio_aux) && (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorInicial())) {
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodoAux, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodoAux, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
 								}
 							}
 
 							//RESTRIÇÃO QUE OBRIGA PT_TRAJ_DESL SER IGUAL A 0 QUANDO NÃO ESTA EM TRAJETÓRIA DE ACIONAMENTO
 							// (- PT_TRAJ_ACIO - ACIO_T(p-nTrajetorias; p) * PtMax >=0 )
 							const int posInePT_ACIO_SOMA = addIneLinear_PT_TRAJETORIA_ACIONAMENTO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE, a_periodo_estudo);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_ACIO_SOMA, 0.0);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_ACIO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO_SOMA, -1);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_ACIO_SOMA, 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_ACIO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO_SOMA, -1);
 
 							for (int trajetoria = 0; trajetoria < numero_trajetorias; trajetoria++) {
 
@@ -2838,19 +2839,19 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 									if (periodo <= a_horizonte_estudo_estagio.getIteradorFinal()) {
 
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO_SOMA, a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO_SOMA, a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, a_idPatamarCarga, double()));
 
 										// LIMITE INFERIOR (PT_TRAJ_LIG - TRAJ_LIG_T * rampa >=0 )
 										const int posInePT_ACIO = addIneLinear_PT_TRAJETORIA_ACIONAMENTO_INF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE, periodo);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_ACIO, 0.0);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_ACIO(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO, 1);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodoAcio, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO, -a_dados.getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_acionamento, trajetoria, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_ACIO, 0.0);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_ACIO(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO, 1);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodoAcio, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO, -a_dados.getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_acionamento, trajetoria, double()));
 
 										// LIMITE SUPERIOR (-PT_TRAJ_LIG + TRAJ_LIG_T * rampa + TRAJ_LIG_T * PT_MIN >= PT_MIN )
 										const int posInePT_ACIO_SUP = addIneLinear_PT_TRAJETORIA_ACIONAMENTO_SUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE, periodo);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_ACIO_SUP, -a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, a_idPatamarCarga, double()));
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_ACIO(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO_SUP, -1);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodoAcio, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO_SUP, -(a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, a_idPatamarCarga, double()) - a_dados.getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_acionamento, trajetoria, double())));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_ACIO_SUP, -a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_ACIO(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO_SUP, -1);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodoAcio, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO_SUP, -(a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, a_idPatamarCarga, double()) - a_dados.getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_acionamento, trajetoria, double())));
 										a_horizonte_estudo_estagio.incrementarIterador(periodo);
 
 									}//if (periodo <= a_horizonte_estudo_estagio.getIteradorFinal()) {
@@ -2858,7 +2859,7 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 							}//for (int trajetoria = 0; trajetoria < numero_trajetorias; trajetoria++) {
 
 							if (periodo <= a_horizonte_estudo_estagio.getIteradorFinal())
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO_SOMA, a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, a_idPatamarCarga, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ACIO_T(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_ACIO_SOMA, a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, a_idPatamarCarga, double()));
 
 						}// else
 
@@ -2867,15 +2868,15 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 						//*************************************************************************************************************************************************************
 						numero_trajetorias = (a_dados.getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_desligamento));
 						if (numero_trajetorias == 0)
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_TRAJ_DESL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_TRAJ_DESL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
 
 						else {
 
 							//RESTRIÇÃO QUE OBRIGA PT_TRAJ_DESL SER IGUAL A 0 QUANDO NÃO ESTA EM TRAJETÓRIA DE DESLIGAMANTO
 							// (- PT_TRAJ_DESL - DESL_T(p-nTrajetorias; p) * PtMax >=0 )
 							const int posInePT_DESL_SOMA = addIneLinear_PT_TRAJETORIA_DESLIGAMENTO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE, a_periodo_estudo, 1);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_DESL_SOMA, 0.0);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_DESL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESL_SOMA, -1);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_DESL_SOMA, 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_DESL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESL_SOMA, -1);
 
 							Periodo periodo = a_periodo_estudo;
 							Periodo periodoTipoMeiaHora = Periodo(TipoPeriodo_meia_hora, a_periodo_estudo.getDia(), a_periodo_estudo.getMes(), a_periodo_estudo.getAno(), a_periodo_estudo.getHora(), a_periodo_estudo.getMinuto());
@@ -2894,7 +2895,7 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 								//RESTRIÇÃO QUE OBRIGA PT_TRAJ_DESL SER IGUAL A 0 QUANDO NÃO ESTA EM TRAJETÓRIA DE DESLIGAMANTO
 								if (periodoPt >= a_horizonte_estudo_estagio.getIteradorInicial())
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T(a_TSS, a_idEstagio, periodoPt, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESL_SOMA, a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodoPt, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T(a_TSS, a_idEstagio, periodoPt, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESL_SOMA, a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodoPt, a_idPatamarCarga, double()));
 
 								if (periodoTrajetoria >= periodo) {
 
@@ -2902,15 +2903,15 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 										// LIMITE INFERIOR (PT_TRAJ_DESL(1;nt) - DESL_T * rampa >=0 )
 										const int posInePT_DESL_INF = addIneLinear_PT_TRAJETORIA_DESLIGAMENTO_INF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE, periodo, trajetoria + 1);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_DESL_INF, 0.0);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_DESL(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESL_INF, 1);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESL_INF, -a_dados.getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_desligamento, trajetoria, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_DESL_INF, 0.0);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_DESL(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESL_INF, 1);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESL_INF, -a_dados.getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_desligamento, trajetoria, double()));
 
 										// LIMITE SUPERIOR (-PT_TRAJ_DESL + DESL_T * (rampa -  PT_MAX) - PT_MAX >= 0 )
 										const int posInePT_DESL_SUP = addIneLinear_PT_TRAJETORIA_DESLIGAMENTO_SUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE, periodo, trajetoria + 1);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_DESL_SUP, -a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, a_idPatamarCarga, double()));
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_DESL(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESL_SUP, -1);
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESL_SUP, (a_dados.getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_desligamento, trajetoria, double()) - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, a_idPatamarCarga, double())));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posInePT_DESL_SUP, -a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_TRAJ_DESL(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESL_SUP, -1);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_DESL_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posInePT_DESL_SUP, (a_dados.getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_desligamento, trajetoria, double()) - a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, a_idPatamarCarga, double())));
 
 										a_horizonte_estudo_estagio.incrementarIterador(periodo);
 									}
@@ -2931,7 +2932,7 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 						//	int numero_trajetorias = (a_dados.getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_acionamento));
 
 						//	if (a_periodo_estudo < a_horizonte_estudo_estagio.getIteradorInicial() + numero_trajetorias)
-						//		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_ACIO_T(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+						//		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_ACIO_T(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
 						//}
 
 
@@ -2941,7 +2942,7 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 						//	int numero_trajetorias = (a_dados.getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_desligamento));
 
 						//	if (a_periodo_estudo < a_horizonte_estudo_estagio.getIteradorInicial() + numero_trajetorias)
-						//		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_DESL_T(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
+						//		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_DESL_T(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), 0.0);
 						//}
 
 
@@ -2957,10 +2958,10 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 					const int posEquPTDISP = addEquLinear_POTENCIA_TERMICA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPTDISP, 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPTDISP, 0.0);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPTDISP, 1.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPTDISP, -a_dados.getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade, a_periodo_estudo, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPTDISP, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPTDISP, -a_dados.getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade, a_periodo_estudo, double()));
 
 				} // if (getVarDecisao_PTDISPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE) > -1) {
 
@@ -2969,11 +2970,11 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 				//	const int posEquPTDISP_REL = addEquLinear_POTENCIA_TERMICA_DISPONIVEL_RELAXADA(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
 
-				//	vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPTDISP_REL, 0.0);
+				//	vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPTDISP_REL, 0.0);
 
-				//	vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP_REL(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPTDISP_REL, 1.0);
-				//	vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPTDISP_REL, -1.0);
-				//	vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP_FINF(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPTDISP_REL, -1.0);
+				//	vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP_REL(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPTDISP_REL, 1.0);
+				//	vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPTDISP_REL, -1.0);
+				//	vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP_FINF(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquPTDISP_REL, -1.0);
 
 				//} // if (getVarDecisao_PTDISP_RELseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE) > -1) {
 
@@ -2990,11 +2991,11 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 
 					if (idUnidadeUTE == IdUnidadeUTE_1) {
 						posIneUN_EQUIVALENTE = addIneLinear_RELACAO_UNIDADES_EQUIVALENTE_TERMICA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneUN_EQUIVALENTE, -1);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneUN_EQUIVALENTE, -1);
 					}
 
 					if (getVarDecisao_LIG_TseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneUN_EQUIVALENTE, -1);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_LIG_T(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posIneUN_EQUIVALENTE, -1);
 				}
 
 
@@ -3009,14 +3010,14 @@ void ModeloOtimizacao::criarRestricoesProducaoTermeletrica_porProdutibilidade(co
 }
 
 
-void ModeloOtimizacao::criarVariaveisAssociadasHorizonteOtimizacao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_estagio_final, const IdEstagio a_estagio_inicial, const Periodo a_periodo_otimizacao) {
+void ModeloOtimizacao::criarVariaveisAssociadasHorizonteOtimizacao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_estagio_final, const IdEstagio a_estagio_inicial, Periodo &a_periodo_otimizacao) {
 
 	try {
 
 		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 			return;
 
-		const double infinito = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
+		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
 		if (a_TSS != TipoSubproblemaSolver_mestre) {
 
@@ -3090,7 +3091,7 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteOtimizacao(const TipoSub
 }
 
 
-void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, const Periodo a_periodo_acoplamento, const Periodo a_periodo_estudo, const Periodo a_periodo_otimizacao_final, const Periodo a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, Periodo &a_periodo_acoplamento, Periodo &a_periodo_estudo, Periodo &a_periodo_otimizacao_final, Periodo &a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
 
 	try {
 
@@ -3112,11 +3113,11 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 
 			const int posEquQMONT = addEquLinear_VAZAO_MONTANTE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQMONT, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQMONT, 0.0);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QMON(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQMONT, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QMON(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQMONT, 1.0);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquQMONT, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquQMONT, -1.0);
 
 		}// try
 
@@ -3132,17 +3133,17 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 
 			const int posEquQDEF = addEquLinear_VAZAO_DEFLUENTE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQDEF, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQDEF, 0.0);
 
 			//QDEF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQDEF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQDEF, 1.0);
 
 			//QTURDISP
 			if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQDEF, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQDEF, -1.0);
 
 			//QVER
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQDEF, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQDEF, -1.0);
 
 
 		}// try
@@ -3160,27 +3161,27 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 
 		const int posEquBH = addEquLinear_BALANCO_HIDRAULICO_VAZ(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, 0.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, 0.0);
 
 		// ENCHENDO VOLUME MORTO 
 		if (a_periodo_estudo > a_horizonte_estudo_estagio.getIteradorInicial()) {
 
 			if (a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_enchendo_volume_morto, periodo_anterior, int()) == 1) {
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo_anterior, double()) / conversor_vazao_volume);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo_anterior, double()) / conversor_vazao_volume);
 				const int posIneVM = addIneLinear_META_ENCHENDO_VOLUME_MORTO(a_TSS, a_idEstagio, periodo_anterior, a_idPatamarCarga, a_idHidreletrica);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneVM, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_meta_enchimento_volume_morto, periodo_anterior, double()));
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, 1.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, periodo_anterior, a_idHidreletrica), posEquBH, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneVM, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_meta_enchimento_volume_morto, periodo_anterior, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, periodo_anterior, a_idHidreletrica), posEquBH, 1.0);
 			}
 		}//if (a_periodo_estudo > a_horizonte_estudo_estagio.getIteradorInicial()) {
 
 		// Variável VI
 		if (getVarDecisao_VIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1)
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, -1.0 / conversor_vazao_volume);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, -1.0 / conversor_vazao_volume);
 
 		//VARIÁVEL EVAPORAÇÃO
 		if (getVarDecisao_QEV_RELseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1) {
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, 1.0);
 
 			// CRIA RESTRIÇÃO EVAPORAÇÃO
 			if (a_idPatamarCarga == IdPatamarCarga_1 && a_dados.getSize1Matriz(a_idHidreletrica, AttMatrizHidreletrica_vazao_evaporada_meta) == 0)
@@ -3196,14 +3197,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 			const int tempo_viagem_agua = a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_tempo_viagem_agua, int());
 
 			if (tempo_viagem_agua > 0) {
-				const Periodo periodo_lag = Periodo(a_periodo_estudo.getTipoPeriodo(), Periodo(TipoPeriodo_horario, a_periodo_estudo) - tempo_viagem_agua);
+				Periodo periodo_lag = Periodo(a_periodo_estudo.getTipoPeriodo(), Periodo(TipoPeriodo_horario, a_periodo_estudo) - tempo_viagem_agua);
 				// Variável QDEFLAG
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(a_TSS, a_dados, a_idEstagio, a_periodo_estudo, idHidreletrica_montante, periodo_lag), posEquBH, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(a_TSS, a_dados, a_idEstagio, a_periodo_estudo, idHidreletrica_montante, periodo_lag), posEquBH, -1.0);
 			}
 			else {
 
 				// Variável QDEF
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica_montante), posEquBH, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica_montante), posEquBH, -1.0);
 
 			}//else {
 
@@ -3216,23 +3217,23 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 			const IdHidreletrica idHidreletrica_montante_desvio = a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_montante_desvio, m, IdHidreletrica());
 
 			// Variável QDES que "entra" na usina
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica_montante_desvio, a_idHidreletrica), posEquBH, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica_montante_desvio, a_idHidreletrica), posEquBH, -1.0);
 
 		}//for (int m = 1; m <= numero_hidreletricas_montante_desvio; m++) {
 
 		// Variável QDES que "sai" da usina
 		if (a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica()) != IdHidreletrica_Nenhum)
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posEquBH, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posEquBH, 1.0);
 
 		// Variável QMON
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QMON(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquBH, -1.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QMON(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquBH, -1.0);
 
 		// Variável QDEF
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquBH, 1.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquBH, 1.0);
 
 		//QOUT
 		if (getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1)
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquBH, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquBH, 1.0);
 
 		///////////////////////////
 		//Intercâmbios Hidráulicos
@@ -3254,7 +3255,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 			if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
 				if (getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posEquBH, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posEquBH, 1.0);
 
 			}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
@@ -3264,14 +3265,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 
 					//Nesta condição o QOUT_REL entra no balanço hídrico
 					if (getVarDecisao_QOUT_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquBH, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquBH, 1.0);
 
 				}//if (a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_minimo, a_periodo_estudo, double()) > 0 && a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_maximo, a_periodo_estudo, double()) > 0) {
 				else {
 
 					//Se o QOUT for negativo, não tem problema de inviabilizar o balanço hídrico
 					if (getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquBH, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquBH, 1.0);
 
 				}//else {
 
@@ -3283,14 +3284,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 
 					//Nesta condição o QILS_TRI_REL entra no balanço hídrico
 					if (getVarDecisao_QILS_TRI_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos)) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos)), posEquBH, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos)), posEquBH, 1.0);
 
 				}//if (a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_minimo, a_periodo_estudo, double()) > 0 && a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_maximo, a_periodo_estudo, double()) > 0) {
 				else {
 
 					//Se o QILS_TRI for negativo, não tem problema de inviabilizar o balanço hídrico
 					if (getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos)) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos)), posEquBH, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos)), posEquBH, 1.0);
 
 				}//else {
 
@@ -3311,14 +3312,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 			if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
 				if (getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posEquBH, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posEquBH, -1.0);
 
 			}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
 			else if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_pereira_barreto) {
 
 				if (getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_destino.at(pos)) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_destino.at(pos)), posEquBH, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_destino.at(pos)), posEquBH, -1.0);
 
 			}//else if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_pereira_barreto) {
 
@@ -3334,14 +3335,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 		const int idUsinaElevatoria_origem_size = int(idUsinaElevatoria_origem.size());
 
 		for (int pos = 0; pos < idUsinaElevatoria_origem_size; pos++)
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria_origem.at(pos)), posEquBH, a_dados.getElementoVetor(idUsinaElevatoria_origem.at(pos), AttVetorUsinaElevatoria_fator_disponibilidade, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria_origem.at(pos)), posEquBH, a_dados.getElementoVetor(idUsinaElevatoria_origem.at(pos), AttVetorUsinaElevatoria_fator_disponibilidade, a_periodo_estudo, double()));
 
 		const std::vector<IdUsinaElevatoria> idUsinaElevatoria_destino = a_dados.vetorUsinaElevatoria.getIdObjetos(AttComumUsinaElevatoria_usina_destino_bombeamento, a_idHidreletrica);
 
 		const int idUsinaElevatoria_destino_size = int(idUsinaElevatoria_destino.size());
 
 		for (int pos = 0; pos < idUsinaElevatoria_destino_size; pos++)
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria_destino.at(pos)), posEquBH, -a_dados.getElementoVetor(idUsinaElevatoria_destino.at(pos), AttVetorUsinaElevatoria_fator_disponibilidade, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria_destino.at(pos)), posEquBH, -a_dados.getElementoVetor(idUsinaElevatoria_destino.at(pos), AttVetorUsinaElevatoria_fator_disponibilidade, a_periodo_estudo, double()));
 
 
 	}// try
@@ -3350,7 +3351,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 }
 
 
-void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, const Periodo a_periodo_acoplamento, const Periodo a_periodo_estudo, const Periodo a_periodo_otimizacao_final, const Periodo a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_acoplamento, Periodo &a_periodo_acoplamento, Periodo &a_periodo_estudo, Periodo &a_periodo_otimizacao_final, Periodo &a_periodo_estudo_inicial, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
 
 	try {
 
@@ -3369,11 +3370,11 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 
 			const int posEquQMONT = addEquLinear_VAZAO_MONTANTE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQMONT, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQMONT, 0.0);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QMON(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQMONT, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QMON(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQMONT, 1.0);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquQMONT, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquQMONT, -1.0);
 
 		}// try
 
@@ -3389,17 +3390,17 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 
 			const int posEquQDEF = addEquLinear_VAZAO_DEFLUENTE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQDEF, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQDEF, 0.0);
 
 			//QDEF
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQDEF, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQDEF, 1.0);
 
 			//QTURDISP
 			if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQDEF, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQDEF, -1.0);
 
 			//QVER
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQDEF, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquQDEF, -1.0);
 
 
 		}// try
@@ -3423,19 +3424,19 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 
 			//EQUAÇÃO DE BALANÇO HIDRAULICO
 			const int posEquBH = addEquLinear_BALANCO_HIDRAULICO_VOL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, 0.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, 0.0);
 
 			// ENCHENDO VOLUME MORTO 
 			if (a_periodo_estudo > a_horizonte_estudo_estagio.getIteradorInicial()) {
 
 				if (a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_enchendo_volume_morto, periodo_anterior, int()) == 1) {
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo_anterior, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo_anterior, double()));
 
 					const int posIneVM = addIneLinear_META_ENCHENDO_VOLUME_MORTO(a_TSS, a_idEstagio, periodo_anterior, a_idPatamarCarga, a_idHidreletrica);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneVM, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_meta_enchimento_volume_morto, periodo_anterior, double()));
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, 1.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, periodo_anterior, a_idHidreletrica), posEquBH, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneVM, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_meta_enchimento_volume_morto, periodo_anterior, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, periodo_anterior, a_idHidreletrica), posEquBH, 1.0);
 				}
 			}//if (a_periodo_estudo > a_horizonte_estudo_estagio.getIteradorInicial()) {
 
@@ -3445,7 +3446,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 
 			if (getVarDecisao_QEV_RELseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1) {
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, conversor_vazao_volume_periodo);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, conversor_vazao_volume_periodo);
 
 				if (a_dados.getSize1Matriz(a_idHidreletrica, AttMatrizHidreletrica_vazao_evaporada_meta) == 0)
 					criarRestricoesEvaporacao(a_TSS, a_dados, a_idEstagio, a_periodo_estudo, a_idHidreletrica, proximo_periodo_estudo);
@@ -3453,15 +3454,15 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 
 			// Variável VI
 			if (getVarDecisao_VIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, -1.0);
 
 			if (a_periodo_estudo < a_horizonte_estudo_estagio.getIteradorFinal()) {
 
 				if (getVarDecisao_VIseExistir(a_TSS, a_idEstagio, proximo_periodo_estudo, a_idHidreletrica) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, proximo_periodo_estudo, a_idHidreletrica), posEquBH, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, proximo_periodo_estudo, a_idHidreletrica), posEquBH, 1.0);
 			}
 			else if ((a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorFinal() && (getVarDecisao_VFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1)))
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquBH, 1.0);
 
 			// Variáveis de Hidreletricas à Montante
 
@@ -3472,15 +3473,15 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 				const int tempo_viagem_agua = a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_tempo_viagem_agua, int());
 
 				if (tempo_viagem_agua > 0) {
-					const Periodo periodo_lag = Periodo(a_periodo_estudo.getTipoPeriodo(), Periodo(TipoPeriodo_horario, a_periodo_estudo) - tempo_viagem_agua);
+					Periodo periodo_lag = Periodo(a_periodo_estudo.getTipoPeriodo(), Periodo(TipoPeriodo_horario, a_periodo_estudo) - tempo_viagem_agua);
 					// Variável QDEFLAG
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(a_TSS, a_dados, a_idEstagio, a_periodo_estudo, idHidreletrica_montante, periodo_lag), posEquBH, -conversor_vazao_volume_periodo);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(a_TSS, a_dados, a_idEstagio, a_periodo_estudo, idHidreletrica_montante, periodo_lag), posEquBH, -conversor_vazao_volume_periodo);
 				}
 
 				else
 
 					// Variável QDEF
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica_montante), posEquBH, -conversor_vazao_volume_periodo);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica_montante), posEquBH, -conversor_vazao_volume_periodo);
 
 
 			} // for (int m = 1; m <= numero_hidreletricas_montante; m++) {
@@ -3496,24 +3497,24 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 			const IdHidreletrica idHidreletrica_montante_desvio = a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_montante_desvio, m, IdHidreletrica());
 
 			// Variável QDES que "entra" na usina
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica_montante_desvio, a_idHidreletrica), posEquBH, -conversor_vazao_volume);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica_montante_desvio, a_idHidreletrica), posEquBH, -conversor_vazao_volume);
 
 		}//for (int m = 1; m <= numero_hidreletricas_montante_desvio; m++) {
 
 		// Variável QDES que "sai" da usina
 		if(a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica()) != IdHidreletrica_Nenhum)
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posEquBH, conversor_vazao_volume);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posEquBH, conversor_vazao_volume);
 
 
 		// Variável QDEF
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquBH, conversor_vazao_volume);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquBH, conversor_vazao_volume);
 
 		// Variável QMON
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QMON(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquBH, -conversor_vazao_volume);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QMON(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquBH, -conversor_vazao_volume);
 
 		//QOUT
 		if (getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica) > -1)
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquBH, conversor_vazao_volume);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posEquBH, conversor_vazao_volume);
 
 		///////////////////////////
 		//Intercâmbios Hidráulicos
@@ -3535,7 +3536,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 			if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
 				if (getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posEquBH, conversor_vazao_volume);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posEquBH, conversor_vazao_volume);
 
 			}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
@@ -3545,14 +3546,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 
 					//Nesta condição o QOUT_REL entra no balanço hídrico
 					if (getVarDecisao_QOUT_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquBH, conversor_vazao_volume);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquBH, conversor_vazao_volume);
 
 				}//if (a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_minimo, a_periodo_estudo, double()) > 0 && a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_maximo, a_periodo_estudo, double()) > 0) {
 				else {
 
 					//Se o QOUT for negativo, não tem problema de inviabilizar o balanço hídrico
 					if (getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquBH, conversor_vazao_volume);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquBH, conversor_vazao_volume);
 
 				}//else {
 
@@ -3563,14 +3564,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 
 					//Nesta condição o QILS_TRI_REL entra no balanço hídrico
 					if (getVarDecisao_QILS_TRI_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos)) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos)), posEquBH, conversor_vazao_volume);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos)), posEquBH, conversor_vazao_volume);
 
 				}//if (a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_minimo, a_periodo_estudo, double()) > 0 && a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_maximo, a_periodo_estudo, double()) > 0) {
 				else {
 
 					//Se o QILS_TRI for negativo, não tem problema de inviabilizar o balanço hídrico
 					if (getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos)) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos)), posEquBH, conversor_vazao_volume);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos)), posEquBH, conversor_vazao_volume);
 
 				}//else {
 
@@ -3592,14 +3593,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 			if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
 				if (getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posEquBH, -conversor_vazao_volume);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posEquBH, -conversor_vazao_volume);
 
 			}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
 			else if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_pereira_barreto) {
 
 				if (getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_destino.at(pos)) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_destino.at(pos)), posEquBH, -conversor_vazao_volume);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_destino.at(pos)), posEquBH, -conversor_vazao_volume);
 
 			}//else if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_pereira_barreto) {
 
@@ -3615,14 +3616,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 		const int idUsinaElevatoria_origem_size = int(idUsinaElevatoria_origem.size());
 
 		for (int pos = 0; pos < idUsinaElevatoria_origem_size; pos++)
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria_origem.at(pos)), posEquBH, conversor_vazao_volume * a_dados.getElementoVetor(idUsinaElevatoria_origem.at(pos), AttVetorUsinaElevatoria_fator_disponibilidade, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria_origem.at(pos)), posEquBH, conversor_vazao_volume * a_dados.getElementoVetor(idUsinaElevatoria_origem.at(pos), AttVetorUsinaElevatoria_fator_disponibilidade, a_periodo_estudo, double()));
 
 		const std::vector<IdUsinaElevatoria> idUsinaElevatoria_destino = a_dados.vetorUsinaElevatoria.getIdObjetos(AttComumUsinaElevatoria_usina_destino_bombeamento, a_idHidreletrica);
 
 		const int idUsinaElevatoria_destino_size = int(idUsinaElevatoria_destino.size());
 
 		for (int pos = 0; pos < idUsinaElevatoria_destino_size; pos++)
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria_destino.at(pos)), posEquBH, -conversor_vazao_volume * a_dados.getElementoVetor(idUsinaElevatoria_destino.at(pos), AttVetorUsinaElevatoria_fator_disponibilidade, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria_destino.at(pos)), posEquBH, -conversor_vazao_volume * a_dados.getElementoVetor(idUsinaElevatoria_destino.at(pos), AttVetorUsinaElevatoria_fator_disponibilidade, a_periodo_estudo, double()));
 
 
 	}// try
@@ -3631,27 +3632,27 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 }
 
 
-void ModeloOtimizacao::criarRestricoesEvaporacao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdHidreletrica a_idHidreletrica, const Periodo a_proximo_periodo_estudo) {
+void ModeloOtimizacao::criarRestricoesEvaporacao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdHidreletrica a_idHidreletrica, Periodo &a_proximo_periodo_estudo) {
 
 	try {
 		const double conversor_vazao_volume = a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, a_periodo_estudo, IdPatamarCarga_1, double());
 		// EVAPORAÇÃO
 		const int posEquEV = addEquLinear_VAZAO_EVAPORADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica);
 
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquEV, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, a_periodo_estudo, double()));
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquEV, 1.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquEV, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, a_periodo_estudo, double()));
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquEV, 1.0);
 
 		if (getVarDecisao_VMEDseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1)
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMED(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquEV, -a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_1, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMED(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquEV, -a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_1, a_periodo_estudo, double()));
 
 		//EVAPORAÇÃO RELAXADA 
 		const int posEquEV_REL = addEquLinear_VAZAO_EVAPORADA_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica);
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquEV_REL, 0.0);
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquEV_REL, -1.0);
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquEV_REL, 1.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquEV_REL, 0.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquEV_REL, -1.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquEV_REL, 1.0);
 		if (getVarDecisao_QEV_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1) {
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquEV_REL, 1.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), 1.2 * a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, a_periodo_estudo, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posEquEV_REL, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), 1.2 * a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, a_periodo_estudo, double()));
 		}
 
 	}// try
@@ -3660,7 +3661,7 @@ void ModeloOtimizacao::criarRestricoesEvaporacao(const TipoSubproblemaSolver a_T
 }
 
 
-void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdUsinaEolica a_maiorIdUsinaEolica, const IdContrato a_maiorIdContrato, const IdSubmercado a_idSubmercado, const IdIntercambio a_maiorIdIntercambio, const IdTermeletrica a_maiorIdTermeletrica, const IdHidreletrica a_maiorIdHidreletrica, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const IdPatamarCarga a_idPatamarCarga) {
+void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdUsinaEolica a_maiorIdUsinaEolica, const IdContrato a_maiorIdContrato, const IdSubmercado a_idSubmercado, const IdIntercambio a_maiorIdIntercambio, const IdTermeletrica a_maiorIdTermeletrica, const IdHidreletrica a_maiorIdHidreletrica, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const IdPatamarCarga a_idPatamarCarga) {
 
 	try {
 
@@ -3671,27 +3672,30 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 			return;
 
 		const int posEquAD = addEquLinear_ATENDIMENTO_DEMANDA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado);
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquAD, 0.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquAD, 0.0);
 
 		// Variável PL
 		if (getVarDecisao_PLseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado) > -1)
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado), posEquAD, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado), posEquAD, -1.0);
 
 		//
 		// Variável Potência Usina Nao Simulada PN
 		//
 
-		for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada(IdUsinaNaoSimulada_Nenhum + 1); idUsinaNaoSimulada < IdUsinaNaoSimulada_Excedente; idUsinaNaoSimulada++) {
+		const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.getMenorId(a_idSubmercado, IdUsinaNaoSimulada());
+		const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.getMaiorId(a_idSubmercado, IdUsinaNaoSimulada());
+
+		for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.incr(a_idSubmercado, idUsinaNaoSimulada)) {
 
 			if (getVarDecisao_PNseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idUsinaNaoSimulada) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idUsinaNaoSimulada), posEquAD, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idUsinaNaoSimulada), posEquAD, 1.0);
 
-		} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada(IdUsinaNaoSimulada_Nenhum + 1); idUsinaNaoSimulada < IdUsinaNaoSimulada_Excedente; idUsinaNaoSimulada++) {
+		} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.incr(a_idSubmercado, idUsinaNaoSimulada)) { {
 
 		//USINAS EOLICAS 
 		for (IdUsinaEolica idUsinaEolica = IdUsinaEolica_1; idUsinaEolica < a_maiorIdUsinaEolica; idUsinaEolica++)
 			if (a_dados.getAtributo(idUsinaEolica, AttComumUsinaEolica_submercado, IdSubmercado()) == a_idSubmercado)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaEolica), posEquAD, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaEolica), posEquAD, 1.0);
 
 
 		// Variaveis Patamares Deficit
@@ -3700,7 +3704,7 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 
 			// Variável PD
 			if (getVarDecisao_PDseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idPatamarDeficit) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PD(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idPatamarDeficit), posEquAD, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PD(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idPatamarDeficit), posEquAD, 1.0);
 
 		} // for (IdPatamarDeficit idPatamarDeficit = IdPatamarDeficit_1; idPatamarDeficit <= maiorIdPatamarDeficit; idPatamarDeficit++) {
 
@@ -3709,10 +3713,10 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 		for (IdContrato idContrato = IdContrato_1; idContrato <= a_maiorIdContrato; idContrato++) {
 
 			if ((getVarDecisao_CEXPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato) > -1) && a_dados.getAtributo(idContrato, AttComumContrato_submercado, IdSubmercado()) == a_idSubmercado)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CEXP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posEquAD, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CEXP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posEquAD, -1.0);
 
 			if ((getVarDecisao_CIMPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato) > -1) && a_dados.getAtributo(idContrato, AttComumContrato_submercado, IdSubmercado()) == a_idSubmercado)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CIMP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posEquAD, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CIMP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posEquAD, 1.0);
 
 		}//for (IdContrato idContrato = IdContrato_1; idContrato <= maiorIdContrato; idContrato++) {
 
@@ -3730,7 +3734,7 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 
 					if (a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_submercado, IdSubmercado()) == a_idSubmercado) {
 						if (getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1)
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquAD, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquAD, 1.0);
 					}
 
 				} // if (getVarDecisao_PFseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1){
@@ -3746,7 +3750,7 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 
 						if (a_dados.getAtributo(idTermeletrica, idUnidadeUTE, AttComumUnidadeUTE_submercado, IdSubmercado()) == a_idSubmercado) {
 							if (getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE) > -1)
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquAD, 1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquAD, 1.0);
 						}
 
 					} // if (getVarDecisao_PTDISPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE) > -1) {
@@ -3774,7 +3778,7 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 				if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1) {
 
 					if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_submercado, IdSubmercado()) == a_idSubmercado)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquAD, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquAD, 1.0);
 
 				} // if (getVarDecisao_PHDISPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1) {
 
@@ -3791,7 +3795,7 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 					if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico) > -1) {
 
 						if (a_dados.getAtributo(idHidreletrica, idConjuntoHidraulico, AttComumConjuntoHidraulico_submercado, IdSubmercado()) == a_idSubmercado)
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posEquAD, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posEquAD, 1.0);
 
 					} // if (getVarDecisao_PHDISPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1) {
 
@@ -3810,7 +3814,7 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 						if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1) {
 
 							if (a_dados.getAtributo(idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttComumUnidadeUHE_submercado, IdSubmercado()) == a_idSubmercado)
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquAD, 1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquAD, 1.0);
 
 						} // if (getVarDecisao_PHDISPseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1) {
 
@@ -3828,10 +3832,10 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 			if (getVarDecisao_PIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio) > -1) {
 
 				if (a_dados.getAtributo(idIntercambio, AttComumIntercambio_submercado_origem, IdSubmercado()) == a_idSubmercado)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posEquAD, -1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posEquAD, -1.0);
 
 				else if (a_dados.getAtributo(idIntercambio, AttComumIntercambio_submercado_destino, IdSubmercado()) == a_idSubmercado)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posEquAD, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posEquAD, 1.0);
 
 			} // if (getVarDecisao_PIseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio) > -1){
 
@@ -3843,7 +3847,7 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 
 			if (a_dados.getAtributo(idUsinaElevatoria, AttComumUsinaElevatoria_submercado, IdSubmercado()) == a_idSubmercado) {
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PBOMDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria), posEquAD, -1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PBOMDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria), posEquAD, -1.0);
 
 			}//if (a_dados.getAtributo(idUsinaElevatoria, AttComumUsinaElevatoria_submercado, IdSubmercado()) == a_idSubmercado) {
 
@@ -3855,7 +3859,7 @@ void ModeloOtimizacao::criarRestricoesAtendimentoDemanda(const TipoSubproblemaSo
 }
 
 
-void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdSubmercado a_idSubmercado, const IdIntercambio a_maiorIdIntercambio, const IdTermeletrica a_maiorIdTermeletrica, const IdHidreletrica a_maiorIdHidreletrica, const IdPatamarCarga a_idPatamarCarga) {
+void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdSubmercado a_idSubmercado, const IdIntercambio a_maiorIdIntercambio, const IdTermeletrica a_maiorIdTermeletrica, const IdHidreletrica a_maiorIdHidreletrica, const IdPatamarCarga a_idPatamarCarga) {
 
 	try {
 
@@ -3873,13 +3877,13 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 
 					if (posEquDemanda < 0) {
 						posEquDemanda = addEquLinear_DEMANDA(a_TSS, a_idEstagio, a_periodo_estudo, a_idSubmercado);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquDemanda, 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquDemanda, 0.0);
 						// Variável PL Media
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, a_idSubmercado), posEquDemanda, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, a_idSubmercado), posEquDemanda, 1.0);
 					}
 
 					// Variável PL
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado), posEquDemanda, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado), posEquDemanda, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
 
 				} // if (getVarDecisao_PLseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado) > -1) {
 
@@ -3897,13 +3901,13 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 
 						if (posEquDeficit < 0) {
 							posEquDeficit = addEquLinear_DEFICIT(a_TSS, a_idEstagio, a_periodo_estudo, a_idSubmercado);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquDeficit, 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquDeficit, 0.0);
 							// Variável PL Media
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PD(a_TSS, a_idEstagio, a_periodo_estudo, a_idSubmercado), posEquDeficit, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PD(a_TSS, a_idEstagio, a_periodo_estudo, a_idSubmercado), posEquDeficit, 1.0);
 						}
 
 						// Variável PD
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PD(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idPatamarDeficit), posEquDeficit, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PD(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idPatamarDeficit), posEquDeficit, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
 
 					} // if (getVarDecisao_PDseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idPatamarDeficit) > -1){
 
@@ -3921,14 +3925,14 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 						if (getEquLinear_POTENCIA_BOMBEAMENTO_DISPONIVELseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idUsinaElevatoria) == -1) {
 
 							const int posEquPBOMDISP = addEquLinear_POTENCIA_BOMBEAMENTO_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, idUsinaElevatoria);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPBOMDISP, 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPBOMDISP, 0.0);
 							// Variável PBOMDISP Media
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PBOMDISP(a_TSS, a_idEstagio, a_periodo_estudo, idUsinaElevatoria), posEquPBOMDISP, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PBOMDISP(a_TSS, a_idEstagio, a_periodo_estudo, idUsinaElevatoria), posEquPBOMDISP, 1.0);
 
 						} // if (getEquLinear_POTENCIA_BOMBEAMENTO_DISPONIVELseExistir(a_idEstagio, a_periodo_estudo, idUsinaElevatoria) == -1) {
 
 						// Variável PHDISP
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PBOMDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria), getEquLinear_POTENCIA_BOMBEAMENTO_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, idUsinaElevatoria), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PBOMDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria), getEquLinear_POTENCIA_BOMBEAMENTO_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, idUsinaElevatoria), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
 
 					}
 
@@ -3948,17 +3952,17 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 
 							if (posEquIntercambio < 0) {
 								posEquIntercambio = addEquLinear_INTERCAMBIO(a_TSS, a_idEstagio, a_periodo_estudo, a_idSubmercado);
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquIntercambio, 0.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquIntercambio, 0.0);
 								// Variável PI Media
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idSubmercado), posEquIntercambio, 1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idSubmercado), posEquIntercambio, 1.0);
 							}
 
 							// Variável PI
 							if (a_dados.getAtributo(idIntercambio, AttComumIntercambio_submercado_origem, IdSubmercado()) == a_idSubmercado)
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posEquIntercambio, a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posEquIntercambio, a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
 
 							else if (a_dados.getAtributo(idIntercambio, AttComumIntercambio_submercado_destino, IdSubmercado()) == a_idSubmercado)
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posEquIntercambio, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posEquIntercambio, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
 
 						} // if ((a_dados.getAtributo(idIntercambio, AttComumIntercambio_submercado_origem, IdSubmercado()) == a_idSubmercado) || (a_dados.getAtributo(idIntercambio, AttComumIntercambio_submercado_destino, IdSubmercado()) == a_idSubmercado)) {
 
@@ -3983,13 +3987,13 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 						if (true) {
 							if (getEquLinear_POTENCIA_HIDRAULICA_DISPONIVELseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) == -1) {
 								const int posEquProducaoHidreletrica = addEquLinear_POTENCIA_HIDRAULICA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica);
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquProducaoHidreletrica, 0.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquProducaoHidreletrica, 0.0);
 								// Variável PHDISP Media
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquProducaoHidreletrica, 1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquProducaoHidreletrica, 1.0);
 							}
 
 							// Variável PHDISP
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), getEquLinear_POTENCIA_HIDRAULICA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), getEquLinear_POTENCIA_HIDRAULICA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
 						}
 
 					} // if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1) {
@@ -4001,12 +4005,12 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 					if (true) {
 						if (getEquLinear_VAZAO_TURBINADA_DISPONIVELseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) == -1) {
 							const int posEquVazaoTurbinadaHidreletrica = addEquLinear_VAZAO_TURBINADA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquVazaoTurbinadaHidreletrica, 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquVazaoTurbinadaHidreletrica, 0.0);
 							// Variável QTURDISP Media
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquVazaoTurbinadaHidreletrica, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquVazaoTurbinadaHidreletrica, 1.0);
 						}
 						// Variável QTURDISP
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), getEquLinear_VAZAO_TURBINADA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), getEquLinear_VAZAO_TURBINADA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
 					}
 
 				} // if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1) {
@@ -4016,26 +4020,26 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 
 				if (getEquLinear_VAZAO_DEFLUENTEseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) == -1) {
 					const int posEquVazaoDefluenteDispHidreletrica = addEquLinear_VAZAO_DEFLUENTE(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquVazaoDefluenteDispHidreletrica, 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquVazaoDefluenteDispHidreletrica, 0.0);
 					// Variável QDEF Media
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquVazaoDefluenteDispHidreletrica, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquVazaoDefluenteDispHidreletrica, 1.0);
 				}
 
 				// Variável QDEF
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), getEquLinear_VAZAO_DEFLUENTE(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), getEquLinear_VAZAO_DEFLUENTE(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
 
 
 				// Vazão Vertida
 
 				if (getEquLinear_VAZAO_VERTIDAseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) == -1) {
 					const int posEquVazaoVertidaHidreletrica = addEquLinear_VAZAO_VERTIDA(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquVazaoVertidaHidreletrica, 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquVazaoVertidaHidreletrica, 0.0);
 					// Variável QVER Media
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquVazaoVertidaHidreletrica, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquVazaoVertidaHidreletrica, 1.0);
 				}
 
 				// Variável QVER
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), getEquLinear_VAZAO_VERTIDA(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), getEquLinear_VAZAO_VERTIDA(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
 
 			} // for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
@@ -4054,13 +4058,13 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 
 						if (getEquLinear_POTENCIA_TERMICA_DISPONIVELseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idTermeletrica) == -1) {
 							const int posEquProducaoTermeletrica = addEquLinear_POTENCIA_TERMICA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, idTermeletrica);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquProducaoTermeletrica, 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquProducaoTermeletrica, 0.0);
 							// Variável PTDISP Media
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, idTermeletrica), posEquProducaoTermeletrica, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, idTermeletrica), posEquProducaoTermeletrica, 1.0);
 						}
 
 						// Variável PTDISP
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), getEquLinear_POTENCIA_TERMICA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, idTermeletrica), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), getEquLinear_POTENCIA_TERMICA_DISPONIVEL(a_TSS, a_idEstagio, a_periodo_estudo, idTermeletrica), -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
 					} // if (getVarDecisao_PTseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1) {
 
 				} // for (IdTermeletrica idTermeletrica = a_dados.getMenorId(IdTermeletrica()); idTermeletrica <= a_maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idTermeletrica)) {
@@ -4070,8 +4074,10 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 			// PRODUCAO_USINA_NAO_SIMULADA
 			if (true) {
 
+				const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.getMenorId(a_idSubmercado, IdUsinaNaoSimulada());
 				const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.getMaiorId(a_idSubmercado, IdUsinaNaoSimulada());
-				for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada(IdUsinaNaoSimulada_Nenhum + 1); idUsinaNaoSimulada < IdUsinaNaoSimulada_Excedente; idUsinaNaoSimulada++) {
+
+				for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.incr(a_idSubmercado, idUsinaNaoSimulada)) {
 
 					if (getVarDecisao_PNseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idUsinaNaoSimulada) > -1) {
 
@@ -4079,17 +4085,17 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 
 						if (posEquDeficit < 0) {
 							posEquDeficit = addEquLinear_PRODUCAO_USINA_NAO_SIMULADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idSubmercado);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquDeficit, 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquDeficit, 0.0);
 							// Variável PN Media
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, a_idSubmercado), posEquDeficit, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, a_idSubmercado), posEquDeficit, 1.0);
 						}
 
 						// Variável PN
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idUsinaNaoSimulada), posEquDeficit, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idUsinaNaoSimulada), posEquDeficit, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, a_idPatamarCarga, double()));
 
 					} // if (getVarDecisao_PNseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idSubmercado, idUsinaNaoSimulada) > -1){
 
-				} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = IdUsinaNaoSimulada(IdUsinaNaoSimulada_Nenhum + 1); idUsinaNaoSimulada < IdUsinaNaoSimulada_Excedente; idUsinaNaoSimulada++) {
+				} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.incr(a_idSubmercado, idUsinaNaoSimulada)) {
 
 			} // if (true) {
 
@@ -4101,7 +4107,7 @@ void ModeloOtimizacao::criarRestricoesProducaoMedia(const TipoSubproblemaSolver 
 }
 
 
-void ModeloOtimizacao::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdSubmercado a_maiorIdSubmercado, const IdTermeletrica a_maiorIdTermeletrica, const IdPatamarCarga a_idPatamarCarga) {
+void ModeloOtimizacao::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdSubmercado a_maiorIdSubmercado, const IdTermeletrica a_maiorIdTermeletrica, const IdPatamarCarga a_idPatamarCarga) {
 
 	try {
 
@@ -4115,19 +4121,19 @@ void ModeloOtimizacao::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(c
 
 		IdContrato maiorIdContrato = a_dados.getMaiorId(IdContrato());
 
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZO, 0.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZO, 0.0);
 
 		// Variável ZO
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga), posEquZO, 1.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZO(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga), posEquZO, 1.0);
 
 		// CONTRATOS
 		for (IdContrato idContrato = IdContrato_1; idContrato <= maiorIdContrato; idContrato++) {
 
 			if (getVarDecisao_CEXPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CEXP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posEquZO, a_dados.getElementoMatriz(idContrato, AttMatrizContrato_preco_energia_imp_exp, a_periodo_estudo, a_idPatamarCarga, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CEXP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posEquZO, a_dados.getElementoMatriz(idContrato, AttMatrizContrato_preco_energia_imp_exp, a_periodo_estudo, a_idPatamarCarga, double()));
 
 			else if (getVarDecisao_CIMPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CIMP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posEquZO, -a_dados.getElementoMatriz(idContrato, AttMatrizContrato_preco_energia_imp_exp, a_periodo_estudo, a_idPatamarCarga, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_CIMP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idContrato), posEquZO, -a_dados.getElementoMatriz(idContrato, AttMatrizContrato_preco_energia_imp_exp, a_periodo_estudo, a_idPatamarCarga, double()));
 
 			else
 				throw std::invalid_argument("Não encontrada variavel de contrato");
@@ -4136,7 +4142,7 @@ void ModeloOtimizacao::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(c
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
-		const Periodo periodo_otimizacao = vetorEstagio.att(a_idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
+		const Periodo periodo_otimizacao = vetorEstagio.at(a_idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
 
 		// Variável PF
 		for (IdTermeletrica idTermeletrica = a_dados.getMenorId(IdTermeletrica()); idTermeletrica <= a_maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idTermeletrica)) {
@@ -4161,7 +4167,7 @@ void ModeloOtimizacao::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(c
 						varPTDISP = getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE);
 
 					if (varPTDISP > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP, posEquZO, -custo_de_operacao);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP, posEquZO, -custo_de_operacao);
 
 					if (tipo_detalhamento_producao == TipoDetalhamentoProducaoTermeletrica_por_usina)
 						break;
@@ -4178,7 +4184,7 @@ void ModeloOtimizacao::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(c
 
 				// Variável PD
 				if (getVarDecisao_PDseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idSubmercado, idPatamarDeficit) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PD(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idSubmercado, idPatamarDeficit), posEquZO, -a_dados.getElementoMatriz(idSubmercado, idPatamarDeficit, AttMatrizPatamarDeficit_custo, a_periodo_estudo, a_idPatamarCarga, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PD(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idSubmercado, idPatamarDeficit), posEquZO, -a_dados.getElementoMatriz(idSubmercado, idPatamarDeficit, AttMatrizPatamarDeficit_custo, a_periodo_estudo, a_idPatamarCarga, double()));
 
 			} // for (IdPatamarDeficit idPatamarDeficit = IdPatamarDeficit_1; idPatamarDeficit <= maiorIdPatamarDeficit; idPatamarDeficit++) {
 
@@ -4189,7 +4195,7 @@ void ModeloOtimizacao::criarRestricoesCustoOperacao_periodoEstudo_patamarCarga(c
 
 }
 
-void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdHidreletrica a_maiorIdHidreletrica) {
+void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdHidreletrica a_maiorIdHidreletrica) {
 	try {
 
 		if (a_TSS == TipoSubproblemaSolver_mestre)
@@ -4200,10 +4206,10 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo(const TipoSu
 
 		const int posEquZP = addEquLinear_CUSTO_PENALIDADE(a_TSS, a_idEstagio, a_periodo_estudo);
 
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZP, 0.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZP, 0.0);
 
 		// Variável ZP
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo), posEquZP, 1.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo), posEquZP, 1.0);
 
 		// Variáveis Restrição Operativa UHE
 		for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= a_maiorIdRestricaoOperativaUHE; idRestricaoOperativaUHE++) {
@@ -4216,11 +4222,11 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo(const TipoSu
 
 				// Variável RHV_FINF
 				if (getVarDecisao_RHV_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
 
 				// Variável RHV_FSUP
 				if (getVarDecisao_RHV_FSUPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
 
 			}//if (a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_volume_armazenado) {
 	
@@ -4233,11 +4239,11 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo(const TipoSu
 
 				// Variável RHE_FINF
 				if (getVarDecisao_RHE_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHE_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHE_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
 
 				// Variável RHE_FSUP
 				if (getVarDecisao_RHE_FSUPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHE_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHE_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
 
 			}//if (a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_energia_armazenada) {
 
@@ -4250,11 +4256,11 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo(const TipoSu
 
 			// Variável QEV_FINF
 			if ((getVarDecisao_QEV_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) > -1))
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_evaporacao, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_evaporacao, double()));
 
 			// Variável YHF Penalizacao e / ou Viabilidade Hidraulica
 			if (getVarDecisao_YHFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YHF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_afluencia_incremental, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YHF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_afluencia_incremental, double()));
 
 		} // for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
@@ -4281,7 +4287,7 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo(const TipoSu
 									const IdHidreletrica idHidreletrica = getIdHidreletricaFromIdProcessoEstocasticoIdVariavelAleatoriaIdVariavelAleatoriaInterna(idPEhidrologico, idVar, idVarInt);
 									penalidade += a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_afluencia_incremental, double()) * getElementoVetor(idPEhidrologico, idVar, idVarInt, AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodo, double());
 								}
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(YPF, posEquZP, -sobreposicao * penalidade);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(YPF, posEquZP, -sobreposicao * penalidade);
 							}
 						}
 					}
@@ -4302,7 +4308,7 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo(const TipoSu
 }
 
 
-void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdSubmercado a_maiorIdSubmercado, const IdIntercambio a_maiorIdIntercambio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const IdTermeletrica a_maiorIdTermeletrica, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdHidreletrica a_maiorIdHidreletrica, const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const Periodo a_periodo_otimizacao, const IdPatamarCarga a_idPatamarCarga) {
+void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdSubmercado a_maiorIdSubmercado, const IdIntercambio a_maiorIdIntercambio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const IdTermeletrica a_maiorIdTermeletrica, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdHidreletrica a_maiorIdHidreletrica, const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, Periodo &a_periodo_otimizacao, const IdPatamarCarga a_idPatamarCarga) {
 	try {
 
 		if (a_TSS == TipoSubproblemaSolver_mestre)
@@ -4313,21 +4319,21 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 		const int posEquZP = addEquLinear_CUSTO_PENALIDADE(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga);
 
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZP, 0.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquZP, 0.0);
 
 		// Variável ZP
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga), posEquZP, 1.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga), posEquZP, 1.0);
 
 
 		// Variável PI
 		for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= a_maiorIdIntercambio; idIntercambio++) {
 
 			if (getVarDecisao_PIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posEquZP, -a_dados.getAtributo(idIntercambio, AttComumIntercambio_penalidade_intercambio, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posEquZP, -a_dados.getAtributo(idIntercambio, AttComumIntercambio_penalidade_intercambio, double()));
 
 			//PI_FINF
 			if (getVarDecisao_PI_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posEquZP, -a_dados.getAtributo(idIntercambio, AttComumIntercambio_penalidade_intercambio_minimo, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PI_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambio), posEquZP, -a_dados.getAtributo(idIntercambio, AttComumIntercambio_penalidade_intercambio_minimo, double()));
 
 
 		}//for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= a_maiorIdIntercambio; idIntercambio++) {
@@ -4337,11 +4343,11 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 			// Variável RE_FINF
 			if (getVarDecisao_RE_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoEletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RE_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoEletrica), posEquZP, -a_dados.getAtributo(idRestricaoEletrica, AttComumRestricaoEletrica_penalidade_restricao_eletrica, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RE_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoEletrica), posEquZP, -a_dados.getAtributo(idRestricaoEletrica, AttComumRestricaoEletrica_penalidade_restricao_eletrica, double()));
 
 			// Variável RE_FSUP
 			if (getVarDecisao_RE_FSUPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoEletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RE_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoEletrica), posEquZP, -a_dados.getAtributo(idRestricaoEletrica, AttComumRestricaoEletrica_penalidade_restricao_eletrica, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RE_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoEletrica), posEquZP, -a_dados.getAtributo(idRestricaoEletrica, AttComumRestricaoEletrica_penalidade_restricao_eletrica, double()));
 
 
 		} // for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= maiorIdRestricaoEletrica; idRestricaoEletrica++) {
@@ -4357,11 +4363,11 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 				// Variável RHA_FINF
 				if (getVarDecisao_RHA_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHA_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHA_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
 
 				// Variável RHA_FSUP
 				if (getVarDecisao_RHA_FSUPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
 
 			}//if (a_idPatamarCarga == IdPatamarCarga_1 && a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_vazao_afluente) {
 
@@ -4373,11 +4379,11 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 				// Variável RHQ_FINF
 				if (getVarDecisao_RHQ_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoOperativaUHE) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
 
 				// Variável RHQ_FSUP
 				if (getVarDecisao_RHQ_FSUPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoOperativaUHE) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoOperativaUHE), posEquZP, -a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, double()));
 
 			}//if (a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_vazao_defluente) {
 
@@ -4393,49 +4399,49 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 			if (a_dados.getAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, bool())) {
 
 				if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_turbinamento, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_turbinamento, double()));
 
 			}//if (!a_dados.getAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, bool())) {
 			else {
 
 				if (getVarDecisao_QTURseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_turbinamento, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_turbinamento, double()));
 
 			}//else {
 
 
 			// Variável QVER
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vertimento, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vertimento, double()));
 
 			// Variável QDEF_FINF
 			if (getVarDecisao_QDEF_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vazao_defluente_minima, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vazao_defluente_minima, double()));
 
 			// Variável QDEF_FSUP
 			if (getVarDecisao_QDEF_FSUPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vazao_defluente_maxima, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vazao_defluente_maxima, double()));
 
 			// Variável QDEF_FINF
 			if (getVarDecisao_QDEF_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vazao_defluente_minima, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vazao_defluente_minima, double()));
 
 			// Variável QDEF_FSUP
 			if (getVarDecisao_QDEF_FSUPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vazao_defluente_maxima, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vazao_defluente_maxima, double()));
 
 
 			// Variável QDES_FINF
 			if (getVarDecisao_QDES_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vazao_desviada_minima, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vazao_desviada_minima, double()));
 
 			// Variável QOUT_FINF
 			if (getVarDecisao_QOUT_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vazao_retirada, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_vazao_retirada, double()));
 
 			
 			// Variável VMORTO_FINF
 			if ((getVarDecisao_VMORTO_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) > -1) && (a_idPatamarCarga == IdPatamarCarga_1))
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_volume_minimo, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_volume_minimo, double()));
 
 			//
 			// Produção Hidreletrica
@@ -4443,19 +4449,19 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 			// Variável PH_FINF
 			if (getVarDecisao_PH_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
 
 			// Variável PHDISP_FINF
 			if (getVarDecisao_PHDISP_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
 
 			// Variável QTUR_FINF
 			if (getVarDecisao_QTUR_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
 
 			// Variável QTURDISP_FINF
 			if (getVarDecisao_QTURDISP_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
 
 
 			if (a_dados.getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_meta) > 0) {
@@ -4463,10 +4469,10 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 				if (a_idPatamarCarga == IdPatamarCarga_1) {
 
 					if (getVarDecisao_PHDISPMETA_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISPMETA_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquZP, -5000);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISPMETA_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquZP, -5000);
 
 					if (getVarDecisao_PHDISPMETA_FSUPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISPMETA_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquZP, -5000);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISPMETA_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posEquZP, -5000);
 
 
 				}//if (a_idPatamarCarga == IdPatamarCarga_1) {
@@ -4481,15 +4487,15 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 				// Variável PH_FINF
 				if (getVarDecisao_PH_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
 
 				// Variável PHDISP_FINF
 				if (getVarDecisao_PHDISP_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
 
 				// Variável QTUR_FINF
 				if (getVarDecisao_QTUR_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
 
 				for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++) {
 
@@ -4499,15 +4505,15 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 					// Variável PH_FINF
 					if (getVarDecisao_PH_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
 
 					// Variável PHDISP_FINF
 					if (getVarDecisao_PHDISP_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
 
 					// Variável QTUR_FINF
 					if (getVarDecisao_QTUR_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posEquZP, -a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
 
 				} // for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++) {
 
@@ -4526,23 +4532,23 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 			// Variável PT_FINF
 			if (getVarDecisao_PT_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquZP, -a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_potencia, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquZP, -a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_potencia, double()));
 
 			// Variável PTDISP_FINF
 			if (getVarDecisao_PTDISP_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquZP, -a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_potencia, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquZP, -a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_potencia, double()));
 
 			// Variável PTDISP_FSUP
 			if (getVarDecisao_PTDISP_FSUPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquZP, -a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_potencia, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISP_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquZP, -a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_potencia, double()));
 
 			// Variável PTDISPCOM_FINF
 			if (getVarDecisao_PTDISPCOM_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquZP, -a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_comando, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquZP, -a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_comando, double()));
 
 			// Variável PTDISP_FSUP
 			if (getVarDecisao_PTDISPCOM_FSUPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquZP, -a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_comando, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), posEquZP, -a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_comando, double()));
 
 			for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= a_dados.getMaiorId(idTermeletrica, IdUnidadeUTE()); idUnidadeUTE++) {
 
@@ -4552,7 +4558,7 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 				// Variável PT_FINF
 				if (getVarDecisao_PT_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquZP, -a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_potencia, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), posEquZP, -a_dados.getAtributo(idTermeletrica, AttComumTermeletrica_penalidade_violacao_potencia, double()));
 
 			} // for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= a_dados.getMaiorId(idTermeletrica, IdUnidadeUTE()); idUnidadeUTE++) {
 
@@ -4564,11 +4570,11 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 			// Variável QOUT_FINF
 			if (getVarDecisao_QOUT_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico, a_dados.getAtributo(idIntercambioHidraulico, AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico, a_dados.getAtributo(idIntercambioHidraulico, AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquZP, -a_dados.getAtributo(idIntercambioHidraulico, AttComumIntercambioHidraulico_penalidade_retirada, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico, a_dados.getAtributo(idIntercambioHidraulico, AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquZP, -a_dados.getAtributo(idIntercambioHidraulico, AttComumIntercambioHidraulico_penalidade_retirada, double()));
 
 			// Variável QILS_TRI_FINF
 			if (getVarDecisao_QILS_TRI_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico), posEquZP, -a_dados.getAtributo(idIntercambioHidraulico, AttComumIntercambioHidraulico_penalidade_retirada, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico), posEquZP, -a_dados.getAtributo(idIntercambioHidraulico, AttComumIntercambioHidraulico_penalidade_retirada, double()));
 
 
 
@@ -4579,11 +4585,11 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 
 			// Variável QBOM_FINF
 			if (getVarDecisao_QBOM_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria), posEquZP, -a_dados.getAtributo(idUsinaElevatoria, AttComumUsinaElevatoria_penalidade_vazao_bombeada_minima, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria), posEquZP, -a_dados.getAtributo(idUsinaElevatoria, AttComumUsinaElevatoria_penalidade_vazao_bombeada_minima, double()));
 
 			// Variável QBOMDISP_FINF
 			if (getVarDecisao_QBOMDISP_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria) > -1)
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOMDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria), posEquZP, -a_dados.getAtributo(idUsinaElevatoria, AttComumUsinaElevatoria_penalidade_vazao_bombeada_minima, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOMDISP_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria), posEquZP, -a_dados.getAtributo(idUsinaElevatoria, AttComumUsinaElevatoria_penalidade_vazao_bombeada_minima, double()));
 
 
 		}//for (IdUsinaElevatoria idUsinaElevatoria = IdUsinaElevatoria_1; idUsinaElevatoria <= a_maiorIdUsinaElevatoria; idUsinaElevatoria++) {
@@ -4596,7 +4602,7 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade_periodoEstudo_patamarCarga
 }
 
 
-void ModeloOtimizacao::criarRestricoesFuncaoProducaoHidreletrica(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const SmartEnupla<Periodo, double>a_horizonte_estudo_estagio, const Periodo a_periodo_estudo) {
+void ModeloOtimizacao::criarRestricoesFuncaoProducaoHidreletrica(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPatamarCarga, const SmartEnupla<Periodo, double>&a_horizonte_estudo_estagio, Periodo &a_periodo_estudo) {
 
 	try {
 
@@ -4629,46 +4635,46 @@ void ModeloOtimizacao::criarRestricoesFuncaoProducaoHidreletrica(const TipoSubpr
 							posRestricaoPH = addIneLinear_POTENCIA_HIDRAULICA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, i);
 						}
 
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_RHS, a_periodo_estudo, i, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_RHS, a_periodo_estudo, i, double()));
 
 
 						if (a_dados.getAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, bool())) {
 
 							if (a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_FC, a_periodo_estudo, i, double()) == 0.0)
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, -1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, -1.0);
 							else
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, -1.0 / a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_FC, a_periodo_estudo, i, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, -1.0 / a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_FC, a_periodo_estudo, i, double()));
 
 
 						}//if (a_dados.getAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, bool())) {
 						else {
 
 							if (a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_FC, a_periodo_estudo, i, double()) == 0.0)
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, -1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, -1.0);
 							else
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, -1.0 / a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_FC, a_periodo_estudo, i, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, -1.0 / a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_FC, a_periodo_estudo, i, double()));
 
 
 						}//else {
 
 
 						if (a_dados.getAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, bool()))
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_QH, a_periodo_estudo, i, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_QH, a_periodo_estudo, i, double()));
 						else
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_QH, a_periodo_estudo, i, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_QH, a_periodo_estudo, i, double()));
 
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_SH, a_periodo_estudo, i, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_SH, a_periodo_estudo, i, double()));
 
 						if (a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()) > 0.0)
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMED(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMED(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 
 					} // for (int i = 1; i <= numero_planos; i++) {
 
 				}//if ((a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_turbinada_maxima, a_periodo_estudo, double()) > 0) && (a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_turbinada_disponivel_maxima, a_periodo_estudo, double()) > 0)) {
 				else {
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), 0.0);
 
 				}//else {
 
@@ -4699,47 +4705,47 @@ void ModeloOtimizacao::criarRestricoesFuncaoProducaoHidreletrica(const TipoSubpr
 									posRestricaoPH = addIneLinear_POTENCIA_HIDRAULICA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, i);
 								}
 
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_RHS, a_periodo_estudo, i, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_RHS, a_periodo_estudo, i, double()));
 
 								if (a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_FC, a_periodo_estudo, i, double()) == 0.0)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posRestricaoPH, -1.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posRestricaoPH, -1.0);
 								else
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posRestricaoPH, -1.0 / a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_FC, a_periodo_estudo, i, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posRestricaoPH, -1.0 / a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_FC, a_periodo_estudo, i, double()));
 
 								if (a_dados.getAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, bool()))
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_QH, a_periodo_estudo, i, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_QH, a_periodo_estudo, i, double()));
 								else
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_QH, a_periodo_estudo, i, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_QH, a_periodo_estudo, i, double()));
 
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_SH, a_periodo_estudo, i, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_SH, a_periodo_estudo, i, double()));
 
 								// VAZÃO TURBINADA DOS DEMAIS CONJUNTOS, É CONSIDERADA COMO VERTIMENTO PARA O ATUAL CONJUNTO
 								for (IdConjuntoHidraulico idConjunto = IdConjuntoHidraulico_1; idConjunto <= a_dados.getMaiorId(a_idHidreletrica, IdConjuntoHidraulico()); idConjunto++)
 									if (idConjunto != idConjuntoHidraulico)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjunto), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_SH, a_periodo_estudo, i, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjunto), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_SH, a_periodo_estudo, i, double()));
 
 								if (a_periodo_estudo < a_horizonte_estudo_estagio.getIteradorFinal()) {
 									if ((getVarDecisao_VIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1) && (getVarDecisao_VIseExistir(a_TSS, a_idEstagio, periodo_estudo_seguinte, a_idHidreletrica) > -1)) {
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_estudo_seguinte, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_estudo_seguinte, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 									}
 									else if ((getVarDecisao_VIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1))
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 
 									else if ((getVarDecisao_VIseExistir(a_TSS, a_idEstagio, periodo_estudo_seguinte, a_idHidreletrica) > -1))
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_estudo_seguinte, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_estudo_seguinte, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 								}
 
 								else if (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorFinal()) {
 									if ((getVarDecisao_VIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1) && (getVarDecisao_VFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1)) {
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 									}
 									else if (getVarDecisao_VIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 
 									else if (getVarDecisao_VFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 								}
 
 							} // for (int i = 1; i <= numero_planos; i++) {
@@ -4767,42 +4773,42 @@ void ModeloOtimizacao::criarRestricoesFuncaoProducaoHidreletrica(const TipoSubpr
 										posRestricaoPH = addIneLinear_POTENCIA_HIDRAULICA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, i);
 									}
 
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_RHS, a_periodo_estudo, i, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_RHS, a_periodo_estudo, i, double()));
 
 									if (a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_FC, a_periodo_estudo, i, double()) == 0.0)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posRestricaoPH, -1.0);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posRestricaoPH, -1.0);
 									else
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posRestricaoPH, -1.0 / a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_FC, a_periodo_estudo, i, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posRestricaoPH, -1.0 / a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_FC, a_periodo_estudo, i, double()));
 
 									if (a_dados.getAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, bool()))
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_QH, a_periodo_estudo, i, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_QH, a_periodo_estudo, i, double()));
 									else
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_QH, a_periodo_estudo, i, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_QH, a_periodo_estudo, i, double()));
 
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_SH, a_periodo_estudo, i, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_SH, a_periodo_estudo, i, double()));
 
 									if (a_periodo_estudo < a_horizonte_estudo_estagio.getIteradorFinal()) {
 										if ((getVarDecisao_VIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1) && (getVarDecisao_VIseExistir(a_TSS, a_idEstagio, periodo_estudo_seguinte, a_idHidreletrica) > -1)) {
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_estudo_seguinte, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_estudo_seguinte, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 										}
 										else if ((getVarDecisao_VIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1))
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 
 										else if ((getVarDecisao_VIseExistir(a_TSS, a_idEstagio, periodo_estudo_seguinte, a_idHidreletrica) > -1))
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_estudo_seguinte, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_estudo_seguinte, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 									}
 
 									else if (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorFinal()) {
 										if ((getVarDecisao_VIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1) && (getVarDecisao_VFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1)) {
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, 0.5 * a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 										}
 										else if (getVarDecisao_VIseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 
 										else if (getVarDecisao_VFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_periodo_estudo, i, double()));
 									}
 
 								} // for (int i = 1; i <= numero_planos; i++) {
@@ -4818,8 +4824,8 @@ void ModeloOtimizacao::criarRestricoesFuncaoProducaoHidreletrica(const TipoSubpr
 			}//if ((a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_turbinada_maxima, a_periodo_estudo, double()) > 0) && (a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_turbinada_disponivel_maxima, a_periodo_estudo, double()) > 0)) {
 			else {
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), 0.0);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), 0.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idHidreletrica), 0.0);
 
 			}//else {
 					
@@ -4831,11 +4837,11 @@ void ModeloOtimizacao::criarRestricoesFuncaoProducaoHidreletrica(const TipoSubpr
 }
 
 
-void ModeloOtimizacao::criarVariaveisVolume(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const SmartEnupla<Periodo, double> &a_horizonte_estudo_estagio, const SmartEnupla<Periodo, IdEstagio> &a_horizonte_estudo_vetor) {
+void ModeloOtimizacao::criarVariaveisVolume(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const SmartEnupla<Periodo, double> &a_horizonte_estudo_estagio, const SmartEnupla<Periodo, IdEstagio> &a_horizonte_estudo_vetor) {
 
 	try {
 
-		const double infinito = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
+		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
 
 		const IdEstagio estagio_inicial = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
@@ -4882,7 +4888,7 @@ void ModeloOtimizacao::criarVariaveisVolume(const TipoSubproblemaSolver a_TSS, D
 						const double volume_util_maximo = a_dados.getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_periodo_estudo, double());
 						if (volume_util_maximo > 0.0) {
 							const double volume_minimo = a_dados.getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, a_periodo_estudo, double());
-							vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) + "," + getString(volume_minimo) + "," + getString(volume_util_maximo)), addVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica, 0.0, 0.0, 0.0), -1);
+							vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) + "," + getString(volume_minimo) + "," + getString(volume_util_maximo)), addVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica, 0.0, 0.0, 0.0), -1);
 						}
 					}
 
@@ -4901,7 +4907,7 @@ void ModeloOtimizacao::criarVariaveisVolume(const TipoSubproblemaSolver a_TSS, D
 					const double volume_util_maximo = a_dados.getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_periodo_estudo, double());
 					const double volume_minimo = a_dados.getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, a_periodo_estudo, double());
 					
-					vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) + "," + getString(volume_minimo) + "," + getString(volume_util_maximo)), addVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica, 0.0, 0.0, 0.0), varVF);
+					vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) + "," + getString(volume_minimo) + "," + getString(volume_util_maximo)), addVarDecisao_VI(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica, 0.0, 0.0, 0.0), varVF);
 					
 				} // else if (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorInicial()) {
 
@@ -4918,7 +4924,7 @@ void ModeloOtimizacao::criarVariaveisVolume(const TipoSubproblemaSolver a_TSS, D
 					const int varDecisao_VF = addVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica, 0.0, a_dados.getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_periodo_estudo, double()), 0.0);
 
 					if ((!regularizacao_periodo_estudo) || (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)) // Se a usina nao tem regularizaçao entao zera o limite final
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varDecisao_VF, 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varDecisao_VF, 0.0);
 
 				} // if ((regularizacao_periodo_estudo) && (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorFinal())) {
 
@@ -4932,21 +4938,21 @@ void ModeloOtimizacao::criarVariaveisVolume(const TipoSubproblemaSolver a_TSS, D
 					int equ_VMED = getEquLinear_VOLUME_MEDIOseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica);
 
 					if (var_VMED == -1) {
-						var_VMED = addVarDecisao_VMED(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+						var_VMED = addVarDecisao_VMED(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 						equ_VMED = addEquLinear_VOLUME_MEDIO(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(var_VMED, equ_VMED, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(var_VMED, equ_VMED, 1.0);
 					}
 
 					if (varVI > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVI, equ_VMED, -0.5);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVI, equ_VMED, -0.5);
 
 						if (a_periodo_estudo > a_horizonte_estudo_estagio.getIteradorInicial())
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVI, getEquLinear_VOLUME_MEDIO(a_TSS, a_idEstagio, periodo_estudo_anterior, idHidreletrica), -0.5);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVI, getEquLinear_VOLUME_MEDIO(a_TSS, a_idEstagio, periodo_estudo_anterior, idHidreletrica), -0.5);
 					}
 
 
 					if (varVF > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVF, equ_VMED, -0.5);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVF, equ_VMED, -0.5);
 
 				}
 
@@ -4962,7 +4968,7 @@ void ModeloOtimizacao::criarVariaveisVolume(const TipoSubproblemaSolver a_TSS, D
 }
 
 
-void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdDemandaEspecial a_maiorIdDemandaEspecial, const IdUsinaEolica a_maiorIdUsinaEolica, const IdContrato a_maiorIdContrato, const IdSubmercado a_maiorIdSubmercado, const IdIntercambio a_maiorIdIntercambio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const IdTermeletrica a_maiorIdTermeletrica, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const SmartEnupla<Periodo, double>a_horizonte_estudo_estagio, TempoVariaveis& a_tempoCriarVariaveis) {
+void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdDemandaEspecial a_maiorIdDemandaEspecial, const IdUsinaEolica a_maiorIdUsinaEolica, const IdContrato a_maiorIdContrato, const IdSubmercado a_maiorIdSubmercado, const IdIntercambio a_maiorIdIntercambio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const IdTermeletrica a_maiorIdTermeletrica, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const SmartEnupla<Periodo, double>&a_horizonte_estudo_estagio, TempoVariaveis& a_tempoCriarVariaveis) {
 
 	try {
 
@@ -4972,6 +4978,7 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 			return;
 
+		/*
 		SmartEnupla<IdSubmercado, SmartEnupla<int, IdUsinaNaoSimulada>> usinaNaoSimulada_total(a_dados.getMenorId(IdSubmercado()), std::vector<SmartEnupla<int, IdUsinaNaoSimulada>>(a_maiorIdSubmercado, SmartEnupla<int, IdUsinaNaoSimulada>()));
 
 		for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
@@ -4980,11 +4987,11 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 				usinaNaoSimulada_total.at(idSubmercado) = SmartEnupla<int, IdUsinaNaoSimulada>(1, a_dados.getIdObjetos(idSubmercado, IdUsinaNaoSimulada()));
 
 		}//for (IdSubmercado idSubmercado = a_dados.getMenorId(IdSubmercado()); idSubmercado <= a_maiorIdSubmercado; a_dados.vetorSubmercado.incr(idSubmercado)) {
-
+		*/
 		auto start_clock = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> tempo;
 
-		const double infinito = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
+		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
 		for (Periodo a_periodo_estudo = a_horizonte_estudo_estagio.getIteradorInicial(); a_periodo_estudo <= a_horizonte_estudo_estagio.getIteradorFinal(); a_horizonte_estudo_estagio.incrementarIterador(a_periodo_estudo)) {
 
@@ -5060,7 +5067,11 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 
 								addVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idSubmercado, a_dados.getElementoMatriz(idSubmercado, AttMatrizSubmercado_demanda, a_periodo_estudo, idPatamarCarga, double()), a_dados.getElementoMatriz(idSubmercado, AttMatrizSubmercado_demanda, a_periodo_estudo, idPatamarCarga, double()), 0.0);
 
-								setNormalizacaoDualVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idSubmercado, 1.0 / (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double()) * double(a_periodo_estudo.getHoras())));
+								const double denominador = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double()) * double(double(a_periodo_estudo.getMinutos()) / 60.0);
+
+								if (denominador == 0) { throw std::invalid_argument("Denominador = 0.0"); }
+
+								setNormalizacaoDualVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idSubmercado, 1.0 / denominador);
 
 								if (getVarDecisao_PLseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado) < 0)
 									addVarDecisao_PL(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado, 0.0, infinito, 0.0);
@@ -5075,12 +5086,16 @@ void ModeloOtimizacao::criarVariaveisAssociadasHorizonteEstudo(const TipoSubprob
 					// VARIAVEIS POTÊNCIA USINAS NÃO SIMULADAS (PN)
 					start_clock = std::chrono::high_resolution_clock::now();
 
-					for (int tipo_usina = 1; tipo_usina <= usinaNaoSimulada_total.at(idSubmercado).size(); tipo_usina++) {
-						IdUsinaNaoSimulada idUsinaNaoSimulada = usinaNaoSimulada_total.at(idSubmercado).at(tipo_usina);
-						addVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idSubmercado, idUsinaNaoSimulada, a_dados.getElementoMatriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_minima, a_periodo_estudo, idPatamarCarga, double()), a_dados.getElementoMatriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_maxima, a_periodo_estudo, idPatamarCarga, double()), 0.0);
-						if (getVarDecisao_PNseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado) < 0)
-							addVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado, 0.0, infinito, 0.0);
-					}
+					const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.getMenorId(idSubmercado, IdUsinaNaoSimulada());
+					const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.getMaiorId(idSubmercado, IdUsinaNaoSimulada());
+
+					for(IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.incr(idSubmercado, idUsinaNaoSimulada)) {
+						if (idUsinaNaoSimulada != IdUsinaNaoSimulada_Nenhum) {
+							addVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idSubmercado, idUsinaNaoSimulada, a_dados.getElementoMatriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_minima, a_periodo_estudo, idPatamarCarga, double()), a_dados.getElementoMatriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_maxima, a_periodo_estudo, idPatamarCarga, double()), 0.0);
+							if (getVarDecisao_PNseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado) < 0)
+								addVarDecisao_PN(a_TSS, a_idEstagio, a_periodo_estudo, idSubmercado, 0.0, infinito, 0.0);
+						}//if (idUsinaNaoSimulada != IdUsinaNaoSimulada_Nenhum) {
+					}//for(IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.incr(idSubmercado, idUsinaNaoSimulada)) {
 
 					tempo = std::chrono::high_resolution_clock::now() - start_clock;
 					a_tempoCriarVariaveis.variaveisUsinaNSimulada += tempo.count() / 60;
@@ -5172,7 +5187,7 @@ void ModeloOtimizacao::setVolumeMeta(const TipoSubproblemaSolver a_TSS, Dados& a
 						if (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorFinal()) {
 
 							const int varDecisao_VF = getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica);
-							idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), varDecisao_VF, -1);
+							idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), varDecisao_VF, -1);
 
 						}//if (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorFinal()) {
 						else {
@@ -5181,13 +5196,13 @@ void ModeloOtimizacao::setVolumeMeta(const TipoSubproblemaSolver a_TSS, Dados& a
 							a_horizonte_estudo_estagio.incrementarIterador(periodo_estudo_seguinte);
 
 							const int varDecisao_VI = getVarDecisao_VI(a_TSS, a_idEstagio, periodo_estudo_seguinte, idHidreletrica);
-							idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_VI(a_TSS, a_idEstagio, periodo_estudo_seguinte, idHidreletrica), varDecisao_VI, -1);
+							idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_VI(a_TSS, a_idEstagio, periodo_estudo_seguinte, idHidreletrica), varDecisao_VI, -1);
 
 						}//else {
 
-						vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
+						vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
 						for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
-							vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idHidreletrica, IdReservatorio_1, AttMatrizReservatorio_volume_meta, idCenario, a_periodo_estudo, double()));
+							vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idHidreletrica, IdReservatorio_1, AttMatrizReservatorio_volume_meta, idCenario, a_periodo_estudo, double()));
 
 					}//if (a_dados.getElementoMatriz(idHidreletrica, IdReservatorio_1, AttMatrizReservatorio_volume_meta, IdCenario_1, a_periodo_estudo, double()) != getdoubleFromChar("min")) {
 
@@ -5236,11 +5251,11 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const TipoSubproblemaSolver a_T
 
 }
 
-void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo) {
+void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo) {
 
 	try {
 
-		const double infinito = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
+		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
 		for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
@@ -5258,15 +5273,15 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 
 						if (a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_vazao_evaporada_meta, IdCenario_1, a_periodo_estudo, double()) != getdoubleFromChar("max")) {
 
-							const IdVariavelEstado idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QEV_REL(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), varQEV_REL, -1);
+							const IdVariavelEstado idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QEV_REL(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), varQEV_REL, -1);
 
 							const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 							const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_menor_cenario, IdCenario());
 							const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_maior_cenario, IdCenario());
 
-							vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
+							vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
 							for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
-								vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_vazao_evaporada_meta, idCenario, a_periodo_estudo, double()));
+								vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_vazao_evaporada_meta, idCenario, a_periodo_estudo, double()));
 
 						} // if (a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_vazao_evaporada_meta, IdCenario_1, a_periodo_estudo, double()) != getdoubleFromChar("max")) {
 
@@ -5296,15 +5311,15 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 
 						if (a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_vazao_vertida_meta, IdCenario_1, a_periodo_estudo, double()) != getdoubleFromChar("max")) {
 
-							const IdVariavelEstado idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), varQVER, -1);
+							const IdVariavelEstado idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QVER(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), varQVER, -1);
 
 							const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 							const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_menor_cenario, IdCenario());
 							const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_maior_cenario, IdCenario());
 
-							vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
+							vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
 							for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
-								vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_vazao_vertida_meta, idCenario, a_periodo_estudo, double()));
+								vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_vazao_vertida_meta, idCenario, a_periodo_estudo, double()));
 
 						} // if (a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_vazao_vertida_meta, IdCenario_1, a_periodo_estudo, double()) != getdoubleFromChar("max")) {
 
@@ -5564,12 +5579,12 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 										} // if ((a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttMatrizUnidadeUHE_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()) > 0.0) && (getVarDecisao_PH_FINFseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) == -1)) {
 
 										else if ((a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttMatrizUnidadeUHE_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()) > 0.0) && (getVarDecisao_PH_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE) > -1))
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttMatrizUnidadeUHE_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttMatrizUnidadeUHE_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									} // if (a_dados.getSize1Matriz(idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttMatrizUnidadeUHE_potencia_disponivel_minima) > 0) {
 
 									if (a_dados.getSize1Matriz(idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttMatrizUnidadeUHE_potencia_disponivel_maxima) > 0)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttMatrizUnidadeUHE_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico, idUnidadeUHE), a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, idUnidadeUHE, AttMatrizUnidadeUHE_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								}
 
@@ -5614,7 +5629,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 							if (a_dados.getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_potencia_minima) > 0) {
 
 								if ((a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()) > 0.0) && (todo_membro_disponivel_possui_potencia_minima))
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								else if ((a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()) > 0.0) && (!todo_membro_disponivel_possui_potencia_minima)) {
 
@@ -5628,7 +5643,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 							} // if (a_dados.getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_potencia_minima) > 0) {
 
 							if (a_dados.getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_potencia_maxima) > 0)
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 						} // if (getVarDecisao_PHseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) == -1) {
 
@@ -5651,31 +5666,31 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 									const int varPHDISPMETA_FINF = addVarDecisao_PHDISPMETA_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica, 0.0, infinito, 0.0);
 									const int varPHDISPMETA_FSUP = addVarDecisao_PHDISPMETA_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica, 0.0, infinito, 0.0);
 
-									const IdVariavelEstado idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_PHDISPMETA(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), varPHDISPMETA, -1);
+									const IdVariavelEstado idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_PHDISPMETA(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), varPHDISPMETA, -1);
 
 									const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 									const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_menor_cenario, IdCenario());
 									const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_maior_cenario, IdCenario());
 
-									vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
+									vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
 									for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
-										vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_meta, idCenario, a_periodo_estudo, double()));
+										vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_meta, idCenario, a_periodo_estudo, double()));
 
 									//Adiciona Restriçao PHDISP = PHDISPMETA + PHDISPMETA_FSUP - PHDISPMETA_FINF
 									const int posEquPHDISP = addEquLinear_POTENCIA_DISPONIVEL_META(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica);
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP, 0.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP, 0.0);
 
 									//PHDISP
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPHDISP, posEquPHDISP, 1.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPHDISP, posEquPHDISP, 1.0);
 
 									//PHDISPMETA
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPHDISPMETA, posEquPHDISP, -1.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPHDISPMETA, posEquPHDISP, -1.0);
 
 									//PHDISPMETA_FSUP
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPHDISPMETA_FSUP, posEquPHDISP, -1.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPHDISPMETA_FSUP, posEquPHDISP, -1.0);
 
 									//PHDISPMETA_FINF
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPHDISPMETA_FINF, posEquPHDISP, 1.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPHDISPMETA_FINF, posEquPHDISP, 1.0);
 
 								} // if (a_dados.getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_meta)) {
 
@@ -5687,7 +5702,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 							if (a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()) > a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()) * a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_disponibilidade, a_periodo_estudo, double())) {
 
 								if (todo_membro_disponivel_possui_potencia_minima)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								else if (!todo_membro_disponivel_possui_potencia_minima) {
 
@@ -5703,7 +5718,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 
 						if (a_dados.getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_maxima) > 0) {
 							if (a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double()) < a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_maxima, a_periodo_estudo, a_idPatamarCarga, double()) * a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_disponibilidade, a_periodo_estudo, double()))
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
 						}
 
 					} // if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica) {
@@ -5721,7 +5736,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 						if (a_dados.getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_turbinada_minima) > 0) {
 
 							if ((a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_vazao_turbinada_minima, a_periodo_estudo, double()) > 0.0) && (todo_membro_disponivel_possui_vazao_turbinada_minima))
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_vazao_turbinada_minima, a_periodo_estudo, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_vazao_turbinada_minima, a_periodo_estudo, double()));
 
 							else if ((a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_vazao_turbinada_minima, a_periodo_estudo, double()) > 0.0) && (!todo_membro_disponivel_possui_vazao_turbinada_minima)) {
 
@@ -5732,7 +5747,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 						} // if (a_dados.getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_turbinada_minima) > 0) {
 
 						if (a_dados.getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_turbinada_maxima) > 0)
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_vazao_turbinada_maxima, a_periodo_estudo, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), a_dados.getElementoVetor(idHidreletrica, AttVetorHidreletrica_vazao_turbinada_maxima, a_periodo_estudo, double()));
 
 					} // if (getVarDecisao_QTURseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) == -1) {
 
@@ -5748,15 +5763,15 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 
 							if (a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_vazao_turbinada_disponivel_meta, IdCenario_1, a_periodo_estudo, double()) != getdoubleFromChar("max")) {
 
-								const IdVariavelEstado idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), varQTURDISP, -1);
+								const IdVariavelEstado idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), varQTURDISP, -1);
 
 								const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 								const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_menor_cenario, IdCenario());
 								const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_maior_cenario, IdCenario());
 
-								vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
+								vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
 								for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
-									vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_vazao_turbinada_disponivel_meta, idCenario, a_periodo_estudo, double()));
+									vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_vazao_turbinada_disponivel_meta, idCenario, a_periodo_estudo, double()));
 
 							} // if (a_dados.getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_vazao_turbinada_disponivel_meta, IdCenario_1, a_periodo_estudo, double()) != getdoubleFromChar("max")) {
 
@@ -5781,7 +5796,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 									if (a_dados.getSize1Matriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_minima) > 0) {
 
 										if ((a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()) > 0.0) && (todo_membro_disponivel_possui_potencia_minima))
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 										else if ((a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double()) > 0.0) && (!todo_membro_disponivel_possui_potencia_minima)) {
 
@@ -5795,7 +5810,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 									} // if (a_dados.getSize1Matriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_minima) > 0) {
 
 									if (a_dados.getSize1Matriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_maxima) > 0)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PH(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								} // if (getVarDecisao_PHseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico) == -1) {
 
@@ -5809,7 +5824,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 								if (a_dados.getSize1Matriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_disponivel_minima) > 0) {
 
 									if ((a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()) > 0.0) && (todo_membro_disponivel_possui_potencia_minima))
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									else if ((a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()) > 0.0) && (!todo_membro_disponivel_possui_potencia_minima)) {
 
@@ -5823,7 +5838,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 								} // if (a_dados.getSize1Matriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_disponivel_minima) > 0) {
 
 								if (a_dados.getSize1Matriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_disponivel_maxima) > 0)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), a_dados.getElementoMatriz(idHidreletrica, idConjuntoHidraulico, AttMatrizConjuntoHidraulico_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 							} // if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica) {
 
@@ -5840,7 +5855,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 								if (a_dados.getSizeVetor(idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_vazao_turbinada_minima) > 0) {
 
 									if ((a_dados.getElementoVetor(idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_vazao_turbinada_minima, a_periodo_estudo, double()) > 0.0) && (todo_membro_disponivel_possui_vazao_turbinada_minima))
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), a_dados.getElementoVetor(idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_vazao_turbinada_minima, a_periodo_estudo, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), a_dados.getElementoVetor(idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_vazao_turbinada_minima, a_periodo_estudo, double()));
 
 									else if ((a_dados.getElementoVetor(idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_vazao_turbinada_minima, a_periodo_estudo, double()) > 0.0) && (!todo_membro_disponivel_possui_vazao_turbinada_minima)) {
 
@@ -5851,7 +5866,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 								} // if (a_dados.getSizeVetor(idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_vazao_turbinada_minima) > 0) {
 
 								if (a_dados.getSizeVetor(idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_vazao_turbinada_maxima) > 0)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), a_dados.getElementoVetor(idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_vazao_turbinada_maxima, a_periodo_estudo, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico), a_dados.getElementoVetor(idHidreletrica, idConjuntoHidraulico, AttVetorConjuntoHidraulico_vazao_turbinada_maxima, a_periodo_estudo, double()));
 
 							} // if (getVarDecisao_QTURseExistir(a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, idConjuntoHidraulico) == -1) {
 
@@ -6032,7 +6047,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas_porPatamar(const TipoSubproblem
 }
 
 
-void ModeloOtimizacao::criarVariaveisDemandaEspecial(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdDemandaEspecial a_maiorIdDemandaEspecial, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::criarVariaveisDemandaEspecial(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo, const IdDemandaEspecial a_maiorIdDemandaEspecial, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
 	try {
 
 		for (IdDemandaEspecial idDemandaEspecial = IdDemandaEspecial_1; idDemandaEspecial <= a_maiorIdDemandaEspecial; idDemandaEspecial++)
@@ -6042,7 +6057,7 @@ void ModeloOtimizacao::criarVariaveisDemandaEspecial(const TipoSubproblemaSolver
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveisDemandaEspecials(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idPatamarCarga) + "," + getFullString(a_periodo_estudo) + "): \n" + std::string(erro.what())); }
 }
 
-void ModeloOtimizacao::criarVariaveisContrato(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdContrato a_maiorIdContrato, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::criarVariaveisContrato(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo, const IdContrato a_maiorIdContrato, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
 	try {
 
 		for (IdContrato idContrato = IdContrato_1; idContrato <= a_maiorIdContrato; idContrato++) {
@@ -6062,7 +6077,7 @@ void ModeloOtimizacao::criarVariaveisContrato(const TipoSubproblemaSolver a_TSS,
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveisContratos(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idPatamarCarga) + "," + getFullString(a_periodo_estudo) + "): \n" + std::string(erro.what())); }
 }
 
-void ModeloOtimizacao::criarVariaveisEolicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdUsinaEolica a_maiorIdUsinaEolica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::criarVariaveisEolicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo, const IdUsinaEolica a_maiorIdUsinaEolica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
 	try {
 
 		for (IdUsinaEolica idUsinaEolica = IdUsinaEolica_1; idUsinaEolica <= a_maiorIdUsinaEolica; idUsinaEolica++) {
@@ -6078,7 +6093,7 @@ void ModeloOtimizacao::criarVariaveisEolicas(const TipoSubproblemaSolver a_TSS, 
 }
 
 
-void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo, const IdTermeletrica a_maiorIdTermeletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo, const IdTermeletrica a_maiorIdTermeletrica, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio) {
 	try {
 		const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
 		const IdEstagio estagio_inicial = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
@@ -6089,7 +6104,7 @@ void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a
 		const Periodo periodo_estudo_inicial = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_estudo, estagio_inicial, Periodo());
 		const Periodo periodo_estudo_final = getIterador2Final(AttMatrizModeloOtimizacao_horizonte_estudo, estagio_final, Periodo());
 
-		const double infinito = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
+		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
 		for (IdTermeletrica idTermeletrica = a_dados.getMenorId(IdTermeletrica()); idTermeletrica <= a_maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idTermeletrica)) {
 
@@ -6128,8 +6143,8 @@ void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a
 
 							const int varPTDISPCOM_pat = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()), a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
 
-							const int varPTDISPCOM_FINF_pat = addVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
-							const int varPTDISPCOM_FSUP_pat = addVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+							const int varPTDISPCOM_FINF_pat = addVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+							const int varPTDISPCOM_FSUP_pat = addVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
 						} // if (lag_mensal_potencia_disponivel_comandada > 0) {
 
@@ -6188,7 +6203,7 @@ void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a
 							//
 
 							if (a_dados.getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima) > 0)
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica, idUnidadeUTE), a_dados.getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 						} // if (a_dados.getElementoVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade, a_periodo_estudo, double()) > 0.0) {
 
@@ -6220,15 +6235,15 @@ void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a
 
 							if (a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_meta, IdCenario_1, a_periodo_estudo, double()) != getdoubleFromChar("max")) {
 
-								const IdVariavelEstado idVariavelEstado = vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, idTermeletrica), varPTDISP, -1);
+								const IdVariavelEstado idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, idTermeletrica), varPTDISP, -1);
 
 								const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 								const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_menor_cenario, IdCenario());
 								const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_maior_cenario, IdCenario());
 
-								vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
+								vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
 								for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
-									vetorEstagio.att(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_meta, idCenario, a_periodo_estudo, double()));
+									vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_meta, idCenario, a_periodo_estudo, double()));
 
 							} // if (a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_meta, IdCenario_1, a_periodo_estudo, double()) != getdoubleFromChar("max")) {
 
@@ -6257,10 +6272,10 @@ void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a
 								potencia_disponivel_maxima = a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double());
 
 						if (potencia_disponivel_minima > -1.0)
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 						if (potencia_disponivel_maxima > -1.0)
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idTermeletrica), a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, a_periodo_estudo, a_idPatamarCarga, double()));
 
 						const double potencia_minima = a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_minima, a_periodo_estudo, a_idPatamarCarga, double());
 
@@ -6282,7 +6297,7 @@ void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveisTermeletricas(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idPatamarCarga) + "," + getFullString(a_periodo_estudo) + "): \n" + std::string(erro.what())); }
 }
 
-int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_penalizacao) {
+int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_penalizacao) {
 
 	try {
 
@@ -6295,7 +6310,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FI
 				return -2;
 		}
 
-		if ((!vetorEstagio.att(a_idEstagio).isSolverInstanciado(a_TSS)) || (a_TSS == TipoSubproblemaSolver_mestre))
+		if ((!vetorEstagio.at(a_idEstagio).isSolverInstanciado(a_TSS)) || (a_TSS == TipoSubproblemaSolver_mestre))
 			return -1;
 	
 		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
@@ -6328,7 +6343,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FI
 					const int varZPO_VF_FINF = criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(a_TSS, a_dados, a_idEstagio, periodo_penalizacao);
 					
 					if (varZPO_VF_FINF > -1)
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZPO_VF_FINF, getEquLinear_CUSTO_PENALIDADE_0(a_TSS, a_idEstagio, periodo_otimizacao), -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZPO_VF_FINF, getEquLinear_CUSTO_PENALIDADE_0(a_TSS, a_idEstagio, periodo_otimizacao), -1.0);
 
 					periodo_penalizacao = Periodo(TipoPeriodo_minuto, Periodo(TipoPeriodo_anual, periodo_penalizacao) + 1) - 1;
 
@@ -6405,30 +6420,30 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FI
 							if (getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0seExistir(a_TSS, a_idEstagio, a_periodo_penalizacao) == -1) {
 								addEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, a_periodo_penalizacao);
 
-								varZP0_VF_FINF = addVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, a_periodo_penalizacao, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+								varZP0_VF_FINF = addVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, a_periodo_penalizacao, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF, getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, a_periodo_penalizacao), 1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF, getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, a_periodo_penalizacao), 1.0);
 
 								if (varZP0_VF_FINF_ant != -1) {
 									const int varZP0_VF_FINF_ADD = addVarDecisao_ZP0_VF_FINF_ADD(a_TSS, a_idEstagio, a_periodo_penalizacao, 0.0, 0.0, 0.0);
-									vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, a_periodo_penalizacao)), varZP0_VF_FINF_ADD, varZP0_VF_FINF_ant);
+									vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, a_periodo_penalizacao)), varZP0_VF_FINF_ADD, varZP0_VF_FINF_ant);
 
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF_ADD, getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, a_periodo_penalizacao), -1.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF_ADD, getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, a_periodo_penalizacao), -1.0);
 								}
 
 							} // if (getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0seExistir(a_TSS, a_idEstagio, a_periodo_penalizacao) == -1) {
 
-							const int varZP0_VF_FINF_per = addVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+							const int varZP0_VF_FINF_per = addVarDecisao_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 							const int equZP0_VF_FINF_per = addEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao);
 
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF_per, equZP0_VF_FINF_per, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF_per, equZP0_VF_FINF_per, 1.0);
 
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF_per, getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, a_periodo_penalizacao), -1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VF_FINF_per, getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, a_periodo_penalizacao), -1.0);
 
 						} // if (getVarDecisao_ZP0_VF_FINFseExistir(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao) == -1) {
 
 						const double valor_penalidade = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_penalidade_volume_util_minimo, double()) * a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, periodo, double());
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo, idHidreletrica), getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao), -valor_penalidade);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo, idHidreletrica), getEquLinear_CUSTO_PENALIDADE_VOLUME_INFERIOR_0(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao), -valor_penalidade);
 
 					} // if (getVarDecisao_VF_FINFseExistir(a_TSS, a_idEstagio, periodo, idHidreletrica) > -1) {
 				} // for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
@@ -6442,9 +6457,9 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FI
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(a_dados," + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getString(a_periodo_penalizacao) + "): \n" + std::string(erro.what())); }
 
-} // int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo) {
+} // int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo) {
 
-int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdHidreletrica a_idHidreletrica, const Periodo a_periodo_lag) {
+int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdHidreletrica a_idHidreletrica, Periodo &a_periodo_lag) {
 
 	try {
 
@@ -6453,7 +6468,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(c
 		if (a_idEstagio < menor_estagio)
 			return -1;
 
-		if ((!vetorEstagio.att(a_idEstagio).isSolverInstanciado(a_TSS)) || (a_TSS == TipoSubproblemaSolver_mestre))
+		if ((!vetorEstagio.at(a_idEstagio).isSolverInstanciado(a_TSS)) || (a_TSS == TipoSubproblemaSolver_mestre))
 			return -1;
 
 		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
@@ -6472,7 +6487,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(c
 		if (varQDEFLAG > -1)
 			return varQDEFLAG;
 
-		const double infinito = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
+		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
 		varQDEFLAG = addVarDecisao_QDEFLAG(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idHidreletrica,  0.0, infinito, 0.0);
 
@@ -6482,7 +6497,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(c
 		if (sobreposicao_periodo_otimizacao > 0.0) {
 
 			equQDEFLAG = addEquLinear_VAZAO_DEFLUENTE_LAG(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idHidreletrica);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEFLAG, equQDEFLAG, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEFLAG, equQDEFLAG, 1.0);
 
 			bool sobreposicao_encontrada = false;
 			for (Periodo periodo = periodo_inicial_horizonte_estudo; periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo)) {
@@ -6490,7 +6505,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(c
 				const double sobreposicao = a_periodo_lag.sobreposicao(periodo);
 
 				if (sobreposicao > 0.0) {
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, periodo, a_idHidreletrica), equQDEFLAG, -sobreposicao);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, periodo, a_idHidreletrica), equQDEFLAG, -sobreposicao);
 					if (!sobreposicao_encontrada)
 						sobreposicao_encontrada = true;
 				}
@@ -6524,10 +6539,10 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(c
 
 					if (equQDEFLAG == -1) {
 						equQDEFLAG = addEquLinear_VAZAO_DEFLUENTE_LAG(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idHidreletrica);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEFLAG, equQDEFLAG, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEFLAG, equQDEFLAG, 1.0);
 					}
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEF, equQDEFLAG, -sobreposicao);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEF, equQDEFLAG, -sobreposicao);
 
 					if (!sobreposicao_encontrada)
 						sobreposicao_encontrada = true;
@@ -6563,13 +6578,13 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(c
 
 				// Variáveis de estado a repassar lag
 				if (sobreposicao_periodo_otimizacao == 0.0)
-					vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QDEFLAG(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idHidreletrica), varQDEFLAG, varQDEFLAG_anterior);
+					vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QDEFLAG(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idHidreletrica), varQDEFLAG, varQDEFLAG_anterior);
 
 				// Variáveis de estado a compor lag
 				else if (sobreposicao_periodo_otimizacao > 0.0) {
 					const int varQDEFLAG_ADD = addVarDecisao_QDEFLAG_ADD(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idHidreletrica, 0.0, infinito, 0.0);
-					vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QDEFLAG(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idHidreletrica), varQDEFLAG_ADD, varQDEFLAG_anterior);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEFLAG_ADD, equQDEFLAG, -1.0);
+					vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeVarDecisao_QDEFLAG(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idHidreletrica), varQDEFLAG_ADD, varQDEFLAG_anterior);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEFLAG_ADD, equQDEFLAG, -1.0);
 				}
 
 			} // if ((varQDEFLAG_anterior > -1) || ((idEstagio_anterior == menor_estagio) && (periodo_inicial_horizonte_estudo > a_periodo_lag))) {
@@ -6580,9 +6595,9 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(c
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(a_dados," + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getString(a_periodo) + "," + getFullString(a_idHidreletrica) + "," + getString(a_periodo_lag) + "): \n" + std::string(erro.what())); }
 
-} // int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdHidreletrica a_idHidreletrica) {
+} // int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdHidreletrica a_idHidreletrica) {
 
-int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo_lag, const double a_grau_liberdade, std::vector<IdHidreletrica> a_listaIdHidreletrica) {
+int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, Periodo &a_periodo_lag, const double a_grau_liberdade, std::vector<IdHidreletrica> a_listaIdHidreletrica) {
 
 	try {
 
@@ -6594,7 +6609,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 		if (a_idEstagio < menor_estagio)
 			return -1;
 
-		if ((!vetorEstagio.att(a_idEstagio).isSolverInstanciado(a_TSS)) && (a_TSS == TipoSubproblemaSolver_mestre))
+		if ((!vetorEstagio.at(a_idEstagio).isSolverInstanciado(a_TSS)) && (a_TSS == TipoSubproblemaSolver_mestre))
 			return -1;
 
 		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
@@ -6664,7 +6679,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 		if (varYP > -1)
 			return varYP;
 
-		const double infinito = vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito();
+		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 		varYP = addVarDecisao_YP(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria, -infinito, infinito, 0.0);
 
 		// Composicao de lag com periodos do horizonte de estudo
@@ -6674,7 +6689,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 		if (sobreposicao_periodo_otimizacao > 0.0) {
 
 			equYP = addEquLinear_YP(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, equYP, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, equYP, 1.0);
 
 			bool sobreposicao_encontrada = false;
 			for (Periodo periodo = periodo_inicial_proc_estoc_hidrologico; periodo <= periodo_final_proc_estoc_hidrologico; proc_estoc_hidrologico.incrementarIterador(periodo)) {
@@ -6692,7 +6707,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 							grau_liberdade += getAtributo(idProcessoEstocastico_modelo, idVarEquiv.at(i), idVarIntEquiv.at(i).at(j), AttComumVariavelAleatoriaInterna_grau_liberdade, double());
 						}
 
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YP(a_TSS, a_idEstagio, periodo_otimizacao, periodo, idProcessoEstocastico_modelo, idVarEquiv.at(i)), equYP, -sobreposicao * coeficiente_participacao);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YP(a_TSS, a_idEstagio, periodo_otimizacao, periodo, idProcessoEstocastico_modelo, idVarEquiv.at(i)), equYP, -sobreposicao * coeficiente_participacao);
 						rhs_equYP += (a_grau_liberdade - grau_liberdade) * sobreposicao;
 					}
 
@@ -6704,7 +6719,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 
 			} // for (Periodo periodo = periodo_inicial_proc_estoc_hidrologico; periodo <= periodo_final_proc_estoc_hidrologico; proc_estoc_hidrologico.incrementarIterador(periodo)) {
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equYP, rhs_equYP);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equYP, rhs_equYP);
 
 		} // if (sobreposicao_periodo_otimizacao > 0.0) {
 
@@ -6750,16 +6765,16 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 
 						if (equYP == -1) {
 							equYP = addEquLinear_YP(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, equYP, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, equYP, 1.0);
 						}
 
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYH, equYP, -sobreposicao);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYH, equYP, -sobreposicao);
 
 					} // for (int i = 0; i < int(a_listaIdHidreletrica.size()); i++) {
 
 					rhs_equYP += (a_grau_liberdade)*sobreposicao;
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equYP, rhs_equYP);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equYP, rhs_equYP);
 
 					if (!sobreposicao_encontrada)
 						sobreposicao_encontrada = true;
@@ -6797,13 +6812,13 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 
 				// Variáveis de estado a repassar lag
 				if (sobreposicao_periodo_otimizacao == 0.0)
-					vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_YP(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria) + "," + getString(a_grau_liberdade) + "," + getStringFromLista(a_listaIdHidreletrica, ",", false)), varYP, varYP_anterior);
+					vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_YP(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria) + "," + getString(a_grau_liberdade) + "," + getStringFromLista(a_listaIdHidreletrica, ",", false)), varYP, varYP_anterior);
 
 				// Variáveis de estado a compor lag
 				else if (sobreposicao_periodo_otimizacao > 0.0) {
 					const int varYP_ADD = addVarDecisao_YP_ADD(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria, -infinito, infinito, 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP_ADD, equYP, -1.0);
-					vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_YP(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria) + "," + getString(a_grau_liberdade) + "," + getStringFromLista(a_listaIdHidreletrica, ",", false)), varYP_ADD, varYP_anterior);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP_ADD, equYP, -1.0);
+					vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_YP(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria) + "," + getString(a_grau_liberdade) + "," + getStringFromLista(a_listaIdHidreletrica, ",", false)), varYP_ADD, varYP_anterior);
 				}
 
 			} // if ((varYP_anterior > -1) || ((idEstagio_anterior == menor_estagio) && (periodo_inicial_proc_estoc_hidrologico > a_idVariavelAleatoria))) {
@@ -6816,7 +6831,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 
 }
 
-int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdPatamarCarga a_idPatamarCarga, const IdTermeletrica a_idTermeletrica, const double a_potencia_disponivel_minima, const double a_potencia_disponivel_maxima) {
+int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdPatamarCarga a_idPatamarCarga, const IdTermeletrica a_idTermeletrica, const double a_potencia_disponivel_minima, const double a_potencia_disponivel_maxima) {
 
 	try {
 
@@ -6829,7 +6844,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 				return -2;
 		}
 
-		if ((!vetorEstagio.att(a_idEstagio).isSolverInstanciado(a_TSS)) || (a_TSS == TipoSubproblemaSolver_mestre) || (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica))
+		if ((!vetorEstagio.at(a_idEstagio).isSolverInstanciado(a_TSS)) || (a_TSS == TipoSubproblemaSolver_mestre) || (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica))
 			return -1;
 
 		const int lag_mensal_potencia_comandada = a_dados.getAtributo(a_idTermeletrica, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int());
@@ -6849,17 +6864,17 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 			else if ((periodo_comando_minuto.sobreposicao(periodo_otimizacao) == 0.0) && ((periodo_otimizacao < periodo_comando_minuto) && (periodo_comando_minuto < (Periodo(TipoPeriodo_minuto, getAtributo(getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()), AttComumEstagio_periodo_otimizacao, Periodo()) + 1) - 1))))
 				return -1;
 
-			varPTDISPCOM = addVarDecisao_PTDISPCOM(a_TSS, a_idEstagio, a_periodo, a_idTermeletrica, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+			varPTDISPCOM = addVarDecisao_PTDISPCOM(a_TSS, a_idEstagio, a_periodo, a_idTermeletrica, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
 			const int varPTDISPCOM_anterior = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, IdEstagio(a_idEstagio - 1), a_periodo, a_idPatamarCarga, a_idTermeletrica, a_potencia_disponivel_minima, a_potencia_disponivel_maxima);
 
 			if (varPTDISPCOM_anterior < 0) {
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPTDISPCOM, a_potencia_disponivel_minima);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varPTDISPCOM, a_potencia_disponivel_maxima);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPTDISPCOM, a_potencia_disponivel_minima);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varPTDISPCOM, a_potencia_disponivel_maxima);
 			}
 			
 			if (varPTDISPCOM_anterior != -1)
-				vetorEstagio.att(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_PTDISPCOM(a_TSS, a_idEstagio, a_periodo, a_idTermeletrica) + "," + getString(a_potencia_disponivel_minima) + "," + getString(a_potencia_disponivel_maxima)), varPTDISPCOM, varPTDISPCOM_anterior);
+				vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeVarDecisao_PTDISPCOM(a_TSS, a_idEstagio, a_periodo, a_idTermeletrica) + "," + getString(a_potencia_disponivel_minima) + "," + getString(a_potencia_disponivel_maxima)), varPTDISPCOM, varPTDISPCOM_anterior);
 
 			return varPTDISPCOM;
 
@@ -6871,7 +6886,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 		if (varPTDISPCOM_pat > -1)
 			return varPTDISPCOM_pat;
 
-		varPTDISPCOM_pat = addVarDecisao_PTDISPCOM(a_TSS, a_idEstagio, a_periodo, a_idPatamarCarga, a_idTermeletrica, 0.0, vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+		varPTDISPCOM_pat = addVarDecisao_PTDISPCOM(a_TSS, a_idEstagio, a_periodo, a_idPatamarCarga, a_idTermeletrica, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
 		// Verifica incidencia de pré comando em dados de entrada
 		Periodo ultimo_periodo_sobreposicao;
@@ -6896,8 +6911,8 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 
 						// Com sobreposicao ~exata, restrição POTENCIA_TERMICA_DISPONIVEL_COMANDADA_pat não é criada
 						if (doubleCompara(1e-6, sobreposicao, 1.0)) {
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPTDISPCOM_pat, potencia_disponivel_comandada);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varPTDISPCOM_pat, potencia_disponivel_comandada);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPTDISPCOM_pat, potencia_disponivel_comandada);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varPTDISPCOM_pat, potencia_disponivel_comandada);
 							return varPTDISPCOM_pat;
 						}
 
@@ -6905,12 +6920,12 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 
 						if (equPTDISPCOM_pat == -1) {
 							equPTDISPCOM_pat = addEquLinear_POTENCIA_TERMICA_DISPONIVEL_COMANDADA(a_TSS, a_idEstagio, a_periodo, a_idPatamarCarga, a_idTermeletrica);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_pat, equPTDISPCOM_pat, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_pat, equPTDISPCOM_pat, 1.0);
 						}
 
 						int varPTDISPPRECOM_pat = addVarDecisao_PTDISPPRECOM(a_TSS, a_idEstagio, periodo, a_idPatamarCarga, a_idTermeletrica, potencia_disponivel_comandada, potencia_disponivel_comandada, 0.0);
 
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPPRECOM_pat, equPTDISPCOM_pat, -sobreposicao);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPPRECOM_pat, equPTDISPCOM_pat, -sobreposicao);
 
 						sobreposicao_acumulada += sobreposicao;
 
@@ -6945,7 +6960,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 		// Verifica se periodo complementar engloba um único mês (maxima performance)
 		if ((idMes_inicio == idMes_final) && (idAno_inicio == idAno_final)) {
 
-			const Periodo periodo_comando = Periodo(idMes_inicio, idAno_inicio);
+			Periodo periodo_comando = Periodo(idMes_inicio, idAno_inicio);
 
 			const int varPTDISPCOM = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, a_idEstagio, periodo_comando, IdPatamarCarga_Nenhum, a_idTermeletrica, a_potencia_disponivel_minima, a_potencia_disponivel_maxima);
 
@@ -6953,10 +6968,10 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 
 			if (equPTDISPCOM_pat == -1) {
 				equPTDISPCOM_pat = addEquLinear_POTENCIA_TERMICA_DISPONIVEL_COMANDADA(a_TSS, a_idEstagio, a_periodo, a_idPatamarCarga, a_idTermeletrica);
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_pat, equPTDISPCOM_pat, 1.0);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_pat, equPTDISPCOM_pat, 1.0);
 			}
 
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM, equPTDISPCOM_pat, -sobreposicao_complementar);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM, equPTDISPCOM_pat, -sobreposicao_complementar);
 
 			return varPTDISPCOM_pat;
 
@@ -6975,7 +6990,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 
 				const double parcela_sobreposicao_complementar = double(contador_minuto)  / double(a_periodo.getMinutos());
 
-				const Periodo periodo_comando = Periodo(idMes_ultimo, idAno_ultimo);
+				Periodo periodo_comando = Periodo(idMes_ultimo, idAno_ultimo);
 
 				const int varPTDISPCOM = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, a_idEstagio, periodo_comando, IdPatamarCarga_Nenhum, a_idTermeletrica, a_potencia_disponivel_minima, a_potencia_disponivel_maxima);
 
@@ -6983,10 +6998,10 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 
 				if (equPTDISPCOM_pat == -1) {
 					equPTDISPCOM_pat = addEquLinear_POTENCIA_TERMICA_DISPONIVEL_COMANDADA(a_TSS, a_idEstagio, a_periodo, a_idPatamarCarga, a_idTermeletrica);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_pat, equPTDISPCOM_pat, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_pat, equPTDISPCOM_pat, 1.0);
 				}
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM, equPTDISPCOM_pat, -sobreposicao_complementar);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM, equPTDISPCOM_pat, -sobreposicao_complementar);
 
 				sobreposicao_complementar -= parcela_sobreposicao_complementar;
 
@@ -7015,7 +7030,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_dados," + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getString(a_periodo) + "," + getFullString(a_idPatamarCarga) + "," + getFullString(a_idTermeletrica) + "," + getFullString(a_potencia_disponivel_minima) + "," + getFullString(a_potencia_disponivel_maxima) + "): \n" + std::string(erro.what())); }
 
-} // int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo, const IdHidreletrica a_idHidreletrica) {
+} // int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEFLAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdHidreletrica a_idHidreletrica) {
 
 
 void ModeloOtimizacao::addCorteBendersToZF(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_anterior, const IdRealizacao a_idRealizacao, const IdCorteBenders a_idCorteBenders) {
@@ -7034,7 +7049,7 @@ void ModeloOtimizacao::addCorteBendersToZF(const TipoSubproblemaSolver a_TSS, co
 		else if (posIneZF == -1)
 			posIneZF = addIneLinear_CB_ZF(a_TSS, a_idEstagio_anterior, periodo_otimizacao_anterior, a_idRealizacao, a_idCorteBenders);
 
-		vetorEstagio.att(a_idEstagio_anterior).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio_anterior, periodo_otimizacao_anterior, a_idRealizacao), posIneZF, 1.0);
+		vetorEstagio.at(a_idEstagio_anterior).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio_anterior, periodo_otimizacao_anterior, a_idRealizacao), posIneZF, 1.0);
 
 		setCorteBendersToZF(a_TSS, a_idEstagio, a_idEstagio_anterior, a_idRealizacao, a_idCorteBenders);
 
@@ -7051,29 +7066,29 @@ void ModeloOtimizacao::setCorteBendersToZF(const TipoSubproblemaSolver a_TSS, co
 		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 			return;
 
-		const Periodo periodo_otimizacao_anterior = vetorEstagio.att(a_idEstagio_anterior).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
+		const Periodo periodo_otimizacao_anterior = vetorEstagio.at(a_idEstagio_anterior).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
 
 		const int posIneZF = getIneLinear_CB_ZF(a_TSS, a_idEstagio_anterior, periodo_otimizacao_anterior, a_idRealizacao, a_idCorteBenders);
 
 		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(a_idEstagio, IdVariavelEstado()); idVariavelEstado++) {
 
-			if (vetorEstagio.att(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
+			if (vetorEstagio.at(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
 				const int idVariavelDecisaoEstagioAnterior = getAtributo(a_idEstagio, idVariavelEstado, AttComumVariavelEstado_idVariavelDecisaoEstagioAnterior, int());
 
 				if (idVariavelDecisaoEstagioAnterior < 0)
-					vetorEstagio.att(a_idEstagio).anularVariavelEstadoCorteBenders(idVariavelEstado);
+					vetorEstagio.at(a_idEstagio).anularVariavelEstadoCorteBenders(idVariavelEstado);
 				else
-					vetorEstagio.att(a_idEstagio_anterior).getSolver(a_TSS)->setCofRestricao(idVariavelDecisaoEstagioAnterior, posIneZF, -getElementoMatriz(a_idEstagio, a_idCorteBenders, AttMatrizCorteBenders_coeficiente, a_idRealizacao, idVariavelEstado, double()));
+					vetorEstagio.at(a_idEstagio_anterior).getSolver(a_TSS)->setCofRestricao(idVariavelDecisaoEstagioAnterior, posIneZF, -getElementoMatriz(a_idEstagio, a_idCorteBenders, AttMatrizCorteBenders_coeficiente, a_idRealizacao, idVariavelEstado, double()));
 
-			} // if (vetorEstagio.att(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
+			} // if (vetorEstagio.at(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
 			else
-				vetorEstagio.att(a_idEstagio).anularVariavelEstadoCorteBenders(idVariavelEstado);
+				vetorEstagio.at(a_idEstagio).anularVariavelEstadoCorteBenders(idVariavelEstado);
 
 		} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(a_idEstagio, IdVariavelEstado()); idVariavelEstado++) {
 
-		vetorEstagio.att(a_idEstagio_anterior).getSolver(a_TSS)->setRHSRestricao(posIneZF, getElementoVetor(a_idEstagio, a_idCorteBenders, AttVetorCorteBenders_rhs, a_idRealizacao, double()));
+		vetorEstagio.at(a_idEstagio_anterior).getSolver(a_TSS)->setRHSRestricao(posIneZF, getElementoVetor(a_idEstagio, a_idCorteBenders, AttVetorCorteBenders_rhs, a_idRealizacao, double()));
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::setCorteBendersToZF(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idEstagio_anterior) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "): \n" + std::string(erro.what())); }
@@ -7088,14 +7103,14 @@ void ModeloOtimizacao::remCorteBendersFromZF(const TipoSubproblemaSolver a_TSS, 
 		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 			return;
 
-		const Periodo periodo_otimizacao_anterior = vetorEstagio.att(a_idEstagio_anterior).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
+		const Periodo periodo_otimizacao_anterior = vetorEstagio.at(a_idEstagio_anterior).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
 
 		const int posIneZF = getIneLinear_CB_ZFseExistir(a_TSS, a_idEstagio_anterior, periodo_otimizacao_anterior, a_idRealizacao, a_idCorteBenders);
 
 		if (posIneZF == -1)
 			return;
 
-		vetorEstagio.att(a_idEstagio_anterior).getSolver(a_TSS)->remRestricao(posIneZF);
+		vetorEstagio.at(a_idEstagio_anterior).getSolver(a_TSS)->remRestricao(posIneZF);
 
 		idx_IneLinear_CB_ZF_4.at(a_TSS).at(a_idEstagio_anterior).at(periodo_otimizacao_anterior).at(a_idRealizacao).at(a_idCorteBenders) = SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>();
 
@@ -7119,7 +7134,7 @@ void ModeloOtimizacao::addCorteBendersToZT(const TipoSubproblemaSolver a_TSS, co
 		else if (posIneZT == -1)
 			posIneZT = addIneLinear_CB_ZT(a_TSS, a_idEstagio, periodo_otimizacao, a_idRealizacao, a_idCorteBenders);
 
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, periodo_otimizacao, a_idRealizacao), posIneZT, 1.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZT(a_TSS, a_idEstagio, periodo_otimizacao, a_idRealizacao), posIneZT, 1.0);
 
 		setCorteBendersToZT(a_TSS, a_idEstagio, a_idRealizacao, a_idCorteBenders);
 
@@ -7132,29 +7147,29 @@ void ModeloOtimizacao::setCorteBendersToZT(const TipoSubproblemaSolver a_TSS, co
 
 	try {
 
-		const Periodo periodo_otimizacao = vetorEstagio.att(a_idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
+		const Periodo periodo_otimizacao = vetorEstagio.at(a_idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
 
 		const int posIneZT = getIneLinear_CB_ZT(a_TSS, a_idEstagio, periodo_otimizacao, a_idRealizacao, a_idCorteBenders);
 
 		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(a_idEstagio, IdVariavelEstado()); idVariavelEstado++) {
 
-			if (vetorEstagio.att(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
+			if (vetorEstagio.at(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
 				const int idVariavelDecisao = getElementoVetor(a_idEstagio, idVariavelEstado, AttVetorVariavelEstado_idVariavelDecisao, a_TSS, int());
 
 				if (idVariavelDecisao < 0)
-					vetorEstagio.att(a_idEstagio).anularVariavelEstadoCorteBenders(idVariavelEstado);
+					vetorEstagio.at(a_idEstagio).anularVariavelEstadoCorteBenders(idVariavelEstado);
 				else
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(idVariavelDecisao, posIneZT, -getElementoMatriz(a_idEstagio, a_idCorteBenders, AttMatrizCorteBenders_coeficiente, a_idRealizacao, idVariavelEstado, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(idVariavelDecisao, posIneZT, -getElementoMatriz(a_idEstagio, a_idCorteBenders, AttMatrizCorteBenders_coeficiente, a_idRealizacao, idVariavelEstado, double()));
 
-			} // if (vetorEstagio.att(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
+			} // if (vetorEstagio.at(a_idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
 			else
-				vetorEstagio.att(a_idEstagio).anularVariavelEstadoCorteBenders(idVariavelEstado);
+				vetorEstagio.at(a_idEstagio).anularVariavelEstadoCorteBenders(idVariavelEstado);
 
 		} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_coeficiente.getIteradorFinal(); idVariavelEstado++) {
 
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneZT, getElementoVetor(a_idEstagio, a_idCorteBenders, AttVetorCorteBenders_rhs, a_idRealizacao, double()));
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneZT, getElementoVetor(a_idEstagio, a_idCorteBenders, AttVetorCorteBenders_rhs, a_idRealizacao, double()));
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::setCorteBendersToZT(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "): \n" + std::string(erro.what())); }
@@ -7165,14 +7180,14 @@ void ModeloOtimizacao::remCorteBendersFromZT(const TipoSubproblemaSolver a_TSS, 
 
 	try {
 
-		const Periodo periodo_otimizacao = vetorEstagio.att(a_idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
+		const Periodo periodo_otimizacao = vetorEstagio.at(a_idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
 
 		const int posIneZT = getIneLinear_CB_ZTseExistir(a_TSS, a_idEstagio, periodo_otimizacao, a_idRealizacao, a_idCorteBenders);
 
 		if (posIneZT == -1)
 			return;
 
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->remRestricao(posIneZT);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->remRestricao(posIneZT);
 
 		idx_IneLinear_CB_ZT_4.at(a_TSS).at(a_idEstagio).at(periodo_otimizacao).at(a_idRealizacao).at(a_idCorteBenders) = SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>();
 
@@ -7222,7 +7237,7 @@ bool ModeloOtimizacao::isNecessarioInstanciarSolver(const IdEstagio a_idEstagio,
 }
 
 
-void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio)
+void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const SmartEnupla<Periodo, int>& a_horizonte_processo_estocastico, const SmartEnupla<Periodo, double>& a_horizonte_estudo_estagio)
 {
 
 	try {
@@ -7256,10 +7271,10 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 
 					const int posIneRHA = addIneLinear_RESTRICAO_HIDRAULICA_AFLUENTE_LIMITE_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHA, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_periodo_estudo, IdPatamarCarga_1, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHA, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 					// Variável de folga RHA_FINF				
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHA_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHA, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHA_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHA, 1.0);
 
 					const IdElementoSistema maiorElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 					for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorElementoSistema; idElementoSistema++) {
@@ -7281,13 +7296,13 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 								a_horizonte_processo_estocastico.incrementarIterador(proximo_periodo_processo_estocastico);
 
 								if ((periodo <= a_periodo_estudo) && (a_periodo_estudo < proximo_periodo_processo_estocastico)) {
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica), posIneRHA, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica), posIneRHA, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
 									break;
 								}
 
 								else if ((a_periodo_estudo <= periodo) && (periodo < proximo_periodo_estudo)) {
 									const double fator_tempo = double(periodo.getMinutos()) / double(a_periodo_estudo.getMinutos());
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica), posIneRHA, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()) * fator_tempo);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica), posIneRHA, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()) * fator_tempo);
 								}
 							}
 
@@ -7304,7 +7319,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 
 									const double duracao_patamar = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double());
 
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idHidreletrica_montante), posIneRHA, duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idHidreletrica_montante), posIneRHA, duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
 
 								}//// for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
@@ -7322,7 +7337,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
 									const double duracao_patamar = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double());
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idHidreletrica_montante_desvio, idHidreletrica), posIneRHA, duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idHidreletrica_montante_desvio, idHidreletrica), posIneRHA, duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
 
 								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
@@ -7346,7 +7361,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 										const double duracao_patamar = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double());
 
 										if (getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHA, duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHA, duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
 
 									}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
@@ -7372,7 +7387,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 										const double duracao_patamar = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double());
 
 										if (getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posIneRHA, duracao_patamar * a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posIneRHA, duracao_patamar * a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
 
 									}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
@@ -7400,10 +7415,10 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 
 					const int posIneRHA = addIneLinear_RESTRICAO_HIDRAULICA_AFLUENTE_LIMITE_SUPERIOR(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHA, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_periodo_estudo, IdPatamarCarga_1, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHA, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 					// Variável de folga RHA_FSUP					
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHA, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHA, 1.0);
 
 					const IdElementoSistema maiorElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 					for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorElementoSistema; idElementoSistema++) {
@@ -7424,13 +7439,13 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 								a_horizonte_processo_estocastico.incrementarIterador(proximo_periodo_processo_estocastico);
 
 								if ((periodo <= a_periodo_estudo) && (a_periodo_estudo < proximo_periodo_processo_estocastico)) {
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica), posIneRHA, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica), posIneRHA, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
 									break;
 								}
 
 								else if ((a_periodo_estudo <= periodo) && (periodo < proximo_periodo_estudo)) {
 									const double fator_tempo = double(periodo.getMinutos()) / double(a_periodo_estudo.getMinutos());
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica), posIneRHA, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()) * fator_tempo);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YH(a_TSS, a_idEstagio, periodo, idHidreletrica), posIneRHA, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()) * fator_tempo);
 								}
 							}
 
@@ -7446,7 +7461,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 
 									const double duracao_patamar = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double());
 
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idHidreletrica_montante), posIneRHA, -duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idHidreletrica_montante), posIneRHA, -duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
 
 								}//// for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
@@ -7464,7 +7479,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
 									const double duracao_patamar = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double());
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idHidreletrica_montante_desvio, idHidreletrica), posIneRHA, -duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idHidreletrica_montante_desvio, idHidreletrica), posIneRHA, -duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
 
 								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
@@ -7488,7 +7503,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 										const double duracao_patamar = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double());
 
 										if (getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHA, -duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHA, -duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
 
 									}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
@@ -7513,7 +7528,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 										const double duracao_patamar = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_periodo_estudo, idPatamarCarga, double());
 
 										if (getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posIneRHA, -duracao_patamar * a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posIneRHA, -duracao_patamar * a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, idPatamarCarga, double()));
 
 									}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
@@ -7539,7 +7554,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 }//void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados)
 
 
-void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, const Periodo a_periodo_estudo) {
+void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdPatamarCarga a_idPatamarCarga, Periodo &a_periodo_estudo) {
 
 	try {
 
@@ -7575,10 +7590,10 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 
 					const int posIneRHQ = addIneLinear_RESTRICAO_HIDRAULICA_DEFLUENCIA_LIMITE_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoOperativaUHE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_periodo_estudo, a_idPatamarCarga, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_periodo_estudo, a_idPatamarCarga, double()));
 
 					// Variável RHQ_FINF
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoOperativaUHE), posIneRHQ, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoOperativaUHE), posIneRHQ, 1.0);
 
 					const IdElementoSistema maiorElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 					for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorElementoSistema; idElementoSistema++) {
@@ -7594,9 +7609,9 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 							if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_vazao_defluente) {
 
 								if (a_dados.getAtributo(AttComumDados_representar_defluencia_disponivel_em_restricoes_hidraulicas, bool()))
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 								else
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 							}//if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_vazao_defluente) {
 
@@ -7605,11 +7620,11 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 
 								if (a_dados.getAtributo(AttComumDados_representar_turbinamento_disponivel_em_restricoes_hidraulicas, bool())) {
 									if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 								}
 								else {
 									if (getVarDecisao_QTURseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 								}
 
 							}//if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_vazao_defluente) {
@@ -7618,7 +7633,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 							if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_vazao_desviada) {
 
 								// Variável QDES que "sai" na usina
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								// hidreletrica_origem
 
@@ -7633,7 +7648,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 									if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
 										if (getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
@@ -7648,7 +7663,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 							if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_vazao_bombeada) {
 
 								if (getVarDecisao_QBOMseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria) > -1)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 							}//if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_bombeado) {
 
@@ -7672,10 +7687,10 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 
 					const int posIneRHQ = addIneLinear_RESTRICAO_HIDRAULICA_DEFLUENCIA_LIMITE_SUPERIOR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoOperativaUHE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_periodo_estudo, a_idPatamarCarga, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_periodo_estudo, a_idPatamarCarga, double()));
 
 					// Variável RHQ_FSUP
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoOperativaUHE), posIneRHQ, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idRestricaoOperativaUHE), posIneRHQ, 1.0);
 
 					const IdElementoSistema maiorElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 					for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorElementoSistema; idElementoSistema++) {
@@ -7691,9 +7706,9 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 							if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_vazao_defluente) {
 
 								if (a_dados.getAtributo(AttComumDados_representar_defluencia_disponivel_em_restricoes_hidraulicas, bool()))
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 								else
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 							}//if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_vazao_defluente) {
 
@@ -7702,11 +7717,11 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 
 								if (a_dados.getAtributo(AttComumDados_representar_turbinamento_disponivel_em_restricoes_hidraulicas, bool())) {
 									if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 								}
 								else {
 									if (getVarDecisao_QTURseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTUR(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 								}
 							}//if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_vazao_defluente) {
 
@@ -7714,7 +7729,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 							if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_vazao_desviada) {
 
 								//QDES
-								vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 								// hidreletrica_origem
 
@@ -7729,7 +7744,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 									if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
 										if (getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 									}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
@@ -7744,7 +7759,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 							if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_vazao_bombeada) {
 
 								if (getVarDecisao_QBOMseExistir(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria) > -1)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, idUsinaElevatoria), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, a_idPatamarCarga, double()));
 
 							}//if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_bombeado) {
 
@@ -7768,7 +7783,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 }//void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados)
 
 
-void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const SmartEnupla<Periodo, double>a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const SmartEnupla<Periodo, double>&a_horizonte_estudo_estagio) {
 
 	try {
 
@@ -7808,10 +7823,10 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 
 					const int posIneRHV = addIneLinear_RESTRICAO_HIDRAULICA_VOLUME_LIMITE_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_periodo_estudo, IdPatamarCarga_1, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 					//Variável RHV_FINF				
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHV, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHV, 1.0);
 
 					const IdElementoSistema maiorElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 					for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorElementoSistema; idElementoSistema++) {
@@ -7829,7 +7844,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 								if (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorFinal()) {
 
 									if (getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 								}//if (a_periodo_estudo == a_horizonte_estudo.getIteradorFinal()) {
 								else {
@@ -7839,7 +7854,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 									a_horizonte_estudo_estagio.incrementarIterador(periodo_seguinte); //O volume final do estágio t é igual ao volume inicial de t+1
 
 									if (getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica), posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica), posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 								}//else {
 
@@ -7856,7 +7871,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 
 									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idHidreletrica), posIneRHV, a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idHidreletrica), posIneRHV, a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
 
 									}//// for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
@@ -7874,7 +7889,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
 										//QDES
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posIneRHV, a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posIneRHV, a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
 
 
 										// hidreletrica_destino
@@ -7890,7 +7905,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 											if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
 												if (getVarDecisao_QDES(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
-													vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHV, a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
+													vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHV, a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
 
 											}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
@@ -7910,7 +7925,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 											if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_retirada && a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) > 0) {
 
 												if (getVarDecisao_QOUT(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
-													vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posIneRHV, a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) * a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
+													vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posIneRHV, a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) * a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
 
 											}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_retirada && a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) > 0) {
 
@@ -7937,7 +7952,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
 										if (getVarDecisao_QBOMseExistir(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idUsinaElevatoria) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idUsinaElevatoria), posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, periodo_auxiliar, idPatamarCarga, double()) * a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idUsinaElevatoria), posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, periodo_auxiliar, idPatamarCarga, double()) * a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
 
 									}//// for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
@@ -7965,10 +7980,10 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 
 					const int posIneRHV = addIneLinear_RESTRICAO_HIDRAULICA_VOLUME_LIMITE_SUPERIOR(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_periodo_estudo, IdPatamarCarga_1, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 					// Variável RHV
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHV, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHV, 1.0);
 
 					const IdElementoSistema maiorElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 					for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorElementoSistema; idElementoSistema++) {
@@ -7986,7 +8001,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 								if (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorFinal()) {
 
 									if (getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 								}//if (a_periodo_estudo == a_horizonte_estudo.getIteradorFinal()) {
 								else {
@@ -7996,7 +8011,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 									a_horizonte_estudo_estagio.incrementarIterador(periodo_seguinte); //O volume final do estágio t é igual ao volume inicial de t+1
 
 									if (getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica), posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica), posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 								}//else {
 							}//if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_util) {
@@ -8012,7 +8027,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 
 									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idHidreletrica), posIneRHV, -a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idHidreletrica), posIneRHV, -a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
 
 									}//// for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
@@ -8030,7 +8045,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
 										//QDES
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posIneRHV, -a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, a_periodo_estudo, idPatamarCarga, idHidreletrica, a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica())), posIneRHV, -a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
 
 										// hidreletrica_destino
 
@@ -8045,7 +8060,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 											if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
 												if (getVarDecisao_QDES(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
-													vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHV, -a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
+													vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDES(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHV, -a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
 
 											}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
@@ -8064,7 +8079,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 											if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_retirada && a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) > 0) {
 
 												if (getVarDecisao_QOUT(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
-													vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posIneRHV, -a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()) * a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()));
+													vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posIneRHV, -a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()) * a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()));
 
 											}//	if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_retirada && a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) > 0) {
 
@@ -8091,7 +8106,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
 										if (getVarDecisao_QBOMseExistir(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idUsinaElevatoria) > -1)
-											vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idUsinaElevatoria), posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, periodo_auxiliar, idPatamarCarga, double()) * a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
+											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QBOM(a_TSS, a_idEstagio, periodo_auxiliar, idPatamarCarga, idUsinaElevatoria), posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, periodo_auxiliar, idPatamarCarga, double()) * a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPatamarCarga, double()));
 
 									}//// for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
@@ -8123,7 +8138,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 
 }//void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados)
 
-void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const SmartEnupla<Periodo, double>a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const SmartEnupla<Periodo, double>&a_horizonte_estudo_estagio) {
 
 	try {
 
@@ -8152,11 +8167,11 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(cons
 
 				const int posIneRHE = addIneLinear_RESTRICAO_HIDRAULICA_ENERGIA_LIMITE_INFERIOR(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE);
 
-				vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHE, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_periodo_estudo, IdPatamarCarga_1, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHE, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 				//Variável RHE_FINF
 				if (getVarDecisao_RHE_FINFseExistir(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE) > -1)
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHE_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHE, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHE_FINF(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHE, 1.0);
 
 				const IdElementoSistema maiorElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 				for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorElementoSistema; idElementoSistema++) {
@@ -8172,7 +8187,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(cons
 							if (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorFinal()) {
 
 								if (getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) > -1)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posIneRHE, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posIneRHE, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 							}//if (a_periodo_estudo == a_horizonte_estudo.getIteradorFinal()) {
 							else {
@@ -8182,7 +8197,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(cons
 								a_horizonte_estudo_estagio.incrementarIterador(periodo_seguinte); //O volume final do estágio t é igual ao volume inicial de t+1
 
 								if (getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica) > -1)
-									vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica), posIneRHE, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica), posIneRHE, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 							}//else {
 
@@ -8207,10 +8222,10 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(cons
 
 					const int posIneRHE = addIneLinear_RESTRICAO_HIDRAULICA_ENERGIA_LIMITE_SUPERIOR(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE);
 
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHE, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_periodo_estudo, IdPatamarCarga_1, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHE, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 					// Variável RHE
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHE_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHE, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHE_FSUP(a_TSS, a_idEstagio, a_periodo_estudo, idRestricaoOperativaUHE), posIneRHE, 1.0);
 
 					const IdElementoSistema maiorElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 					for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorElementoSistema; idElementoSistema++) {
@@ -8228,7 +8243,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(cons
 								if (a_periodo_estudo == a_horizonte_estudo_estagio.getIteradorFinal()) {
 
 									if (getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posIneRHE, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF(a_TSS, a_idEstagio, a_periodo_estudo, idHidreletrica), posIneRHE, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 								}//if (a_periodo_estudo == a_horizonte_estudo.getIteradorFinal()) {
 								else {
@@ -8238,7 +8253,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(cons
 									a_horizonte_estudo_estagio.incrementarIterador(periodo_seguinte); //O volume final do estágio t é igual ao volume inicial de t+1
 
 									if (getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica) > -1)
-										vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica), posIneRHE, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, periodo_seguinte, idHidreletrica), posIneRHE, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_periodo_estudo, IdPatamarCarga_1, double()));
 
 								}//else {
 							}//if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_util) {
@@ -8263,7 +8278,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(cons
 }//void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados)
 
 
-void ModeloOtimizacao::criarRestricoesIntercambioHidraulicooRetiradaRelaxada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga, const IdIntercambioHidraulico a_idIntercambioHidraulico) {
+void ModeloOtimizacao::criarRestricoesIntercambioHidraulicooRetiradaRelaxada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga, const IdIntercambioHidraulico a_idIntercambioHidraulico) {
 
 	try {
 
@@ -8277,26 +8292,26 @@ void ModeloOtimizacao::criarRestricoesIntercambioHidraulicooRetiradaRelaxada(con
 
 		const int posEquQOUT_REL = addEquLinear_INTERCAMBIO_HIDRAULICO_RETIRADA_RELAXADA(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico);
 
-		vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQOUT_REL, 0.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQOUT_REL, 0.0);
 
 		if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_retirada) {
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico, a_dados.getAtributo(a_idIntercambioHidraulico, AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquQOUT_REL, 1.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico, a_dados.getAtributo(a_idIntercambioHidraulico, AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquQOUT_REL, -1.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico, a_dados.getAtributo(a_idIntercambioHidraulico, AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquQOUT_REL, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico, a_dados.getAtributo(a_idIntercambioHidraulico, AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquQOUT_REL, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico, a_dados.getAtributo(a_idIntercambioHidraulico, AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquQOUT_REL, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico, a_dados.getAtributo(a_idIntercambioHidraulico, AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquQOUT_REL, 1.0);
 		}
 
 		else if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_pereira_barreto) {
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico), posEquQOUT_REL, 1.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico), posEquQOUT_REL, -1.0);
-			vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico), posEquQOUT_REL, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI_REL(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico), posEquQOUT_REL, 1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico), posEquQOUT_REL, -1.0);
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QILS_TRI_FINF(a_TSS, a_idEstagio, a_periodo_estudo, a_idPatamarCarga, a_idIntercambioHidraulico), posEquQOUT_REL, 1.0);
 		}
 
 	}//try {
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarRestricoesIntercambioHidraulicooRetiradaRelaxada(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_periodo_estudo) + "," + getFullString(a_idIntercambioHidraulico) + "): \n" + std::string(erro.what())); }
 
-}//void ModeloOtimizacao::criarRestricoesIntercambioHidraulicooRetiradaRelaxada(Dados& a_dados, const IdEstagio a_idEstagio, const IdIntercambioHidraulico a_idIntercambioHidraulico, const Periodo a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga){
+}//void ModeloOtimizacao::criarRestricoesIntercambioHidraulicooRetiradaRelaxada(Dados& a_dados, const IdEstagio a_idEstagio, const IdIntercambioHidraulico a_idIntercambioHidraulico, Periodo &a_periodo_estudo, const IdPatamarCarga a_idPatamarCarga){
 
-void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdIntercambio a_maiorIdIntercambio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const IdTermeletrica a_maiorIdTermeletrica, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const SmartEnupla<Periodo, double>a_horizonte_estudo_estagio) {
+void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdIntercambio a_maiorIdIntercambio, const IdRestricaoEletrica a_maiorIdRestricaoEletrica, const IdTermeletrica a_maiorIdTermeletrica, const IdRestricaoOperativaUHE a_maiorIdRestricaoOperativaUHE, const IdIntercambioHidraulico a_maiorIdIntercambioHidraulico, const IdUsinaElevatoria a_maiorIdUsinaElevatoria, const SmartEnupla<Periodo, double>&a_horizonte_estudo_estagio) {
 
 	try {
 
@@ -8317,32 +8332,32 @@ void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Da
 
 				
 				if (getVarDecisao_QEV_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QEV_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
 				}//if (getVarDecisao_QEV_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
 				
 				////////////
 
 				if (getVarDecisao_QDEF_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
 				}//if (getVarDecisao_QDEF_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
 
 				if (getVarDecisao_QDEF_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
 				}//if (getVarDecisao_QDEF_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
 
 				////////////
 
 				if (getVarDecisao_VF_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
 				}//if (getVarDecisao_VF_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
 
 				if (getVarDecisao_VMORTO_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica), 0.0);
 				}//if (getVarDecisao_VMORTO_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idHidreletrica) > -1) {
 
 				//*********************
@@ -8352,48 +8367,48 @@ void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Da
 				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
 
 					if (getVarDecisao_PH_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PH_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
 					}//if (getVarDecisao_PH_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
 
 					////////////
 
 					if (getVarDecisao_PHDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PHDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
 					}//if (getVarDecisao_PHDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
 
 					////////////
 
 					if (getVarDecisao_QTURDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QTURDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QTURDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QTURDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QTURDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
 					}//if (getVarDecisao_QTURDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
 
 					////////////
 
 					if (getVarDecisao_QTUR_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
 					}//if (getVarDecisao_QTUR_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
 
 					////////////
 
 					if (getVarDecisao_QDEF_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
 					}//if (getVarDecisao_QDEF_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
 
 					if (getVarDecisao_QDEF_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
 					}//if (getVarDecisao_QDEF_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
 
 					////////////
 
 					if (getVarDecisao_QOUT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica), 0.0);
 					}//if (getVarDecisao_QOUT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
 
 
@@ -8404,8 +8419,8 @@ void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Da
 					for (IdHidreletrica idHidreletrica_aux = a_dados.getMenorId(IdHidreletrica()); idHidreletrica_aux <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica_aux)) {
 
 						if (getVarDecisao_QDES_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, idHidreletrica_aux) > -1) {
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDES_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, idHidreletrica_aux), 0.0);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDES_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, idHidreletrica_aux), 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QDES_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, idHidreletrica_aux), 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QDES_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica, idHidreletrica_aux), 0.0);
 						}//if (getVarDecisao_QOUT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
 
 					}//for (IdHidreletrica idHidreletrica_aux = a_dados.getMenorId(IdHidreletrica()); idHidreletrica_aux <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica_aux)) {
@@ -8426,37 +8441,37 @@ void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Da
 				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
 
 					if (getVarDecisao_PT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
 					}//if (getVarDecisao_PT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
 
 					if (getVarDecisao_PT_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PT_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PT_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PT_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
 					}//if (getVarDecisao_PT_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
 
 					//////////////
 
 					if (getVarDecisao_PTDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
 					}//if (getVarDecisao_PTDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
 
 					if (getVarDecisao_PTDISP_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISP_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISP_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISP_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISP_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
 					}//if (getVarDecisao_PTDISP_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
 
 					//////////////
 
 					if (getVarDecisao_PTDISPCOM_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
 					}//if (getVarDecisao_PTDISPCOM_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
 
 					if (getVarDecisao_PTDISPCOM_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica), 0.0);
 					}//if (getVarDecisao_PTDISPCOM_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idTermeletrica) > -1) {
 
 				}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
@@ -8473,15 +8488,15 @@ void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Da
 				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
 
 					if (getVarDecisao_QBOM_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QBOM_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QBOM_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QBOM_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QBOM_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria), 0.0);
 					}//if (getVarDecisao_QBOM_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria) > -1) {
 
 					/////////////
 
 					if (getVarDecisao_QBOMDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QBOMDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QBOMDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QBOMDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QBOMDISP_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria), 0.0);
 					}//if (getVarDecisao_QBOMDISP_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idUsinaElevatoria) > -1) {
 
 				}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
@@ -8496,37 +8511,37 @@ void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Da
 				//*********************
 
 				if (getVarDecisao_RHA_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHA_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHA_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHA_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHA_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
 				}//if (getVarDecisao_RHA_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
 
 				if (getVarDecisao_RHA_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
 				}//if (getVarDecisao_RHA_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
 
 				/////////////
 
 				if (getVarDecisao_RHV_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
 				}//if (getVarDecisao_RHV_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
 
 				if (getVarDecisao_RHV_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
 				}//if (getVarDecisao_RHV_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
 
 				/////////////
 
 				if (getVarDecisao_RHE_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHE_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHE_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHE_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHE_FINF(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
 				}//if (getVarDecisao_RHE_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
 
 				if (getVarDecisao_RHE_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHE_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
-					vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHE_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHE_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHE_FSUP(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE), 0.0);
 				}//if (getVarDecisao_RHE_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idRestricaoOperativaUHE) > -1) {
 
 
@@ -8537,13 +8552,13 @@ void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Da
 				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
 
 					if (getVarDecisao_RHQ_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE), 0.0);
 					}//if (getVarDecisao_RHQ_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica) > -1) {
 
 					if (getVarDecisao_RHQ_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoOperativaUHE), 0.0);
 					}//if (getVarDecisao_RHQ_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica) > -1) {
 
 				}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
@@ -8560,13 +8575,13 @@ void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Da
 				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
 
 					if (getVarDecisao_RE_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RE_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RE_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RE_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RE_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica), 0.0);
 					}//if (getVarDecisao_RE_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica) > -1) {
 
 					if (getVarDecisao_RE_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RE_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RE_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_RE_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_RE_FSUP(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica), 0.0);
 					}//if (getVarDecisao_RE_FSUPseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idRestricaoEletrica) > -1) {
 
 					////////////
@@ -8586,8 +8601,8 @@ void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Da
 				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
 
 					if (getVarDecisao_PI_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambio) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PI_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambio), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PI_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambio), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PI_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambio), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_PI_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambio), 0.0);
 					}//if (getVarDecisao_PI_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idHidreletrica) > -1) {
 
 				}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
@@ -8604,8 +8619,8 @@ void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Da
 				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_estudo, IdPatamarCarga()); idPatamarCarga++) {
 
 					if (getVarDecisao_QILS_TRI_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico) > -1) {
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QILS_TRI_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico), 0.0);
-						vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QILS_TRI_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QILS_TRI_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico), 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QILS_TRI_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico), 0.0);
 					}//if (getVarDecisao_QILS_TRI_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico) > -1) {
 
 					//*********************
@@ -8615,8 +8630,8 @@ void ModeloOtimizacao::zerarVariaveisFolga(const TipoSubproblemaSolver a_TSS, Da
 					for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 						if (getVarDecisao_QOUT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico, idHidreletrica) > -1) {
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico, idHidreletrica), 0.0);
-							vetorEstagio.att(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico, idHidreletrica), 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico, idHidreletrica), 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(getVarDecisao_QOUT_FINF(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico, idHidreletrica), 0.0);
 						}//if (getVarDecisao_QOUT_FINFseExistir(a_TSS, a_idEstagio, periodo_estudo, idPatamarCarga, idIntercambioHidraulico, idHidreletrica) > -1) {
 
 					}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {

@@ -8,7 +8,7 @@
 
 #include "mpi.h"
 
-void MetodoSolucao::executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao &a_modeloOtimizacao){
+void MetodoSolucao::executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao &a_modeloOtimizacao, Dados& a_dados){
 
 	try {
 
@@ -37,10 +37,10 @@ void MetodoSolucao::executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const Id
 				a_modeloOtimizacao.setAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, true);
 			} // if (iteracao_numero_maximo < idIteracao){
 
-			executarPDDE_forward(a_entradaSaidaDados, estagio_inicial, estagio_final, simulacao, idIteracao, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao);
+			executarPDDE_forward(a_entradaSaidaDados, estagio_inicial, estagio_final, simulacao, idIteracao, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao, a_dados);
 
 			if (!simulacao)
-				executarPDDE_backward_new(a_entradaSaidaDados, estagio_inicial, estagio_final, idIteracao, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao);
+				executarPDDE_backward_new(a_entradaSaidaDados, estagio_inicial, estagio_final, idIteracao, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao, a_dados);
 
 			executarPDDE_avaliarSolucao(a_entradaSaidaDados, idIteracao, a_idProcesso, a_modeloOtimizacao);
 
@@ -72,7 +72,7 @@ void MetodoSolucao::executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const Id
 } // void MetodoSolucao::executarPDDE(Dados &a_dados, EntradaSaidaDados a_entradaSaidaDados, const IdModeloOtimizacao a_idModeloOtimizacao){
 
 
-void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, const bool a_simulacao, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao &a_modeloOtimizacao){
+void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, const bool a_simulacao, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao &a_modeloOtimizacao, Dados& a_dados){
 
 	try {
 
@@ -139,6 +139,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 		double cont_tempo_otimizacao = 0.0;
 		int cont_numero_otimizacao = 0;
+
 		for (IdEstagio idEstagio = a_estagio_inicial; idEstagio <= a_estagio_final; idEstagio++) {
 
 			const IdEstagio idEstagio_seguinte = IdEstagio(idEstagio + 1);
@@ -189,10 +190,10 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, idCenario_estado);
 
+							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado_posEstudo(idEstagio, a_estagio_final, idCenario, IdRealizacao_Nenhum, a_dados);
+
 							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, idCenario);
-
-							a_modeloOtimizacao.atualizarModeloOtimizacaoComRestricaoCenario(idEstagio, idCenario);
-
+							
 							a_modeloOtimizacao.otimizarProblema(tSS, a_idProcesso, a_idIteracao, idEstagio, idCenario, diretorio_pl);
 
 							if (idEstagio == a_estagio_inicial)
@@ -313,7 +314,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 } // void MetodoSolucao::executarPDDE_forward(const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const IdIteracao a_idIteracao, EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, ModeloOtimizacao & a_modeloOtimizacao){
 
-void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDados, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao& a_modeloOtimizacao) {
+void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDados, const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao& a_modeloOtimizacao, Dados& a_dados) {
 
 	try {
 
@@ -443,9 +444,9 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 						auto start_clock_realizacao = std::chrono::high_resolution_clock::now();
 
-						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, IdRealizacao(idAbertura));
+						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado_posEstudo(idEstagio, a_estagio_final, idCenario_estado, IdRealizacao(idAbertura), a_dados);
 
-						a_modeloOtimizacao.atualizarModeloOtimizacaoComRestricaoCenario(idEstagio, idCenario_estado, IdRealizacao(idAbertura));
+						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, IdRealizacao(idAbertura));
 
 						const bool otimizacao = a_modeloOtimizacao.otimizarProblema(tSS, a_idProcesso, a_idIteracao, idEstagio, idCenario_estado, IdRealizacao(idAbertura), sol_inf_var_dinamica, solucao_dual_var_dinamica, limite_inferior_var_dinamica, limite_superior_var_dinamica, sol_dual_var_estado, diretorio_pl);
 

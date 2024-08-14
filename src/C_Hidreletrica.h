@@ -22,8 +22,9 @@
 	  m(Hidreletrica,  AttComum,   representacao_discreta_producao,                                 bool,      false,         true,             false,         nao) \
 	  m(Hidreletrica,  AttComum,                  considerar_usina,                                 bool,      false,         true,              true,         sim) \
 	  m(Hidreletrica,  AttComum,              numero_maquinas_base,                                  int,          0,          100,                 1,         nao) \
-	  m(Hidreletrica,  AttComum,                      codigo_usina,                                  int,          0,          500,                 1,         nao) \
+	  m(Hidreletrica,  AttComum,                      codigo_usina,                                  int,          0,          999,                 1,         nao) \
       m(Hidreletrica,  AttComum,                      codigo_posto,                                  int,          0,          500,                 0,         nao) \
+      m(Hidreletrica,  AttComum,      codigo_posto_acoplamento_ENA,                                  int,          0,          999,                 0,         nao) \
 	  m(Hidreletrica,  AttComum,          tipo_de_perda_hidraulica,                  TipoPerdaHidraulica,        min,          max,               min,         nao) \
 	  m(Hidreletrica,  AttComum,                  perda_hidraulica,                               double,          0,          100,                 0,         nao) \
 	  m(Hidreletrica,  AttComum,                 fator_de_producao,                               double,          0,         0.01,                 0,         nao) \
@@ -63,7 +64,7 @@
       m(Hidreletrica,  AttComum,                  queda_referencia,                               double,          0,         1000,                  0,         nao) \
       m(Hidreletrica,  AttComum,                 volume_referencia,                               double,          0,       100000,                  0,         nao) \
       m(Hidreletrica,  AttComum,                tipo_regularizacao,                    TipoRegularizacao,     Nenhum,          max,             Nenhum,         nao) \
-      m(Hidreletrica,  AttComum,          codigo_usina_jusante_JUSENA,                                  int,          0,          500,                  0,         nao) \
+      m(Hidreletrica,  AttComum,          codigo_usina_jusante_JUSENA,                               int,          0,          500,                  0,         nao) \
       m(Hidreletrica,  AttComum,               produtibilidade_EAR,                               double,          0,       100000,                  0,         nao)
 //          c_classe,   smrtAtt,                      nomeAtributo,                                 tipo, lowerBound,   upperBound,      initialValue, mustRead?
 
@@ -96,7 +97,6 @@
       m(Hidreletrica,  AttVetor,             indisponibilidade_programada,                                double,          0,            1,             0,    Periodo) \
       m(Hidreletrica,  AttVetor,                          disponibilidade,                                double,          0,            1,             0,    Periodo) \
       m(Hidreletrica,  AttVetor,            produtibilidade_acumulada_EAR,                                double,          0,        50000,             0,    IdReservatorioEquivalente) \
-      m(Hidreletrica,  AttVetor,                      produtibilidade_ENA,                                double,          0,        50000,             0,    Periodo) \
       m(Hidreletrica,  AttVetor,                codigo_usinas_calculo_ENA,                                   int,        min,          max,           min,        int)
 
 
