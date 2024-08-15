@@ -732,8 +732,9 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 			try {
 
 				// Inicializa Lista
-				if (a_listasIdxElem.size() == 0)
+				if (a_listasIdxElem.size() == 0) {
 					a_listasIdxElem.addElemento_rIt(a_it, a_listasIdxElem.getTipoElemento());
+				}
 
 				// Alocação do final da lista até iterador informado
 				else if (a_listasIdxElem.getIteradorFinal() < a_it) {
@@ -768,7 +769,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		void addConteudoIters_12(TListasIdxElem& a_listasIdxElem, TConteudo& a_conteudo, TIt1 a_it1, TIt2 a_it2, TIt3 a_it3, TIt4 a_it4, TIt5 a_it5, TIt6 a_it6, TIt7 a_it7, TIt8 a_it8, TIt9 a_it9, TIt10 a_it10, TIt11 a_it11, TIt12 a_it12) {
 
 			try {
-
+				
 				alocConteudoIter(a_listasIdxElem, a_it1);
 				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1), a_it2);
 				alocConteudoIter(a_listasIdxElem.at_rIt(a_it1).at_rIt(a_it2), a_it3);
