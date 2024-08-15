@@ -10,6 +10,9 @@
 #define GET_STRING_ELEMENTO(nIt, TIt)  + "," + getString(a_##TIt##_##nIt)
 #define GET_FULL_STRING_ELEMENTO(nIt, TIt)  + "," + getFullString(a_##TIt##_##nIt)
 
+#define GET_STRING_ELEMENTO2(nIt, TIt)  + getString(a_##TIt##_##nIt) + ","
+#define GET_FULL_STRING_ELEMENTO2(nIt, TIt)  + getFullString(a_##TIt##_##nIt) + ","
+
 #define AT_A_ITERS(nIt, TIt).at(a_##TIt##_##nIt)
 #define AT_ITERS(nIt, TIt).at(_##TIt##_##nIt)
 
@@ -96,8 +99,9 @@
 //
 
 #define DECLARAR_METODOS_ELEMENTO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual)\
-SmartEnupla<IdEstagio, std::vector<std::string>> nam_##Nro;\
-SmartEnupla<IdEstagio, std::vector<int>> idx_##Nro;\
+SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>> name_##Elem##_##Nome##_##Nro;\
+SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<int>>>         indx_##Elem##_##Nome##_##Nro;\
+SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<double>>>      nrmD_##Elem##_##Nome##_##Nro;\
 std::vector<int> is_##Elem##_##Nome##_##Nro##_instanciada = std::vector<int>(TipoSubproblemaSolver_Excedente, 0); \
 std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> idx_##Elem##_##Nome##_##Nro = \
 std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
@@ -118,24 +122,64 @@ std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_#
 std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
              Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>());\
 std::string getNome##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) ){\
-std::string name; \
 if (vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->isNomeSimplificado()) \
-	name = std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_STRING_ELEMENTO)); \
+	return std::string(std::string(#Nome) Valores(GET_STRING_ELEMENTO)); \
 else \
-	name = std::string(std::string(#Elem) + std::string(#Nome) Valores(GET_FULL_STRING_ELEMENTO)); \
-std::replace(name.begin(), name.end(),':','_'); \
-return name; \
+	return std::string(std::string(#Nome) Valores(GET_FULL_STRING_ELEMENTO)); \
 };\
+std::string getNomeArg##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) ){\
+std::string nameArg;\
+if (vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->isNomeSimplificado()) \
+	nameArg = std::string(" " Valores(GET_STRING_ELEMENTO2)); \
+else \
+	nameArg = std::string(" " Valores(GET_FULL_STRING_ELEMENTO2)); \
+const int pos = nameArg.find(',');\
+if (pos == std::string::npos) {return "";}\
+nameArg = nameArg.substr(pos + 1, nameArg.length());\
+return nameArg;\
+};\
+int getPos##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
+	try{\
+		const int pos = getPos##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS));\
+		if (pos < 0) {throw std::invalid_argument("Invalid element");}\
+		return pos;\
+	} \
+	catch (const std::exception& erro) { throw std::invalid_argument("getPos" + std::string(#Elem) +  "_" + std::string(#Nome) + "(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
+}; \
+int getPos##Elem##_##Nome##seExistir(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
+	try{ \
+		if (name_##Elem##_##Nome##_##Nro.size() == 0){\
+			name_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>> (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<std::string>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<std::string>>()));\
+			indx_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<int>>>         (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<int>>>        (TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<int>>()));\
+			if (getboolFromChar(#NormDual)) { nrmD_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<double>>>      (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<double>>>     (TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<double>>())); }\
+		}\
+		if (name_##Elem##_##Nome##_##Nro.at(a_TSS).size() == 0){\
+			const IdEstagio stageIni = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()); \
+			const int num_stage = int(getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()) - stageIni) + 1;\
+			name_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<std::string>>(stageIni, std::vector<std::vector<std::string>>(num_stage, std::vector<std::string>()));\
+			indx_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<int>>        (stageIni, std::vector<std::vector<int>>        (num_stage, std::vector<int>())); \
+			if (getboolFromChar(#NormDual)) { nrmD_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<double>>(stageIni, std::vector<std::vector<double>>(num_stage, std::vector<double>())); } \
+			return -1;\
+		} \
+		if (name_##Elem##_##Nome##_##Nro.at(a_TSS).size() == 0){ return -1;}\
+		const std::string name = getNomeArg##Elem##_##Nome(a_TSS Valores(ARGS_ITERS));\
+		return findStringSensNoVetorReturnPos(name, name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1)); \
+	} \
+	catch (const std::exception& erro) { throw std::invalid_argument("getPos" + std::string(#Elem) + "_" + std::string(#Nome) + "seExistir(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
+}; \
 int get##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
-	try{ return int(idx_##Elem##_##Nome##_##Nro.at(a_TSS) Valores(AT_A_ITERS) AT_CONST_##Nro##_10 .at(IdRealizacao_1).at(IdCenario_1)); } \
+	try{\
+		const int indx = get##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS));\
+		if (indx < 0) {throw std::invalid_argument("Invalid element");}\
+		return indx;\
+	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("get" + std::string(#Elem) +  "_" + std::string(#Nome) + "(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
 }; \
 int get##Elem##_##Nome##seExistir(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
 	try{ \
-		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)) return -1; \
-		double conteudo = -1; \
-		getConteudoIters_12(idx_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(ARGS_ITERS) ARGS_CONST_##Nro##_10, IdRealizacao_1, IdCenario_1); \
-		return int(conteudo); \
+		const int pos = getPos##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS));\
+		if (pos < 0) { return -1;}\
+		return indx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos);\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("get" + std::string(#Elem) + "_" + std::string(#Nome) + "seExistir(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
 }; \
@@ -143,30 +187,27 @@ int add##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) DEC
 	try{ \
 		if (get##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS)) > -1) \
 			throw std::invalid_argument("Conteudo ja existente."); \
-		double id##Elem = double(vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)-> DECLARAR_ADD_ELEMENTO_##Elem##_2 getNome##Elem##_##Nome(a_TSS Valores(ARGS_ITERS)))); \
-		addConteudoIters_12(idx_##Elem##_##Nome##_##Nro.at(a_TSS), id##Elem Valores(ARGS_ITERS) ARGS_CONST_##Nro##_10, IdRealizacao_1, IdCenario_1 ); \
-		if (!is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS)){ \
-			is_##Elem##_##Nome##_##Nro##_instanciada.at(a_TSS) = true;\
-			lista_##Elem##_instanciadas.at(a_TSS).push_back(std::string(std::string(#Nome) + "_" + std::string(#Nro))); \
-		} \
-		return int(id##Elem); \
+		const int indx = vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)-> DECLARAR_ADD_ELEMENTO_##Elem##_2 getNome##Elem##_##Nome(a_TSS Valores(ARGS_ITERS))); \
+		name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).push_back(getNomeArg##Elem##_##Nome(a_TSS Valores(ARGS_ITERS)));\
+		indx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).push_back(indx);\
+		if (getboolFromChar(#NormDual)) { nrmD_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).push_back(1.0);}\
+		return indx; \
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("add" + std::string(#Elem) + "_" + std::string(#Nome) + "(" Valores(GET_FULL_STRING_ELEMENTO) DECLARAR_ADD_ELEMENTO_##Elem##_3 + "): \n" + std::string(erro.what())); } \
 }; \
 void setNormalizacaoDual##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) , const double a_normMultiplicacao){ \
 	try{ \
 		if (!getboolFromChar(#NormDual)) throw std::invalid_argument("Elemento nao passivel de normalizacao dual."); \
-		if (get##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS)) == -1) throw std::invalid_argument("Elemento nao existente."); \
-		addConteudoIters_12(normD_##Elem##_##Nome##_##Nro.at(a_TSS), a_normMultiplicacao Valores(ARGS_ITERS) ARGS_CONST_##Nro##_10, IdRealizacao_1, IdCenario_1); \
+		const int pos = getPos##Elem##_##Nome(a_TSS Valores(ARGS_ITERS));\
+		nrmD_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos) = a_normMultiplicacao;\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("setNormalizacaoDual" + std::string(#Elem) + "_" + std::string(#Nome) + "(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
 }; \
 double getNormalizacaoDual##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
 	try{ \
-		DECLARAR_CONDICAO_RETORNO_NormDual_##NormDual \
-		double conteudo = 1.0; \
-		getConteudoIters_12(normD_##Elem##_##Nome##_##Nro.at(a_TSS), conteudo Valores(ARGS_ITERS) ARGS_CONST_##Nro##_10, IdRealizacao_1, IdCenario_1); \
-		return conteudo; \
+		if (!getboolFromChar(#NormDual)) return 1.0; \
+		const int pos = getPos##Elem##_##Nome(a_TSS Valores(ARGS_ITERS));\
+		return nrmD_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos);\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("getNormalizacaoDual" + std::string(#Elem) + "_" + std::string(#Nome) + "(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
 }; \

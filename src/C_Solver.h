@@ -1824,7 +1824,7 @@ private:
 
     static void remCharsInvalidos(std::string &str) {
         for (char &s : str) {
-            if (s == '/' || s == '-') {
+            if (s == '/' || s == '-' || s == ':') {
                 s = '_';
             }
         }
