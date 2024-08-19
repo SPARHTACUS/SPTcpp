@@ -1085,10 +1085,18 @@ public:
 			Periodo perIni;
 
 			const std::vector<int> pos_idx = getPosIdxStructIfAny(a_period_externo);
-			if (pos_idx.at(1) > -1)
-				perIni = list_structPeriod.at(pos_idx.at(0)).getPeriod(pos_idx.at(1));
-			else
+
+			if (int(pos_idx.size()) > 0) {
+
+				if (pos_idx.at(1) > -1)
+					perIni = list_structPeriod.at(pos_idx.at(0)).getPeriod(pos_idx.at(1));
+				else
+					perIni = getIteradorInicial();
+
+			}//if (int(pos_idx.size()) > 0) {
+			else {
 				perIni = getIteradorInicial();
+			}//else {
 
 			const Periodo periodo_externo_seguinte = a_period_externo + 1;
 
