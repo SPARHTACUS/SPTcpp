@@ -349,35 +349,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(const bool a_isAlocMode, const S
 			} // for (int i = 0; i < int(a_listaTSS.at(idEstagio).size()); i++) {
 		} // for (IdEstagio idEstagio = a_idEstagioIni; idEstagio <= a_idEstagioEnd; idEstagio++) {
 
-		if (a_isAlocMode) {
-			for (IdEstagio idEstagio = a_idEstagioIni; idEstagio <= a_idEstagioEnd; idEstagio++) {
-				for (int i = 0; i < int(a_listaTSS.at(idEstagio).size()); i++) {
-
-						VARIAVEL_DECISAO_1(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						VARIAVEL_DECISAO_2(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						VARIAVEL_DECISAO_3(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						VARIAVEL_DECISAO_4(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						VARIAVEL_DECISAO_5(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						VARIAVEL_DECISAO_6(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-
-						EQUACAO_LINEAR_1(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						EQUACAO_LINEAR_2(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						EQUACAO_LINEAR_3(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						EQUACAO_LINEAR_4(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						EQUACAO_LINEAR_5(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						EQUACAO_LINEAR_6(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-
-
-						INEQUACAO_LINEAR_3(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						INEQUACAO_LINEAR_4(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						INEQUACAO_LINEAR_5(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						INEQUACAO_LINEAR_6(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-						INEQUACAO_LINEAR_7(ALOCAR_ELEMENTOS_POR_ESTAGIO)
-
-				} // for (int i = 0; i < int(a_listaTSS.at(idEstagio).size()); i++) {
-			} // for (IdEstagio idEstagio = a_idEstagioIni; idEstagio <= a_idEstagioEnd; idEstagio++) {
-		} // if (a_isAlocMode) {
-
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::formularModeloOtimizacao(" + getFullString(a_isAlocMode) + "," + getFullString(a_idEstagioIni) + "," + "," + getFullString(a_idEstagioEnd) + "): \n" + std::string(erro.what())); }
 

@@ -87,6 +87,9 @@
 #define DECLARAR_ISVAR_EquLinear  false
 #define DECLARAR_ISVAR_IneLinear  false
 
+#define DECLARAR_ISNORMD_sim  true
+#define DECLARAR_ISNORMD_nao  false
+
 #define DECLARAR_CONDICAO_RETORNO_ImprimirPrimal_nao return;
 #define DECLARAR_CONDICAO_RETORNO_ImprimirPrimal_sim
 #define DECLARAR_CONDICAO_RETORNO_ImprimirDual_nao return;
@@ -99,10 +102,11 @@
 //
 
 #define DECLARAR_METODOS_ELEMENTO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual)\
-SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, int>> num_aloc_##Elem##_##Nome##_##Nro;\
 SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>> name_##Elem##_##Nome##_##Nro;\
 SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<int>>>         indx_##Elem##_##Nome##_##Nro;\
 SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<double>>>      nrmD_##Elem##_##Nome##_##Nro;\
+SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::vector<std::string>>>> vlrP_##Elem##_##Nome##_##Nro;\
+SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::vector<std::string>>>> vlrD_##Elem##_##Nome##_##Nro;\
 std::vector<int> is_##Elem##_##Nome##_##Nro##_instanciada = std::vector<int>(TipoSubproblemaSolver_Excedente, 0); \
 std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> idx_##Elem##_##Nome##_##Nro = \
 std::vector< Valores(DECLARAR_ALOCAR_ENUPLA_ITER) DECLARAR_ALOCAR_ENUPLA_CONST_##Nro SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>>>>>> (TipoSubproblemaSolver_Excedente,\
@@ -139,73 +143,33 @@ std::string getNomeArg##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(
 	nameArg = nameArg.substr(pos + 1, nameArg.length());\
 	return nameArg;\
 };\
-void updtAloc##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio){ \
+void alocVlr##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio){ \
 	try{\
-				if (num_aloc_##Elem##_##Nome##_##Nro.size() == 0){ return; }\
-				if (num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio) > 0){\
-					name_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>> (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<std::string>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<std::string>>()));\
-					indx_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<int>>>         (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<int>>>        (TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<int>>()));\
-					if (getboolFromChar(#NormDual)) { nrmD_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<double>>>      (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<double>>>     (TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<double>>())); }\
-					\
-					const IdEstagio stageIni = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()); \
-					const int num_stage = int(getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()) - stageIni) + 1;\
-					name_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<std::string>>(stageIni, std::vector<std::vector<std::string>>(num_stage, std::vector<std::string>()));\
-					indx_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<int>>        (stageIni, std::vector<std::vector<int>>        (num_stage, std::vector<int>())); \
-					if (getboolFromChar(#NormDual)) { nrmD_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<double>>(stageIni, std::vector<std::vector<double>>(num_stage, std::vector<double>())); } \
-					\
-					name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio) = std::vector<std::string>();\
-					name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio).reserve(num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio));\
-					indx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio).reserve(num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio));\
-					if (getboolFromChar(#NormDual)) { nrmD_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio).reserve(num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio)); } \
-					\
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->DECLARAR_ALOCAR_##Elem(num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio));\
-					num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio) = 0;\
-				}\
-				return;\
+		if (DECLARAR_ISVAR_##Elem){\
+			if (vlrP_##Elem##_##Nome##_##Nro.size() == 0) {	\
+				vlrP_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::vector<std::string>>>>(TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<std::vector<std::string>>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<std::vector<std::string>>>())); \
+				const IdEstagio stageIni = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()); \
+				const int num_stage = int(getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()) - stageIni) + 1; \
+				vlrP_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<std::vector<std::string>>>(stageIni, std::vector<std::vector<std::vector<std::string>>>(num_stage, std::vector<std::vector<std::string>>())); \
+			}\
+		}\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("aloc" + std::string(#Elem) +  "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); } \
 }; \
-void aloc##Elem##_##Nome##_##Nro(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio){ \
+void aloc##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio){ \
 	try{\
-		if (!a_isAlocMode) {\
-			if (num_aloc_##Elem##_##Nome##_##Nro.size() == 0){\
-					num_aloc_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, int>>(TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, int>>(TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, int>()));\
-					name_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>> (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<std::string>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<std::string>>()));\
-					indx_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<int>>>         (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<int>>>        (TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<int>>()));\
-					if (getboolFromChar(#NormDual)) { nrmD_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<double>>>      (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<double>>>     (TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<double>>())); }\
-					const IdEstagio stageIni = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()); \
-					const int num_stage = int(getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()) - stageIni) + 1;\
-					num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, int>(stageIni, std::vector<int>(num_stage, -1));\
-					name_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<std::string>>(stageIni, std::vector<std::vector<std::string>>(num_stage, std::vector<std::string>()));\
-					indx_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<int>>        (stageIni, std::vector<std::vector<int>>        (num_stage, std::vector<int>())); \
-					if (getboolFromChar(#NormDual)) { nrmD_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<double>>(stageIni, std::vector<std::vector<double>>(num_stage, std::vector<double>())); } \
-			}\
-			if (num_aloc_##Elem##_##Nome##_##Nro.size() > 0) {\
-				if (num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio) <= 0){ return; }\
-				if (name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio).capacity() == 0){\
-					name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio).reserve(500);\
-					indx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio).reserve(500);\
-					if (getboolFromChar(#NormDual)) { nrmD_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio).reserve(500); } \
-					num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio) = 0;\
-				}\
-			}\
-		}\
-		if (a_isAlocMode){\
-			if (num_aloc_##Elem##_##Nome##_##Nro.size() == 0){\
-				num_aloc_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, int>>(TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, int>>(TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, int>()));\
-				name_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>> (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<std::string>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<std::string>>()));\
-				const IdEstagio stageIni = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()); \
-				const int num_stage = int(getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()) - stageIni) + 1;\
-				num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, int>(stageIni, std::vector<int>(num_stage, -1));\
-				name_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<std::string>>(stageIni, std::vector<std::vector<std::string>>(num_stage, std::vector<std::string>()));\
-			}\
-			if (num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio) == 0) {throw std::invalid_argument("Element already allocated");}\
-			if (name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio).capacity() == 0) { name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio).reserve(500);}\
-			if (num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio) == -1) { num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio) = 1; } \
-			else { num_aloc_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio)++; }\
+		if (name_##Elem##_##Nome##_##Nro.size() == 0){\
+			name_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>> (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<std::string>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<std::string>>()));\
+			indx_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<int>>>         (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<int>>>        (TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<int>>()));\
+			if (DECLARAR_ISNORMD_##NormDual) { nrmD_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<double>>>      (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<double>>>     (TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<double>>())); }\
+			const IdEstagio stageIni = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()); \
+			const int num_stage = int(getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()) - stageIni) + 1;\
+			name_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<std::string>>(stageIni, std::vector<std::vector<std::string>>(num_stage, std::vector<std::string>()));\
+			indx_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<int>>        (stageIni, std::vector<std::vector<int>>        (num_stage, std::vector<int>())); \
+			if (DECLARAR_ISNORMD_##NormDual) { nrmD_##Elem##_##Nome##_##Nro.at(a_TSS) = SmartEnupla<IdEstagio, std::vector<double>>(stageIni, std::vector<std::vector<double>>(num_stage, std::vector<double>())); } \
 		}\
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("aloc" + std::string(#Elem) +  "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getString(a_isAlocMode) + "," + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); } \
+	catch (const std::exception& erro) { throw std::invalid_argument("aloc" + std::string(#Elem) +  "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); } \
 }; \
 int getPos##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
 	try{\
@@ -231,43 +195,42 @@ int get##Elem##_##Nome(const bool a_isAlocMode, const TipoSubproblemaSolver a_TS
 		if (indx < 0) {throw std::invalid_argument("Invalid element");}\
 		return indx;\
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("get" + std::string(#Elem) +  "_" + std::string(#Nome) + "(" + getString(a_isAlocMode) + Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
+	catch (const std::exception& erro) { throw std::invalid_argument("get" + std::string(#Elem) +  "_" + std::string(#Nome) + "(" + Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
 }; \
 int get##Elem##_##Nome##seExistir(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
 	try{ \
-		aloc##Elem##_##Nome##_##Nro(a_isAlocMode, a_TSS, a_IdEstagio_1);\
 		const int pos = getPos##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS));\
 		if (pos < 0) { return -1;}\
 		if (a_isAlocMode) { return 0; };\
 		return indx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos);\
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("get" + std::string(#Elem) + "_" + std::string(#Nome) + "seExistir(" + getString(a_isAlocMode) + Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
+	catch (const std::exception& erro) { throw std::invalid_argument("get" + std::string(#Elem) + "_" + std::string(#Nome) + "seExistir(" + Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
 }; \
 int add##Elem##_##Nome(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) DECLARAR_ADD_ELEMENTO_##Elem##_1){ \
 	try{ \
 		if (get##Elem##_##Nome##seExistir(a_isAlocMode, a_TSS Valores(ARGS_ITERS)) > -1) \
 			throw std::invalid_argument("Conteudo ja existente."); \
+		aloc##Elem##_##Nome##_##Nro(a_TSS, a_IdEstagio_1);\
 		name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).push_back(getNomeArg##Elem##_##Nome(a_TSS Valores(ARGS_ITERS)));\
-		if (a_isAlocMode) { return 0; };\
 		const int indx = vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)-> DECLARAR_ADD_ELEMENTO_##Elem##_2 getNome##Elem##_##Nome(a_TSS Valores(ARGS_ITERS))); \
 		indx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).push_back(indx);\
 		if (getboolFromChar(#NormDual)) { nrmD_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).push_back(1.0);}\
 		return indx; \
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("add" + std::string(#Elem) + "_" + std::string(#Nome) + "(" + getString(a_isAlocMode) + Valores(GET_FULL_STRING_ELEMENTO) DECLARAR_ADD_ELEMENTO_##Elem##_3 + "): \n" + std::string(erro.what())); } \
+	catch (const std::exception& erro) { throw std::invalid_argument("add" + std::string(#Elem) + "_" + std::string(#Nome) + "(" + Valores(GET_FULL_STRING_ELEMENTO) DECLARAR_ADD_ELEMENTO_##Elem##_3 + "): \n" + std::string(erro.what())); } \
 }; \
 void setNormalizacaoDual##Elem##_##Nome(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) , const double a_normMultiplicacao){ \
 	try{ \
 		if (a_isAlocMode) { return; };\
-		if (!getboolFromChar(#NormDual)) throw std::invalid_argument("Elemento nao passivel de normalizacao dual."); \
+		if (!DECLARAR_ISNORMD_##NormDual) throw std::invalid_argument("Elemento nao passivel de normalizacao dual."); \
 		const int pos = getPos##Elem##_##Nome(a_TSS Valores(ARGS_ITERS));\
 		nrmD_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos) = a_normMultiplicacao;\
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("setNormalizacaoDual" + std::string(#Elem) + "_" + std::string(#Nome) + "(" + getString(a_isAlocMode) + Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
+	catch (const std::exception& erro) { throw std::invalid_argument("setNormalizacaoDual" + std::string(#Elem) + "_" + std::string(#Nome) + "(" + Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
 }; \
 double getNormalizacaoDual##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
 	try{ \
-		if (!getboolFromChar(#NormDual)) return 1.0; \
+		if (!DECLARAR_ISNORMD_##NormDual) return 1.0; \
 		const int pos = getPos##Elem##_##Nome(a_TSS Valores(ARGS_ITERS));\
 		return nrmD_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos);\
 	} \
@@ -316,13 +279,6 @@ void consolidarResultados##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_T
 armazenarValorPrimalPorEstagioPorCenario##Elem##_##Nome##_##Nro(a_TSS, a_idIteracao, a_idEstagio, a_idCenario);\
 armazenarValorDualPorEstagioPorCenario##Elem##_##Nome##_##Nro(a_TSS, a_idIteracao, a_idEstagio, a_idCenario);
 
-
-//
-// ARMAZENAR VALOR POR ESTAGIO POR CENARIO
-//
-
-#define ALOCAR_ELEMENTOS_POR_ESTAGIO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual) \
-updtAloc##Elem##_##Nome##_##Nro(a_listaTSS.at(idEstagio).at(i), idEstagio);
 
 //
 // ARMAZENAR VALOR POR ESTAGIO POR CENARIO POR REALIZACAO
