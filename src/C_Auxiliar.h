@@ -127,6 +127,16 @@ static int findStringNoVetorReturnPos(const std::string a_string, const std::vec
 
 } // static bool findStringNoVetorReturnPos(const std::string a_string, const std::vector<std::string> &a_vetor) {
 
+static int findStringSensNoVetorReturnPos(const std::string a_string, const std::vector<std::string>& a_vetor) {
+
+	for (int i = int(a_vetor.size() - 1); i >= 0; i--) {
+		if (a_string == a_vetor.at(i))
+			return i;
+	} // for (int i = int(a_vetor.size() - 1); i >= 0; i--) {
+
+	return -1;
+
+} // static bool findStringNoVetorReturnPos(const std::string a_string, const std::vector<std::string> &a_vetor) {
 
 static std::vector<bool> findStringsNoVetor(const std::vector<std::string> a_strings, const std::vector<std::string> &a_vetor) {
 

@@ -79,15 +79,19 @@ public:
 
     virtual int addVar(const double a_lb, const double a_ub, const double a_obj, const std::string a_nome) = 0;
 
-    virtual bool setCofObjetivo(const int a_posicao, const double a_cofObjetivo) = 0;
+    virtual bool setCofObjetivo(const bool a_isAlocMode, const int a_posicao, const double a_cofObjetivo) = 0;
 
-    virtual bool setLimInferior(const int a_posicao, const double a_limInferior) = 0;
+    virtual bool setLimInferior(const bool a_isAlocMode, const int a_posicao, const double a_limInferior) = 0;
 
-    virtual bool setLimSuperior(const int a_posicao, const double a_limSuperior) = 0;
+    virtual bool setLimSuperior(const bool a_isAlocMode, const int a_posicao, const double a_limSuperior) = 0;
 
-    virtual bool setTipoVariavelContinua(const int a_posicao) = 0;
+    virtual bool setTipoVariavelContinua(const bool a_isAlocMode, const int a_posicao) = 0;
 
-    virtual bool setTipoVariavelBinaria(const int a_posicao) = 0;
+    virtual bool setTipoVariavelBinaria(const bool a_isAlocMode, const int a_posicao) = 0;
+
+    virtual bool incrAlocVar(const int a_incrAloc) = 0;
+    virtual bool incrAlocEqu(const int a_incrAloc) = 0;
+    virtual bool incrAlocIne(const int a_incrAloc) = 0;
 
     virtual double getCofObjetivo(const int a_posicao) = 0;
 
@@ -114,7 +118,7 @@ public:
 
     virtual bool remRestricao(const int a_posicaoRestricao) = 0;
 
-    virtual bool addVarDinamica(const int a_posicaoVariavel) = 0;
+    virtual bool addVarDinamica(const bool a_isAlocMode, const int a_posicaoVariavel) = 0;
 
     virtual double getSolucaoInferiorVarDinamica() = 0;
 
@@ -131,9 +135,9 @@ public:
     virtual bool setNomeRestricao(const int a_posicaoRestricao, const std::string a_nome) = 0;
     virtual std::string getNomeRestricao(const int a_posicaoRestricao) = 0;
 
-    virtual bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) = 0;
+    virtual bool setCofRestricao(const bool a_isAlocMode, const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) = 0;
 
-    virtual bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) = 0;
+    virtual bool setRHSRestricao(const bool a_isAlocMode, const int a_posicaoRestricao, const double a_RHS) = 0;
 
     virtual double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao) = 0;
 
@@ -392,6 +396,13 @@ public:
 
     bool isNomeSimplificado() { return true; };
 
+
+    bool incrAlocVar(const int a_incrAloc) { return true; }
+
+    bool incrAlocEqu(const int a_incrAloc) { return true; }
+
+    bool incrAlocIne(const int a_incrAloc) { return true; }
+
     int addVar(const double a_lb, const double a_ub, const double a_obj, const std::string a_nome) {
         try {
             if (this == nullptr)
@@ -414,8 +425,9 @@ public:
     }; // bool addVar(double a_lb, double a_ub, double a_obj, std::string a_nome) {
 
 
-    bool setCofObjetivo(const int a_posicao, const double a_cofObjetivo) {
+    bool setCofObjetivo(const bool a_isAlocMode, const int a_posicao, const double a_cofObjetivo) {
         try {
+            if (a_isAlocMode) { return true; }
             vetorGRBVar.at(a_posicao).set(GRB_DoubleAttr_Obj, a_cofObjetivo);
             return true;
         }
@@ -434,8 +446,9 @@ public:
     }; // bool setCofObjetivo(int a_posicao, double a_cofObjetivo) {
 
 
-    bool setLimInferior(const int a_posicao, const double a_limInferior) {
+    bool setLimInferior(const bool a_isAlocMode, const int a_posicao, const double a_limInferior) {
         try {
+            if (a_isAlocMode) { return true; }
             ptrModelo->update();
             const std::string varName = vetorGRBVar.at(a_posicao).get(GRB_StringAttr_VarName);
             const double prevLB = vetorGRBVar.at(a_posicao).get(GRB_DoubleAttr_LB);
@@ -465,8 +478,9 @@ public:
     }; // bool setLimInferior(int a_posicao, double a_limInferior) {
 
 
-    bool setLimSuperior(const int a_posicao, const double a_limSuperior) {
+    bool setLimSuperior(const bool a_isAlocMode, const int a_posicao, const double a_limSuperior) {
         try {
+            if (a_isAlocMode) { return true; }
             ptrModelo->update();
             const std::string varName = vetorGRBVar.at(a_posicao).get(GRB_StringAttr_VarName);
             const double prevUB = vetorGRBVar.at(a_posicao).get(GRB_DoubleAttr_UB);
@@ -495,8 +509,9 @@ public:
     }; // bool setLimSuperior(int a_posicao, double a_limSuperior) {
 
 
-    bool setTipoVariavelContinua(const int a_posicao) {
+    bool setTipoVariavelContinua(const bool a_isAlocMode, const int a_posicao) {
         try {
+            if (a_isAlocMode) { return true; }
             vetorGRBVar.at(a_posicao).set(GRB_CharAttr_VType, GRB_CONTINUOUS);
             return true;
         }
@@ -513,8 +528,9 @@ public:
     }; // bool setTipoVariavelContinua(int a_posicao) {
 
 
-    bool setTipoVariavelBinaria(const int a_posicao) {
+    bool setTipoVariavelBinaria(const bool a_isAlocMode, const int a_posicao) {
         try {
+            if (a_isAlocMode) { return true; }
             vetorGRBVar.at(a_posicao).set(GRB_CharAttr_VType, GRB_BINARY);
             return true;
         }
@@ -676,8 +692,9 @@ public:
         }
     }
 
-    bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
+    bool setCofRestricao(const bool a_isAlocMode, const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
         try {
+            if (a_isAlocMode) { return true; }
             ptrModelo->chgCoeff(vetorGRBConstr.at(a_posicaoRestricao), vetorGRBVar.at(a_posicaoVariavel),
                                 a_cofRestricao);
             return true;
@@ -696,8 +713,9 @@ public:
     }; // bool setCofRestricao(int a_posicaoVariavel, int a_posicaoRestricao, double a_cofRestricao) {
 
 
-    bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) {
+    bool setRHSRestricao(const bool a_isAlocMode, const int a_posicaoRestricao, const double a_RHS) {
         try {
+            if (a_isAlocMode) { return true; }
             vetorGRBConstr.at(a_posicaoRestricao).set(GRB_DoubleAttr_RHS, a_RHS);
             return true;
         }
@@ -755,8 +773,9 @@ public:
         }
     }; // double getRHSRestricao(int a_posicaoRestricao) {
 
-    bool addVarDinamica(const int a_posicaoVariavel) {
+    bool addVarDinamica(const bool a_isAlocMode, const int a_posicaoVariavel) {
         try {
+            if (a_isAlocMode) { return true; }
             if (vetorGRBVar.size() > a_posicaoVariavel) {
                 for (int i : lista_variavel_dinamica) {
                     if (i == a_posicaoVariavel)
@@ -1500,10 +1519,6 @@ public:
 #include "CbcSolver.hpp"
 #include <algorithm>
 
-#define CAP_INI_VAR 512     //capacidade inicial para inserir variaveis
-#define CAP_INI_CONSTR 512     //capacidade inicial para inserir restricoes
-#define CAP_INI_POR_CONSTR 256 //capacidade inicial para inserir idxs e coefs em cada restricao
-
 static void *xmalloc(const size_t size);
 
 static void *xrealloc(void *ptr, const size_t size);
@@ -1518,6 +1533,14 @@ private:
     int realNumRows;
     std::vector<int> origRowIdx;
     std::vector<char> origRowSense;
+
+    int cap_ini_var_preset = 512;
+    int cap_ini_constr_preset = 512;
+    int cap_ini_por_constr_preset = 4; //capacidade inicial para inserir idxs e coefs em cada restricao
+
+    int cap_ini_var = cap_ini_var_preset;
+    int cap_ini_constr = cap_ini_constr_preset;
+    int cap_ini_por_constr = cap_ini_por_constr_preset;
 
     /* buffer de restricoes */
     int **matrizIdxs = nullptr; //matriz de restricoes, contendo os indices das vars
@@ -1559,7 +1582,8 @@ private:
 
     void inicializaMemRestricoes() {
         sizeBufferRows = 0;
-        capBufferRows = CAP_INI_CONSTR;
+        cap_ini_constr = cap_ini_constr_preset;
+        capBufferRows = cap_ini_constr;
         matrizIdxs = (int **) xmalloc(sizeof(int *) * capBufferRows);
         matrizCoefs = (double **) xmalloc(sizeof(double *) * capBufferRows);
         nomeRow = (char **) xmalloc(sizeof(char *) * capBufferRows);
@@ -1580,7 +1604,8 @@ private:
 
     void inicializaMemVariaveis() {
         sizeBufferCols = 0;
-        capBufferCols = CAP_INI_VAR;
+        cap_ini_var = cap_ini_var_preset;
+        capBufferCols = cap_ini_var;
         nomeCol = (char**)xmalloc(sizeof(char*) * capBufferCols);
         binCol = (int*)xmalloc(sizeof(double) * capBufferCols);
         lbCol = (double*)xmalloc(sizeof(double) * capBufferCols);
@@ -1598,7 +1623,7 @@ private:
     void realocaMemDaRestricao(int pos) {
         assert(pos >= 0 && pos < sizeBufferRows);
         const int capAntiga = capRow[pos];
-        capRow[pos] = (std::max)(CAP_INI_POR_CONSTR, (int) ceil(capAntiga * 1.2));
+        capRow[pos] = (std::max)(cap_ini_por_constr, (int) ceil(capAntiga * 1.2));
         matrizIdxs[pos] = (int *) xrealloc(matrizIdxs[pos], sizeof(int) * capRow[pos]);
         matrizCoefs[pos] = (double *) xrealloc(matrizCoefs[pos], sizeof(double) * capRow[pos]);
     }
@@ -1611,7 +1636,7 @@ private:
         const int capAntiga = capBufferRows;
 
         if (a_numConstrs == 1)
-            capBufferRows = (std::max)(CAP_INI_CONSTR, (int)ceil(capAntiga * 1.2));
+            capBufferRows = (std::max)(cap_ini_constr, (int)ceil(capAntiga * 1.2));
         else
             capBufferRows += a_numConstrs;
 
@@ -1641,7 +1666,7 @@ private:
         const int capAntiga = capBufferCols;
 
         if (a_numVars == 1)
-            capBufferCols = (std::max)(CAP_INI_VAR, (int)ceil(capAntiga * 1.2));
+            capBufferCols = (std::max)(cap_ini_var, (int)ceil(capAntiga * 1.2));
         else
             capBufferCols += a_numVars;
 
@@ -1769,7 +1794,7 @@ private:
 
         sizeBufferRows = 0;
 
-        if (capBufferRows > CAP_INI_CONSTR) {
+        if (capBufferRows > cap_ini_constr) {
             esvaziaMemRestricoes();
             inicializaMemRestricoes();
         }
@@ -1814,7 +1839,7 @@ private:
 
         sizeBufferCols = 0;
 
-        if (capBufferCols > CAP_INI_VAR) {
+        if (capBufferCols > cap_ini_var) {
             esvaziaMemVariaveis();
             inicializaMemVariaveis();
         }
@@ -1824,7 +1849,7 @@ private:
 
     static void remCharsInvalidos(std::string &str) {
         for (char &s : str) {
-            if (s == '/' || s == '-') {
+            if (s == '/' || s == '-' || s == ':') {
                 s = '_';
             }
         }
@@ -2204,6 +2229,35 @@ public:
 
     bool isNomeSimplificado() { return true; }
 
+
+    bool incrAlocVar(const int a_incrAloc) {
+        try {
+            if (a_incrAloc < 0) { throw std::invalid_argument("Negative Value."); }
+            cap_ini_var += a_incrAloc;
+            return true;
+        }
+        catch (const std::exception& erro) { throw std::invalid_argument("SolverCLP::incrAlocVar(" + std::to_string(a_incrAloc) + "): \n" + std::string(erro.what())); }
+    }
+
+    bool incrAlocEqu(const int a_incrAloc) {
+        try {
+            if (a_incrAloc < 0) { throw std::invalid_argument("Negative Value."); }
+            cap_ini_constr += a_incrAloc;
+            return true;
+        }
+        catch (const std::exception& erro) { throw std::invalid_argument("SolverCLP::incrAlocEqu(" + std::to_string(a_incrAloc) + "): \n" + std::string(erro.what())); }
+    }
+
+    bool incrAlocIne(const int a_incrAloc) {
+        try {
+            if (a_incrAloc < 0) { throw std::invalid_argument("Negative Value."); }
+            cap_ini_constr += a_incrAloc;
+            return true;
+        }
+        catch (const std::exception& erro) { throw std::invalid_argument("SolverCLP::incrAlocIne(" + std::to_string(a_incrAloc) + "): \n" + std::string(erro.what())); }
+    }
+
+
     int addVar_old(const double a_lb, const double a_ub, const double a_obj, const std::string a_nome) {
         try {
             std::string nomeVar = a_nome;
@@ -2288,9 +2342,9 @@ public:
     }
 
 
-    bool setCofObjetivo(const int a_posicao, const double a_cofObjetivo) {
+    bool setCofObjetivo(const bool a_isAlocMode, const int a_posicao, const double a_cofObjetivo) {
         try {
-
+            if (a_isAlocMode) { return true; }
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2343,9 +2397,9 @@ public:
     }
 
 
-    bool setLimInferior(const int a_posicao, const double a_limInferior) {
+    bool setLimInferior(const bool a_isAlocMode, const int a_posicao, const double a_limInferior) {
         try {
-
+            if (a_isAlocMode) { return true; }
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2400,9 +2454,9 @@ public:
         }
     }
 
-    bool setLimSuperior(const int a_posicao, const double a_limSuperior) {
+    bool setLimSuperior(const bool a_isAlocMode, const int a_posicao, const double a_limSuperior) {
         try {
-
+            if (a_isAlocMode) { return true; }
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2438,9 +2492,9 @@ public:
     }
 
 
-    bool setTipoVariavelContinua(const int a_posicao) {
+    bool setTipoVariavelContinua(const bool a_isAlocMode, const int a_posicao) {
         try {
-
+            if (a_isAlocMode) { return true; }
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2468,10 +2522,10 @@ public:
         }
     }
 
-    bool setTipoVariavelBinaria(const int a_posicao) {
+    bool setTipoVariavelBinaria(const bool a_isAlocMode, const int a_posicao) {
         try {
 
-
+            if (a_isAlocMode) { return true; }
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2611,7 +2665,7 @@ public:
             assert(sizeRow[sizeBufferRows] == 0);
 
             if (capRow[sizeBufferRows] == 0) {
-                capRow[sizeBufferRows] = CAP_INI_POR_CONSTR;
+                capRow[sizeBufferRows] = cap_ini_por_constr;
                 matrizIdxs[sizeBufferRows] = (int *) xmalloc(sizeof(int) * capRow[sizeBufferRows]);
                 matrizCoefs[sizeBufferRows] = (double *) xmalloc(sizeof(double) * capRow[sizeBufferRows]);
             }
@@ -2654,7 +2708,7 @@ public:
             assert(sizeRow[sizeBufferRows] == 0);
 
             if (capRow[sizeBufferRows] == 0) {
-                capRow[sizeBufferRows] = CAP_INI_POR_CONSTR;
+                capRow[sizeBufferRows] = cap_ini_por_constr;
                 matrizIdxs[sizeBufferRows] = (int *) xmalloc(sizeof(int) * capRow[sizeBufferRows]);
                 matrizCoefs[sizeBufferRows] = (double *) xmalloc(sizeof(double) * capRow[sizeBufferRows]);
             }
@@ -2702,7 +2756,7 @@ public:
                 assert(sizeRow[sizeBufferRows] == 0);
 
                 if (capRow[sizeBufferRows] == 0) {
-                    capRow[sizeBufferRows] = CAP_INI_POR_CONSTR;
+                    capRow[sizeBufferRows] = cap_ini_por_constr;
                     matrizIdxs[sizeBufferRows] = (int*)xmalloc(sizeof(int) * capRow[sizeBufferRows]);
                     matrizCoefs[sizeBufferRows] = (double*)xmalloc(sizeof(double) * capRow[sizeBufferRows]);
                 }
@@ -2748,7 +2802,7 @@ public:
             assert(sizeRow[sizeBufferRows] == 0);
 
             if (capRow[sizeBufferRows] == 0) {
-                capRow[sizeBufferRows] = CAP_INI_POR_CONSTR;
+                capRow[sizeBufferRows] = cap_ini_por_constr;
                 matrizIdxs[sizeBufferRows] = (int *) xmalloc(sizeof(int) * capRow[sizeBufferRows]);
                 matrizCoefs[sizeBufferRows] = (double *) xmalloc(sizeof(double) * capRow[sizeBufferRows]);
             }
@@ -2833,8 +2887,9 @@ public:
         }
     }
 
-    bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
+    bool setCofRestricao(const bool a_isAlocMode, const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
         try {
+            if (a_isAlocMode) { return true; }
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2875,8 +2930,9 @@ public:
         }
     }
 
-    bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) {
+    bool setRHSRestricao(const bool a_isAlocMode, const int a_posicaoRestricao, const double a_RHS) {
         try {
+            if (a_isAlocMode) { return true; }
             const double newRHS = (fabs(a_RHS) <= 1e-6) ? 0.0 : a_RHS;
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
@@ -3057,9 +3113,9 @@ public:
         }
     }
 
-    bool addVarDinamica(const int a_posicao) {
+    bool addVarDinamica(const bool a_isAlocMode, const int a_posicao) {
         try {
-
+            if (a_isAlocMode) { return true; }
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(

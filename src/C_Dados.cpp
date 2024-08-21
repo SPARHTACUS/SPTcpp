@@ -11212,6 +11212,8 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 						for (IdCenario idCenario_iteracao = menor_cenario_iteracao_local; idCenario_iteracao <= maior_cenario_iteracao_local; idCenario_iteracao++) {
 
+							const SmartEnupla<Periodo, IdRealizacao> mapeamento_espaco_amostral_idCenario_iteracao = mapeamento_espaco_amostral.at(idCenario_iteracao);
+
 							IdCenario idCenario_mesmo_passado = IdCenario_Excedente;
 							IdCenario idCenario_mesma_trajetoria = IdCenario_Excedente;
 
@@ -11224,9 +11226,10 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 								for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
 									if (arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()) != IdCenario_Nenhum) {
 										for (IdCenario idCenario = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()); idCenario <= arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario()); idCenario++) {
+											const SmartEnupla<Periodo, IdRealizacao> mapeamento_espaco_amostral_idCenario = mapeamento_espaco_amostral.at(idCenario);
 											for (IdEstagio idEstagio_past = estagio_inicial; idEstagio_past <= idEstagio; idEstagio_past++) {
-												if (IdAbertura(mapeamento_espaco_amostral.at(idCenario_iteracao).at_rIt(periodos.at(idEstagio_past))) !=
-													IdAbertura(mapeamento_espaco_amostral.at(idCenario).at_rIt(periodos.at(idEstagio_past))))
+												if (IdAbertura(mapeamento_espaco_amostral_idCenario_iteracao.at_rIt(periodos.at(idEstagio_past))) !=
+													IdAbertura(mapeamento_espaco_amostral_idCenario.at_rIt(periodos.at(idEstagio_past))))
 													break;
 												else if ((idEstagio_past == IdEstagio(idEstagio - 1)) && (idCenario < idCenario_mesmo_passado))
 													idCenario_mesmo_passado = idCenario;
