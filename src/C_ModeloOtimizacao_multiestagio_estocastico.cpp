@@ -208,7 +208,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 			auto start_timer = std::chrono::high_resolution_clock::now();
 			if (idProcesso == IdProcesso_mestre)
 				std::cout << "Alocando modelo otimizacao...";
-			formularModeloOtimizacao(true, listaTSS, a_dados, estagio_inicial, estagio_final, horizon);
+			//formularModeloOtimizacao(true, listaTSS, a_dados, estagio_inicial, estagio_final, horizon);
 			if (idProcesso == IdProcesso_mestre)
 				std::cout << "ok (" << std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_timer).count() / 60 << "min)" << std::endl;
 		}
@@ -3176,7 +3176,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const bool a
 		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QD(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, a_idHidreletrica), posEquBH, 1.0);
 
 		//QI
-		if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, a_idHidreletrica) > -1)
+		if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, a_idHidreletrica) > -1)
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, a_idHidreletrica), posEquBH, 1.0);
 
 		///////////////////////////
@@ -3198,7 +3198,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const bool a
 
 			if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
-				if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
+				if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posEquBH, 1.0);
 
 			}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
@@ -3208,14 +3208,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const bool a
 				if (a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_minimo, a_period, double()) > 0 && a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_maximo, a_period, double()) > 0) {
 
 					//Nesta condição o QI_REL entra no balanço hídrico
-					if (getVarDecisao_QI_REL(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
+					if (getVarDecisao_QI_RELseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI_REL(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquBH, 1.0);
 
 				}//if (a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_minimo, a_period, double()) > 0 && a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_maximo, a_period, double()) > 0) {
 				else {
 
 					//Se o QI for negativo, não tem problema de inviabilizar o balanço hídrico
-					if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
+					if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquBH, 1.0);
 
 				}//else {
@@ -3255,14 +3255,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const bool a
 
 			if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
-				if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
+				if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posEquBH, -1.0);
 
 			}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
 			else if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_pereira_barreto) {
 
-				if (getVarDecisao_QILS_TRI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_destino.at(pos)) > -1)
+				if (getVarDecisao_QILS_TRIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_destino.at(pos)) > -1)
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QILS_TRI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_destino.at(pos)), posEquBH, -1.0);
 
 			}//else if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_pereira_barreto) {
@@ -3451,7 +3451,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const bool 
 		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QM(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, a_idHidreletrica), posEquBH, -conversor_vazao_volume);
 
 		//QI
-		if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, a_idHidreletrica) > -1)
+		if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, a_idHidreletrica) > -1)
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, a_idHidreletrica), posEquBH, conversor_vazao_volume);
 
 		///////////////////////////
@@ -3473,7 +3473,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const bool 
 
 			if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
-				if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
+				if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posEquBH, conversor_vazao_volume);
 
 			}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
@@ -3483,14 +3483,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const bool 
 				if (a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_minimo, a_period, double()) > 0 && a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_maximo, a_period, double()) > 0) {
 
 					//Nesta condição o QI_REL entra no balanço hídrico
-					if (getVarDecisao_QI_REL(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
+					if (getVarDecisao_QI_RELseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI_REL(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquBH, conversor_vazao_volume);
 
 				}//if (a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_minimo, a_period, double()) > 0 && a_dados.getElementoVetor(idIntercambioHidraulico_origem.at(pos), AttVetorIntercambioHidraulico_desvio_agua_maximo, a_period, double()) > 0) {
 				else {
 
 					//Se o QI for negativo, não tem problema de inviabilizar o balanço hídrico
-					if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
+					if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posEquBH, conversor_vazao_volume);
 
 				}//else {
@@ -3530,14 +3530,14 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const bool 
 
 			if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
-				if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
+				if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posEquBH, -conversor_vazao_volume);
 
 			}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
 			else if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_pereira_barreto) {
 
-				if (getVarDecisao_QILS_TRI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_destino.at(pos)) > -1)
+				if (getVarDecisao_QILS_TRIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_destino.at(pos)) > -1)
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QILS_TRI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_destino.at(pos)), posEquBH, -conversor_vazao_volume);
 
 			}//else if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_pereira_barreto) {
@@ -5246,7 +5246,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const bool a_isAlocMode, const 
 					addVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idUHE, 0.0, a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_vazao_retirada, a_period, double()), 0.0);
 					addVarDecisao_QI_FINF(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idUHE, 0.0, infinito, 0.0);
 				}//if (a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_vazao_retirada, a_period, double()) > 0.0) {
-				else
+				else if(a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_vazao_retirada, a_period, double()) < 0.0)
 					addVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idUHE, a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_vazao_retirada, a_period, double()), a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_vazao_retirada, a_period, double()), 0.0);
 
 
@@ -7373,7 +7373,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const bo
 
 										const double duracao_patamar = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_period, idPat, double());
 
-										if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
+										if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
 											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHA, duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_period, idPat, double()));
 
 									}//for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= maiorIdPatamarCarga; idPat++) {
@@ -7399,7 +7399,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const bo
 
 										const double duracao_patamar = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_period, idPat, double());
 
-										if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
+										if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
 											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posIneRHA, duracao_patamar * a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_period, idPat, double()));
 
 									}//for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= maiorIdPatamarCarga; idPat++) {
@@ -7498,7 +7498,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const bo
 
 										const double duracao_patamar = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_period, idPat, double());
 
-										if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
+										if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
 											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHA, -duracao_patamar * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_period, idPat, double()));
 
 									}//for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= maiorIdPatamarCarga; idPat++) {
@@ -7523,7 +7523,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const bo
 
 										const double duracao_patamar = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_period, idPat, double());
 
-										if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
+										if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
 											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posIneRHA, -duracao_patamar * a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) * a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_period, idPat, double()));
 
 									}//for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= maiorIdPatamarCarga; idPat++) {
@@ -7643,7 +7643,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const b
 
 									if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
-										if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
+										if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
 											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_period, a_idPat, double()));
 
 									}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
@@ -7739,7 +7739,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const b
 
 									if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
-										if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
+										if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
 											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, a_period, a_idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, a_period, a_idPat, double()));
 
 									}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
@@ -7896,7 +7896,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 
 											if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
-												if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, periodo_auxiliar, idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
+												if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, periodo_auxiliar, idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
 													vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, periodo_auxiliar, idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHV, a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPat, double()));
 
 											}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
@@ -7916,7 +7916,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 
 											if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_retirada && a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) > 0) {
 
-												if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, periodo_auxiliar, idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
+												if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, periodo_auxiliar, idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
 													vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, periodo_auxiliar, idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posIneRHV, a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) * a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPat, double()));
 
 											}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_retirada && a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) > 0) {
@@ -8047,7 +8047,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 
 											if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
 
-												if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, periodo_auxiliar, idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
+												if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, periodo_auxiliar, idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())) > -1)
 													vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, periodo_auxiliar, idPat, idIntercambioHidraulico_destino.at(pos), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica()), a_dados.getAtributo(idIntercambioHidraulico_destino.at(pos), AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica())), posIneRHV, -a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPat, double()));
 
 											}//if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_desvio) {
@@ -8066,7 +8066,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 
 											if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_retirada && a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) > 0) {
 
-												if (getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, periodo_auxiliar, idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
+												if (getVarDecisao_QIseExistir(a_isAlocMode, a_TSS, a_idEstagio, periodo_auxiliar, idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())) > -1)
 													vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, getVarDecisao_QI(a_isAlocMode, a_TSS, a_idEstagio, periodo_auxiliar, idPat, idIntercambioHidraulico_origem.at(pos), a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_hidreletrica_origem, IdHidreletrica())), posIneRHV, -a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodo_auxiliar, idPat, double()) * a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()));
 
 											}//	if (tipo_intercambio_hidraulico == TipoIntercambioHidraulico_retirada && a_dados.getAtributo(idIntercambioHidraulico_origem.at(pos), AttComumIntercambioHidraulico_percentual_retorno_do_desvio, double()) > 0) {
