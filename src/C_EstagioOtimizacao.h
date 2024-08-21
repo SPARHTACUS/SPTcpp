@@ -61,10 +61,10 @@ public:
 
 	DECLARA_SMART_ELEMENTO(Estagio, SMART_ELEMENTO_ESTAGIO_OTIMIZACAO)
 
-	IdVariavelEstado            addVariavelEstado           (const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const int a_idVariavelDecisaoEstagioAnterior);
-	IdVariavelRealizacao        addVariavelRealizacao       (const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo, const double a_fator);
-	IdRestricaoCenario         addRestricaoCenario        (const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idRestricao, const SmartEnupla<IdCenario, double>& a_rhs, const SmartEnupla<int, SmartEnupla<IdCenario, double>> &a_coeficiente);
-	IdVariavelRealizacaoInterna addVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const Periodo a_periodo, const double a_fator, const TipoValor a_tipo_valor, const double percentual_inicial, const double percentual_passo);
+	IdVariavelEstado            addVariavelEstado           (const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const int a_idVariavelDecisaoEstagioAnterior);
+	IdVariavelRealizacao        addVariavelRealizacao       (const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo, const double a_fator);
+	IdRestricaoCenario         addRestricaoCenario        (const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idRestricao, const SmartEnupla<IdCenario, double>& a_rhs, const SmartEnupla<int, SmartEnupla<IdCenario, double>> &a_coeficiente);
+	IdVariavelRealizacaoInterna addVariavelRealizacaoInterna(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const Periodo a_periodo, const double a_fator, const TipoValor a_tipo_valor, const double percentual_inicial, const double percentual_passo);
 
 	void addValorVariavelEstado(const IdVariavelEstado a_idVariavelEstado, const IdCenario a_idCenario, const IdCenario a_menorIdCenario, const IdCenario a_maiorIdCenario, const double a_valor);
 	void alocarVariaveisEstado(const IdCenario a_menorIdCenario, const IdCenario a_maiorIdCenario);
