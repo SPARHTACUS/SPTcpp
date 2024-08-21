@@ -1721,8 +1721,8 @@ void LeituraCEPEL::leitura_SISTEMA_201908_NW25(Dados &a_dados, std::string nomeA
 					bloco_usina_nao_simulada = atributo;
 
 				//Descrição do bloco de usinas não simuladas
-				if (line.size() >= 20) {
-					atributo = line.substr(11, 20);
+				if (line.size() >= 12) {
+					atributo = line.substr(11, int(line.size()));
 					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 				}
 				else
