@@ -21520,17 +21520,19 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 					a_dados.vetorRestricaoEletrica.add(restricaoEletrica);
 
 					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_menos_inf(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
 					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_inf (horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
 
 					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 						const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 						matriz_zero.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+						matriz_menos_inf.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("min"))));
 						matriz_inf.setElemento(periodo,  SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("max"))));
 
 					}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-					a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_potencia_minima, matriz_zero);
+					a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_potencia_minima, matriz_menos_inf);
 					a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_potencia_maxima, matriz_inf);
 					
 					////////////////////////////////
@@ -21612,7 +21614,6 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				//*******************************************************************
 				//2. Atualiza restrições originais no CP
 				//   Deixa os limites abertos para os períodos dentro do horizonte_PD
-				//   Zera os coeficientes de participação dos elementos
 				//*******************************************************************
 				for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= maiorIdRestricaoEletrica_REF; idRestricaoEletrica++) {
 
@@ -21623,16 +21624,17 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
 							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-								a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, 0.0);
+								a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, getdoubleFromChar("min"));
 								a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, getdoubleFromChar("max"));
 							}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
+							/*
 							const IdElementoSistema maiorIdElementoSistema = a_dados.getMaiorId(idRestricaoEletrica, IdElementoSistema());
 
 							for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema; idElementoSistema++) {
 								a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).vetorElementoSistema.at(idElementoSistema).setElemento(AttVetorElementoSistema_fator_participacao, periodo, 0.0); //O fator de participação é armazenado na leitura_DECOMP como um Vetor
 							}//for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema; idElementoSistema++) {
-
+							*/
 						}//if (periodo <= periodo_REF) {
 						else
 							break; //Evita percorrer o horizonte todo
@@ -21785,7 +21787,6 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				//*******************************************************************
 				//2. Atualiza restrições originais no CP
 				//   Deixa os limites abertos para os períodos dentro do horizonte_PD
-				//   Zera os coeficientes de participação dos elementos
 				//*******************************************************************
 				for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE_REF; idRestricaoOperativaUHE++) {
 
@@ -21796,16 +21797,17 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
 							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-								a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, 0.0);
+								a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, getdoubleFromChar("min"));
 								a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_superior, periodo, idPatamarCarga, getdoubleFromChar("max"));
 							}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
+							/*
 							const IdElementoSistema maiorIdElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 
 							for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema; idElementoSistema++) {
 								a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).vetorElementoSistema.at(idElementoSistema).setElemento(AttVetorElementoSistema_fator_participacao, periodo, 0.0); //O fator de participação é armazenado na leitura_DECOMP como um Vetor
 							}//for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema; idElementoSistema++) {
-
+							*/
 						}//if (periodo <= periodo_REF) {
 						else
 							break; //Evita percorrer o horizonte todo
