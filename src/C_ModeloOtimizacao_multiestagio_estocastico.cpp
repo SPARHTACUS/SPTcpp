@@ -204,15 +204,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 		const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 		
-		if (tipoSolver == TipoSolver_clp) {
-			auto start_timer = std::chrono::high_resolution_clock::now();
-			if (idProcesso == IdProcesso_mestre)
-				std::cout << "Alocando modelo otimizacao...";
-			//formularModeloOtimizacao(true, listaTSS, a_dados, estagio_inicial, estagio_final, horizon);
-			if (idProcesso == IdProcesso_mestre)
-				std::cout << "ok (" << std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_timer).count() / 60 << "min)" << std::endl;
-		}
-
 		auto start_timer = std::chrono::high_resolution_clock::now();
 		if (idProcesso == IdProcesso_mestre)
 			std::cout << "Instanciando modelo otimizacao...";
