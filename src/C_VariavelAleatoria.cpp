@@ -1270,8 +1270,10 @@ void VariavelAleatoria::gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario
 
 		setMatriz_forced(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, a_horizonte_processo_estocastico);
 
+		IdVariavelAleatoriaInterna maiorIdVariavelAleatoria = getMaiorId(IdVariavelAleatoriaInterna());
+
 		if (a_gerar_cenarios_internos) {
-			for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= getMaiorId(IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++) {
+			for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoria; idVariavelAleatoriaInterna++) {
 				if (vetorVariavelAleatoriaInterna.at(idVariavelAleatoriaInterna).getSizeMatriz(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) == 0)
 					vetorVariavelAleatoriaInterna.at(idVariavelAleatoriaInterna).setMatriz_forced(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_horizonte_processo_estocastico);
 			}
@@ -1288,35 +1290,45 @@ void VariavelAleatoria::gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario
 		Periodo periodo_inicial_amostra = periodo_final;
 		a_horizonte_processo_estocastico.incrementarIterador(periodo_inicial_amostra);
 
+		SmartEnupla<Periodo, double> enupla_tendencia;
 		if (getSizeVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada) > 0) {
 			periodo_inicial_amostra = getIteradorFinal(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, Periodo());
 			a_horizonte_processo_estocastico.incrementarIterador(periodo_inicial_amostra);
+			enupla_tendencia = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, Periodo(), double());
 		}
 
 		else if (getSizeVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal) > 0) {
 			periodo_inicial_amostra = getIteradorFinal(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo());
 			a_horizonte_processo_estocastico.incrementarIterador(periodo_inicial_amostra);
+			enupla_tendencia = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double());
 		}
 		else if (a_mapeamento_amostra_comum.size() > 0)
 			periodo_inicial_amostra = a_mapeamento_amostra_comum.at(cenario_inicial).getIteradorInicial();
 
 
+		SmartEnupla<Periodo, IdRealizacao> enupla_horizonte = a_mapeamento_amostra_comum.at(cenario_inicial);
+
 		//
 		// Horizonte Tendencia
 		//
 
+		Periodo periodo_tendencia = periodo_inicial;
 		for (Periodo periodo = periodo_inicial; periodo < periodo_inicial_amostra; a_horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
 			for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
 				// Realização Transformada é a própria Tendencia Transformada
 
-				setElemento(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodo, idCenario, getTendenciaTemporalTransformada(idCenario, periodo));
+				setElemento(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodo, idCenario, getTendenciaTemporalTransformada(idCenario, periodo_tendencia));
 
-				if (a_gerar_cenarios_internos)
-					setRealizacaoInternaFromTendencia(idCenario, periodo);
+				if (a_gerar_cenarios_internos) {
+					for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoria; idVariavelAleatoriaInterna++)
+						vetorVariavelAleatoriaInterna.at(idVariavelAleatoriaInterna).setElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, periodo, idCenario, getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo_tendencia, double()));
+				}
 
 			}
+
+			enupla_tendencia.incrementarIterador(periodo_tendencia);
 
 		} // for (Periodo periodo = periodo_inicial_tendencia; periodo <= periodo_final_amostra; periodo++) {
 
@@ -1324,6 +1336,7 @@ void VariavelAleatoria::gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario
 		// Horizonte Espaco Amostral
 		//
 
+		Periodo periodo_amostra = periodo_inicial_amostra;
 		for (Periodo periodo = periodo_inicial_amostra; periodo <= periodo_final; a_horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
 			for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
@@ -1332,15 +1345,25 @@ void VariavelAleatoria::gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario
 
 				const IdRealizacao idRealizacao = a_mapeamento_amostra_comum.at(idCenario).getElemento(periodo);
 
-				if (a_gerar_cenarios_buffer)
-					setElemento(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodo, idCenario, getRealizacaoTransformadaEspacoAmostral(idCenario, idRealizacao, periodo));
-				else
-					setElemento(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodo, idCenario, getRealizacaoTransformadaEspacoAmostral_recursivo(idCenario, idRealizacao, a_mapeamento_amostra_comum.at(idCenario), periodo, periodo, a_horizonte_processo_estocastico));
+				double realizacao = 0.0;
 
-				if (a_gerar_cenarios_internos)
-					setRealizacaoInterna(idCenario, periodo);
+				if (a_gerar_cenarios_buffer)
+					realizacao = getRealizacaoTransformadaEspacoAmostral(idCenario, idRealizacao, periodo_amostra);
+				else
+					realizacao = getRealizacaoTransformadaEspacoAmostral_recursivo(idCenario, idRealizacao, a_mapeamento_amostra_comum.at(idCenario), periodo_amostra, periodo_amostra, a_horizonte_processo_estocastico);
+
+				setElemento(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodo, idCenario, realizacao);
+
+				if (a_gerar_cenarios_internos) {
+
+					for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoria; idVariavelAleatoriaInterna++)
+						vetorVariavelAleatoriaInterna.at(idVariavelAleatoriaInterna).setElemento(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, periodo, idCenario, vetorVariavelAleatoriaInterna.at(idVariavelAleatoriaInterna).calcularRealizacao(realizacao, periodo_amostra));
+					
+				}
 
 			} // for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_Final; idCenario++) {
+
+			enupla_horizonte.incrementarIterador(periodo_amostra);
 
 		} // for (Periodo periodo = periodo_inicial_amostra; periodo <= periodo_final; a_horizonte_processo_estocastico.incrementarIterador(periodo)) {
 

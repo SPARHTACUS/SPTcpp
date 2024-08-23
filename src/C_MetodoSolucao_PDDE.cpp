@@ -46,7 +46,7 @@ void MetodoSolucao::executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const Id
 
 		} // for (IdIteracao idIteracao = iteracao_inicial; idIteracao <= iteracao_final; idIteracao++) {
 
-		executarPDDE_operacao_final(a_entradaSaidaDados, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao);
+		//executarPDDE_operacao_final(a_entradaSaidaDados, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao);
 
 		if (true) {
 			int barreira = 0;
@@ -79,7 +79,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 		auto start_clock = std::chrono::high_resolution_clock::now();
 
 		const std::string diretorio = a_entradaSaidaDados.getDiretorioSaida();
-		const std::string diretorio_iteracao = diretorio + "//" + getFullString(a_idIteracao) + "//Foward";
+		const std::string diretorio_iteracao = diretorio + "//" + getFullString(a_idIteracao) + "//Forward";
 		const std::string diretorio_resultado = diretorio_iteracao + "//Resultados";
 		const std::string diretorio_pl = diretorio_iteracao + "//PLs";
 		const std::string diretorio_tempos = diretorio_iteracao + "//Tempos";
@@ -175,7 +175,6 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 					valores_tratamento.at(1).push_back(getFullString(idEstagio) + ";" + getFullString(a_idProcesso) + ";");
 				} // if (imprimir_tempos) {
 
-				bool algum_cenario = false;
 				for (int c = 0; c < numero_cenarios; c++) {
 
 					const IdCenario idCenario = IdCenario(menor_cenario + c);
@@ -232,8 +231,6 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 							cont_numero_otimizacao++;
 
-							algum_cenario = true;
-
 							if (imprimir_tempos) {
 								valores_tempo.at(1).push_back(getString(tempo_cenario.count()));
 								valores_tempo_otimizacao.at(1).push_back(getString(tempo_otimizacao));
@@ -267,10 +264,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 				else
 					a_entradaSaidaDados.setAppendArquivo(true);
 
-				if (!algum_cenario)
-					a_modeloOtimizacao.armazenarValoresSolver(tSS, a_idIteracao, idEstagio, IdCenario_Nenhum, IdRealizacao_Nenhum);
-
-				a_modeloOtimizacao.imprimirSolucaoPorEstagioPorCenario_porEstagio(a_idProcesso, "", a_entradaSaidaDados);
+				a_modeloOtimizacao.imprimirSolucaoPorEstagio(a_idProcesso, idEstagio, "", a_entradaSaidaDados);
 
 			} // if (numero_cenarios > 0) {
 
@@ -308,6 +302,9 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 		if (a_idProcesso == IdProcesso_mestre)
 			a_modeloOtimizacao.exportarVariaveisEstado_AcoplamentoPosEstudo(a_idIteracao, a_entradaSaidaDados);
+
+		a_entradaSaidaDados.setDiretorioSaida(diretorio_resultado);
+		a_modeloOtimizacao.consolidarResultados(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);
 
 	} // try {
 	catch (const std::exception&erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_forward(a_entradaSaidaDados," + getFullString(a_estagio_inicial) + "," + getFullString(a_estagio_final) + "," + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_modeloOtimizacao): \n" + std::string(erro.what())); }
@@ -551,7 +548,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 				a_entradaSaidaDados.setAppendArquivo(true);
 
 			a_entradaSaidaDados.setDiretorioSaida(diretorio_resultado);
-			a_modeloOtimizacao.imprimirSolucaoPorEstagioPorCenarioPorRealizacao_porEstagio(a_idProcesso, "", a_entradaSaidaDados);
+			a_modeloOtimizacao.imprimirSolucaoPorEstagio(a_idProcesso, idEstagio, "", a_entradaSaidaDados);
 
 		} // for (IdEstagio idEstagio = a_estagio_final; idEstagio >= a_estagio_inicial; idEstagio--) {
 
@@ -602,6 +599,9 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 		if (a_idProcesso == IdProcesso_mestre)
 			incrementarTempoExecucao(a_idIteracao, tempo.count() / 60);
+
+		a_entradaSaidaDados.setDiretorioSaida(diretorio_resultado);
+		a_modeloOtimizacao.consolidarResultados(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);
 
 	} // try {
 	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_backward(a_entradaSaidaDados," + getFullString(a_estagio_inicial) + "," + getFullString(a_estagio_final) + "," + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_modeloOtimizacao): \n" + std::string(erro.what())); }
@@ -1570,7 +1570,7 @@ void MetodoSolucao::executarPDDE_operacao_final(EntradaSaidaDados a_entradaSaida
 
 		for (IdIteracao idIteracao = IdIteracao(iteracao_final + 1); idIteracao >= a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao()); idIteracao--) {
 
-			const std::string diretorio_FW = diretorio + "//" + getFullString(idIteracao) + "//Foward//Resultados";
+			const std::string diretorio_FW = diretorio + "//" + getFullString(idIteracao) + "//Forward//Resultados";
 
 			a_entradaSaidaDados.setDiretorioSaida(diretorio_FW);
 			a_modeloOtimizacao.consolidarResultados(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);

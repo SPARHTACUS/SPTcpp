@@ -102,6 +102,7 @@ public:
 
 	void imprimirArquivoCSV_SmartEnupla(const std::string a_nomeArquivo, const std::vector<std::vector<std::string>>& a_matriz_string)const;
 	void imprimirArquivoCSV_SmartEnupla(const std::string a_nomeArquivo, const std::vector<std::vector<std::string>>& a_matriz_string, const bool a_incluir_cabecalho)const;
+	void imprimirArquivoCSV(const std::string a_nomeArquivo, const std::vector<std::string>& a_matriz_string, const bool a_incluir_cabecalho)const;
 
 	// AttComum 
 

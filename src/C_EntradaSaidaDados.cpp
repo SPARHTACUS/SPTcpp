@@ -1927,6 +1927,88 @@ void EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(const std::string a_nomeA
 
 } // void EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(const std::string a_nomeArquivo, const std::vector<std::vector<std::string>>& a_matriz_string, const bool a_incluir_cabecalho) const{
 
+void EntradaSaidaDados::imprimirArquivoCSV(const std::string a_nomeArquivo, const std::vector<std::string>& a_matriz_string, const bool a_incluir_cabecalho = true) const {
+
+	std::string caminhoArquivo = diretorioSaida + "//" + a_nomeArquivo;
+	if (diretorioSaida == "")
+		caminhoArquivo = a_nomeArquivo;
+
+	try {
+
+		bool incluirCabecalho = a_incluir_cabecalho;
+		if (appendArquivo)
+			incluirCabecalho = false;
+
+		const int numLin = int(a_matriz_string.size());
+
+		if (numLin == 0)
+			return;
+
+		criarDiretorio(diretorioSaida);
+
+		std::ofstream escritaArquivo;
+
+		std::string caminhoArquivo_wr = caminhoArquivo + "_rw";
+
+		int tempo_total = 0;
+		bool arquivo_existente = false;
+		int arquivo_renomeado = 1;
+		while (true) {
+			escritaArquivo.open(caminhoArquivo.c_str(), std::ios_base::app);
+			arquivo_existente = escritaArquivo.is_open();
+
+			if (arquivo_existente) {
+				if (escritaArquivo.is_open())
+					escritaArquivo.close();
+
+				arquivo_renomeado = rename(caminhoArquivo.c_str(), caminhoArquivo_wr.c_str());
+
+				if (arquivo_renomeado == 0)
+					break;
+			} // if (arquivo_existente) {
+
+			if (tempo_total >= tempo_maximo_tentativa_escrita_arquivo)
+				throw std::invalid_argument("Nao foi possivel abrir o arquivo para escrita apos " + getString(int(tempo_maximo_tentativa_escrita_arquivo / 60000)) + " minutos.");
+
+			aguardarTempo(5000);
+			tempo_total += 5000;
+
+		} // while (true) {
+
+		if (appendArquivo)
+			escritaArquivo.open(caminhoArquivo_wr.c_str(), std::ios_base::app);
+		else
+			escritaArquivo.open(caminhoArquivo_wr.c_str(), std::ios_base::out);
+
+		if (!escritaArquivo.is_open())
+			throw std::invalid_argument("Nao foi possivel abrir o arquivo " + caminhoArquivo_wr + ".");
+
+		int primeira_coluna_IdCenario = -1;
+
+		for (int lin = 0; lin < numLin; lin++) {
+			if ((incluirCabecalho) || (lin > 0))
+				escritaArquivo << a_matriz_string.at(lin) << std::endl;
+		} // for (int lin = 0; lin < numLin; lin++) {
+
+		if (fimDeArquivo != "")
+			escritaArquivo << fimDeArquivo;
+
+		escritaArquivo.close();
+		escritaArquivo.clear();
+
+		if (rename(caminhoArquivo_wr.c_str(), caminhoArquivo.c_str()) != 0)
+			throw std::invalid_argument("Nao foi possivel renomear o arquivo " + caminhoArquivo_wr + " para " + caminhoArquivo + ".");
+
+		if (imprimirNaTela)
+			std::cout << "Sucesso na impressao de " << caminhoArquivo << std::endl;
+
+	} // try
+
+	catch (const std::ifstream::failure& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(" + caminhoArquivo + ",a_matriz_string," + getString(a_incluir_cabecalho) + "): \nErro de Integridade do Arquivo." + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(" + caminhoArquivo + ",a_matriz_string," + getString(a_incluir_cabecalho) + "): \n" + std::string(erro.what())); }
+
+} // void EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(const std::string a_nomeArquivo, const std::vector<std::vector<std::string>>& a_matriz_string, const bool a_incluir_cabecalho) const{
+
 
 void EntradaSaidaDados::getMembroIdMembro(const std::string a_string, std::string & a_m1, std::string & a_idM1)const {
 

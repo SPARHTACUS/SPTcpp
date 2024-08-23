@@ -660,6 +660,8 @@ double ModeloOtimizacao::atualizar_ENA_acoplamento(Dados& a_dados, const IdReser
 
 		const IdProcessoEstocastico idProcessoEstocastico = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
 
+		const Periodo periodo_amostra_ini = vetorProcessoEstocastico.at(idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo());
+
 		for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idUHE)) {
 
 			const int codigo_posto = a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_posto, int());
@@ -701,18 +703,16 @@ double ModeloOtimizacao::atualizar_ENA_acoplamento(Dados& a_dados, const IdReser
 							// e logo pondera as afluências vezes a produtibilidade_ENA
 							//****************************************************************************************************************************					
 							std::vector<SmartEnupla<IdHidreletrica, double>> coeficiente_idHidreletricas_calculo_ENA;
-							double termo_independente_calculo_ENA = 0.0;
+							double afluencia_natural = 0.0;
 
-							retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(a_dados, periodoPE, codigo_posto, codigo_posto_acoplamento_ENA, idUHE, a_idCenario, a_idRealizacao, idProcessoEstocastico, coeficiente_idHidreletricas_calculo_ENA, termo_independente_calculo_ENA);
-
-							double afluencia_natural = termo_independente_calculo_ENA;
+							retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(a_dados, periodoPE, codigo_posto, codigo_posto_acoplamento_ENA, idUHE, a_idCenario, a_idRealizacao, idProcessoEstocastico, coeficiente_idHidreletricas_calculo_ENA, afluencia_natural);
 
 							for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
 
 								const IdHidreletrica idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).getIteradorInicial();
 								const double         coeficiente_idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE_ENA);
 
-								if (periodoPE < vetorProcessoEstocastico.at(idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) //Valores da tendência
+								if (periodoPE < periodo_amostra_ini) //Valores da tendência
 									afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.at(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodoPE, double());
 								else//Valores dentro da árvore
 									afluencia_natural += coeficiente_idUHE_ENA * get_afluencia_incremental_from_idVariavelAleatoria(mapIdVar.at(idUHE_ENA), a_idCenario, a_idRealizacao, periodoPE); //Depende se estiver na etapa do forward/backward
@@ -3249,57 +3249,57 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao == IdRealizacao_Nenhum)) {
 
-				VARIAVEL_DECISAO_1(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+				VARIAVEL_DECISAO_1(ARMAZENAR_VALOR)
+				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR)
 
 			} // if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao == IdRealizacao_Nenhum)) {
 
 			else if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao != IdRealizacao_Nenhum)) {
 
-				VARIAVEL_DECISAO_1(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+				VARIAVEL_DECISAO_1(ARMAZENAR_VALOR)
+				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR)
 
 			} // else if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao != IdRealizacao_Nenhum)) {
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao == IdRealizacao_Nenhum)) {
 
-					EQUACAO_LINEAR_1(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					EQUACAO_LINEAR_1(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_2(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_3(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_4(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_5(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_6(ARMAZENAR_VALOR)
 
-					INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					INEQUACAO_LINEAR_3(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_4(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_5(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_6(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_7(ARMAZENAR_VALOR)
 
 			} // if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao == IdRealizacao_Nenhum)) {
 
 			else if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao != IdRealizacao_Nenhum)) {
 
-					EQUACAO_LINEAR_1(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					EQUACAO_LINEAR_1(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_2(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_3(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_4(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_5(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_6(ARMAZENAR_VALOR)
 
-					INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					INEQUACAO_LINEAR_3(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_4(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_5(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_6(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_7(ARMAZENAR_VALOR)
 
 			} // else if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()) && getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()) && (a_idRealizacao != IdRealizacao_Nenhum)) {
 
@@ -5043,6 +5043,7 @@ bool ModeloOtimizacao::isVariavelEstadoInstanciada(const IdEstagio a_idEstagio, 
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::isVariavelEstadoInstanciada(" + getFullString(a_idEstagio) + "," + getFullString(a_idVariavelEstado) + "): \n" + std::string(erro.what())); }
 }
 
+VARIAVEL_DECISAO_1(DECLARAR_IMPRIMIR_VALOR)
 VARIAVEL_DECISAO_2(DECLARAR_IMPRIMIR_VALOR)
 VARIAVEL_DECISAO_3(DECLARAR_IMPRIMIR_VALOR)
 VARIAVEL_DECISAO_4(DECLARAR_IMPRIMIR_VALOR)
@@ -5064,7 +5065,7 @@ INEQUACAO_LINEAR_7(DECLARAR_IMPRIMIR_VALOR);
 
 
 
-void ModeloOtimizacao::imprimirSolucaoPorEstagioPorCenario_porEstagio(const IdProcesso a_idProcesso, const std::string a_subdiretorio, EntradaSaidaDados a_entradaSaidaDados) {
+void ModeloOtimizacao::imprimirSolucaoPorEstagio(const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const std::string a_subdiretorio, EntradaSaidaDados a_entradaSaidaDados) {
 
 	try {
 
@@ -5073,91 +5074,36 @@ void ModeloOtimizacao::imprimirSolucaoPorEstagioPorCenario_porEstagio(const IdPr
 		for (TipoSubproblemaSolver TSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); TSS < TipoSubproblemaSolver_Excedente; TSS++) {
 
 			a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(TSS));
-
-			if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool())) {
-
-				if ((TSS == TipoSubproblemaSolver_viabilidade_hidraulica) && (!getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()))){}
-				else {
-
-
-					VARIAVEL_DECISAO_2(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-						VARIAVEL_DECISAO_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-						VARIAVEL_DECISAO_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-						VARIAVEL_DECISAO_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-						VARIAVEL_DECISAO_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-
-				}
-			}
-
-			if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, bool())) {
-
-				EQUACAO_LINEAR_2(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-
-					INEQUACAO_LINEAR_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					INEQUACAO_LINEAR_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					INEQUACAO_LINEAR_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					INEQUACAO_LINEAR_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					INEQUACAO_LINEAR_7(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO)
-			}
-
-		}
-
-	} // try {
-
-	catch (const std::exception & erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::imprimirSolucaoPorEstagioPorCenario(" + getString(a_idProcesso) + "," + a_subdiretorio + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
-
-} // void ModeloOtimizacao::imprimirSolucao(EntradaSaidaDados a_entradaSaidaDados){
-
-
-void ModeloOtimizacao::imprimirSolucaoPorEstagioPorCenarioPorRealizacao_porEstagio(const IdProcesso a_idProcesso, const std::string a_subdiretorio, EntradaSaidaDados a_entradaSaidaDados) {
-
-	try {
-
-		const std::string diretorio = a_entradaSaidaDados.getDiretorioSaida() + "//" + a_subdiretorio;
-
-		for (TipoSubproblemaSolver TSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); TSS < TipoSubproblemaSolver_Excedente; TSS++) {
-
-			a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(TSS));
-
-			if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, bool())) {
 
 				if ((TSS == TipoSubproblemaSolver_viabilidade_hidraulica) && (!getAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, bool()))) {}
 				else {
 
 
-					VARIAVEL_DECISAO_2(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-						VARIAVEL_DECISAO_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-						VARIAVEL_DECISAO_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-						VARIAVEL_DECISAO_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-						VARIAVEL_DECISAO_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					VARIAVEL_DECISAO_1(IMPRIMIR_VALOR)
+					VARIAVEL_DECISAO_2(IMPRIMIR_VALOR)
+						VARIAVEL_DECISAO_3(IMPRIMIR_VALOR)
+						VARIAVEL_DECISAO_4(IMPRIMIR_VALOR)
+						VARIAVEL_DECISAO_5(IMPRIMIR_VALOR)
+						VARIAVEL_DECISAO_6(IMPRIMIR_VALOR)
 
 				}
-			}
 
-			if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, bool())) {
+				EQUACAO_LINEAR_2(IMPRIMIR_VALOR)
+					EQUACAO_LINEAR_3(IMPRIMIR_VALOR)
+					EQUACAO_LINEAR_4(IMPRIMIR_VALOR)
+					EQUACAO_LINEAR_5(IMPRIMIR_VALOR)
+					EQUACAO_LINEAR_6(IMPRIMIR_VALOR)
 
-				EQUACAO_LINEAR_2(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-
-					INEQUACAO_LINEAR_3(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					INEQUACAO_LINEAR_4(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					INEQUACAO_LINEAR_5(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					INEQUACAO_LINEAR_6(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					INEQUACAO_LINEAR_7(IMPRIMIR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-			}
-
+					INEQUACAO_LINEAR_3(IMPRIMIR_VALOR)
+					INEQUACAO_LINEAR_4(IMPRIMIR_VALOR)
+					INEQUACAO_LINEAR_5(IMPRIMIR_VALOR)
+					INEQUACAO_LINEAR_6(IMPRIMIR_VALOR)
+					INEQUACAO_LINEAR_7(IMPRIMIR_VALOR)
 		}
 
 	} // try {
 
-	catch (const std::exception & erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::imprimirSolucaoPorEstagioPorCenarioPorRealizacao(" + getString(a_idProcesso) + "," + a_subdiretorio + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
+	catch (const std::exception & erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::imprimirSolucaoPorEstagio(" + getString(a_idProcesso) + "," + a_subdiretorio + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::imprimirSolucao(EntradaSaidaDados a_entradaSaidaDados){
 
@@ -5764,27 +5710,28 @@ void ModeloOtimizacao::armazenarValoresSolver(const TipoSubproblemaSolver a_TSS,
 
 				int i = 1;
 
-				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+				VARIAVEL_DECISAO_1(ARMAZENAR_VALOR)
+				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR)
 
 			}
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, bool())) {
 
-				EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+				EQUACAO_LINEAR_2(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_3(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_4(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_5(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_6(ARMAZENAR_VALOR)
 
-					INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
-					INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO)
+					INEQUACAO_LINEAR_3(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_4(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_5(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_6(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_7(ARMAZENAR_VALOR)
 
 			} // if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool())) {
 
@@ -5793,27 +5740,28 @@ void ModeloOtimizacao::armazenarValoresSolver(const TipoSubproblemaSolver a_TSS,
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, bool())) {
 
-				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+				VARIAVEL_DECISAO_1(ARMAZENAR_VALOR)
+				VARIAVEL_DECISAO_2(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_3(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_4(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_5(ARMAZENAR_VALOR)
+					VARIAVEL_DECISAO_6(ARMAZENAR_VALOR)
 
 			}
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool())) {
 
-				EQUACAO_LINEAR_2(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					EQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+				EQUACAO_LINEAR_2(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_3(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_4(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_5(ARMAZENAR_VALOR)
+					EQUACAO_LINEAR_6(ARMAZENAR_VALOR)
 
-					INEQUACAO_LINEAR_3(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					INEQUACAO_LINEAR_4(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					INEQUACAO_LINEAR_5(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					INEQUACAO_LINEAR_6(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
-					INEQUACAO_LINEAR_7(ARMAZENAR_VALOR_POR_ESTAGIO_POR_CENARIO_POR_REALIZACAO)
+					INEQUACAO_LINEAR_3(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_4(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_5(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_6(ARMAZENAR_VALOR)
+					INEQUACAO_LINEAR_7(ARMAZENAR_VALOR)
 
 			}
 
@@ -6000,6 +5948,7 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::consolidarVariaveis(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
 } // void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
 
+VARIAVEL_DECISAO_1(DECLARAR_CONSOLIDAR_RESULTADOS)
 VARIAVEL_DECISAO_2(DECLARAR_CONSOLIDAR_RESULTADOS)
 VARIAVEL_DECISAO_3(DECLARAR_CONSOLIDAR_RESULTADOS)
 VARIAVEL_DECISAO_4(DECLARAR_CONSOLIDAR_RESULTADOS)
@@ -6041,6 +5990,7 @@ void ModeloOtimizacao::consolidarVariaveis(const IdProcesso a_idProcesso, const 
 
 				const std::string VarDecisao_str = lista_VarDecisao_instanciadas.at(a_TSS).at(i);
 
+				VARIAVEL_DECISAO_1(CONSOLIDAR_RESULTADOS)
 				VARIAVEL_DECISAO_2(CONSOLIDAR_RESULTADOS)
 					VARIAVEL_DECISAO_3(CONSOLIDAR_RESULTADOS)
 					VARIAVEL_DECISAO_4(CONSOLIDAR_RESULTADOS)

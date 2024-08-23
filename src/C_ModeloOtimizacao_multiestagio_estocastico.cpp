@@ -4901,12 +4901,10 @@ void ModeloOtimizacao::criarVariaveisVolume(const bool a_isAlocMode, const TipoS
 				else if (a_period == a_periodIni_stage && !regularizacao_periodPrev)
 					addVarDecisao_VI(a_isAlocMode, a_TSS, a_idEstagio, a_period, idUHE, 0.0, 0.0, 0.0);
 
-				else
-					addVarDecisao_VI(a_isAlocMode, a_TSS, a_idEstagio, a_period, idUHE, 0.0, a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_periodPrev, double()), 0.0);
-
-
-				// Variável Volume Final (VF)
-				if (a_period == a_periodEnd_stage) {
+				if (a_periodNext <= a_periodEnd_stage)
+					addVarDecisao_VI(a_isAlocMode, a_TSS, a_idEstagio, a_periodNext, idUHE, 0.0, a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_period, double()), 0.0);
+				
+				else if (a_period == a_periodEnd_stage) {
 
 					const int varDecisao_VF = addVarDecisao_VF(a_isAlocMode, a_TSS, a_idEstagio, a_period, idUHE, 0.0, a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_period, double()), 0.0);
 
@@ -4915,11 +4913,12 @@ void ModeloOtimizacao::criarVariaveisVolume(const bool a_isAlocMode, const TipoS
 
 				} // if ((regularizacao_periodo_estudo) && (a_period == a_periodEnd_stage)) {
 
-				const int varVI = getVarDecisao_VIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, idUHE);
-				const int varVF = getVarDecisao_VFseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, idUHE);
+				const int varVI      = getVarDecisao_VIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, idUHE);
+				const int varVI_next = getVarDecisao_VIseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_periodNext, idUHE);
+				const int varVF      = getVarDecisao_VFseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, idUHE);
 
 				// Vaiável Volume Médio (VM)
-				if ((varVI > -1) || (varVF > -1)) {
+				if ((varVI > -1) || (varVI_next > -1) || (varVF > -1)) {
 
 					int var_VMED = getVarDecisao_VMEDseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, idUHE);
 					int equ_VMED = getEquLinear_VMEDseExistir(a_isAlocMode, a_TSS, a_idEstagio, a_period, idUHE);
@@ -4930,15 +4929,13 @@ void ModeloOtimizacao::criarVariaveisVolume(const bool a_isAlocMode, const TipoS
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, var_VMED, equ_VMED, 1.0);
 					}
 
-					if (varVI > -1) {
+					if (varVI > -1)
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, varVI, equ_VMED, -0.5);
 
-						if (a_period > a_periodIni_stage)
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, varVI, getEquLinear_VMED(a_isAlocMode, a_TSS, a_idEstagio, a_periodPrev, idUHE), -0.5);
-					}
+					if (varVI_next > -1)
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, varVI_next, equ_VMED, -0.5);
 
-
-					if (varVF > -1)
+					else if (varVF > -1)
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, varVF, equ_VMED, -0.5);
 
 				}
@@ -6508,14 +6505,14 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDLAG(con
 
 			} // for (Periodo periodo = periodIni_stage; periodo <= periodEnd_stage; horiz_stage.incrementarIterador(periodo)) {
 			
-			if (periodIni_stage >= a_periodo_lag)
+			if (a_periodo_lag >= periodIni_stage)
 				return varQDLAG;
 
 		} // if (sobreposicao_periodo_otimizacao > 0.0) {
 
 		// ADD any deterministic (past) compound of QD.
 		// Only in stage where a_period belongs
-		if ((a_periodo_lag < periodIni_stageIni) && (stageIni == IdEstagio_1) && (periodIni_stage <= a_periodo) && (a_periodo <= periodEnd_stage)) {
+		if (((a_periodo_lag < periodIni_stageIni) && (stageIni == a_idEstagio)) || (a_periodo_lag + 1 <= periodIni_stageIni)) {
 
 			const SmartEnupla<Periodo, double> vazao_defluencia = a_dados.getVetor(a_idHidreletrica, IdDefluencia_passada, AttVetorDefluencia_vazao_defluencia, Periodo(), double());
 
@@ -6579,16 +6576,16 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDLAG(con
 			if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 				varQDLAG_anterior = -1;
 
-			// Variáveis de estado a repassar lag
-			if (sobreposicao_periodo_otimizacao == 0.0)
-				vetorEstagio.at(a_idEstagio).addVariavelEstado(a_isAlocMode, a_TSS, getNomeVarDecisao_QDLAG(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idHidreletrica), varQDLAG, varQDLAG_anterior);
-
 			// Variáveis de estado a compor lag
-			else if (sobreposicao_periodo_otimizacao > 0.0) {
+			if (sobreposicao_periodo_otimizacao > 0.0) {
 				const int varQDLAG_ADD = addVarDecisao_QDLAG_ADD(a_isAlocMode, a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idHidreletrica, 0.0, infinito, 0.0);
 				vetorEstagio.at(a_idEstagio).addVariavelEstado(a_isAlocMode, a_TSS, getNomeVarDecisao_QDLAG(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idHidreletrica), varQDLAG_ADD, varQDLAG_anterior);
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(a_isAlocMode, varQDLAG_ADD, equQDLAG, -1.0);
 			}
+
+			// Variáveis de estado a repassar lag
+			else
+				vetorEstagio.at(a_idEstagio).addVariavelEstado(a_isAlocMode, a_TSS, getNomeVarDecisao_QDLAG(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idHidreletrica), varQDLAG, varQDLAG_anterior);
 
 		} // if (varQDLAG_anterior > -1){
 

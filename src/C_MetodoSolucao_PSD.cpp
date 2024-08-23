@@ -43,7 +43,7 @@ void MetodoSolucao::executarPSD(EntradaSaidaDados a_entradaSaidaDados, const IdP
 					a_entradaSaidaDados.setAppendArquivo(true);
 
 				a_entradaSaidaDados.setDiretorioSaida(diretorio_resultado);
-				a_modeloOtimizacao.imprimirSolucaoPorEstagioPorCenario_porEstagio(a_idProcesso, "", a_entradaSaidaDados);
+				a_modeloOtimizacao.imprimirSolucaoPorEstagio(a_idProcesso, idEstagio, "", a_entradaSaidaDados);
 			
 			} // try {
 				
