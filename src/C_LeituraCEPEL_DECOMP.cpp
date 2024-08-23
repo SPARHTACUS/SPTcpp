@@ -16043,6 +16043,8 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 			try {
 
+				std::cout << "Carregando arquivo de preConfiguracao: SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
+
 				const IdSubmercado idSubmercadoIni_PD = dados_PD.getMenorId(IdSubmercado());
 				const IdSubmercado idSubmercadoOut_PD = dados_PD.getIdOut(IdSubmercado());
 				//const IdSubmercado maiorIdSubmercado_PD = dados_PD.getMaiorId(IdSubmercado());
@@ -16114,6 +16116,8 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 			try {
 
+				std::cout << "Carregando arquivo de preConfiguracao: SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
+
 				const IdSubmercado idSubmercadoIni_PD = dados_PD.getMenorId(IdSubmercado());
 				const IdSubmercado idSubmercadoOut_PD = dados_PD.getIdOut(IdSubmercado());
 
@@ -16177,11 +16181,6 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 								//Zera para o período P a info de todos os Ids_CP, depois cria novos Ids_CP (se necessário) e atualiza a info com os Ids_PD
 								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorUsinaNaoSimulada.at(idUsinaNaoSimuladaIni_PD).getIterador2Final(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo_PD, IdPatamarCarga());
-
-								if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
-									throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD ");
-
 								///////////////////////////////////////////////////////////////////////////////
 								//1. Zera a informação dos idsCP (para o periodo avaliado)
 								///////////////////////////////////////////////////////////////////////////////
@@ -16210,6 +16209,11 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 								///////////////////////////////////////////////////////////////////////////////
 
 								for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = idUsinaNaoSimuladaIni_PD; idUsinaNaoSimulada_PD < idUsinaNaoSimuladaOut_PD; dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
+
+									const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada_PD).getIterador2Final(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo_PD, IdPatamarCarga());
+
+									if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
+										throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD ");
 
 									//Instancia Ids_CP que não existem
 									if (!a_dados.vetorSubmercado.at(idSubmercado_PD).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada_PD)) {
@@ -16276,6 +16280,8 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		if (dadosPreConfig_submercado_premissa) {
 
 			try {
+
+				std::cout << "Carregando arquivo de preConfiguracao: SUBMERCADO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
 
 				const IdSubmercado idSubmercadoIni_PD = dados_PD.getMenorId(IdSubmercado());
 				const IdSubmercado idSubmercadoOut_PD = dados_PD.getIdOut(IdSubmercado());
@@ -16366,6 +16372,8 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		if (dadosPreConfig_usina_nao_simulada_premissa) {
 
 			try {
+
+				std::cout << "Carregando arquivo de preConfiguracao: SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
 
 				const IdSubmercado idSubmercadoIni_PD = dados_PD.getMenorId(IdSubmercado());
 				const IdSubmercado idSubmercadoOut_PD = dados_PD.getIdOut(IdSubmercado());
@@ -16531,6 +16539,11 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		if (is_carregar_PD_restricoes_eletricas) {
 
 			try {
+
+				std::cout << "Carregando arquivo de preConfiguracao: RESTRICAO_ELETRICA_AttComumOperacional.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttComumOperacional.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
 
 				//Informação para atualizar os limites das restrições originais: Seus limites vão ser "liberados" nos períodos do horizonte das restrições PD
 				const IdRestricaoEletrica maiorIdRestricaoEletrica_REF = a_dados.getMaiorId(IdRestricaoEletrica()); //maior idRestricaoEletrica do conjunto de restrições originais
@@ -16706,6 +16719,11 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 			try {
 
+				std::cout << "Carregando arquivo de preConfiguracao: RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttComumOperacional.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
+
 				//Informação para atualizar os limites das restrições originais: Seus limites vão ser "liberados" nos períodos do horizonte das restrições PD
 				const IdRestricaoOperativaUHE maiorIdRestricaoOperativaUHE_REF = a_dados.getMaiorId(IdRestricaoOperativaUHE()); //maior idRestricaoOperativaUHE do conjunto de restrições originais
 				Periodo periodo_REF = horizonte_estudo.getIteradorInicial(); //Período a partir do qual vão ser consideradas as restrições originais (atualiza-se a partir do periodo_final_PD)
@@ -16730,15 +16748,15 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 					//Instancia as novas restrições PD no CP
 					////////////////////////////////////////
 
-					RestricaoOperativaUHE RestricaoOperativaUHE;
+					RestricaoOperativaUHE restricaoOperativaUHE;
 
 					const IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE(a_dados.getMaiorId(IdRestricaoOperativaUHE()) + 1);
 
-					RestricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_idRestricaoOperativaUHE, idRestricaoOperativaUHE);
+					restricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_idRestricaoOperativaUHE, idRestricaoOperativaUHE);
 
 					std::string nome = dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getAtributo(AttComumRestricaoOperativaUHE_nome, std::string());
-					RestricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_nome, nome);
-					a_dados.vetorRestricaoOperativaUHE.add(RestricaoOperativaUHE);
+					restricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_nome, nome);
+					a_dados.vetorRestricaoOperativaUHE.add(restricaoOperativaUHE);
 
 					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
 					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_menos_inf(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
