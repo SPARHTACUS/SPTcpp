@@ -192,7 +192,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, idCenario_estado);
 
-							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado_posEstudo(idEstagio, a_estagio_final, idCenario, IdRealizacao_Nenhum, a_dados);
+							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado_posEstudo(idEstagio, a_estagio_final, idCenario_estado, idCenario, IdRealizacao_Nenhum, a_dados);
 
 							a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, idCenario);
 							
@@ -446,7 +446,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 						auto start_clock_realizacao = std::chrono::high_resolution_clock::now();
 
-						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado_posEstudo(idEstagio, a_estagio_final, idCenario_estado, IdRealizacao(idAbertura), a_dados);
+						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado_posEstudo(idEstagio, a_estagio_final, idCenario_estado, IdCenario_Nenhum, IdRealizacao(idAbertura), a_dados);
 
 						a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelRealizacao(idEstagio, IdRealizacao(idAbertura));
 
