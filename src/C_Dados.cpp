@@ -4042,7 +4042,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 		const int numIdHidrPorProcesso = vetorHidreletrica.numObjetos() / numProcessos;
 
 
-		//MAIOR ID TERMELETRICA
+		//MAIOR ID HIDRELETRICA
 		int numIdHidr_before = 0;
 		for (IdProcesso idProcesso_comp = IdProcesso_mestre; idProcesso_comp < idProcesso; idProcesso_comp++) {
 			numIdHidr_before += numIdHidrPorProcesso;
@@ -4689,8 +4689,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				// 
 
 				if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_defluente_minima) == 0) {
-					vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_defluente_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_defluente_minima, double())));
-					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = sim_operacional;
+					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = nao_sem_utilizacao;
 				}
 				else
 					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = nao_operacional_informado;
@@ -4704,8 +4703,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				// 
 
 				if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_defluente_maxima) == 0) {
-					vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_defluente_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_defluente_maxima, double())));
-					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = sim_operacional;
+					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = nao_sem_utilizacao;
 				}
 				else
 					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = nao_operacional_informado;
