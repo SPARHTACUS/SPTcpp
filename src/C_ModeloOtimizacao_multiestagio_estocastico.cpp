@@ -231,113 +231,119 @@ void ModeloOtimizacao::formularModeloOtimizacao(const bool a_isAlocMode, const S
 
 		for (IdEstagio idEstagio = a_idEstagioIni; idEstagio <= a_idEstagioEnd; idEstagio++) {
 
-			const SmartEnupla<Periodo, int> horizonSP        = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo(), int());
-			const SmartEnupla<Periodo, double> horizon_stage = a_dados.getElementosMatriz(AttMatrizDados_percentual_duracao_horizonte_estudo, idEstagio, Periodo(), double());
+			//if (!arranjoResolucao.isAnyCenarioEstado(idEstagio) && !arranjoResolucao.isAnyAberturas(idEstagio)) {
+			if (true){
 
-			Periodo period_stage = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
-			Periodo periodIni_stage = horizon_stage.getIteradorInicial();
-			Periodo periodEnd_stage = horizon_stage.getIteradorFinal();
+				const SmartEnupla<Periodo, int> horizonSP = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo(), int());
+				const SmartEnupla<Periodo, double> horizon_stage = a_dados.getElementosMatriz(AttMatrizDados_percentual_duracao_horizonte_estudo, idEstagio, Periodo(), double());
 
-			for (int i = 0; i < int(a_listaTSS.at(idEstagio).size()); i++) {
+				Periodo period_stage = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
+				Periodo periodIni_stage = horizon_stage.getIteradorInicial();
+				Periodo periodEnd_stage = horizon_stage.getIteradorFinal();
 
-				criarVariaveisCusto(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio);
+				for (int i = 0; i < int(a_listaTSS.at(idEstagio).size()); i++) {
 
-				criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidrologico(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, periodIni_stage, period_stage, periodEnd_stage, horizonSP, a_horizon);
+					criarVariaveisCusto(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio);
 
-				for (Periodo period = periodIni_stage; period <= periodEnd_stage; a_horizon.incrementarIterador(period)) {
+					criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidrologico(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, periodIni_stage, period_stage, periodEnd_stage, horizonSP, a_horizon);
 
-					const IdPatamarCarga idPatEnd = a_horizon.at_rIt(period).getIteradorFinal();
+					for (Periodo period = periodIni_stage; period <= periodEnd_stage; a_horizon.incrementarIterador(period)) {
 
-					Periodo periodPrev = period;
-					a_horizon.decrementarIterador(periodPrev);
+						const IdPatamarCarga idPatEnd = a_horizon.at_rIt(period).getIteradorFinal();
 
-					Periodo periodNext = period;
-					a_horizon.incrementarIterador(periodNext);
+						Periodo periodPrev = period;
+						a_horizon.decrementarIterador(periodPrev);
 
-					// Variaveis Decisão
-
-					criarVariaveisCusto(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period);
-
-					criarVariaveisVolume(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, periodIni_stage, periodEnd_stage, periodPrev, period, periodNext);
-
-					// Restrições
-
-					criarRestricoesCusto(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period);
-
-					criarRestricoesHidraulicaEspecial_vazao_afluente(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period);
-
-					criarRestricoesHidraulicaEspecial_volume_armazenado(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, periodIni_stage, periodEnd_stage, period, periodNext, a_horizon);
-
-					criarRestricoesHidraulicaEspecial_energia_armazenada(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, periodEnd_stage, period, periodNext);
-
-					for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= idPatEnd; idPat++) {
+						Periodo periodNext = period;
+						a_horizon.incrementarIterador(periodNext);
 
 						// Variaveis Decisão
 
-						criarVariaveisCusto(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+						criarVariaveisCusto(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period);
 
-						criarVariaveisContrato(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
-
-						criarVariaveisEolicas(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
-
-						criarVariaveisUsinaNaoSimulada(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
-
-						criarVariaveisTermeletricas(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, periodIni_stage, periodPrev, period, idPat);
-
-						criarVariaveisHidraulicas(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
-
-						criarVariaveisIntercambio(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
-
-						criarVariaveisDemanda(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
-
-						criarVariaveisDemandaEspecial(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
-
-						criarVariaveisDeficit(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
-
-						criarVariaveisRestricaoEletrica(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+						criarVariaveisVolume(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, periodIni_stage, periodEnd_stage, periodPrev, period, periodNext);
 
 						// Restrições
 
-						criarRestricoesCusto(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+						criarRestricoesCusto(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period);
 
-						criarRestricoesCustoOperacao(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+						criarRestricoesHidraulicaEspecial_vazao_afluente(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period);
 
-						criarRestricoesCustoPenalidade(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+						criarRestricoesHidraulicaEspecial_volume_armazenado(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, periodIni_stage, periodEnd_stage, period, periodNext, a_horizon);
 
-						criarRestricoesHidraulicas(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, periodIni_stage, periodEnd_stage, periodPrev, period, periodNext, idPat);
+						criarRestricoesHidraulicaEspecial_energia_armazenada(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, periodEnd_stage, period, periodNext);
 
-						criarRestricoesHidraulicaEspecial_vazao_defluente(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+						for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= idPatEnd; idPat++) {
 
-						criarRestricoesTermeletrica(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, idPat, periodIni_stage, periodEnd_stage, periodPrev, period, a_horizon);
+							// Variaveis Decisão
 
-						criarRestricoesEletricas(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+							criarVariaveisCusto(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
 
-						criarRestricoesAgrupamentoIntercambio(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+							criarVariaveisContrato(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
 
-						criarRestricoesIntercambio(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+							criarVariaveisEolicas(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
 
-						criarRestricoesIntercambioHidraulico(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+							criarVariaveisUsinaNaoSimulada(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
 
-						criarRestricoesInformacaoMedia(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+							criarVariaveisTermeletricas(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, periodIni_stage, periodPrev, period, idPat);
 
-						criarRestricoesAtendimentoDemanda(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+							criarVariaveisHidraulicas(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
 
-						criarRestricoesUsinaElevatoria(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+							criarVariaveisIntercambio(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
 
-					}// for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= maiorIdPatamarCarga; idPat++) {
+							criarVariaveisDemanda(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
 
-					criarRestricoesCustoPenalidade(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period);
+							criarVariaveisDemandaEspecial(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
 
-					tratarVariaveisFolga(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period);
+							criarVariaveisDeficit(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
 
-				} // for (Periodo period = horizon_stage.getIteradorInicial(); period <= horizon_stage.getIteradorFinal(); horizon_stage.incrementarIterador(period)) {
+							criarVariaveisRestricaoEletrica(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
 
-				if (idEstagio < a_idEstagioEnd)
-					criarRestricoesCorteBendersEmCustoFuturo(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), idEstagio);
+							// Restrições
 
-				criarRestricoesCorteBendersEmCustoTotal(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), idEstagio);
+							criarRestricoesCusto(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
 
-			} // for (int i = 0; i < int(a_listaTSS.at(idEstagio).size()); i++) {
+							criarRestricoesCustoOperacao(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+
+							criarRestricoesCustoPenalidade(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+
+							criarRestricoesHidraulicas(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, periodIni_stage, periodEnd_stage, periodPrev, period, periodNext, idPat);
+
+							criarRestricoesHidraulicaEspecial_vazao_defluente(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+
+							criarRestricoesTermeletrica(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, idPat, periodIni_stage, periodEnd_stage, periodPrev, period, a_horizon);
+
+							criarRestricoesEletricas(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+
+							criarRestricoesAgrupamentoIntercambio(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+
+							criarRestricoesIntercambio(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+
+							criarRestricoesIntercambioHidraulico(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+
+							criarRestricoesInformacaoMedia(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+
+							criarRestricoesAtendimentoDemanda(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+
+							criarRestricoesUsinaElevatoria(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period, idPat);
+
+						}// for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= maiorIdPatamarCarga; idPat++) {
+
+						criarRestricoesCustoPenalidade(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period);
+
+						tratarVariaveisFolga(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), a_dados, idEstagio, period);
+
+					} // for (Periodo period = horizon_stage.getIteradorInicial(); period <= horizon_stage.getIteradorFinal(); horizon_stage.incrementarIterador(period)) {
+
+					if (idEstagio < a_idEstagioEnd)
+						criarRestricoesCorteBendersEmCustoFuturo(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), idEstagio);
+
+					criarRestricoesCorteBendersEmCustoTotal(a_isAlocMode, a_listaTSS.at(idEstagio).at(i), idEstagio);
+
+				} // for (int i = 0; i < int(a_listaTSS.at(idEstagio).size()); i++) {
+
+			} // if (!arranjoResolucao.isAnyCenarioEstado(idEstagio) && !arranjoResolucao.isAnyAberturas(idEstagio)) {
+
 		} // for (IdEstagio idEstagio = a_idEstagioIni; idEstagio <= a_idEstagioEnd; idEstagio++) {
 
 	} // try
