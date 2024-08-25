@@ -386,14 +386,14 @@ void ModeloOtimizacao::selecionarCorteBenders(const IdEstagio a_idEstagio){
 
 
 
-void ModeloOtimizacao::gerarRealizacoes(const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, EntradaSaidaDados a_entradaSaidaDados){
+void ModeloOtimizacao::gerarRealizacoes(const IdEstagio a_estagioIni, const IdEstagio a_estagioEnd, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, EntradaSaidaDados a_entradaSaidaDados){
 
 	try {
 
 		const IdProcessoEstocastico idPE = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
 
 		bool algum_truncamento = false;
-		for (IdEstagio idEstagio = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()); idEstagio <= getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()); idEstagio++) {
+		for (IdEstagio idEstagio = a_estagioIni; idEstagio <= a_estagioEnd; idEstagio++) {
 			if (getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, idEstagio, int()) == 1) {
 				algum_truncamento = true;
 				break;
@@ -411,6 +411,39 @@ void ModeloOtimizacao::gerarRealizacoes(const IdIteracao a_idIteracao, const IdP
 			const IdCenario menor_cenario_iteracao = arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_menor_cenario, IdCenario());
 			const IdCenario maior_cenario_iteracao = arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_maior_cenario, IdCenario());
 
+			if (arranjoResolucao.getMenorId(IdIteracao()) < a_idIteracao) {
+				const IdIteracao idIteracao_past = IdIteracao(a_idIteracao - 1);
+				const IdCenario menor_cenario_iteracao_past = arranjoResolucao.getAtributo(idIteracao_past, AttComumIteracao_menor_cenario, IdCenario());
+				const IdCenario maior_cenario_iteracao_past = arranjoResolucao.getAtributo(idIteracao_past, AttComumIteracao_maior_cenario, IdCenario());
+				if ((menor_cenario_iteracao == menor_cenario_iteracao_past) && (maior_cenario_iteracao == maior_cenario_iteracao_past))
+					return;
+			} // if (arranjoResolucao.getMenorId(IdIteracao()) < a_idIteracao) {
+
+			IdCenario menor_cenario = IdCenario_Nenhum;
+			IdCenario maior_cenario = IdCenario_Nenhum;
+
+			for (IdEstagio idEstagio = a_estagioIni; idEstagio < a_estagioEnd; idEstagio++) {
+
+				for (IdProcesso idPro = IdProcesso_mestre; idPro <= arranjoResolucao.getMaiorId(IdProcesso()); idPro++) {
+
+					const std::vector<IdCenario> cenarios_estados = arranjoResolucao.getIdsCenarioEstadoFromAberturas(idPro, a_idIteracao, idEstagio);
+
+					if ((cenarios_estados.size() > 0) && (menor_cenario == IdCenario_Nenhum)) {
+						menor_cenario = cenarios_estados.at(0);
+						maior_cenario = cenarios_estados.at(0);
+					}
+
+					for (int i = 1; i < int(cenarios_estados.size()); i++) {
+						if (cenarios_estados.at(i) < menor_cenario)
+							menor_cenario = cenarios_estados.at(i);
+						else if (maior_cenario < cenarios_estados.at(i))
+							maior_cenario = cenarios_estados.at(i);
+					}
+				}
+
+			} // for (IdEstagio idEstagio = a_estagioIni; idEstagio < a_estagioEnd; idEstagio++) {
+
+
 			int semente_geracao_cenario_hidrologico = -1;
 
 			bool gerar_cenarios_internos = false;
@@ -419,7 +452,7 @@ void ModeloOtimizacao::gerarRealizacoes(const IdIteracao a_idIteracao, const IdP
 				a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//ProcessoEstocasticoHidrologico");
 			}
 
-			vetorProcessoEstocastico.at(idPE).gerarCenariosPorSorteio(a_entradaSaidaDados, imprimir_cenarios, true, gerar_cenarios_internos, getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()), menor_cenario_iteracao, maior_cenario_iteracao, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
+			vetorProcessoEstocastico.at(idPE).gerarCenariosPorSorteio(a_entradaSaidaDados, imprimir_cenarios, true, gerar_cenarios_internos, getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()), menor_cenario, maior_cenario, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
 
 		}
 
@@ -487,13 +520,18 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado(const IdEstagi
 } // void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado(const IdEstagio a_idEstagio, const IdProcesso a_idProcesso, const IdCenario a_idCenario, int& a_indice, double* a_array){
 
 
-void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado_posEstudo(const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_final, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, Dados& a_dados) {
+void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado_posEstudo(const IdEstagio a_idEstagio, const IdEstagio a_idEstagio_final, const IdCenario a_idCenario, IdRealizacao a_idRealizacao, Dados& a_dados) {
 
 	try {
 
 		const IdEstagio idEstagio_futuro = vetorEstagio.getMaiorId();
 
 		if (a_idEstagio == a_idEstagio_final && idEstagio_futuro > a_idEstagio_final) {//Procura variáveis de ENA no idEstagio_futuro (se existir)
+
+			if (a_idRealizacao == IdRealizacao_Nenhum) {
+				const Periodo period = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo());
+				a_idRealizacao = getElementoMatriz(getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()), AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, period, IdRealizacao());
+			}
 
 			const Periodo periodo_estudo_inicial = getAtributo(AttComumModeloOtimizacao_periodo_estudo_inicial, Periodo());
 			const IdVariavelEstado maiorIdVariavelEstado = getMaiorId(idEstagio_futuro, IdVariavelEstado());

@@ -138,7 +138,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 		const double tempo_limite = multiplicador_tempo_limite_resolucao * tempo_medio_solver_bw;
 
 		a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao);
-		a_modeloOtimizacao.gerarRealizacoes(a_idIteracao, a_idProcesso, a_entradaSaidaDados);
+		a_modeloOtimizacao.gerarRealizacoes(a_estagio_inicial, a_estagio_final, a_idIteracao, a_idProcesso, a_entradaSaidaDados);
 		a_entradaSaidaDados.setDiretorioSaida(diretorio);
 
 		double cont_tempo_otimizacao = 0.0;
@@ -160,10 +160,6 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 				custo_superior.at(idEstagio).reserve(numero_cenarios);
 				custo_superior_problema_mestre.at(idEstagio).reserve(numero_cenarios);
-
-
-				//if ((idEstagio == a_estagio_inicial) && (a_estagio_inicial > IdEstagio_1))
-					//a_modeloOtimizacao.importarVariaveisEstado_AcoplamentoPreEstudo(a_idProcesso, a_maiorIdProcesso, a_idIteracao, menor_cenario, maior_cenario, a_entradaSaidaDados);
 
 				a_modeloOtimizacao.setTempoLimiteOtimizacao(tSS, idEstagio, -1.0);
 
