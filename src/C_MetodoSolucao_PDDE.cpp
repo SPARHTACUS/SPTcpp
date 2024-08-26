@@ -1114,6 +1114,18 @@ void MetodoSolucao::executarPDDE_calcularCorteBenders_new(const TipoSubproblemaS
 
 		executarPDDE_sincronizarResultadosParaCorteBenders(a_TSS, a_idIteracao, a_idEstagio, a_status_otimizacao, a_custo_total, a_sol_inf_var_dinamica, a_solucao_dual_var_dinamica, a_limite_inferior_var_dinamica, a_limite_superior_var_dinamica, a_sol_dual_var_estado, a_vlr_var_estado, a_modeloOtimizacao);
 
+		if (!a_modeloOtimizacao.arranjoResolucao.isAnyCenarioEstado(IdEstagio(a_idEstagio - 1)) && !a_modeloOtimizacao.arranjoResolucao.isAnyAberturas(IdEstagio(a_idEstagio - 1))) {
+			a_status_otimizacao.esvaziar();
+			a_custo_total.esvaziar();
+			a_sol_inf_var_dinamica.esvaziar();
+			a_solucao_dual_var_dinamica.esvaziar();
+			a_limite_inferior_var_dinamica.esvaziar();
+			a_limite_superior_var_dinamica.esvaziar();
+			a_sol_dual_var_estado.esvaziar();
+			a_vlr_var_estado.esvaziar();
+			return;
+		}
+
 		EstruturaResultados<int> map_solucao_dual_proxy;
 
 		executarPDDE_mapearSolucaoProxy(a_idIteracao, a_idEstagio, a_status_otimizacao, a_custo_total, a_sol_inf_var_dinamica, a_solucao_dual_var_dinamica, a_limite_inferior_var_dinamica, a_limite_superior_var_dinamica, a_sol_dual_var_estado, map_solucao_dual_proxy, a_modeloOtimizacao);
@@ -1133,8 +1145,28 @@ void MetodoSolucao::executarPDDE_calcularCorteBenders_new(const TipoSubproblemaS
 void MetodoSolucao::executarPDDE_sincronizarResultadosParaCorteBenders(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio, EstruturaResultados<int>& a_status_otimizacao, EstruturaResultados<double>& a_custo_total, EstruturaResultados<double>& a_sol_inf_var_dinamica, EstruturaResultados<double>& a_solucao_dual_var_dinamica, EstruturaResultados<double>& a_limite_inferior_var_dinamica, EstruturaResultados<double>& a_limite_superior_var_dinamica, EstruturaResultados<double>& a_sol_dual_var_estado, EstruturaResultados<double>& a_vlr_var_estado, ModeloOtimizacao& a_modeloOtimizacao) {
 	try {
 
-		const int numero_estados = int(a_modeloOtimizacao.getMaiorId(a_idEstagio, IdVariavelEstado()));
-		const int numero_variaveis_dinamicas = a_modeloOtimizacao.getNumeroVariavelDinamica(a_TSS, a_idEstagio);
+		const IdProcesso idProcesso_local = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+
+		int numero_estados = 0;
+		int numero_variaveis_dinamicas = 0;
+
+		if (idProcesso_local == IdProcesso_mestre) {
+
+			numero_estados = int(a_modeloOtimizacao.getMaiorId(a_idEstagio, IdVariavelEstado()));
+			numero_variaveis_dinamicas = a_modeloOtimizacao.getNumeroVariavelDinamica(a_TSS, a_idEstagio);
+			
+			for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
+				MPI_Send(&numero_estados, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
+				MPI_Send(&numero_variaveis_dinamicas, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
+			}
+		}
+		else {
+			MPI_Recv(&numero_estados, 1, MPI_INT, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			MPI_Recv(&numero_variaveis_dinamicas, 1, MPI_INT, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		}
+
+
+
 		const int numero_processos = int(a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()));
 
 		EstruturaResultados<int> status_otimizacao_all(numero_processos);

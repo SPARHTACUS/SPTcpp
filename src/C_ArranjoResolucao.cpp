@@ -323,11 +323,9 @@ int ArranjoResolucao::getNumeroAberturas(const IdProcesso a_idProcesso, const Id
 
 			} // for (IdCenario idCenario_estado = menor_idCenario_estado; idCenario_estado <= maior_idCenario_estado; idCenario_estado++) {
 
-			return 0;
-
 		} // if (getSize1Matriz(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_abertura_por_cenario_estado) > 0) {
 
-		throw std::invalid_argument("Erro");
+		return 0;
 	}
 
 	catch (const std::exception& erro) { throw std::invalid_argument("ArranjoResolucao::getNumeroAberturas(" + getFullString(a_idProcesso) + "," + getFullString(a_idIteracao) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }

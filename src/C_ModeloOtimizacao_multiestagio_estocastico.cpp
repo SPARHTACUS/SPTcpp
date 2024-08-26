@@ -231,8 +231,8 @@ void ModeloOtimizacao::formularModeloOtimizacao(const bool a_isAlocMode, const S
 
 		for (IdEstagio idEstagio = a_idEstagioIni; idEstagio <= a_idEstagioEnd; idEstagio++) {
 
-			//if (!arranjoResolucao.isAnyCenarioEstado(idEstagio) && !arranjoResolucao.isAnyAberturas(idEstagio)) {
-			if (true){
+			if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio)) {
+			//if (true){
 
 				const SmartEnupla<Periodo, int> horizonSP = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo(), int());
 				const SmartEnupla<Periodo, double> horizon_stage = a_dados.getElementosMatriz(AttMatrizDados_percentual_duracao_horizonte_estudo, idEstagio, Periodo(), double());
@@ -4886,7 +4886,7 @@ void ModeloOtimizacao::criarVariaveisVolume(const bool a_isAlocMode, const TipoS
 					
 					int varVF = -1;
 					if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica)
-						varVF = getVarDecisao_VF(a_isAlocMode, a_TSS, idEstagioAnterior, periodo_estudo_final_estagio_anterior, idUHE);
+						varVF = getVarDecisao_VFseExistir(a_isAlocMode, a_TSS, idEstagioAnterior, periodo_estudo_final_estagio_anterior, idUHE);
 
 					const double volume_util_maximo = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_period, double());
 					const double volume_minimo = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_minimo, a_period, double());

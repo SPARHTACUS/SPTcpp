@@ -173,29 +173,6 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		validacao_operacional_Dados(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 
-		SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
-
-		Periodo periodo8 = Periodo(19, 8, 2023);
-		Periodo periodo7 = Periodo(21, 8, 2023);
-		Periodo periodo6 = Periodo(20, 8, 2023);
-		Periodo periodo5 = Periodo(18, 8, 2023);
-		Periodo periodo4 = Periodo(24, 8, 2023);
-		Periodo periodo3 = Periodo(25, 8, 2023);
-		Periodo periodo2 = Periodo(23, 8, 2023);
-		Periodo periodo1 = Periodo(22, 8, 2023);
-
-		horizonte_estudo.addElemento(periodo1, IdEstagio_381);
-		horizonte_estudo.addElemento(periodo2, IdEstagio_382);
-		horizonte_estudo.addElemento(periodo3, IdEstagio_383);
-		horizonte_estudo.addElemento(periodo4, IdEstagio_384);
-		horizonte_estudo.addElemento(periodo5, IdEstagio_385);
-		horizonte_estudo.addElemento(periodo6, IdEstagio_386);
-		horizonte_estudo.addElemento(periodo7, IdEstagio_387);
-		horizonte_estudo.addElemento(periodo8, IdEstagio_388);
-
-
-
-
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		//
 		//                                                                        Carregar Arquivos de Submercado

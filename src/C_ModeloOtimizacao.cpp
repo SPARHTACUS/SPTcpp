@@ -268,7 +268,7 @@ void ModeloOtimizacao::requestCorteBenders(const IdProcesso a_idProcesso, const 
 		if ((idEstagio_anterior < estagio_inicial) && (!vetorEstagio.at(a_idEstagio).isSolverInstanciado(TipoSubproblemaSolver_mestre)))
 			return;
 
-		if (lista_subproblemaSolver.size() == 0)
+		if (!arranjoResolucao.isAnyCenarioEstado(idEstagio_anterior) && !arranjoResolucao.isAnyAberturas(idEstagio_anterior))
 			return;
 
 		selecionarCorteBenders(a_idEstagio);

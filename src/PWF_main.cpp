@@ -156,8 +156,8 @@ int main(int argc, char *argv[]) {
 
 		if (!encerrar_apos_deck_cepel) {
 
-			//if (idProcesso == IdProcesso_mestre)
-				//std::system("pause");
+			if (idProcesso == IdProcesso_mestre)
+				std::system("pause");
 
 			MPI_Barrier(MPI_COMM_WORLD);
 
