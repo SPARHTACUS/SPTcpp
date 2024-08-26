@@ -99,8 +99,6 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 
 			a_modeloOtimizacao.imprimirVariaveisRealizacao(a_entradaSaidaDados);
 
-			//a_modeloOtimizacao.imprimirRestricoesCenario(a_entradaSaidaDados);
-
 			a_modeloOtimizacao.imprimirVariaveisRealizacaoInterna(a_entradaSaidaDados);
 
 			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getString(AttVetorEstagio_selecao_solucao_proxy) + ".csv", IdEstagio_Nenhum, a_modeloOtimizacao, AttVetorEstagio_selecao_solucao_proxy);
@@ -662,27 +660,25 @@ void MetodoSolucao::executarPDDE_atualizarCustoSuperior_FW(const IdIteracao a_id
 				for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
 
 					int numero_cenarios_outro = 0;
-					MPI_Recv(&numero_cenarios_outro, 1, MPI_INT, getRank(idProcesso), getRank(idProcesso), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					MPI_Recv(&numero_cenarios_outro, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 					if (numero_cenarios_outro > 0) {
-						double* custo_superior_outro = new double[numero_cenarios_outro];
+						std::vector<double> custo_superior_outro(numero_cenarios_outro, 0.0);
 
-						MPI_Recv(custo_superior_outro, numero_cenarios_outro, MPI_DOUBLE, getRank(idProcesso), getRank(idProcesso), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+						MPI_Recv(&custo_superior_outro[0], numero_cenarios_outro, MPI_DOUBLE, getRank(idProcesso), 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 						int c = 0;
 						const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getIterador1Inicial(a_idIteracao, idProcesso, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
 						const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getIterador1Final(a_idIteracao, idProcesso, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
 						for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
 							if (a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_cenario_estado_por_cenario, idCenario, idEstagio, IdCenario()) != IdCenario_Nenhum) {
-								compilacao_custo_superior.at(idEstagio).at(idCenario) = custo_superior_outro[c];
+								compilacao_custo_superior.at(idEstagio).at(idCenario) = custo_superior_outro.at(c);
 								c++;
 							}
 						}
 
 						if (c != numero_cenarios_outro)
 							throw std::invalid_argument("Erro em " + getFullString(idProcesso));
-
-						delete[] custo_superior_outro;
 					}
 				} // for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_maiorIdProcesso; idProcesso++) {
 
@@ -758,10 +754,10 @@ void MetodoSolucao::executarPDDE_atualizarCustoSuperior_FW(const IdIteracao a_id
 				if (a_custo_superior.size() > 0)
 					numero_cenarios = int(a_custo_superior.at(idEstagio).size());
 
-				MPI_Send(&numero_cenarios, 1, MPI_INT, getRank(IdProcesso_mestre), getRank(idProcesso_local), MPI_COMM_WORLD);
+				MPI_Send(&numero_cenarios, 1, MPI_INT, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD);
 
 				if (numero_cenarios > 0)
-					MPI_Send(&a_custo_superior.at(idEstagio)[0], numero_cenarios, MPI_DOUBLE, getRank(IdProcesso_mestre), getRank(idProcesso_local), MPI_COMM_WORLD);
+					MPI_Send(&a_custo_superior.at(idEstagio)[0], numero_cenarios, MPI_DOUBLE, getRank(IdProcesso_mestre), 1, MPI_COMM_WORLD);
 
 			} // for (IdEstagio idEstagio = menor_estagio; idEstagio <= maior_estagio; idEstagio++) {
 
@@ -969,20 +965,20 @@ void MetodoSolucao::executarPDDE_atualizarCustoInferior(const IdIteracao a_idIte
 			for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
 
 				int numero_cenarios_outro = 0;
-				MPI_Recv(&numero_cenarios_outro, 1, MPI_INT, getRank(idProcesso), getRank(idProcesso), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				MPI_Recv(&numero_cenarios_outro, 1, MPI_INT, getRank(idProcesso), 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 				if (numero_cenarios_outro > 0) {
-					double* custo_inferior_outro = new double[numero_cenarios_outro];
+					std::vector<double> custo_inferior_outro(numero_cenarios_outro, 0.0);
 
-					MPI_Recv(custo_inferior_outro, numero_cenarios_outro, MPI_DOUBLE, getRank(idProcesso), getRank(idProcesso), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					MPI_Recv(&custo_inferior_outro[0], numero_cenarios_outro, MPI_DOUBLE, getRank(idProcesso), 3, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 					int c = 0;
 					const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getIterador1Inicial(a_idIteracao, idProcesso, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
 					const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getIterador1Final(a_idIteracao, idProcesso, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
 					for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
 						if (a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_cenario_estado_por_cenario, idCenario, menor_estagio, IdCenario()) != IdCenario_Nenhum) {
-							setElemento(AttMatrizMetodoSolucao_custo_inferior, a_idIteracao, idCenario, custo_inferior_outro[c]);
-							custo_inferior.at(idCenario) = custo_inferior_outro[c];
+							setElemento(AttMatrizMetodoSolucao_custo_inferior, a_idIteracao, idCenario, custo_inferior_outro.at(c));
+							custo_inferior.at(idCenario) = custo_inferior_outro.at(c);
 							c++;
 						}
 					}
@@ -990,7 +986,6 @@ void MetodoSolucao::executarPDDE_atualizarCustoInferior(const IdIteracao a_idIte
 					if (c != numero_cenarios_outro)
 						throw std::invalid_argument("Erro em " + getFullString(idProcesso));
 
-					delete[] custo_inferior_outro;
 				}
 
 			} // for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_maiorIdProcesso; idProcesso++) {
@@ -1004,10 +999,10 @@ void MetodoSolucao::executarPDDE_atualizarCustoInferior(const IdIteracao a_idIte
 
 			int numero_cenarios = int(a_custo_inferior.at(menor_estagio).size());
 
-			MPI_Send(&numero_cenarios, 1, MPI_INT, getRank(IdProcesso_mestre), getRank(idProcesso_local), MPI_COMM_WORLD);
+			MPI_Send(&numero_cenarios, 1, MPI_INT, getRank(IdProcesso_mestre), 2, MPI_COMM_WORLD);
 
 			if (numero_cenarios > 0)
-				MPI_Send(&a_custo_inferior.at(menor_estagio)[0], numero_cenarios, MPI_DOUBLE, getRank(IdProcesso_mestre), getRank(idProcesso_local), MPI_COMM_WORLD);
+				MPI_Send(&a_custo_inferior.at(menor_estagio)[0], numero_cenarios, MPI_DOUBLE, getRank(IdProcesso_mestre), 3, MPI_COMM_WORLD);
 
 		} // else {
 
@@ -1680,7 +1675,7 @@ void MetodoSolucao::executarPDDE_distribuirEstadosEntreProcessos(const IdIteraca
 
 	try {
 
-		const int numero_estados = int(a_modeloOtimizacao.getMaiorId(a_idEstagio, IdVariavelEstado()));
+		int numero_estados = int(a_modeloOtimizacao.getMaiorId(a_idEstagio, IdVariavelEstado()));
 
 		const IdProcesso idProcesso_local = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 		const IdProcesso maior_processo = a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso());
@@ -1698,22 +1693,20 @@ void MetodoSolucao::executarPDDE_distribuirEstadosEntreProcessos(const IdIteraca
 
 						if (numero_cenarios_estado > 0) {
 
-							double* valores = new double[numero_cenarios_estado * numero_estados];
+							std::vector<double> valores(numero_cenarios_estado * numero_estados, 0.0);
 
 							int i = 0;
 							for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_modeloOtimizacao.getMaiorId(a_idEstagio, IdVariavelEstado()); idVariavelEstado++) {
 								if (a_modeloOtimizacao.isVariavelEstadoInstanciada(a_idEstagio, idVariavelEstado)) {
 									for (int c = 0; c < numero_cenarios_estado; c++) {
 										const IdCenario idCenario_estado = lista_idCenarios_estado.at(c);
-										valores[i] = a_modeloOtimizacao.getElementoVetor(a_idEstagio, idVariavelEstado, AttVetorVariavelEstado_valor, idCenario_estado, double());
+										valores.at(i) = a_modeloOtimizacao.getElementoVetor(a_idEstagio, idVariavelEstado, AttVetorVariavelEstado_valor, idCenario_estado, double());
 										i++;
 									}
 								}
 							}
 
-							MPI_Send(valores, i, MPI_DOUBLE, getRank(idProcesso_para), 0, MPI_COMM_WORLD);
-
-							delete[] valores;
+							MPI_Send(&valores[0], i, MPI_DOUBLE, getRank(idProcesso_para), 22, MPI_COMM_WORLD);
 
 						} // if (lista_idCenarios_estado.size() > 0) {
 
@@ -1731,22 +1724,20 @@ void MetodoSolucao::executarPDDE_distribuirEstadosEntreProcessos(const IdIteraca
 
 				if (numero_cenarios_estado > 0) {
 
-					double* valores = new double[numero_cenarios_estado * numero_estados];
+					std::vector<double> valores(numero_cenarios_estado * numero_estados, 0.0);
 
-					MPI_Recv(valores, numero_cenarios_estado * numero_estados, MPI_DOUBLE, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					MPI_Recv(&valores[0], numero_cenarios_estado * numero_estados, MPI_DOUBLE, getRank(idProcesso), 22, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 					int e = 0;
 					for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= a_modeloOtimizacao.getMaiorId(a_idEstagio, IdVariavelEstado()); idVariavelEstado++) {
 						if (a_modeloOtimizacao.isVariavelEstadoInstanciada(a_idEstagio, idVariavelEstado)) {
 							for (int c = 0; c < numero_cenarios_estado; c++) {
 								const IdCenario idCenario_estado = lista_idCenarios_estado.at(c);
-								a_modeloOtimizacao.addValorVariavelEstado(a_idEstagio, idVariavelEstado, idCenario_estado, valores[e * numero_cenarios_estado + c]);
+								a_modeloOtimizacao.addValorVariavelEstado(a_idEstagio, idVariavelEstado, idCenario_estado, valores.at(e * numero_cenarios_estado + c));
 							}
 							e++;
 						}
 					}
-
-					delete[] valores;
 
 				} // if (lista_idCenarios_estado.size() > 0) {
 

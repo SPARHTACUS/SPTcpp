@@ -170,30 +170,31 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 		SmartEnupla<IdEstagio, std::vector<TipoSubproblemaSolver>> listaTSS(estagio_inicial, std::vector<std::vector<TipoSubproblemaSolver>>(int(estagio_final- estagio_inicial) + 1, std::vector<TipoSubproblemaSolver>()));
 		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
-			if (true) {
-				bool isViabilidadeHidraulicaInstanciado = false;
-				for (TipoSubproblemaSolver tipoSubproblemaSolver = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tipoSubproblemaSolver < TipoSubproblemaSolver_Excedente; tipoSubproblemaSolver++) {
-					if (isNecessarioInstanciarSolver(idEstagio, tipoSubproblemaSolver)) {
-						if (tipoSubproblemaSolver == TipoSubproblemaSolver_viabilidade_hidraulica)
-							isViabilidadeHidraulicaInstanciado = true;
-						else
-							listaTSS.at(idEstagio).push_back(tipoSubproblemaSolver);
-					}
-				} // for (TipoSubproblemaSolver tipoSubproblemaSolver = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tipoSubproblemaSolver < TipoSubproblemaSolver_Excedente; tipoSubproblemaSolver++) {
-				// Instancia viabilidade hidraulica por último para compatibilização com criação de estados.
-				if (isViabilidadeHidraulicaInstanciado)
-					listaTSS.at(idEstagio).push_back(TipoSubproblemaSolver_viabilidade_hidraulica);
-			}
+				if (true) {
+					bool isViabilidadeHidraulicaInstanciado = false;
+					for (TipoSubproblemaSolver tipoSubproblemaSolver = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tipoSubproblemaSolver < TipoSubproblemaSolver_Excedente; tipoSubproblemaSolver++) {
+						if (isNecessarioInstanciarSolver(idEstagio, tipoSubproblemaSolver)) {
+							if (tipoSubproblemaSolver == TipoSubproblemaSolver_viabilidade_hidraulica)
+								isViabilidadeHidraulicaInstanciado = true;
+							else
+								listaTSS.at(idEstagio).push_back(tipoSubproblemaSolver);
+						}
+					} // for (TipoSubproblemaSolver tipoSubproblemaSolver = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tipoSubproblemaSolver < TipoSubproblemaSolver_Excedente; tipoSubproblemaSolver++) {
+					// Instancia viabilidade hidraulica por último para compatibilização com criação de estados.
+					if (isViabilidadeHidraulicaInstanciado)
+						listaTSS.at(idEstagio).push_back(TipoSubproblemaSolver_viabilidade_hidraulica);
+				}
 
-			for (int i = 0; i < int(listaTSS.at(idEstagio).size()); i++) {
-				vetorEstagio.at(idEstagio).instanciarSolver(listaTSS.at(idEstagio).at(i), tipoSolver);
-				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_tipo_solver, tipoSolver);
-				vetorEstagio.at(idEstagio).getSolver(listaTSS.at(idEstagio).at(i))->exibirNaTela(a_dados.getAtributo(AttComumDados_exibir_na_tela_resultado_solver, bool()));
-				vetorEstagio.at(idEstagio).getSolver(listaTSS.at(idEstagio).at(i))->setMetodoPadrao(a_dados.getAtributo(AttComumDados_metodo_solver, TipoMetodoSolver()));
-				vetorEstagio.at(idEstagio).getSolver(listaTSS.at(idEstagio).at(i))->setToleranciaOtimalidade(a_dados.getAtributo(AttComumDados_tolerancia_otimalidade, double()));
-				vetorEstagio.at(idEstagio).getSolver(listaTSS.at(idEstagio).at(i))->setToleranciaViabilidade(a_dados.getAtributo(AttComumDados_tolerancia_viabilidade, double()));
-				vetorEstagio.at(idEstagio).getSolver(listaTSS.at(idEstagio).at(i))->setFocoNumerico(a_dados.getAtributo(AttComumDados_foco_numerico, int()));
-			} // for (int i = 0; i < int(listaTSS.size()); i++) {
+				for (int i = 0; i < int(listaTSS.at(idEstagio).size()); i++) {
+					vetorEstagio.at(idEstagio).instanciarSolver(listaTSS.at(idEstagio).at(i), tipoSolver);
+					vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_tipo_solver, tipoSolver);
+					vetorEstagio.at(idEstagio).getSolver(listaTSS.at(idEstagio).at(i))->exibirNaTela(a_dados.getAtributo(AttComumDados_exibir_na_tela_resultado_solver, bool()));
+					vetorEstagio.at(idEstagio).getSolver(listaTSS.at(idEstagio).at(i))->setMetodoPadrao(a_dados.getAtributo(AttComumDados_metodo_solver, TipoMetodoSolver()));
+					vetorEstagio.at(idEstagio).getSolver(listaTSS.at(idEstagio).at(i))->setToleranciaOtimalidade(a_dados.getAtributo(AttComumDados_tolerancia_otimalidade, double()));
+					vetorEstagio.at(idEstagio).getSolver(listaTSS.at(idEstagio).at(i))->setToleranciaViabilidade(a_dados.getAtributo(AttComumDados_tolerancia_viabilidade, double()));
+					vetorEstagio.at(idEstagio).getSolver(listaTSS.at(idEstagio).at(i))->setFocoNumerico(a_dados.getAtributo(AttComumDados_foco_numerico, int()));
+				} // for (int i = 0; i < int(listaTSS.size()); i++) {
+
 		} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
 		// **************************************************************************************************************************

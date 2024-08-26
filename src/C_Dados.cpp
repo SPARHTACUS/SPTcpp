@@ -11248,16 +11248,21 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 						arranjoResolucao.vetorIteracao.at(idIteracao).vetorProcesso.at(idProcesso).setMatriz_forced(AttMatrizProcesso_cenario_estado_por_cenario, SmartEnupla<IdCenario, SmartEnupla<IdEstagio, IdCenario>>(menor_cenario_iteracao, std::vector<SmartEnupla<IdEstagio, IdCenario>>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, enupla_inicial)));
 
-						const int tamanho = (int(estagio_final - estagio_inicial) + 1) * (int(maior_cenario_iteracao - menor_cenario_iteracao) + 1);
+						std::vector<int> valores_recv;
 
-						std::vector<int> valores_recv(tamanho, 0);
-
-						if (idProcesso != idProcesso_local)
-							MPI_Recv(&valores_recv[0], tamanho, MPI_INT, getRank(idProcesso), getRank(idProcesso_local), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+						if (idProcesso != idProcesso_local) {
+							int vlr_size_rcv = 0;
+							MPI_Recv(&vlr_size_rcv, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+							valores_recv = std::vector<int>(vlr_size_rcv, 0);
+							MPI_Recv(&valores_recv[0], vlr_size_rcv, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+						}
 						else {
 							for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
-								if (idProcesso_aux != idProcesso_local)
-									MPI_Send(&valores[0], int(valores.size()), MPI_INT, getRank(idProcesso_aux), getRank(idProcesso_aux), MPI_COMM_WORLD);
+								if (idProcesso_aux != idProcesso_local) {
+									int vlr_size = int(valores.size());
+									MPI_Send(&vlr_size, 1, MPI_INT, getRank(idProcesso_aux), 0, MPI_COMM_WORLD);
+									MPI_Send(&valores[0], int(valores.size()), MPI_INT, getRank(idProcesso_aux), 0, MPI_COMM_WORLD);
+								}
 							}
 							valores_recv = valores;
 						}

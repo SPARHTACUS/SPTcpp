@@ -5235,19 +5235,25 @@ void ModeloOtimizacao::setTempoLimiteOtimizacao(const TipoSubproblemaSolver a_TS
 
 	try {
 
+		if (!vetorEstagio.at(a_idEstagio).isSolverInstanciado(a_TSS))
+			return;
+
 		if (a_tempo_limite <= 0.0)
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setTempoLimite();
 		else
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setTempoLimite(a_tempo_limite);
 
 	} // try
-	catch (const std::exception & erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::getTempoOtimizacao(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_tempo_limite) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception & erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::setTempoLimiteOtimizacao(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_tempo_limite) + "): \n" + std::string(erro.what())); }
 
 } // void ModeloOtimizacao::setTempoLimiteOtimizacao(const IdEstagio a_idEstagio, const double a_tempo_limite){
 
 double ModeloOtimizacao::getTempoOtimizacao(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio) {
 
 	try {
+
+		if (!vetorEstagio.at(a_idEstagio).isSolverInstanciado(a_TSS))
+			return 0.0;
 
 		return vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getTempoOtimizacao();
 
