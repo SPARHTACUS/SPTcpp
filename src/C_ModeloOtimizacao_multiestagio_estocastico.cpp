@@ -979,11 +979,9 @@ void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoFuturo(const bool a_isA
 
 		const int multiplicidade_corte = getAtributo(idEstagio_seguinte, AttComumEstagio_cortes_multiplos, int());
 
-		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
-
 		if (multiplicidade_corte == 0) {
 
-			const int posIneZF = addIneLinear_CB_ZF(a_isAlocMode, a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1, IdCorteBenders_1);
+			const int posIneZF = addIneLinear_CB_ZF(a_isAlocMode, a_TSS, a_idEstagio, IdRealizacao_1, IdCorteBenders_1);
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(a_isAlocMode, posIneZF, 0.0);
 
 			if (getVarDecisao_ZFseExistir(a_isAlocMode, a_TSS, a_idEstagio, IdRealizacao_1) == -1)
@@ -995,10 +993,8 @@ void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoFuturo(const bool a_isA
 
 		else if (multiplicidade_corte > 0) {
 
-			const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
-
 			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getAtributo(idEstagio_seguinte, AttComumEstagio_maiorIdRealizacao, IdRealizacao()); idRealizacao++) {
-				const int posIneZF = addIneLinear_CB_ZF(a_isAlocMode, a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao, IdCorteBenders_1);
+				const int posIneZF = addIneLinear_CB_ZF(a_isAlocMode, a_TSS, a_idEstagio, idRealizacao, IdCorteBenders_1);
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(a_isAlocMode, posIneZF, 0.0);
 
 				if (getVarDecisao_ZFseExistir(a_isAlocMode, a_TSS, a_idEstagio, idRealizacao) == -1)
@@ -1023,11 +1019,9 @@ void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoTotal(const bool a_isAl
 
 		const int multiplicidade_corte = getAtributo(a_idEstagio, AttComumEstagio_cortes_multiplos, int());
 
-		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
-
 		if (multiplicidade_corte == 0) {
 
-			const int posIneZT = addIneLinear_CB_ZT(a_isAlocMode, a_TSS, a_idEstagio, periodo_otimizacao, IdRealizacao_1, IdCorteBenders_1);
+			const int posIneZT = addIneLinear_CB_ZT(a_isAlocMode, a_TSS, a_idEstagio, IdRealizacao_1, IdCorteBenders_1);
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(a_isAlocMode, posIneZT, 0.0);
 
 			if (getVarDecisao_ZTseExistir(a_isAlocMode, a_TSS, a_idEstagio, IdRealizacao_1) == -1)
@@ -1040,7 +1034,7 @@ void ModeloOtimizacao::criarRestricoesCorteBendersEmCustoTotal(const bool a_isAl
 		else if (multiplicidade_corte > 0) {
 
 			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= getAtributo(a_idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao()); idRealizacao++) {
-				const int posIneZT = addIneLinear_CB_ZT(a_isAlocMode, a_TSS, a_idEstagio, periodo_otimizacao, idRealizacao, IdCorteBenders_1);
+				const int posIneZT = addIneLinear_CB_ZT(a_isAlocMode, a_TSS, a_idEstagio, idRealizacao, IdCorteBenders_1);
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(a_isAlocMode, posIneZT, 0.0);
 
 				if (getVarDecisao_ZTseExistir(a_isAlocMode, a_TSS, a_idEstagio, idRealizacao) == -1)
@@ -7037,14 +7031,12 @@ void ModeloOtimizacao::addCorteBendersToZF(const TipoSubproblemaSolver a_TSS, co
 		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 			return;
 
-		const Periodo periodo_otimizacao_anterior = getAtributo(a_idEstagio_anterior, AttComumEstagio_periodo_otimizacao, Periodo());
-
-		int posIneZF = getIneLinear_CB_ZFseExistir(false, a_TSS, a_idEstagio_anterior, periodo_otimizacao_anterior, a_idRealizacao, a_idCorteBenders);
+		int posIneZF = getIneLinear_CB_ZFseExistir(false, a_TSS, a_idEstagio_anterior, a_idRealizacao, a_idCorteBenders);
 
 		if ((posIneZF > -1) && (a_idCorteBenders != IdCorteBenders_1))
 			throw std::invalid_argument("Corte de benders ja adicionado.");
 		else if (posIneZF == -1)
-			posIneZF = addIneLinear_CB_ZF(false, a_TSS, a_idEstagio_anterior, periodo_otimizacao_anterior, a_idRealizacao, a_idCorteBenders);
+			posIneZF = addIneLinear_CB_ZF(false, a_TSS, a_idEstagio_anterior, a_idRealizacao, a_idCorteBenders);
 
 		vetorEstagio.at(a_idEstagio_anterior).getSolver(a_TSS)->setCofRestricao(false, getVarDecisao_ZF(false, a_TSS, a_idEstagio_anterior, a_idRealizacao), posIneZF, 1.0);
 
@@ -7065,7 +7057,7 @@ void ModeloOtimizacao::setCorteBendersToZF(const TipoSubproblemaSolver a_TSS, co
 
 		const Periodo periodo_otimizacao_anterior = vetorEstagio.at(a_idEstagio_anterior).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
 
-		const int posIneZF = getIneLinear_CB_ZF(false, a_TSS, a_idEstagio_anterior, periodo_otimizacao_anterior, a_idRealizacao, a_idCorteBenders);
+		const int posIneZF = getIneLinear_CB_ZF(false, a_TSS, a_idEstagio_anterior, a_idRealizacao, a_idCorteBenders);
 
 		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(a_idEstagio, IdVariavelEstado()); idVariavelEstado++) {
 
@@ -7100,16 +7092,17 @@ void ModeloOtimizacao::remCorteBendersFromZF(const TipoSubproblemaSolver a_TSS, 
 		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 			return;
 
-		const Periodo periodo_otimizacao_anterior = vetorEstagio.at(a_idEstagio_anterior).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
-
-		const int posIneZF = getIneLinear_CB_ZFseExistir(false, a_TSS, a_idEstagio_anterior, periodo_otimizacao_anterior, a_idRealizacao, a_idCorteBenders);
+		const int posIneZF = getIneLinear_CB_ZFseExistir(false, a_TSS, a_idEstagio_anterior, a_idRealizacao, a_idCorteBenders);
 
 		if (posIneZF == -1)
 			return;
 
 		vetorEstagio.at(a_idEstagio_anterior).getSolver(a_TSS)->remRestricao(posIneZF);
 
-		idx_IneLinear_CB_ZF_4.at(a_TSS).at(a_idEstagio_anterior).at(periodo_otimizacao_anterior).at(a_idRealizacao).at(a_idCorteBenders) = SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>();
+		const int pos = getPosIneLinear_CB_ZF(a_TSS, a_idEstagio_anterior, a_idRealizacao, a_idCorteBenders);
+
+		indx_IneLinear_CB_ZF_3.at(a_TSS).at(a_idEstagio_anterior).erase(indx_IneLinear_CB_ZF_3.at(a_TSS).at(a_idEstagio_anterior).begin() + pos);
+		name_IneLinear_CB_ZF_3.at(a_TSS).at(a_idEstagio_anterior).erase(name_IneLinear_CB_ZF_3.at(a_TSS).at(a_idEstagio_anterior).begin() + pos);
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::remCorteBendersFromZF(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio_anterior) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "): \n" + std::string(erro.what())); }
@@ -7122,14 +7115,12 @@ void ModeloOtimizacao::addCorteBendersToZT(const TipoSubproblemaSolver a_TSS, co
 
 	try {
 
-		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
-
-		int posIneZT = getIneLinear_CB_ZTseExistir(false, a_TSS, a_idEstagio, periodo_otimizacao, a_idRealizacao, a_idCorteBenders);
+		int posIneZT = getIneLinear_CB_ZTseExistir(false, a_TSS, a_idEstagio, a_idRealizacao, a_idCorteBenders);
 
 		if ((posIneZT > -1) && (a_idCorteBenders != IdCorteBenders_1))
 			throw std::invalid_argument("Corte de benders ja adicionado.");
 		else if (posIneZT == -1)
-			posIneZT = addIneLinear_CB_ZT(false, a_TSS, a_idEstagio, periodo_otimizacao, a_idRealizacao, a_idCorteBenders);
+			posIneZT = addIneLinear_CB_ZT(false, a_TSS, a_idEstagio, a_idRealizacao, a_idCorteBenders);
 
 		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(false, getVarDecisao_ZT(false, a_TSS, a_idEstagio, a_idRealizacao), posIneZT, 1.0);
 
@@ -7144,9 +7135,7 @@ void ModeloOtimizacao::setCorteBendersToZT(const TipoSubproblemaSolver a_TSS, co
 
 	try {
 
-		const Periodo periodo_otimizacao = vetorEstagio.at(a_idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
-
-		const int posIneZT = getIneLinear_CB_ZT(false, a_TSS, a_idEstagio, periodo_otimizacao, a_idRealizacao, a_idCorteBenders);
+		const int posIneZT = getIneLinear_CB_ZT(false, a_TSS, a_idEstagio, a_idRealizacao, a_idCorteBenders);
 
 		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(a_idEstagio, IdVariavelEstado()); idVariavelEstado++) {
 
@@ -7177,16 +7166,17 @@ void ModeloOtimizacao::remCorteBendersFromZT(const TipoSubproblemaSolver a_TSS, 
 
 	try {
 
-		const Periodo periodo_otimizacao = vetorEstagio.at(a_idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
-
-		const int posIneZT = getIneLinear_CB_ZTseExistir(false, a_TSS, a_idEstagio, periodo_otimizacao, a_idRealizacao, a_idCorteBenders);
+		const int posIneZT = getIneLinear_CB_ZTseExistir(false, a_TSS, a_idEstagio, a_idRealizacao, a_idCorteBenders);
 
 		if (posIneZT == -1)
 			return;
 
 		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->remRestricao(posIneZT);
 
-		idx_IneLinear_CB_ZT_4.at(a_TSS).at(a_idEstagio).at(periodo_otimizacao).at(a_idRealizacao).at(a_idCorteBenders) = SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<IdRealizacao, SmartEnupla<IdCenario, double>>>>>>>>();
+		const int pos = getPosIneLinear_CB_ZF(a_TSS, a_idEstagio, a_idRealizacao, a_idCorteBenders);
+
+		indx_IneLinear_CB_ZT_3.at(a_TSS).at(a_idEstagio).erase(indx_IneLinear_CB_ZT_3.at(a_TSS).at(a_idEstagio).begin() + pos);
+		name_IneLinear_CB_ZT_3.at(a_TSS).at(a_idEstagio).erase(name_IneLinear_CB_ZT_3.at(a_TSS).at(a_idEstagio).begin() + pos);
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::remCorteBendersFromZF(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "," + getFullString(a_idRealizacao) + "," + getFullString(a_idCorteBenders) + "): \n" + std::string(erro.what())); }
