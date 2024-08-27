@@ -448,15 +448,15 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado(const IdEstagi
 
 				if ((tSS == TipoSubproblemaSolver_mestre) && (vetorEstagio.at(a_idEstagio).isSolverInstanciado(tSS))) {
 					if (getElementoVetor(a_idEstagio, idVariavelEstado, AttVetorVariavelEstado_idVariavelDecisao, tSS, int()) == -1)
-						vetorEstagio.at(a_idEstagio).addVariavelEstado(false, tSS, getAtributo(a_idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, string()), addVarDecisao_ESTADO(false, tSS, a_idEstagio, idVariavelEstado, 0.0, 0.0, 0.0), -1);
+						vetorEstagio.at(a_idEstagio).addVariavelEstado(tSS, getAtributo(a_idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, string()), addVarDecisao_ESTADO(tSS, a_idEstagio, idVariavelEstado, 0.0, 0.0, 0.0), -1);
 				} // if ((tSS == TipoSubproblemaSolver_mestre) && (vetorEstagio.at(a_idEstagio).isSolverInstanciado(tSS))) {
 
 				const int idVariavelDecisao = getElementoVetor(a_idEstagio, idVariavelEstado, AttVetorVariavelEstado_idVariavelDecisao, tSS, int());
 
 				if (idVariavelDecisao > -1) {
 
-					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimInferior(false, idVariavelDecisao, valor);
-					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimSuperior(false, idVariavelDecisao, valor);
+					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimInferior(idVariavelDecisao, valor);
+					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimSuperior(idVariavelDecisao, valor);
 
 				} // if (idVariavelDecisao > -1) {
 
@@ -542,8 +542,8 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado_posEstudo(cons
 							if ((periodo_lag >= periodo_estudo_inicial) || (periodo_lag.sobreposicao(periodo_estudo_inicial) > 0.0) || (valor == 0.0))//Para calcular a ENA de períodos de tendência somente 1 vez
 								valor = atualizar_ENA_acoplamento(a_dados, idREE, a_idCenario_estado, a_idRealizacao, periodo_lag);
 
-							vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimInferior(false, idVariavelDecisao, valor);
-							vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimSuperior(false, idVariavelDecisao, valor);
+							vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimInferior(idVariavelDecisao, valor);
+							vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimSuperior(idVariavelDecisao, valor);
 
 						} // if (idVariavelDecisao > -1) {
 
@@ -3034,8 +3034,8 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacao(const IdEs
 
 				if (idVariavelDecisao > -1) {
 
-					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimInferior(false, idVariavelDecisao, valor);
-					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimSuperior(false, idVariavelDecisao, valor);
+					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimInferior(idVariavelDecisao, valor);
+					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimSuperior(idVariavelDecisao, valor);
 
 					if (idVariavelRealizacao == maiorIdVariavelRealizacao)
 						vetorEstagio.at(a_idEstagio).getSolver(tSS)->atualizar();
@@ -3073,8 +3073,8 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacao(const IdEs
 
 				if (idVariavelDecisao > -1) {
 
-					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimInferior(false, idVariavelDecisao, valor);
-					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimSuperior(false, idVariavelDecisao, valor);
+					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimInferior(idVariavelDecisao, valor);
+					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimSuperior(idVariavelDecisao, valor);
 
 					if (idVariavelRealizacao == maiorIdVariavelRealizacao)
 						vetorEstagio.at(a_idEstagio).getSolver(tSS)->atualizar();
@@ -3153,7 +3153,7 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComRestricaoCenario(const IdEsta
 				if (idEquacao > -1) {
 
 					if (getSizeVetor(a_idEstagio, idRestricaoCenario, AttVetorRestricaoCenario_rhs) > 0)
-						vetorEstagio.at(a_idEstagio).getSolver(tSS)->setRHSRestricao(false, idEquacao, getElementoVetor(a_idEstagio, idRestricaoCenario, AttVetorRestricaoCenario_rhs, a_idCenario, double()));
+						vetorEstagio.at(a_idEstagio).getSolver(tSS)->setRHSRestricao(idEquacao, getElementoVetor(a_idEstagio, idRestricaoCenario, AttVetorRestricaoCenario_rhs, a_idCenario, double()));
 
 					if (getSize1Matriz(a_idEstagio, idRestricaoCenario, AttMatrizRestricaoCenario_coeficiente) > 0) {
 
@@ -3163,7 +3163,7 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComRestricaoCenario(const IdEsta
 						for (int var = menorVar; var <= maiorVar; var++) {
 
 							if (getSize2Matriz(a_idEstagio, idRestricaoCenario, AttMatrizRestricaoCenario_coeficiente, var) > 0)
-								vetorEstagio.at(a_idEstagio).getSolver(tSS)->setCofRestricao(false, var, idEquacao,  getElementoMatriz(a_idEstagio, idRestricaoCenario, AttMatrizRestricaoCenario_coeficiente, var, a_idCenario, double()));
+								vetorEstagio.at(a_idEstagio).getSolver(tSS)->setCofRestricao(var, idEquacao,  getElementoMatriz(a_idEstagio, idRestricaoCenario, AttMatrizRestricaoCenario_coeficiente, var, a_idCenario, double()));
 
 						} // for (int var = menorVar; var <= maiorVar; var++) {
 
@@ -3218,7 +3218,7 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 				const int idVariavelDecisao_origem = getElementoVetor(a_idEstagio, idVariavelRealizacaoInterna, AttVetorVariavelRealizacaoInterna_idVariavelDecisao, a_TSS, int());
 
 				//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(idVariavelDecisao_origem, 0.0);
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(false, idVariavelDecisao_origem, valor_novo);
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(idVariavelDecisao_origem, valor_novo);
 
 				if (idVariavelRealizacaoInterna == maiorIdVariavelRealizacaoInterna)
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->atualizar();
@@ -3230,7 +3230,7 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->otimizar();
 
 		if (vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getStatusOtimizacao() == TipoStatusSolver_nao_otimalidade) {
-			//otimizarProblemaComTratamentoNumericoInviabilidade(false, a_TSS, 1, a_idEstagio);
+			//otimizarProblemaComTratamentoNumericoInviabilidade(a_TSS, 1, a_idEstagio);
 			otimizarProblemaComTratamentoNumericoInviabilidade(a_TSS, a_idEstagio);
 		}
 
@@ -3314,8 +3314,8 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 
 						const int idVariavelDecisao = getElementoVetor(a_idEstagio, idVariavelRealizacaoInterna, AttVetorVariavelRealizacaoInterna_idVariavelDecisao, a_TSS_destino, int());
 
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS_destino)->setLimInferior(false, idVariavelDecisao, valor + 1.0);
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS_destino)->setLimSuperior(false, idVariavelDecisao, valor + 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS_destino)->setLimInferior(idVariavelDecisao, valor + 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS_destino)->setLimSuperior(idVariavelDecisao, valor + 1.0);
 
 					} // if (valor > 0.0) {
 
@@ -3379,8 +3379,8 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 					if (getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool()) && (a_idRealizacao != IdRealizacao_Nenhum))
 						novo_valor_sup = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(false, idVariavelDecisao, novo_valor_inf);
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(false, idVariavelDecisao, novo_valor_sup);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(idVariavelDecisao, novo_valor_inf);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(idVariavelDecisao, novo_valor_sup);
 
 				}
 
@@ -3388,8 +3388,8 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 				else if ((tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento) || (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao)) {
 
 					if (getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool()) && (a_idRealizacao == IdRealizacao_Nenhum)) {
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(false, idVariavelDecisao, novo_valor_inf);
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(false, idVariavelDecisao, novo_valor_sup);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(idVariavelDecisao, novo_valor_inf);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(idVariavelDecisao, novo_valor_sup);
 					}
 
 					else {
@@ -3413,8 +3413,8 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 								novo_valor_inf = novo_valor_sup;
 						}
 
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(false, idVariavelDecisao, novo_valor_inf);
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(false, idVariavelDecisao, novo_valor_sup);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(idVariavelDecisao, novo_valor_inf);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(idVariavelDecisao, novo_valor_sup);
 
 					}
 				} // else if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento) {
@@ -4111,7 +4111,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 									throw std::invalid_argument(getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) + " em " + getFullString(idVariavelEstado_corte) + " nao foi instanciado no modelo.");
 
 								else if (listaHidreletricaNaoInstanciadaNoModelo.size() == 0) {
-									const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(false, a_TSS, a_dados, idEstagio, periodo, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica);
+									const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, periodo, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica);
 									if (varYP == -1)
 										throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
 									vetorEstagio_aux.at(idEstagio).setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado_corte, a_TSS, varYP);
@@ -4327,28 +4327,28 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 
 		const Periodo periodo_otimizacao_estagio_final = getAtributo(estagio_final, AttComumEstagio_periodo_otimizacao, Periodo());
 
-		if (getVarDecisao_ZFseExistir(false, a_TSS, estagio_final) == -1) {
+		if (getVarDecisao_ZFseExistir(a_TSS, estagio_final) == -1) {
 
 			// Variável ZF
-			addVarDecisao_ZF(false, a_TSS, estagio_final, 0.0, vetorEstagio.at(estagio_final).getSolver(a_TSS)->getInfinito(), 0.0);
+			addVarDecisao_ZF(a_TSS, estagio_final, 0.0, vetorEstagio.at(estagio_final).getSolver(a_TSS)->getInfinito(), 0.0);
 
 			// Variável ZF em EquLinear_ZT
-			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(false, getVarDecisao_ZF(false, a_TSS, estagio_final), getEquLinear_ZT(false, a_TSS, estagio_final), -1.0);
+			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, estagio_final), getEquLinear_ZT(a_TSS, estagio_final), -1.0);
 
-			//criarRestricoesCorteBendersEmCustoFuturo(false, a_TSS, estagio_final);
+			//criarRestricoesCorteBendersEmCustoFuturo(a_TSS, estagio_final);
 
-			const int posEquZF = addEquLinear_ZF(false, a_TSS, estagio_final);
+			const int posEquZF = addEquLinear_ZF(a_TSS, estagio_final);
 
-			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setRHSRestricao(false, posEquZF, 0.0);
+			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setRHSRestricao(posEquZF, 0.0);
 
 			// Variável ZF
-			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(false, getVarDecisao_ZF(false, a_TSS, estagio_final), posEquZF, 1.0);
+			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, estagio_final), posEquZF, 1.0);
 
 			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao_corte; idRealizacao++) {
-				int varZF = getVarDecisao_ZFseExistir(false, a_TSS, estagio_final, idRealizacao);
+				int varZF = getVarDecisao_ZFseExistir(a_TSS, estagio_final, idRealizacao);
 				if (varZF == -1)
-					varZF = addVarDecisao_ZF(false, a_TSS, estagio_final, idRealizacao, 0.0, vetorEstagio.at(estagio_final).getSolver(a_TSS)->getInfinito(), 0.0);
-				vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(false, varZF, posEquZF, -(1.0 / double(maiorIdRealizacao_corte)));
+					varZF = addVarDecisao_ZF(a_TSS, estagio_final, idRealizacao, 0.0, vetorEstagio.at(estagio_final).getSolver(a_TSS)->getInfinito(), 0.0);
+				vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(varZF, posEquZF, -(1.0 / double(maiorIdRealizacao_corte)));
 			}
 
 		} // if (getVarDecisao_ZFseExistir(estagio_final) == -1) {
@@ -4378,20 +4378,20 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 
 			for (IdRealizacao idRealizacao = maiorIdRealizacao_corte; idRealizacao >= IdRealizacao_1; idRealizacao--) {
 
-				const int varZF = getVarDecisao_ZF(false, a_TSS, estagio_final, idRealizacao);
+				const int varZF = getVarDecisao_ZF(a_TSS, estagio_final, idRealizacao);
 
 				for (IdCorteBenders idCorteBenders = getMaiorId(idEstagio_futuro, IdCorteBenders()); idCorteBenders >= getMenorId(idEstagio_futuro, IdCorteBenders()); idCorteBenders--) {
 
 					if (vetorEstagio.at(idEstagio_futuro).vetorCorteBenders.isInstanciado(idCorteBenders)) {
 
-						if (getIneLinear_CB_ZFseExistir(false, a_TSS, estagio_final, idRealizacao, idCorteBenders) > -1)
+						if (getIneLinear_CB_ZFseExistir(a_TSS, estagio_final, idRealizacao, idCorteBenders) > -1)
 							throw std::invalid_argument("Conteudo ja existente " +  getFullString(idCorteBenders));
 
 						alocIneLinear_CB_ZF_3(a_TSS, estagio_final);
 						name_IneLinear_CB_ZF_3.at(a_TSS).at(estagio_final).push_back(getNomeIneLinear_CB_ZF(a_TSS, estagio_final, idRealizacao, idCorteBenders));
 						indx_IneLinear_CB_ZF_3.at(a_TSS).at(estagio_final).push_back(indice_corte);
 
-						vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(false, varZF, indice_corte, 1.0);
+						vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(varZF, indice_corte, 1.0);
 
 						for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(idEstagio_futuro, IdVariavelEstado()); idVariavelEstado++) {
 
@@ -4400,7 +4400,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 								const int idVariavelDecisaoEstagioAnterior = getAtributo(idEstagio_futuro, idVariavelEstado, AttComumVariavelEstado_idVariavelDecisaoEstagioAnterior, int());
 
 								if (idVariavelDecisaoEstagioAnterior > -1)
-									vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(false, idVariavelDecisaoEstagioAnterior, indice_corte, -getElementoMatriz(idEstagio_futuro, idCorteBenders, AttMatrizCorteBenders_coeficiente, idRealizacao, idVariavelEstado, double()));
+									vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(idVariavelDecisaoEstagioAnterior, indice_corte, -getElementoMatriz(idEstagio_futuro, idCorteBenders, AttMatrizCorteBenders_coeficiente, idRealizacao, idVariavelEstado, double()));
 								else if (getSizeVetor(idEstagio_futuro, idCorteBenders, AttVetorCorteBenders_estado) > 0)
 									vetorEstagio.at(idEstagio_futuro).anularVariavelEstadoCorteBenders(idVariavelEstado, idCorteBenders);
 
@@ -4411,7 +4411,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 
 						} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(idEstagio_futuro, IdVariavelEstado()); idVariavelEstado++) {
 
-						vetorEstagio.at(estagio_final).getSolver(a_TSS)->setRHSRestricao(false, indice_corte, getElementoVetor(idEstagio_futuro, idCorteBenders, AttVetorCorteBenders_rhs, idRealizacao, double()));
+						vetorEstagio.at(estagio_final).getSolver(a_TSS)->setRHSRestricao(indice_corte, getElementoVetor(idEstagio_futuro, idCorteBenders, AttVetorCorteBenders_rhs, idRealizacao, double()));
 
 						indice_corte++;
 
@@ -4672,7 +4672,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 				
 					Periodo periodo_penalizacao(nome.at(2));
 
-					const int varZP0_VF_FINF = criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(false, a_TSS, a_dados, idEstagio, periodo_penalizacao);
+					const int varZP0_VF_FINF = criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(a_TSS, a_dados, idEstagio, periodo_penalizacao);
 
 					if (varZP0_VF_FINF > -1)
 						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varZP0_VF_FINF);
@@ -4702,14 +4702,14 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 					estagio.setVariavelDecisaoEmVariavelEstado(idVariavelEstado, a_TSS, -1);
 
-					const int varVF = getVarDecisao_VFseExistir(false, a_TSS, idEstagio, periodo_estudo_final, idHidreletrica);
+					const int varVF = getVarDecisao_VFseExistir(a_TSS, idEstagio, periodo_estudo_final, idHidreletrica);
 
 					if (varVF > -1)
 						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varVF);
 
 					else if (varVF == -1) {
 
-						const int varVF_nova = addVarDecisao_VF(false, a_TSS, idEstagio, periodo_estudo_final, idHidreletrica, 0.0, 0.0, 0.0);
+						const int varVF_nova = addVarDecisao_VF(a_TSS, idEstagio, periodo_estudo_final, idHidreletrica, 0.0, 0.0, 0.0);
 
 						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varVF_nova);
 
@@ -4767,7 +4767,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 						throw std::invalid_argument(getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) + " em " + getFullString(idVariavelEstado) + " nao foi instanciado no modelo.");
 
 					else if (listaHidreletricaNaoInstanciadaNoModelo.size() == 0) {
-						const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(false, a_TSS, a_dados, idEstagio, periodo, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica);
+						const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, periodo, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica);
 						if (varYP == -1)
 							throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varYP);
@@ -4788,7 +4788,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 						const IdReservatorioEquivalente idREE = getIdReservatorioEquivalenteFromChar(nome.at(4).c_str());
 
-						int varENA_REE = getVarDecisao_ENAseExistir(false, a_TSS, estagio_final, periodo, periodo_lag, idREE);
+						int varENA_REE = getVarDecisao_ENAseExistir(a_TSS, estagio_final, periodo, periodo_lag, idREE);
 
 						if (varENA_REE == -1) {
 
@@ -4796,7 +4796,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 							const double limite_inferior = 0.0;
 							const double limite_superior = 0.0;
 
-							varENA_REE = addVarDecisao_ENA(false, a_TSS, estagio_final, periodo, periodo_lag, idREE, limite_inferior, limite_superior, 0.0);
+							varENA_REE = addVarDecisao_ENA(a_TSS, estagio_final, periodo, periodo_lag, idREE, limite_inferior, limite_superior, 0.0);
 
 						}
 
@@ -4854,16 +4854,16 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 								if (a_dados.getSize1Matriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1) > 0)
 									is_valores_1 = true;
 
-								const int varENA = addVarDecisao_ENA(false, a_TSS, idEstagio, periodo, periodo_lag, idHidreletrica, idREE, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+								const int varENA = addVarDecisao_ENA(a_TSS, idEstagio, periodo, periodo_lag, idHidreletrica, idREE, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 
-								const int equENA = addEquLinear_ENA(false, a_TSS, idEstagio, periodo, periodo_lag, idHidreletrica, idREE);
+								const int equENA = addEquLinear_ENA(a_TSS, idEstagio, periodo, periodo_lag, idHidreletrica, idREE);
 
 								vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA, equENA, 1.0);
 
 								SmartEnupla<IdCenario, double> valores_0;
 								SmartEnupla<int, SmartEnupla<IdCenario, double>> valores_1;
 
-								const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(false, a_TSS, a_dados, idEstagio, periodo, IdProcessoEstocastico_hidrologico_hidreletrica, IdVariavelAleatoria(idHidreletrica), periodo_lag, 0.0, std::vector<IdHidreletrica>{idHidreletrica});
+								const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, periodo, IdProcessoEstocastico_hidrologico_hidreletrica, IdVariavelAleatoria(idHidreletrica), periodo_lag, 0.0, std::vector<IdHidreletrica>{idHidreletrica});
 								if (varYP == -1)
 									throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(periodo_lag) + "," + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 
@@ -4904,21 +4904,21 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 								} // for (IdCenario idCenario = cenarioInicial; idCenario <= cenarioFinal; idCenario++) {
 
 
-								vetorEstagio.at(idEstagio).addRestricaoCenario(false, a_TSS, getNomeVarDecisao_ENA(false, a_TSS, idEstagio, periodo, periodo_lag, idHidreletrica, idREE), equENA, valores_0, valores_1);
+								vetorEstagio.at(idEstagio).addRestricaoCenario(a_TSS, getNomeVarDecisao_ENA(a_TSS, idEstagio, periodo, periodo_lag, idHidreletrica, idREE), equENA, valores_0, valores_1);
 
-								int varENA_REE = getVarDecisao_ENAseExistir(false, a_TSS, idEstagio, periodo, periodo_lag, idREE);
-								int equENA_REE = getEquLinear_ENAseExistir(false, a_TSS, idEstagio, periodo, periodo_lag, idREE);
+								int varENA_REE = getVarDecisao_ENAseExistir(a_TSS, idEstagio, periodo, periodo_lag, idREE);
+								int equENA_REE = getEquLinear_ENAseExistir(a_TSS, idEstagio, periodo, periodo_lag, idREE);
 
 								if (varENA_REE == -1) {
-									equENA_REE = addEquLinear_ENA(false, a_TSS, idEstagio, periodo, periodo_lag, idREE);
-									varENA_REE = addVarDecisao_ENA(false, a_TSS, idEstagio, periodo, periodo_lag, idREE, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+									equENA_REE = addEquLinear_ENA(a_TSS, idEstagio, periodo, periodo_lag, idREE);
+									varENA_REE = addVarDecisao_ENA(a_TSS, idEstagio, periodo, periodo_lag, idREE, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 									vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA_REE, equENA_REE, 1.0);
 
-									int varENA_SIN = getVarDecisao_ENAseExistir(false, a_TSS, idEstagio, periodo, periodo_lag);
-									int equENA_SIN = getEquLinear_ENAseExistir(false, a_TSS, idEstagio, periodo, periodo_lag);
+									int varENA_SIN = getVarDecisao_ENAseExistir(a_TSS, idEstagio, periodo, periodo_lag);
+									int equENA_SIN = getEquLinear_ENAseExistir(a_TSS, idEstagio, periodo, periodo_lag);
 									if (varENA_SIN == -1) {
-										equENA_SIN = addEquLinear_ENA(false, a_TSS, idEstagio, periodo, periodo_lag);
-										varENA_SIN = addVarDecisao_ENA(false, a_TSS, idEstagio, periodo, periodo_lag, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+										equENA_SIN = addEquLinear_ENA(a_TSS, idEstagio, periodo, periodo_lag);
+										varENA_SIN = addVarDecisao_ENA(a_TSS, idEstagio, periodo, periodo_lag, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
 										vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA_SIN, equENA_SIN, 1.0);
 									}
 									vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA_REE, equENA_SIN, -1.0);
@@ -4960,7 +4960,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					if (tempo_viagem_agua_estado != tempo_viagem_agua)
 						throw std::invalid_argument("Tempo de viagem da agua " + getString(tempo_viagem_agua) + "h em " + getFullString(idHidreletrica) + " nao compativel com " + getString(tempo_viagem_agua_estado) + "h em " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 
-					const int varQDLAG = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDLAG(false, a_TSS, a_dados, idEstagio, periodo, idHidreletrica, periodo_lag);
+					const int varQDLAG = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDLAG(a_TSS, a_dados, idEstagio, periodo, idHidreletrica, periodo_lag);
 					if (varQDLAG == -1)
 						throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDLAG de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 					else
@@ -4977,7 +4977,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					const double potencia_maxima_disponivel = getdoubleFromChar(nome.at(5).c_str());
 
 
-					const int varPTDISPCOM = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(false, a_TSS, a_dados, idEstagio, periodo_comando, IdPatamarCarga_Nenhum, idTermeletrica, potencia_minima_disponivel, potencia_maxima_disponivel);
+					const int varPTDISPCOM = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, idEstagio, periodo_comando, IdPatamarCarga_Nenhum, idTermeletrica, potencia_minima_disponivel, potencia_maxima_disponivel);
 					if (varPTDISPCOM == -1)
 						throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes PTDISPCOM de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 					else
@@ -5236,7 +5236,7 @@ double ModeloOtimizacao::otimizarProblema(const TipoSubproblemaSolver a_TSS, con
 		// Tratamento Numérico de Inviabilidade
 		//
 
-		//otimizarProblemaComTratamentoNumericoInviabilidade(false, a_TSS, 1, a_idEstagio);
+		//otimizarProblemaComTratamentoNumericoInviabilidade(a_TSS, 1, a_idEstagio);
 		otimizarProblemaComTratamentoNumericoInviabilidade(a_TSS, a_idEstagio);
 
 		if (vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getStatusOtimizacao() != TipoStatusSolver_nao_otimalidade)
@@ -5283,7 +5283,7 @@ double ModeloOtimizacao::otimizarProblema(const TipoSubproblemaSolver a_TSS, con
 
 					escreverLog10005(a_TSS, a_idIteracao, a_idEstagio, a_idCenario, IdRealizacao_Nenhum, erro_str);
 
-					//otimizarProblemaComTratamentoNumericoInviabilidade(false, a_TSS, 1, a_idEstagio);
+					//otimizarProblemaComTratamentoNumericoInviabilidade(a_TSS, 1, a_idEstagio);
 					otimizarProblemaComTratamentoNumericoInviabilidade(a_TSS, a_idEstagio);
 
 					if (getElementoVetor(AttVetorModeloOtimizacao_tratamento_inviabilidade, a_idEstagio, int()) >= 0)
@@ -5293,10 +5293,10 @@ double ModeloOtimizacao::otimizarProblema(const TipoSubproblemaSolver a_TSS, con
 
 						setElemento(AttVetorModeloOtimizacao_custo_total, a_idEstagio, 0.0);
 
-						if (getVarDecisao_ZIseExistir(false, a_TSS, a_idEstagio) > -1)
+						if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio) > -1)
 							setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, 0.0);
 
-						if (getVarDecisao_ZFseExistir(false, a_TSS, a_idEstagio) > -1)
+						if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1)
 							setElemento(AttVetorModeloOtimizacao_custo_futuro, a_idEstagio, 0.0);
 
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->resetar();
@@ -5371,7 +5371,7 @@ bool ModeloOtimizacao::otimizarProblema(const TipoSubproblemaSolver a_TSS, const
 		// Tratamento Numérico de Inviabilidade
 		//
 
-		//otimizarProblemaComTratamentoNumericoInviabilidade(false, a_TSS, 1, a_idEstagio);
+		//otimizarProblemaComTratamentoNumericoInviabilidade(a_TSS, 1, a_idEstagio);
 		otimizarProblemaComTratamentoNumericoInviabilidade(a_TSS, a_idEstagio);
 
 		if (vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getStatusOtimizacao() != TipoStatusSolver_nao_otimalidade)
@@ -5450,11 +5450,11 @@ double ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS
 
 				setElemento(AttVetorModeloOtimizacao_custo_total, a_idEstagio, valorObjetivo);
 
-				if (getVarDecisao_ZIseExistir(false, a_TSS, a_idEstagio) > -1)
-					setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZI(false, a_TSS, a_idEstagio)));
+				if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio) > -1)
+					setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZI(a_TSS, a_idEstagio)));
 
-				if (getVarDecisao_ZFseExistir(false, a_TSS, a_idEstagio) > -1)
-					setElemento(AttVetorModeloOtimizacao_custo_futuro, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZF(false, a_TSS, a_idEstagio)));
+				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1)
+					setElemento(AttVetorModeloOtimizacao_custo_futuro, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZF(a_TSS, a_idEstagio)));
 
 				return getCustoTotal(a_idEstagio);
 
@@ -5518,11 +5518,11 @@ double ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS
 
 				setElemento(AttVetorModeloOtimizacao_custo_total, a_idEstagio, valorObjetivo);
 
-				if (getVarDecisao_ZIseExistir(false, a_TSS, a_idEstagio) > -1)
-					setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZI(false, a_TSS, a_idEstagio)));
+				if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio) > -1)
+					setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZI(a_TSS, a_idEstagio)));
 
-				if (getVarDecisao_ZFseExistir(false, a_TSS, a_idEstagio) > -1) {
-					double zf = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZF(false, a_TSS, a_idEstagio));
+				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1) {
+					double zf = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZF(a_TSS, a_idEstagio));
 					if ((zf > -0.1) && (zf < 0.0))
 						zf = 0.0;
 					setElemento(AttVetorModeloOtimizacao_custo_futuro, a_idEstagio, zf);
@@ -5542,7 +5542,7 @@ double ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS
 
 						escreverLog10005(a_TSS, a_idIteracao, a_idEstagio, a_idCenario, IdRealizacao_Nenhum, erro_str);
 
-						//otimizarProblemaComTratamentoNumericoInviabilidade(false, a_TSS, 1, a_idEstagio);
+						//otimizarProblemaComTratamentoNumericoInviabilidade(a_TSS, 1, a_idEstagio);
 						otimizarProblemaComTratamentoNumericoInviabilidade(a_TSS, a_idEstagio);
 
 						if (getElementoVetor(AttVetorModeloOtimizacao_tratamento_inviabilidade, a_idEstagio, int()) >= 0)
@@ -5552,10 +5552,10 @@ double ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS
 
 							setElemento(AttVetorModeloOtimizacao_custo_total, a_idEstagio, 0.0);
 
-							if (getVarDecisao_ZIseExistir(false, a_TSS, a_idEstagio) > -1)
+							if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio) > -1)
 								setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, 0.0);
 
-							if (getVarDecisao_ZFseExistir(false, a_TSS, a_idEstagio) > -1)
+							if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1)
 								setElemento(AttVetorModeloOtimizacao_custo_futuro, a_idEstagio, 0.0);
 
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->resetar();
@@ -5618,11 +5618,11 @@ bool ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS, 
 
 				setElemento(AttVetorModeloOtimizacao_custo_total, a_idEstagio, valorObjetivo);
 
-				if (getVarDecisao_ZIseExistir(false, a_TSS, a_idEstagio) > -1)
-					setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZI(false, a_TSS, a_idEstagio)));
+				if (getVarDecisao_ZIseExistir(a_TSS, a_idEstagio) > -1)
+					setElemento(AttVetorModeloOtimizacao_custo_imediato, a_idEstagio, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZI(a_TSS, a_idEstagio)));
 
-				if (getVarDecisao_ZFseExistir(false, a_TSS, a_idEstagio) > -1) {
-					double zf = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZF(false, a_TSS, a_idEstagio));
+				if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1) {
+					double zf = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(getVarDecisao_ZF(a_TSS, a_idEstagio));
 					if ((zf > -0.1) && (zf < 0.0))
 						zf = 0.0;
 					setElemento(AttVetorModeloOtimizacao_custo_futuro, a_idEstagio, zf);
@@ -5802,11 +5802,11 @@ void ModeloOtimizacao::calcularCustoPrimalViaSubproblemaMestre(const TipoSubprob
 						idRealizacao = getElementoMatriz(idProcessoEstocastico, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, periodo_processo_estocastico, IdRealizacao());
 				}
 
-				const int varZT_r = getVarDecisao_ZT(false, a_TSS, a_idEstagio, idRealizacao);
+				const int varZT_r = getVarDecisao_ZT(a_TSS, a_idEstagio, idRealizacao);
 
 				a_custo_individual = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(varZT_r);
 
-				const int varZT = getVarDecisao_ZT(false, a_TSS, a_idEstagio);
+				const int varZT = getVarDecisao_ZT(a_TSS, a_idEstagio);
 
 				a_custo_geral = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorPrimal(varZT);
 

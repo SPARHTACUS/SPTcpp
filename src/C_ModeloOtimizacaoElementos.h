@@ -7,65 +7,12 @@
 //
 
 #define ITERS_ARGS(nIt, TIt) , const TIt a_##TIt##_##nIt
+#define ARGS_ITERS(nIt, TIt) , a_##TIt##_##nIt 
 
 #define GET_STRING_TIPO_ELEMENTO(nIt, TIt)  + getStringTipo(TIt()) + ";"
 
 #define GET_STRING_ELEMENTO(nIt, TIt)  + getString(a_##TIt##_##nIt) + ";"
 #define GET_FULL_STRING_ELEMENTO(nIt, TIt)  + "," + getFullString(a_##TIt##_##nIt)
-
-#define AT_A_ITERS(nIt, TIt).at(a_##TIt##_##nIt)
-#define AT_ITERS(nIt, TIt).at(_##TIt##_##nIt)
-
-#define AT_CONST_1_10 .at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1)
-#define AT_CONST_2_10 .at(1).at(1).at(1).at(1).at(1).at(1).at(1).at(1)
-#define AT_CONST_3_10 .at(1).at(1).at(1).at(1).at(1).at(1).at(1)
-#define AT_CONST_4_10 .at(1).at(1).at(1).at(1).at(1).at(1)
-#define AT_CONST_5_10 .at(1).at(1).at(1).at(1).at(1)
-#define AT_CONST_6_10 .at(1).at(1).at(1).at(1)
-#define AT_CONST_7_10 .at(1).at(1).at(1)
-#define AT_CONST_8_10 .at(1).at(1)
-#define AT_CONST_9_10 .at(1)
-#define AT_CONST_10_10 
-
-#define ARGS_ITERS(nIt, TIt) , a_##TIt##_##nIt 
-#define ARGS_CONST_1_10  , 1, 1, 1, 1, 1, 1, 1, 1, 1
-#define ARGS_CONST_2_10  , 1, 1, 1, 1, 1, 1, 1, 1
-#define ARGS_CONST_3_10  , 1, 1, 1, 1, 1, 1, 1
-#define ARGS_CONST_4_10  , 1, 1, 1, 1, 1, 1
-#define ARGS_CONST_5_10  , 1, 1, 1, 1, 1
-#define ARGS_CONST_6_10  , 1, 1, 1, 1
-#define ARGS_CONST_7_10  , 1, 1, 1
-#define ARGS_CONST_8_10  , 1, 1
-#define ARGS_CONST_9_10  , 1
-#define ARGS_CONST_10_10 
-
-
-#define DECLARA_TITERS(nIt, TIt) TIt(),
-#define DECLARA_TITERS_CONST_1_10 int(),  int(),  int(),  int(),  int(),  int(),  int(),  int(),  int(), 
-#define DECLARA_TITERS_CONST_2_10 int(),  int(),  int(),  int(),  int(),  int(),  int(),  int(), 
-#define DECLARA_TITERS_CONST_3_10 int(),  int(),  int(),  int(),  int(),  int(),  int(), 
-#define DECLARA_TITERS_CONST_4_10 int(),  int(),  int(),  int(),  int(),  int(), 
-#define DECLARA_TITERS_CONST_5_10 int(),  int(),  int(),  int(),  int(), 
-#define DECLARA_TITERS_CONST_6_10 int(),  int(),  int(),  int(), 
-#define DECLARA_TITERS_CONST_7_10 int(),  int(),  int(), 
-#define DECLARA_TITERS_CONST_8_10 int(),  int(), 
-#define DECLARA_TITERS_CONST_9_10 int(), 
-#define DECLARA_TITERS_CONST_10_10 
-
-
-#define DECLARAR_ALOCAR_ENUPLA_ITER(nIt, TIt) SmartEnupla<TIt, 
-
-#define DECLARAR_ALOCAR_ENUPLA_CONST_1  SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, 
-#define DECLARAR_ALOCAR_ENUPLA_CONST_2  SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, 
-#define DECLARAR_ALOCAR_ENUPLA_CONST_3  SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, 
-#define DECLARAR_ALOCAR_ENUPLA_CONST_4  SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, 
-#define DECLARAR_ALOCAR_ENUPLA_CONST_5  SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, 
-#define DECLARAR_ALOCAR_ENUPLA_CONST_6  SmartEnupla<int, SmartEnupla<int, SmartEnupla<int, SmartEnupla<int,  
-#define DECLARAR_ALOCAR_ENUPLA_CONST_7  SmartEnupla<int, SmartEnupla<int, SmartEnupla<int,  
-#define DECLARAR_ALOCAR_ENUPLA_CONST_8  SmartEnupla<int, SmartEnupla<int,  
-#define DECLARAR_ALOCAR_ENUPLA_CONST_9  SmartEnupla<int,  
-#define DECLARAR_ALOCAR_ENUPLA_CONST_10   
-
 
 #define DECLARAR_ADD_ELEMENTO_VarDecisao_1 , const double a_valor_inferior, const double a_valor_superior, const double a_valor_objetivo
 #define DECLARAR_ADD_ELEMENTO_EquLinear_1
@@ -87,20 +34,15 @@
 #define DECLARAR_ISVAR_EquLinear  false
 #define DECLARAR_ISVAR_IneLinear  false
 
-#define DECLARAR_CONDICAO_RETORNO_ImprimirPrimal_nao return;
-#define DECLARAR_CONDICAO_RETORNO_ImprimirPrimal_sim
-
 #define DECLARAR_CONDICAO_RETORNO_ImprimirDual_nao return;
 #define DECLARAR_CONDICAO_RETORNO_ImprimirDual_sim
 
-#define DECLARAR_CONDICAO_RETORNO_NormDual_nao return 1.0;
-#define DECLARAR_CONDICAO_RETORNO_NormDual_sim
 
 //
 //  Chamada Geral Declaracao
 //
 
-#define DECLARAR_METODOS_ELEMENTO(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual)\
+#define DECLARAR_METODOS_ELEMENTO(Elem, Nome, Nro, Valores, ImprimirDual)\
 SmartEnupla<TipoSubproblemaSolver, IdEstagio> idEstagioIni_vlrP_##Elem##_##Nome##_##Nro;\
 SmartEnupla<TipoSubproblemaSolver, IdEstagio> idEstagioIni_vlrD_##Elem##_##Nome##_##Nro;\
 SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>> name_##Elem##_##Nome##_##Nro;\
@@ -176,26 +118,25 @@ int getPos##Elem##_##Nome##seExistir(const TipoSubproblemaSolver a_TSS Valores(I
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("getPos" + std::string(#Elem) + "_" + std::string(#Nome) + "seExistir(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
 }; \
-int get##Elem##_##Nome(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
+int get##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
 	try{\
-		const int indx = get##Elem##_##Nome##seExistir(a_isAlocMode, a_TSS Valores(ARGS_ITERS));\
+		const int indx = get##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS));\
 		if (indx < 0) {throw std::invalid_argument("Invalid element");}\
 		return indx;\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("get" + std::string(#Elem) +  "_" + std::string(#Nome) + "(" + Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
 }; \
-int get##Elem##_##Nome##seExistir(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
+int get##Elem##_##Nome##seExistir(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS)){ \
 	try{ \
 		const int pos = getPos##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS));\
 		if (pos < 0) { return -1;}\
-		if (a_isAlocMode) { return 0; };\
 		return indx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos);\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("get" + std::string(#Elem) + "_" + std::string(#Nome) + "seExistir(" + Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
 }; \
-int add##Elem##_##Nome(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) DECLARAR_ADD_ELEMENTO_##Elem##_1){ \
+int add##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) DECLARAR_ADD_ELEMENTO_##Elem##_1){ \
 	try{ \
-		if (get##Elem##_##Nome##seExistir(a_isAlocMode, a_TSS Valores(ARGS_ITERS)) > -1) \
+		if (get##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS)) > -1) \
 			throw std::invalid_argument("Conteudo ja existente."); \
 		aloc##Elem##_##Nome##_##Nro(a_TSS, a_IdEstagio_1);\
 		name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).push_back(getNome##Elem##_##Nome(a_TSS Valores(ARGS_ITERS)));\
@@ -206,7 +147,7 @@ int add##Elem##_##Nome(const bool a_isAlocMode, const TipoSubproblemaSolver a_TS
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("add" + std::string(#Elem) + "_" + std::string(#Nome) + "(" + Valores(GET_FULL_STRING_ELEMENTO) DECLARAR_ADD_ELEMENTO_##Elem##_3 + "): \n" + std::string(erro.what())); } \
 }; \
-void setNormalizacaoDual##Elem##_##Nome(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) , const double a_normMultiplicacao){ \
+void setNormalizacaoDual##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) , const double a_normMultiplicacao){ \
 	try{ \
 		if (nrmD_##Elem##_##Nome##_##Nro.size() == 0) { \
 			nrmD_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<double>>>      (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<double>>>     (TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<double>>())); \
@@ -288,7 +229,7 @@ void consolidarResultados##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_T
 // ARMAZENAR VALOR POR ESTAGIO POR CENARIO POR REALIZACAO
 //
 
-#define ARMAZENAR_VALOR(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual) \
+#define ARMAZENAR_VALOR(Elem, Nome, Nro, Valores, ImprimirDual) \
 armazenarValorPrimal##Elem##_##Nome##_##Nro(a_TSS, a_idIteracao, a_idEstagio, a_idCenario, a_idRealizacao);\
 armazenarValorDual##Elem##_##Nome##_##Nro(a_TSS, a_idIteracao, a_idEstagio, a_idCenario, a_idRealizacao);
 
@@ -296,7 +237,7 @@ armazenarValorDual##Elem##_##Nome##_##Nro(a_TSS, a_idIteracao, a_idEstagio, a_id
 // IMPRIMIR VALOR PRIMAL POR ESTAGIO POR CENARIO
 //
 
-#define DECLARAR_IMPRIMIR_VALOR(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual) \
+#define DECLARAR_IMPRIMIR_VALOR(Elem, Nome, Nro, Valores, ImprimirDual) \
 void ModeloOtimizacao::imprimirValorPrimal##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados){ \
 	try{ \
 		if (DECLARAR_ISVAR_##Elem){\
@@ -327,7 +268,7 @@ void ModeloOtimizacao::imprimirValorDual##Elem##_##Nome##_##Nro(const TipoSubpro
 	catch (const std::exception& erro) { throw std::invalid_argument("imprimirValorDual" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
 };\
 
-#define IMPRIMIR_VALOR(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual) \
+#define IMPRIMIR_VALOR(Elem, Nome, Nro, Valores, ImprimirDual) \
 imprimirValorPrimal##Elem##_##Nome##_##Nro(TSS, a_idEstagio, getFullString(a_idProcesso), a_entradaSaidaDados); \
 imprimirValorDual##Elem##_##Nome##_##Nro(TSS, a_idEstagio, getFullString(a_idProcesso), a_entradaSaidaDados);
 
@@ -335,7 +276,7 @@ imprimirValorDual##Elem##_##Nome##_##Nro(TSS, a_idEstagio, getFullString(a_idPro
 // CONSOLIDAR RESULTADOS
 //
 
-#define DECLARAR_CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual)  \
+#define DECLARAR_CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores, ImprimirDual)  \
 void ModeloOtimizacao::consolidarResultados##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_variavel, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados) {	\
 	try{ \
 		if (std::string(std::string(#Nome) + "_" + std::string(#Nro)) != a_variavel) \
@@ -361,7 +302,7 @@ void ModeloOtimizacao::consolidarResultados##Elem##_##Nome##_##Nro(const TipoSub
 };\
 
 
-#define CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores, ImprimirPrimal, ImprimirDual, NormDual) consolidarResultados##Elem##_##Nome##_##Nro(a_TSS, Elem##_str, a_maiorIdProcesso, a_entradaSaidaDados);
+#define CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores, ImprimirDual) consolidarResultados##Elem##_##Nome##_##Nro(a_TSS, Elem##_str, a_maiorIdProcesso, a_entradaSaidaDados);
 
 
 

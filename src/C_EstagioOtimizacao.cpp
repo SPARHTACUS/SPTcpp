@@ -48,11 +48,9 @@ Estagio::~Estagio(){
 } // Estagio::~Estagio(){
 
 
-IdVariavelEstado Estagio::addVariavelEstado(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const int a_idVariavelDecisaoEstagioAnterior) {
+IdVariavelEstado Estagio::addVariavelEstado(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const int a_idVariavelDecisaoEstagioAnterior) {
 
 	try {
-
-		if (a_isAlocMode) { return IdVariavelEstado(1); }
 
 		const IdVariavelEstado maiorIdVariavelEstado = getMaiorId(IdVariavelEstado());
 
@@ -94,11 +92,9 @@ IdVariavelEstado Estagio::addVariavelEstado(const bool a_isAlocMode, const TipoS
 } // IdVariavelEstado Estagio::adicionarVariavelEstado(const string a_nome, const IdEstagio a_idEstagio, const int a_indice_variavel_decisao, const IdEstagio a_idEstagioDE, const int a_indice_variavel_decisaoDE){
 
 
-IdVariavelRealizacao Estagio::addVariavelRealizacao(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo, const double a_fator) {
+IdVariavelRealizacao Estagio::addVariavelRealizacao(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const Periodo a_periodo, const double a_fator) {
 
 	try {
-
-		if (a_isAlocMode) { return IdVariavelRealizacao(1); }
 
 		const IdVariavelRealizacao maiorIdVariavelRealizacao = getMaiorId(IdVariavelRealizacao());
 
@@ -140,11 +136,9 @@ IdVariavelRealizacao Estagio::addVariavelRealizacao(const bool a_isAlocMode, con
 
 } // IdVariavelRealizacao Estagio::adicionarVariavelRealizacao(const string a_nome, const IdEstagio a_idEstagio, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria){
 
-IdRestricaoCenario Estagio::addRestricaoCenario(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idRestricao, const SmartEnupla<IdCenario, double>& a_rhs, const SmartEnupla<int, SmartEnupla<IdCenario, double>> &a_coeficiente) {
+IdRestricaoCenario Estagio::addRestricaoCenario(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idRestricao, const SmartEnupla<IdCenario, double>& a_rhs, const SmartEnupla<int, SmartEnupla<IdCenario, double>> &a_coeficiente) {
 	
 	try{
-
-		if (a_isAlocMode) { return IdRestricaoCenario(1); }
 
 		const IdRestricaoCenario maiorIdRestricaoCenario = getMaiorId(IdRestricaoCenario());
 
@@ -172,11 +166,9 @@ IdRestricaoCenario Estagio::addRestricaoCenario(const bool a_isAlocMode, const T
 }
 
 
-IdVariavelRealizacaoInterna Estagio::addVariavelRealizacaoInterna(const bool a_isAlocMode, const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const Periodo a_periodo, const double a_fator, const TipoValor a_tipo_valor, const double a_percentual_inicial, const double a_percentual_passo){
+IdVariavelRealizacaoInterna Estagio::addVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const Periodo a_periodo, const double a_fator, const TipoValor a_tipo_valor, const double a_percentual_inicial, const double a_percentual_passo){
 
 	try {
-
-		if (a_isAlocMode) { return IdVariavelRealizacaoInterna(1); }
 
 		if ((a_percentual_inicial == 1.0) && (a_percentual_inicial + a_percentual_passo <= 1.0))
 			throw std::invalid_argument("Para percentual inicial igual a 1.0, o percentual passo deve ser positivo.");
@@ -373,8 +365,8 @@ void Estagio::resetarValorVariavelRealizacaoInterna(const TipoSubproblemaSolver 
 
 		const int idVariavelDecisao = getElementoVetor(idVariavelRealizacaoInterna, AttVetorVariavelRealizacaoInterna_idVariavelDecisao, a_TSS, int());
 
-		getSolver(a_TSS)->setLimInferior(false, idVariavelDecisao, 0.0);
-		getSolver(a_TSS)->setLimSuperior(false, idVariavelDecisao, 0.0);
+		getSolver(a_TSS)->setLimInferior(idVariavelDecisao, 0.0);
+		getSolver(a_TSS)->setLimSuperior(idVariavelDecisao, 0.0);
 
 		vetorVariavelRealizacaoInterna.at(idVariavelRealizacaoInterna).setAtributo(AttComumVariavelRealizacaoInterna_percentual_a_utilizar, getAtributo(idVariavelRealizacaoInterna, AttComumVariavelRealizacaoInterna_percentual_inicial, double()));
 	} // try
@@ -1048,7 +1040,7 @@ void Estagio::exportarVersaoAlternativaCorteBenders(Estagio& a_estagio, const st
 
 			for (int i = 0; i < int(nome_novo.size()); i++) {
 
-				a_estagio.addVariavelEstado(false, TipoSubproblemaSolver_geral, nome_novo.at(i), 0, 0);
+				a_estagio.addVariavelEstado(TipoSubproblemaSolver_geral, nome_novo.at(i), 0, 0);
 
 				const IdVariavelEstado idVariavelEstadoNovo = a_estagio.getMaiorId(IdVariavelEstado());
 

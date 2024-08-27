@@ -79,15 +79,15 @@ public:
 
     virtual int addVar(const double a_lb, const double a_ub, const double a_obj, const std::string a_nome) = 0;
 
-    virtual bool setCofObjetivo(const bool a_isAlocMode, const int a_posicao, const double a_cofObjetivo) = 0;
+    virtual bool setCofObjetivo(const int a_posicao, const double a_cofObjetivo) = 0;
 
-    virtual bool setLimInferior(const bool a_isAlocMode, const int a_posicao, const double a_limInferior) = 0;
+    virtual bool setLimInferior(const int a_posicao, const double a_limInferior) = 0;
 
-    virtual bool setLimSuperior(const bool a_isAlocMode, const int a_posicao, const double a_limSuperior) = 0;
+    virtual bool setLimSuperior(const int a_posicao, const double a_limSuperior) = 0;
 
-    virtual bool setTipoVariavelContinua(const bool a_isAlocMode, const int a_posicao) = 0;
+    virtual bool setTipoVariavelContinua(const int a_posicao) = 0;
 
-    virtual bool setTipoVariavelBinaria(const bool a_isAlocMode, const int a_posicao) = 0;
+    virtual bool setTipoVariavelBinaria(const int a_posicao) = 0;
 
     virtual bool incrAlocVar(const int a_incrAloc) = 0;
     virtual bool incrAlocEqu(const int a_incrAloc) = 0;
@@ -118,7 +118,7 @@ public:
 
     virtual bool remRestricao(const int a_posicaoRestricao) = 0;
 
-    virtual bool addVarDinamica(const bool a_isAlocMode, const int a_posicaoVariavel) = 0;
+    virtual bool addVarDinamica(const int a_posicaoVariavel) = 0;
 
     virtual double getSolucaoInferiorVarDinamica() = 0;
 
@@ -135,9 +135,9 @@ public:
     virtual bool setNomeRestricao(const int a_posicaoRestricao, const std::string a_nome) = 0;
     virtual std::string getNomeRestricao(const int a_posicaoRestricao) = 0;
 
-    virtual bool setCofRestricao(const bool a_isAlocMode, const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) = 0;
+    virtual bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) = 0;
 
-    virtual bool setRHSRestricao(const bool a_isAlocMode, const int a_posicaoRestricao, const double a_RHS) = 0;
+    virtual bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) = 0;
 
     virtual double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao) = 0;
 
@@ -425,9 +425,9 @@ public:
     }; // bool addVar(double a_lb, double a_ub, double a_obj, std::string a_nome) {
 
 
-    bool setCofObjetivo(const bool a_isAlocMode, const int a_posicao, const double a_cofObjetivo) {
+    bool setCofObjetivo(const int a_posicao, const double a_cofObjetivo) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             vetorGRBVar.at(a_posicao).set(GRB_DoubleAttr_Obj, a_cofObjetivo);
             return true;
         }
@@ -446,9 +446,9 @@ public:
     }; // bool setCofObjetivo(int a_posicao, double a_cofObjetivo) {
 
 
-    bool setLimInferior(const bool a_isAlocMode, const int a_posicao, const double a_limInferior) {
+    bool setLimInferior(const int a_posicao, const double a_limInferior) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             ptrModelo->update();
             const std::string varName = vetorGRBVar.at(a_posicao).get(GRB_StringAttr_VarName);
             const double prevLB = vetorGRBVar.at(a_posicao).get(GRB_DoubleAttr_LB);
@@ -478,9 +478,9 @@ public:
     }; // bool setLimInferior(int a_posicao, double a_limInferior) {
 
 
-    bool setLimSuperior(const bool a_isAlocMode, const int a_posicao, const double a_limSuperior) {
+    bool setLimSuperior(const int a_posicao, const double a_limSuperior) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             ptrModelo->update();
             const std::string varName = vetorGRBVar.at(a_posicao).get(GRB_StringAttr_VarName);
             const double prevUB = vetorGRBVar.at(a_posicao).get(GRB_DoubleAttr_UB);
@@ -509,9 +509,9 @@ public:
     }; // bool setLimSuperior(int a_posicao, double a_limSuperior) {
 
 
-    bool setTipoVariavelContinua(const bool a_isAlocMode, const int a_posicao) {
+    bool setTipoVariavelContinua(const int a_posicao) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             vetorGRBVar.at(a_posicao).set(GRB_CharAttr_VType, GRB_CONTINUOUS);
             return true;
         }
@@ -528,9 +528,9 @@ public:
     }; // bool setTipoVariavelContinua(int a_posicao) {
 
 
-    bool setTipoVariavelBinaria(const bool a_isAlocMode, const int a_posicao) {
+    bool setTipoVariavelBinaria(const int a_posicao) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             vetorGRBVar.at(a_posicao).set(GRB_CharAttr_VType, GRB_BINARY);
             return true;
         }
@@ -692,9 +692,9 @@ public:
         }
     }
 
-    bool setCofRestricao(const bool a_isAlocMode, const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
+    bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             ptrModelo->chgCoeff(vetorGRBConstr.at(a_posicaoRestricao), vetorGRBVar.at(a_posicaoVariavel),
                                 a_cofRestricao);
             return true;
@@ -713,9 +713,9 @@ public:
     }; // bool setCofRestricao(int a_posicaoVariavel, int a_posicaoRestricao, double a_cofRestricao) {
 
 
-    bool setRHSRestricao(const bool a_isAlocMode, const int a_posicaoRestricao, const double a_RHS) {
+    bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             vetorGRBConstr.at(a_posicaoRestricao).set(GRB_DoubleAttr_RHS, a_RHS);
             return true;
         }
@@ -773,9 +773,9 @@ public:
         }
     }; // double getRHSRestricao(int a_posicaoRestricao) {
 
-    bool addVarDinamica(const bool a_isAlocMode, const int a_posicaoVariavel) {
+    bool addVarDinamica(const int a_posicaoVariavel) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             if (vetorGRBVar.size() > a_posicaoVariavel) {
                 for (int i : lista_variavel_dinamica) {
                     if (i == a_posicaoVariavel)
@@ -2342,9 +2342,9 @@ public:
     }
 
 
-    bool setCofObjetivo(const bool a_isAlocMode, const int a_posicao, const double a_cofObjetivo) {
+    bool setCofObjetivo(const int a_posicao, const double a_cofObjetivo) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2397,9 +2397,9 @@ public:
     }
 
 
-    bool setLimInferior(const bool a_isAlocMode, const int a_posicao, const double a_limInferior) {
+    bool setLimInferior(const int a_posicao, const double a_limInferior) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2454,9 +2454,9 @@ public:
         }
     }
 
-    bool setLimSuperior(const bool a_isAlocMode, const int a_posicao, const double a_limSuperior) {
+    bool setLimSuperior(const int a_posicao, const double a_limSuperior) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2492,9 +2492,9 @@ public:
     }
 
 
-    bool setTipoVariavelContinua(const bool a_isAlocMode, const int a_posicao) {
+    bool setTipoVariavelContinua(const int a_posicao) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2522,10 +2522,10 @@ public:
         }
     }
 
-    bool setTipoVariavelBinaria(const bool a_isAlocMode, const int a_posicao) {
+    bool setTipoVariavelBinaria(const int a_posicao) {
         try {
 
-            if (a_isAlocMode) { return true; }
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2887,9 +2887,9 @@ public:
         }
     }
 
-    bool setCofRestricao(const bool a_isAlocMode, const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
+    bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2930,9 +2930,9 @@ public:
         }
     }
 
-    bool setRHSRestricao(const bool a_isAlocMode, const int a_posicaoRestricao, const double a_RHS) {
+    bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const double newRHS = (fabs(a_RHS) <= 1e-6) ? 0.0 : a_RHS;
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
@@ -3113,9 +3113,9 @@ public:
         }
     }
 
-    bool addVarDinamica(const bool a_isAlocMode, const int a_posicao) {
+    bool addVarDinamica(const int a_posicao) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
