@@ -1825,11 +1825,6 @@ void EntradaSaidaDados::imprimirConsolidacaoVerticalCSV(const std::string a_nome
 
 		std::ofstream escritaArquivo;
 
-		escritaArquivo.open(caminhoArquivo.c_str(), std::ios_base::out);
-
-		if (!escritaArquivo.is_open())
-			return;
-
 		std::vector<int> indice_arquivos_originais;
 		std::vector<std::ifstream> lista_escritaArquivo;
 
@@ -1855,8 +1850,12 @@ void EntradaSaidaDados::imprimirConsolidacaoVerticalCSV(const std::string a_nome
 
 		if (arquivos_nao_abertos.size() == a_lista_arquivos_originais.size())
 			return;
-		//else if (arquivos_nao_abertos.size() > 0)
-			//throw std::invalid_argument("Nao foi possivel abrir o arquivo " + a_lista_arquivos_originais.at(arquivos_nao_abertos.at(0)) + ".");
+
+
+		escritaArquivo.open(caminhoArquivo.c_str(), std::ios_base::out);
+
+		if (!escritaArquivo.is_open())
+			return;
 
 		std::string linha_inner;
 		for (int i = 0; i < int(lista_escritaArquivo.size()); i++) {
@@ -1871,7 +1870,8 @@ void EntradaSaidaDados::imprimirConsolidacaoVerticalCSV(const std::string a_nome
 				}
 				else {
 					strNormalizada(linha_inner);
-					escritaArquivo << linha_inner << std::endl;
+					if (linha_inner.size() > 0)
+						escritaArquivo << linha_inner << std::endl;
 				}
 			}
 		} // for (int i = 0; i < int(lista_escritaArquivo.size()); i++) {

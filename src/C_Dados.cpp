@@ -11154,7 +11154,9 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 			if ((tipo_processamento == TipoProcessamentoParalelo_por_abertura) && (cortes_multiplos != 1))
 				agrupar_aberturas.at(idEstagio) = 1;
 
-			periodos.at(idEstagio) = mapeamento_espaco_amostral.at(mapeamento_espaco_amostral.getIteradorInicial()).getIteradores(getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo())).at(0);
+			const std::vector<Periodo> periodos_lista = mapeamento_espaco_amostral.at(mapeamento_espaco_amostral.getIteradorInicial()).getIteradores(getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo()));
+
+			periodos.at(idEstagio) = periodos_lista.at(0);
 
 		} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 

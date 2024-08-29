@@ -5938,10 +5938,13 @@ double ModeloOtimizacao::getProbabilidadeAbertura(const IdEstagio a_idEstagio, c
 void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
 	try{
 
-		consolidarVariaveis(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);
-		consolidarEquacoes(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);
-		consolidarInequacoes(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);
+		if (a_idProcesso == IdProcesso_mestre) {
 
+			consolidarVariaveis(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);
+			consolidarEquacoes(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);
+			consolidarInequacoes(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);
+
+		}
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::consolidarVariaveis(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
 } // void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
@@ -5963,9 +5966,11 @@ void ModeloOtimizacao::consolidarVariaveis(const IdProcesso a_idProcesso, const 
 
 			a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS));
 
-			int numero_variaveis_consolidar = int(lista_VarDecisao_instanciadas.at(a_TSS).size()) / int(a_maiorIdProcesso);
+			//int numero_variaveis_consolidar = int(lista_VarDecisao_instanciadas.at(a_TSS).size()) / int(a_maiorIdProcesso);
+			int numero_variaveis_consolidar = int(lista_VarDecisao_instanciadas.at(a_TSS).size()) / int(a_idProcesso);
 
-			const int resto_variaveis_consolidar = int(lista_VarDecisao_instanciadas.at(a_TSS).size()) % int(a_maiorIdProcesso);
+			//const int resto_variaveis_consolidar = int(lista_VarDecisao_instanciadas.at(a_TSS).size()) % int(a_maiorIdProcesso);
+			const int resto_variaveis_consolidar = int(lista_VarDecisao_instanciadas.at(a_TSS).size()) % int(a_idProcesso);
 
 			int pos_inicial = -1;
 			int pos_final = -1;
@@ -6020,9 +6025,11 @@ void ModeloOtimizacao::consolidarEquacoes(const IdProcesso a_idProcesso, const I
 
 			a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS));
 
-			int numero_equacoes_consolidar = int(lista_EquLinear_instanciadas.at(a_TSS).size()) / int(a_maiorIdProcesso);
+			//int numero_equacoes_consolidar = int(lista_EquLinear_instanciadas.at(a_TSS).size()) / int(a_maiorIdProcesso);
+			int numero_equacoes_consolidar = int(lista_EquLinear_instanciadas.at(a_TSS).size()) / int(a_idProcesso);
 
-			const int resto_equacoes_consolidar = int(lista_EquLinear_instanciadas.at(a_TSS).size()) % int(a_maiorIdProcesso);
+			//const int resto_equacoes_consolidar = int(lista_EquLinear_instanciadas.at(a_TSS).size()) % int(a_maiorIdProcesso);
+			const int resto_equacoes_consolidar = int(lista_EquLinear_instanciadas.at(a_TSS).size()) % int(a_idProcesso);
 
 			int pos_inicial = -1;
 			int pos_final = -1;
@@ -6077,9 +6084,11 @@ void ModeloOtimizacao::consolidarInequacoes(const IdProcesso a_idProcesso, const
 
 			a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS));
 
-			int numero_inequacoes_consolidar = int(lista_IneLinear_instanciadas.at(a_TSS).size()) / int(a_maiorIdProcesso);
+			//int numero_inequacoes_consolidar = int(lista_IneLinear_instanciadas.at(a_TSS).size()) / int(a_maiorIdProcesso);
+			int numero_inequacoes_consolidar = int(lista_IneLinear_instanciadas.at(a_TSS).size()) / int(a_idProcesso);
 
-			const int resto_inequacoes_consolidar = int(lista_IneLinear_instanciadas.at(a_TSS).size()) % int(a_maiorIdProcesso);
+			//const int resto_inequacoes_consolidar = int(lista_IneLinear_instanciadas.at(a_TSS).size()) % int(a_maiorIdProcesso);
+			const int resto_inequacoes_consolidar = int(lista_IneLinear_instanciadas.at(a_TSS).size()) % int(a_idProcesso);
 
 			int pos_inicial = -1;
 			int pos_final = -1;

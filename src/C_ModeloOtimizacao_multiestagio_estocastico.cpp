@@ -65,9 +65,19 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 					vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, 0);
 				else
 					vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, getAtributo(AttComumModeloOtimizacao_selecao_cortes_nivel_dominancia, int()));
-
-				if (strCompara(getAtributo(AttComumModeloOtimizacao_diretorio_importacao_cortes, std::string()), "nenhum"))
-					vetorEstagio.at(idEstagio).vetorCorteBenders.alocar(getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()));
+				
+				if ((idEstagio > estagio_inicial) || (estagio_inicial != IdEstagio_1)) {
+					if (strCompara(getAtributo(AttComumModeloOtimizacao_diretorio_importacao_cortes, std::string()), "nenhum")) {
+						if (idEstagio > estagio_inicial) {
+							if (arranjoResolucao.isAnyCenarioEstado(IdEstagio(idEstagio - 1)) || arranjoResolucao.isAnyAberturas(IdEstagio(idEstagio - 1)))
+								vetorEstagio.at(idEstagio).vetorCorteBenders.alocar(getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()));
+						}
+						else {
+							if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio))
+								vetorEstagio.at(idEstagio).vetorCorteBenders.alocar(getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()));
+						}
+					}
+				} // if ((idEstagio > estagio_inicial) || (estagio_inicial != IdEstagio_1)) {
 
 				for (Periodo periodo = horizonte_estudo_original.getIteradorInicial(); periodo <= horizonte_estudo_original.getIteradorFinal(); horizonte_estudo_original.incrementarIterador(periodo)) {
 					if (horizonte_estudo_original.at(periodo) == idEstagio)
@@ -79,9 +89,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 		} // if (true) {
 
-		//
-		// Identificação do menor_periodo_estagio_acoplamento_pre_estudo
-		//
 
 		Periodo periodo_acoplamento;
 		if (idEstagio_acoplamento > estagio_final) {
@@ -147,8 +154,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 			} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
-			setVetor(AttVetorModeloOtimizacao_horizonte_estudo, horizonte_estudo);
-
 			setMatriz(AttMatrizModeloOtimizacao_horizonte_estudo, horizonte_estudo_por_estagio);
 			setMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, horizonte_processo_estocastico_hidrologico_por_estagio);
 
@@ -161,8 +166,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 			setVetor(AttVetorModeloOtimizacao_tratamento_inviabilidade, SmartEnupla<IdEstagio, int>(estagio_inicial, std::vector<int>(int(estagio_final) - int(estagio_inicial) + 1, 2)));
 
 			setMatriz(AttMatrizModeloOtimizacao_custo_medio, custo_medio);
-
-			setMatriz(AttMatrizModeloOtimizacao_percentual_duracao_patamar_carga, horizon);
 
 		} // if (true) {
 
@@ -233,7 +236,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(const SmartEnupla<IdEstagio, std
 		for (IdEstagio idEstagio = a_idEstagioIni; idEstagio <= a_idEstagioEnd; idEstagio++) {
 
 			if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio)) {
-			//if (true){
 
 				const SmartEnupla<Periodo, int> horizonSP = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo(), int());
 				const SmartEnupla<Periodo, double> horizon_stage = a_dados.getElementosMatriz(AttMatrizDados_percentual_duracao_horizonte_estudo, idEstagio, Periodo(), double());
