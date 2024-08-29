@@ -98,10 +98,14 @@ public:
 
 	void imprimirConsolidacaoHorizontalCSV(const std::string a_nome_arquivo_resultante, const std::vector<std::string>& a_lista_arquivos_originais, const int a_numero_colunas_suprimir, const bool a_apagar_arquivos_originais)const;
 
+	void imprimirConsolidacaoVerticalCSV(const std::string a_nome_arquivo_resultante, const std::vector<std::string>& a_lista_arquivos_originais, const bool a_apagar_arquivos_originais, const bool a_remover_cabecalho) const;
+
+
 	std::string sequenciarNomeArquivoImpressao(const std::string a_nome_arquivo, const std::string a_extensao, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso);
 
 	void imprimirArquivoCSV_SmartEnupla(const std::string a_nomeArquivo, const std::vector<std::vector<std::string>>& a_matriz_string)const;
 	void imprimirArquivoCSV_SmartEnupla(const std::string a_nomeArquivo, const std::vector<std::vector<std::string>>& a_matriz_string, const bool a_incluir_cabecalho)const;
+	void imprimirArquivoCSV(const std::string a_nomeArquivo, const std::vector<std::string>& a_matriz_string, const bool a_incluir_cabecalho)const;
 
 	// AttComum 
 

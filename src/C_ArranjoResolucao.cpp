@@ -77,6 +77,25 @@ bool ArranjoResolucao::isIdsCenarioEstadoDiferentesEmAberturasAndCenarios(const 
 	catch (const std::exception& erro) { throw std::invalid_argument("ArranjoResolucao::isIdsCenarioEstadoDiferentesEmAberturasAndCenarios(" + getFullString(a_idIteracao) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
 }
 
+bool ArranjoResolucao::isAnyCenarioEstado(const IdEstagio a_idEstagio){
+	try {
+
+		const IdIteracao idIterIni = getMenorId(IdIteracao());
+		const IdIteracao idIterEnd = getMaiorId(IdIteracao());
+
+		const IdProcesso idProcesso = getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+
+		for (IdIteracao idIter = idIterIni; idIter <= idIterEnd; idIter++) {
+			if (getIdsCenarioEstadoFromCenarios(idProcesso, idIter, a_idEstagio).size() > 0)
+				return true;
+		}
+
+		return false;
+	}
+	catch (const std::exception& erro) { throw std::invalid_argument("ArranjoResolucao::isIdsCenarioEstadoDiferentesEmAberturasAndCenarios(" + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
+
+}
+
 std::vector<IdCenario> ArranjoResolucao::getIdsCenarioEstadoFromCenarios(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio){
 	try {
 
@@ -264,6 +283,27 @@ std::vector<IdCenario> ArranjoResolucao::getIdsCenarioEstado(const IdProcesso a_
 	catch (const std::exception& erro) { throw std::invalid_argument("ArranjoResolucao::getIdsCenarioEstado(" + getFullString(a_idProcessoDE) + "," + getFullString(a_idProcessoPARA) + "," + getFullString(a_idIteracao) + "): \n" + std::string(erro.what())); }
 }
 
+bool ArranjoResolucao::isAnyAberturas(const IdEstagio a_idEstagio){
+
+	try{
+
+		const IdIteracao idIterIni = getMenorId(IdIteracao());
+		const IdIteracao idIterEnd = getMaiorId(IdIteracao());
+
+		const IdProcesso idProcesso = getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+
+		for (IdIteracao idIter = idIterIni; idIter <= idIterEnd; idIter++) {
+			if (getNumeroAberturas(idProcesso, idIter, a_idEstagio) > 0)
+				return true;
+		}
+
+		return false;
+	
+	}
+	catch (const std::exception& erro) { throw std::invalid_argument("ArranjoResolucao::isAnyAberturas(" + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
+
+}
+
 int ArranjoResolucao::getNumeroAberturas(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio) {
 	try {
 
@@ -283,11 +323,9 @@ int ArranjoResolucao::getNumeroAberturas(const IdProcesso a_idProcesso, const Id
 
 			} // for (IdCenario idCenario_estado = menor_idCenario_estado; idCenario_estado <= maior_idCenario_estado; idCenario_estado++) {
 
-			return 0;
-
 		} // if (getSize1Matriz(a_idIteracao, a_idProcessoPARA, AttMatrizProcesso_menor_abertura_por_cenario_estado) > 0) {
 
-		throw std::invalid_argument("Erro");
+		return 0;
 	}
 
 	catch (const std::exception& erro) { throw std::invalid_argument("ArranjoResolucao::getNumeroAberturas(" + getFullString(a_idProcesso) + "," + getFullString(a_idIteracao) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }

@@ -54,7 +54,8 @@ private:
 	
 	void executarPSD(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, ModeloOtimizacao& a_modeloOtimizacao);
 		
-	void executarPDDE_atualizarCustoSuperior(const IdIteracao a_idIteracao, const SmartEnupla<IdEstagio, std::vector<double>>& a_custo_superior, ModeloOtimizacao &a_modeloOtimizacao);
+	void executarPDDE_atualizarCustoSuperior_FW(const IdIteracao a_idIteracao, const IdEstagio a_idEstagioEnd_fw, const SmartEnupla<IdEstagio, std::vector<double>>& a_custo_superior, ModeloOtimizacao &a_modeloOtimizacao);
+	void executarPDDE_atualizarCustoSuperior_BW(const IdIteracao a_idIteracao, const SmartEnupla<IdEstagio, std::vector<double>>& a_custo_superior, ModeloOtimizacao &a_modeloOtimizacao);
 	void executarPDDE_atualizarCustoInferior(const IdIteracao a_idIteracao, const SmartEnupla<IdEstagio, std::vector<double>>& a_custo_inferior, ModeloOtimizacao &a_modeloOtimizacao);
 
 	void executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaidaDados, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, ModeloOtimizacao &a_modeloOtimizacao);

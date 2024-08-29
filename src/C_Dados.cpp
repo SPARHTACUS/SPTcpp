@@ -173,29 +173,6 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		validacao_operacional_Dados(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 
-		SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
-
-		Periodo periodo8 = Periodo(19, 8, 2023);
-		Periodo periodo7 = Periodo(21, 8, 2023);
-		Periodo periodo6 = Periodo(20, 8, 2023);
-		Periodo periodo5 = Periodo(18, 8, 2023);
-		Periodo periodo4 = Periodo(24, 8, 2023);
-		Periodo periodo3 = Periodo(25, 8, 2023);
-		Periodo periodo2 = Periodo(23, 8, 2023);
-		Periodo periodo1 = Periodo(22, 8, 2023);
-
-		horizonte_estudo.addElemento(periodo1, IdEstagio_381);
-		horizonte_estudo.addElemento(periodo2, IdEstagio_382);
-		horizonte_estudo.addElemento(periodo3, IdEstagio_383);
-		horizonte_estudo.addElemento(periodo4, IdEstagio_384);
-		horizonte_estudo.addElemento(periodo5, IdEstagio_385);
-		horizonte_estudo.addElemento(periodo6, IdEstagio_386);
-		horizonte_estudo.addElemento(periodo7, IdEstagio_387);
-		horizonte_estudo.addElemento(periodo8, IdEstagio_388);
-
-
-
-
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		//
 		//                                                                        Carregar Arquivos de Submercado
@@ -4042,7 +4019,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 		const int numIdHidrPorProcesso = vetorHidreletrica.numObjetos() / numProcessos;
 
 
-		//MAIOR ID TERMELETRICA
+		//MAIOR ID HIDRELETRICA
 		int numIdHidr_before = 0;
 		for (IdProcesso idProcesso_comp = IdProcesso_mestre; idProcesso_comp < idProcesso; idProcesso_comp++) {
 			numIdHidr_before += numIdHidrPorProcesso;
@@ -4689,8 +4666,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				// 
 
 				if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_defluente_minima) == 0) {
-					vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_defluente_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_defluente_minima, double())));
-					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = sim_operacional;
+					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = nao_sem_utilizacao;
 				}
 				else
 					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = nao_operacional_informado;
@@ -4704,8 +4680,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				// 
 
 				if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_defluente_maxima) == 0) {
-					vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_defluente_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_defluente_maxima, double())));
-					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = sim_operacional;
+					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = nao_sem_utilizacao;
 				}
 				else
 					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = nao_operacional_informado;
@@ -11179,7 +11154,9 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 			if ((tipo_processamento == TipoProcessamentoParalelo_por_abertura) && (cortes_multiplos != 1))
 				agrupar_aberturas.at(idEstagio) = 1;
 
-			periodos.at(idEstagio) = mapeamento_espaco_amostral.at(mapeamento_espaco_amostral.getIteradorInicial()).getIteradores(getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo())).at(0);
+			const std::vector<Periodo> periodos_lista = mapeamento_espaco_amostral.at(mapeamento_espaco_amostral.getIteradorInicial()).getIteradores(getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo()));
+
+			periodos.at(idEstagio) = periodos_lista.at(0);
 
 		} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
@@ -11212,6 +11189,8 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 						for (IdCenario idCenario_iteracao = menor_cenario_iteracao_local; idCenario_iteracao <= maior_cenario_iteracao_local; idCenario_iteracao++) {
 
+							const SmartEnupla<Periodo, IdRealizacao> mapeamento_espaco_amostral_idCenario_iteracao = mapeamento_espaco_amostral.at(idCenario_iteracao);
+
 							IdCenario idCenario_mesmo_passado = IdCenario_Excedente;
 							IdCenario idCenario_mesma_trajetoria = IdCenario_Excedente;
 
@@ -11224,9 +11203,10 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 								for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
 									if (arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()) != IdCenario_Nenhum) {
 										for (IdCenario idCenario = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()); idCenario <= arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario()); idCenario++) {
+											const SmartEnupla<Periodo, IdRealizacao> mapeamento_espaco_amostral_idCenario = mapeamento_espaco_amostral.at(idCenario);
 											for (IdEstagio idEstagio_past = estagio_inicial; idEstagio_past <= idEstagio; idEstagio_past++) {
-												if (IdAbertura(mapeamento_espaco_amostral.at(idCenario_iteracao).at_rIt(periodos.at(idEstagio_past))) !=
-													IdAbertura(mapeamento_espaco_amostral.at(idCenario).at_rIt(periodos.at(idEstagio_past))))
+												if (IdAbertura(mapeamento_espaco_amostral_idCenario_iteracao.at_rIt(periodos.at(idEstagio_past))) !=
+													IdAbertura(mapeamento_espaco_amostral_idCenario.at_rIt(periodos.at(idEstagio_past))))
 													break;
 												else if ((idEstagio_past == IdEstagio(idEstagio - 1)) && (idCenario < idCenario_mesmo_passado))
 													idCenario_mesmo_passado = idCenario;
@@ -11270,16 +11250,21 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 						arranjoResolucao.vetorIteracao.at(idIteracao).vetorProcesso.at(idProcesso).setMatriz_forced(AttMatrizProcesso_cenario_estado_por_cenario, SmartEnupla<IdCenario, SmartEnupla<IdEstagio, IdCenario>>(menor_cenario_iteracao, std::vector<SmartEnupla<IdEstagio, IdCenario>>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, enupla_inicial)));
 
-						const int tamanho = (int(estagio_final - estagio_inicial) + 1) * (int(maior_cenario_iteracao - menor_cenario_iteracao) + 1);
+						std::vector<int> valores_recv;
 
-						std::vector<int> valores_recv(tamanho, 0);
-
-						if (idProcesso != idProcesso_local)
-							MPI_Recv(&valores_recv[0], tamanho, MPI_INT, getRank(idProcesso), getRank(idProcesso_local), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+						if (idProcesso != idProcesso_local) {
+							int vlr_size_rcv = 0;
+							MPI_Recv(&vlr_size_rcv, 1, MPI_INT, getRank(idProcesso), 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+							valores_recv = std::vector<int>(vlr_size_rcv, 0);
+							MPI_Recv(&valores_recv[0], vlr_size_rcv, MPI_INT, getRank(idProcesso), 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+						}
 						else {
 							for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
-								if (idProcesso_aux != idProcesso_local)
-									MPI_Send(&valores[0], int(valores.size()), MPI_INT, getRank(idProcesso_aux), getRank(idProcesso_aux), MPI_COMM_WORLD);
+								if (idProcesso_aux != idProcesso_local) {
+									int vlr_size = int(valores.size());
+									MPI_Send(&vlr_size, 1, MPI_INT, getRank(idProcesso_aux), 1, MPI_COMM_WORLD);
+									MPI_Send(&valores[0], int(valores.size()), MPI_INT, getRank(idProcesso_aux), 2, MPI_COMM_WORLD);
+								}
 							}
 							valores_recv = valores;
 						}

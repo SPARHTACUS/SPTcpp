@@ -76,6 +76,11 @@ friend class LeituraCEPEL;\
 		} \
 		return numCont; \
 	};\
+	Id##Membro getIdOut()const{ \
+		if (maiorId > Id##Membro##_Nenhum)\
+			return Id##Membro(maiorId + 1);\
+		return maiorId;\
+	};\
 	Id##Membro getMaiorId()const{ return maiorId; };\
 	Id##Membro getMenorId()const{ return menorId; };\
 	std::vector<Id##Membro> getIdObjetos()const { \
@@ -90,6 +95,10 @@ friend class LeituraCEPEL;\
 		return vetorIdMembro; \
 	};\
 	void incr(Id##Membro &a_id)const{\
+		if (maiorId == Id##Membro(0)){\
+			a_id = Id##Membro##_Excedente; \
+			return;\
+		}\
 		Id##Membro idInicial = Id##Membro(int(a_id) + 1); \
 		if (idInicial < menorId) \
 			idInicial = menorId; \
@@ -816,6 +825,10 @@ Id##Membro getMaiorId(const Id##Membro a_m1)const{ \
 	try { return vetor##Membro.getMaiorId(); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMaiorId(" + getString(a_m1) + "): \n" + std::string(erro.what())); } \
 };\
+Id##Membro getIdOut(const Id##Membro a_m1)const{ \
+	try { return vetor##Membro.getIdOut(); } \
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIdOut(" + getString(a_m1) + "): \n" + std::string(erro.what())); } \
+};\
 void incr(Id##Membro &a_m1)const{ \
 	try { vetor##Membro.incr(a_m1); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::incr(" + getString(a_m1) + "): \n" + std::string(erro.what())); } \
@@ -866,6 +879,11 @@ template<typename IdM2> \
 IdM2 getMaiorId(const Id##Membro a_m1, const IdM2 a_m2){ \
 	try { return vetor##Membro.at(a_m1).getMaiorId(a_m2); } \
 	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getMaiorId(" + getString(a_m1) + "," + getString(a_m2) + "): \n" + std::string(erro.what())); } \
+};\
+template<typename IdM2> \
+IdM2 getIdOut(const Id##Membro a_m1, const IdM2 a_m2){ \
+	try { return vetor##Membro.at(a_m1).getIdOut(a_m2); } \
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::getIdOut(" + getString(a_m1) + "," + getString(a_m2) + "): \n" + std::string(erro.what())); } \
 };\
 template<typename IdM2> \
 void incr(const Id##Membro a_m1, IdM2 &a_m2){ \

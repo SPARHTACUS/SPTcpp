@@ -80,6 +80,7 @@ int main(int argc, char *argv[]) {
 	std::string nick_estudo = "";
 	std::string deck_cepel  = "";
 
+	bool pause_initiation = false;
 	bool encerrar_apos_deck_cepel = false;
 
 	if (argc > 1) {
@@ -101,6 +102,11 @@ int main(int argc, char *argv[]) {
 		if (indice > 0) {
 			if (std::atoi(argv[indice + 1]) > 0)
 				encerrar_apos_deck_cepel = true;
+		}
+		indice = getIndiceArgumento("-pause", argc, argv);
+		if (indice > 0) {
+			if (std::atoi(argv[indice + 1]) > 0)
+				pause_initiation = true;
 		}
 		else if (indice < 0)
 			encerrar_sessao = true;
@@ -124,6 +130,10 @@ int main(int argc, char *argv[]) {
 	const std::string PWF_status = "PWF" + nick_estudo + "_status.txt";
 
 	try {
+
+		if ((idProcesso == IdProcesso_mestre) && pause_initiation)
+			std::system("pause");
+
 
 		//
 		// Inicialização de arquivo de Status.
@@ -155,9 +165,6 @@ int main(int argc, char *argv[]) {
 		} // if (deck_cepel != "") {
 
 		if (!encerrar_apos_deck_cepel) {
-
-			//if (idProcesso == IdProcesso_mestre)
-				//std::system("pause");
 
 			MPI_Barrier(MPI_COMM_WORLD);
 

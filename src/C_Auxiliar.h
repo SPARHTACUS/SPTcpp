@@ -127,6 +127,16 @@ static int findStringNoVetorReturnPos(const std::string a_string, const std::vec
 
 } // static bool findStringNoVetorReturnPos(const std::string a_string, const std::vector<std::string> &a_vetor) {
 
+static int findStringSensNoVetorReturnPos(const std::string a_string, const std::vector<std::string>& a_vetor) {
+
+	for (int i = int(a_vetor.size() - 1); i >= 0; i--) {
+		if (a_string == a_vetor.at(i))
+			return i;
+	} // for (int i = int(a_vetor.size() - 1); i >= 0; i--) {
+
+	return -1;
+
+} // static bool findStringNoVetorReturnPos(const std::string a_string, const std::vector<std::string> &a_vetor) {
 
 static std::vector<bool> findStringsNoVetor(const std::vector<std::string> a_strings, const std::vector<std::string> &a_vetor) {
 
@@ -295,6 +305,7 @@ static std::string getString(const std::string a_string) { return a_string; }
 
 static std::string getString(const double* a_valor) { return std::string("double*"); }
 
+static std::string getString(const std::vector<std::string> a_vetor) { return std::string("vector<string>"); }
 static std::string getString(const std::vector<int> a_vetor) { return std::string("vector<int>"); }
 static std::string getString(const std::vector<double> a_vetor) { return std::string("vector<double>"); }
 static std::string getString(const std::vector<std::vector<double>> a_vetor) { return std::string("vector<vector<double>>"); }
