@@ -2940,9 +2940,10 @@ bool LeituraCEPEL::aplicarModificacaoJUSENA(Dados& a_dados, const IdHidreletrica
 		if (a_modificacaoUHE.tipo_de_modificacao != TipoModificacaoUHE_JUSENA)
 			throw std::invalid_argument("Modificacao nao compativel com metodo.");
 
-		const int codigo_usina_jusante_JUSENA = int(a_modificacaoUHE.valor_1);
+		const int codigo_usina_JUSENA = int(a_modificacaoUHE.valor_1);
+		const IdHidreletrica idHidreletricaJusante_JUSENA = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina_JUSENA);
 
-		a_dados.vetorHidreletrica.at(a_idHidreletrica).setAtributo(AttComumHidreletrica_codigo_usina_jusante_JUSENA, codigo_usina_jusante_JUSENA);
+		a_dados.vetorHidreletrica.at(a_idHidreletrica).setAtributo(AttComumHidreletrica_jusante_JUSENA, idHidreletricaJusante_JUSENA);
 
 		return true;
 
@@ -3981,6 +3982,7 @@ void LeituraCEPEL::instanciar_hidreletricas_sem_producao_para_acoplamento_cortes
 
 		}//if (!a_dados.vetorHidreletrica.at(a_idHidreletrica).vetorReservatorio.isInstanciado(IdReservatorio_1)) {
 
+		
 		if (a_dados.getSizeVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_evaporacao) == 0) {
 			for (IdMes idMes = IdMes_1; idMes <= IdMes_12; idMes++)
 				a_dados.vetorHidreletrica.at(a_idHidreletrica).vetorReservatorio.at(IdReservatorio_1).addElemento(AttVetorReservatorio_evaporacao, idMes, 0.0);
@@ -4021,7 +4023,7 @@ void LeituraCEPEL::instanciar_hidreletricas_sem_producao_para_acoplamento_cortes
 
 		if (a_dados.getSizeVetor(a_idHidreletrica, AttVetorHidreletrica_regularizacao) == 0)
 			a_dados.vetorHidreletrica.at(a_idHidreletrica).setVetor(AttVetorHidreletrica_regularizacao, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
-
+		
 
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_hidreletricas_sem_producao_para_acoplamento_cortes_NW: \n" + std::string(erro.what())); }
@@ -5588,52 +5590,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 
 }
 
-void LeituraCEPEL::instanciar_codigo_usina_jusante_JUSENA(Dados& a_dados)
-{
-	try {
-
-		const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
-		const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
-
-		for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-
-			/////////////////////////////////
-			bool is_registro_JUSENA = false;
-
-			if (lista_modificacaoUHE.size() > int(idHidreletrica)) {//Pode ter usinas do MP que não existem no CP
-
-				for (int idModificacaoUHE = 0; idModificacaoUHE < lista_modificacaoUHE.at(idHidreletrica).size(); idModificacaoUHE++) {
-
-					if (lista_modificacaoUHE.at(idHidreletrica).at(idModificacaoUHE).tipo_de_modificacao == TipoModificacaoUHE_JUSENA) {
-						is_registro_JUSENA = true;
-						break;
-					}//if (lista_modificacaoUHE.at(idHidreletrica).at(idModificacaoUHE).tipo_de_modificacao == TipoModificacaoUHE_JUSENA) {
-
-				}//for (int idModificacaoUHE = 0; idModificacaoUHE < lista_modificacaoUHE.at(idHidreletrica).size(); idModificacaoUHE++) {
-
-			}//if (lista_modificacaoUHE.size() > int(idHidreletrica)) {
-
-			/////////////////////////////////
-
-			if (!is_registro_JUSENA) {//Somente atualiza para usinas que não tem registro JUSENA (já o codigo_usina_jusante_JUSENA foi atualizado previamente)
-
-				const IdHidreletrica idHidreletrica_jusante = a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_jusante, IdHidreletrica());
-
-				int codigo_usina_jusante_JUSENA = 0;
-
-				if (idHidreletrica_jusante != IdHidreletrica_Nenhum)
-					codigo_usina_jusante_JUSENA = a_dados.vetorHidreletrica.at(idHidreletrica_jusante).getAtributo(AttComumHidreletrica_codigo_usina, int());
-
-				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_usina_jusante_JUSENA, codigo_usina_jusante_JUSENA);
-			}//if (!is_registro_JUSENA) {
-
-		}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-
-	}//	try {
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_codigo_usina_jusante_JUSENA: \n" + std::string(erro.what())); }
-
-}
-
 double LeituraCEPEL::get_cota_para_conversao_cortes_NEWAVE(Hidreletrica& a_hidreletrica, const SmartEnupla<Periodo, bool> a_horizonte_alvo, const Periodo a_periodo, const double a_percentual_volume_util, const bool a_is_calculo_para_ENA)
 {
 	try {
@@ -5695,284 +5651,6 @@ double LeituraCEPEL::get_produtibilidade_para_conversao_cortes_NEWAVE(Hidreletri
 
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::get_produtibilidade_para_conversao_cortes_NEWAVE: \n" + std::string(erro.what())); }
-
-}
-
-void LeituraCEPEL::set_atributos_hidreletrica_from_CadUsH_csv(Dados& a_dados, std::string a_nomeArquivo, const int a_codigo_usina)
-{
-	try {
-
-		int pos;
-		std::string line;
-		std::string atributo;
-
-		std::ifstream leituraArquivo(a_nomeArquivo);
-
-		////////////////////////////////////////////////////
-
-		IdHidreletrica idHidreletrica = IdHidreletrica_Nenhum;
-
-		const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
-		const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
-
-		for (IdHidreletrica idHidreletrica_aux = idHidreletricaIni; idHidreletrica_aux < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica_aux)) {
-
-			if (a_dados.vetorHidreletrica.at(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_usina, int()) == a_codigo_usina) {
-				idHidreletrica = idHidreletrica_aux;
-				break;
-
-			}//if (a_dados.vetorHidreletrica.at(idHidreletrica_aux).getAtributo(AttComumHidreletrica_codigo_usina, int()) == a_codigo_usina) {
-
-		}//for (IdHidreletrica idHidreletrica_aux = idHidreletricaIni; idHidreletrica_aux < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica_aux)) {
-
-		if (idHidreletrica == IdHidreletrica_Nenhum)
-			throw std::invalid_argument("Nao instanciada hidreletrica com codigo_usina: " + getString(a_codigo_usina));
-
-		////////////////////////////////////////////////////
-
-		int registro_CodUsina = -1;
-		int registro_nomeUsina = -1;
-		int registro_Jusante = -1;
-		int registro_VolMax = -1;
-		int registro_VolMin = -1;
-		int registro_poli_cota_volume_0 = -1;
-		int registro_poli_cota_volume_1 = -1;
-		int registro_poli_cota_volume_2 = -1;
-		int registro_poli_cota_volume_3 = -1;
-		int registro_poli_cota_volume_4 = -1;
-		int registro_produtibilidade_especifica = -1;
-		int registro_canal_fuga_medio = -1;
-		int registro_tipo_perdas = -1;
-		int registro_valor_perdas = -1;
-		int registro_volume_referencia = -1;
-		int registro_regularizacao = -1;
-
-		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
-
-		if (leituraArquivo.is_open()) {
-
-			//Cabeçalho
-			std::getline(leituraArquivo, line);
-
-			int registro = 0;
-
-			while (line.size() > 0) {
-				pos = int(line.find(';'));
-				atributo = line.substr(0, pos).c_str();
-				atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-				if (atributo == "CodUsina")
-					registro_CodUsina = registro;
-
-				if (atributo == "Usina")
-					registro_nomeUsina = registro;
-
-				if (atributo == "Jusante")
-					registro_Jusante = registro;
-
-				if (atributo == "Vol.Máx.(hm3)")
-					registro_VolMax = registro;
-
-				if (atributo == "Vol.min.(hm3)")
-					registro_VolMin = registro;
-
-				if (atributo == "PCV(0)")
-					registro_poli_cota_volume_0 = registro;
-
-				if (atributo == "PCV(1)")
-					registro_poli_cota_volume_1 = registro;
-
-				if (atributo == "PCV(2)")
-					registro_poli_cota_volume_2 = registro;
-
-				if (atributo == "PCV(3)")
-					registro_poli_cota_volume_3 = registro;
-
-				if (atributo == "PCV(4)")
-					registro_poli_cota_volume_4 = registro;
-
-				if (atributo == "Prod.Esp.(MW/m3/s/m)")
-					registro_produtibilidade_especifica = registro;
-
-				if (atributo == "CanalFugaMédio(m)")
-					registro_canal_fuga_medio = registro;
-
-				if (atributo == "TipoPerdas(1=%/2=M/3=K)")
-					registro_tipo_perdas = registro;
-
-				if (atributo == "ValorPerdas")
-					registro_valor_perdas = registro;
-
-				if (atributo == "Vol.Ref.")
-					registro_volume_referencia = registro;
-
-				if (atributo == "Reg")
-					registro_regularizacao = registro;
-
-				line = line.substr(pos + 1, int(line.length()));
-				registro++;
-
-			}//while (line.size() > 0) {
-
-			if (registro_CodUsina == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para CodUsina \n"); }
-			if (registro_nomeUsina == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para nomeUsina \n"); }
-			if (registro_Jusante == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para Jusante \n"); }
-			if (registro_VolMax == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para VolMax \n"); }
-			if (registro_VolMin == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para VolMin \n"); }
-			if (registro_poli_cota_volume_0 == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_0 \n"); }
-			if (registro_poli_cota_volume_1 == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_1 \n"); }
-			if (registro_poli_cota_volume_2 == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_2 \n"); }
-			if (registro_poli_cota_volume_3 == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_3 \n"); }
-			if (registro_poli_cota_volume_4 == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para poli_cota_volume_4 \n"); }
-			if (registro_produtibilidade_especifica == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para produtibilidade_especifica \n"); }
-			if (registro_canal_fuga_medio == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para canal_fuga_medio \n"); }
-			if (registro_tipo_perdas == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para tipo_perdas \n"); }
-			if (registro_valor_perdas == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para valor_perdas \n"); }
-			if (registro_volume_referencia == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para volume_referencia \n"); }
-			if (registro_regularizacao == -1) { throw std::invalid_argument("Nao encontrado posicao de registro para regularizacao \n"); }
-
-
-			while (std::getline(leituraArquivo, line)) {
-
-				int registro = 0;
-
-				strNormalizada(line);
-
-				if (registro == registro_CodUsina) {
-
-					pos = int(line.find(';'));
-					atributo = line.substr(0, pos).c_str();
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-					line = line.substr(pos + 1, int(line.length()));
-
-					const int codigo_usina = std::atoi(atributo.c_str());
-
-					registro++;
-
-					if (codigo_usina == a_codigo_usina) {
-
-						while (int(line.length()) > 0) {
-
-							pos = int(line.find(';'));
-							atributo = line.substr(0, pos).c_str();
-							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-							line = line.substr(pos + 1, int(line.length()));
-
-							if (registro == registro_nomeUsina) {
-								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_nome, atributo);
-							}
-							else if (registro == registro_Jusante) {
-
-								pos = int(atributo.find('-'));
-								const int codigo_jusante = std::atoi(atributo.substr(0, pos).c_str());
-
-								const IdHidreletrica idHidreletricaJusante = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_jusante);
-								if (idHidreletricaJusante != IdHidreletrica_Nenhum) {
-
-									if (codigo_usina != 176)	//176-COMP PAF-MOX deve ficar isolada do sistema no BH do problema de CP (não aponta para nenhuma outra usina, os cálculos de produtibilidade_ENA e produtibilida_EAR são realizado por meio do codigo_usina_jusante_JUSENA)								
-										a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_jusante, idHidreletricaJusante);
-
-									a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_usina_jusante_JUSENA, codigo_jusante); //Para fazer cálculo da produtibilidade_EAR
-
-								}
-
-							}
-							else if (registro == registro_VolMax) {
-								const double volume_maximo = std::atof(atributo.c_str());
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_maximo, volume_maximo);
-							}
-							else if (registro == registro_VolMin) {
-								const double volume_minimo = std::atof(atributo.c_str());
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_maximo, volume_minimo);
-							}
-							else if (registro == registro_poli_cota_volume_0) {
-								const double poli_cota_volume_0 = std::atof(atributo.c_str());
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_0, poli_cota_volume_0);
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_0, SmartEnupla<Periodo, double>(horizonte_estudo, poli_cota_volume_0));
-							}
-							else if (registro == registro_poli_cota_volume_1) {
-								const double poli_cota_volume_1 = std::atof(atributo.c_str());
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_1, poli_cota_volume_1);
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_1, SmartEnupla<Periodo, double>(horizonte_estudo, poli_cota_volume_1));
-							}
-							else if (registro == registro_poli_cota_volume_2) {
-								const double poli_cota_volume_2 = std::atof(atributo.c_str());
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_2, poli_cota_volume_2);
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_2, SmartEnupla<Periodo, double>(horizonte_estudo, poli_cota_volume_2));
-
-							}
-							else if (registro == registro_poli_cota_volume_3) {
-								const double poli_cota_volume_3 = std::atof(atributo.c_str());
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_3, poli_cota_volume_3);
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_3, SmartEnupla<Periodo, double>(horizonte_estudo, poli_cota_volume_3));
-
-							}
-							else if (registro == registro_poli_cota_volume_4) {
-								const double poli_cota_volume_4 = std::atof(atributo.c_str());
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_4, poli_cota_volume_4);
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_4, SmartEnupla<Periodo, double>(horizonte_estudo, poli_cota_volume_4));
-
-							}
-							else if (registro == registro_produtibilidade_especifica) {
-								const double fator_de_producao = std::atof(atributo.c_str());
-								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_fator_de_producao, fator_de_producao);
-							}
-							else if (registro == registro_canal_fuga_medio) {
-								const double canal_fuga_medio = std::atof(atributo.c_str());
-								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_canal_fuga_medio, canal_fuga_medio);
-								a_dados.vetorHidreletrica.at(idHidreletrica).setVetor(AttVetorHidreletrica_canal_fuga_medio, SmartEnupla<Periodo, double>(horizonte_estudo, canal_fuga_medio));
-
-							}
-							else if (registro == registro_tipo_perdas) {
-
-								TipoPerdaHidraulica tipo_de_perda_hidraulica = TipoPerdaHidraulica_Nenhum;
-
-								if (atributo == "1") { tipo_de_perda_hidraulica = TipoPerdaHidraulica_percentual; }
-								else if (atributo == "2") { tipo_de_perda_hidraulica = TipoPerdaHidraulica_metro; }
-
-								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_de_perda_hidraulica, tipo_de_perda_hidraulica);
-							}
-							else if (registro == registro_valor_perdas) {
-								double perda_hidraulica = std::atof(atributo.c_str());
-
-								if (a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_de_perda_hidraulica, TipoPerdaHidraulica()) == TipoPerdaHidraulica_percentual)
-									perda_hidraulica /= 100;
-
-								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_perda_hidraulica, perda_hidraulica);
-							}
-							else if (registro == registro_volume_referencia) {
-								const double volume_referencia = std::atof(atributo.c_str());
-								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_volume_referencia, volume_referencia);
-							}
-							else if (registro == registro_regularizacao) {
-
-								if (atributo == "M") { a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_mensal); }
-								else if (atributo == "S") { a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_semanal); }
-								else if (atributo == "D") { a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_diaria); }
-								else { throw std::invalid_argument("Nao identificado tipo_regularizacao: " + atributo); }
-
-							}
-
-							registro++;
-
-						}//while (int(line.length()) > 0) {
-
-					}//if (codigo_usina == codigo_usina_jusante_JUSENA) {
-
-				}//if registro == registro_CodUsina {
-
-				registro++;
-
-			}//while (std::getline(leituraArquivo, line)) {
-
-		}//if (leituraArquivo.is_open()) {
-		else
-			throw std::invalid_argument("Nao foi possivel abrir o arquivo " + a_nomeArquivo);
-
-	}//	try {
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::set_atributos_hidreletrica_from_CadUsH_csv: \n" + std::string(erro.what())); }
 
 }
 
@@ -6410,7 +6088,7 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 						is_REE_encontrado = true;
 					}//if (codigo_ONS_REE_alvo == codigos_ONS_REE_aporte_energia.at(pos)) {
 
-					int codigo_usina_jusante = a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina_jusante_JUSENA, int());
+					IdHidreletrica idHidreletrica_jusante_JUSENA = a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_jusante_JUSENA, IdHidreletrica());
 
 					//////////////////////////////////
 					//Soma quem estiver a jusante_EAR
@@ -6418,16 +6096,10 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 
 					int aux_pos_lista_hidreletrica_out_estudo = -1;
 
-					while (codigo_usina_jusante > 0) {
+					while (idHidreletrica_jusante_JUSENA != IdHidreletrica_Nenhum) {
 
-						const IdHidreletrica idHidreletrica_jusante = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina_jusante);
-
-						if (idHidreletrica_jusante != IdHidreletrica_Nenhum) {
-							if (lista_codigo_ONS_REE.getElemento(idHidreletrica_jusante) == codigos_ONS_REE_aporte_energia.at(pos))
-								is_REE_encontrado = true;
-						}//if (idHidreletrica_jusante != IdHidreletrica_Nenhum) {
-						else
-							throw std::invalid_argument("Nao identificado hidreletrica_jusante com codigo_usina: " + getString(codigo_usina_jusante));
+						if (lista_codigo_ONS_REE.getElemento(idHidreletrica_jusante_JUSENA) == codigos_ONS_REE_aporte_energia.at(pos))
+							is_REE_encontrado = true;
 
 						///////////////////////////////////////////////////////////////////////////////////////////
 						//Verifica se está no mesmo REE
@@ -6435,20 +6107,20 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 						//           a exceção das usinas em vetor codigo_usina_a_montante_desconsidera_Itaipu
 						///////////////////////////////////////////////////////////////////////////////////////////
 
-						if (codigos_ONS_REE_aporte_energia.at(pos) != lista_codigo_ONS_REE.getElemento(idHidreletrica_jusante) and is_REE_encontrado and (!is_REE_considerando_Itaipu))
+						if (codigos_ONS_REE_aporte_energia.at(pos) != lista_codigo_ONS_REE.getElemento(idHidreletrica_jusante_JUSENA) and is_REE_encontrado and (!is_REE_considerando_Itaipu))
 							break;
-						else if (codigos_ONS_REE_aporte_energia.at(pos) != lista_codigo_ONS_REE.getElemento(idHidreletrica_jusante) and is_REE_encontrado and is_desconsiderar_Itaipu_no_calculo_produtibilidade_acumulada)
+						else if (codigos_ONS_REE_aporte_energia.at(pos) != lista_codigo_ONS_REE.getElemento(idHidreletrica_jusante_JUSENA) and is_REE_encontrado and is_desconsiderar_Itaipu_no_calculo_produtibilidade_acumulada)
 							break;
 						else {
 
 							if (is_REE_encontrado) {
-								produtibilidade_acumulada_EAR += a_dados.vetorHidreletrica.at(idHidreletrica_jusante).getAtributo(AttComumHidreletrica_produtibilidade_EAR, double());
+								produtibilidade_acumulada_EAR += a_dados.vetorHidreletrica.at(idHidreletrica_jusante_JUSENA).getAtributo(AttComumHidreletrica_produtibilidade_EAR, double());
 							}//if (is_REE_encontrado) {
 
-							codigo_usina_jusante = a_dados.vetorHidreletrica.at(idHidreletrica_jusante).getAtributo(AttComumHidreletrica_codigo_usina_jusante_JUSENA, int());
+							idHidreletrica_jusante_JUSENA = a_dados.vetorHidreletrica.at(idHidreletrica_jusante_JUSENA).getAtributo(AttComumHidreletrica_jusante_JUSENA, IdHidreletrica());
 						}//else {
 
-					}//while (codigo_usina_jusante > 0) {
+					}//while (idHidreletrica_jusante_JUSENA != IdHidreletrica_Nenhum) {
 
 					a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_produtibilidade_acumulada_EAR, idReservatorioEquivalente, produtibilidade_acumulada_EAR);
 

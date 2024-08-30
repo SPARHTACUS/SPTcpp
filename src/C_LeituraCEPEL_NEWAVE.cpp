@@ -51,7 +51,7 @@ void LeituraCEPEL::leitura_NEWAVE(Dados& a_dados, const std::string a_diretorio,
 
 			inicializa_Submercados_Intercambios_Nao_Registrados(a_dados, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()));
 
-			leitura_CADUSIH_201904_NW25_DC29_DES16(a_dados, a_diretorio + "//HIDR.DAT", false, readPoliJusHidr_dat);
+			leitura_CADUSIH_201904_NW25_DC29_DES16(a_dados, a_diretorio + "//HIDR.DAT", false, readPoliJusHidr_dat, true, false, 0);
 
 			leitura_MODIF_201908_NW25(a_dados, a_diretorio + "//MODIF.DAT");
 
@@ -143,14 +143,12 @@ void LeituraCEPEL::leitura_NEWAVE(Dados& a_dados, const std::string a_diretorio,
 		sequenciarRestricoesEletricas(a_dados);
 		sequenciarRestricoesHidraulicas(a_dados);
 
-		validacoes_NW(a_dados);
+		validacoes_NW(a_dados, a_diretorio);
 
 	}//try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::leitura_NEWAVE: \n" + std::string(erro.what())); }
 
 } // void LeituraCEPEL::leitura_NEWAVE(Dados &a_dados, std::string nomeArquivo) {
-
-
 
 void LeituraCEPEL::leitura_CURVA_202001_NW27(Dados& a_dados, std::string a_nomeArquivo)
 {
@@ -269,9 +267,6 @@ void LeituraCEPEL::leitura_CURVA_202001_NW27(Dados& a_dados, std::string a_nomeA
 
 
 }
-
-
-
 
 void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArquivo) {
 
@@ -1873,6 +1868,9 @@ void LeituraCEPEL::leitura_CONFHD_201908_NW25(Dados &a_dados, std::string nomeAr
 				//Campo 5 -  Número do REE a que pertence a usina 
 				const int codigo_REE_CEPEL = std::stoi(line.substr(30, 4));
 
+				if (maior_ONS_REE < codigo_REE_CEPEL)
+					maior_ONS_REE = codigo_REE_CEPEL;
+
 				//Campo 6 -  Volume armazenado inicial em percentagem do volume útil 
 				const double percentual_volume_inicial = std::stof(line.substr(35, 6)) / 100;
 				
@@ -2391,8 +2389,6 @@ void LeituraCEPEL::leitura_VAZOES_201908_NW25(Dados &a_dados, std::string nomeAr
 
 
 }
-
-
 
 void LeituraCEPEL::leitura_MODIF_201908_NW25(Dados &a_dados, std::string nomeArquivo) {
 
@@ -8204,9 +8200,23 @@ void LeituraCEPEL::leitura_RE_201908_NW25(Dados& a_dados, std::string nomeArquiv
 
 }
 
-void LeituraCEPEL::validacoes_NW(Dados & a_dados) {
+void LeituraCEPEL::validacoes_NW(Dados & a_dados, const std::string a_diretorio) {
 
 	try {
+
+		////////////////////////////////////////////////////
+		// Detecta se existe arquivo de cortes NEWAVE
+		////////////////////////////////////////////////////
+		std::string nomeArquivo_cortes_NW = "nenhum";
+
+		const std::string nomeArquivo_nwlistcf = a_diretorio + "//DadosAdicionais//Cortes_NEWAVE//nwlistcf.rel";
+
+		std::ifstream leituraArquivo_nwlistcf(nomeArquivo_nwlistcf);
+
+		if (leituraArquivo_nwlistcf.is_open()) {
+			nomeArquivo_cortes_NW = nomeArquivo_nwlistcf;
+			leituraArquivo_nwlistcf.close();
+		}//if (leituraArquivo_nwlistcf.is_open()){
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Via pre-config podem ter sido instanciadas usinas sem produção necessárias para o acoplamento com o modelo NW (cálculo de ENAs)
@@ -8279,6 +8289,19 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados) {
 		a_dados.validacao_operacional_AgrupamentoIntercambio(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
+
+		const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+
+		if (idProcesso == IdProcesso_mestre && nomeArquivo_cortes_NW != "nenhum" && hidreletricasPreConfig_instanciadas) {
+
+			leitura_CADUSIH_201904_NW25_DC29_DES16(a_dados, a_diretorio + "//HIDR.DAT", hidreletricasPreConfig_instanciadas, false, false, true, 176);//Carrega informação da IdHidreletrica_176_COMPPAFMOX
+
+			const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+			const SmartEnupla<Periodo, bool>      horizonte_processo_estocastico = SmartEnupla<Periodo, bool>(a_dados.processoEstocastico_hidrologico.getElementosMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo(), IdRealizacao()), true);
+
+			leitura_cortes_NEWAVE(a_dados, horizonte_estudo, nomeArquivo_cortes_NW, diretorio_att_premissas, maior_ONS_REE, horizonte_processo_estocastico, percentual_duracao_patamar_carga_original);
+
+		}//if (idProcesso == IdProcesso_mestre && nomeArquivo_cortes_NW != "nenhum") {
 
 	}//try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::validacoes_NW(a_dados): \n" + std::string(erro.what())); }

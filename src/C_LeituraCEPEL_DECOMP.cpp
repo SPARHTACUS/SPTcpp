@@ -43,7 +43,6 @@ SmartEnupla<int, SmartEnupla <Periodo, double>>  valor_afluencia_historica; //Va
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Vazao defluente historica minima
 SmartEnupla<int, SmartEnupla<Periodo, double>> porcentagem_vazao_minima_historica_REE;
-int maior_ONS_REE = 0;
 bool inicializa_vetor_porcentagem_vazao_minima_historica_REE = true;
 ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -55,7 +54,6 @@ SmartEnupla<int, IdReservatorioEquivalente> idReservatorioEquivalente_restricao_
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //SmartEnuplas auxiliares para a conversão
-SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>                                 percentual_duracao_patamar_carga_original; //Necessário para a conversão da parcela do corte das GNLs
 SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>                                 percentual_duracao_patamar_carga_deck; //Necessário para a conversão com a modulação informada na preConfig PD 
 SmartEnupla <IdSubmercado, SmartEnupla<Periodo, double>>                                  demanda_media_deck; //Necessário para a conversão com a modulação informada na preConfig PD 
 SmartEnupla <IdSubmercado, SmartEnupla<IdUsinaNaoSimulada, SmartEnupla<Periodo, double>>> geracao_usina_nao_simulada_media_deck; //Necessário para a conversão com a modulação informada na preConfig PD 
@@ -282,7 +280,7 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 		leitura_DADGNL_201906_DC29_A(a_dados, a_diretorio + "//DADGNL." + revisao, a_diretorio + "//relgnl." + revisao, a_diretorio + "//DadosAdicionais//relgnl." + revisao);// Ajustar que a geração comandada pode estar fora do horizonte_estudo
 		leitura_DADGNL_201906_DC29_B(a_dados, a_diretorio, "DADGNL." + revisao);// Ajustar que a geração comandada pode estar fora do horizonte_estudo
 
-		leitura_CADUSIH_201904_NW25_DC29_DES16(a_dados, a_diretorio + "//HIDR.DAT", hidreletricasPreConfig_instanciadas, readPoliJusHidr_dat);
+		leitura_CADUSIH_201904_NW25_DC29_DES16(a_dados, a_diretorio + "//HIDR.DAT", hidreletricasPreConfig_instanciadas, readPoliJusHidr_dat, true, false, 0);
 
 		leitura_PERDAS_201906_DC29(a_dados, a_diretorio + "//PERDAS.DAT");
 
@@ -12521,74 +12519,6 @@ void LeituraCEPEL::leitura_volumes_meta_from_relatos_DC(Dados& a_dados, std::str
 
 }
 
-void LeituraCEPEL::leitura_volume_referencia_e_regularizacao_from_CadUsH_csv(Dados& a_dados, std::string a_nomeArquivo)
-{
-	try {
-
-		int pos;
-		std::string line;
-		std::string atributo;
-
-		std::ifstream leituraArquivo(a_nomeArquivo);
-
-		if (leituraArquivo.is_open()) {
-
-			//Descarta o cabeçalho
-			std::getline(leituraArquivo, line);
-
-			while (std::getline(leituraArquivo, line)) {
-
-				strNormalizada(line);
-
-				pos = int(line.find(';'));
-				atributo = line.substr(0, pos).c_str();
-				atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-				line = line.substr(pos + 1, int(line.length()));
-
-				const int codigo_usina = std::atoi(atributo.c_str());
-				const IdHidreletrica idHidreletrica = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina);
-
-				if (idHidreletrica != IdHidreletrica_Nenhum) {
-
-					//Descarta info nao necessária
-					for (int registro = 0; registro < 177; registro++) {
-						pos = int(line.find(';'));
-						line = line.substr(pos + 1, int(line.length()));
-					}
-
-					//Volume referência
-					pos = int(line.find(';'));
-					atributo = line.substr(0, pos).c_str();
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-					line = line.substr(pos + 1, int(line.length()));
-
-					const double volume_referencia = atof(atributo.c_str());
-
-					a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_volume_referencia, volume_referencia);
-
-					//Tipo de regularização (mensal, semnal, diária)
-					pos = int(line.find(';'));				
-					atributo = line.substr(0, pos).c_str();
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-					if      (atributo == "M"){a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_mensal); }
-					else if (atributo == "S"){a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_semanal); }
-					else if (atributo == "D") { a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_diaria); }
-					else { throw std::invalid_argument("Nao identificado tipo_regularizacao: " + atributo); }
-
-				}//if (idHidreletrica != IdHidreletrica_Nenhum) {
-
-			}//while (std::getline(leituraArquivo, line)) {
-
-		}//if (leituraArquivo.is_open()) {
-		else
-			throw std::invalid_argument("Nao foi possivel abrir o arquivo " + a_nomeArquivo);
-
-	}//	try {
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::leitura_volume_referencia_e_regularizacao_from_CadUsH_csv: \n" + std::string(erro.what())); }
-
-}
 
 void LeituraCEPEL::defineHorizontes_CP(Dados& a_dados)
 {
@@ -16951,6 +16881,46 @@ void LeituraCEPEL::atualizar_codigo_posto_acoplamento_ENA_das_hidreletricas_inst
 
 }
 
+void LeituraCEPEL::instanciar_jusante_JUSENA(Dados& a_dados)
+{
+	try {
+
+		const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+		const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
+
+		for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+			/////////////////////////////////
+			bool is_registro_JUSENA = false;
+
+			if (lista_modificacaoUHE.size() > int(idHidreletrica)) {//Pode ter usinas do MP que não existem no CP
+
+				for (int idModificacaoUHE = 0; idModificacaoUHE < lista_modificacaoUHE.at(idHidreletrica).size(); idModificacaoUHE++) {
+
+					if (lista_modificacaoUHE.at(idHidreletrica).at(idModificacaoUHE).tipo_de_modificacao == TipoModificacaoUHE_JUSENA) {
+						is_registro_JUSENA = true;
+						break;
+					}//if (lista_modificacaoUHE.at(idHidreletrica).at(idModificacaoUHE).tipo_de_modificacao == TipoModificacaoUHE_JUSENA) {
+
+				}//for (int idModificacaoUHE = 0; idModificacaoUHE < lista_modificacaoUHE.at(idHidreletrica).size(); idModificacaoUHE++) {
+
+			}//if (lista_modificacaoUHE.size() > int(idHidreletrica)) {
+
+			/////////////////////////////////
+
+			if (!is_registro_JUSENA && idHidreletrica != IdHidreletrica_176_COMPPAFMOX) {//Somente atualiza para usinas que não tem registro JUSENA (já o jusante_JUSENA foi atualizado previamente)
+
+				const IdHidreletrica idHidreletrica_jusante = a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_jusante, IdHidreletrica());
+				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_jusante_JUSENA, idHidreletrica_jusante);
+			}//if (!is_registro_JUSENA) {
+
+		}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+	}//	try {
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_jusante_JUSENA: \n" + std::string(erro.what())); }
+
+}
+
 void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, const std::string a_revisao) {
 
 	try {
@@ -16981,30 +16951,30 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			leituraArquivo_nwlistcf.close();
 		}//if (leituraArquivo_nwlistcf.is_open()){
 
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////				
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		if (nomeArquivo_cortes_NW != "nenhum") {
+
+			for (int pos = 0; pos < int(idHidreletricas_sem_producao.size()); pos++)
+				instanciar_hidreletricas_sem_producao_para_acoplamento_cortes_NW(a_dados, idHidreletricas_sem_producao.at(pos), codigo_usina_idHidreletricas_sem_producao.at(pos), codigo_posto_idHidreletricas_sem_producao.at(pos), codigo_posto_acoplamento_ENA_idHidreletricas_sem_producao.at(pos), codigo_ONS_REE_idHidreletricas_sem_producao.at(pos));
+
+			leitura_CADUSIH_201904_NW25_DC29_DES16(a_dados, a_diretorio + "//HIDR.DAT", hidreletricasPreConfig_instanciadas, false, false, true, 176);//Carrega informação da IdHidreletrica_176_COMPPAFMOX
+
+		}//if (nomeArquivo_cortes_NW != "nenhum") {
+
 		aplicarModificacoesUHE(a_dados);
 
 		valida_bacia_sao_francisco(a_dados);
-
 		modifica_lista_jusante_hidreletrica_com_casos_validados_CP(a_dados);
+		instanciar_jusante_JUSENA(a_dados); //Para desacoplamento do corte NEWAVE (caso necessário)-> Atributo que foi atualizado em aplicarModificacoesUHE(a_dados) para usinas com registro JUSENA
 
-		instanciar_codigo_usina_jusante_JUSENA(a_dados); //Para desacoplamento do corte NEWAVE (caso necessário)-> Atributo que foi atualizado em aplicarModificacoesUHE(a_dados) para usinas com registro JUSENA
-		
+	
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		//Instancia hidreletricas sem produção para acoplamento cortes NW
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		
 		atualizar_codigo_posto_acoplamento_ENA_das_hidreletricas_instanciadas(a_dados); //Atualiza codigo_posto_acoplamento_ENA para ser compatível com as regras de cálculo da ENA de acoplamento
 		atualiza_codigo_posto_acoplamento_ENA_regras_especiais(a_dados);//Para as usinas do REE 3 - Nordeste (Itaparica e Xingó setadas na otimização com posto 300, i.e., aflu incremental = 0) -> Define o NPOSNW = posto_hidr_dat para cálculo das ENAs
-
-		if (nomeArquivo_cortes_NW != "nenhum") {
-
-			for (int pos = 0; pos < int(idHidreletricas_sem_producao.size()); pos++)
-				instanciar_hidreletricas_sem_producao_para_acoplamento_cortes_NW(a_dados, idHidreletricas_sem_producao.at(pos), codigo_usina_idHidreletricas_sem_producao.at(pos), codigo_posto_idHidreletricas_sem_producao.at(pos), codigo_posto_acoplamento_ENA_idHidreletricas_sem_producao.at(pos), codigo_ONS_REE_idHidreletricas_sem_producao.at(pos));
-	
-			set_atributos_hidreletrica_from_CadUsH_csv(a_dados, a_diretorio + "//CadUsH.csv", 176);
-
-		}//if (nomeArquivo_cortes_NW != "nenhum") {
 
 		///////////////////////////////////////////////////////////////////////////////////////////////
 		//Instancia hidreletricas sem produção para TipoRestricaoHidraulica_energia_armazenada
@@ -17030,7 +17000,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 						const int codigo_ONS_REE = 3;
 
 						instanciar_hidreletricas_sem_producao_para_acoplamento_cortes_NW(a_dados, idHidreletrica, codigo_usina_COMP_MOX, codigo_posto, codigo_posto_acoplamento_ENA, codigo_ONS_REE);
-						set_atributos_hidreletrica_from_CadUsH_csv(a_dados, a_diretorio + "//CadUsH.csv", codigo_usina_COMP_MOX);
+						leitura_CADUSIH_201904_NW25_DC29_DES16(a_dados, a_diretorio + "//HIDR.DAT", hidreletricasPreConfig_instanciadas, false, false, true, 176);//Carrega informação da IdHidreletrica_176_COMPPAFMOX
 
 					}//if (!a_dados.vetorHidreletrica.isInstanciado(idHidreletrica)) {
 
@@ -17340,8 +17310,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		}
 
 		// FINAL DEV NOVO PROC ESTOCASTICO
-
-		leitura_volume_referencia_e_regularizacao_from_CadUsH_csv(a_dados, a_diretorio + "//CadUsH.csv");
 		
 		calculaEngolimentoMaximo(a_dados, horizonte_estudo, horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal()), lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC, menor_cenario, maior_cenario);
 
