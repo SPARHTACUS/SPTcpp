@@ -1764,12 +1764,12 @@ void ProcessoEstocastico::reducao_adaptacao_nested_distance(EntradaSaidaDados a_
 			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao_original; idRealizacao++) {
 
 				const int posEqu = vetorPtrSolver.at(idEstagio)->addConstrIgual("Transporte_amostra_original_" + getFullString(idRealizacao));
-				vetorPtrSolver.at(idEstagio)->setRHSRestricao(false, posEqu, getElementoMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao, periodo, idRealizacao, double()));
+				vetorPtrSolver.at(idEstagio)->setRHSRestricao(posEqu, getElementoMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao, periodo, idRealizacao, double()));
 
 				for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
 					const int posVar = var_matriz_transporte_estagio.at(idEstagio).getElemento(idRealizacao) + num;
-					vetorPtrSolver.at(idEstagio)->setCofRestricao(false, posVar, posEqu, 1.0);
+					vetorPtrSolver.at(idEstagio)->setCofRestricao(posVar, posEqu, 1.0);
 
 				}//for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
@@ -1781,17 +1781,17 @@ void ProcessoEstocastico::reducao_adaptacao_nested_distance(EntradaSaidaDados a_
 			for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
 				const int posEqu = vetorPtrSolver.at(idEstagio)->addConstrIgual("Transporte_amostra_reduzida_" + getString(num + 1));
-				vetorPtrSolver.at(idEstagio)->setRHSRestricao(false, posEqu, 0.0);
+				vetorPtrSolver.at(idEstagio)->setRHSRestricao(posEqu, 0.0);
 
 				for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao_original; idRealizacao++) {
 
 					const int posVar = var_matriz_transporte_estagio.at(idEstagio).getElemento(idRealizacao) + num;
-					vetorPtrSolver.at(idEstagio)->setCofRestricao(false, posVar, posEqu, 1.0);
+					vetorPtrSolver.at(idEstagio)->setCofRestricao(posVar, posEqu, 1.0);
 
 				}//for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao_original; idRealizacao++) {
 
 				const int posVar = var_probabilidades_arvore_reduzida_estagio.getElemento(idEstagio) + num;
-				vetorPtrSolver.at(idEstagio)->setCofRestricao(false, posVar, posEqu, -1.0);
+				vetorPtrSolver.at(idEstagio)->setCofRestricao(posVar, posEqu, -1.0);
 
 			}//for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
@@ -1799,12 +1799,12 @@ void ProcessoEstocastico::reducao_adaptacao_nested_distance(EntradaSaidaDados a_
 			//Somatorio(pj) = 1
 
 			const int posEqu = vetorPtrSolver.at(idEstagio)->addConstrIgual("Probabilidade_amostra_reduzida");
-			vetorPtrSolver.at(idEstagio)->setRHSRestricao(false, posEqu, 1.0);
+			vetorPtrSolver.at(idEstagio)->setRHSRestricao(posEqu, 1.0);
 
 			for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
 				const int posVar = var_probabilidades_arvore_reduzida_estagio.getElemento(idEstagio) + num;
-				vetorPtrSolver.at(idEstagio)->setCofRestricao(false, posVar, posEqu, 1.0);
+				vetorPtrSolver.at(idEstagio)->setCofRestricao(posVar, posEqu, 1.0);
 
 			}//for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
@@ -1860,8 +1860,8 @@ void ProcessoEstocastico::reducao_adaptacao_nested_distance(EntradaSaidaDados a_
 					for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
 						const int posVar = var_probabilidades_arvore_reduzida_estagio.getElemento(idEstagio) + num;
-						vetorPtrSolver.at(idEstagio)->setLimInferior(false, posVar, std::pow(a_numero_aberturas.getElemento(idEstagio), -1));
-						vetorPtrSolver.at(idEstagio)->setLimSuperior(false, posVar, std::pow(a_numero_aberturas.getElemento(idEstagio), -1));
+						vetorPtrSolver.at(idEstagio)->setLimInferior(posVar, std::pow(a_numero_aberturas.getElemento(idEstagio), -1));
+						vetorPtrSolver.at(idEstagio)->setLimSuperior(posVar, std::pow(a_numero_aberturas.getElemento(idEstagio), -1));
 
 					}//for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
@@ -1871,8 +1871,8 @@ void ProcessoEstocastico::reducao_adaptacao_nested_distance(EntradaSaidaDados a_
 					for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
 						const int posVar = var_probabilidades_arvore_reduzida_estagio.getElemento(idEstagio) + num;
-						vetorPtrSolver.at(idEstagio)->setLimInferior(false, posVar, 0.0);
-						vetorPtrSolver.at(idEstagio)->setLimSuperior(false, posVar, 1.0);
+						vetorPtrSolver.at(idEstagio)->setLimInferior(posVar, 0.0);
+						vetorPtrSolver.at(idEstagio)->setLimSuperior(posVar, 1.0);
 
 					}//for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
@@ -1921,7 +1921,7 @@ void ProcessoEstocastico::reducao_adaptacao_nested_distance(EntradaSaidaDados a_
 						if (idEstagio < a_estagio_final)
 							norma_2 += nested_distance.getElemento(IdEstagio(idEstagio + 1));
 
-						vetorPtrSolver.at(idEstagio)->setCofObjetivo(false, posVar, norma_2*std::pow(fator_normalizador, -1));
+						vetorPtrSolver.at(idEstagio)->setCofObjetivo(posVar, norma_2*std::pow(fator_normalizador, -1));
 
 					}//for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 

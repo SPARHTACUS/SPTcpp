@@ -1810,6 +1810,116 @@ void EntradaSaidaDados::imprimirConsolidacaoHorizontalCSV(const std::string a_no
 } // void EntradaSaidaDados::imprimirConsolidacaoHorizontalCSV(const std::string a_nome_arquivo_resultante, const std::vector<std::string>& a_lista_arquivos_originais, const bool a_apagar_arquivos_originais) const{
 
 
+void EntradaSaidaDados::imprimirConsolidacaoVerticalCSV(const std::string a_nome_arquivo_resultante, const std::vector<std::string>& a_lista_arquivos_originais, const bool a_apagar_arquivos_originais, const bool a_remover_cabecalho) const {
+
+
+	std::string caminhoArquivo = diretorioSaida + "//" + a_nome_arquivo_resultante;
+	if (diretorioSaida == "")
+		caminhoArquivo = a_nome_arquivo_resultante;
+
+	try {
+
+		if (a_lista_arquivos_originais.size() == 0)
+			throw std::invalid_argument("A lista de arquivos a serem consolidados esta vazia.");
+
+
+		std::ofstream escritaArquivo;
+
+		std::vector<int> indice_arquivos_originais;
+		std::vector<std::ifstream> lista_escritaArquivo;
+
+		std::vector<int> arquivos_nao_abertos;
+		for (int i = 0; i < int(a_lista_arquivos_originais.size()); i++) {
+
+			const std::string caminhoArquivo_original = diretorioSaida + "//" + a_lista_arquivos_originais.at(i);
+
+			std::ifstream escritaArquivo;
+			escritaArquivo.open(caminhoArquivo_original.c_str(), std::ios_base::in);
+
+			if (!escritaArquivo.is_open())
+				arquivos_nao_abertos.push_back(i);
+			else {
+				escritaArquivo.close();
+				escritaArquivo.clear();
+				lista_escritaArquivo.push_back(std::ifstream());
+				lista_escritaArquivo.at(lista_escritaArquivo.size() - 1).open(caminhoArquivo_original.c_str(), std::ios_base::in);
+				indice_arquivos_originais.push_back(i);
+			}
+
+		}// for (int i = 0; i < int(a_lista_arquivos_originais.size()); i++) {
+
+		if (arquivos_nao_abertos.size() == a_lista_arquivos_originais.size())
+			return;
+
+
+		escritaArquivo.open(caminhoArquivo.c_str(), std::ios_base::out);
+
+		if (!escritaArquivo.is_open())
+			return;
+
+		std::string linha_inner;
+		for (int i = 0; i < int(lista_escritaArquivo.size()); i++) {
+
+			bool no_write_line = a_remover_cabecalho;
+			while (!lista_escritaArquivo.at(i).eof()) {
+
+				std::getline(lista_escritaArquivo.at(i), linha_inner);
+
+				if (no_write_line && (i > 0)) {
+					no_write_line = false;
+				}
+				else {
+					strNormalizada(linha_inner);
+					if (linha_inner.size() > 0)
+						escritaArquivo << linha_inner << std::endl;
+				}
+			}
+		} // for (int i = 0; i < int(lista_escritaArquivo.size()); i++) {
+
+		if (fimDeArquivo != "")
+			escritaArquivo << fimDeArquivo;
+
+		for (int i = 0; i < int(lista_escritaArquivo.size()); i++) {
+
+			lista_escritaArquivo.at(i).close();
+			lista_escritaArquivo.at(i).clear();
+
+			if (a_apagar_arquivos_originais) {
+
+				const std::string caminhoArquivo_original = diretorioSaida + "//" + a_lista_arquivos_originais.at(indice_arquivos_originais.at(i));
+
+				std::ofstream escrita_zerar_arquivo;
+
+				escrita_zerar_arquivo.open(caminhoArquivo_original.c_str(), std::ios_base::out);
+
+				if (escrita_zerar_arquivo.is_open()) {
+					escrita_zerar_arquivo << "";
+					escrita_zerar_arquivo.close();
+				} // if (escrita_zerar_arquivo.is_open()) {
+
+				escrita_zerar_arquivo.clear();
+
+				deletarArquivo(caminhoArquivo_original.c_str());
+
+			} // if (a_apagar_arquivos_originais) {
+
+		} // for (int i = 0; i < int(a_lista_arquivos_originais.size()); i++) {
+
+		escritaArquivo.close();
+		escritaArquivo.clear();
+
+
+		if (imprimirNaTela)
+			std::cout << "Sucesso na consolidacao de " << caminhoArquivo << std::endl;
+
+	} // try
+
+	catch (const std::ifstream::failure& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirConsolidacaoVerticalCSV(" + caminhoArquivo + ",a_matriz_string," + getString(a_apagar_arquivos_originais) + "): \nErro de Integridade do Arquivo." + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirConsolidacaoVerticalCSV(" + caminhoArquivo + ",a_matriz_string," + getString(a_apagar_arquivos_originais) + "): \n" + std::string(erro.what())); }
+
+} // void EntradaSaidaDados::imprimirConsolidacaoHorizontalCSV(const std::string a_nome_arquivo_resultante, const std::vector<std::string>& a_lista_arquivos_originais, const bool a_apagar_arquivos_originais) const{
+
+
 void EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(const std::string a_nomeArquivo, const std::vector<std::vector<std::string>>& a_matriz_string) const{ imprimirArquivoCSV_SmartEnupla(a_nomeArquivo, a_matriz_string, true); }
 
 void EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(const std::string a_nomeArquivo, const std::vector<std::vector<std::string>>& a_matriz_string, const bool a_incluir_cabecalho) const {
@@ -1906,6 +2016,88 @@ void EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(const std::string a_nomeA
 				}// if (imprimir_linha) {
 
 			} // if ((incluirCabecalho) || (lin > 0)) {
+		} // for (int lin = 0; lin < numLin; lin++) {
+
+		if (fimDeArquivo != "")
+			escritaArquivo << fimDeArquivo;
+
+		escritaArquivo.close();
+		escritaArquivo.clear();
+
+		if (rename(caminhoArquivo_wr.c_str(), caminhoArquivo.c_str()) != 0)
+			throw std::invalid_argument("Nao foi possivel renomear o arquivo " + caminhoArquivo_wr + " para " + caminhoArquivo + ".");
+
+		if (imprimirNaTela)
+			std::cout << "Sucesso na impressao de " << caminhoArquivo << std::endl;
+
+	} // try
+
+	catch (const std::ifstream::failure& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(" + caminhoArquivo + ",a_matriz_string," + getString(a_incluir_cabecalho) + "): \nErro de Integridade do Arquivo." + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(" + caminhoArquivo + ",a_matriz_string," + getString(a_incluir_cabecalho) + "): \n" + std::string(erro.what())); }
+
+} // void EntradaSaidaDados::imprimirArquivoCSV_SmartEnupla(const std::string a_nomeArquivo, const std::vector<std::vector<std::string>>& a_matriz_string, const bool a_incluir_cabecalho) const{
+
+void EntradaSaidaDados::imprimirArquivoCSV(const std::string a_nomeArquivo, const std::vector<std::string>& a_matriz_string, const bool a_incluir_cabecalho = true) const {
+
+	std::string caminhoArquivo = diretorioSaida + "//" + a_nomeArquivo;
+	if (diretorioSaida == "")
+		caminhoArquivo = a_nomeArquivo;
+
+	try {
+
+		bool incluirCabecalho = a_incluir_cabecalho;
+		if (appendArquivo)
+			incluirCabecalho = false;
+
+		const int numLin = int(a_matriz_string.size());
+
+		if (numLin == 0)
+			return;
+
+		criarDiretorio(diretorioSaida);
+
+		std::ofstream escritaArquivo;
+
+		std::string caminhoArquivo_wr = caminhoArquivo + "_rw";
+
+		int tempo_total = 0;
+		bool arquivo_existente = false;
+		int arquivo_renomeado = 1;
+		while (true) {
+			escritaArquivo.open(caminhoArquivo.c_str(), std::ios_base::app);
+			arquivo_existente = escritaArquivo.is_open();
+
+			if (arquivo_existente) {
+				if (escritaArquivo.is_open())
+					escritaArquivo.close();
+
+				arquivo_renomeado = rename(caminhoArquivo.c_str(), caminhoArquivo_wr.c_str());
+
+				if (arquivo_renomeado == 0)
+					break;
+			} // if (arquivo_existente) {
+
+			if (tempo_total >= tempo_maximo_tentativa_escrita_arquivo)
+				throw std::invalid_argument("Nao foi possivel abrir o arquivo para escrita apos " + getString(int(tempo_maximo_tentativa_escrita_arquivo / 60000)) + " minutos.");
+
+			aguardarTempo(5000);
+			tempo_total += 5000;
+
+		} // while (true) {
+
+		if (appendArquivo)
+			escritaArquivo.open(caminhoArquivo_wr.c_str(), std::ios_base::app);
+		else
+			escritaArquivo.open(caminhoArquivo_wr.c_str(), std::ios_base::out);
+
+		if (!escritaArquivo.is_open())
+			throw std::invalid_argument("Nao foi possivel abrir o arquivo " + caminhoArquivo_wr + ".");
+
+		int primeira_coluna_IdCenario = -1;
+
+		for (int lin = 0; lin < numLin; lin++) {
+			if ((incluirCabecalho) || (lin > 0))
+				escritaArquivo << a_matriz_string.at(lin) << std::endl;
 		} // for (int lin = 0; lin < numLin; lin++) {
 
 		if (fimDeArquivo != "")
