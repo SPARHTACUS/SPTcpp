@@ -173,29 +173,6 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		validacao_operacional_Dados(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 
-		SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
-
-		Periodo periodo8 = Periodo(19, 8, 2023);
-		Periodo periodo7 = Periodo(21, 8, 2023);
-		Periodo periodo6 = Periodo(20, 8, 2023);
-		Periodo periodo5 = Periodo(18, 8, 2023);
-		Periodo periodo4 = Periodo(24, 8, 2023);
-		Periodo periodo3 = Periodo(25, 8, 2023);
-		Periodo periodo2 = Periodo(23, 8, 2023);
-		Periodo periodo1 = Periodo(22, 8, 2023);
-
-		horizonte_estudo.addElemento(periodo1, IdEstagio_381);
-		horizonte_estudo.addElemento(periodo2, IdEstagio_382);
-		horizonte_estudo.addElemento(periodo3, IdEstagio_383);
-		horizonte_estudo.addElemento(periodo4, IdEstagio_384);
-		horizonte_estudo.addElemento(periodo5, IdEstagio_385);
-		horizonte_estudo.addElemento(periodo6, IdEstagio_386);
-		horizonte_estudo.addElemento(periodo7, IdEstagio_387);
-		horizonte_estudo.addElemento(periodo8, IdEstagio_388);
-
-
-
-
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		//
 		//                                                                        Carregar Arquivos de Submercado
@@ -9701,7 +9678,7 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 				SmartEnupla<int, SmartEnupla<Periodo, double>> tendencia_temporal_variavel_aleatoria_interna;
 
 				int contador = 1;
-				for (IdHidreletrica idHidreletrica = getMaiorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
+				for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 
 					if (getAtributo(idHidreletrica, AttComumHidreletrica_bacia, IdBaciaHidrografica()) == idBaciaHidrografica) {
 
@@ -9712,7 +9689,7 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 							serie_temporal_variavel_aleatoria_interna.addElemento(contador, getVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico, Periodo(), double()));
 							tendencia_temporal_variavel_aleatoria_interna.addElemento(contador, getVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_tendencia, Periodo(), double()));
 
-						} // if (a_processo_estocastico.getMaiorId(IdVariavelAleatoria()) != IdVariavelAleatoria_Nenhum) {
+						} // if (a_processo_estocastico.getMenorId(IdVariavelAleatoria()) != IdVariavelAleatoria_Nenhum) {
 
 						else {
 

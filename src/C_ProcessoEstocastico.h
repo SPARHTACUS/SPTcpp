@@ -232,7 +232,7 @@ inline void ProcessoEstocastico::addSeriesTemporais(const TipoVariavelAleatoria 
 		if (a_lista_tipo_variavel_aleatoria_interna.getIteradorInicial() != 1)
 			throw std::invalid_argument("O iterador inicial da lista de variaveis aleatorias internas deve ser 1.");
 
-		const IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria(a_tipo_variavel_aleatoria);
+		IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria(getMaiorId(IdVariavelAleatoria()) + 1);
 
 		if (vetorVariavelAleatoria.isInstanciado(idVariavelAleatoria))
 			throw std::invalid_argument("Variavel aleatoria ja instanciada " + getFullString(idVariavelAleatoria) + " " + getAtributo(idVariavelAleatoria, AttComumVariavelAleatoria_nome, std::string()));
@@ -287,7 +287,7 @@ inline void ProcessoEstocastico::addTendenciasTemporais(const TipoVariavelAleato
 		if (a_lista_tipo_variavel_aleatoria_interna.getIteradorInicial() != 1)
 			throw std::invalid_argument("O iterador inicial da lista de variaveis aleatorias internas deve ser 1.");
 
-		const IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria(a_tipo_variavel_aleatoria);
+		const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromIdFisico(a_tipo_variavel_aleatoria);
 
 		if (!vetorVariavelAleatoria.isInstanciado(idVariavelAleatoria))
 			throw std::invalid_argument("Variavel aleatoria ainda nao instanciada " + getFullString(idVariavelAleatoria));

@@ -265,24 +265,13 @@ void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_ent
 		const SmartEnupla <IdCenario, SmartEnupla<Periodo, IdRealizacao>> mapeamento_espaco_amostral = getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao());
 
 		SmartEnupla<Periodo, IdRealizacao> horizonte_amostra;
-		Periodo periodo_inicial_amostra;
 
-		if (mapeamento_espaco_amostral.size() > 0) {
+		if (mapeamento_espaco_amostral.size() > 0)
 			horizonte_amostra = mapeamento_espaco_amostral.getElemento(a_cenario_inicial);
-			periodo_inicial_amostra = horizonte_amostra.getIteradorInicial();
-		}
-		else
-			periodo_inicial_amostra = horizonte_tendencia.getIteradorFinal() + 1;
 
 		SmartEnupla<Periodo, double> horizonte_processo_estocastico(horizonte_tendencia.size() + horizonte_amostra.size());
-		for (Periodo periodo = horizonte_tendencia.getIteradorInicial(); periodo < periodo_inicial_amostra; horizonte_tendencia.incrementarIterador(periodo)) {
-
-			if (periodo >= periodo_inicial_amostra)
-				break;
-
+		for (Periodo periodo = horizonte_tendencia.getIteradorInicial(); periodo <= horizonte_tendencia.getIteradorFinal(); horizonte_tendencia.incrementarIterador(periodo))
 			horizonte_processo_estocastico.addElemento(periodo, NAN);
-
-		} // for (Periodo periodo = horizonte_tendencia.getIteradorInicial(); periodo < periodo_inicial_amostra; horizonte_tendencia.incrementarIterador(periodo)) {
 
 		if (horizonte_amostra.size() > 0) {
 			for (Periodo periodo = horizonte_amostra.getIteradorInicial(); periodo <= horizonte_amostra.getIteradorFinal(); horizonte_amostra.incrementarIterador(periodo))
@@ -299,7 +288,7 @@ void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_ent
 			imprimirCenarios(a_entradaSaidaDados);
 
 	} // try{
-	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::gerarCenariosPorSorteio(a_entradaSaidaDados," + getString(a_imprimir_cenarios) + ",a_mapeamento_cenarios_tendencia," + getString(a_tipo_sorteio) + "," + getString(a_semente) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::gerarCenariosPorSorteio(a_entradaSaidaDados," + getString(a_imprimir_cenarios) + "," + getString(a_gerar_cenarios_buffer) + "," + getString(a_gerar_cenarios_internos) + "," + getString(a_numero_cenarios_global) + "," + getFullString(a_cenario_inicial) + "," + getFullString(a_cenario_final) + "," + getString(a_tipo_sorteio) + "," + getString(a_semente) + "): \n" + std::string(erro.what())); }
 
 } // void ProcessoEstocastico::gerarCenariosPorSorteio(const SmartEnupla<IdCenario, IdCenario> a_mapeamento_cenarios_tendencia, const int a_semente){
 
