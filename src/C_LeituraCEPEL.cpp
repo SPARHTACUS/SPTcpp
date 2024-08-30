@@ -6350,35 +6350,6 @@ void LeituraCEPEL::defineHidreletricasMontanteNaCascataENA(Dados& a_dados) {
 
 } // void Dados::defineHidreletricasMontanteNaCascataENA() {
 
-void LeituraCEPEL::atualiza_codigo_posto_acoplamento_ENA_regras_especiais(Dados& a_dados) {
-
-	try {
-
-		const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
-		const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
-
-		for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-
-			const int codigo_usina = a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int());
-
-			if (codigo_usina == 172)//172-Itaparica com posto de acoplamento para cálculo das ENAs = 172
-				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, 172);
-			else if (codigo_usina == 178) //178-Xingó com posto de acoplamento para cálculo das ENAs = 178
-				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, 178);
-			else if (codigo_usina == 173) //173-Moxotó com posto de acoplamento para cálculo das ENAs = 0 (afluência = 0)
-				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, 0);
-			else if (codigo_usina == 174) //174-P.Afonso123 com posto de acoplamento para cálculo das ENAs = 0 (afluência = 0)
-				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, 0);
-			else if (codigo_usina == 175) //175-P.Afonso4 com posto de acoplamento para cálculo das ENAs = 0 (afluência = 0)
-				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, 0);
-
-		} // for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-
-	} // try{
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::atualiza_codigo_posto_acoplamento_ENA_regras_especiais: \n" + std::string(erro.what())); }
-
-}
-
 void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(Dados& a_dados, const Periodo a_periodoPE, const SmartEnupla<int, IdHidreletrica>& a_lista_codUsina, const SmartEnupla<int, IdHidreletrica>& a_lista_codPosto, const SmartEnupla<IdHidreletrica, IdVariavelAleatoria>& a_mapIdVar, const SmartEnupla<IdHidreletrica, IdVariavelAleatoriaInterna>& a_mapIdVarInterna, const int a_codigo_posto, const int a_codigo_posto_acoplamento_ENA, const IdHidreletrica a_idHidreletrica, const IdCenario a_idCenario, const Periodo a_periodo_inicial_horizonte_estudo, const Periodo a_periodo, std::vector<SmartEnupla<IdHidreletrica, double>>& a_coeficiente_idHidreletricas_calculo_ENA, double& a_termo_independente_calculo_ENA) {
 
 	try {

@@ -13799,15 +13799,29 @@ void LeituraCEPEL::valida_bacia_sao_francisco(Dados& a_dados){
 
 			if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_codigo_posto, int()) == 168) {
 
+				IdHidreletrica idHidreletrica_jusante = a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_jusante, IdHidreletrica());
+
+				while (idHidreletrica_jusante != IdHidreletrica_Nenhum) {
+
+					a_dados.vetorHidreletrica.at(idHidreletrica_jusante).setAtributo(AttComumHidreletrica_codigo_posto, 300);
+					idHidreletrica_jusante = a_dados.vetorHidreletrica.at(idHidreletrica_jusante).getAtributo(AttComumHidreletrica_jusante, IdHidreletrica());
+
+				}//while (idHidreletrica_jusante != IdHidreletrica_Nenhum) {
+
+				/*
 				for (IdHidreletrica idHidreletrica_jus = idHidreletricaIni; idHidreletrica_jus < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica_jus)) {
 
-					const int posto = a_dados.getAtributo(idHidreletrica_jus, AttComumHidreletrica_codigo_posto, int());
+					if (idHidreletrica_jus != IdHidreletrica_176_COMPPAFMOX && idHidreletrica_jus != IdHidreletrica_168_ENA_SOBRADINHO && idHidreletrica_jus != IdHidreletrica_172_ENA_ITAPARICA && idHidreletrica_jus != IdHidreletrica_178_ENA_XINGO) {
 
-					if ((posto == 172) || (posto == 173) || (posto == 175) || (posto == 178))
-						a_dados.vetorHidreletrica.at(idHidreletrica_jus).setAtributo(AttComumHidreletrica_codigo_posto, 300);
+						const int posto = a_dados.getAtributo(idHidreletrica_jus, AttComumHidreletrica_codigo_posto, int());
+
+						if ((posto == 172) || (posto == 173) || (posto == 175) || (posto == 178))
+							a_dados.vetorHidreletrica.at(idHidreletrica_jus).setAtributo(AttComumHidreletrica_codigo_posto, 300);
+
+					}//if
 
 				} // for (IdHidreletrica idHidreletrica_jus = idHidreletricaIni; idHidreletrica_jus < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica_jus)) {
-
+				*/
 			} // if (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_codigo_posto, int()) == 168) {
 
 		} // for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
@@ -16871,13 +16885,63 @@ void LeituraCEPEL::atualizar_codigo_posto_acoplamento_ENA_das_hidreletricas_inst
 
 		for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-			if (a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, int()) == 0) //Somente atualiza usinas que NÃO tenham tido registro NPOSNW
-				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_posto, int()));
+			if (idHidreletrica != IdHidreletrica_176_COMPPAFMOX && idHidreletrica != IdHidreletrica_168_ENA_SOBRADINHO && idHidreletrica != IdHidreletrica_172_ENA_ITAPARICA && idHidreletrica != IdHidreletrica_178_ENA_XINGO) {//Estas usinas já tem o codigo_posto_acoplamento_ENA instanciado
+
+				/////////////////////////////////
+				bool is_registro_NPOSNW = false;
+
+				if (lista_modificacaoUHE.size() > int(idHidreletrica)) {//Pode ter usinas do MP que não existem no CP
+
+					for (int idModificacaoUHE = 0; idModificacaoUHE < lista_modificacaoUHE.at(idHidreletrica).size(); idModificacaoUHE++) {
+
+						if (lista_modificacaoUHE.at(idHidreletrica).at(idModificacaoUHE).tipo_de_modificacao == TipoModificacaoUHE_NPOSNW) {
+							is_registro_NPOSNW = true;
+							break;
+						}//if (lista_modificacaoUHE.at(idHidreletrica).at(idModificacaoUHE).tipo_de_modificacao == TipoModificacaoUHE_NPOSNW) {
+
+					}//for (int idModificacaoUHE = 0; idModificacaoUHE < lista_modificacaoUHE.at(idHidreletrica).size(); idModificacaoUHE++) {
+
+				}//if (lista_modificacaoUHE.size() > int(idHidreletrica)) {
+
+
+				if (!is_registro_NPOSNW) //Somente atualiza usinas que NÃO tenham tido registro NPOSNW
+					a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_posto, int()));
+
+			}//if 
 
 		}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::atualizar_codigo_posto_acoplamento_ENA_das_hidreletricas_instanciadas: \n" + std::string(erro.what())); }
+
+}
+
+void LeituraCEPEL::atualiza_codigo_posto_acoplamento_ENA_regras_especiais(Dados& a_dados) {
+
+	try {
+
+		const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+		const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
+
+		for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+			const int codigo_usina = a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_usina, int());
+
+			if (codigo_usina == 172)//172-Itaparica com posto de acoplamento para cálculo das ENAs = 172
+				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, 172);
+			else if (codigo_usina == 178) //178-Xingó com posto de acoplamento para cálculo das ENAs = 178
+				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, 178);
+			else if (codigo_usina == 173) //173-Moxotó com posto de acoplamento para cálculo das ENAs = 0 (afluência = 0)
+				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, 0);
+			else if (codigo_usina == 174) //174-P.Afonso123 com posto de acoplamento para cálculo das ENAs = 0 (afluência = 0)
+				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, 0);
+			else if (codigo_usina == 175) //175-P.Afonso4 com posto de acoplamento para cálculo das ENAs = 0 (afluência = 0)
+				a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, 0);
+
+		} // for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::atualiza_codigo_posto_acoplamento_ENA_regras_especiais: \n" + std::string(erro.what())); }
 
 }
 
@@ -16950,9 +17014,11 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			nomeArquivo_cortes_NW = nomeArquivo_nwlistcf;
 			leituraArquivo_nwlistcf.close();
 		}//if (leituraArquivo_nwlistcf.is_open()){
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
+		///////////////////////////////////////////////////////////////////////////////////////////////
+		//Instancia hidreletricas sem produção para acoplamento cortes NW
+		///////////////////////////////////////////////////////////////////////////////////////////////
+
 		if (nomeArquivo_cortes_NW != "nenhum") {
 
 			for (int pos = 0; pos < int(idHidreletricas_sem_producao.size()); pos++)
@@ -16968,11 +17034,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		modifica_lista_jusante_hidreletrica_com_casos_validados_CP(a_dados);
 		instanciar_jusante_JUSENA(a_dados); //Para desacoplamento do corte NEWAVE (caso necessário)-> Atributo que foi atualizado em aplicarModificacoesUHE(a_dados) para usinas com registro JUSENA
 
-	
-		///////////////////////////////////////////////////////////////////////////////////////////////
-		//Instancia hidreletricas sem produção para acoplamento cortes NW
-		///////////////////////////////////////////////////////////////////////////////////////////////
-		
 		atualizar_codigo_posto_acoplamento_ENA_das_hidreletricas_instanciadas(a_dados); //Atualiza codigo_posto_acoplamento_ENA para ser compatível com as regras de cálculo da ENA de acoplamento
 		atualiza_codigo_posto_acoplamento_ENA_regras_especiais(a_dados);//Para as usinas do REE 3 - Nordeste (Itaparica e Xingó setadas na otimização com posto 300, i.e., aflu incremental = 0) -> Define o NPOSNW = posto_hidr_dat para cálculo das ENAs
 
