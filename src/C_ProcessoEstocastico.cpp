@@ -1073,6 +1073,8 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 		if (periodo_inicial > periodo_final)
 			return;
 
+		periodo_inicial = periodo_seguinte_mapeamento_existente;
+
 		SmartEnupla<Periodo, int> horizonte_mapeamento_cenarios_por_sorteio;
 		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_espaco_amostral.incrementarIterador(periodo))
 			horizonte_mapeamento_cenarios_por_sorteio.addElemento(periodo, 0);

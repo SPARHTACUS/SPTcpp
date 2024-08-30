@@ -4721,8 +4721,10 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 				if ((getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_vazao_defluente_minima) == 0) && (a_imprimir_atributos_sem_recarregar)) {
 					preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_vazao_defluente_minima) = sim_operacional;
-					if (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) == sim_operacional)
+					if (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) == nao_sem_utilizacao) {
 						preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = sim_premissa;
+						vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_defluente_minima, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
+					}
 					else if (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) == nao_operacional_informado)
 						preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = nao_premissa_informado;
 				} // if ((getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_defluente_minima) == 0) && (hidreletrica_com_unidade)) {
@@ -4738,8 +4740,10 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 				if ((getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_vazao_defluente_maxima) == 0) && (a_imprimir_atributos_sem_recarregar)) {
 					preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_vazao_defluente_maxima) = sim_operacional;
-					if (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) == sim_operacional)
+					if (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) == nao_sem_utilizacao) {
 						preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = sim_premissa;
+						vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_defluente_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getdoubleFromChar("inf")));
+					}
 					else if (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) == nao_operacional_informado)
 						preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = nao_premissa_informado;
 				} // if ((getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_defluente_maxima) == 0) && (hidreletrica_com_unidade)) {
