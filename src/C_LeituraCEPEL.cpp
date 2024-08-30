@@ -5906,7 +5906,7 @@ void LeituraCEPEL::calcular_produtibilidade_EAR_acumulada_por_usina(Dados& a_dad
 				if (true) {
 
 					////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					//Encontra o primeiro periododo horizonte_alvo dentro do horizonte_DECK //Premissa validada com dados do DC
+					//Encontra o primeiro periodo do horizonte_alvo dentro do horizonte_DECK //Premissa validada com dados do DC
 					////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					Periodo periodo_inicial_in_horizonte_estudo = a_horizonte_alvo.getIteradorInicial();
 					bool is_sobreposicao_encontrada = false;
