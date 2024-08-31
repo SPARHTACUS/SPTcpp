@@ -1352,16 +1352,46 @@ void VariavelAleatoria::gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario
 		Periodo periodo_amostra = periodo_inicial_amostra;
 		for (Periodo periodo = periodo_inicial_amostra; periodo <= periodo_final; a_horizonte_processo_estocastico.incrementarIterador(periodo)) {
 
+			const int lag_final = getIterador2Final(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_amostra, int());
+			SmartEnupla<int, std::vector<double>> valores_lag(1, std::vector<std::vector<double>>(lag_final, std::vector<double>()));
+			SmartEnupla<int, std::vector<Periodo>> periodos_lag(1, std::vector<std::vector<Periodo>>(lag_final, std::vector<Periodo>()));
+			if (a_gerar_cenarios_buffer) {
+				for (int lag = 1; lag <= lag_final; lag++) {
+
+					const double coeficiente_linear = getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_amostra, lag, double());
+
+					if (coeficiente_linear != 0.0) {
+						const Periodo periodo_lag = periodo - lag;
+
+						periodos_lag.at(lag) = a_horizonte_processo_estocastico.getIteradores(periodo_lag);
+
+						valores_lag.at(lag) = std::vector<double>(periodos_lag.at(lag).size(), 0.0);
+
+						for (int p = 0; p < int(periodos_lag.at(lag).size()); p++)
+							valores_lag.at(lag).at(p) = periodo_lag.sobreposicao(periodos_lag.at(lag).at(p)) * coeficiente_linear;
+
+					} // if (coeficiente_linear != 0.0) {
+				} // for (int lag = 1; lag <= lag_final; lag++)
+			}
+
 			for (IdCenario idCenario = cenario_inicial; idCenario <= cenario_final; idCenario++) {
 
-				// Realização Transformada é obtida a partir da realização mapeada e do cenário.
+				double parcela_regressiva = 0.0;
+				if (a_gerar_cenarios_buffer) {
+					for (int lag = 1; lag <= lag_final; lag++) {
+						for (int p = 0; p < int(periodos_lag.at(lag).size()); p++)
+							parcela_regressiva += valores_lag.at(lag).at(p) * getElementoMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodos_lag.at(lag).at(p), idCenario, double());
+					} // for (int lag = 1; lag <= lag_final; lag++) {
+				}
 
+				// Realização Transformada é obtida a partir da realização mapeada e do cenário.
 				const IdRealizacao idRealizacao = a_mapeamento_amostra_comum.at(idCenario).getElemento(periodo);
 
 				double realizacao = 0.0;
 
-				if (a_gerar_cenarios_buffer)
-					realizacao = getRealizacaoTransformadaEspacoAmostral(idCenario, idRealizacao, periodo_amostra);
+				if (a_gerar_cenarios_buffer) {
+					realizacao = parcela_regressiva + getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_amostra, idRealizacao, double());
+				}
 				else
 					realizacao = getRealizacaoTransformadaEspacoAmostral_recursivo(idCenario, idRealizacao, a_mapeamento_amostra_comum.at(idCenario), periodo_amostra, periodo_amostra, a_horizonte_processo_estocastico);
 

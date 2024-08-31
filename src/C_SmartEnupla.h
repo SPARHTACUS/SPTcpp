@@ -1086,8 +1086,12 @@ public:
 
 			const std::vector<int> pos_idx = getPosIdxStructIfAny(a_period_externo);
 			if (pos_idx.size() > 0) {
-				if (pos_idx.at(1) > -1)
+				if (pos_idx.at(1) > -1) {
 					perIni = list_structPeriod.at(pos_idx.at(0)).getPeriod(pos_idx.at(1));
+					perIni.posStructPeriod = pos_idx.at(0);
+					perIni.idxStructPeriod = pos_idx.at(1);
+					perIni.codStructPeriod = code;
+				}
 			}
 			
 			if (!perIni.isValido()) {
