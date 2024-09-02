@@ -142,6 +142,8 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 		double cont_tempo_otimizacao = 0.0;
 		int cont_numero_otimizacao = 0;
 
+		MPI_Barrier(MPI_COMM_WORLD);
+
 		for (IdEstagio idEstagio = a_estagio_inicial; idEstagio <= a_estagio_final; idEstagio++) {
 
 			const IdEstagio idEstagio_seguinte = IdEstagio(idEstagio + 1);

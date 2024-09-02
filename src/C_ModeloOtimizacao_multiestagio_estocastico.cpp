@@ -234,7 +234,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(const SmartEnupla<IdEstagio, std
 	try{
 
 		for (IdEstagio idEstagio = a_idEstagioIni; idEstagio <= a_idEstagioEnd; idEstagio++) {
-
+			//if(true){
 			if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio)) {
 
 				const SmartEnupla<Periodo, int> horizonSP = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo(), int());
@@ -6446,7 +6446,16 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FI
 			if (percentual_inclusao_periodo > 0.0) {
 
 				for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE < a_dados.getIdOut(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idUHE)) {
-					if (getVarDecisao_VF_FINFseExistir(a_TSS, a_idEstagio, periodo, idUHE) > -1) {
+
+					int varVF_FINF = getVarDecisao_VF_FINFseExistir(a_TSS, a_idEstagio, periodo, idUHE);
+
+					// Cria variável quando nao houve necessidade de formular o modelo do estágio
+					if (varVF_FINF == -1) {
+						if (a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_minimo, periodo, double()) > 0.0)
+							varVF_FINF = addVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo, idUHE, 0.0, a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_minimo, periodo, double()), 0.0);
+					}
+
+					if (varVF_FINF > -1) {
 
 						if (getVarDecisao_ZP0_VF_FINFseExistir(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao) == -1) {
 
@@ -6478,7 +6487,8 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FI
 						const double valor_penalidade = a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_volume_util_minimo, double()) * a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, periodo, double());
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VF_FINF(a_TSS, a_idEstagio, periodo, idUHE), getEquLinear_ZP0_VF_FINF(a_TSS, a_idEstagio, periodo, a_periodo_penalizacao), -valor_penalidade);
 
-					} // if (getVarDecisao_VF_FINFseExistir(a_TSS, a_idEstagio, periodo, idUHE) > -1) {
+					} // if (varVF_FINF > -1) {
+
 				} // for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE < a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idUHE)) {
 
 			} // if (percentual_inclusao_periodo > 0.0) {
@@ -6735,9 +6745,6 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 		const double sobreposicao_periodo_otimizacao = a_periodo_lag.sobreposicao(periodo_otimizacao);
 		if (sobreposicao_periodo_otimizacao > 0.0) {
 
-			equYP = addEquLinear_YP(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria);
-			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, equYP, 1.0);
-
 			bool sobreposicao_encontrada = false;
 			for (Periodo periodo = periodo_inicial_proc_estoc_hidrologico; periodo <= periodo_final_proc_estoc_hidrologico; proc_estoc_hidrologico.incrementarIterador(periodo)) {
 
@@ -6754,7 +6761,14 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 							grau_liberdade += getAtributo(idProcessoEstocastico_modelo, idVarEquiv.at(i), idVarIntEquiv.at(i).at(j), AttComumVariavelAleatoriaInterna_grau_liberdade, double());
 						}
 
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_YP(a_TSS, a_idEstagio, periodo_otimizacao, periodo, idProcessoEstocastico_modelo, idVarEquiv.at(i)), equYP, -sobreposicao * coeficiente_participacao);
+						int varYP_compose_lag = getVarDecisao_YPseExistir(a_TSS, a_idEstagio, periodo_otimizacao, periodo, idProcessoEstocastico_modelo, idVarEquiv.at(i));
+						if (varYP_compose_lag > -1) {
+							if (equYP == -1) {
+								equYP = addEquLinear_YP(a_TSS, a_idEstagio, a_periodo, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, equYP, 1.0);
+							}
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP_compose_lag, equYP, -sobreposicao * coeficiente_participacao);
+						}
 						rhs_equYP += (a_grau_liberdade - grau_liberdade) * sobreposicao;
 					}
 
@@ -6766,7 +6780,11 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 
 			} // for (Periodo periodo = periodo_inicial_proc_estoc_hidrologico; periodo <= periodo_final_proc_estoc_hidrologico; proc_estoc_hidrologico.incrementarIterador(periodo)) {
 
-			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equYP, rhs_equYP);
+			if (equYP > -1)
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equYP, rhs_equYP);
+
+			if (sobreposicao_periodo_otimizacao == 1.0)
+				return varYP;
 
 		} // if (sobreposicao_periodo_otimizacao > 0.0) {
 

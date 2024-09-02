@@ -11333,6 +11333,9 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 						// O mapeamento das aberturas engloba cenarios_estados de outros processos quando o processamento é realizado por abertura, exceto se cortes_multiplos == 1
 						for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
 
+							const IdCenario menor_cenario_iteracao = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario());
+							const IdCenario maior_cenario_iteracao = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario());
+
 							for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
 								const int cortes_multiplos = getElementoVetor(AttVetorDados_cortes_multiplos, idEstagio, int());
@@ -11347,41 +11350,46 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 											const IdCenario idCenario_estado = lista_cenario_estado.at(c);
 
-											if (map_menor_abertura.size() == 0) {
-												map_menor_abertura.addElemento(idCenario_estado, enupla_inicial_abertura);
-												map_maior_abertura.addElemento(idCenario_estado, enupla_inicial_abertura);
-											}
+											// Em caso de proc. paralelo por cenario, aberturas sao geradas apenas para cenario estado no dominio do processo para evitar redundancia
+											if ((tipo_processamento == TipoProcessamentoParalelo_por_cenario) && ((idCenario_estado < menor_cenario_iteracao) || (maior_cenario_iteracao < idCenario_estado))) {}
 
-											else if ((idCenario_estado < map_menor_abertura.getIteradorInicial())) {
-												for (IdCenario idCenario = IdCenario(map_menor_abertura.getIteradorInicial() - 1); idCenario >= idCenario_estado; idCenario--) {
-													map_menor_abertura.addElemento(idCenario, enupla_inicial_abertura);
-													map_maior_abertura.addElemento(idCenario, enupla_inicial_abertura);
-												}
-											}
-											else if ((map_menor_abertura.getIteradorFinal() < idCenario_estado)) {
-												for (IdCenario idCenario = IdCenario(map_menor_abertura.getIteradorFinal() + 1); idCenario <= idCenario_estado; idCenario++) {
-													map_menor_abertura.addElemento(idCenario, enupla_inicial_abertura);
-													map_maior_abertura.addElemento(idCenario, enupla_inicial_abertura);
-												}
-											}
-
-											// Em caso de cortes_multiplos == 1, preenche-se com a abertura do mapeamento do espaço amostral.
-											if (cortes_multiplos == 1) {
-												const IdAbertura idAbertura = IdAbertura(mapeamento_espaco_amostral.at(idCenario_estado).at_rIt(periodos.at(idEstagio)));
-
-												map_menor_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
-												map_maior_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
-											} // if (cortes_multiplos == 1) {
-
-											else if (tipo_processamento == TipoProcessamentoParalelo_por_cenario) {
-												map_menor_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_1;
-												map_maior_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura(getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int()));
-											}
 											else {
-												map_menor_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_Excedente;
-												map_maior_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_Excedente;
-											}
 
+												if (map_menor_abertura.size() == 0) {
+													map_menor_abertura.addElemento(idCenario_estado, enupla_inicial_abertura);
+													map_maior_abertura.addElemento(idCenario_estado, enupla_inicial_abertura);
+												}
+
+												else if ((idCenario_estado < map_menor_abertura.getIteradorInicial())) {
+													for (IdCenario idCenario = IdCenario(map_menor_abertura.getIteradorInicial() - 1); idCenario >= idCenario_estado; idCenario--) {
+														map_menor_abertura.addElemento(idCenario, enupla_inicial_abertura);
+														map_maior_abertura.addElemento(idCenario, enupla_inicial_abertura);
+													}
+												}
+												else if ((map_menor_abertura.getIteradorFinal() < idCenario_estado)) {
+													for (IdCenario idCenario = IdCenario(map_menor_abertura.getIteradorFinal() + 1); idCenario <= idCenario_estado; idCenario++) {
+														map_menor_abertura.addElemento(idCenario, enupla_inicial_abertura);
+														map_maior_abertura.addElemento(idCenario, enupla_inicial_abertura);
+													}
+												}
+
+												// Em caso de cortes_multiplos == 1, preenche-se com a abertura do mapeamento do espaço amostral.
+												if (cortes_multiplos == 1) {
+													const IdAbertura idAbertura = IdAbertura(mapeamento_espaco_amostral.at(idCenario_estado).at_rIt(periodos.at(idEstagio)));
+
+													map_menor_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
+													map_maior_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
+												} // if (cortes_multiplos == 1) {
+
+												else if (tipo_processamento == TipoProcessamentoParalelo_por_cenario) {
+													map_menor_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_1;
+													map_maior_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura(getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int()));
+												}
+												else {
+													map_menor_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_Excedente;
+													map_maior_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_Excedente;
+												}
+											}
 										} // for (int c = 0; c < int(lista_cenario_estado.size()); c++) {
 									} // if (lista_cenario_estado.size() > 0){
 								} // if (((tipo_processamento == TipoProcessamentoParalelo_por_abertura) && (cortes_multiplos != 1)) || (idProcesso_aux == idProcesso)) {
