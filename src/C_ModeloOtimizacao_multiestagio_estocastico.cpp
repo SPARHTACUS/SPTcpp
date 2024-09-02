@@ -5885,6 +5885,12 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const TipoSubproblemaSolver a_T
 void ModeloOtimizacao::criarVariaveisDemandaEspecial(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat) {
 	try {
 
+		if (a_TSS == TipoSubproblemaSolver_mestre)
+			return;
+
+		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+			return;
+
 		const IdDemandaEspecial idDEIni = a_dados.getMenorId(IdDemandaEspecial());
 		const IdDemandaEspecial idDEOut = a_dados.getIdOut(IdDemandaEspecial());
 
@@ -5898,6 +5904,12 @@ void ModeloOtimizacao::criarVariaveisDemandaEspecial(const TipoSubproblemaSolver
 
 void ModeloOtimizacao::criarVariaveisUsinaNaoSimulada(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat) {
 	try {
+
+		if (a_TSS == TipoSubproblemaSolver_mestre)
+			return;
+
+		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+			return;
 
 		const IdSubmercado idSSEIni = a_dados.getMenorId(IdSubmercado());
 		const IdSubmercado idSSEOut = a_dados.getIdOut(IdSubmercado());
@@ -5922,6 +5934,12 @@ void ModeloOtimizacao::criarVariaveisUsinaNaoSimulada(const TipoSubproblemaSolve
 void ModeloOtimizacao::criarVariaveisIntercambio(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat) {
 	try {
 
+		if (a_TSS == TipoSubproblemaSolver_mestre)
+			return;
+
+		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+			return;
+
 		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
 		const IdIntercambio idInterIni = a_dados.getMenorId(IdIntercambio());
@@ -5945,6 +5963,12 @@ void ModeloOtimizacao::criarVariaveisIntercambio(const TipoSubproblemaSolver a_T
 
 void ModeloOtimizacao::criarVariaveisDemanda(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat) {
 	try {
+
+		if (a_TSS == TipoSubproblemaSolver_mestre)
+			return;
+
+		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+			return;
 
 		const IdSubmercado idSSEIni = a_dados.getMenorId(IdSubmercado());
 		const IdSubmercado idSSEOut = a_dados.getIdOut(IdSubmercado());
@@ -5979,6 +6003,12 @@ void ModeloOtimizacao::criarVariaveisDemanda(const TipoSubproblemaSolver a_TSS, 
 void ModeloOtimizacao::criarVariaveisDeficit(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat) {
 	try {
 
+		if (a_TSS == TipoSubproblemaSolver_mestre)
+			return;
+
+		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+			return;
+
 		const IdSubmercado idSSEIni = a_dados.getMenorId(IdSubmercado());
 		const IdSubmercado idSSEOut = a_dados.getIdOut(IdSubmercado());
 
@@ -6007,6 +6037,12 @@ void ModeloOtimizacao::criarVariaveisDeficit(const TipoSubproblemaSolver a_TSS, 
 void ModeloOtimizacao::criarVariaveisContrato(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat) {
 	try {
 
+		if (a_TSS == TipoSubproblemaSolver_mestre)
+			return;
+
+		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+			return;
+
 		const IdContrato idContratoIni = a_dados.getMenorId(IdContrato());
 		const IdContrato idContratoOut = a_dados.getIdOut(IdContrato());
 
@@ -6030,6 +6066,12 @@ void ModeloOtimizacao::criarVariaveisContrato(const TipoSubproblemaSolver a_TSS,
 void ModeloOtimizacao::criarVariaveisEolicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat) {
 	try {
 
+		if (a_TSS == TipoSubproblemaSolver_mestre)
+			return;
+
+		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+			return;
+
 		const IdUsinaEolica idEolIni = a_dados.getMenorId(IdUsinaEolica());
 		const IdUsinaEolica IdEolOut = a_dados.getIdOut(IdUsinaEolica());
 
@@ -6047,6 +6089,12 @@ void ModeloOtimizacao::criarVariaveisEolicas(const TipoSubproblemaSolver a_TSS, 
 
 void ModeloOtimizacao::criarVariaveisRestricaoEletrica(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat) {
 	try {
+
+		if (a_TSS == TipoSubproblemaSolver_mestre)
+			return;
+
+		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+			return;
 
 		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
@@ -6084,6 +6132,12 @@ void ModeloOtimizacao::criarVariaveisRestricaoEletrica(const TipoSubproblemaSolv
 
 void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_periodIni_stage, Periodo& a_periodPrev, Periodo& a_period, const IdPatamarCarga a_idPat) {
 	try {
+
+		if (a_TSS == TipoSubproblemaSolver_mestre)
+			return;
+
+		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+			return;
 
 		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
@@ -6602,7 +6656,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 		if (a_idEstagio < menor_estagio)
 			return -1;
 
-		if ((!vetorEstagio.at(a_idEstagio).isSolverInstanciado(a_TSS)) && (a_TSS == TipoSubproblemaSolver_mestre))
+		if ((!vetorEstagio.at(a_idEstagio).isSolverInstanciado(a_TSS)) || (a_TSS == TipoSubproblemaSolver_mestre))
 			return -1;
 
 		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());

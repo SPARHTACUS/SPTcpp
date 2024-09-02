@@ -959,7 +959,7 @@ void MetodoSolucao::executarPDDE_atualizarCustoInferior(const IdIteracao a_idIte
 					}
 				}
 
-				if (c != int(a_custo_inferior.size()))
+				if (c != int(a_custo_inferior.at(menor_estagio).size()))
 					throw std::invalid_argument("Erro em " + getFullString(idProcesso_local));
 
 			} // if (a_custo_inferior.size() > 0) {
