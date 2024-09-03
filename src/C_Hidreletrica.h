@@ -96,7 +96,7 @@
 	  m(Hidreletrica,  AttVetor,                indisponibilidade_forcada,                                double,          0,            1,             0,    Periodo) \
       m(Hidreletrica,  AttVetor,             indisponibilidade_programada,                                double,          0,            1,             0,    Periodo) \
       m(Hidreletrica,  AttVetor,                          disponibilidade,                                double,          0,            1,             0,    Periodo) \
-      m(Hidreletrica,  AttVetor,            produtibilidade_acumulada_EAR,                                double,          0,        50000,             0,    IdReservatorioEquivalente) \
+      m(Hidreletrica,  AttVetor,                      produtibilidade_EAR,                                double,          0,        50000,             0,    Periodo) \
       m(Hidreletrica,  AttVetor,                codigo_usinas_calculo_ENA,                                   int,        min,          max,           min,        int)
 
 

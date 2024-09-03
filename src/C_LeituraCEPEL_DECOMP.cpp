@@ -13977,14 +13977,16 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 				////////////////////////////////////////////
 				//Calcula as produtibilidade_acumulada_EAR
 				////////////////////////////////////////////
-
-				if (a_dados.vetorHidreletrica.at(a_dados.getMenorId(IdHidreletrica())).getSizeVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR) == 0) {
+			
+				if (a_dados.vetorHidreletrica.at(a_dados.getMenorId(IdHidreletrica())).vetorReservatorioEquivalente.getMaiorId() == IdReservatorioEquivalente_Nenhum) { //Pode ter sido instanciado para o cálculo das produtibilidade_acumulada_EAR em restrições de energia armazenada RHV
 					atualizar_vetores_premissas_calculo_produtibilidades(a_dados, SmartEnupla<Periodo, bool>(horizonte_estudo, true));
-					calcular_produtibilidade_EAR_acumulada_por_usina(a_dados,SmartEnupla<Periodo, bool>(horizonte_estudo, true), a_maior_ONS_REE);//produtibilidade_EAR é estática e calculada com as premissas do 1° período do estudo
+					calcular_produtibilidade_EAR_acumulada_x_usina_x_REE_x_periodo(a_dados, SmartEnupla<Periodo, bool>(horizonte_estudo, true));
+				}
+				else if (a_dados.vetorHidreletrica.at(a_dados.getMenorId(IdHidreletrica())).vetorReservatorioEquivalente.at(a_dados.getMenorId(a_dados.getMenorId(IdHidreletrica()), IdReservatorioEquivalente())).getSizeVetor(AttVetorReservatorioEquivalente_produtibilidade_acumulada_EAR) == 0) {
+					atualizar_vetores_premissas_calculo_produtibilidades(a_dados, SmartEnupla<Periodo, bool>(horizonte_estudo, true));
+					calcular_produtibilidade_EAR_acumulada_x_usina_x_REE_x_periodo(a_dados, SmartEnupla<Periodo, bool>(horizonte_estudo, true));
 				}
 					
-				
-
 				SmartEnupla<Periodo, double> energia_maxima_REE (horizonte_estudo, 0.0); //Calcula com base no volume_util_maximo * produtibilidade_acumulada_EAR das hidrelétricas que aportam no REE
 
 				///////////////////////////////////
@@ -14013,44 +14015,49 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 				for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-					const double produtibilidade_acumulada_EAR = a_dados.vetorHidreletrica.at(idHidreletrica).getElementoVetor(AttVetorHidreletrica_produtibilidade_acumulada_EAR, idReservatorioEquivalente, double());
+					if (a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorioEquivalente.isInstanciado(idReservatorioEquivalente)) {
 
-					if (produtibilidade_acumulada_EAR > 0) {
+						if (a_dados.getSizeVetor(idHidreletrica, idReservatorioEquivalente, AttVetorReservatorioEquivalente_produtibilidade_acumulada_EAR) > 0) {
 
-						IdElementoSistema idElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
+							IdElementoSistema idElementoSistema = a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 
-						if (idElementoSistema == IdElementoSistema_Nenhum) { idElementoSistema = IdElementoSistema_1; }
-						else { idElementoSistema++; }
+							if (idElementoSistema == IdElementoSistema_Nenhum) { idElementoSistema = IdElementoSistema_1; }
+							else { idElementoSistema++; }
 
-						ElementoSistema elementoSistema;
-						elementoSistema.setAtributo(AttComumElementoSistema_idElementoSistema, idElementoSistema);
-						elementoSistema.setAtributo(AttComumElementoSistema_tipo_elemento, TipoElementoSistema_hidreletrica);
-						elementoSistema.setAtributo(AttComumElementoSistema_hidreletrica, idHidreletrica);
-						elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_volume_util);
+							ElementoSistema elementoSistema;
+							elementoSistema.setAtributo(AttComumElementoSistema_idElementoSistema, idElementoSistema);
+							elementoSistema.setAtributo(AttComumElementoSistema_tipo_elemento, TipoElementoSistema_hidreletrica);
+							elementoSistema.setAtributo(AttComumElementoSistema_hidreletrica, idHidreletrica);
+							elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_volume_util);
 
-						const double fator_participacao = produtibilidade_acumulada_EAR * conversao_MWporVazao_em_MWhporVolume;
+							///////////////////////////////////
+							//Cálculo da energia_maxima_REE
+							///////////////////////////////////
 
-						elementoSistema.setVetor(AttVetorElementoSistema_fator_participacao, SmartEnupla<Periodo, double>(horizonte_estudo, fator_participacao));
+							SmartEnupla<Periodo, double> fator_participacao(horizonte_estudo, 0.0);
 
-						a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).vetorElementoSistema.add(elementoSistema);
+							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-						///////////////////////////////////
-						//Cálculo da energia_maxima_REE
-						///////////////////////////////////
+								const double produtibilidade_acumulada_EAR = a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorioEquivalente.at(idReservatorioEquivalente).getElementoVetor(AttVetorReservatorioEquivalente_produtibilidade_acumulada_EAR, periodo, double());
+								fator_participacao.at(periodo) = produtibilidade_acumulada_EAR * conversao_MWporVazao_em_MWhporVolume;
 
-						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+								const double volume_util_minimo = a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_util_minimo, periodo, double());
+								const double volume_util_maximo = a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_util_maximo, periodo, double());
 
-							const double volume_util_minimo = a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_util_minimo, periodo, double());
-							const double volume_util_maximo = a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_util_maximo, periodo, double());
+								double energia_maxima_periodo_anterior = energia_maxima_REE.getElemento(periodo);
+								double energia_maxima_periodo_nova = energia_maxima_periodo_anterior + (volume_util_maximo - volume_util_minimo) * produtibilidade_acumulada_EAR * conversao_MWporVazao_em_MWhporVolume;
 
-							double energia_maxima_periodo_anterior = energia_maxima_REE.getElemento(periodo);
-							double energia_maxima_periodo_nova = energia_maxima_periodo_anterior + (volume_util_maximo - volume_util_minimo) * produtibilidade_acumulada_EAR * conversao_MWporVazao_em_MWhporVolume;
+								energia_maxima_REE.setElemento(periodo, energia_maxima_periodo_nova);
 
-							energia_maxima_REE.setElemento(periodo, energia_maxima_periodo_nova);
+							}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-						}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+							elementoSistema.setVetor(AttVetorElementoSistema_fator_participacao, fator_participacao);
 
-					}//if (produtibilidade_acumulada_EAR > 0) {
+							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).vetorElementoSistema.add(elementoSistema);
+
+						}//if (a_dados.getSizeVetor(idHidreletrica, idReservatorioEquivalente, AttVetorReservatorioEquivalente_produtibilidade_acumulada_EAR) > 0) {
+
+					}//if (a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorioEquivalente.isInstanciado(idReservatorioEquivalente)) {
 
 				}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 

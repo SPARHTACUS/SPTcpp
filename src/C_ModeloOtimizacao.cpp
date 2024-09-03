@@ -665,85 +665,77 @@ double ModeloOtimizacao::atualizar_ENA_acoplamento(Dados& a_dados, const IdReser
 			const int codigo_posto = a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_posto, int());
 			const int codigo_posto_acoplamento_ENA = a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_posto_acoplamento_ENA, int());
 
-			IdReservatorioEquivalente menorIdREE = a_dados.getMenorId(idUHE, IdReservatorioEquivalente());
-			IdReservatorioEquivalente maiorIdREE = a_dados.getMaiorId(idUHE, IdReservatorioEquivalente());
+			//O vetor produtibilidade_ENA é formado pelo horizonte_tendencia + horizonte_processo_estocastico
+			const SmartEnupla<Periodo, double> produtibilidade_ENA = a_dados.getVetor(idUHE, a_idReservatorioEquivalente, AttVetorReservatorioEquivalente_produtibilidade_ENA, Periodo(), double());
 
-			if (menorIdREE != maiorIdREE)
-				throw std::invalid_argument("Aporte no calculo da ENA em varios REE da idHidreletrica:" + getString(idUHE) + ", deveria aportar somente em um REE");
+			const Periodo periodoPE_inicial = produtibilidade_ENA.getIteradorInicial();
+			const Periodo periodoPE_final = produtibilidade_ENA.getIteradorFinal();
 
-			if (maiorIdREE == a_idReservatorioEquivalente) {
+			bool is_sobreposicao_encontrada = false;
+			bool is_precisa_calcular = false;
+			double soma_sobreposicao = 0.0;
 
-				//O vetor produtibilidade_ENA é formado pelo horizonte_tendencia + horizonte_processo_estocastico
-				const SmartEnupla<Periodo, double> produtibilidade_ENA = a_dados.getVetor(idUHE, maiorIdREE, AttVetorReservatorioEquivalente_produtibilidade_ENA, Periodo(), double());
+			for (Periodo periodoPE = periodoPE_inicial; periodoPE <= periodoPE_final; produtibilidade_ENA.incrementarIterador(periodoPE)) {
 
-				const Periodo periodoPE_inicial = produtibilidade_ENA.getIteradorInicial();
-				const Periodo periodoPE_final = produtibilidade_ENA.getIteradorFinal();
+				if (produtibilidade_ENA.at(periodoPE) > 0.0) {//Evita cálcular afluências para cálculo de ENA desnecessárias
 
-				bool is_sobreposicao_encontrada = false;
-				bool is_precisa_calcular = false;
-				double soma_sobreposicao = 0.0;
+					is_precisa_calcular = true;
 
-				for (Periodo periodoPE = periodoPE_inicial; periodoPE <= periodoPE_final; produtibilidade_ENA.incrementarIterador(periodoPE)) {
+					const double sobreposicao = a_periodo_lag.sobreposicao(periodoPE);
 
-					if (produtibilidade_ENA.at(periodoPE) > 0.0) {//Evita cálcular afluências para cálculo de ENA desnecessárias
+					if (sobreposicao > 0.0) {
 
-						is_precisa_calcular = true;
+						soma_sobreposicao += sobreposicao;
+						is_sobreposicao_encontrada = true;
 
-						const double sobreposicao = a_periodo_lag.sobreposicao(periodoPE);
+						//****************************************************************************************************************************
+						//Filosofia: Obter o equacionamento da ENA x usina (termo_independente_calculo_ENA + coeficiente_idHidreletricas_calculo_ENA) 
+						// e logo pondera as afluências vezes a produtibilidade_ENA
+						//****************************************************************************************************************************					
+						std::vector<SmartEnupla<IdHidreletrica, double>> coeficiente_idHidreletricas_calculo_ENA;
+						double termo_independente_calculo_ENA = 0.0;
 
-						if (sobreposicao > 0.0) {
+						retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(a_dados, periodoPE, codigo_posto, codigo_posto_acoplamento_ENA, idUHE, a_idCenario, a_idRealizacao, idProcessoEstocastico, coeficiente_idHidreletricas_calculo_ENA, termo_independente_calculo_ENA);
 
-							soma_sobreposicao += sobreposicao;
-							is_sobreposicao_encontrada = true;
+						double afluencia_natural = termo_independente_calculo_ENA;
 
-							//****************************************************************************************************************************
-							//Filosofia: Obter o equacionamento da ENA x usina (termo_independente_calculo_ENA + coeficiente_idHidreletricas_calculo_ENA) 
-							// e logo pondera as afluências vezes a produtibilidade_ENA
-							//****************************************************************************************************************************					
-							std::vector<SmartEnupla<IdHidreletrica, double>> coeficiente_idHidreletricas_calculo_ENA;
-							double termo_independente_calculo_ENA = 0.0;
+						for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
 
-							retorna_equacionamento_regras_afluencia_natural_x_idHidreletrica(a_dados, periodoPE, codigo_posto, codigo_posto_acoplamento_ENA, idUHE, a_idCenario, a_idRealizacao, idProcessoEstocastico, coeficiente_idHidreletricas_calculo_ENA, termo_independente_calculo_ENA);
+							const IdHidreletrica idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).getIteradorInicial();
+							const double         coeficiente_idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE_ENA);
 
-							double afluencia_natural = termo_independente_calculo_ENA;
+							if (periodoPE < vetorProcessoEstocastico.at(idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) //Valores da tendência
+								afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.at(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodoPE, double());
+							else//Valores dentro da árvore
+								afluencia_natural += coeficiente_idUHE_ENA * get_afluencia_incremental_from_idVariavelAleatoria(mapIdVar.at(idUHE_ENA), a_idCenario, a_idRealizacao, periodoPE); //Depende se estiver na etapa do forward/backward
 
-							for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
+						}//for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
 
-								const IdHidreletrica idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).getIteradorInicial();
-								const double         coeficiente_idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE_ENA);
+						if (afluencia_natural < 0.0)
+							afluencia_natural = 0.0;
 
-								if (periodoPE < vetorProcessoEstocastico.at(idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) //Valores da tendência
-									afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.at(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodoPE, double());
-								else//Valores dentro da árvore
-									afluencia_natural += coeficiente_idUHE_ENA * get_afluencia_incremental_from_idVariavelAleatoria(mapIdVar.at(idUHE_ENA), a_idCenario, a_idRealizacao, periodoPE); //Depende se estiver na etapa do forward/backward
+						valor_ENA += sobreposicao * produtibilidade_ENA.at(periodoPE) * afluencia_natural;
+						//****************************************************************************************************************************
 
-							}//for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
+					}//if (sobreposicao > 0.0) {
 
-							if (afluencia_natural < 0.0)
-								afluencia_natural = 0.0;
+					if (is_sobreposicao_encontrada && sobreposicao == 0.0) {//Evita percorrer o horizonte todo					
+						const double tol = 1e-6;
+						if (abs(1 - soma_sobreposicao) > tol)
+							throw std::invalid_argument("Soma de sobreposicao diferente de 1.0, valor encontrado: " + getString(soma_sobreposicao));
 
-							valor_ENA += sobreposicao * produtibilidade_ENA.at(periodoPE) * afluencia_natural;
-							//****************************************************************************************************************************
-
-						}//if (sobreposicao > 0.0) {
-
-						if (is_sobreposicao_encontrada && sobreposicao == 0.0) {//Evita percorrer o horizonte todo					
-							const double tol = 1e-6;
-							if (abs(1 - soma_sobreposicao) > tol)
-								throw std::invalid_argument("Soma de sobreposicao diferente de 1.0, valor encontrado: " + getString(soma_sobreposicao));
-
-							break;
-						}//if (is_sobreposicao_encontrada && sobreposicao == 0.0) {
+						break;
+					}//if (is_sobreposicao_encontrada && sobreposicao == 0.0) {
 
 
-					}//if (produtibilidade_ENA.at(periodoPE) > 0.0) {
+				}//if (produtibilidade_ENA.at(periodoPE) > 0.0) {
 
-				}//for (Periodo periodo = periodo_inicial; periodo <= periodo_final; produtibilidade_ENA.incrementarIterador(periodo)) {
+			}//for (Periodo periodo = periodo_inicial; periodo <= periodo_final; produtibilidade_ENA.incrementarIterador(periodo)) {
 
-				if (!is_sobreposicao_encontrada && is_precisa_calcular)
-					throw std::invalid_argument("Nao encontrada sobreposicao do periodo_lag: " + getString(a_periodo_lag));
+			if (!is_sobreposicao_encontrada && is_precisa_calcular)
+				throw std::invalid_argument("Nao encontrada sobreposicao do periodo_lag: " + getString(a_periodo_lag));
 
-			}//if (maiorIdREE == a_idReservatorioEquivalente) {
+
 
 		}//for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idUHE)) {
 

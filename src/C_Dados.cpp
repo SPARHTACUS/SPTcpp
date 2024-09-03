@@ -3611,6 +3611,8 @@ void Dados::validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, cons
 
 		for (IdHidreletrica idUHE = menorIdHidreletrica; idUHE <= maiorIdHidreletrica; vetorHidreletrica.incr(idUHE)) {
 
+			int numero_REEs_com_produtibilidade_ENA = 0;
+
 			if (vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente.numObjetos() > 0) {
 
 				const IdReservatorioEquivalente maiorIdReservatorioEquivalente = getMaiorId(idUHE, IdReservatorioEquivalente());
@@ -3625,7 +3627,9 @@ void Dados::validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, cons
 
 					if (sizeVetor_produtibilidade_ENA > 0) {
 
-						if(idUHE == menorIdHidreletrica && idREE == menorIdReservatorioEquivalente)
+						numero_REEs_com_produtibilidade_ENA++;
+
+						if(controle_size_produtibilidade_ENA == 0)
 							controle_size_produtibilidade_ENA = sizeVetor_produtibilidade_ENA;
 
 						if(controle_size_produtibilidade_ENA != sizeVetor_produtibilidade_ENA)
@@ -3635,6 +3639,9 @@ void Dados::validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, cons
 
 				}//for (IdReservatorioEquivalente idREE = getMenorId(idUHE, IdReservatorioEquivalente()); idREE <= getMaiorId(idUHE, IdReservatorioEquivalente()); vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente.incr(idREE)) {
 			}//if (vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente.numObjetos() > 0) {
+
+			if(numero_REEs_com_produtibilidade_ENA != 1)
+				throw std::invalid_argument("AttVetorReservatorioEquivalente_produtibilidade_ENA deve ter aporte para um unico REE na usina: " + getString(idUHE));
 
 		} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
 
@@ -3647,7 +3654,23 @@ void Dados::validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, cons
 			SmartEnupla<Periodo, bool> horizonte_tendencia_mais_PE;
 
 			if (true) {
-				const SmartEnupla<Periodo, double> produtibilidade_ENA_base = getVetor(menorIdHidreletrica, getMenorId(menorIdHidreletrica, IdReservatorioEquivalente()), AttVetorReservatorioEquivalente_produtibilidade_ENA, Periodo(), double());
+				
+				//////////////////////////////////////////////////////////////
+				//Pega o AttVetorReservatorioEquivalente_produtibilidade_ENA para utilizar os periodos
+				//Precisa validar por REE instanciado se produtibilidade_ENA existe para um REE (podem existir usinas com REE instanciados sem produtibilidade_ENA por causa da produtibilidade_acumulada_EAR)
+				SmartEnupla<Periodo, double> produtibilidade_ENA_base;
+
+				for (IdReservatorioEquivalente idREE = getMenorId(menorIdHidreletrica, IdReservatorioEquivalente()); idREE <= getMaiorId(menorIdHidreletrica, IdReservatorioEquivalente()); vetorHidreletrica.at(menorIdHidreletrica).vetorReservatorioEquivalente.incr(idREE)) {
+					if (getSizeVetor(menorIdHidreletrica, idREE, AttVetorReservatorioEquivalente_produtibilidade_ENA) > 0) {
+						produtibilidade_ENA_base = getVetor(menorIdHidreletrica, idREE, AttVetorReservatorioEquivalente_produtibilidade_ENA, Periodo(), double());
+						break;
+					}
+				}//for (IdReservatorioEquivalente idREE = getMenorId(menorIdHidreletrica, IdReservatorioEquivalente()); idREE <= getMaiorId(menorIdHidreletrica, IdReservatorioEquivalente()); vetorHidreletrica.at(menorIdHidreletrica).vetorReservatorioEquivalente.incr(idREE)) {
+
+				if (int(produtibilidade_ENA_base.size()) == 0)
+					throw std::invalid_argument("Nao encontrado AttVetorReservatorioEquivalente_produtibilidade_ENA");
+
+				//////////////////////////////////////////////////////////////
 
 				Periodo periodoPE_inicial = a_processoEstocastico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo());
 				Periodo periodoPE_final = a_processoEstocastico.getIterador2Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo());
@@ -3686,47 +3709,51 @@ void Dados::validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, cons
 
 				for (IdReservatorioEquivalente idREE = menorIdReservatorioEquivalente; idREE <= maiorIdReservatorioEquivalente; vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente.incr(idREE)) {
 
-					SmartEnupla<Periodo, double> produtibilidade_ENA_alvo(horizonte_tendencia_mais_PE, 0.0);
+					if (getSizeVetor(idUHE, idREE, AttVetorReservatorioEquivalente_produtibilidade_ENA) > 0) {
 
-					const SmartEnupla<Periodo, double> produtibilidade_ENA_base = getVetor(idUHE, idREE, AttVetorReservatorioEquivalente_produtibilidade_ENA, Periodo(), double());
+						SmartEnupla<Periodo, double> produtibilidade_ENA_alvo(horizonte_tendencia_mais_PE, 0.0);
 
-					for (Periodo periodo_alvo = produtibilidade_ENA_alvo.getIteradorInicial(); periodo_alvo <= produtibilidade_ENA_alvo.getIteradorFinal(); produtibilidade_ENA_alvo.incrementarIterador(periodo_alvo)) {
+						const SmartEnupla<Periodo, double> produtibilidade_ENA_base = getVetor(idUHE, idREE, AttVetorReservatorioEquivalente_produtibilidade_ENA, Periodo(), double());
 
-						bool is_sobreposicao_encontrada = false;
-						double soma_sobreposicao = 0.0;
+						for (Periodo periodo_alvo = produtibilidade_ENA_alvo.getIteradorInicial(); periodo_alvo <= produtibilidade_ENA_alvo.getIteradorFinal(); produtibilidade_ENA_alvo.incrementarIterador(periodo_alvo)) {
 
-						for (Periodo periodo_base = produtibilidade_ENA_base.getIteradorInicial(); periodo_base <= produtibilidade_ENA_base.getIteradorFinal(); produtibilidade_ENA_base.incrementarIterador(periodo_base)) {
+							bool is_sobreposicao_encontrada = false;
+							double soma_sobreposicao = 0.0;
 
-							const double sobreposicao = periodo_alvo.sobreposicao(periodo_base);
+							for (Periodo periodo_base = produtibilidade_ENA_base.getIteradorInicial(); periodo_base <= produtibilidade_ENA_base.getIteradorFinal(); produtibilidade_ENA_base.incrementarIterador(periodo_base)) {
 
-							if (sobreposicao > 0.0) {
-								is_sobreposicao_encontrada = true;
-								soma_sobreposicao += sobreposicao;
+								const double sobreposicao = periodo_alvo.sobreposicao(periodo_base);
 
-								double valor_novo = produtibilidade_ENA_alvo.at(periodo_alvo) + sobreposicao * produtibilidade_ENA_base.at(periodo_base);
-								produtibilidade_ENA_alvo.at(periodo_alvo) = valor_novo;
+								if (sobreposicao > 0.0) {
+									is_sobreposicao_encontrada = true;
+									soma_sobreposicao += sobreposicao;
 
-							}//if (sobreposicao > 0.0) {
+									double valor_novo = produtibilidade_ENA_alvo.at(periodo_alvo) + sobreposicao * produtibilidade_ENA_base.at(periodo_base);
+									produtibilidade_ENA_alvo.at(periodo_alvo) = valor_novo;
 
-							if (is_sobreposicao_encontrada && sobreposicao == 0.0) {//Evita percorrer o horizonte base todo
+								}//if (sobreposicao > 0.0) {
 
-								if (!doubleCompara(1e-6, soma_sobreposicao, 1.0))
-									throw std::invalid_argument("Soma de sobreposicao diferente de 1.0, valor encontrado: " + getString(soma_sobreposicao));
+								if (is_sobreposicao_encontrada && sobreposicao == 0.0) {//Evita percorrer o horizonte base todo
 
-								break;
+									if (!doubleCompara(1e-6, soma_sobreposicao, 1.0))
+										throw std::invalid_argument("Soma de sobreposicao diferente de 1.0, valor encontrado: " + getString(soma_sobreposicao));
 
-							}//if (is_sobreposicao_encontrada && sobreposicao == 0.0) {
-							
-						}//for (Periodo periodo_base = produtibilidade_ENA_base.getIteradorInicial(); periodo_base <= produtibilidade_ENA_base.getIteradorFinal(); produtibilidade_ENA_base.incrementarIterador(periodo_base)) {
+									break;
 
-						if(!is_sobreposicao_encontrada){ throw std::invalid_argument("Nao encontrado em horizonte_produtibilidade_ENA o periodo alvo: " + getString(periodo_alvo)); }
+								}//if (is_sobreposicao_encontrada && sobreposicao == 0.0) {
 
-					}//for (Periodo periodo_alvo = produtibilidade_ENA_alvo.getIteradorInicial(); periodo_alvo <= produtibilidade_ENA_alvo.getIteradorFinal(); produtibilidade_ENA_alvo.incrementarIterador(periodo_alvo)) {
+							}//for (Periodo periodo_base = produtibilidade_ENA_base.getIteradorInicial(); periodo_base <= produtibilidade_ENA_base.getIteradorFinal(); produtibilidade_ENA_base.incrementarIterador(periodo_base)) {
 
-					////////////////////////////////////////////////////////////////
-					//Atualiza AttVetorReservatorioEquivalente_produtibilidade_ENA
-					////////////////////////////////////////////////////////////////
-					vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente.at(idREE).setVetor_forced(AttVetorReservatorioEquivalente_produtibilidade_ENA, produtibilidade_ENA_alvo);
+							if (!is_sobreposicao_encontrada) { throw std::invalid_argument("Nao encontrado em horizonte_produtibilidade_ENA o periodo alvo: " + getString(periodo_alvo)); }
+
+						}//for (Periodo periodo_alvo = produtibilidade_ENA_alvo.getIteradorInicial(); periodo_alvo <= produtibilidade_ENA_alvo.getIteradorFinal(); produtibilidade_ENA_alvo.incrementarIterador(periodo_alvo)) {
+
+						////////////////////////////////////////////////////////////////
+						//Atualiza AttVetorReservatorioEquivalente_produtibilidade_ENA
+						////////////////////////////////////////////////////////////////
+						vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente.at(idREE).setVetor_forced(AttVetorReservatorioEquivalente_produtibilidade_ENA, produtibilidade_ENA_alvo);
+
+					}//if (getSizeVetor(idUHE, idREE, AttVetorReservatorioEquivalente_produtibilidade_ENA) > 0) {
 
 				}//for (IdReservatorioEquivalente idREE = getMenorId(idUHE, IdReservatorioEquivalente()); idREE <= getMaiorId(idUHE, IdReservatorioEquivalente()); vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente.incr(idREE)) {
 
