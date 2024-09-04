@@ -142,6 +142,8 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 		double cont_tempo_otimizacao = 0.0;
 		int cont_numero_otimizacao = 0;
 
+		MPI_Barrier(MPI_COMM_WORLD);
+
 		for (IdEstagio idEstagio = a_estagio_inicial; idEstagio <= a_estagio_final; idEstagio++) {
 
 			const IdEstagio idEstagio_seguinte = IdEstagio(idEstagio + 1);
@@ -959,7 +961,7 @@ void MetodoSolucao::executarPDDE_atualizarCustoInferior(const IdIteracao a_idIte
 					}
 				}
 
-				if (c != int(a_custo_inferior.size()))
+				if (c != int(a_custo_inferior.at(menor_estagio).size()))
 					throw std::invalid_argument("Erro em " + getFullString(idProcesso_local));
 
 			} // if (a_custo_inferior.size() > 0) {

@@ -54,7 +54,7 @@ public:
 
 	void gerarTendenciaTemporalMedia(const Periodo a_periodo_final);
 
-	void parametrizarModelo(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_parametros, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_coeficiente_auto_correlacao, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao_variaveis_aleatorias, const double a_valor_determinacao_correlacao);
+	void parametrizarModelo(const EntradaSaidaDados &a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_idProcessoEnd, const bool a_imprimir_parametros, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_coeficiente_auto_correlacao, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao_variaveis_aleatorias, const double a_valor_determinacao_correlacao);
 
 	void avaliarModeloViaSerieSintetica(const EntradaSaidaDados &a_entradaSaidaDados, const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, const int a_numero_periodos_avaliacao_sintetica);
 
@@ -88,7 +88,7 @@ public:
 
 	void imprimirCenarios(EntradaSaidaDados a_entradaSaidaDados);
 
-	void imprimirParametros(EntradaSaidaDados a_entradaSaidaDados);
+	void imprimirParametros(EntradaSaidaDados a_entradaSaidaDados, const IdVariavelAleatoria a_idVarIni, const IdVariavelAleatoria a_idVarEnd);
 
 	int getMaiorOrdemAutocorrelacaoLinear(const Periodo a_periodo);
 
@@ -232,7 +232,7 @@ inline void ProcessoEstocastico::addSeriesTemporais(const TipoVariavelAleatoria 
 		if (a_lista_tipo_variavel_aleatoria_interna.getIteradorInicial() != 1)
 			throw std::invalid_argument("O iterador inicial da lista de variaveis aleatorias internas deve ser 1.");
 
-		const IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria(a_tipo_variavel_aleatoria);
+		IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria(getMaiorId(IdVariavelAleatoria()) + 1);
 
 		if (vetorVariavelAleatoria.isInstanciado(idVariavelAleatoria))
 			throw std::invalid_argument("Variavel aleatoria ja instanciada " + getFullString(idVariavelAleatoria) + " " + getAtributo(idVariavelAleatoria, AttComumVariavelAleatoria_nome, std::string()));
@@ -287,7 +287,7 @@ inline void ProcessoEstocastico::addTendenciasTemporais(const TipoVariavelAleato
 		if (a_lista_tipo_variavel_aleatoria_interna.getIteradorInicial() != 1)
 			throw std::invalid_argument("O iterador inicial da lista de variaveis aleatorias internas deve ser 1.");
 
-		const IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria(a_tipo_variavel_aleatoria);
+		const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromIdFisico(a_tipo_variavel_aleatoria);
 
 		if (!vetorVariavelAleatoria.isInstanciado(idVariavelAleatoria))
 			throw std::invalid_argument("Variavel aleatoria ainda nao instanciada " + getFullString(idVariavelAleatoria));

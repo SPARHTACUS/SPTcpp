@@ -133,6 +133,7 @@ int main(int argc, char *argv[]) {
 
 		if ((idProcesso == IdProcesso_mestre) && pause_initiation)
 			std::system("pause");
+		MPI_Barrier(MPI_COMM_WORLD);
 
 
 		//

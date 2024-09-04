@@ -221,7 +221,10 @@ void LeituraCEPEL::leitura_CURVA_202001_NW27(Dados& a_dados, std::string a_nomeA
 									const Periodo periodo_dado = Periodo(TipoPeriodo_mensal, IdMes(mes), getIdAnoFromChar(line.substr(0, 4).c_str()));
 									double percentual_energia = std::stod(line.substr(mes * 6, 5)) * 0.01;
 
-									for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+									const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+									const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
+
+									for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 										if (lista_codigo_ONS_REE.getElemento(idHidreletrica) == ree) {
 
@@ -237,7 +240,7 @@ void LeituraCEPEL::leitura_CURVA_202001_NW27(Dados& a_dados, std::string a_nomeA
 
 										}//if (lista_codigo_ONS_REE.getElemento(idHidreletrica) == ree) {
 
-									}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {								
+									}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {							
 
 								} // for (int mes = 1; mes <= 12; mes++) {
 
@@ -452,7 +455,7 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 
 				a_dados.setAtributo(AttComumDados_numero_maximo_iteracoes, numero_maximo_iteracoes);
 
-				a_dados.setAtributo(AttComumDados_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico_hidrologico_bacia);
+				a_dados.setAtributo(AttComumDados_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico_hidrologico_hidreletrica);
 
 				a_dados.setAtributo(AttComumDados_tipo_modelo_geracao_cenario_hidrologico, TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal);
 
@@ -1721,8 +1724,8 @@ void LeituraCEPEL::leitura_SISTEMA_201908_NW25(Dados &a_dados, std::string nomeA
 					bloco_usina_nao_simulada = atributo;
 
 				//Descrição do bloco de usinas não simuladas
-				if (line.size() >= 20) {
-					atributo = line.substr(11, 20);
+				if (line.size() >= 12) {
+					atributo = line.substr(11, int(line.size()));
 					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 				}
 				else
@@ -2044,12 +2047,14 @@ void LeituraCEPEL::leitura_CONFHD_201908_NW25(Dados &a_dados, std::string nomeAr
 
 							IdHidreletrica idHidreletrica_bacia = IdHidreletrica_Nenhum;
 							if (a_dados.getMenorId(IdHidreletrica()) != IdHidreletrica_Nenhum) {
-								for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+								const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+								const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
+								for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 									if (lista_codigo_ONS_REE.at(idHidreletrica) == codigo_REE_CEPEL) {
 										idHidreletrica_bacia = idHidreletrica;
 										break;
 									} // if (getIdFromCodigoONS(lista_codigo_ONS_REE, codigo_REE_CEPEL) == idHidreletrica) {
-								} // for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+								} // for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 							} // if (a_dados.getMenorId(IdHidreletrica()) != IdHidreletrica_Nenhum) {
 
 							const IdHidreletrica idHidreletrica = IdHidreletrica(codigo_usina);
@@ -2316,8 +2321,6 @@ void LeituraCEPEL::leitura_VAZOES_201908_NW25(Dados &a_dados, std::string nomeAr
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
-		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
-
 		if (leituraArquivo.is_open()) {
 
 			while (!(leituraArquivo.eof())) {
@@ -2341,7 +2344,10 @@ void LeituraCEPEL::leitura_VAZOES_201908_NW25(Dados &a_dados, std::string nomeAr
 				else
 					throw std::invalid_argument("tamanho do registro de vazoes ivalido " + getFullString(tamanho_registro_arquivo_vazoes_historicas) + ".");
 
-				for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+				const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+				const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
+
+				for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 					if (!lista_hidreletrica_pre_configuracao.getElemento(idHidreletrica)) {
 
@@ -2366,7 +2372,7 @@ void LeituraCEPEL::leitura_VAZOES_201908_NW25(Dados &a_dados, std::string nomeAr
 
 					} // if (!lista_hidreletrica_pre_configuracao.at(idHidreletrica)) {
 
-				}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= idHidreletrica_MaiorId; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+				}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			}//while (!(leituraArquivo.eof())) {
 
@@ -4656,7 +4662,10 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 				//para todos os submercados inicializados
 				///////////////////////////////////////////////////////////////
 
-				for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado))
+				const IdSubmercado idSubmercadoIni = a_dados.getMenorId(IdSubmercado());
+				const IdSubmercado idSubmercadoOut = a_dados.getIdOut(IdSubmercado());
+
+				for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado))
 					a_dados.vetorSubmercado.at(idSubmercado).setMatriz(AttMatrizSubmercado_percentual_variacao_patamar_carga, matriz_periodo_patamar_zero);
 
 				////////////////
@@ -5012,21 +5021,22 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_usinaNaoSimulada_percentual_variacao_patamar_carga(horizonte_estudo, vetor_usinaNaoSimulada_percentual_variacao_patamar_carga);
 
-					const IdSubmercado idSubmercado_Maior = a_dados.vetorSubmercado.getMaiorId();
+					const IdSubmercado idSubmercadoIni = a_dados.getMenorId(IdSubmercado());
+					const IdSubmercado idSubmercadoOut = a_dados.getIdOut(IdSubmercado());
 
-					for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
+					for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 						if (a_dados.vetorSubmercado.at(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
-							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.at(idSubmercado).getMenorId(IdUsinaNaoSimulada());
-							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.at(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada idUsinaNaoSimuladaIni = a_dados.getMenorId(idSubmercado, IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada idUsinaNaoSimuladaOut = a_dados.getIdOut(idSubmercado, IdUsinaNaoSimulada());
 
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = idUsinaNaoSimuladaIni; idUsinaNaoSimulada < idUsinaNaoSimuladaOut; a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
 								a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_usinaNaoSimulada_percentual_variacao_patamar_carga);
 
 						}//if (a_dados.vetorSubmercado.at(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
-					}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
+					}//for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 				}//if (leitura_bloco_5 == false) {
 				else if (leitura_bloco_5 == true) {
@@ -5047,21 +5057,22 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_usinaNaoSimulada_percentual_variacao_patamar_carga(horizonte_estudo, vetor_usinaNaoSimulada_percentual_variacao_patamar_carga);
 
-						const IdSubmercado idSubmercado_Maior = a_dados.vetorSubmercado.getMaiorId();
+						const IdSubmercado idSubmercadoIni = a_dados.getMenorId(IdSubmercado());
+						const IdSubmercado idSubmercadoOut = a_dados.getIdOut(IdSubmercado());
 
-						for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
+						for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 							if (a_dados.vetorSubmercado.at(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
-								const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.at(idSubmercado).getMenorId(IdUsinaNaoSimulada());
-								const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.at(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+								const IdUsinaNaoSimulada idUsinaNaoSimuladaIni = a_dados.getMenorId(idSubmercado, IdUsinaNaoSimulada());
+								const IdUsinaNaoSimulada idUsinaNaoSimuladaOut = a_dados.getIdOut(idSubmercado, IdUsinaNaoSimulada());
 
-								for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
+								for (IdUsinaNaoSimulada idUsinaNaoSimulada = idUsinaNaoSimuladaIni; idUsinaNaoSimulada < idUsinaNaoSimuladaOut; a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
 									a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_usinaNaoSimulada_percentual_variacao_patamar_carga);
 
 							}//if (a_dados.vetorSubmercado.at(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
-						}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
+						}//for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 					}//if (int(line.length()) == 0) {
 					else {
@@ -5076,15 +5087,19 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 						//para todos os submercados inicializados
 						///////////////////////////////////////////////////////////////
 
-						for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
+						const IdSubmercado idSubmercadoIni = a_dados.getMenorId(IdSubmercado());
+						const IdSubmercado idSubmercadoOut = a_dados.getIdOut(IdSubmercado());
 
-							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.at(idSubmercado).getMenorId(IdUsinaNaoSimulada());
-							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.at(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+						for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
+
+							const IdUsinaNaoSimulada idUsinaNaoSimuladaIni = a_dados.getMenorId(idSubmercado, IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada idUsinaNaoSimuladaOut = a_dados.getIdOut(idSubmercado, IdUsinaNaoSimulada());
+
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = idUsinaNaoSimuladaIni; idUsinaNaoSimulada < idUsinaNaoSimuladaOut; a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
 								a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_periodo_patamar_zero);
 
-						}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
+						}//for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 						////////////////
 
@@ -5366,7 +5381,10 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 				//para todos os submercados inicializados
 				///////////////////////////////////////////////////////////////
 
-				for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado))
+				const IdSubmercado idSubmercadoIni = a_dados.getMenorId(IdSubmercado());
+				const IdSubmercado idSubmercadoOut = a_dados.getIdOut(IdSubmercado());
+
+				for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado))
 					a_dados.vetorSubmercado.at(idSubmercado).setMatriz(AttMatrizSubmercado_percentual_variacao_patamar_carga, matriz_periodo_patamar_zero);
 
 				////////////////
@@ -5631,21 +5649,22 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 					SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_usinaNaoSimulada_percentual_variacao_patamar_carga(horizonte_estudo, vetor_usinaNaoSimulada_percentual_variacao_patamar_carga);
 
-					const IdSubmercado idSubmercado_Maior = a_dados.vetorSubmercado.getMaiorId();
+					const IdSubmercado idSubmercadoIni = a_dados.getMenorId(IdSubmercado());
+					const IdSubmercado idSubmercadoOut = a_dados.getIdOut(IdSubmercado());
 
-					for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
+					for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 						if (a_dados.vetorSubmercado.at(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
-							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.at(idSubmercado).getMenorId(IdUsinaNaoSimulada());
-							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.at(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada idUsinaNaoSimuladaIni = a_dados.getMenorId(idSubmercado, IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada idUsinaNaoSimuladaOut = a_dados.getIdOut(idSubmercado, IdUsinaNaoSimulada());
 
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = idUsinaNaoSimuladaIni; idUsinaNaoSimulada < idUsinaNaoSimuladaOut; a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
 								a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_usinaNaoSimulada_percentual_variacao_patamar_carga);
 
 						}//if (a_dados.vetorSubmercado.at(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
-					}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
+					}//for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 				}//if (leitura_bloco_5 == false) {
 				else if (leitura_bloco_5 == true) {
@@ -5666,21 +5685,22 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_usinaNaoSimulada_percentual_variacao_patamar_carga(horizonte_estudo, vetor_usinaNaoSimulada_percentual_variacao_patamar_carga);
 
-						const IdSubmercado idSubmercado_Maior = a_dados.vetorSubmercado.getMaiorId();
+						const IdSubmercado idSubmercadoIni = a_dados.getMenorId(IdSubmercado());
+						const IdSubmercado idSubmercadoOut = a_dados.getIdOut(IdSubmercado());
 
-						for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
+						for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 							if (a_dados.vetorSubmercado.at(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
-								const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.at(idSubmercado).getMenorId(IdUsinaNaoSimulada());
-								const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.at(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+								const IdUsinaNaoSimulada idUsinaNaoSimuladaIni = a_dados.getMenorId(idSubmercado, IdUsinaNaoSimulada());
+								const IdUsinaNaoSimulada idUsinaNaoSimuladaOut = a_dados.getIdOut(idSubmercado, IdUsinaNaoSimulada());
 
-								for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
+								for (IdUsinaNaoSimulada idUsinaNaoSimulada = idUsinaNaoSimuladaIni; idUsinaNaoSimulada < idUsinaNaoSimuladaOut; a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
 									a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_usinaNaoSimulada_percentual_variacao_patamar_carga);
 
 							}//if (a_dados.vetorSubmercado.at(idSubmercado).getAtributo(AttComumSubmercado_ficticio, bool()) == false) {
 
-						}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
+						}//for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 					}//if (int(line.length()) == 0) {
 					else {
@@ -5695,15 +5715,18 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 						//para todos os submercados inicializados
 						///////////////////////////////////////////////////////////////
 
-						for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
+						const IdSubmercado idSubmercadoIni = a_dados.getMenorId(IdSubmercado());
+						const IdSubmercado idSubmercadoOut = a_dados.getIdOut(IdSubmercado());
 
-							const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = a_dados.vetorSubmercado.at(idSubmercado).getMenorId(IdUsinaNaoSimulada());
-							const IdUsinaNaoSimulada maiorIdUsinaNaoSimulada = a_dados.vetorSubmercado.at(idSubmercado).getMaiorId(IdUsinaNaoSimulada());
+						for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
-							for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada <= maiorIdUsinaNaoSimulada; a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
+							const IdUsinaNaoSimulada idUsinaNaoSimuladaIni = a_dados.getMenorId(idSubmercado, IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada idUsinaNaoSimuladaOut = a_dados.getIdOut(idSubmercado, IdUsinaNaoSimulada());
+
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = idUsinaNaoSimuladaIni; idUsinaNaoSimulada < idUsinaNaoSimuladaOut; a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada))
 								a_dados.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).setMatriz(AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, matriz_periodo_patamar_zero);
 
-						}//for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= idSubmercado_Maior; a_dados.vetorSubmercado.incr(idSubmercado)) {
+						}//for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 						////////////////
 
 						while (true) {
@@ -6118,7 +6141,9 @@ void LeituraCEPEL::leitura_VAZPAST_201908_NW25(Dados& a_dados, std::string nomeA
 			} // while(std::getline(leituraArquivo, line)) {
 
 			/*
-			for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+			const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+			const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
+			for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 				if (a_dados.getSize1Matriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_natural_tendencia) == 0) {
 
@@ -6130,7 +6155,7 @@ void LeituraCEPEL::leitura_VAZPAST_201908_NW25(Dados& a_dados, std::string nomeA
 					
 				} // if (a_dados.getSize1Matriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_natural_tendencia) == 0) {
 
-			} // for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+			} // for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 			*/
 
 			leituraArquivo.close();
@@ -6268,7 +6293,10 @@ void LeituraCEPEL::leitura_C_ADIC_201908_NW25(Dados& a_dados, std::string nomeAr
 
 				leituraArquivo.close();
 
-				for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.vetorSubmercado.getMaiorId(); a_dados.vetorSubmercado.incr(idSubmercado)) {
+				const IdSubmercado idSubmercadoIni = a_dados.getMenorId(IdSubmercado());
+				const IdSubmercado idSubmercadoOut = a_dados.getIdOut(IdSubmercado());
+
+				for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 					if (lista_C_ADIC.at(idSubmercado).size() > 0) {
 
@@ -6283,7 +6311,7 @@ void LeituraCEPEL::leitura_C_ADIC_201908_NW25(Dados& a_dados, std::string nomeAr
 						} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 					} // if (lista_C_ADIC.at(idSubmercado).size() > 0) {
-				} // for (IdSubmercado idSubmercado = a_dados.vetorSubmercado.getMenorId(); idSubmercado <= a_dados.getMaiorId(IdSubmercado()); a_dados.vetorSubmercado.incr(idSubmercado)) {
+				} // for (IdSubmercado idSubmercado = idSubmercadoIni; idSubmercado < idSubmercadoOut; a_dados.vetorSubmercado.incr(idSubmercado)) {
 
 			}//if (leituraArquivo.is_open()) {
 			else  throw std::invalid_argument("Nao foi possivel abrir o arquivo " + nomeArquivo + ".");
@@ -6697,12 +6725,15 @@ void LeituraCEPEL::leitura_PENALID_201908_NW25(Dados& a_dados, std::string nomeA
 
 						//O subsistema para as hidrelétricas refere-se ao REE associado (ver arquivo: CONFHD.DAT)
 
-						for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+						const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
+
+						for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 							if (lista_codigo_ONS_REE.at(idHidreletrica) == subsistema) {
 								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_penalidade_desvio_agua, penalidade);
 								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_penalidade_afluencia_incremental, penalidade);
 							} // if (lista_codigo_ONS_REE.at(idHidreletrica) == subsistema) {
-						} // for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {	
+						} // for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 					}//if (subsistema_reportado == true) {
 
@@ -6710,12 +6741,13 @@ void LeituraCEPEL::leitura_PENALID_201908_NW25(Dados& a_dados, std::string nomeA
 
 						//O valor de penalidade aplica para todas as usinas
 
-						const IdHidreletrica idHidreletrica_maiorId = a_dados.vetorHidreletrica.getMaiorId();
+						const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+						const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
 
-						for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= idHidreletrica_maiorId; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_penalidade_desvio_agua, penalidade);
 							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_penalidade_afluencia_incremental, penalidade);
-						}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= idHidreletrica_maiorId; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 					} //else if (subsistema_reportado == false) {
 
@@ -6778,7 +6810,7 @@ void LeituraCEPEL::leitura_PENALID_201908_NW25(Dados& a_dados, std::string nomeA
 
 							a_dados.vetorIntercambio.at(idIntercambio).setAtributo(AttComumIntercambio_penalidade_intercambio, penalidade);
 
-						}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= idHidreletrica_maiorId; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						}//for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= idIntercambio_maiorId; idIntercambio++) {
 
 					}//else if (subsistema_reportado == false) {
 
@@ -6790,12 +6822,15 @@ void LeituraCEPEL::leitura_PENALID_201908_NW25(Dados& a_dados, std::string nomeA
 
 						//O subsistema para as hidrelétricas refere-se ao REE associado (ver arquivo: CONFHD.DAT)
 
-						for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+						const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
+
+						for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 							if (lista_codigo_ONS_REE.at(idHidreletrica) == subsistema) {
 								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_penalidade_vazao_defluente_minima, penalidade);
 								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_penalidade_vazao_defluente_maxima, penalidade);
 							} // if (lista_codigo_ONS_REE.at(idHidreletrica) == subsistema) {
-						} // for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						} // for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 					}//if (subsistema_reportado == true) {
 
@@ -6803,13 +6838,14 @@ void LeituraCEPEL::leitura_PENALID_201908_NW25(Dados& a_dados, std::string nomeA
 
 						//O valor de penalidade aplica para todas as usinas
 
-						const IdHidreletrica idHidreletrica_maiorId = a_dados.vetorHidreletrica.getMaiorId();
+						const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+						const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
 
-						for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= idHidreletrica_maiorId; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_penalidade_vazao_defluente_minima, penalidade);
 
-						}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= idHidreletrica_maiorId; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 					}//else if (subsistema_reportado == false) {
 
@@ -6821,10 +6857,13 @@ void LeituraCEPEL::leitura_PENALID_201908_NW25(Dados& a_dados, std::string nomeA
 
 						//O subsistema para as hidrelétricas refere-se ao REE associado (ver arquivo: CONFHD.DAT)
 
-						for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+						const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
+
+						for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 							if (lista_codigo_ONS_REE.at(idHidreletrica) == subsistema) 
 								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_penalidade_volume_minimo, penalidade);
-						} // for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						} // for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 					} // if (subsistema_reportado == true) {
 
@@ -6832,13 +6871,14 @@ void LeituraCEPEL::leitura_PENALID_201908_NW25(Dados& a_dados, std::string nomeA
 
 						//O valor de penalidade aplica para todas as usinas
 
-						const IdHidreletrica idHidreletrica_maiorId = a_dados.vetorHidreletrica.getMaiorId();
+						const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+						const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
 
-						for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= idHidreletrica_maiorId; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_penalidade_volume_minimo, penalidade);
 
-						}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= idHidreletrica_maiorId; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 					}//else if (subsistema_reportado == false) {
 
@@ -6850,23 +6890,27 @@ void LeituraCEPEL::leitura_PENALID_201908_NW25(Dados& a_dados, std::string nomeA
 
 						// O subsistema para as hidrelétricas refere-se ao REE associado (ver arquivo: CONFHD.DAT)
 
-						for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+						const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
+
+						for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 							if (lista_codigo_ONS_REE.at(idHidreletrica) == subsistema)
 								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_penalidade_potencia_minima, penalidade);
-						} // for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						} // for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 					}//if (subsistema_reportado == true) {
 					else if (subsistema_reportado == false) {
 
 						//O valor de penalidade aplica para todas as usinas
 
-						const IdHidreletrica idHidreletrica_maiorId = a_dados.vetorHidreletrica.getMaiorId();
+						const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+						const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
 
-						for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= idHidreletrica_maiorId; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_penalidade_potencia_minima, penalidade);
 
-						}//for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= idHidreletrica_maiorId; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+						}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 					}//else if (subsistema_reportado == false) {
 
@@ -8168,10 +8212,10 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados) {
 		//Via pre-config podem ter sido instanciadas usinas sem produção necessárias para o acoplamento com o modelo NW (cálculo de ENAs)
 		// Nesse caso, é necessário instanciar o reservatório, afluência, variavelAleatoria etc
 
-		const IdHidreletrica menorIdHidreletrica = a_dados.getMenorId(IdHidreletrica());
-		const IdHidreletrica maiorIdHidreletrica = a_dados.getMaiorId(IdHidreletrica());
+		const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+		const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
 
-		for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+		for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 			for (int pos = 0; pos < int(idHidreletricas_sem_producao.size()); pos++) {
 
@@ -8179,7 +8223,7 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados) {
 					instanciar_hidreletricas_sem_producao_para_acoplamento_cortes_NW(a_dados, idHidreletrica, codigo_usina_idHidreletricas_sem_producao.at(pos), codigo_posto_idHidreletricas_sem_producao.at(pos), codigo_posto_acoplamento_ENA_idHidreletricas_sem_producao.at(pos), codigo_ONS_REE_idHidreletricas_sem_producao.at(pos));
 
 			}//for (int pos = 0; pos < int(idHidreletricas_sem_producao.size()); pos++) {
-		}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+		}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8233,6 +8277,8 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados) {
 		a_dados.validacao_operacional_RestricaoEletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		a_dados.validacao_operacional_AgrupamentoIntercambio(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+
+		a_dados.definirCenariosPorProcessosEmArranjoResolucao();
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 
