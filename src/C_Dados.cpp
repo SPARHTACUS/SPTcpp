@@ -11055,7 +11055,6 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 		arranjoResolucao.setAtributo(AttComumArranjoResolucao_iteracao_numero_maximo, iteracao_numero_maximo);
 		arranjoResolucao.setAtributo(AttComumArranjoResolucao_iteracao_final, iteracao_final);
 
-
 		//
 		// Computar menor e maior cenarios por iteracao
 		//
