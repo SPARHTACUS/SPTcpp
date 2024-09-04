@@ -94,8 +94,10 @@
 	  m(Dados,  AttComum,           imprimir_selecao_corte_por_iteracao,                                bool,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,             imprimir_tempos_construcao_modelo,                                bool,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                imprimir_tempos_metodo_solucao,                                bool,         min,         max,           min,      nao) \
-	  m(Dados,  AttComum,    imprimir_resultado_por_estagio_por_cenario,                                bool,         min,         max,           min,      nao) \
-	  m(Dados,  AttComum, imprimir_resultado_por_estagio_por_cenario_por_realizacao,                    bool,         min,         max,           min,      nao) \
+	  m(Dados,  AttComum,    imprimir_variavel_decisao_por_estagio_por_cenario,                                bool,         min,         max,           min,      nao) \
+	  m(Dados,  AttComum, imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao,                    bool,         min,         max,           min,      nao) \
+	  m(Dados,  AttComum,    imprimir_restricao_por_estagio_por_cenario,                                bool,         min,         max,           min,      nao) \
+	  m(Dados,  AttComum, imprimir_restricao_por_estagio_por_cenario_por_realizacao,                    bool,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,      imprimir_resultado_viabilidade_hidraulica,                               bool,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                      imprimir_resultado_mestre,                               bool,         min,         max,           min,      nao) \
       m(Dados,  AttComum,  representar_producao_hidreletrica_com_turbinamento_disponivel,               bool,         min,         max,           nao,      nao) \

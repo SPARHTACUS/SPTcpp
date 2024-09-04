@@ -338,7 +338,6 @@ void LeituraCEPEL::InstanciaProcessoEstocastico(Dados& a_dados, SmartEnupla<Peri
 		a_dados.setAtributo(AttComumDados_tipo_solver, TipoSolver_gurobi);
 		//a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("DadosSaidaCP//Otimizacao//AcoplamentoPreEstudo") );
 		a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio_2);
-		a_dados.setAtributo(AttComumDados_imprimir_resultado_por_estagio_por_cenario, true);
 		a_dados.setAtributo(AttComumDados_tipo_metodo_solucao, IdMetodoSolucao_MILP);
 		a_dados.setAtributo(AttComumDados_tipo_espaco_amostral_geracao_cenario_hidrologico, TipoEspacoAmostral_arvore_cenarios);
 		a_dados.setAtributo(AttComumDados_tipo_estudo, TipoEstudo_otimizacao);

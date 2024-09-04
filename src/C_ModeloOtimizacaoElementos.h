@@ -122,7 +122,7 @@ void aloc##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEsta
 			if ((name_str.find("FINF") != std::string::npos) || (name_str.find("FSUP") != std::string::npos)){\
 				isF_##Elem##_##Nome##_##Nro = true;\
 			}\
-			lista_##Elem##_impressao.at(a_TSS).push_back(std::string(std::string(#Nome) + "_" + std::string(#Nro))); \
+			lista_elemento_impressao.at(a_TSS).push_back(std::string(std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro))); \
 			name_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>> (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<std::string>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<std::string>>()));\
 			indx_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<int>>>         (TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<int>>>        (TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<int>>()));\
 		}\
@@ -392,7 +392,7 @@ imprimirRestricoes##Elem##_##Nome##_##Nro(TSS, a_idEstagio, getFullString(a_idPr
 #define DECLARAR_CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores)  \
 void ModeloOtimizacao::consolidarResultados##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const std::string a_variavel, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados) {	\
 	try{ \
-		if (std::string(std::string(#Nome) + "_" + std::string(#Nro)) != a_variavel) \
+		if (strCompara(std::string(std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro)), a_variavel)) \
 			return; \
 		const std::string diretorio = a_entradaSaidaDados.getDiretorioSaida(); \
 		if (DECLARAR_ISVAR_##Elem){\
@@ -430,7 +430,7 @@ void ModeloOtimizacao::consolidarResultados##Elem##_##Nome##_##Nro(const TipoSub
 };\
 
 
-#define CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores) consolidarResultados##Elem##_##Nome##_##Nro(a_TSS, Elem##_str, a_maiorIdProcesso, a_entradaSaidaDados);
+#define CONSOLIDAR_RESULTADOS(Elem, Nome, Nro, Valores) consolidarResultados##Elem##_##Nome##_##Nro(a_TSS, elem_str, a_maiorIdProcesso, a_entradaSaidaDados);
 
 
 
