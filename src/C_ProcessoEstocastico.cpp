@@ -58,7 +58,7 @@ void ProcessoEstocastico::gerarTendenciaTemporalMedia(const Periodo a_periodo_fi
 
 
 
-void ProcessoEstocastico::parametrizarModelo(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_parametros, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_maxima_coeficiente_auto_correlacao, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao_variaveis_aleatorias, const double a_valor_determinacao_correlacao){
+void ProcessoEstocastico::parametrizarModelo(const EntradaSaidaDados &a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_idProcessoEnd, const bool a_imprimir_parametros, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_maxima_coeficiente_auto_correlacao, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao_variaveis_aleatorias, const double a_valor_determinacao_correlacao){
 
 	try {
 
@@ -79,8 +79,31 @@ void ProcessoEstocastico::parametrizarModelo(const EntradaSaidaDados &a_entradaS
 
 		calcularMatrizCargaSazonalResiduoVariaveisAleatorias();
 
-		if (a_imprimir_parametros)
-			imprimirParametros(a_entradaSaidaDados);
+		if (a_imprimir_parametros) {
+
+			if (a_idProcesso == IdProcesso_mestre)
+				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_MLT.csv", IdVariavelAleatoria_Nenhum, IdVariavelAleatoriaInterna_Nenhum, *this, AttVetorVariavelAleatoriaInterna_media_serie_temporal);
+
+			const int numero_var_balanceados_por_processo = vetorVariavelAleatoria.numObjetos() / int(a_idProcessoEnd);
+			const int numero_var_desbalanceados = vetorVariavelAleatoria.numObjetos() - (numero_var_balanceados_por_processo * int(a_idProcessoEnd));
+			const IdProcesso maior_processo_desbalanceado = IdProcesso(numero_var_desbalanceados);
+
+			IdVariavelAleatoria idVarIni = IdVariavelAleatoria_Nenhum;
+			IdVariavelAleatoria idVarEnd = IdVariavelAleatoria_Nenhum;
+
+			if (a_idProcesso <= maior_processo_desbalanceado) {
+				idVarIni = IdVariavelAleatoria(numero_var_balanceados_por_processo * int(a_idProcesso - 1) + int(a_idProcesso - 1) + 1);			
+				idVarEnd = IdVariavelAleatoria(numero_var_balanceados_por_processo * int(a_idProcesso) + int(a_idProcesso));
+			}
+			else if ((a_idProcesso > maior_processo_desbalanceado) && (numero_var_balanceados_por_processo > 0)) {
+
+				idVarIni = IdVariavelAleatoria(numero_var_balanceados_por_processo * int(a_idProcesso - 1) + 1 + numero_var_desbalanceados);
+				idVarEnd = IdVariavelAleatoria(numero_var_balanceados_por_processo * int(a_idProcesso) + numero_var_desbalanceados);
+
+			}// else if ((a_idProcesso > maior_processo_desbalanceado) && (numero_var_balanceados_por_processo > 0)) {
+
+			imprimirParametros(a_entradaSaidaDados, idVarIni, idVarEnd);
+		}
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::parametrizarModelo(a_entradaSaidaDados," + getFullString(a_imprimir_parametros) + "," + getFullString(a_tipo_modelo_geracao_sintetica) + "," + getFullString(a_tipo_coeficiente_auto_correlacao) + "," + getFullString(a_ordem_maxima_coeficiente_auto_correlacao) + "," +  getFullString(a_tipo_correlacao_variaveis_aleatorias) + "): \n" + std::string(erro.what())); }
@@ -139,7 +162,7 @@ void ProcessoEstocastico::avaliarModeloViaSerieSintetica(const EntradaSaidaDados
 
 		//processoEstocastico.addSeriesTemporais(serie_sintetica);
 
-		processoEstocastico.parametrizarModelo(a_entradaSaidaDados, true, tipo_modelo_geracao_sintetica, tipo_coeficiente_auto_correlacao, ordem_maxima_coeficiente_auto_correlacao, tipo_correlacao_variaveis_aleatorias, correlacao_determinante);
+		processoEstocastico.parametrizarModelo(a_entradaSaidaDados, IdProcesso_mestre, IdProcesso_mestre, true, tipo_modelo_geracao_sintetica, tipo_coeficiente_auto_correlacao, ordem_maxima_coeficiente_auto_correlacao, tipo_correlacao_variaveis_aleatorias, correlacao_determinante);
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::avaliarModeloViaSerieSintetica(a_entradaSaidaDados," + getString(a_tipo_sorteio) + "," + getString(a_numero_periodos_avaliacao_sintetica) + "): \n" + std::string(erro.what())); }
@@ -265,24 +288,13 @@ void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_ent
 		const SmartEnupla <IdCenario, SmartEnupla<Periodo, IdRealizacao>> mapeamento_espaco_amostral = getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao());
 
 		SmartEnupla<Periodo, IdRealizacao> horizonte_amostra;
-		Periodo periodo_inicial_amostra;
 
-		if (mapeamento_espaco_amostral.size() > 0) {
+		if (mapeamento_espaco_amostral.size() > 0)
 			horizonte_amostra = mapeamento_espaco_amostral.getElemento(a_cenario_inicial);
-			periodo_inicial_amostra = horizonte_amostra.getIteradorInicial();
-		}
-		else
-			periodo_inicial_amostra = horizonte_tendencia.getIteradorFinal() + 1;
 
 		SmartEnupla<Periodo, double> horizonte_processo_estocastico(horizonte_tendencia.size() + horizonte_amostra.size());
-		for (Periodo periodo = horizonte_tendencia.getIteradorInicial(); periodo < periodo_inicial_amostra; horizonte_tendencia.incrementarIterador(periodo)) {
-
-			if (periodo >= periodo_inicial_amostra)
-				break;
-
+		for (Periodo periodo = horizonte_tendencia.getIteradorInicial(); periodo <= horizonte_tendencia.getIteradorFinal(); horizonte_tendencia.incrementarIterador(periodo))
 			horizonte_processo_estocastico.addElemento(periodo, NAN);
-
-		} // for (Periodo periodo = horizonte_tendencia.getIteradorInicial(); periodo < periodo_inicial_amostra; horizonte_tendencia.incrementarIterador(periodo)) {
 
 		if (horizonte_amostra.size() > 0) {
 			for (Periodo periodo = horizonte_amostra.getIteradorInicial(); periodo <= horizonte_amostra.getIteradorFinal(); horizonte_amostra.incrementarIterador(periodo))
@@ -299,7 +311,7 @@ void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_ent
 			imprimirCenarios(a_entradaSaidaDados);
 
 	} // try{
-	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::gerarCenariosPorSorteio(a_entradaSaidaDados," + getString(a_imprimir_cenarios) + ",a_mapeamento_cenarios_tendencia," + getString(a_tipo_sorteio) + "," + getString(a_semente) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception&erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::gerarCenariosPorSorteio(a_entradaSaidaDados," + getString(a_imprimir_cenarios) + "," + getString(a_gerar_cenarios_buffer) + "," + getString(a_gerar_cenarios_internos) + "," + getString(a_numero_cenarios_global) + "," + getFullString(a_cenario_inicial) + "," + getFullString(a_cenario_final) + "," + getString(a_tipo_sorteio) + "," + getString(a_semente) + "): \n" + std::string(erro.what())); }
 
 } // void ProcessoEstocastico::gerarCenariosPorSorteio(const SmartEnupla<IdCenario, IdCenario> a_mapeamento_cenarios_tendencia, const int a_semente){
 
@@ -487,8 +499,12 @@ double ProcessoEstocastico::calcularRealizacao(const IdVariavelAleatoria a_idVar
 	try {
 
 		/**/
-		if (vetorVariavelAleatoria.at(a_idVariavelAleatoria).getSizeMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral) > 0)
-			return vetorVariavelAleatoria.at(a_idVariavelAleatoria).calcularRealizacao(a_periodo, a_idCenario, SmartEnupla<Periodo, double>(), getElementoMatriz(a_idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, a_idRealizacao, double()));
+		if (vetorVariavelAleatoria.at(a_idVariavelAleatoria).getSizeMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral) > 0) {	
+			const double realiz_old = getElementoMatriz(a_idVariavelAleatoria, AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, a_periodo, a_idCenario, double());
+			const double trend = realiz_old - getElementoMatriz(a_idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, a_periodo, IdRealizacao()), double());
+			const double realiz_new = trend + getElementoMatriz(a_idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, a_idRealizacao, double());
+			return realiz_new;
+		}
 		else {
 			const SmartEnupla<Periodo, IdRealizacao> idRealizacoes_cenario = getElementosMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, Periodo(), IdRealizacao());
 			const SmartEnupla<Periodo, IdRealizacao> horizonte_mapeamento_espaco_amostral = getElementosMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, Periodo(), IdRealizacao());
@@ -518,7 +534,7 @@ void ProcessoEstocastico::imprimirEspacoAmostral(EntradaSaidaDados a_entradaSaid
 	try {
 
 		const std::string diretorio_base = a_entradaSaidaDados.getDiretorioSaida();
-
+		;
 		for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= getMaiorIdVariavelAleatoria(); idVar++) {
 
 			const std::string diretorio_va = diretorio_base + "//" + getAtributo(idVar, AttComumVariavelAleatoria_nome, std::string());
@@ -593,15 +609,16 @@ void ProcessoEstocastico::imprimirCenarios(EntradaSaidaDados a_entradaSaidaDados
 } // void ProcessoEstocastico::imprimirCenarios(const EntradaSaidaDados & a_entradaSaidaDados){
 
 
-void ProcessoEstocastico::imprimirParametros(EntradaSaidaDados a_entradaSaidaDados){
+void ProcessoEstocastico::imprimirParametros(EntradaSaidaDados a_entradaSaidaDados, const IdVariavelAleatoria a_idVarIni, const IdVariavelAleatoria a_idVarEnd){
 
 	try {
 
+		if ((a_idVarIni == IdVariavelAleatoria_Nenhum) || (a_idVarEnd == IdVariavelAleatoria_Nenhum))
+			return;
+
 		const std::string diretorio_base = a_entradaSaidaDados.getDiretorioSaida();
 
-		a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_MLT.csv", IdVariavelAleatoria_Nenhum, IdVariavelAleatoriaInterna_Nenhum, *this, AttVetorVariavelAleatoriaInterna_media_serie_temporal);
-
-		for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= getMaiorIdVariavelAleatoria(); idVar++) {
+		for (IdVariavelAleatoria idVar = a_idVarIni; idVar <= a_idVarEnd; idVar++) {
 
 			const std::string diretorio_va = diretorio_base + "//" + getAtributo(idVar, AttComumVariavelAleatoria_nome, std::string());
 
@@ -1083,6 +1100,8 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 
 		if (periodo_inicial > periodo_final)
 			return;
+
+		periodo_inicial = periodo_seguinte_mapeamento_existente;
 
 		SmartEnupla<Periodo, int> horizonte_mapeamento_cenarios_por_sorteio;
 		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_espaco_amostral.incrementarIterador(periodo))
@@ -1775,12 +1794,12 @@ void ProcessoEstocastico::reducao_adaptacao_nested_distance(EntradaSaidaDados a_
 			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao_original; idRealizacao++) {
 
 				const int posEqu = vetorPtrSolver.at(idEstagio)->addConstrIgual("Transporte_amostra_original_" + getFullString(idRealizacao));
-				vetorPtrSolver.at(idEstagio)->setRHSRestricao(false, posEqu, getElementoMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao, periodo, idRealizacao, double()));
+				vetorPtrSolver.at(idEstagio)->setRHSRestricao(posEqu, getElementoMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao, periodo, idRealizacao, double()));
 
 				for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
 					const int posVar = var_matriz_transporte_estagio.at(idEstagio).getElemento(idRealizacao) + num;
-					vetorPtrSolver.at(idEstagio)->setCofRestricao(false, posVar, posEqu, 1.0);
+					vetorPtrSolver.at(idEstagio)->setCofRestricao(posVar, posEqu, 1.0);
 
 				}//for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
@@ -1792,17 +1811,17 @@ void ProcessoEstocastico::reducao_adaptacao_nested_distance(EntradaSaidaDados a_
 			for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
 				const int posEqu = vetorPtrSolver.at(idEstagio)->addConstrIgual("Transporte_amostra_reduzida_" + getString(num + 1));
-				vetorPtrSolver.at(idEstagio)->setRHSRestricao(false, posEqu, 0.0);
+				vetorPtrSolver.at(idEstagio)->setRHSRestricao(posEqu, 0.0);
 
 				for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao_original; idRealizacao++) {
 
 					const int posVar = var_matriz_transporte_estagio.at(idEstagio).getElemento(idRealizacao) + num;
-					vetorPtrSolver.at(idEstagio)->setCofRestricao(false, posVar, posEqu, 1.0);
+					vetorPtrSolver.at(idEstagio)->setCofRestricao(posVar, posEqu, 1.0);
 
 				}//for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao_original; idRealizacao++) {
 
 				const int posVar = var_probabilidades_arvore_reduzida_estagio.getElemento(idEstagio) + num;
-				vetorPtrSolver.at(idEstagio)->setCofRestricao(false, posVar, posEqu, -1.0);
+				vetorPtrSolver.at(idEstagio)->setCofRestricao(posVar, posEqu, -1.0);
 
 			}//for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
@@ -1810,12 +1829,12 @@ void ProcessoEstocastico::reducao_adaptacao_nested_distance(EntradaSaidaDados a_
 			//Somatorio(pj) = 1
 
 			const int posEqu = vetorPtrSolver.at(idEstagio)->addConstrIgual("Probabilidade_amostra_reduzida");
-			vetorPtrSolver.at(idEstagio)->setRHSRestricao(false, posEqu, 1.0);
+			vetorPtrSolver.at(idEstagio)->setRHSRestricao(posEqu, 1.0);
 
 			for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
 				const int posVar = var_probabilidades_arvore_reduzida_estagio.getElemento(idEstagio) + num;
-				vetorPtrSolver.at(idEstagio)->setCofRestricao(false, posVar, posEqu, 1.0);
+				vetorPtrSolver.at(idEstagio)->setCofRestricao(posVar, posEqu, 1.0);
 
 			}//for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
@@ -1871,8 +1890,8 @@ void ProcessoEstocastico::reducao_adaptacao_nested_distance(EntradaSaidaDados a_
 					for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
 						const int posVar = var_probabilidades_arvore_reduzida_estagio.getElemento(idEstagio) + num;
-						vetorPtrSolver.at(idEstagio)->setLimInferior(false, posVar, std::pow(a_numero_aberturas.getElemento(idEstagio), -1));
-						vetorPtrSolver.at(idEstagio)->setLimSuperior(false, posVar, std::pow(a_numero_aberturas.getElemento(idEstagio), -1));
+						vetorPtrSolver.at(idEstagio)->setLimInferior(posVar, std::pow(a_numero_aberturas.getElemento(idEstagio), -1));
+						vetorPtrSolver.at(idEstagio)->setLimSuperior(posVar, std::pow(a_numero_aberturas.getElemento(idEstagio), -1));
 
 					}//for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
@@ -1882,8 +1901,8 @@ void ProcessoEstocastico::reducao_adaptacao_nested_distance(EntradaSaidaDados a_
 					for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
 						const int posVar = var_probabilidades_arvore_reduzida_estagio.getElemento(idEstagio) + num;
-						vetorPtrSolver.at(idEstagio)->setLimInferior(false, posVar, 0.0);
-						vetorPtrSolver.at(idEstagio)->setLimSuperior(false, posVar, 1.0);
+						vetorPtrSolver.at(idEstagio)->setLimInferior(posVar, 0.0);
+						vetorPtrSolver.at(idEstagio)->setLimSuperior(posVar, 1.0);
 
 					}//for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 
@@ -1932,7 +1951,7 @@ void ProcessoEstocastico::reducao_adaptacao_nested_distance(EntradaSaidaDados a_
 						if (idEstagio < a_estagio_final)
 							norma_2 += nested_distance.getElemento(IdEstagio(idEstagio + 1));
 
-						vetorPtrSolver.at(idEstagio)->setCofObjetivo(false, posVar, norma_2*std::pow(fator_normalizador, -1));
+						vetorPtrSolver.at(idEstagio)->setCofObjetivo(posVar, norma_2*std::pow(fator_normalizador, -1));
 
 					}//for (int num = 0; num < a_numero_aberturas.getElemento(idEstagio); num++) {
 

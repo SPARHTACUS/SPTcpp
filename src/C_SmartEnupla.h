@@ -1085,18 +1085,36 @@ public:
 			Periodo perIni;
 
 			const std::vector<int> pos_idx = getPosIdxStructIfAny(a_period_externo);
-
-			if (int(pos_idx.size()) > 0) {
-
-				if (pos_idx.at(1) > -1)
+			if (pos_idx.size() > 0) {
+				if (pos_idx.at(1) > -1) {
 					perIni = list_structPeriod.at(pos_idx.at(0)).getPeriod(pos_idx.at(1));
-				else
-					perIni = getIteradorInicial();
-
-			}//if (int(pos_idx.size()) > 0) {
-			else {
-				perIni = getIteradorInicial();
-			}//else {
+					perIni.posStructPeriod = pos_idx.at(0);
+					perIni.idxStructPeriod = pos_idx.at(1);
+					perIni.codStructPeriod = code;
+				}
+			}
+			
+			if (!perIni.isValido()) {
+				int pos;
+				for (pos = 0; pos < int(list_structPeriod.size()); pos++) {
+					if (a_period_externo < list_structPeriod.at(pos).getPeriodIni()) {
+						if (pos > 0)
+							pos--;
+						break;
+					}
+				}
+				perIni = list_structPeriod.at(pos).getPeriodIni();
+				if (!perIni.isValido())
+					return std::vector<Periodo>();
+				else if (pos == list_structPeriod.size() - 1) {
+					if (a_period_externo >= list_structPeriod.at(pos).getPeriodEnd() + 1)
+						return std::vector<Periodo>();
+				}
+				else if (pos == 0) {
+					if (a_period_externo + 1 <= list_structPeriod.at(0).getPeriodIni())
+						return std::vector<Periodo>();
+				}
+			}
 
 			const Periodo periodo_externo_seguinte = a_period_externo + 1;
 

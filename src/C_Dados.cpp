@@ -173,29 +173,6 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		validacao_operacional_Dados(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 
-		SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
-
-		Periodo periodo8 = Periodo(19, 8, 2023);
-		Periodo periodo7 = Periodo(21, 8, 2023);
-		Periodo periodo6 = Periodo(20, 8, 2023);
-		Periodo periodo5 = Periodo(18, 8, 2023);
-		Periodo periodo4 = Periodo(24, 8, 2023);
-		Periodo periodo3 = Periodo(25, 8, 2023);
-		Periodo periodo2 = Periodo(23, 8, 2023);
-		Periodo periodo1 = Periodo(22, 8, 2023);
-
-		horizonte_estudo.addElemento(periodo1, IdEstagio_381);
-		horizonte_estudo.addElemento(periodo2, IdEstagio_382);
-		horizonte_estudo.addElemento(periodo3, IdEstagio_383);
-		horizonte_estudo.addElemento(periodo4, IdEstagio_384);
-		horizonte_estudo.addElemento(periodo5, IdEstagio_385);
-		horizonte_estudo.addElemento(periodo6, IdEstagio_386);
-		horizonte_estudo.addElemento(periodo7, IdEstagio_387);
-		horizonte_estudo.addElemento(periodo8, IdEstagio_388);
-
-
-
-
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		//
 		//                                                                        Carregar Arquivos de Submercado
@@ -4069,7 +4046,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 		const int numIdHidrPorProcesso = vetorHidreletrica.numObjetos() / numProcessos;
 
 
-		//MAIOR ID TERMELETRICA
+		//MAIOR ID HIDRELETRICA
 		int numIdHidr_before = 0;
 		for (IdProcesso idProcesso_comp = IdProcesso_mestre; idProcesso_comp < idProcesso; idProcesso_comp++) {
 			numIdHidr_before += numIdHidrPorProcesso;
@@ -4716,8 +4693,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				// 
 
 				if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_defluente_minima) == 0) {
-					vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_defluente_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_defluente_minima, double())));
-					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = sim_operacional;
+					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = nao_sem_utilizacao;
 				}
 				else
 					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = nao_operacional_informado;
@@ -4731,8 +4707,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				// 
 
 				if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_defluente_maxima) == 0) {
-					vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_defluente_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_defluente_maxima, double())));
-					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = sim_operacional;
+					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = nao_sem_utilizacao;
 				}
 				else
 					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = nao_operacional_informado;
@@ -4773,8 +4748,10 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 				if ((getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_vazao_defluente_minima) == 0) && (a_imprimir_atributos_sem_recarregar)) {
 					preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_vazao_defluente_minima) = sim_operacional;
-					if (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) == sim_operacional)
+					if (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) == nao_sem_utilizacao) {
 						preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = sim_premissa;
+						vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_defluente_minima, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
+					}
 					else if (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) == nao_operacional_informado)
 						preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_minima) = nao_premissa_informado;
 				} // if ((getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_defluente_minima) == 0) && (hidreletrica_com_unidade)) {
@@ -4790,8 +4767,10 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 				if ((getSize1Matriz(idHidreletrica, AttMatrizHidreletrica_vazao_defluente_maxima) == 0) && (a_imprimir_atributos_sem_recarregar)) {
 					preencher_AttMatrizHidreletrica.at(idHidreletrica).at(AttMatrizHidreletrica_vazao_defluente_maxima) = sim_operacional;
-					if (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) == sim_operacional)
+					if (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) == nao_sem_utilizacao) {
 						preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = sim_premissa;
+						vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_defluente_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getdoubleFromChar("inf")));
+					}
 					else if (preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) == nao_operacional_informado)
 						preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_defluente_maxima) = nao_premissa_informado;
 				} // if ((getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_defluente_maxima) == 0) && (hidreletrica_com_unidade)) {
@@ -7073,34 +7052,34 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 						int vlr = 0;
 
-						vlr = int(impresso_AttMatrizFuncaoProducaoHidreletrica_por_unidade);
-						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
-
-						vlr = int(impresso_AttVetorFuncaoProducaoHidreletrica_por_unidade);
-						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
-
-						vlr = int(impresso_AttMatrizFuncaoProducaoHidreletrica_por_conjunto);
-						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
-
-						vlr = int(impresso_AttVetorFuncaoProducaoHidreletrica_por_conjunto);
-						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
-
-						vlr = int(impresso_AttMatrizFuncaoProducaoHidreletrica_por_usina);
-						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
-
-						vlr = int(impresso_AttVetorFuncaoProducaoHidreletrica_por_usina);
-						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
-
-						vlr = int(impresso_AttVetorDefluencia_PorPeriodo);
-						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
-
-						vlr = int(impresso_AttComumHidreletrica);
+						vlr = int(impresso_PolinomioCotaJusante);
 						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
 
 						vlr = int(impresso_AttComumReservatorio);
 						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
 
-						vlr = int(impresso_PolinomioCotaJusante);
+						vlr = int(impresso_AttComumHidreletrica);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(impresso_AttVetorDefluencia_PorPeriodo);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(impresso_AttVetorFuncaoProducaoHidreletrica_por_usina);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(impresso_AttMatrizFuncaoProducaoHidreletrica_por_usina);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(impresso_AttVetorFuncaoProducaoHidreletrica_por_conjunto);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(impresso_AttMatrizFuncaoProducaoHidreletrica_por_conjunto);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(impresso_AttVetorFuncaoProducaoHidreletrica_por_unidade);
+						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
+
+						vlr = int(impresso_AttMatrizFuncaoProducaoHidreletrica_por_unidade);
 						MPI_Send(&vlr, 1, MPI_INT, getRank(idProcesso_send), 0, MPI_COMM_WORLD);
 
 						vlr = int(recarregar_AttMatrizUnidadeUHE_PorPeriodoPorIdPatamarCarga);
@@ -9070,6 +9049,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 	try {
 
 		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+		const IdProcesso idProcessoEnd = arranjoResolucao.getMaiorId(IdProcesso());
 
 		bool calcular_att_operacionais_historico_hidrologico = false;
 		bool calcular_att_operacionais_tendencia_hidrologica = false;
@@ -9236,7 +9216,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 			// Parametrizacao do Modelo do Processo Estocastico Hidrologico
 			//
 
-			processoEstocastico_hidrologico.parametrizarModelo(a_entradaSaidaDados, imprimir_parametros_hidrologico, tipo_modelo_geracao_sintetica, tipo_coeficiente_auto_correlacao, ordem_maxima_auto_correlacao_hidrologica, tipo_correlacao_variaveis_aleatorias, correlacao_dominante);
+			processoEstocastico_hidrologico.parametrizarModelo(a_entradaSaidaDados, idProcesso, idProcessoEnd, imprimir_parametros_hidrologico, tipo_modelo_geracao_sintetica, tipo_coeficiente_auto_correlacao, ordem_maxima_auto_correlacao_hidrologica, tipo_correlacao_variaveis_aleatorias, correlacao_dominante);
 
 
 			if (idProcesso == IdProcesso_mestre) {
@@ -9728,7 +9708,7 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 				SmartEnupla<int, SmartEnupla<Periodo, double>> tendencia_temporal_variavel_aleatoria_interna;
 
 				int contador = 1;
-				for (IdHidreletrica idHidreletrica = getMaiorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
+				for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 
 					if (getAtributo(idHidreletrica, AttComumHidreletrica_bacia, IdBaciaHidrografica()) == idBaciaHidrografica) {
 
@@ -9739,7 +9719,7 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 							serie_temporal_variavel_aleatoria_interna.addElemento(contador, getVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico, Periodo(), double()));
 							tendencia_temporal_variavel_aleatoria_interna.addElemento(contador, getVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_tendencia, Periodo(), double()));
 
-						} // if (a_processo_estocastico.getMaiorId(IdVariavelAleatoria()) != IdVariavelAleatoria_Nenhum) {
+						} // if (a_processo_estocastico.getMenorId(IdVariavelAleatoria()) != IdVariavelAleatoria_Nenhum) {
 
 						else {
 
@@ -11102,7 +11082,6 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 		arranjoResolucao.setAtributo(AttComumArranjoResolucao_iteracao_numero_maximo, iteracao_numero_maximo);
 		arranjoResolucao.setAtributo(AttComumArranjoResolucao_iteracao_final, iteracao_final);
 
-
 		//
 		// Computar menor e maior cenarios por iteracao
 		//
@@ -11206,7 +11185,9 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 			if ((tipo_processamento == TipoProcessamentoParalelo_por_abertura) && (cortes_multiplos != 1))
 				agrupar_aberturas.at(idEstagio) = 1;
 
-			periodos.at(idEstagio) = mapeamento_espaco_amostral.at(mapeamento_espaco_amostral.getIteradorInicial()).getIteradores(getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo())).at(0);
+			const std::vector<Periodo> periodos_lista = mapeamento_espaco_amostral.at(mapeamento_espaco_amostral.getIteradorInicial()).getIteradores(getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo()));
+
+			periodos.at(idEstagio) = periodos_lista.at(0);
 
 		} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
@@ -11233,23 +11214,28 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 					valores = std::vector<int>(tamanho, 0);
 
 					int i = 0;
+					bool any_cenario_suprimido = true;
 					for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
 						const int cortes_multiplos = getElementoVetor(AttVetorDados_cortes_multiplos, idEstagio, int());
 
+						bool any_cenario_suprimido_stage = false;
+
 						for (IdCenario idCenario_iteracao = menor_cenario_iteracao_local; idCenario_iteracao <= maior_cenario_iteracao_local; idCenario_iteracao++) {
 
-							const SmartEnupla<Periodo, IdRealizacao> mapeamento_espaco_amostral_idCenario_iteracao = mapeamento_espaco_amostral.at(idCenario_iteracao);
+							if (any_cenario_suprimido) {
 
-							IdCenario idCenario_mesmo_passado = IdCenario_Excedente;
-							IdCenario idCenario_mesma_trajetoria = IdCenario_Excedente;
+								const SmartEnupla<Periodo, IdRealizacao> mapeamento_espaco_amostral_idCenario_iteracao = mapeamento_espaco_amostral.at(idCenario_iteracao);
 
-							if (idEstagio == estagio_inicial) {
-								idCenario_mesmo_passado = arranjoResolucao.getAtributo(idIteracao, AttComumIteracao_menor_cenario, IdCenario());
-								idCenario_mesma_trajetoria = idCenario_mesmo_passado;
-							}
+								IdCenario idCenario_mesmo_passado = IdCenario_Excedente;
+								IdCenario idCenario_mesma_trajetoria = IdCenario_Excedente;
 
-							else {
+								//if (idEstagio == estagio_inicial) {
+									//idCenario_mesmo_passado = arranjoResolucao.getAtributo(idIteracao, AttComumIteracao_menor_cenario, IdCenario());
+									//idCenario_mesma_trajetoria = idCenario_mesmo_passado;
+								//}
+
+								//else {
 								for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
 									if (arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()) != IdCenario_Nenhum) {
 										for (IdCenario idCenario = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()); idCenario <= arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario()); idCenario++) {
@@ -11266,20 +11252,30 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 										} // for (IdCenario idCenario = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()); idCenario <= arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario()); idCenario++) {
 									} // if (arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()) != IdCenario_Nenhum) {
 								} // for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
-							}
+							//}
 
 							// Resolver cenario: priorizado resolver sempre o cenario de menor id daqueles que são iguais
-							if (idCenario_iteracao <= idCenario_mesma_trajetoria) {
+								if (idCenario_iteracao <= idCenario_mesma_trajetoria) {
 
-								IdCenario idCenario_estado = idCenario_iteracao;
-								if (idCenario_mesmo_passado < idCenario_estado)
-									idCenario_estado = idCenario_mesmo_passado;
+									IdCenario idCenario_estado = idCenario_iteracao;
+									if (idCenario_mesmo_passado < idCenario_estado)
+										idCenario_estado = idCenario_mesmo_passado;
 
-								valores.at(i) = int(idCenario_estado);
+									valores.at(i) = int(idCenario_estado);
 
-							} // if (idCenario_iteracao <= idCenario_mesma_trajetoria) {
+								} // if (idCenario_iteracao <= idCenario_mesma_trajetoria) {
+								else
+									any_cenario_suprimido_stage = true;
+
+							}
+							else
+								valores.at(i) = int(idCenario_iteracao);
+
 							i++;
 						} // for (IdCenario idCenario_iteracao = menor_cenario_iteracao; idCenario_iteracao <= menor_cenario_iteracao; idCenario_iteracao++) {
+
+						any_cenario_suprimido = any_cenario_suprimido_stage;
+
 					} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
 				} // Condicoes para mapeamento de cenarios
@@ -11300,16 +11296,21 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 						arranjoResolucao.vetorIteracao.at(idIteracao).vetorProcesso.at(idProcesso).setMatriz_forced(AttMatrizProcesso_cenario_estado_por_cenario, SmartEnupla<IdCenario, SmartEnupla<IdEstagio, IdCenario>>(menor_cenario_iteracao, std::vector<SmartEnupla<IdEstagio, IdCenario>>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, enupla_inicial)));
 
-						const int tamanho = (int(estagio_final - estagio_inicial) + 1) * (int(maior_cenario_iteracao - menor_cenario_iteracao) + 1);
+						std::vector<int> valores_recv;
 
-						std::vector<int> valores_recv(tamanho, 0);
-
-						if (idProcesso != idProcesso_local)
-							MPI_Recv(&valores_recv[0], tamanho, MPI_INT, getRank(idProcesso), getRank(idProcesso_local), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+						if (idProcesso != idProcesso_local) {
+							int vlr_size_rcv = 0;
+							MPI_Recv(&vlr_size_rcv, 1, MPI_INT, getRank(idProcesso), 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+							valores_recv = std::vector<int>(vlr_size_rcv, 0);
+							MPI_Recv(&valores_recv[0], vlr_size_rcv, MPI_INT, getRank(idProcesso), 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+						}
 						else {
 							for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
-								if (idProcesso_aux != idProcesso_local)
-									MPI_Send(&valores[0], int(valores.size()), MPI_INT, getRank(idProcesso_aux), getRank(idProcesso_aux), MPI_COMM_WORLD);
+								if (idProcesso_aux != idProcesso_local) {
+									int vlr_size = int(valores.size());
+									MPI_Send(&vlr_size, 1, MPI_INT, getRank(idProcesso_aux), 1, MPI_COMM_WORLD);
+									MPI_Send(&valores[0], int(valores.size()), MPI_INT, getRank(idProcesso_aux), 2, MPI_COMM_WORLD);
+								}
 							}
 							valores_recv = valores;
 						}
@@ -11358,6 +11359,9 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 						// O mapeamento das aberturas engloba cenarios_estados de outros processos quando o processamento é realizado por abertura, exceto se cortes_multiplos == 1
 						for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
 
+							const IdCenario menor_cenario_iteracao = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario());
+							const IdCenario maior_cenario_iteracao = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario());
+
 							for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
 								const int cortes_multiplos = getElementoVetor(AttVetorDados_cortes_multiplos, idEstagio, int());
@@ -11372,41 +11376,46 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 											const IdCenario idCenario_estado = lista_cenario_estado.at(c);
 
-											if (map_menor_abertura.size() == 0) {
-												map_menor_abertura.addElemento(idCenario_estado, enupla_inicial_abertura);
-												map_maior_abertura.addElemento(idCenario_estado, enupla_inicial_abertura);
-											}
+											// Em caso de proc. paralelo por cenario, aberturas sao geradas apenas para cenario estado no dominio do processo para evitar redundancia
+											if ((tipo_processamento == TipoProcessamentoParalelo_por_cenario) && ((idCenario_estado < menor_cenario_iteracao) || (maior_cenario_iteracao < idCenario_estado))) {}
 
-											else if ((idCenario_estado < map_menor_abertura.getIteradorInicial())) {
-												for (IdCenario idCenario = IdCenario(map_menor_abertura.getIteradorInicial() - 1); idCenario >= idCenario_estado; idCenario--) {
-													map_menor_abertura.addElemento(idCenario, enupla_inicial_abertura);
-													map_maior_abertura.addElemento(idCenario, enupla_inicial_abertura);
-												}
-											}
-											else if ((map_menor_abertura.getIteradorFinal() < idCenario_estado)) {
-												for (IdCenario idCenario = IdCenario(map_menor_abertura.getIteradorFinal() + 1); idCenario <= idCenario_estado; idCenario++) {
-													map_menor_abertura.addElemento(idCenario, enupla_inicial_abertura);
-													map_maior_abertura.addElemento(idCenario, enupla_inicial_abertura);
-												}
-											}
-
-											// Em caso de cortes_multiplos == 1, preenche-se com a abertura do mapeamento do espaço amostral.
-											if (cortes_multiplos == 1) {
-												const IdAbertura idAbertura = IdAbertura(mapeamento_espaco_amostral.at(idCenario_estado).at_rIt(periodos.at(idEstagio)));
-
-												map_menor_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
-												map_maior_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
-											} // if (cortes_multiplos == 1) {
-
-											else if (tipo_processamento == TipoProcessamentoParalelo_por_cenario) {
-												map_menor_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_1;
-												map_maior_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura(getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int()));
-											}
 											else {
-												map_menor_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_Excedente;
-												map_maior_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_Excedente;
-											}
 
+												if (map_menor_abertura.size() == 0) {
+													map_menor_abertura.addElemento(idCenario_estado, enupla_inicial_abertura);
+													map_maior_abertura.addElemento(idCenario_estado, enupla_inicial_abertura);
+												}
+
+												else if ((idCenario_estado < map_menor_abertura.getIteradorInicial())) {
+													for (IdCenario idCenario = IdCenario(map_menor_abertura.getIteradorInicial() - 1); idCenario >= idCenario_estado; idCenario--) {
+														map_menor_abertura.addElemento(idCenario, enupla_inicial_abertura);
+														map_maior_abertura.addElemento(idCenario, enupla_inicial_abertura);
+													}
+												}
+												else if ((map_menor_abertura.getIteradorFinal() < idCenario_estado)) {
+													for (IdCenario idCenario = IdCenario(map_menor_abertura.getIteradorFinal() + 1); idCenario <= idCenario_estado; idCenario++) {
+														map_menor_abertura.addElemento(idCenario, enupla_inicial_abertura);
+														map_maior_abertura.addElemento(idCenario, enupla_inicial_abertura);
+													}
+												}
+
+												// Em caso de cortes_multiplos == 1, preenche-se com a abertura do mapeamento do espaço amostral.
+												if (cortes_multiplos == 1) {
+													const IdAbertura idAbertura = IdAbertura(mapeamento_espaco_amostral.at(idCenario_estado).at_rIt(periodos.at(idEstagio)));
+
+													map_menor_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
+													map_maior_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
+												} // if (cortes_multiplos == 1) {
+
+												else if (tipo_processamento == TipoProcessamentoParalelo_por_cenario) {
+													map_menor_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_1;
+													map_maior_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura(getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int()));
+												}
+												else {
+													map_menor_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_Excedente;
+													map_maior_abertura.at(idCenario_estado).at(idEstagio) = IdAbertura_Excedente;
+												}
+											}
 										} // for (int c = 0; c < int(lista_cenario_estado.size()); c++) {
 									} // if (lista_cenario_estado.size() > 0){
 								} // if (((tipo_processamento == TipoProcessamentoParalelo_por_abertura) && (cortes_multiplos != 1)) || (idProcesso_aux == idProcesso)) {

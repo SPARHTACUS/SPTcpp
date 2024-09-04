@@ -450,7 +450,7 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 
 				a_dados.setAtributo(AttComumDados_numero_maximo_iteracoes, numero_maximo_iteracoes);
 
-				a_dados.setAtributo(AttComumDados_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico_hidrologico_bacia);
+				a_dados.setAtributo(AttComumDados_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico_hidrologico_hidreletrica);
 
 				a_dados.setAtributo(AttComumDados_tipo_modelo_geracao_cenario_hidrologico, TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal);
 
@@ -8287,6 +8287,8 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados, const std::string a_diretorio)
 		a_dados.validacao_operacional_RestricaoEletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		a_dados.validacao_operacional_AgrupamentoIntercambio(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+
+		a_dados.definirCenariosPorProcessosEmArranjoResolucao();
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 

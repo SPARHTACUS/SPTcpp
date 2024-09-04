@@ -79,15 +79,15 @@ public:
 
     virtual int addVar(const double a_lb, const double a_ub, const double a_obj, const std::string a_nome) = 0;
 
-    virtual bool setCofObjetivo(const bool a_isAlocMode, const int a_posicao, const double a_cofObjetivo) = 0;
+    virtual bool setCofObjetivo(const int a_posicao, const double a_cofObjetivo) = 0;
 
-    virtual bool setLimInferior(const bool a_isAlocMode, const int a_posicao, const double a_limInferior) = 0;
+    virtual bool setLimInferior(const int a_posicao, const double a_limInferior) = 0;
 
-    virtual bool setLimSuperior(const bool a_isAlocMode, const int a_posicao, const double a_limSuperior) = 0;
+    virtual bool setLimSuperior(const int a_posicao, const double a_limSuperior) = 0;
 
-    virtual bool setTipoVariavelContinua(const bool a_isAlocMode, const int a_posicao) = 0;
+    virtual bool setTipoVariavelContinua(const int a_posicao) = 0;
 
-    virtual bool setTipoVariavelBinaria(const bool a_isAlocMode, const int a_posicao) = 0;
+    virtual bool setTipoVariavelBinaria(const int a_posicao) = 0;
 
     virtual bool incrAlocVar(const int a_incrAloc) = 0;
     virtual bool incrAlocEqu(const int a_incrAloc) = 0;
@@ -107,6 +107,8 @@ public:
         return varRC[a_posicao];
     }
 
+    virtual std::vector<std::vector<double>> getConstrCoefsByVar(const int a_posicaoRestricao) = 0;
+
     virtual double getInfinito() = 0;
 
     virtual int addConstrIgual(const std::string a_nome) = 0;
@@ -118,7 +120,7 @@ public:
 
     virtual bool remRestricao(const int a_posicaoRestricao) = 0;
 
-    virtual bool addVarDinamica(const bool a_isAlocMode, const int a_posicaoVariavel) = 0;
+    virtual bool addVarDinamica(const int a_posicaoVariavel) = 0;
 
     virtual double getSolucaoInferiorVarDinamica() = 0;
 
@@ -133,11 +135,12 @@ public:
     virtual int getNumeroVarDinamica() = 0;
 
     virtual bool setNomeRestricao(const int a_posicaoRestricao, const std::string a_nome) = 0;
+    virtual std::string getNomeVariavel(const int a_posicaoVariavel) = 0;
     virtual std::string getNomeRestricao(const int a_posicaoRestricao) = 0;
 
-    virtual bool setCofRestricao(const bool a_isAlocMode, const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) = 0;
+    virtual bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) = 0;
 
-    virtual bool setRHSRestricao(const bool a_isAlocMode, const int a_posicaoRestricao, const double a_RHS) = 0;
+    virtual bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) = 0;
 
     virtual double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao) = 0;
 
@@ -425,9 +428,9 @@ public:
     }; // bool addVar(double a_lb, double a_ub, double a_obj, std::string a_nome) {
 
 
-    bool setCofObjetivo(const bool a_isAlocMode, const int a_posicao, const double a_cofObjetivo) {
+    bool setCofObjetivo(const int a_posicao, const double a_cofObjetivo) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             vetorGRBVar.at(a_posicao).set(GRB_DoubleAttr_Obj, a_cofObjetivo);
             return true;
         }
@@ -446,9 +449,9 @@ public:
     }; // bool setCofObjetivo(int a_posicao, double a_cofObjetivo) {
 
 
-    bool setLimInferior(const bool a_isAlocMode, const int a_posicao, const double a_limInferior) {
+    bool setLimInferior(const int a_posicao, const double a_limInferior) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             ptrModelo->update();
             const std::string varName = vetorGRBVar.at(a_posicao).get(GRB_StringAttr_VarName);
             const double prevLB = vetorGRBVar.at(a_posicao).get(GRB_DoubleAttr_LB);
@@ -478,9 +481,9 @@ public:
     }; // bool setLimInferior(int a_posicao, double a_limInferior) {
 
 
-    bool setLimSuperior(const bool a_isAlocMode, const int a_posicao, const double a_limSuperior) {
+    bool setLimSuperior(const int a_posicao, const double a_limSuperior) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             ptrModelo->update();
             const std::string varName = vetorGRBVar.at(a_posicao).get(GRB_StringAttr_VarName);
             const double prevUB = vetorGRBVar.at(a_posicao).get(GRB_DoubleAttr_UB);
@@ -509,9 +512,9 @@ public:
     }; // bool setLimSuperior(int a_posicao, double a_limSuperior) {
 
 
-    bool setTipoVariavelContinua(const bool a_isAlocMode, const int a_posicao) {
+    bool setTipoVariavelContinua(const int a_posicao) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             vetorGRBVar.at(a_posicao).set(GRB_CharAttr_VType, GRB_CONTINUOUS);
             return true;
         }
@@ -528,9 +531,9 @@ public:
     }; // bool setTipoVariavelContinua(int a_posicao) {
 
 
-    bool setTipoVariavelBinaria(const bool a_isAlocMode, const int a_posicao) {
+    bool setTipoVariavelBinaria(const int a_posicao) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             vetorGRBVar.at(a_posicao).set(GRB_CharAttr_VType, GRB_BINARY);
             return true;
         }
@@ -692,9 +695,20 @@ public:
         }
     }
 
-    bool setCofRestricao(const bool a_isAlocMode, const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
+    std::string getNomeVariavel(const int a_posicaoVariavel) {
         try {
-            if (a_isAlocMode) { return true; }
+            return vetorGRBVar.at(a_posicaoVariavel).get(GRB_StringAttr_VarName);
+        }
+        catch (const std::exception& erro) {
+            throw std::invalid_argument(
+                "SolverGRB::getNomeVariavel(" + std::to_string(a_posicaoVariavel) + "): \n" +
+                std::string(erro.what()));
+        }
+    }
+
+    bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
+        try {
+            
             ptrModelo->chgCoeff(vetorGRBConstr.at(a_posicaoRestricao), vetorGRBVar.at(a_posicaoVariavel),
                                 a_cofRestricao);
             return true;
@@ -713,9 +727,9 @@ public:
     }; // bool setCofRestricao(int a_posicaoVariavel, int a_posicaoRestricao, double a_cofRestricao) {
 
 
-    bool setRHSRestricao(const bool a_isAlocMode, const int a_posicaoRestricao, const double a_RHS) {
+    bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             vetorGRBConstr.at(a_posicaoRestricao).set(GRB_DoubleAttr_RHS, a_RHS);
             return true;
         }
@@ -745,6 +759,7 @@ public:
         }
     }; // double getCofRestricao(int a_posicaoVariavel, int a_posicaoRestricao) {
 
+    std::vector<std::vector<double>> getConstrCoefsByVar(const int a_posicaoRestricao) { return  std::vector<std::vector<double>>(); };
 
     double getRHSRestricao(const int a_posicaoRestricao) {
         try { return vetorGRBConstr.at(a_posicaoRestricao).get(GRB_DoubleAttr_RHS); }
@@ -773,9 +788,9 @@ public:
         }
     }; // double getRHSRestricao(int a_posicaoRestricao) {
 
-    bool addVarDinamica(const bool a_isAlocMode, const int a_posicaoVariavel) {
+    bool addVarDinamica(const int a_posicaoVariavel) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             if (vetorGRBVar.size() > a_posicaoVariavel) {
                 for (int i : lista_variavel_dinamica) {
                     if (i == a_posicaoVariavel)
@@ -2342,9 +2357,9 @@ public:
     }
 
 
-    bool setCofObjetivo(const bool a_isAlocMode, const int a_posicao, const double a_cofObjetivo) {
+    bool setCofObjetivo(const int a_posicao, const double a_cofObjetivo) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2356,7 +2371,8 @@ public:
                 objCol[idxBuffer] = a_cofObjetivo;
             }
             else { //restricao ja foi inserida no solver
-
+                if (!solver->matrix()->isColOrdered())
+                    solver->matrix()->reverseOrdering();
                 solver->setObjCoeff(colIdx, a_cofObjetivo);
             }
 
@@ -2397,9 +2413,9 @@ public:
     }
 
 
-    bool setLimInferior(const bool a_isAlocMode, const int a_posicao, const double a_limInferior) {
+    bool setLimInferior(const int a_posicao, const double a_limInferior) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2414,7 +2430,8 @@ public:
                 lbCol[idxBuffer] = newLB;
             }
             else { //restricao ja foi inserida no solver
-
+                if (!solver->matrix()->isColOrdered())
+                    solver->matrix()->reverseOrdering();
                 solver->setColLower(colIdx, newLB);
                 colDbg.changeLB(solver->getColumnName(a_posicao), solver->getColLower()[a_posicao], newLB);
             }
@@ -2454,9 +2471,9 @@ public:
         }
     }
 
-    bool setLimSuperior(const bool a_isAlocMode, const int a_posicao, const double a_limSuperior) {
+    bool setLimSuperior(const int a_posicao, const double a_limSuperior) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2471,7 +2488,8 @@ public:
                 ubCol[idxBuffer] = newUB;
             }
             else { //restricao ja foi inserida no solver
-
+                if (!solver->matrix()->isColOrdered())
+                    solver->matrix()->reverseOrdering();
                 solver->setColUpper(colIdx, newUB);
                 colDbg.changeUB(solver->getColumnName(a_posicao), solver->getColUpper()[a_posicao], newUB);
             }
@@ -2492,9 +2510,9 @@ public:
     }
 
 
-    bool setTipoVariavelContinua(const bool a_isAlocMode, const int a_posicao) {
+    bool setTipoVariavelContinua(const int a_posicao) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2506,6 +2524,8 @@ public:
                 binCol[idxBuffer] = 0;
             }
             else { //restricao ja foi inserida no solver
+                if (!solver->matrix()->isColOrdered())
+                    solver->matrix()->reverseOrdering();
                 solver->setContinuous(a_posicao);
             }
            
@@ -2522,10 +2542,10 @@ public:
         }
     }
 
-    bool setTipoVariavelBinaria(const bool a_isAlocMode, const int a_posicao) {
+    bool setTipoVariavelBinaria(const int a_posicao) {
         try {
 
-            if (a_isAlocMode) { return true; }
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2538,6 +2558,8 @@ public:
                 isMILP = true;
             }
             else { //restricao ja foi inserida no solver
+                if (!solver->matrix()->isColOrdered())
+                    solver->matrix()->reverseOrdering();
                 solver->setInteger(a_posicao);
                 solver->setColBounds(a_posicao, 0.0, 1.0);
                 isMILP = true;
@@ -2562,6 +2584,8 @@ public:
 
     double getCofObjetivo(const int a_posicao) {
         try {
+            if (!solver->matrix()->isColOrdered())
+                solver->matrix()->reverseOrdering();
             return solver->getObjCoefficients()[a_posicao];
         }
 
@@ -2586,7 +2610,8 @@ public:
                 return lbCol[idxBuffer];
             }
             else { //restricao ja foi inserida no solver
-
+                if (!solver->matrix()->isColOrdered())
+                    solver->matrix()->reverseOrdering();
                 return solver->getColLower()[a_posicao];
 
             }
@@ -2627,7 +2652,8 @@ public:
                 return ubCol[idxBuffer];
             }
             else { //restricao ja foi inserida no solver
-
+                if (!solver->matrix()->isColOrdered())
+                    solver->matrix()->reverseOrdering();
                 return solver->getColUpper()[a_posicao];
 
             }
@@ -2854,6 +2880,8 @@ public:
                 strncpy(nomeRow[idxBuffer], nomeRestricao.c_str(), nomeRestricao.size());
                 nomeRow[idxBuffer][nomeRestricao.size()] = '\0';
             } else { //restricao ja foi inserida no solver
+                if (!solver->matrix()->isColOrdered())
+                    solver->matrix()->reverseOrdering();
                 solver->setRowName(rowIdx, nomeRestricao);
             }
 
@@ -2883,13 +2911,86 @@ public:
             const int idxBuffer = rowIdx - solver->getNumRows();
             return nomeRow[idxBuffer];
         } else { //restricao ja foi inserida no solver
+            if (!solver->matrix()->isColOrdered())
+                solver->matrix()->reverseOrdering();
             return solver->getRowName(rowIdx);
         }
     }
 
-    bool setCofRestricao(const bool a_isAlocMode, const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
+    std::string getNomeVariavel(const int a_posicaoRestricaoVar) {
+        const int colIdx = origColIdx.at(a_posicaoRestricaoVar);
+        if (colIdx == -1) { //restricao ja foi removida do modelo
+            throw std::invalid_argument(
+                "Variavel de indice [" + std::to_string(a_posicaoRestricaoVar) + "] foi removida do modelo.");
+        }
+
+        if (colIdx >= solver->getNumCols()) { //restricao esta no buffer; ainda nao foi inserida no modelo
+            const int idxBuffer = colIdx - solver->getNumCols();
+            return nomeCol[idxBuffer];
+        }
+        else { //restricao ja foi inserida no solver
+            if (!solver->matrix()->isColOrdered())
+                solver->matrix()->reverseOrdering();
+            return solver->getColumnName(colIdx);
+        }
+    }
+
+    std::vector<std::vector<double>> getConstrCoefsByVar(const int a_posicaoRestricao) { 
+    
         try {
-            if (a_isAlocMode) { return true; }
+
+            std::vector<std::vector<double>> lista_coefs_vars;
+
+            const int rowIdx = origRowIdx.at(a_posicaoRestricao);
+            if (rowIdx == -1) {//restricao ja foi removida do modelo
+                throw std::invalid_argument(
+                    "Restricao de indice [" + std::to_string(a_posicaoRestricao) + "] foi removida do modelo.");
+            }
+
+            if (rowIdx >= solver->getNumRows()) { //restricao esta no buffer; ainda nao foi inserida no modelo
+                const int idxBuffer = rowIdx - solver->getNumRows();
+
+                lista_coefs_vars = std::vector<std::vector<double>>(sizeRow[idxBuffer], std::vector<double>(2, NAN));
+
+                for (int i = 0; i < sizeRow[idxBuffer]; i++) {
+                    lista_coefs_vars.at(i).at(0) = double(matrizIdxs[idxBuffer][i]);
+                    lista_coefs_vars.at(i).at(1) = matrizCoefs[idxBuffer][i];
+                }
+
+            }
+			else { //restricao ja foi inserida no solver
+
+				const int i = a_posicaoRestricao;
+
+				if (solver->matrix()->isColOrdered())
+					solver->matrix()->reverseOrdering();
+
+				const int size = solver->matrix()->getVectorLengths()[i];
+				const int ini = solver->matrix()->getVectorStarts()[i];
+				const int end = ini + size;
+
+				lista_coefs_vars = std::vector<std::vector<double>>(size, std::vector<double>(2, NAN));
+
+				for (int col = ini; col < end; col++) {
+					lista_coefs_vars.at(col - ini).at(0) = solver->matrix()->getIndices()[col];
+					lista_coefs_vars.at(col - ini).at(1) = solver->matrix()->getElements()[col];
+				}
+
+			}
+
+			return lista_coefs_vars;
+		}
+
+		catch (const std::exception& erro) {
+            throw std::invalid_argument("SolverCLP::getConstrCoefsByVar(" + std::to_string(a_posicaoRestricao) + "): \n" + std::string(erro.what()));
+        }
+ 
+    
+    };
+
+    bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
+        try {
+            
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2917,6 +3018,8 @@ public:
                 matrizCoefs[idxBuffer][tamAtual] = a_cofRestricao;
                 sizeRow[idxBuffer] = sizeRow[idxBuffer] + 1;
             } else { //restricao ja foi inserida no solver
+                if (!solver->matrix()->isColOrdered())
+                    solver->matrix()->reverseOrdering();
                 solver->modifyCoefficient(rowIdx, a_posicaoVariavel, a_cofRestricao);
             }
 
@@ -2930,9 +3033,9 @@ public:
         }
     }
 
-    bool setRHSRestricao(const bool a_isAlocMode, const int a_posicaoRestricao, const double a_RHS) {
+    bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const double newRHS = (fabs(a_RHS) <= 1e-6) ? 0.0 : a_RHS;
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
@@ -2944,6 +3047,8 @@ public:
                 const int idxBuffer = rowIdx - solver->getNumRows();
                 rhsRow[idxBuffer] = newRHS;
             } else { //restricao ja foi inserida no solver
+                if (!solver->matrix()->isColOrdered())
+                    solver->matrix()->reverseOrdering();
                 const char rowSense = origRowSense.at(a_posicaoRestricao);
 
                 if (rowSense == '<') {
@@ -2991,6 +3096,8 @@ public:
                 }
                 return 0.0;
             } else { //restricao ja foi inserida no solver
+                if (!solver->matrix()->isColOrdered())
+                    solver->matrix()->reverseOrdering();
                 const CoinPackedMatrix *matrixByRow = solver->matrix();
                 const int *idxs = matrixByRow->getIndices();
                 const double *coefs = matrixByRow->getElements();
@@ -3025,6 +3132,8 @@ public:
                 const int idxBuffer = rowIdx - solver->getNumRows();
                 return rhsRow[idxBuffer];
             } else { //restricao ja foi inserida no solver
+                if (!solver->matrix()->isColOrdered())
+                    solver->matrix()->reverseOrdering();
                 const char rowSense = origRowSense.at(a_posicaoRestricao);
 
                 if (rowSense == '<' || rowSense == '=') {
@@ -3113,9 +3222,9 @@ public:
         }
     }
 
-    bool addVarDinamica(const bool a_isAlocMode, const int a_posicao) {
+    bool addVarDinamica(const int a_posicao) {
         try {
-            if (a_isAlocMode) { return true; }
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -3370,6 +3479,10 @@ public:
     }
 
     bool otimizar() {
+        if (solver->getNumCols() > 0){
+            if (!solver->matrix()->isColOrdered())
+                solver->matrix()->reverseOrdering();
+        }
         insereVariaveis();
         insereRestricoes();
         return otimizar(solver);
