@@ -3326,7 +3326,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 		if (a_idPat == IdPatamarCarga_1) {
 
 			//EQUAÇÃO DE BALANÇO HIDRAULICO
-			const int posEquBH = addEquLinear_BH_VOL(a_TSS, a_idEstagio, a_period, a_idPat, a_idHidreletrica);
+			const int posEquBH = addEquLinear_BH_VOL(a_TSS, a_idEstagio, a_period, a_idHidreletrica);
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, 0.0);
 
 			// ENCHENDO VOLUME MORTO 
@@ -3391,7 +3391,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 
 		} // if (a_idPat == IdPatamarCarga_1){
 
-		const int posEquBH = getEquLinear_BH_VOL(a_TSS, a_idEstagio, a_period, IdPatamarCarga_1, a_idHidreletrica);
+		const int posEquBH = getEquLinear_BH_VOL(a_TSS, a_idEstagio, a_period, a_idHidreletrica);
 
 		// Variáveis de Hidreletricas à Montante desvio
 		const int numero_hidreletricas_montante_desvio = a_dados.getSizeVetor(a_idHidreletrica, AttVetorHidreletrica_montante_desvio);
