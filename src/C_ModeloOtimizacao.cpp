@@ -5932,33 +5932,13 @@ double ModeloOtimizacao::getProbabilidadeAbertura(const IdEstagio a_idEstagio, c
 
 } // double ModeloOtimizacao::getProbabilidadeAbertura(const IdEstagio a_idEstagio, const IdCenario a_idRealizacao) {
 
-VARIAVEL_DECISAO_1(DECLARAR_CONSOLIDAR_RESULTADOS)
-VARIAVEL_DECISAO_2(DECLARAR_CONSOLIDAR_RESULTADOS)
-VARIAVEL_DECISAO_3(DECLARAR_CONSOLIDAR_RESULTADOS)
-VARIAVEL_DECISAO_4(DECLARAR_CONSOLIDAR_RESULTADOS)
-VARIAVEL_DECISAO_5(DECLARAR_CONSOLIDAR_RESULTADOS)
-VARIAVEL_DECISAO_6(DECLARAR_CONSOLIDAR_RESULTADOS)
-
-
-EQUACAO_LINEAR_2(DECLARAR_CONSOLIDAR_RESULTADOS)
-EQUACAO_LINEAR_3(DECLARAR_CONSOLIDAR_RESULTADOS)
-EQUACAO_LINEAR_4(DECLARAR_CONSOLIDAR_RESULTADOS)
-EQUACAO_LINEAR_5(DECLARAR_CONSOLIDAR_RESULTADOS)
-EQUACAO_LINEAR_6(DECLARAR_CONSOLIDAR_RESULTADOS)
-
-INEQUACAO_LINEAR_3(DECLARAR_CONSOLIDAR_RESULTADOS)
-INEQUACAO_LINEAR_4(DECLARAR_CONSOLIDAR_RESULTADOS)
-INEQUACAO_LINEAR_5(DECLARAR_CONSOLIDAR_RESULTADOS)
-INEQUACAO_LINEAR_6(DECLARAR_CONSOLIDAR_RESULTADOS)
-INEQUACAO_LINEAR_7(DECLARAR_CONSOLIDAR_RESULTADOS)
 
 void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
 	try{
 
+		MPI_Barrier(MPI_COMM_WORLD);
 
-		if (!isPrintElemSync) {
-
-			MPI_Barrier(MPI_COMM_WORLD);
+		if (isPrintElemSync < 2) {
 
 			std::vector<std::vector<std::string>> lista_elemento_impressao_sync(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
 
@@ -6023,19 +6003,17 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 
 			lista_elemento_impressao = lista_elemento_impressao_sync;
 
-			isPrintElemSync = true;
+			isPrintElemSync++;
 
 			MPI_Barrier(MPI_COMM_WORLD);
 
-		} // if (!isPrintElemSync) {
+		} // if (isPrintElemSync < 2) {
 
 		const string diretorio = a_entradaSaidaDados.getDiretorioSaida();
 
 		for (TipoSubproblemaSolver a_TSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); a_TSS < TipoSubproblemaSolver_Excedente; a_TSS++) {
 
 			if (lista_elemento_impressao.at(a_TSS).size() > 0) {
-
-				a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS));
 
 				const int numero_elementos_consolidar = int(lista_elemento_impressao.at(a_TSS).size()) / int(a_maiorIdProcesso);
 
@@ -6053,30 +6031,35 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 
 					const std::string elem_str = lista_elemento_impressao.at(a_TSS).at(i);
 
-					VARIAVEL_DECISAO_1(CONSOLIDAR_RESULTADOS)
-						VARIAVEL_DECISAO_2(CONSOLIDAR_RESULTADOS)
-						VARIAVEL_DECISAO_3(CONSOLIDAR_RESULTADOS)
-						VARIAVEL_DECISAO_4(CONSOLIDAR_RESULTADOS)
-						VARIAVEL_DECISAO_5(CONSOLIDAR_RESULTADOS)
-						VARIAVEL_DECISAO_6(CONSOLIDAR_RESULTADOS)
+					size_t pos = elem_str.find('_');
 
-						EQUACAO_LINEAR_2(CONSOLIDAR_RESULTADOS)
-						EQUACAO_LINEAR_3(CONSOLIDAR_RESULTADOS)
-						EQUACAO_LINEAR_4(CONSOLIDAR_RESULTADOS)
-						EQUACAO_LINEAR_5(CONSOLIDAR_RESULTADOS)
-						EQUACAO_LINEAR_6(CONSOLIDAR_RESULTADOS)
+					if (pos == std::string::npos)
+						throw std::invalid_argument("Error.");
 
-						INEQUACAO_LINEAR_3(CONSOLIDAR_RESULTADOS)
-						INEQUACAO_LINEAR_4(CONSOLIDAR_RESULTADOS)
-						INEQUACAO_LINEAR_5(CONSOLIDAR_RESULTADOS)
-						INEQUACAO_LINEAR_6(CONSOLIDAR_RESULTADOS)
-						INEQUACAO_LINEAR_7(CONSOLIDAR_RESULTADOS)
+					a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS) + "//" + elem_str.substr(0, pos));
+					std::string nome_arquivo = elem_str;
+					nome_arquivo.erase(nome_arquivo.size() - 1); 
+					nome_arquivo += ".csv"; 
+					std::vector<std::string> lista_arquivos(a_maiorIdProcesso, ""); 
+					for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) 
+						lista_arquivos.at(getRank(idProcesso)) = elem_str + getFullString(idProcesso) + ".csv";
+					a_entradaSaidaDados.imprimirConsolidacaoVerticalCSV(nome_arquivo, lista_arquivos, true, true); 
+						
+					pos = elem_str.find("FINF");
+					if (pos == std::string::npos)
+						pos = elem_str.find("FSUP");
+					
+					if (pos != std::string::npos) {
+						a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS));
+						a_entradaSaidaDados.imprimirConsolidacaoVerticalCSV(nome_arquivo, lista_arquivos, true, true);
+					}		
 
 				} // for (int i = pos_inicial; i < pos_final; i++) {
 			}
 
 		} // for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++){
 
+		MPI_Barrier(MPI_COMM_WORLD);
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::consolidarResultados(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }

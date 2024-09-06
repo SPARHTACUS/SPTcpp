@@ -666,7 +666,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////
 
-		bool isPrintElemSync = false;
+		int isPrintElemSync = 0;
 
 		std::vector<std::vector<std::string>> lista_elemento_impressao;
 
