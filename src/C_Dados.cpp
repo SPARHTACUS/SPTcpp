@@ -9406,7 +9406,8 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 
 		/////////////////////////
 
-		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
+		const IdHidreletrica idHidreletricaIni = getMenorId(IdHidreletrica());
+		const IdHidreletrica idHidreletricaOut = getIdOut(IdHidreletrica());
 
 		for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= maiorIdVariavelAleatoria; idVariavelAleatoria++) {
 
@@ -9416,12 +9417,12 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 
 				IdHidreletrica idHidreletrica_YHF = IdHidreletrica_Nenhum;
 
-				for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
+				for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; vetorHidreletrica.incr(idHidreletrica)) {
 					if (getFullString(idHidreletrica) == processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVariavelAleatoria).vetorVariavelAleatoriaInterna.at(idVariavelAleatoriaInterna).getAtributo(AttComumVariavelAleatoriaInterna_nome, std::string())) {
 						idHidreletrica_YHF = idHidreletrica;
 						break;
 					} // if (getFullString(idHidreletrica) == getAtributo(tipo_processo_estocastico_hidrologico, idVariavelAleatoria, idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_nome, std::string())) {
-				} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
+				} // for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; vetorHidreletrica.incr(idHidreletrica)) {
 
 				if (idHidreletrica_YHF == IdHidreletrica_Nenhum)
 					throw std::invalid_argument("Nao ha hidreletrica compativel com " + getFullString(idVariavelAleatoriaInterna) + " em " + getFullString(idVariavelAleatoria));
@@ -9478,7 +9479,7 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 
 			for (IdCenario idCenario = a_cenario_inicial; idCenario <= a_cenario_final; idCenario++) {
 
-				for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
+				for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; vetorHidreletrica.incr(idHidreletrica)) {
 
 					const double afluencia_incremental = getElementoMatriz(idHidreletrica, IdAfluencia_vazao_afluente, AttMatrizAfluencia_incremental, periodo, idCenario, double());
 
@@ -9497,7 +9498,7 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 
 					}//while (idhidreletrica_jusante != IdHidreletrica_Nenhum) {
 
-				}//for (Periodo periodo = horizonte_afluencia_tendencia.getIteradorInicial(); periodo <= horizonte_afluencia_tendencia.getIteradorFinal(); horizonte_afluencia_tendencia.incrementarIterador(periodo)) {
+				}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; vetorHidreletrica.incr(idHidreletrica)) {
 
 			}//for (IdCenario idCenario = a_cenario_inicial; idCenario <= a_cenario_final; idCenario++) {
 
@@ -9509,7 +9510,7 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 
 		for (Periodo periodo = horizonte_afluencia.getIteradorInicial(); periodo < horizonte_otimizacao.at(estagio_inicial); horizonte_afluencia.incrementarIterador(periodo)) {
 
-			for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
+			for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; vetorHidreletrica.incr(idHidreletrica)) {
 
 				const double afluencia_incremental = getElementoVetor(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_tendencia, periodo, double());
 
@@ -9528,7 +9529,7 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 
 				}//while (idhidreletrica_jusante != IdHidreletrica_Nenhum) {
 
-			}//for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
+			}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; vetorHidreletrica.incr(idHidreletrica)) {
 
 		}//for (Periodo periodo = horizonte_afluencia.getIteradorInicial(); periodo < horizonte_otimizacao.at(estagio_inicial); horizonte_afluencia.incrementarIterador(periodo)) {
 
@@ -9541,12 +9542,12 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 
 			const SmartEnupla<Periodo, double> horizonte_historico = SmartEnupla<Periodo, double>(vetorHidreletrica.at(getMenorId(IdHidreletrica())).vetorAfluencia.at(IdAfluencia_vazao_afluente).getVetor(AttVetorAfluencia_incremental_historico, Periodo(), double()), 0.0);
 
-			for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica))
+			for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; vetorHidreletrica.incr(idHidreletrica))
 				vetorHidreletrica.at(idHidreletrica).vetorAfluencia.at(IdAfluencia_vazao_afluente).setVetor_forced(AttVetorAfluencia_natural_historico, horizonte_historico);
 
 			for (Periodo periodo = horizonte_historico.getIteradorInicial(); periodo <= horizonte_historico.getIteradorFinal(); horizonte_historico.incrementarIterador(periodo)) {
 
-				for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
+				for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; vetorHidreletrica.incr(idHidreletrica)) {
 
 					const double afluencia_incremental = vetorHidreletrica.at(idHidreletrica).vetorAfluencia.at(IdAfluencia_vazao_afluente).getElementoVetor(AttVetorAfluencia_incremental_historico, periodo, double());
 
@@ -9565,7 +9566,7 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 
 					}//while (idhidreletrica_jusante != IdHidreletrica_Nenhum) {
 
-				}//for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= maiorIdHidreletrica; vetorHidreletrica.incr(idHidreletrica)) {
+				}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; vetorHidreletrica.incr(idHidreletrica)) {
 
 			}//for (Periodo periodo = horizonte_historico.getIteradorInicial(); periodo <= horizonte_historico.getIteradorFinal(); horizonte_historico.incrementarIterador(periodo)) {
 

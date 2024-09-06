@@ -17423,8 +17423,16 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		////////////////////////////////////////////////////
 		// Detecta se existe arquivo de cortes NEWAVE
 		////////////////////////////////////////////////////
-		if (idProcesso == IdProcesso_mestre && nomeArquivo_cortes_NW != "nenhum")
-			leitura_cortes_NEWAVE(a_dados, horizonte_estudo, nomeArquivo_cortes_NW, diretorio_att_premissas, maior_ONS_REE, horizonte_processo_estocastico, percentual_duracao_patamar_carga_original);
+		if (idProcesso == IdProcesso_mestre && nomeArquivo_cortes_NW != "nenhum") {
+			bool must_read_nwlistcf = false;
+
+			//Se existe expansão do horizonte, tem que colocar o arquivo de cortes nwlistcf.rel. Caso contrário, pode ser nwlistcf.rel ou fcfnwn.rvX
+			if (get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados) < horizonte_estudo.getIteradorFinal())
+				must_read_nwlistcf = true;
+
+			leitura_cortes_NEWAVE(a_dados, horizonte_estudo, nomeArquivo_cortes_NW, must_read_nwlistcf, diretorio_att_premissas, maior_ONS_REE, horizonte_processo_estocastico, percentual_duracao_patamar_carga_original);
+
+		}//if (idProcesso == IdProcesso_mestre && nomeArquivo_cortes_NW != "nenhum") {
 
 
 		//

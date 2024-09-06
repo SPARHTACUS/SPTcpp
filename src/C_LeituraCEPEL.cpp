@@ -4080,7 +4080,7 @@ IdUsinaNaoSimulada LeituraCEPEL::getIdUsinaNaoSimulada_from_nome_or_bloco(const 
 
 }
 
-void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, const std::string a_nomeArquivo_cortes, const std::string a_diretorio_att_premissas, const int a_maior_ONS_REE, const SmartEnupla<Periodo, bool> a_horizonte_processo_estocastico, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> a_percentual_duracao_patamar_carga_original)
+void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, const std::string a_nomeArquivo_cortes, const bool a_must_read_nwlistcf, const std::string a_diretorio_att_premissas, const int a_maior_ONS_REE, const SmartEnupla<Periodo, bool> a_horizonte_processo_estocastico, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> a_percentual_duracao_patamar_carga_original)
 {
 	try {
 
@@ -4096,12 +4096,11 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		//       (ii) serve para também para estudos com expansão do horizonte do CP
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados);
 		const Periodo periodo_inicial = a_horizonte_estudo.getIteradorInicial();
 		const Periodo periodo_final = a_horizonte_estudo.getIteradorFinal();
 
-		if ((periodo_ultimo_sobreposicao < periodo_final) && (a_nomeArquivo_cortes.find("fcfnwn") != std::string::npos))//Existe expansão do horizonte
-			throw std::invalid_argument("Cortes do NEWAVE do arquivo fcfnwn.rvX nao copativeis com acomplamento de horizonte estendido");
+		if ((a_must_read_nwlistcf) && (!(a_nomeArquivo_cortes.find("nwlistcf") != std::string::npos)))//Se existe expansão do horizonte no CP ou for o MP tem que ser o arquivo nwlistcf.rel
+			throw std::invalid_argument("Leitura Cortes do NEWAVE tem que ser do arquivo nwlistcf.rel");
 
 		std::cout << "Lendo cortes do modelo NEWAVE do arquivo: " << a_nomeArquivo_cortes << " ..." << std::endl;
 
@@ -6399,8 +6398,6 @@ void LeituraCEPEL::retorna_equacionamento_regras_afluencia_natural_x_idHidreletr
 
 		}//if (a_codigo_posto == a_codigo_posto_acoplamento_ENA) {
 		else {//Posto com regra específica para acoplamento com o NW
-
-			const Periodo periodo_ultimo_sobreposicao = get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados); //Necessário para as premissas da cascata do Rio São Francisco
 
 			//Ver arquivo REGRAS.DAT do modelo GEVAZP
 			//Posto 169 (Sobradinho natural) é uma propagação das vazões de Três Marias e Queimado + Incremental de Sobradinho

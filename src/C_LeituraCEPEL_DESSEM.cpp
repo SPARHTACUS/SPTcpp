@@ -1626,51 +1626,53 @@ void LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16(Dados& a_dados, const 
 						int numero_unidades_usina = 0;
 						for (int conjunto = 0; conjunto < numConjuntos; conjunto++) {
 
-							// VERIFICA SE O CONJUNTO HIDRAULICO JÁ FOI INSTANCIADO
-							if (a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.isInstanciado(IdConjuntoHidraulico(conjunto + 1))) {
+							// INSTANCIA CONJUNTO HIDRAULICO
+							const IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico(conjunto + 1);
 
-								//Esta condição é para o conjuntoHidraulico Itaipu 50 Hz que pode ser instanciado previamente
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico(conjunto + 1)).setAtributo(AttComumConjuntoHidraulico_queda_referencia, h_nominal.at(conjunto));
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico(conjunto + 1)).setAtributo(AttComumConjuntoHidraulico_nome, nome);
-							}//if (a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.isInstanciado(IdConjuntoHidraulico(conjunto + 1))) {
-
-							else {
-								// INSTANCIA CONJUNTO HIDRAULICO
+							if (!a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.isInstanciado(idConjuntoHidraulico)) {
 								ConjuntoHidraulico conjuntohidraulico;
-								conjuntohidraulico.setAtributo(AttComumConjuntoHidraulico_idConjuntoHidraulico, IdConjuntoHidraulico(conjunto + 1));
-								conjuntohidraulico.setAtributo(AttComumConjuntoHidraulico_submercado, idSubmercado);
-								conjuntohidraulico.setAtributo(AttComumConjuntoHidraulico_queda_referencia, h_nominal.at(conjunto));
-								conjuntohidraulico.setAtributo(AttComumConjuntoHidraulico_nome, nome);
+								conjuntohidraulico.setAtributo(AttComumConjuntoHidraulico_idConjuntoHidraulico, idConjuntoHidraulico);
 								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.add(conjuntohidraulico);
-							}//else {
+							}//if (!a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.isInstanciado(idConjuntoHidraulico)) {
+
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).setAtributo(AttComumConjuntoHidraulico_submercado, idSubmercado);
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).setAtributo(AttComumConjuntoHidraulico_queda_referencia, h_nominal.at(conjunto));
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).setAtributo(AttComumConjuntoHidraulico_nome, nome);
+
 
 							// INSTANCIA AS UNIDADES DOS CONJUNTO HIDRAULICOS 
 							for (int unidade = 1; unidade <= numero_maquinas_conjunto.at(conjunto); unidade++) {
-								UnidadeUHE unidadeUHE;
-								unidadeUHE.setAtributo(AttComumUnidadeUHE_idUnidadeUHE, IdUnidadeUHE(unidade));
-								unidadeUHE.setAtributo(AttComumUnidadeUHE_submercado, idSubmercado);
-								unidadeUHE.setAtributo(AttComumUnidadeUHE_potencia_minima, 0.0);
-								unidadeUHE.setAtributo(AttComumUnidadeUHE_potencia_maxima, potencia_unidade_x_conjunto.at(conjunto));
-								unidadeUHE.setAtributo(AttComumUnidadeUHE_vazao_turbinada_minima, 0.0);
-								unidadeUHE.setAtributo(AttComumUnidadeUHE_vazao_turbinada_maxima, q_nominal.at(conjunto));
-								unidadeUHE.setAtributo(AttComumUnidadeUHE_fator_de_producao, fator_de_producao);
+								
+								const IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE(unidade);
+
+								if (!a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.isInstanciado(idUnidadeUHE)) {
+									UnidadeUHE unidadeUHE;
+									unidadeUHE.setAtributo(AttComumUnidadeUHE_idUnidadeUHE, idUnidadeUHE);
+									a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.add(unidadeUHE);
+								}//if (!a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.isInstanciado(idUnidadeUHE)) {
+								
+								
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_submercado, idSubmercado);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_potencia_minima, 0.0);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_potencia_maxima, potencia_unidade_x_conjunto.at(conjunto));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_vazao_turbinada_minima, 0.0);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_vazao_turbinada_maxima, q_nominal.at(conjunto));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_fator_de_producao, fator_de_producao);
 
 								// TIPO DE PERDA HIDRAULICA
 								if (tipo_perda == 1) {
 									a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_de_perda_hidraulica, TipoPerdaHidraulica_percentual);
 									a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_perda_hidraulica, double(perdas / 100));
-									unidadeUHE.setAtributo(AttComumUnidadeUHE_tipo_de_perda_hidraulica, TipoPerdaHidraulica_percentual);
-									unidadeUHE.setAtributo(AttComumUnidadeUHE_perda_hidraulica, double(perdas / 100));
+									a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_tipo_de_perda_hidraulica, TipoPerdaHidraulica_percentual);
+									a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_perda_hidraulica, double(perdas / 100));
 								}
 								else if (tipo_perda == 2) {
 									a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_de_perda_hidraulica, TipoPerdaHidraulica_metro);
 									a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_perda_hidraulica, perdas);
-									unidadeUHE.setAtributo(AttComumUnidadeUHE_tipo_de_perda_hidraulica, TipoPerdaHidraulica_metro);
-									unidadeUHE.setAtributo(AttComumUnidadeUHE_perda_hidraulica, perdas);
+									a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_tipo_de_perda_hidraulica, TipoPerdaHidraulica_metro);
+									a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_perda_hidraulica, perdas);
 								}
 								else{ throw std::invalid_argument("Nao identificado tipo_perda: " + getString(tipo_perda)); }
-
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico(conjunto + 1)).vetorUnidadeUHE.add(unidadeUHE);
 
 							}//for (int unidade = 1; unidade <= uhe.numMaquinas[conjunto]; unidade++) 
 
