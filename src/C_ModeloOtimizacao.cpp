@@ -6016,27 +6016,30 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 			if (lista_elemento_impressao.at(a_TSS).size() > 0) {
 
 				const int numero_elementos_consolidar = int(lista_elemento_impressao.at(a_TSS).size()) / int(a_maiorIdProcesso);
+				const int numero_elementos_resto      = int(lista_elemento_impressao.at(a_TSS).size()) % int(a_maiorIdProcesso);
 
 				int pos_inicial = -1;
 				int pos_final = -1;
 
-				pos_inicial = getRank(a_idProcesso) * numero_elementos_consolidar;
-
-				if (a_idProcesso < a_maiorIdProcesso)
-					pos_final = getRank(IdProcesso(a_idProcesso + 1)) * numero_elementos_consolidar;
-				else
-					pos_final = int(lista_elemento_impressao.at(a_TSS).size());
+				if (getRank(a_idProcesso) < numero_elementos_resto) {
+					pos_inicial = getRank(a_idProcesso) * (numero_elementos_consolidar + 1);
+					pos_final = pos_inicial + numero_elementos_consolidar + 1;
+				}
+				else {
+					pos_inicial = numero_elementos_resto + (getRank(a_idProcesso) * numero_elementos_consolidar);
+					pos_final = pos_inicial + numero_elementos_consolidar;
+				}
 
 				for (int i = pos_inicial; i < pos_final; i++) {
 
 					const std::string elem_str = lista_elemento_impressao.at(a_TSS).at(i);
 
-					size_t pos = elem_str.find('_');
+					size_t pos = elem_str.find("IdEstagio");
 
 					if (pos == std::string::npos)
 						throw std::invalid_argument("Error.");
 
-					a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS) + "//" + elem_str.substr(0, pos));
+					a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS) + "//" + elem_str.substr(0, pos - 1));
 					std::string nome_arquivo = elem_str;
 					nome_arquivo.erase(nome_arquivo.size() - 1); 
 					nome_arquivo += ".csv"; 

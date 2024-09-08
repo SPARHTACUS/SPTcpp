@@ -107,7 +107,7 @@ public:
         return varRC[a_posicao];
     }
 
-    virtual std::vector<int> getCofsRestricao(const int a_posicaoRestricao) = 0;
+    virtual std::vector<std::vector<int>> getCofsRestricao(const int a_posicaoRestricao) = 0;
 
     virtual double getInfinito() = 0;
 
@@ -142,7 +142,7 @@ public:
 
     virtual bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) = 0;
 
-    virtual double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao) = 0;
+    virtual double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const int a_pos = -1) = 0;
 
     virtual double getRHSRestricao(const int a_posicaoRestricao) = 0;
 
@@ -746,7 +746,7 @@ public:
     }; // bool setRHSRestricao(int a_posicaoRestricao, double a_RHS) {
 
 
-    double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao) {
+    double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const int a_pos = -1) {
         try { return ptrModelo->getCoeff(vetorGRBConstr.at(a_posicaoRestricao), vetorGRBVar.at(a_posicaoVariavel)); }
         catch (const GRBException erro) {
             throw std::invalid_argument("SolverGRB::getCofRestricao(" + std::to_string(a_posicaoVariavel) + "," +
@@ -759,7 +759,7 @@ public:
         }
     }; // double getCofRestricao(int a_posicaoVariavel, int a_posicaoRestricao) {
 
-    std::vector<int> getCofsRestricao(const int a_posicaoRestricao) { return  std::vector<int>(); };
+    std::vector<std::vector<int>> getCofsRestricao(const int a_posicaoRestricao) { return  std::vector<std::vector<int>>(); };
 
     double getRHSRestricao(const int a_posicaoRestricao) {
         try { return vetorGRBConstr.at(a_posicaoRestricao).get(GRB_DoubleAttr_RHS); }
@@ -2927,11 +2927,11 @@ public:
         }
     }
 
-    std::vector<int> getCofsRestricao(const int a_posicaoRestricao) { 
+    std::vector<std::vector<int>> getCofsRestricao(const int a_posicaoRestricao) { 
     
         try {
 
-            std::vector<int> lista_coefs_vars;
+            std::vector<std::vector<int>> lista_coefs_vars;
 
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
@@ -2942,10 +2942,10 @@ public:
             if (rowIdx >= solver->getNumRows()) { //restricao esta no buffer; ainda nao foi inserida no modelo
                 const int idxBuffer = rowIdx - solver->getNumRows();
 
-                lista_coefs_vars = std::vector<int>(sizeRow[idxBuffer], -1);
+                lista_coefs_vars = std::vector<std::vector<int>>(sizeRow[idxBuffer], std::vector<int>{-1, -1});
 
 				for (int i = 0; i < sizeRow[idxBuffer]; i++) {
-					lista_coefs_vars.at(i) = matrizIdxs[idxBuffer][i];
+					lista_coefs_vars.at(i).at(0) = matrizIdxs[idxBuffer][i];
 				}
 
 			}
@@ -2960,10 +2960,11 @@ public:
 
                 if (!matrixByRow->isColOrdered()) {                 
 
-                    lista_coefs_vars = std::vector<int>(length[rowIdx], -1);
+                    lista_coefs_vars = std::vector<std::vector<int>>(length[rowIdx], std::vector<int>{-1, -1});
 
                     for (int j = start[rowIdx]; j < start[rowIdx] + length[rowIdx]; j++) {
-                        lista_coefs_vars.at(j - start[rowIdx]) = idxs[j];
+                        lista_coefs_vars.at(j - start[rowIdx]).at(0) = idxs[j];
+                        lista_coefs_vars.at(j - start[rowIdx]).at(1) = j;
                     }
                 }
                 else {
@@ -2977,7 +2978,7 @@ public:
                         if (colIdx >= 0) {
                             for (int j = start[colIdx]; j < start[colIdx] + length[colIdx]; j++) {
                                 if (rowIdx == idxs[j]) {
-                                    lista_coefs_vars.push_back(var_orig);
+                                    lista_coefs_vars.push_back(std::vector<int>{var_orig, j});
                                     break;
                                 }
                             }
@@ -3087,7 +3088,7 @@ public:
         }
     }
 
-    double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao) {
+    double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const int a_pos = -1) {
         try {
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
@@ -3114,20 +3115,45 @@ public:
                 const int colIdx = origColIdx.at(a_posicaoVariavel);
 
                 if (!matrixByRow->isColOrdered()) {
+                    
+                    int ini = start[rowIdx];
+                    int end = start[rowIdx] + length[rowIdx];
 
-                    for (int j = start[rowIdx]; j < start[rowIdx] + length[rowIdx]; j++) {
+                    if (a_pos > -1) {
+                        if (a_pos >= end)
+                            throw std::invalid_argument("Invalid a_pos");
+                        ini = a_pos;
+                        end = a_pos + 1;
+                    }
+
+                    for (int j = ini; j < end; j++) {
                         if (idxs[j] == colIdx) {
                             return coefs[j];
                         }
                     }
+
+                    throw std::invalid_argument("No cof found");
+
                 }
                 else {
 
-                    for (int j = start[colIdx]; j < start[colIdx] + length[colIdx]; j++) {
+                    int ini = start[colIdx];
+                    int end = start[colIdx] + length[colIdx];
+
+                    if (a_pos > -1) {
+                        if (a_pos >= end)
+                            throw std::invalid_argument("Invalid a_pos");
+                        ini = a_pos;
+                        end = a_pos + 1;
+                    }
+
+                    for (int j = ini; j < end; j++) {
                         if (idxs[j] == rowIdx) {
                             return coefs[j];
                         }
                     }
+
+                    throw std::invalid_argument("No cof found");
 
                 }
 

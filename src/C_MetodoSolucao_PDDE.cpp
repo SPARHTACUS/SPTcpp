@@ -33,7 +33,7 @@ void MetodoSolucao::executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const Id
 
 			if ((iteracao_numero_maximo < idIteracao) || (IdIteracao_0 == iteracao_final)) {
 				simulacao = true;
-				//a_modeloOtimizacao.setAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, true);
+				a_modeloOtimizacao.setAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, true);
 				a_modeloOtimizacao.setAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, true);
 			} // if (iteracao_numero_maximo < idIteracao){
 

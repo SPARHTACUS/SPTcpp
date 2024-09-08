@@ -48,7 +48,7 @@ SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<double>>> 
 SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>> vlrV_##Elem##_##Nome##_##Nro;\
 SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>> vlrF_##Elem##_##Nome##_##Nro;\
 SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>> vlrC_##Elem##_##Nome##_##Nro;\
-SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::vector<int>>>> vlrCV_##Elem##_##Nome##_##Nro;\
+SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::vector<std::vector<int>>>>> vlrCV_##Elem##_##Nome##_##Nro;\
 bool isF_##Elem##_##Nome##_##Nro = false;\
 bool isPrintFw_##Elem##_##Nome##_##Nro = true;\
 std::string getNome##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) ){\
@@ -105,23 +105,23 @@ void alocVlrConstr##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, con
 		if (DECLARAR_ISVAR_##Elem){return;}\
 		if (vlrC_##Elem##_##Nome##_##Nro.size() == 0){	\
 			vlrC_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>>(TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<std::string>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<std::string>>())); \
-			vlrCV_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::vector<int>>>>(TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<std::vector<int>>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<std::vector<int>>>())); \
+			vlrCV_##Elem##_##Nome##_##Nro = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::vector<std::vector<int>>>>>(TipoSubproblemaSolver(1), std::vector<SmartEnupla<IdEstagio, std::vector<std::vector<std::vector<int>>>>>(TipoSubproblemaSolver_Excedente, SmartEnupla<IdEstagio, std::vector<std::vector<std::vector<int>>>>())); \
 			lista_elemento_impressao.at(a_TSS).push_back(std::string(std::string(#Elem) + std::string(#Nome) + "_" Valores(GET_STRING_TIPO_ELEMENTO2))); \
 		}\
 		if (vlrC_##Elem##_##Nome##_##Nro.at(a_TSS).size() == 0)	{\
 			vlrC_##Elem##_##Nome##_##Nro.at(a_TSS).addElemento(a_idEstagio, std::vector<std::string>());\
-			vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).addElemento(a_idEstagio, std::vector<std::vector<int>>());\
+			vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).addElemento(a_idEstagio, std::vector<std::vector<std::vector<int>>>());\
 		}\
 		else if (a_idEstagio < vlrC_##Elem##_##Nome##_##Nro.at(a_TSS).getIteradorInicial()) {	\
 			for (IdEstagio idEstagio = IdEstagio(vlrC_##Elem##_##Nome##_##Nro.at(a_TSS).getIteradorInicial() - 1); idEstagio >= a_idEstagio; idEstagio--){\
 				vlrC_##Elem##_##Nome##_##Nro.at(a_TSS).addElemento(idEstagio, std::vector<std::string>());\
-				vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).addElemento(a_idEstagio, std::vector<std::vector<int>>());\
+				vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).addElemento(a_idEstagio, std::vector<std::vector<std::vector<int>>>());\
 			}\
 		}\
 		else if (vlrC_##Elem##_##Nome##_##Nro.at(a_TSS).getIteradorFinal() < a_idEstagio) {	\
 			for (IdEstagio idEstagio = IdEstagio(vlrC_##Elem##_##Nome##_##Nro.at(a_TSS).getIteradorFinal() + 1); idEstagio <= a_idEstagio; idEstagio++){\
 				vlrC_##Elem##_##Nome##_##Nro.at(a_TSS).addElemento(idEstagio, std::vector<std::string>());\
-				vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).addElemento(a_idEstagio, std::vector<std::vector<int>>());\
+				vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).addElemento(a_idEstagio, std::vector<std::vector<std::vector<int>>>());\
 			}\
 		}\
 	} \
@@ -292,7 +292,7 @@ void armazenarValorDual##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS
 			if (DECLARAR_TESTE_DUAL_##Elem){\
 				alocVlrConstr##Elem##_##Nome##_##Nro(a_TSS, a_IdEstagio_1);\
 				if (vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).size() == 0){\
-					vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1) = std::vector<std::vector<int>>(indx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).size(), std::vector<int>());\
+					vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1) = std::vector<std::vector<std::vector<int>>>(indx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).size(), std::vector<std::vector<int>>());\
 					is_var_read = false;\
 				}\
 				if (!is_var_read){\
@@ -317,7 +317,7 @@ void armazenarValorDual##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS
 					for (int i = 0; i < int(vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos).size()); i++){\
 						std::string lInf = "";\
 						std::string lSup = "";\
-						const int idx_var = vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos).at(i);\
+						const int idx_var = vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos).at(i).at(0);\
 						const double vlrP = vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->getValorPrimal(idx_var);\
 						const double vlrI = vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->getLimInferior(idx_var);\
 						const double vlrS = vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->getLimSuperior(idx_var);\
@@ -326,7 +326,7 @@ void armazenarValorDual##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS
 						if (vlrP - vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->getToleranciaViabilidade() <= vlrI)\
 							lInf = "|";\
 						std::string name_var = vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->getNomeVariavel(idx_var);\
-						const std::string coef_var = getString(vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->getCofRestricao(idx_var, indx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos))); \
+						const std::string coef_var = getString(vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->getCofRestricao(idx_var, indx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos), vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(pos).at(i).at(1))); \
 						vlrC_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(idx_name) += coef_var + ";" + lInf + name_var + lSup + ";"; \
 						vlrC_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).at(idx_valr) += coef_var + ";" + getString(vlrP) + ";"; \
 					}\
@@ -404,7 +404,7 @@ void ModeloOtimizacao::imprimirRestricoes##Elem##_##Nome##_##Nro(const TipoSubpr
 		std::string nome_arquivo = std::string(std::string(#Elem) + std::string(#Nome) + "_" Valores(GET_STRING_TIPO_ELEMENTO2) + a_nome_arquivo + ".csv"); \
 		a_entradaSaidaDados.imprimirArquivoCSV(nome_arquivo, vlrC_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio), true); \
 		vlrC_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio) = std::vector<string>();\
-		vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio) = std::vector<std::vector<int>>();\
+		vlrCV_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_idEstagio) = std::vector<std::vector<std::vector<int>>>();\
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("imprimirRestricoes" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + a_nome_arquivo + ",a_entradaSaidaDados): \n" + std::string(erro.what())); } \
 };\
