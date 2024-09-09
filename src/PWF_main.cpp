@@ -241,7 +241,7 @@ int main(int argc, char *argv[]) {
 			std::chrono::duration<double> tempo = std::chrono::high_resolution_clock::now() - start_clock_total;
 			std::cout << std::endl << "Tempo Total de Execucao = " << tempo.count() / 60 << std::endl;
 
-			std::cout << std::endl << "O SPARHTACUS foi finalizado com sucesso." << std::endl;
+			std::cout << std::endl << "O PowerFusion foi finalizado com sucesso." << std::endl;
 
 			try {
 				std::ofstream escritaStream;
