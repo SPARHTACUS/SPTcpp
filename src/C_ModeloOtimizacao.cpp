@@ -740,6 +740,9 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 
 	try {
 
+		if (a_codigo_posto_acoplamento_ENA == -1)
+			throw std::invalid_argument("Deve ser definido o codigo_posto_acoplamento_ENA para a idHidreletrica: " + getString(a_idHidreletrica));
+
 		if (a_codigo_posto_acoplamento_ENA == 0) //Usinas que não entram no equcionamento da ENA de forma direta (as afluências destas usinas são utilizadas dentro de regras de outras usinas)
 			return;
 

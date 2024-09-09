@@ -584,8 +584,8 @@ void LeituraCEPEL::instanciar_membros_das_hidreletricas_instanciadas(Dados& a_da
 			//////////////////////////////////////////////
 
 			/////////////////////////////////////////////
-			if ((!hidreletricasPreConfig_instanciadas) && (lista_codigo_ONS_REE.at(idHidreletrica) == -1))
-				lista_codigo_ONS_REE.setElemento(idHidreletrica, 0);
+			//if ((!hidreletricasPreConfig_instanciadas) && (lista_codigo_ONS_REE.at(idHidreletrica) == -1))
+				//lista_codigo_ONS_REE.setElemento(idHidreletrica, 0);
 
 		}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
@@ -2423,7 +2423,9 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_bacia, atribui_bacia_hidrografica(a_dados, codigo_usina));
 
-							lista_codigo_ONS_REE.setElemento(idHidreletrica, codigo_REE_CEPEL); //Precisa para setar a defluencia_disponivel_minima
+							//lista_codigo_ONS_REE.setElemento(idHidreletrica, codigo_REE_CEPEL); //Precisa para setar a defluencia_disponivel_minima
+							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_REE, codigo_REE_CEPEL);
+
 
 							//Determina se a usina está em operação
 
@@ -13756,10 +13758,28 @@ void LeituraCEPEL::inicializa_vazao_defluente_CP(Dados& a_dados) {
 
 		if (int(porcentagem_vazao_minima_historica_REE.size()) > 0) {
 
+			for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+				const int codigo_REE = a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_codigo_REE, int());
+
+				set_zero_vazao_defluente_minima_historica_usina_fio_sem_reservatorio_a_montante(a_dados, idHidreletrica);
+
+				const double vazao_defluente_minima_historica = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_vazao_defluente_minima_historica, double());
+
+				for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+					if (a_dados.vetorHidreletrica.at(idHidreletrica).getElementoVetor(AttVetorHidreletrica_vazao_defluente_minima, periodo, double()) < vazao_defluente_minima_historica * porcentagem_vazao_minima_historica_REE.at(codigo_REE).getElemento(periodo))
+						a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_vazao_defluente_minima, periodo, vazao_defluente_minima_historica * porcentagem_vazao_minima_historica_REE.at(codigo_REE).getElemento(periodo));
+
+				}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+			}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+			/*
 			for (int codigo_ONS_REE = 1; codigo_ONS_REE <= maior_ONS_REE; codigo_ONS_REE++) {
 
 				const std::vector<IdHidreletrica> idHidreletricas_REE = getIdsFromCodigoONS(lista_codigo_ONS_REE, codigo_ONS_REE);
-
+				
 				const int numero_usinas_no_REE = int(idHidreletricas_REE.size());
 
 				for (int usina_REE = 0; usina_REE < numero_usinas_no_REE; usina_REE++) {
@@ -13780,6 +13800,7 @@ void LeituraCEPEL::inicializa_vazao_defluente_CP(Dados& a_dados) {
 				}//for (int usina_REE = 0; usina_REE < numero_usinas_no_REE; usina_REE++)
 
 			}//for (int codigo_ONS_REE = 1; codigo_ONS_REE <= maior_ONS_REE; codigo_ONS_REE++) {
+			*/
 
 		}//if (int(porcentagem_vazao_minima_historica_REE.size()) > 0) {
 

@@ -6458,9 +6458,22 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 							a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
 							a_entradaSaidaDados.setAppendArquivo(impresso_AttComumHidreletrica);
-							const std::vector<AttComumHidreletrica> lista_HIDRELETRICA_AttComumOperacional{ AttComumHidreletrica_idHidreletrica,    AttComumHidreletrica_nome, AttComumHidreletrica_codigo_usina, AttComumHidreletrica_codigo_posto, AttComumHidreletrica_codigo_posto_acoplamento_ENA, AttComumHidreletrica_submercado, AttComumHidreletrica_bacia, AttComumHidreletrica_considerar_usina, AttComumHidreletrica_representacao_discreta_producao,       AttComumHidreletrica_jusante,                   AttComumHidreletrica_jusante_desvio,                   AttComumHidreletrica_jusante_JUSENA,                       AttComumHidreletrica_tempo_viagem_agua, \
+							std::vector<AttComumHidreletrica> lista_HIDRELETRICA_AttComumOperacional{ AttComumHidreletrica_idHidreletrica,    AttComumHidreletrica_nome, AttComumHidreletrica_codigo_usina, AttComumHidreletrica_codigo_posto, AttComumHidreletrica_submercado, AttComumHidreletrica_bacia, AttComumHidreletrica_considerar_usina, AttComumHidreletrica_representacao_discreta_producao,       AttComumHidreletrica_jusante,                   AttComumHidreletrica_jusante_desvio,                       AttComumHidreletrica_tempo_viagem_agua, \
 																											AttComumHidreletrica_vertimento_maximo, AttComumHidreletrica_penalidade_afluencia_incremental, AttComumHidreletrica_penalidade_vertimento, AttComumHidreletrica_penalidade_turbinamento, AttComumHidreletrica_penalidade_desvio_agua, AttComumHidreletrica_penalidade_turbinamento_minimo, AttComumHidreletrica_penalidade_vazao_defluente_minima, AttComumHidreletrica_penalidade_vazao_defluente_maxima,\
 								AttComumHidreletrica_penalidade_vazao_desviada_minima, AttComumHidreletrica_penalidade_volume_minimo, AttComumHidreletrica_penalidade_potencia_minima, AttComumHidreletrica_tipo_detalhamento_producao,AttComumHidreletrica_penalidade_evaporacao, AttComumHidreletrica_penalidade_volume_util_minimo, AttComumHidreletrica_penalidade_vazao_retirada };
+							
+							////////////////////////
+							//Atributos que são necessários para a conversão/método solução da leitura dos cortes_NW
+							if (getAtributo(menorIdHidreletrica, AttComumHidreletrica_codigo_posto_acoplamento_ENA, int()) > -1)
+								lista_HIDRELETRICA_AttComumOperacional.push_back(AttComumHidreletrica_codigo_posto_acoplamento_ENA);
+							
+							if (getAtributo(menorIdHidreletrica, AttComumHidreletrica_codigo_REE, int()) > 0)
+								lista_HIDRELETRICA_AttComumOperacional.push_back(AttComumHidreletrica_codigo_REE);
+							
+							if (getAtributo(menorIdHidreletrica, AttComumHidreletrica_jusante_JUSENA, IdHidreletrica()) != IdHidreletrica_Nenhum)
+								lista_HIDRELETRICA_AttComumOperacional.push_back(AttComumHidreletrica_jusante_JUSENA);
+							////////////////////////
+
 							a_entradaSaidaDados.imprimirArquivoCSV_AttComum("HIDRELETRICA_AttComumOperacional.csv", idHidreletrica, *this, lista_HIDRELETRICA_AttComumOperacional);
 							a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
 							a_entradaSaidaDados.imprimirArquivoCSV_AttComum("HIDRELETRICA_AttComumPremissa.csv", idHidreletrica, *this);

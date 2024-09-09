@@ -347,7 +347,7 @@ private:
 
 	////////////////////////////////////////////////////////////////
 
-	SmartEnupla<IdHidreletrica, int> lista_codigo_ONS_REE = SmartEnupla<IdHidreletrica, int>(IdHidreletrica(1), std::vector<int>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), -1));
+	//SmartEnupla<IdHidreletrica, int> lista_codigo_ONS_REE = SmartEnupla<IdHidreletrica, int>(IdHidreletrica(1), std::vector<int>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), -1));
 	SmartEnupla<IdBaciaHidrografica, int> lista_codigo_ONS_bacia_REE = SmartEnupla<IdBaciaHidrografica, int>(IdBaciaHidrografica_1, std::vector<int>(IdBaciaHidrografica(int(IdBaciaHidrografica_Excedente) - 1), -1));
 
 	SmartEnupla<IdHidreletrica, int> lista_codigo_ONS_hidreletrica = SmartEnupla<IdHidreletrica, int>(IdHidreletrica(1), std::vector<int>(IdHidreletrica(int(IdHidreletrica_Excedente) - 1), -1));
