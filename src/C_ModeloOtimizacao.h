@@ -642,9 +642,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		double getCustoFuturo(const IdEstagio a_idEstagio);
 
 		void consolidarResultados(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados);
-		void consolidarVariaveis(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados);
-		void consolidarEquacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados);
-		void consolidarInequacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados);
 
 		int getNumeroVariavelDinamica(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio);
 
@@ -669,11 +666,9 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////
 
-		bool isPrintElemSync = false;
+		int isPrintElemSync = 0;
 
-		std::vector<std::vector<std::string>> lista_VarDecisao_impressao;
-		std::vector<std::vector<std::string>> lista_EquLinear_impressao;
-		std::vector<std::vector<std::string>> lista_IneLinear_impressao;
+		std::vector<std::vector<std::string>> lista_elemento_impressao;
 
 		IdCorteBenders maiorIdCorteExportadoPreEstudo = IdCorteBenders_Nenhum;
 
