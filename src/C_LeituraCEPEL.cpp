@@ -196,6 +196,11 @@ IdBaciaHidrografica LeituraCEPEL::atribui_bacia_hidrografica(Dados& a_dados, con
 		const std::vector<int> xingu{ 288, 314 };
 		const std::vector<int> teles_pires{ 227, 228, 229, 230 };
 		const std::vector<int> atlantico_leste{ 148, 189, 283, 154 };
+		//Usinas "fictícias" necessárias para o acoplamento com os cortes NW
+		const std::vector<int> ena_sobradinho{ 168 };
+		const std::vector<int> ena_itaparica{ 972 };
+		const std::vector<int> ena_xingo{ 978 };
+		const std::vector<int> comp_paf_mox{ 176 };
 
 		std::string nome_bacia = "Nenhum";
 		if (encontrar(paranaiba, a_codigo_ons_uhe) > -1)
@@ -240,6 +245,15 @@ IdBaciaHidrografica LeituraCEPEL::atribui_bacia_hidrografica(Dados& a_dados, con
 			nome_bacia = "teles_pires";
 		else if (encontrar(atlantico_leste, a_codigo_ons_uhe) > -1)
 			nome_bacia = "atlantico_leste";
+		else if (encontrar(ena_sobradinho, a_codigo_ons_uhe) > -1)
+			nome_bacia = "ena_sobradinho";
+		else if (encontrar(ena_itaparica, a_codigo_ons_uhe) > -1)
+			nome_bacia = "ena_itaparica";
+		else if (encontrar(ena_xingo, a_codigo_ons_uhe) > -1)
+			nome_bacia = "ena_xingo";
+		else if (encontrar(comp_paf_mox, a_codigo_ons_uhe) > -1)
+			nome_bacia = "comp_paf_mox";
+
 
 		const std::vector<IdBaciaHidrografica> lista_idBaciaHidrografica = a_dados.vetorBaciaHidrografica.getIdObjetos(AttComumBaciaHidrografica_nome, nome_bacia);
 
@@ -3954,6 +3968,7 @@ void LeituraCEPEL::instanciar_hidreletricas_sem_producao_para_acoplamento_cortes
 		a_dados.vetorHidreletrica.at(a_idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, a_codigo_posto_acoplamento_ENA);
 		a_dados.vetorHidreletrica.at(a_idHidreletrica).setAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica_sem_producao);
 		a_dados.vetorHidreletrica.at(a_idHidreletrica).setAtributo(AttComumHidreletrica_codigo_REE, a_codigo_ONS_REE);
+		a_dados.vetorHidreletrica.at(a_idHidreletrica).setAtributo(AttComumHidreletrica_bacia, atribui_bacia_hidrografica(a_dados, a_codigo_usina));
 		//lista_codigo_ONS_REE.setElemento(a_idHidreletrica, a_codigo_ONS_REE);
 		lista_codigo_ONS_hidreletrica.setElemento(a_idHidreletrica, a_codigo_usina);
 
@@ -4194,6 +4209,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			int periodo_acoplamento = 0; //Inicializa com este valor por ser parte da lógica
 
 			if (a_nomeArquivo_cortes.find("nwlistcf") != std::string::npos) {
+
 				//No nwlistcf.rel o período se refer ao estágio onde os cortes são colocados no modelo de otimização 
 				// (p.ex, Periodo: 10, significa a FCF que deve ser acoplada no mês outubro significando o custo de novembro em diante)
 				//Informação validada com o arquivo fcfnwn.rvX (saída do modelo DC)
@@ -4203,14 +4219,15 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				/////////////////////////////////////////
 				//Atualiza periodo_acoplamento
 				/////////////////////////////////////////
+				//Determina o mês/ano operativo do periodo_inicial do horizonte_estudo com base na semana operativa (p.ex: o período 26/08/2023-semanal tem como mês operativo = Setembro/2023)
 
-				Periodo periodo_inicial_mensal = Periodo(TipoPeriodo_mensal, horizonte_estudo_DECK.getIteradorFinal().getMes(), horizonte_estudo_DECK.getIteradorFinal().getAno());
-				periodo_inicial_mensal--;
-
+				Periodo periodo_inicial_semanal = Periodo(TipoPeriodo_semanal, a_horizonte_estudo.getIteradorInicial());
+				periodo_inicial_semanal++;
+				
 				Periodo periodo_final_mensal = horizonte_tendencia_mais_processo_estocastico_MENSAL.getIteradorFinal();
 
 				//////////////////////
-				Periodo periodo_inicial_aux = Periodo(TipoPeriodo_mensal, IdMes_1, periodo_inicial_mensal.getAno()); //A impressão dos cortes no arquivo nwlistcf.rel é desde o mês 1 até o mês 12 (mesmo que o estudo comece p.ex. no mês 6)
+				Periodo periodo_inicial_aux = Periodo(TipoPeriodo_mensal, IdMes_1, periodo_inicial_semanal.getAno()); //A impressão dos cortes no arquivo nwlistcf.rel é desde o mês 1 até o mês 12 (mesmo que o estudo comece p.ex. no mês 6)
 
 				for (Periodo periodo = periodo_inicial_aux; periodo <= periodo_final_mensal; periodo++)//Todos os períodos são em base mensal
 					periodo_acoplamento++;
@@ -4230,7 +4247,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 			const double conversao_MWporVazao_em_MWhporVolume = 1e6 / 3600.0;
 
-			const IdEstagio idEstagio_pos_estudo = IdEstagio(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal() + 1);
+			const IdEstagio idEstagio_pos_estudo = IdEstagio(a_dados.getAtributo(AttComumDados_estagio_final, IdEstagio()) + 1);
 
 			Estagio estagio_pos_estudo;
 
