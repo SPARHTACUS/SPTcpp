@@ -479,8 +479,6 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 
 				a_dados.setAtributo(AttComumDados_imprimir_solver, false);
 
-				a_dados.setAtributo(AttComumDados_imprimir_resultado_por_estagio_por_cenario, false);
-
 			} // if (!dadosPreConfig_instanciados) {
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

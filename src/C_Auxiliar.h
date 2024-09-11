@@ -307,6 +307,8 @@ static std::string getString(const double* a_valor) { return std::string("double
 
 static std::string getString(const std::vector<std::string> a_vetor) { return std::string("vector<string>"); }
 static std::string getString(const std::vector<int> a_vetor) { return std::string("vector<int>"); }
+static std::string getString(const std::vector<std::vector<int>> a_vetor) { return std::string("vector<vector<int>>"); }
+static std::string getString(const std::vector<std::vector<std::vector<int>>> a_vetor) { return std::string("vector<vector<vector<int>>>"); }
 static std::string getString(const std::vector<double> a_vetor) { return std::string("vector<double>"); }
 static std::string getString(const std::vector<std::vector<double>> a_vetor) { return std::string("vector<vector<double>>"); }
 

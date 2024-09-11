@@ -18,9 +18,7 @@ ModeloOtimizacao::ModeloOtimizacao(const IdModeloOtimizacao a_idModeloOtimizacao
 
 	try { 
 		   
-		lista_VarDecisao_impressao = std::vector<std::vector<std::string>>(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
-		lista_EquLinear_impressao = std::vector<std::vector<std::string>>(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
-		lista_IneLinear_impressao = std::vector<std::vector<std::string>>(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
+		lista_elemento_impressao = std::vector<std::vector<std::string>>(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
 
 		contadorLog10005 = 0;
 		escreverLog10005(TipoSubproblemaSolver_Nenhum, IdIteracao_Nenhum, IdEstagio_Nenhum, IdCenario_Nenhum, IdRealizacao_Nenhum, std::string());
@@ -5933,14 +5931,11 @@ double ModeloOtimizacao::getProbabilidadeAbertura(const IdEstagio a_idEstagio, c
 void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
 	try{
 
+		MPI_Barrier(MPI_COMM_WORLD);
 
-		if (!isPrintElemSync) {
+		if (isPrintElemSync < 2) {
 
-			MPI_Barrier(MPI_COMM_WORLD);
-
-			std::vector<std::vector<std::string>> lista_VarDecisao_impressao_sync(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
-			std::vector<std::vector<std::string>> lista_EquLinear_impressao_sync(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
-			std::vector<std::vector<std::string>> lista_IneLinear_impressao_sync(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
+			std::vector<std::vector<std::string>> lista_elemento_impressao_sync(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
 
 			const IdProcesso idProcesso_local = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 			const IdProcesso maior_processo = arranjoResolucao.getMaiorId(IdProcesso());
@@ -5956,44 +5951,16 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 							int size = 0;
 
 							for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++) {
-								size = int(lista_VarDecisao_impressao.at(tSS).size());
+								size = int(lista_elemento_impressao.at(tSS).size());
 								MPI_Send(&size, 1, MPI_INT, getRank(idProcesso_para), 12, MPI_COMM_WORLD);
 								
 								for (int i = 0; i < size; i++) {
-									int size_name = int(lista_VarDecisao_impressao.at(tSS).at(i).size());
+									int size_name = int(lista_elemento_impressao.at(tSS).at(i).size())+1;
 									MPI_Send(&size_name, 1, MPI_INT, getRank(idProcesso_para), 13, MPI_COMM_WORLD);
-									MPI_Send(lista_VarDecisao_impressao.at(tSS).at(i).c_str(), size_name, MPI_CHAR, getRank(idProcesso_para), 14, MPI_COMM_WORLD);
+									MPI_Send(lista_elemento_impressao.at(tSS).at(i).c_str(), size_name, MPI_CHAR, getRank(idProcesso_para), 14, MPI_COMM_WORLD);
 
-									if (findStringSensNoVetorReturnPos(lista_VarDecisao_impressao.at(tSS).at(i), lista_VarDecisao_impressao_sync.at(tSS)) == -1)
-										lista_VarDecisao_impressao_sync.at(tSS).push_back(lista_VarDecisao_impressao.at(tSS).at(i));
-								}
-							} // for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++) {
-
-							for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++) {
-								size = int(lista_EquLinear_impressao.at(tSS).size());
-								MPI_Send(&size, 1, MPI_INT, getRank(idProcesso_para), 22, MPI_COMM_WORLD);
-
-								for (int i = 0; i < size; i++) {
-									int size_name = int(lista_EquLinear_impressao.at(tSS).at(i).size());
-									MPI_Send(&size_name, 1, MPI_INT, getRank(idProcesso_para), 23, MPI_COMM_WORLD);
-									MPI_Send(lista_EquLinear_impressao.at(tSS).at(i).c_str(), size_name, MPI_CHAR, getRank(idProcesso_para), 24, MPI_COMM_WORLD);
-
-									if (findStringSensNoVetorReturnPos(lista_EquLinear_impressao.at(tSS).at(i), lista_EquLinear_impressao_sync.at(tSS)) == -1)
-										lista_EquLinear_impressao_sync.at(tSS).push_back(lista_EquLinear_impressao.at(tSS).at(i));
-								}
-							} // for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++) {
-
-							for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++) {
-								size = int(lista_IneLinear_impressao.at(tSS).size());
-								MPI_Send(&size, 1, MPI_INT, getRank(idProcesso_para), 32, MPI_COMM_WORLD);
-
-								for (int i = 0; i < size; i++) {
-									int size_name = int(lista_IneLinear_impressao.at(tSS).at(i).size());
-									MPI_Send(&size_name, 1, MPI_INT, getRank(idProcesso_para), 33, MPI_COMM_WORLD);
-									MPI_Send(lista_IneLinear_impressao.at(tSS).at(i).c_str(), size_name, MPI_CHAR, getRank(idProcesso_para), 34, MPI_COMM_WORLD);
-
-									if (findStringSensNoVetorReturnPos(lista_IneLinear_impressao.at(tSS).at(i), lista_IneLinear_impressao_sync.at(tSS)) == -1)
-										lista_IneLinear_impressao_sync.at(tSS).push_back(lista_IneLinear_impressao.at(tSS).at(i));
+									if (findStringSensNoVetorReturnPos(lista_elemento_impressao.at(tSS).at(i), lista_elemento_impressao_sync.at(tSS)) == -1)
+										lista_elemento_impressao_sync.at(tSS).push_back(lista_elemento_impressao.at(tSS).at(i));
 								}
 							} // for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++) {
 
@@ -6016,48 +5983,12 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 							char* name = new char[size_name];
 							MPI_Recv(name, size_name, MPI_CHAR, getRank(idProcesso), 14, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-							std::string str_recv(name, size_name);
+							std::string str_recv = name;
 
-							if (findStringSensNoVetorReturnPos(str_recv, lista_VarDecisao_impressao_sync.at(tSS)) == -1)
-								lista_VarDecisao_impressao_sync.at(tSS).push_back(str_recv);
+							if (findStringSensNoVetorReturnPos(str_recv, lista_elemento_impressao_sync.at(tSS)) == -1)
+								lista_elemento_impressao_sync.at(tSS).push_back(str_recv);
 							
-							delete name;
-						}
-					}
-
-					for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++) {
-						MPI_Recv(&size, 1, MPI_INT, getRank(idProcesso), 22, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-						for (int i = 0; i < size; i++) {
-							int size_name = 0;
-							MPI_Recv(&size_name, 1, MPI_INT, getRank(idProcesso), 23, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-							char* name = new char[size_name];
-							MPI_Recv(name, size_name, MPI_CHAR, getRank(idProcesso), 24, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-							std::string str_recv(name, size_name);
-
-							if (findStringSensNoVetorReturnPos(str_recv, lista_EquLinear_impressao_sync.at(tSS)) == -1)
-								lista_EquLinear_impressao_sync.at(tSS).push_back(str_recv);
-
-							delete name;
-						}
-					}
-
-					for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++) {
-						MPI_Recv(&size, 1, MPI_INT, getRank(idProcesso), 32, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-						for (int i = 0; i < size; i++) {
-							int size_name = 0;
-							MPI_Recv(&size_name, 1, MPI_INT, getRank(idProcesso), 33, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-							char* name = new char[size_name];
-							MPI_Recv(name, size_name, MPI_CHAR, getRank(idProcesso), 34, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-							std::string str_recv(name, size_name);
-
-							if (findStringSensNoVetorReturnPos(str_recv, lista_IneLinear_impressao_sync.at(tSS)) == -1)
-								lista_IneLinear_impressao_sync.at(tSS).push_back(str_recv);
-
-							delete name;
+							delete[] name;
 						}
 					}
 
@@ -6065,191 +5996,74 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 
 			} // for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= maior_processo; idProcesso++) {
 
+			lista_elemento_impressao = lista_elemento_impressao_sync;
 
-			isPrintElemSync = true;
+			isPrintElemSync++;
 
 			MPI_Barrier(MPI_COMM_WORLD);
 
-		} // if (!isPrintElemSync) {
+		} // if (isPrintElemSync < 2) {
 
-		consolidarVariaveis(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);
-		consolidarEquacoes(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);
-		consolidarInequacoes(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);
+		const string diretorio = a_entradaSaidaDados.getDiretorioSaida();
+
+		for (TipoSubproblemaSolver a_TSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); a_TSS < TipoSubproblemaSolver_Excedente; a_TSS++) {
+
+			if (lista_elemento_impressao.at(a_TSS).size() > 0) {
+
+				const int numero_elementos_consolidar = int(lista_elemento_impressao.at(a_TSS).size()) / int(a_maiorIdProcesso);
+				const int numero_elementos_resto      = int(lista_elemento_impressao.at(a_TSS).size()) % int(a_maiorIdProcesso);
+
+				int pos_inicial = -1;
+				int pos_final = -1;
+
+				if (getRank(a_idProcesso) < numero_elementos_resto) {
+					pos_inicial = getRank(a_idProcesso) * (numero_elementos_consolidar + 1);
+					pos_final = pos_inicial + numero_elementos_consolidar + 1;
+				}
+				else {
+					pos_inicial = numero_elementos_resto + (getRank(a_idProcesso) * numero_elementos_consolidar);
+					pos_final = pos_inicial + numero_elementos_consolidar;
+				}
+
+				for (int i = pos_inicial; i < pos_final; i++) {
+
+					const std::string elem_str = lista_elemento_impressao.at(a_TSS).at(i);
+
+					size_t pos = elem_str.find("IdEstagio");
+
+					if (pos == std::string::npos)
+						throw std::invalid_argument("Error.");
+
+					a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS) + "//" + elem_str.substr(0, pos - 1));
+					std::string nome_arquivo = elem_str;
+					nome_arquivo.erase(nome_arquivo.size() - 1); 
+					nome_arquivo += ".csv"; 
+					std::vector<std::string> lista_arquivos(a_maiorIdProcesso, ""); 
+					for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= a_maiorIdProcesso; idProcesso++) 
+						lista_arquivos.at(getRank(idProcesso)) = elem_str + getFullString(idProcesso) + ".csv";
+					a_entradaSaidaDados.imprimirConsolidacaoVerticalCSV(nome_arquivo, lista_arquivos, true, true); 
+						
+					pos = elem_str.find("FINF");
+					if (pos == std::string::npos)
+						pos = elem_str.find("FSUP");
+					
+					if (pos != std::string::npos) {
+						a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS));
+						a_entradaSaidaDados.imprimirConsolidacaoVerticalCSV(nome_arquivo, lista_arquivos, true, true);
+					}		
+
+				} // for (int i = pos_inicial; i < pos_final; i++) {
+			}
+
+		} // for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++){
+
+		MPI_Barrier(MPI_COMM_WORLD);
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::consolidarVariaveis(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::consolidarResultados(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
 } // void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
 
-VARIAVEL_DECISAO_1(DECLARAR_CONSOLIDAR_RESULTADOS)
-VARIAVEL_DECISAO_2(DECLARAR_CONSOLIDAR_RESULTADOS)
-VARIAVEL_DECISAO_3(DECLARAR_CONSOLIDAR_RESULTADOS)
-VARIAVEL_DECISAO_4(DECLARAR_CONSOLIDAR_RESULTADOS)
-VARIAVEL_DECISAO_5(DECLARAR_CONSOLIDAR_RESULTADOS)
-VARIAVEL_DECISAO_6(DECLARAR_CONSOLIDAR_RESULTADOS)
 
-void ModeloOtimizacao::consolidarVariaveis(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
-
-	try{
-
-		const string diretorio = a_entradaSaidaDados.getDiretorioSaida();
-
-		for (TipoSubproblemaSolver a_TSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); a_TSS < TipoSubproblemaSolver_Excedente; a_TSS++) {
-
-			a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS));
-
-			int numero_variaveis_consolidar = int(lista_VarDecisao_impressao.at(a_TSS).size()) / int(a_maiorIdProcesso);
-
-			const int resto_variaveis_consolidar = int(lista_VarDecisao_impressao.at(a_TSS).size()) % int(a_maiorIdProcesso);
-
-			int pos_inicial = -1;
-			int pos_final = -1;
-
-			pos_inicial = getRank(a_idProcesso) * numero_variaveis_consolidar;
-
-			if (a_idProcesso < a_maiorIdProcesso) {
-
-				if (numero_variaveis_consolidar == 0.0)
-					return;
-
-				pos_final = getRank(IdProcesso(a_idProcesso + 1)) * numero_variaveis_consolidar;
-
-			} // if (a_idProcesso < a_maiorIdProcesso) {
-
-			else
-				pos_final = int(lista_VarDecisao_impressao.at(a_TSS).size());
-
-			for (int i = pos_inicial; i < pos_final; i++) {
-
-				const std::string VarDecisao_str = lista_VarDecisao_impressao.at(a_TSS).at(i);
-
-				VARIAVEL_DECISAO_1(CONSOLIDAR_RESULTADOS)
-				VARIAVEL_DECISAO_2(CONSOLIDAR_RESULTADOS)
-					VARIAVEL_DECISAO_3(CONSOLIDAR_RESULTADOS)
-					VARIAVEL_DECISAO_4(CONSOLIDAR_RESULTADOS)
-					VARIAVEL_DECISAO_5(CONSOLIDAR_RESULTADOS)
-					VARIAVEL_DECISAO_6(CONSOLIDAR_RESULTADOS)
-
-			} // for (int i = pos_inicial; i < pos_final; i++) {
-
-		} // for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++){
-
-	} // try
-	catch (const std::exception & erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::consolidarVariaveis(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
-
-} // void ModeloOtimizacao::consolidarVariaveis(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
-
-EQUACAO_LINEAR_2(DECLARAR_CONSOLIDAR_RESULTADOS)
-EQUACAO_LINEAR_3(DECLARAR_CONSOLIDAR_RESULTADOS)
-EQUACAO_LINEAR_4(DECLARAR_CONSOLIDAR_RESULTADOS)
-EQUACAO_LINEAR_5(DECLARAR_CONSOLIDAR_RESULTADOS)
-EQUACAO_LINEAR_6(DECLARAR_CONSOLIDAR_RESULTADOS)
-
-void ModeloOtimizacao::consolidarEquacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados) {
-
-	try {
-
-		const string diretorio = a_entradaSaidaDados.getDiretorioSaida();
-
-		for (TipoSubproblemaSolver a_TSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); a_TSS < TipoSubproblemaSolver_Excedente; a_TSS++) {
-
-			a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS));
-
-			int numero_equacoes_consolidar = int(lista_EquLinear_impressao.at(a_TSS).size()) / int(a_maiorIdProcesso);
-
-			const int resto_equacoes_consolidar = int(lista_EquLinear_impressao.at(a_TSS).size()) % int(a_maiorIdProcesso);
-
-			int pos_inicial = -1;
-			int pos_final = -1;
-
-			pos_inicial = getRank(a_idProcesso) * numero_equacoes_consolidar;
-
-			if (a_idProcesso < a_maiorIdProcesso) {
-
-				if (numero_equacoes_consolidar == 0.0)
-					return;
-
-				pos_final = getRank(IdProcesso(a_idProcesso + 1)) * numero_equacoes_consolidar;
-
-			} // if (a_idProcesso < a_maiorIdProcesso) {
-
-			else
-				pos_final = int(lista_EquLinear_impressao.at(a_TSS).size());
-
-			for (int i = pos_inicial; i < pos_final; i++) {
-
-				const std::string EquLinear_str = lista_EquLinear_impressao.at(a_TSS).at(i);
-
-				    EQUACAO_LINEAR_2(CONSOLIDAR_RESULTADOS)
-					EQUACAO_LINEAR_3(CONSOLIDAR_RESULTADOS)
-					EQUACAO_LINEAR_4(CONSOLIDAR_RESULTADOS)
-					EQUACAO_LINEAR_5(CONSOLIDAR_RESULTADOS)
-					EQUACAO_LINEAR_6(CONSOLIDAR_RESULTADOS)
-
-			} // for (int i = pos_inicial; i < pos_final; i++) {
-
-		} // for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++){
-
-	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::consolidarEquacoes(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
-
-} // void ModeloOtimizacao::consolidarEquacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
-
-
-INEQUACAO_LINEAR_3(DECLARAR_CONSOLIDAR_RESULTADOS)
-INEQUACAO_LINEAR_4(DECLARAR_CONSOLIDAR_RESULTADOS)
-INEQUACAO_LINEAR_5(DECLARAR_CONSOLIDAR_RESULTADOS)
-INEQUACAO_LINEAR_6(DECLARAR_CONSOLIDAR_RESULTADOS)
-INEQUACAO_LINEAR_7(DECLARAR_CONSOLIDAR_RESULTADOS)
-
-void ModeloOtimizacao::consolidarInequacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados) {
-
-	try {
-
-		const string diretorio = a_entradaSaidaDados.getDiretorioSaida();
-
-		for (TipoSubproblemaSolver a_TSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); a_TSS < TipoSubproblemaSolver_Excedente; a_TSS++) {
-
-			a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS));
-
-			int numero_inequacoes_consolidar = int(lista_IneLinear_impressao.at(a_TSS).size()) / int(a_maiorIdProcesso);
-
-			const int resto_inequacoes_consolidar = int(lista_IneLinear_impressao.at(a_TSS).size()) % int(a_maiorIdProcesso);
-
-			int pos_inicial = -1;
-			int pos_final = -1;
-
-			pos_inicial = getRank(a_idProcesso) * numero_inequacoes_consolidar;
-
-			if (a_idProcesso < a_maiorIdProcesso) {
-
-				if (numero_inequacoes_consolidar == 0.0)
-					return;
-
-				pos_final = getRank(IdProcesso(a_idProcesso + 1)) * numero_inequacoes_consolidar;
-
-			} // if (a_idProcesso < a_maiorIdProcesso) {
-
-			else
-				pos_final = int(lista_IneLinear_impressao.at(a_TSS).size());
-
-			for (int i = pos_inicial; i < pos_final; i++) {
-
-				const std::string IneLinear_str = lista_IneLinear_impressao.at(a_TSS).at(i);
-
-					INEQUACAO_LINEAR_3(CONSOLIDAR_RESULTADOS)
-					INEQUACAO_LINEAR_4(CONSOLIDAR_RESULTADOS)
-					INEQUACAO_LINEAR_5(CONSOLIDAR_RESULTADOS)
-					INEQUACAO_LINEAR_6(CONSOLIDAR_RESULTADOS)
-					INEQUACAO_LINEAR_7(CONSOLIDAR_RESULTADOS)
-
-			} // for (int i = pos_inicial; i < pos_final; i++) {
-
-		} // for (TipoSubproblemaSolver tSS = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tSS < TipoSubproblemaSolver_Excedente; tSS++){
-
-	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::consolidarInequacoes(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
-
-} // void ModeloOtimizacao::consolidarIninequacoes(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, EntradaSaidaDados a_entradaSaidaDados){
 
 int ModeloOtimizacao::getNumeroVariavelDinamica(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio){
 
@@ -6323,11 +6137,11 @@ void ModeloOtimizacao::criarModeloOtimizacao(Dados &a_dados, EntradaSaidaDados a
 
 			setAtributo(AttComumModeloOtimizacao_imprimir_cenario_hidrologico_pre_otimizacao, a_dados.getAtributo(AttComumDados_imprimir_cenario_hidrologico_pre_otimizacao, bool()));
 
-			setAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, a_dados.getAtributo(AttComumDados_imprimir_resultado_por_estagio_por_cenario, bool()));
-			setAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, a_dados.getAtributo(AttComumDados_imprimir_resultado_por_estagio_por_cenario_por_realizacao, bool()));
+			setAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, a_dados.getAtributo(AttComumDados_imprimir_variavel_decisao_por_estagio_por_cenario, bool()));
+			setAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, a_dados.getAtributo(AttComumDados_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, bool()));
 
-			setAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, a_dados.getAtributo(AttComumDados_imprimir_resultado_por_estagio_por_cenario, bool()));
-			setAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, a_dados.getAtributo(AttComumDados_imprimir_resultado_por_estagio_por_cenario_por_realizacao, bool()));
+			setAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, a_dados.getAtributo(AttComumDados_imprimir_restricao_por_estagio_por_cenario, bool()));
+			setAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, a_dados.getAtributo(AttComumDados_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()));
 			
 			setAtributo(AttComumModeloOtimizacao_imprimir_resultado_viabilidade_hidraulica, a_dados.getAtributo(AttComumDados_imprimir_resultado_viabilidade_hidraulica, bool()));
 			setAtributo(AttComumModeloOtimizacao_imprimir_resultado_mestre, a_dados.getAtributo(AttComumDados_imprimir_resultado_mestre, bool()));
