@@ -5726,19 +5726,19 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const TipoSubproblemaSolver a_T
 			//
 			if (a_idPat == IdPatamarCarga_1 && a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_vazao_afluente) {
 
-				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
+				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
 
 					if (a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema()) != IdElementoSistema_Nenhum)
 						addVarDecisao_RHA_FINF(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE, 0.0, infinito, 0.0);
 
-				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
+				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
 
-				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
+				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
 
 					if (a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema()) != IdElementoSistema_Nenhum)
 						addVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE, 0.0, infinito, 0.0);
 
-				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
+				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
 
 			}//if (a_idPat == IdPatamarCarga_1 && a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_vazao_afluente) {						
 
@@ -5747,19 +5747,19 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const TipoSubproblemaSolver a_T
 			//
 			if (a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_vazao_defluente) {
 
-				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
+				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
 
 					if (a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema()) != IdElementoSistema_Nenhum)
 						addVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idRestricaoOperativaUHE, 0.0, infinito, 0.0);
 
-				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, a_idPat, double()) != 0.0) {
+				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, a_idPat, double()) != 0.0) {
 
-				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
+				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
 
 					if (a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema()) != IdElementoSistema_Nenhum)
 						addVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, a_period, a_idPat, idRestricaoOperativaUHE, 0.0, infinito, 0.0);
 
-				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
+				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
 
 			}//if (a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_vazao_afluente) {						
 
@@ -5768,19 +5768,19 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const TipoSubproblemaSolver a_T
 			//
 			if (a_idPat == IdPatamarCarga_1 && a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_volume_armazenado) {
 
-				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
+				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
 
 					if (a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema()) != IdElementoSistema_Nenhum)
 						addVarDecisao_RHV_FINF(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE, 0.0, infinito, 0.0);
 
-				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
+				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
 
-				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
+				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
 
 					if (a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema()) != IdElementoSistema_Nenhum)
 						addVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE, 0.0, infinito, 0.0);
 
-				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
+				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
 
 			}//if (a_idPat == IdPatamarCarga_1 && a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_volume_armazenado) {						
 
@@ -5788,19 +5788,19 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const TipoSubproblemaSolver a_T
 			//
 			if (a_idPat == IdPatamarCarga_1 && a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_energia_armazenada) {
 
-				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
+				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
 
-					if (a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema()) != IdElementoSistema_Nenhum && a_dados.getElementoVetor(idRestricaoOperativaUHE, AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior, a_period, double()) > 0.0)
+					if (a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema()) != IdElementoSistema_Nenhum && a_dados.getElementoVetor(idRestricaoOperativaUHE, AttVetorRestricaoOperativaUHE_lim_sup_folga_inf, a_period, double()) > 0.0)
 						addVarDecisao_RHE_FINF(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE, 0.0, infinito, 0.0);
 
-				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
+				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
 
-				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
+				if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
 
 					if (a_dados.getMaiorId(idRestricaoOperativaUHE, IdElementoSistema()) != IdElementoSistema_Nenhum)
 						addVarDecisao_RHE_FSUP(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE, 0.0, infinito, 0.0);
 
-				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
+				}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
 
 			}//if (a_idPat == IdPatamarCarga_1 && a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica()) == TipoRestricaoHidraulica_energia_armazenad) {		
 
@@ -7326,13 +7326,13 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 			//Restrição <=
 			//******************************************
 
-			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, IdPatamarCarga_1, double()) != getdoubleFromChar("min")) {
+			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, IdPatamarCarga_1, double()) != getdoubleFromChar("min")) {
 
 				if (getVarDecisao_RHA_FINF(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE) > -1) {
 
 					const int posIneRHA = addIneLinear_RHA_FINF(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE);
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHA, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, IdPatamarCarga_1, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHA, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, IdPatamarCarga_1, double()));
 
 					// Variável de folga RHA_FINF				
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHA_FINF(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE), posIneRHA, 1.0);
@@ -7446,19 +7446,19 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 
 				} // if (getVarDecisao_RHA_FINF(a_idEstagio, a_period, idRestricaoOperativaUHE) > -1) {
 
-			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, IdPatamarCarga_1, double()) > 0) {
+			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, IdPatamarCarga_1, double()) > 0) {
 
 			//******************************************
 			//Restrição >=
 			//******************************************
 
-			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, IdPatamarCarga_1, double()) != getdoubleFromChar("max")) {
+			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, IdPatamarCarga_1, double()) != getdoubleFromChar("max")) {
 
 				if (getVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE) > -1) {
 
 					const int posIneRHA = addIneLinear_RHA_FSUP(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE);
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHA, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, IdPatamarCarga_1, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHA, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, IdPatamarCarga_1, double()));
 
 					// Variável de folga RHA_FSUP					
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHA_FSUP(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE), posIneRHA, 1.0);
@@ -7570,7 +7570,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_afluente(const Ti
 
 				} // if (getVarDecisao_RHA_FSUP(a_idEstagio, a_period, idRestricaoOperativaUHE) > -1) {
 
-			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, IdPatamarCarga_1, double()) < getdoubleFromChar("max")) {
+			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, IdPatamarCarga_1, double()) < getdoubleFromChar("max")) {
 
 		}// for (int pos = 0; pos < numero_restricoes; pos++) {
 
@@ -7610,13 +7610,13 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 			//Restrição <=
 			//******************************************
 
-			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
+			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, a_idPat, double()) != getdoubleFromChar("min")) {
 
 				if (getVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idRestricaoOperativaUHE) > -1) {
 
 					const int posIneRHQ = addIneLinear_RHQ_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idRestricaoOperativaUHE);
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, a_idPat, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHQ, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, a_idPat, double()));
 
 					// Variável RHQ_FINF
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHQ_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idRestricaoOperativaUHE), posIneRHQ, 1.0);
@@ -7701,19 +7701,19 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 
 				} // if (getVarDecisao_RHQseExistir(a_idEstagio, a_period, a_idPat, idRestricaoOperativaUHE) > -1) {
 
-			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, a_idPat, double()) > 0) {
+			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, a_idPat, double()) > 0) {
 
 			//******************************************
 			//Restrição >=
 			//******************************************
 
-			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
+			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
 
 				if (getVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, a_period, a_idPat, idRestricaoOperativaUHE) > -1) {
 
 					const int posIneRHQ = addIneLinear_RHQ_FSUP(a_TSS, a_idEstagio, a_period, a_idPat, idRestricaoOperativaUHE);
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, a_idPat, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHQ, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, a_idPat, double()));
 
 					// Variável RHQ_FSUP
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHQ_FSUP(a_TSS, a_idEstagio, a_period, a_idPat, idRestricaoOperativaUHE), posIneRHQ, 1.0);
@@ -7797,7 +7797,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_vazao_defluente(const T
 
 				} // if (getVarDecisao_RHQseExistir(a_idEstagio, a_period, a_idPat, idRestricaoOperativaUHE) > -1) {
 
-			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, a_idPat, double()) > getdoubleFromChar("max")) {
+			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, a_idPat, double()) > getdoubleFromChar("max")) {
 
 
 		}// for (int pos = 0; pos < numero_restricoes; pos++) {
@@ -7843,13 +7843,13 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 			//Restrição <=
 			//******************************************
 
-			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, IdPatamarCarga_1, double()) != getdoubleFromChar("min")) {
+			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, IdPatamarCarga_1, double()) != getdoubleFromChar("min")) {
 
 				if (getVarDecisao_RHV_FINFseExistir(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE) > -1) {
 
 					const int posIneRHV = addIneLinear_RHV_FINF(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE);
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, IdPatamarCarga_1, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHV, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, IdPatamarCarga_1, double()));
 
 					//Variável RHV_FINF				
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHV_FINF(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE), posIneRHV, 1.0);
@@ -7990,19 +7990,19 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 
 				} // if (getVarDecisao_RHVseExistir(a_idEstagio, a_period, idRestricaoOperativaUHE) > -1) {
 
-			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, IdPatamarCarga_1, double()) > 0) {
+			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, IdPatamarCarga_1, double()) > 0) {
 
 			//******************************************
 			//Restrição >=
 			//******************************************
 
-			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, IdPatamarCarga_1, double()) != getdoubleFromChar("max")) {
+			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, IdPatamarCarga_1, double()) != getdoubleFromChar("max")) {
 
 				if (getVarDecisao_RHV_FSUPseExistir(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE) > -1) {
 
 					const int posIneRHV = addIneLinear_RHV_FSUP(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE);
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, IdPatamarCarga_1, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHV, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, IdPatamarCarga_1, double()));
 
 					// Variável RHV
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHV_FSUP(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE), posIneRHV, 1.0);
@@ -8140,7 +8140,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_volume_armazenado(const
 
 				} // if (getVarDecisao_RHVseExistir(a_idEstagio, a_period, idRestricaoOperativaUHE) > -1) {
 
-			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, IdPatamarCarga_1, double()) < getdoubleFromChar("max")) {
+			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, IdPatamarCarga_1, double()) < getdoubleFromChar("max")) {
 
 			//Atualiza o periodo onde começa o estágio da leitura dos dados
 			if (a_period < a_periodEnd_stage) {//Signica um periodo que corresponde a o fim de um estagio_DC mas não do estagio_SPT
@@ -8181,11 +8181,11 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(cons
 			//Restrição <=
 			//******************************************
 
-			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, IdPatamarCarga_1, double()) != getdoubleFromChar("min")) {
+			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, IdPatamarCarga_1, double()) != getdoubleFromChar("min")) {
 
 				const int posIneRHE = addIneLinear_RHE_FINF(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE);
 
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHE, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, IdPatamarCarga_1, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHE, a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, IdPatamarCarga_1, double()));
 
 				//Variável RHE_FINF
 				if (getVarDecisao_RHE_FINFseExistir(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE) > -1)
@@ -8224,19 +8224,19 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(cons
 				} // for (IdElementoSistema idElementoSistema; idElementoSistema <= maiorElementoSistema; idElementoSistema++){
 
 
-			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_inferior, a_period, IdPatamarCarga_1, double()) > 0) {
+			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, a_period, IdPatamarCarga_1, double()) > 0) {
 
 			//******************************************
 			//Restrição >=
 			//******************************************
 
-			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, IdPatamarCarga_1, double()) != getdoubleFromChar("max")) {
+			if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, IdPatamarCarga_1, double()) != getdoubleFromChar("max")) {
 
 				if (getVarDecisao_RHE_FSUPseExistir(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE) > -1) {
 
 					const int posIneRHE = addIneLinear_RHE_FSUP(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE);
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHE, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, IdPatamarCarga_1, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRHE, -a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, IdPatamarCarga_1, double()));
 
 					// Variável RHE
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RHE_FSUP(a_TSS, a_idEstagio, a_period, idRestricaoOperativaUHE), posIneRHE, 1.0);
@@ -8276,7 +8276,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicaEspecial_energia_armazenada(cons
 
 				} // if (getVarDecisao_RHEseExistir(a_idEstagio, a_period, idRestricaoOperativaUHE) > -1) {
 
-			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_limite_superior, a_period, IdPatamarCarga_1, double()) < getdoubleFromChar("max")) {
+			}//if (a_dados.getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, a_period, IdPatamarCarga_1, double()) < getdoubleFromChar("max")) {
 
 
 		}// for (int pos = 0; pos < numero_restricoes; pos++) {

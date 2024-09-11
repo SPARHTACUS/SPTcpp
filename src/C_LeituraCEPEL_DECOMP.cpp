@@ -7596,8 +7596,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-									restricaoOperativaUHE.addElemento(AttVetorRestricaoOperativaUHE_limite_inferior, periodo, getdoubleFromChar("min"));
-									restricaoOperativaUHE.addElemento(AttVetorRestricaoOperativaUHE_limite_superior, periodo, getdoubleFromChar("max"));
+									restricaoOperativaUHE.addElemento(AttVetorRestricaoOperativaUHE_lim_inf, periodo, getdoubleFromChar("min"));
+									restricaoOperativaUHE.addElemento(AttVetorRestricaoOperativaUHE_lim_sup, periodo, getdoubleFromChar("max"));
 
 								}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -7709,8 +7709,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								//Filosofia: Este tipo de restrição é carregada para todos os periodos
 
 								for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.incrementarIterador(periodo)) {
-									if (limiteInferior != "") { a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttVetorRestricaoOperativaUHE_limite_inferior, periodo, std::atof(limiteInferior.c_str())); }
-									if (limiteSuperior != "") { a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttVetorRestricaoOperativaUHE_limite_superior, periodo, std::atof(limiteSuperior.c_str())); }
+									if (limiteInferior != "") { a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttVetorRestricaoOperativaUHE_lim_inf, periodo, std::atof(limiteInferior.c_str())); }
+									if (limiteSuperior != "") { a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttVetorRestricaoOperativaUHE_lim_sup, periodo, std::atof(limiteSuperior.c_str())); }
 								}//for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.at(periodo)) {
 
 							}//if (limiteInferior != "" || limiteSuperior != "") {
@@ -7943,8 +7943,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 											const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo);
 
-											restricaoOperativaUHE.addElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, getdoubleFromChar("min"));
-											restricaoOperativaUHE.addElemento(AttMatrizRestricaoOperativaUHE_limite_superior, periodo, idPatamarCarga, getdoubleFromChar("max"));
+											restricaoOperativaUHE.addElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, getdoubleFromChar("min"));
+											restricaoOperativaUHE.addElemento(AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, getdoubleFromChar("max"));
 
 										}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
 
@@ -8132,10 +8132,10 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 											const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo);
 
 											if (limiteInferior != "")										
-												a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo_atualizar_limites, idPatamarCarga, std::atof(limiteInferior.c_str()));
+												a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo_atualizar_limites, idPatamarCarga, std::atof(limiteInferior.c_str()));
 
 											if (limiteSuperior != "")
-												a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_superior, periodo_atualizar_limites, idPatamarCarga, std::atof(limiteSuperior.c_str()));
+												a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_sup, periodo_atualizar_limites, idPatamarCarga, std::atof(limiteSuperior.c_str()));
 
 										}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
 
@@ -8470,8 +8470,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 											const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo);
 
-											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).addElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, getdoubleFromChar("min"));
-											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).addElemento(AttMatrizRestricaoOperativaUHE_limite_superior, periodo, idPatamarCarga, getdoubleFromChar("max"));
+											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).addElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, getdoubleFromChar("min"));
+											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).addElemento(AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, getdoubleFromChar("max"));
 
 										}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
 
@@ -8597,8 +8597,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 											const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo.at(periodo));
 
-											if (limiteInferior != "") { a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, std::atof(limiteInferior.c_str())); }
-											if (limiteSuperior != "") { a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_superior, periodo, idPatamarCarga, std::atof(limiteSuperior.c_str())); }
+											if (limiteInferior != "") { a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, std::atof(limiteInferior.c_str())); }
+											if (limiteSuperior != "") { a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, std::atof(limiteSuperior.c_str())); }
 
 										}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
 
@@ -9303,12 +9303,12 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								/////////////////////////////////////
 								//Instancia as matrizes
-								restricaoOperativaUHE.setMatriz(AttMatrizRestricaoOperativaUHE_limite_inferior, matriz_limite_inferior);
-								restricaoOperativaUHE.setMatriz(AttMatrizRestricaoOperativaUHE_limite_superior, matriz_limite_superior);
+								restricaoOperativaUHE.setMatriz(AttMatrizRestricaoOperativaUHE_lim_inf, matriz_limite_inferior);
+								restricaoOperativaUHE.setMatriz(AttMatrizRestricaoOperativaUHE_lim_sup, matriz_limite_superior);
 								/////////////////////////////////////
 								//Instancia as vetores
 								// 
-								restricaoOperativaUHE.setVetor(AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
+								restricaoOperativaUHE.setVetor(AttVetorRestricaoOperativaUHE_lim_sup_folga_inf, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
 								
 								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 								//Carrega restrição
@@ -9342,7 +9342,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 										const double sobreposicao = periodo.sobreposicao(periodo_DECK);
 
 										if (sobreposicao > 0.0)
-											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, limite_inferior);
+											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, limite_inferior);
 
 									}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
 
@@ -9361,7 +9361,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								if (sobreposicao > 0.0) {
 									is_sobreposicao_encontrado = true;
-									a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttVetorRestricaoOperativaUHE_limite_superior_folga_inferior, periodo, limite_superior_folga_inferior);
+									a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttVetorRestricaoOperativaUHE_lim_sup_folga_inf, periodo, limite_superior_folga_inferior);
 								}//if (sobreposicao > 0.0) {
 
 								if (is_sobreposicao_encontrado && sobreposicao == 0.0)
@@ -14122,7 +14122,7 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-							const double limite_inferior_percentual = a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getElementoMatriz(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, double());
+							const double limite_inferior_percentual = a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getElementoMatriz(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, double());
 							
 							if (limite_inferior_percentual != getdoubleFromChar("min")) {
 
@@ -14196,11 +14196,11 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 									const double limite_inferior_MW = limite_inferior_percentual * energia_maxima_REE.getElemento(periodo) / 100;
 
-									a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, limite_inferior_MW);
+									a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, limite_inferior_MW);
 
 								}//if (is_periodo_um_periodo_final_deck) {
 								else if(!is_periodo_um_periodo_final_deck)
-									a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, getdoubleFromChar("min"));//Na leitura é instanciado com o valor percentual do registro, e.g., 20% -> se coloca -inf caso não seja um período final de estágio DC 
+									a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, getdoubleFromChar("min"));//Na leitura é instanciado com o valor percentual do registro, e.g., 20% -> se coloca -inf caso não seja um período final de estágio DC 
 
 							}//if (limite_inferior_percentual != getdoubleFromChar("min")) {
 
@@ -15161,9 +15161,9 @@ void LeituraCEPEL::atualizar_valores_periodos_horizonte_expandido_restricao_oper
 
 		if (true) {
 			int pos_elemento = 1;
-			attMatrizRestricaoOperativaUHE.addElemento(pos_elemento, AttMatrizRestricaoOperativaUHE_limite_inferior);
+			attMatrizRestricaoOperativaUHE.addElemento(pos_elemento, AttMatrizRestricaoOperativaUHE_lim_inf);
 			pos_elemento++;
-			attMatrizRestricaoOperativaUHE.addElemento(pos_elemento, AttMatrizRestricaoOperativaUHE_limite_superior);
+			attMatrizRestricaoOperativaUHE.addElemento(pos_elemento, AttMatrizRestricaoOperativaUHE_lim_sup);
 
 		}
 
@@ -16709,7 +16709,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				for (IdRestricaoOperativaUHE idRestricaoOperativaUHE_PD = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE_PD <= maiorIdRestricaoOperativaUHE_PD; idRestricaoOperativaUHE_PD++) {
 
 					//Validação do horizonte_informacao_PD_pre_config
-					std::vector<Periodo> periodos_PD = dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getMatriz(AttMatrizRestricaoOperativaUHE_limite_inferior, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+					std::vector<Periodo> periodos_PD = dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getMatriz(AttMatrizRestricaoOperativaUHE_lim_inf, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
 
 					const Periodo periodo_inicial_PD = periodos_PD.at(0);
 					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
@@ -16743,8 +16743,8 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 					}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-					a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_limite_inferior, matriz_menos_inf);
-					a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_limite_superior, matriz_inf);
+					a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_lim_inf, matriz_menos_inf);
+					a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_lim_sup, matriz_inf);
 
 					////////////////////////////////
 					//Elementos Restrição
@@ -16797,15 +16797,15 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									periodo_REF = periodo;
 
 								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
-								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getIterador2Final(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo_PD, IdPatamarCarga());
+								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getIterador2Final(AttMatrizRestricaoOperativaUHE_lim_inf, periodo_PD, IdPatamarCarga());
 
 								if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
 									throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
 
 								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-									a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo_PD, idPatamarCarga, double()));
-									a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_superior, periodo, idPatamarCarga, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_limite_superior, periodo_PD, idPatamarCarga, double()));
+									a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_lim_inf, periodo_PD, idPatamarCarga, double()));
+									a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_lim_sup, periodo_PD, idPatamarCarga, double()));
 
 									for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema_PD; idElementoSistema++) {
 										a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).vetorElementoSistema.at(idElementoSistema).setElemento(AttMatrizElementoSistema_fator_participacao, periodo, idPatamarCarga, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getElementoMatriz(AttMatrizElementoSistema_fator_participacao, periodo_PD, idPatamarCarga, double()));
@@ -16834,8 +16834,8 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
 							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-								a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_inferior, periodo, idPatamarCarga, getdoubleFromChar("min"));
-								a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_limite_superior, periodo, idPatamarCarga, getdoubleFromChar("max"));
+								a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, getdoubleFromChar("min"));
+								a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, getdoubleFromChar("max"));
 							}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
 							/*
