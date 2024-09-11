@@ -413,7 +413,7 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 
 				const int posIneRE = addIneLinear_RE_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idRE);
 
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRE, a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_potencia_minima, a_period, a_idPat, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRE, a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_lim_inf, a_period, a_idPat, double()));
 
 				// Variável RE_FINF
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RE_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idRE), posIneRE, 1.0);
@@ -688,7 +688,7 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 
 				const int posIneRE = addIneLinear_RE_FSUP(a_TSS, a_idEstagio, a_period, a_idPat, idRE);
 
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRE, -a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_potencia_maxima, a_period, a_idPat, double()));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneRE, -a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_lim_sup, a_period, a_idPat, double()));
 
 				// Variável RE_FSUP
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RE_FSUP(a_TSS, a_idEstagio, a_period, a_idPat, idRE), posIneRE, 1.0);
@@ -6105,17 +6105,17 @@ void ModeloOtimizacao::criarVariaveisRestricaoEletrica(const TipoSubproblemaSolv
 
 			//RE_FINF
 
-			if (a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_potencia_minima, a_period, a_idPat, double()) > 0.0) {
+			if (a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_lim_inf, a_period, a_idPat, double()) > 0.0) {
 
 				if (a_dados.getMaiorId(idRE, IdElementoSistema()) != IdElementoSistema_Nenhum)
 					addVarDecisao_RE_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idRE, 0.0, infinito, 0.0);
 
-			} // if (a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_potencia_minima, a_period, a_idPat, double()) > 0.0) {
+			} // if (a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_lim_inf, a_period, a_idPat, double()) > 0.0) {
 
 			//RE_FSUP
 
-			if (a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_potencia_maxima, a_period, a_idPat, double()) >= 0.0 && \
-				a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_potencia_maxima, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
+			if (a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_lim_sup, a_period, a_idPat, double()) >= 0.0 && \
+				a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_lim_sup, a_period, a_idPat, double()) != getdoubleFromChar("max")) {
 
 				if (a_dados.getMaiorId(idRE, IdElementoSistema()) != IdElementoSistema_Nenhum)
 					addVarDecisao_RE_FSUP(a_TSS, a_idEstagio, a_period, a_idPat, idRE, 0.0, infinito, 0.0);

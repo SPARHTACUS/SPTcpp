@@ -2891,11 +2891,11 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 							for (int pos = 0; pos < int(vetor_idRestricaoEletrica_comUTE.size()); pos++) {
 
-								if (getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, double()) > getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima, periodo, idPatamarCarga, double()))
-									vetorTermeletrica.at(idTermeletrica).setElemento(AttMatrizTermeletrica_potencia_disponivel_minima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, double()));
+								if (getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, double()) > getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_minima, periodo, idPatamarCarga, double()))
+									vetorTermeletrica.at(idTermeletrica).setElemento(AttMatrizTermeletrica_potencia_disponivel_minima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, double()));
 
-								if (getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double()) < getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, double()))
-									vetorTermeletrica.at(idTermeletrica).setElemento(AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double()));
+								if (getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, double()) < getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, double()))
+									vetorTermeletrica.at(idTermeletrica).setElemento(AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica_comUTE.at(pos), AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, double()));
 
 							}//for (int pos = 0; pos < int(vetor_idRestricaoEletrica_comUTE.size()); pos++) {
 
@@ -6278,11 +6278,11 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 								for (int pos = 0; pos < int(vetor_idRestricaoEletrica.size()); pos++) {
 
-									if (getElementoMatriz(vetor_idRestricaoEletrica.at(pos), AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, double()) > getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_minima, periodo, idPatamarCarga, double()))
-										vetorHidreletrica.at(idHidreletrica).setElemento(AttMatrizHidreletrica_potencia_disponivel_minima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica.at(pos), AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, double()));
+									if (getElementoMatriz(vetor_idRestricaoEletrica.at(pos), AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, double()) > getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_minima, periodo, idPatamarCarga, double()))
+										vetorHidreletrica.at(idHidreletrica).setElemento(AttMatrizHidreletrica_potencia_disponivel_minima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica.at(pos), AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, double()));
 
-									if (getElementoMatriz(vetor_idRestricaoEletrica.at(pos), AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double()) < getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, double()))
-										vetorHidreletrica.at(idHidreletrica).setElemento(AttMatrizHidreletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica.at(pos), AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double()));
+									if (getElementoMatriz(vetor_idRestricaoEletrica.at(pos), AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, double()) < getElementoMatriz(idHidreletrica, AttMatrizHidreletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, double()))
+										vetorHidreletrica.at(idHidreletrica).setElemento(AttMatrizHidreletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica.at(pos), AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, double()));
 
 								}//for (int pos = 0; pos < int(vetor_idRestricaoOperativaUHE_comUHE.size()); pos++) {
 
@@ -7942,12 +7942,12 @@ void Dados::validacao_operacional_Intercambio(EntradaSaidaDados a_entradaSaidaDa
 						for (int pos = 0; pos < int(vetor_idRestricaoEletrica_comINT.size()); pos++) {
 
 							//potencia_disponivel_minima
-							if (getElementoMatriz(vetor_idRestricaoEletrica_comINT.at(pos), AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, double()) > getElementoMatriz(idIntercambio, AttMatrizIntercambio_potencia_minima, periodo, idPatamarCarga, double()))
-								vetorIntercambio.at(idIntercambio).setElemento(AttMatrizIntercambio_potencia_minima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica_comINT.at(pos), AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, double()));
+							if (getElementoMatriz(vetor_idRestricaoEletrica_comINT.at(pos), AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, double()) > getElementoMatriz(idIntercambio, AttMatrizIntercambio_potencia_minima, periodo, idPatamarCarga, double()))
+								vetorIntercambio.at(idIntercambio).setElemento(AttMatrizIntercambio_potencia_minima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica_comINT.at(pos), AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, double()));
 
 							//potencia_disponivel_maxima
-							if (getElementoMatriz(vetor_idRestricaoEletrica_comINT.at(pos), AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double()) < getElementoMatriz(idIntercambio, AttMatrizIntercambio_potencia_maxima, periodo, idPatamarCarga, double()))
-								vetorIntercambio.at(idIntercambio).setElemento(AttMatrizIntercambio_potencia_maxima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica_comINT.at(pos), AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double()));
+							if (getElementoMatriz(vetor_idRestricaoEletrica_comINT.at(pos), AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, double()) < getElementoMatriz(idIntercambio, AttMatrizIntercambio_potencia_maxima, periodo, idPatamarCarga, double()))
+								vetorIntercambio.at(idIntercambio).setElemento(AttMatrizIntercambio_potencia_maxima, periodo, idPatamarCarga, getElementoMatriz(vetor_idRestricaoEletrica_comINT.at(pos), AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, double()));
 
 						}//for (int pos = 0; pos < int(vetor_idRestricaoEletrica_comUTE.size()); pos++) {
 
@@ -8323,22 +8323,22 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 		const IdRestricaoEletrica maiorIdRestricaoEletrica = getMaiorId(IdRestricaoEletrica());
 		for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= maiorIdRestricaoEletrica; idRestricaoEletrica++) {
 
-			if ((getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_minima) == 0) || (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_maxima) == 0)) {
+			if ((getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_inf) == 0) || (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_sup) == 0)) {
 
 				calcular_att_operacionais_restricao_eletrica = true;
 
 				bool preencher_potencia_minima = false;
-				if (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_minima) == 0) {
+				if (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_inf) == 0) {
 					preencher_potencia_minima = true;
-					if (getSizeVetor(idRestricaoEletrica, AttVetorRestricaoEletrica_potencia_minima) == 0)
-						vetorRestricaoEletrica.at(idRestricaoEletrica).setVetor_forced(AttVetorRestricaoEletrica_potencia_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoEletrica, AttComumRestricaoEletrica_potencia_minima, double())));
+					if (getSizeVetor(idRestricaoEletrica, AttVetorRestricaoEletrica_lim_inf) == 0)
+						vetorRestricaoEletrica.at(idRestricaoEletrica).setVetor_forced(AttVetorRestricaoEletrica_lim_inf, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoEletrica, AttComumRestricaoEletrica_lim_inf, double())));
 				}
 
 				bool preencher_potencia_maxima = false;
-				if (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_maxima) == 0) {
+				if (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_sup) == 0) {
 					preencher_potencia_maxima = true;
-					if (getSizeVetor(idRestricaoEletrica, AttVetorRestricaoEletrica_potencia_maxima) == 0)
-						vetorRestricaoEletrica.at(idRestricaoEletrica).setVetor_forced(AttVetorRestricaoEletrica_potencia_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoEletrica, AttComumRestricaoEletrica_potencia_maxima, double())));
+					if (getSizeVetor(idRestricaoEletrica, AttVetorRestricaoEletrica_lim_sup) == 0)
+						vetorRestricaoEletrica.at(idRestricaoEletrica).setVetor_forced(AttVetorRestricaoEletrica_lim_sup, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoEletrica, AttComumRestricaoEletrica_lim_sup, double())));
 				}
 
 
@@ -8357,13 +8357,13 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 						const double percentual_variacao = getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_percentual_variacao_patamar_carga, periodo, idPatamarCarga, double());
 
 						if (preencher_potencia_minima)
-							vetorRestricaoEletrica.at(idRestricaoEletrica).addElemento(AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, getElementoVetor(idRestricaoEletrica, AttVetorRestricaoEletrica_potencia_minima, periodo, double()) * percentual_variacao);
+							vetorRestricaoEletrica.at(idRestricaoEletrica).addElemento(AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, getElementoVetor(idRestricaoEletrica, AttVetorRestricaoEletrica_lim_inf, periodo, double()) * percentual_variacao);
 
 						if (preencher_potencia_maxima)
-							vetorRestricaoEletrica.at(idRestricaoEletrica).addElemento(AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, getElementoVetor(idRestricaoEletrica, AttVetorRestricaoEletrica_potencia_maxima, periodo, double()) * percentual_variacao);
+							vetorRestricaoEletrica.at(idRestricaoEletrica).addElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, getElementoVetor(idRestricaoEletrica, AttVetorRestricaoEletrica_lim_sup, periodo, double()) * percentual_variacao);
 
-						const double potencia_minima = getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, double());
-						const double potencia_maxima = getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double());
+						const double potencia_minima = getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, double());
+						const double potencia_maxima = getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, double());
 
 						if (potencia_minima > potencia_maxima)
 							throw std::invalid_argument("Potencia Minima maior que Potencia Maxima em " + getString(periodo) + " em " + getString(idPatamarCarga) + " em " + getString(idRestricaoEletrica));
@@ -8371,7 +8371,7 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 					} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 				} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-			} // if ((getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_minima) == 0) || (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_maxima) == 0)) {
+			} // if ((getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_inf) == 0) || (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_sup) == 0)) {
 
 			const IdElementoSistema maiorIdElementoSistema = getMaiorId(idRestricaoEletrica, IdElementoSistema());
 
@@ -8484,9 +8484,9 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 						else
 							a_entradaSaidaDados.setAppendArquivo(true);
 
-						a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("RESTRICAO_ELETRICA_AttVetorPremissa_PorPeriodo.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, AttVetorRestricaoEletrica_potencia_minima);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("RESTRICAO_ELETRICA_AttVetorPremissa_PorPeriodo.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, AttVetorRestricaoEletrica_lim_inf);
 						a_entradaSaidaDados.setAppendArquivo(true);
-						a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("RESTRICAO_ELETRICA_AttVetorPremissa_PorPeriodo.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, AttVetorRestricaoEletrica_potencia_maxima);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("RESTRICAO_ELETRICA_AttVetorPremissa_PorPeriodo.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, AttVetorRestricaoEletrica_lim_sup);
 
 						if (idRestricaoEletrica == IdRestricaoEletrica_1)
 							a_entradaSaidaDados.setAppendArquivo(false);
@@ -8542,9 +8542,9 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 					else
 						a_entradaSaidaDados.setAppendArquivo(true);
 
-					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_potencia_minima);
+					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_lim_inf);
 					a_entradaSaidaDados.setAppendArquivo(true);
-					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_potencia_maxima);
+					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_lim_sup);
 
 					if (idRestricaoEletrica == IdRestricaoEletrica_1)
 						a_entradaSaidaDados.setAppendArquivo(false);
@@ -10276,15 +10276,15 @@ void Dados::validaRestricaoEletrica() {
 			if (maiorIdElementoSistema == IdElementoSistema_Nenhum)
 				throw std::invalid_argument("Necessario incluir elementosSistema em " + getFullString(idRestricaoEletrica));
 
-			if ((getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_minima) > 0) && (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_maxima) > 0)) {
+			if ((getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_inf) > 0) && (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_sup) > 0)) {
 
 				for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
 					const IdPatamarCarga maiorIdPatamarCarga = getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
 					for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-						const double potencia_minima = getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, double());
-						const double potencia_maxima = getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double());
+						const double potencia_minima = getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, double());
+						const double potencia_maxima = getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, double());
 
 						if (potencia_minima > potencia_maxima)
 							throw std::invalid_argument("Potencia Minima maior que Potencia Maxima em " + getString(periodo) + " em " + getFullString(idPatamarCarga) + " em " + getFullString(idRestricaoEletrica));
@@ -10293,7 +10293,7 @@ void Dados::validaRestricaoEletrica() {
 
 				} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-			} // if ((getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_minima) > 0) && (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_maxima) > 0)) {
+			} // if ((getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_inf) > 0) && (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_sup) > 0)) {
 
 		} // for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= maiorIdRestricaoEletrica; idRestricaoEletrica++) {
 
