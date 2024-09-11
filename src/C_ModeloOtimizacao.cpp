@@ -119,15 +119,15 @@ void ModeloOtimizacao::instanciarCorteBenders(const IdEstagio a_idEstagio, const
 						const int pos_zf = getPosIneLinear_CB_ZFseExistir(tss, estagio_anterior, idReal, idCorte_old);
 
 						if (pos_zf > -1) {
-							name_IneLinear_CB_ZF_3.at(tss).at(estagio_anterior).at(pos_zf) = getNomeIneLinear_CB_ZF(tss, estagio_anterior, idReal, idCorte);
-							vetorEstagio.at(estagio_anterior).getSolver(tss)->setNomeRestricao(indx_IneLinear_CB_ZF_3.at(tss).at(estagio_anterior).at(pos_zf), name_IneLinear_CB_ZF_3.at(tss).at(estagio_anterior).at(pos_zf));
+							name_IneLinear_CB_ZF_3.at(tss).at(estagio_anterior).at(pos_zf) = getNomePrintIneLinear_CB_ZF(tss, estagio_anterior, idReal, idCorte);
+							vetorEstagio.at(estagio_anterior).getSolver(tss)->setNomeRestricao(indx_IneLinear_CB_ZF_3.at(tss).at(estagio_anterior).at(pos_zf), getNomeSolverIneLinear_CB_ZF(tss, estagio_anterior, idReal, idCorte));
 						}
 
 						const int pos_zt = getPosIneLinear_CB_ZTseExistir(tss, estagio_anterior, idReal, idCorte_old);
 
 						if (pos_zt > -1) {
-							name_IneLinear_CB_ZT_3.at(tss).at(estagio_anterior).at(pos_zt) = getNomeIneLinear_CB_ZT(tss, estagio_anterior, idReal, idCorte);
-							vetorEstagio.at(estagio_anterior).getSolver(tss)->setNomeRestricao(indx_IneLinear_CB_ZT_3.at(tss).at(estagio_anterior).at(pos_zt), name_IneLinear_CB_ZT_3.at(tss).at(estagio_anterior).at(pos_zt));
+							name_IneLinear_CB_ZT_3.at(tss).at(estagio_anterior).at(pos_zt) = getNomePrintIneLinear_CB_ZT(tss, estagio_anterior, idReal, idCorte);
+							vetorEstagio.at(estagio_anterior).getSolver(tss)->setNomeRestricao(indx_IneLinear_CB_ZT_3.at(tss).at(estagio_anterior).at(pos_zt), getNomeSolverIneLinear_CB_ZT(tss, estagio_anterior, idReal, idCorte));
 						}
 
 					} // for (TipoSubproblemaSolver tss = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tss < TipoSubproblemaSolver_Excedente; tss++) {
@@ -4366,7 +4366,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 				for (IdRealizacao idRealizacao = maiorIdRealizacao_corte; idRealizacao >= IdRealizacao_1; idRealizacao--) {
 					for (IdCorteBenders idCorteBenders = getMaiorId(idEstagio_futuro, IdCorteBenders()); idCorteBenders >= getMenorId(idEstagio_futuro, IdCorteBenders()); idCorteBenders--) {
 						if (vetorEstagio.at(idEstagio_futuro).vetorCorteBenders.isInstanciado(idCorteBenders)) {
-							nomes.at(cont) = getNomeIneLinear_CB_ZF(a_TSS, estagio_final, idRealizacao, idCorteBenders);
+							nomes.at(cont) = getNomeSolverIneLinear_CB_ZF(a_TSS, estagio_final, idRealizacao, idCorteBenders);
 							cont++;
 						}
 					}
@@ -4386,7 +4386,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 							throw std::invalid_argument("Conteudo ja existente " +  getFullString(idCorteBenders));
 
 						alocIneLinear_CB_ZF_3(a_TSS, estagio_final);
-						name_IneLinear_CB_ZF_3.at(a_TSS).at(estagio_final).push_back(getNomeIneLinear_CB_ZF(a_TSS, estagio_final, idRealizacao, idCorteBenders));
+						name_IneLinear_CB_ZF_3.at(a_TSS).at(estagio_final).push_back(getNomePrintIneLinear_CB_ZF(a_TSS, estagio_final, idRealizacao, idCorteBenders));
 						indx_IneLinear_CB_ZF_3.at(a_TSS).at(estagio_final).push_back(indice_corte);
 
 						vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(varZF, indice_corte, 1.0);
@@ -5040,6 +5040,7 @@ VARIAVEL_DECISAO_4(DECLARAR_IMPRIMIR_VALOR)
 VARIAVEL_DECISAO_5(DECLARAR_IMPRIMIR_VALOR)
 VARIAVEL_DECISAO_6(DECLARAR_IMPRIMIR_VALOR)
 
+EQUACAO_LINEAR_1(DECLARAR_IMPRIMIR_VALOR)
 EQUACAO_LINEAR_2(DECLARAR_IMPRIMIR_VALOR)
 EQUACAO_LINEAR_3(DECLARAR_IMPRIMIR_VALOR)
 EQUACAO_LINEAR_4(DECLARAR_IMPRIMIR_VALOR)
@@ -5078,6 +5079,7 @@ void ModeloOtimizacao::imprimirSolucaoPorEstagio(const IdProcesso a_idProcesso, 
 
 				}
 
+				EQUACAO_LINEAR_1(IMPRIMIR_VALOR)
 				EQUACAO_LINEAR_2(IMPRIMIR_VALOR)
 					EQUACAO_LINEAR_3(IMPRIMIR_VALOR)
 					EQUACAO_LINEAR_4(IMPRIMIR_VALOR)
@@ -5717,6 +5719,7 @@ void ModeloOtimizacao::armazenarValoresSolver(const TipoSubproblemaSolver a_TSS,
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, bool())) {
 
+				EQUACAO_LINEAR_1(ARMAZENAR_VALOR)
 				EQUACAO_LINEAR_2(ARMAZENAR_VALOR)
 					EQUACAO_LINEAR_3(ARMAZENAR_VALOR)
 					EQUACAO_LINEAR_4(ARMAZENAR_VALOR)
@@ -5747,6 +5750,7 @@ void ModeloOtimizacao::armazenarValoresSolver(const TipoSubproblemaSolver a_TSS,
 
 			if (getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool())) {
 
+				EQUACAO_LINEAR_1(ARMAZENAR_VALOR)
 				EQUACAO_LINEAR_2(ARMAZENAR_VALOR)
 					EQUACAO_LINEAR_3(ARMAZENAR_VALOR)
 					EQUACAO_LINEAR_4(ARMAZENAR_VALOR)

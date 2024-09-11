@@ -51,9 +51,13 @@ SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::strin
 SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::vector<std::vector<int>>>>> vlrCV_##Elem##_##Nome##_##Nro;\
 bool isF_##Elem##_##Nome##_##Nro = false;\
 bool isPrintFw_##Elem##_##Nome##_##Nro = true;\
-std::string getNome##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) ){\
+std::string getNomeSolver##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) ){\
 	std::string name = std::string(std::string(#Nome) + "," Valores(GET_STRING_ELEMENTO2)); \
 	name.erase(name.size() -1);\
+	return name;\
+};\
+std::string getNomePrint##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) ){\
+	std::string name = std::string(std::string(#Nome) + ";" Valores(GET_STRING_ELEMENTO)); \
 	return name;\
 };\
 void alocVlrF##Elem##_##Nome##_##Nro(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio){ \
@@ -159,7 +163,7 @@ int getPos##Elem##_##Nome##seExistir(const TipoSubproblemaSolver a_TSS Valores(I
 		if (name_##Elem##_##Nome##_##Nro.size() == 0){ return -1;}\
 		if (name_##Elem##_##Nome##_##Nro.at(a_TSS).size() == 0){ return -1;}\
 		if (name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).size() == 0){ return -1;}\
-		const std::string name = std::string(std::string(#Nome) + ";" Valores(GET_STRING_ELEMENTO));\
+		const std::string name = getNomePrint##Elem##_##Nome(a_TSS Valores(ARGS_ITERS));\
 		return findStringSensNoVetorReturnPos(name, name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1)); \
 	} \
 	catch (const std::exception& erro) { throw std::invalid_argument("getPos" + std::string(#Elem) + "_" + std::string(#Nome) + "seExistir(" Valores(GET_FULL_STRING_ELEMENTO) + "): \n" + std::string(erro.what())); } \
@@ -185,8 +189,8 @@ int add##Elem##_##Nome(const TipoSubproblemaSolver a_TSS Valores(ITERS_ARGS) DEC
 		if (get##Elem##_##Nome##seExistir(a_TSS Valores(ARGS_ITERS)) > -1) \
 			throw std::invalid_argument("Conteudo ja existente."); \
 		aloc##Elem##_##Nome##_##Nro(a_TSS, a_IdEstagio_1);\
-		name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).push_back(std::string(std::string(#Nome) + ";" Valores(GET_STRING_ELEMENTO)));\
-		const int indx = vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)-> DECLARAR_ADD_ELEMENTO_##Elem##_2 getNome##Elem##_##Nome(a_TSS Valores(ARGS_ITERS))); \
+		name_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).push_back(getNomePrint##Elem##_##Nome(a_TSS Valores(ARGS_ITERS)));\
+		const int indx = vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)-> DECLARAR_ADD_ELEMENTO_##Elem##_2 getNomeSolver##Elem##_##Nome(a_TSS Valores(ARGS_ITERS))); \
 		indx_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).push_back(indx);\
 		if (nrmD_##Elem##_##Nome##_##Nro.size() > 0) { nrmD_##Elem##_##Nome##_##Nro.at(a_TSS).at(a_IdEstagio_1).push_back(1.0);}\
 		return indx; \
