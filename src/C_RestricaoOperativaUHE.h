@@ -7,9 +7,9 @@
 #define ATT_COMUM_REST_OPER_LIMITE_UHE(m)  \
 	  m(RestricaoOperativaUHE,  AttComum,  idRestricaoOperativaUHE, IdRestricaoOperativaUHE,         min,         max,           min,       sim) \
       m(RestricaoOperativaUHE,  AttComum,                     nome,                  string,         min,          max,        Nenhum,      sim) \
-	  m(RestricaoOperativaUHE,  AttComum,          limite_inferior,                  double,           0,      100000,             0,       nao) \
-	  m(RestricaoOperativaUHE,  AttComum,          limite_superior,                  double,           0,      100000,        100000,       nao) \
-	  m(RestricaoOperativaUHE,  AttComum,    limite_superior_folga_inferior,                  double,           0,         max,           max,       nao) \
+	  m(RestricaoOperativaUHE,  AttComum,          lim_inf,                  double,           0,      100000,             0,       nao) \
+	  m(RestricaoOperativaUHE,  AttComum,          lim_sup,                  double,           0,      100000,        100000,       nao) \
+	  m(RestricaoOperativaUHE,  AttComum,    lim_sup_folga_inf,                  double,           0,         max,           max,       nao) \
       m(RestricaoOperativaUHE,  AttComum,     rampa_min_percentual,                  double,           0,      100000,        100000,       nao) \
       m(RestricaoOperativaUHE,  AttComum,     rampa_max_percentual,                  double,           0,      100000,        100000,       nao) \
       m(RestricaoOperativaUHE,  AttComum,       rampa_min_absoluta,                  double,           0,      100000,        100000,       nao) \
@@ -24,18 +24,18 @@
 //     c_classe,             smrtAtt,                 nomeAtributo,                  tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
 #define ATT_VETOR_REST_OPER_LIMITE_UHE(m)  \
-	  m(RestricaoOperativaUHE,  AttVetor,     limite_inferior,             double,        min,          max,           max,      Periodo) \
-	  m(RestricaoOperativaUHE,  AttVetor,     limite_superior,             double,        min,          max,           max,      Periodo) \
-	  m(RestricaoOperativaUHE,  AttVetor,     limite_inferior_media,             double,        min,          max,           max,      Periodo) \
-	  m(RestricaoOperativaUHE,  AttVetor,     limite_superior_media,             double,        min,          max,           max,      Periodo) \
-	  m(RestricaoOperativaUHE,  AttVetor,     limite_superior_folga_inferior,             double,          0,          max,           max,      Periodo) 
+	  m(RestricaoOperativaUHE,  AttVetor,     lim_inf,             double,        min,          max,           max,      Periodo) \
+	  m(RestricaoOperativaUHE,  AttVetor,     lim_sup,             double,        min,          max,           max,      Periodo) \
+	  m(RestricaoOperativaUHE,  AttVetor,     lim_inf_media,             double,        min,          max,           max,      Periodo) \
+	  m(RestricaoOperativaUHE,  AttVetor,     lim_sup_media,             double,        min,          max,           max,      Periodo) \
+	  m(RestricaoOperativaUHE,  AttVetor,     lim_sup_folga_inf,             double,          0,          max,           max,      Periodo) 
 //               c_classe,   smrtAtt,     nomeAtributo,                   Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define ATT_MATRIZ_REST_OPER_LIMITE_UHE(m)  \
-	  m(RestricaoOperativaUHE,  AttMatriz,             limite_inferior,     double,          min,          max,             max,  Periodo, IdPatamarCarga) \
-      m(RestricaoOperativaUHE,  AttMatriz,             limite_superior,     double,          min,          max,             max,  Periodo, IdPatamarCarga) 
+	  m(RestricaoOperativaUHE,  AttMatriz,             lim_inf,     double,          min,          max,             max,  Periodo, IdPatamarCarga) \
+      m(RestricaoOperativaUHE,  AttMatriz,             lim_sup,     double,          min,          max,             max,  Periodo, IdPatamarCarga) 
 
-//Nota: limite_inferior/limite_superior com valor max não é considerado dentro do modelo
+//Nota: lim_inf/lim_sup com valor max não é considerado dentro do modelo
 
 #define MEMBRO_REST_OPER_LIMITE_UHE(m)          \
 	m(RestricaoOperativaUHE, ElementoSistema)  

@@ -7952,8 +7952,8 @@ void LeituraCEPEL::leitura_RE_201908_NW25(Dados& a_dados, std::string nomeArquiv
 
 						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
 
-							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).addElemento(AttMatrizRestricaoEletrica_potencia_minima, periodo, idPatamarCarga, 0.0);
-							//a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).addElemento(AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, getdoubleFromChar("max"));
+							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).addElemento(AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, 0.0);
+							//a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).addElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, getdoubleFromChar("max"));
 
 						} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 					} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); periodo++) {
@@ -8162,7 +8162,7 @@ void LeituraCEPEL::leitura_RE_201908_NW25(Dados& a_dados, std::string nomeArquiv
 
 				if (lista_RE_PMAX.at(idRestricaoEletrica).size() > 0) {
 
-					a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz_forced(AttMatrizRestricaoEletrica_potencia_maxima, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), getdoubleFromChar("max")))));
+					a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz_forced(AttMatrizRestricaoEletrica_lim_sup, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), getdoubleFromChar("max")))));
 
 					for (Periodo periodo_DECK = lista_RE_PMAX.at(idRestricaoEletrica).getIteradorInicial(); periodo_DECK <= lista_RE_PMAX.at(idRestricaoEletrica).getIteradorFinal(); periodo_DECK++) {
 
@@ -8179,12 +8179,12 @@ void LeituraCEPEL::leitura_RE_201908_NW25(Dados& a_dados, std::string nomeArquiv
 
 									if (lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).at(idPatamarCarga) != getdoubleFromChar("max")) {//Somente periodos com valores de registros de potencia_maxima sao atualizados 
 
-										double valor_antigo = a_dados.getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, double());
+										double valor_antigo = a_dados.getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, double());
 
 										if (valor_antigo == getdoubleFromChar("max"))//O primeiro valor a modificar pela restriçao deve ser zero
 											valor_antigo = 0;
 
-										a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_potencia_maxima, periodo, idPatamarCarga, valor_antigo + sobreposicao * lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).at(idPatamarCarga));
+										a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, valor_antigo + sobreposicao * lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).at(idPatamarCarga));
 
 									}//if (lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).at(idPatamarCarga) != getdoubleFromChar("max")) {
 									
