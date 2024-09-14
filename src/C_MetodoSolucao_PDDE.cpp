@@ -24,6 +24,8 @@ void MetodoSolucao::executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const Id
 			std::cout << "Metodo Solucao Iniciado" << std::endl;
 		}
 
+		bool encerrar_iteracoes = false;
+
 		for (IdIteracao idIteracao = iteracao_inicial; idIteracao <= iteracao_final; idIteracao++) {
 
 			bool simulacao = false;
@@ -42,22 +44,16 @@ void MetodoSolucao::executarPDDE(EntradaSaidaDados a_entradaSaidaDados, const Id
 			if (!simulacao)
 				executarPDDE_backward_new(a_entradaSaidaDados, estagio_inicial, estagio_final, idIteracao, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao, a_dados);
 
-			executarPDDE_avaliarSolucao(a_entradaSaidaDados, idIteracao, a_idProcesso, a_modeloOtimizacao);
+			encerrar_iteracoes = executarPDDE_avaliarSolucao(a_entradaSaidaDados, idIteracao, a_idProcesso, a_modeloOtimizacao);
+
+			if ((encerrar_iteracoes) && (iteracao_numero_maximo == iteracao_final))
+				break;
+			else if ((encerrar_iteracoes) && (idIteracao < iteracao_final))
+				idIteracao = IdIteracao(iteracao_final - 1);
 
 		} // for (IdIteracao idIteracao = iteracao_inicial; idIteracao <= iteracao_final; idIteracao++) {
 
-		//executarPDDE_operacao_final(a_entradaSaidaDados, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao);
-
-		if (true) {
-			int barreira = 0;
-
-			if (a_idProcesso == IdProcesso_mestre) {
-				for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_maiorIdProcesso; idProcesso++)
-					MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
-			}
-			else
-				MPI_Recv(&barreira, 1, MPI_INT, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		MPI_Barrier(MPI_COMM_WORLD);
 
 	} // try {
 	catch (const std::exception&erro) { 
@@ -79,7 +75,18 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 		auto start_clock = std::chrono::high_resolution_clock::now();
 
 		const std::string diretorio = a_entradaSaidaDados.getDiretorioSaida();
-		const std::string diretorio_iteracao = diretorio + "//" + getFullString(a_idIteracao) + "//Forward";
+
+		std::string diretorio_iteracao = diretorio + "//" + getFullString(a_idIteracao) + "//Forward";
+		
+		if (a_simulacao) {
+			const IdIteracao iteracao_final = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_final, IdIteracao());
+			const IdIteracao iteracao_numero_maximo = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_numero_maximo, IdIteracao());
+			if (iteracao_final == IdIteracao_0)
+				diretorio_iteracao = diretorio;
+			else if ((a_idIteracao == iteracao_final) && (iteracao_numero_maximo < iteracao_final))
+				diretorio_iteracao = diretorio + "//Simulacao";
+		}
+
 		const std::string diretorio_resultado = diretorio_iteracao + "//Resultados";
 		const std::string diretorio_pl = diretorio_iteracao + "//PLs";
 		const std::string diretorio_tempos = diretorio_iteracao + "//Tempos";
@@ -130,7 +137,7 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 		const double multiplicador_tempo_limite_resolucao = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_multiplicador_tempo_limite_resolucao, double());
 
 		double tempo_medio_solver_bw = 1000;
-		if ((a_idIteracao > IdIteracao(iteracao_inicial + 1)) || ((a_idIteracao > iteracao_inicial) && iteracao_inicial > IdIteracao_0))
+		if (!a_simulacao && ((a_idIteracao > IdIteracao(iteracao_inicial + 1)) || ((a_idIteracao > iteracao_inicial) && iteracao_inicial > IdIteracao_0)))
 			tempo_medio_solver_bw = getElementoVetor(AttVetorMetodoSolucao_tempo_medio_solver_bw, IdIteracao(a_idIteracao - 1), double());
 
 		const double tempo_limite = multiplicador_tempo_limite_resolucao * tempo_medio_solver_bw;
@@ -286,6 +293,13 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 		double cont_tempo_otimizacao_global;
 		MPI_Allreduce(&cont_tempo_otimizacao, &cont_tempo_otimizacao_global, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
+		if (getSizeVetor(AttVetorMetodoSolucao_tempo_medio_solver_fw) > 0) {
+			const IdIteracao idIter_eval = IdIteracao(getIteradorFinal(AttVetorMetodoSolucao_tempo_medio_solver_fw, IdIteracao()) + 1);
+			if (a_idIteracao > idIter_eval) {
+				for (IdIteracao idIter = idIter_eval; idIter < a_idIteracao; idIter++)
+					addElemento(AttVetorMetodoSolucao_tempo_medio_solver_fw, idIter, 0.0);
+			}
+		}
 		addElemento(AttVetorMetodoSolucao_tempo_medio_solver_fw, a_idIteracao, cont_tempo_otimizacao_global / cont_numero_otimizacao_global);
 
 		auto stop_clock = std::chrono::high_resolution_clock::now();
@@ -301,8 +315,34 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 		a_entradaSaidaDados.setDiretorioSaida(diretorio_resultado);
 		a_modeloOtimizacao.consolidarResultados(a_idProcesso, a_maiorIdProcesso, a_entradaSaidaDados);
 
-		if (a_simulacao)
+		if (a_simulacao) {
+			const IdIteracao iteracao_final = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_final, IdIteracao());
+			const IdIteracao iteracao_numero_maximo = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_numero_maximo, IdIteracao());
+			if ((a_idIteracao == iteracao_final) && (iteracao_numero_maximo < iteracao_final)) {
+				IdEstagio estagio_inicial = a_estagio_inicial;
+				if (estagio_inicial == IdEstagio_1)
+					estagio_inicial++;
+				for (IdEstagio idEstagio = a_estagio_final; idEstagio >= estagio_inicial; idEstagio--) {
+
+					if (a_idProcesso == IdProcesso_mestre) {
+						a_entradaSaidaDados.setAppendArquivo(false);
+						a_entradaSaidaDados.setDiretorioSaida(diretorio);
+						a_modeloOtimizacao.exportarCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
+						a_entradaSaidaDados.setAppendArquivo(false);
+						a_entradaSaidaDados.setDiretorioSaida(diretorio);
+						a_modeloOtimizacao.exportarVersaoAlternativaCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
+
+						if (idEstagio == a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_acoplamento_pre_estudo, IdEstagio())) {
+							a_entradaSaidaDados.setAppendArquivo(false);
+							a_entradaSaidaDados.setDiretorioSaida(diretorio);
+							a_modeloOtimizacao.exportarCorteBenders_AcoplamentoPreEstudo(a_idIteracao, a_entradaSaidaDados);
+						}
+					} // if (a_idProcesso == IdProcesso_mestre) {
+
+				} // for (IdEstagio idEstagio = a_estagio_final; idEstagio >= a_estagio_inicial; idEstagio--) {
+			} // if ((a_idIteracao == iteracao_final) && (iteracao_numero_maximo < iteracao_final)) {
 			return;
+		}
 
 		a_entradaSaidaDados.setDiretorioSaida(diretorio);
 
@@ -563,10 +603,17 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 		for (IdEstagio idEstagio = a_estagio_final; idEstagio >= estagio_inicial; idEstagio--) {
 
 			if (a_idProcesso == IdProcesso_mestre) {
-				if ((a_idIteracao == a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_numero_maximo, IdIteracao())) || (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_imprimir_corte_por_iteracao, bool()))) {
+				if (((a_idIteracao == a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_final, IdIteracao())) && (a_idIteracao == a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_numero_maximo, IdIteracao()))) || (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_imprimir_corte_por_iteracao, bool()))) {
 					a_entradaSaidaDados.setAppendArquivo(false);
-					a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao);
+					if (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_imprimir_corte_por_iteracao, bool()))
+						a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao);
+					else
+						a_entradaSaidaDados.setDiretorioSaida(diretorio);
 					a_modeloOtimizacao.exportarCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
+
+					a_entradaSaidaDados.setAppendArquivo(false);
+					a_entradaSaidaDados.setDiretorioSaida(diretorio);
+					a_modeloOtimizacao.exportarVersaoAlternativaCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
 				}
 				if (idEstagio == a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_acoplamento_pre_estudo, IdEstagio())) {
 					a_entradaSaidaDados.setAppendArquivo(false);
@@ -574,15 +621,9 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 					a_modeloOtimizacao.exportarCorteBenders_AcoplamentoPreEstudo(a_idIteracao, a_entradaSaidaDados);
 				}
 
-				if (a_idIteracao == a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_numero_maximo, IdIteracao())) {
-					a_entradaSaidaDados.setAppendArquivo(false);
-					a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao);
-					a_modeloOtimizacao.exportarVersaoAlternativaCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
-				}
-
 			} // if (a_idProcesso == IdProcesso_mestre) {
 
-			if (a_idIteracao == a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_numero_maximo, IdIteracao()))
+			if ((a_idIteracao == a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_final, IdIteracao())) && (a_idIteracao == a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_numero_maximo, IdIteracao())))
 				a_modeloOtimizacao.removerCorteBenders(idEstagio);
 
 		} // for (IdEstagio idEstagio = a_estagio_final; idEstagio >= a_estagio_inicial; idEstagio--) {
@@ -775,6 +816,15 @@ void MetodoSolucao::executarPDDE_atualizarCustoSuperior_FW(const IdIteracao a_id
 			}
 
 			const double custo_superior_medio = getSoma_noNAN(getElementosMatriz(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, IdCenario(), double()));
+
+			if (getSizeVetor(AttVetorMetodoSolucao_custo_superior) > 0) {
+				const IdIteracao idIter_eval = IdIteracao(getIteradorFinal(AttVetorMetodoSolucao_custo_superior, IdIteracao()) + 1);
+				if (a_idIteracao > idIter_eval) {
+					for (IdIteracao idIter = idIter_eval; idIter < a_idIteracao; idIter++)
+						addElemento(AttVetorMetodoSolucao_custo_superior, idIter, 0.0);
+				}
+			}
+
 			addElemento(AttVetorMetodoSolucao_custo_superior, a_idIteracao, custo_superior_medio);
 
 		} // if (a_idProcesso == IdProcesso_mestre) {
@@ -1060,6 +1110,13 @@ void MetodoSolucao::executarPDDE_atualizarCustoInferior(const IdIteracao a_idIte
 			} // for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_maiorIdProcesso; idProcesso++) {
 
 			const double custo_inferior_medio = getMedia_noNAN(custo_inferior);
+			if (getSizeVetor(AttVetorMetodoSolucao_custo_inferior) > 0) {
+				const IdIteracao idIter_eval = IdIteracao(getIteradorFinal(AttVetorMetodoSolucao_custo_inferior, IdIteracao()) + 1);
+				if (a_idIteracao > idIter_eval) {
+					for (IdIteracao idIter = idIter_eval; idIter < a_idIteracao; idIter++)
+						addElemento(AttVetorMetodoSolucao_custo_inferior, idIter, 0.0);
+				}
+			}
 			addElemento(AttVetorMetodoSolucao_custo_inferior, a_idIteracao, custo_inferior_medio);
 
 		} // if (a_idProcesso == IdProcesso_mestre) {
@@ -1082,20 +1139,29 @@ void MetodoSolucao::executarPDDE_atualizarCustoInferior(const IdIteracao a_idIte
 
 
 
-void MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaidaDados, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, ModeloOtimizacao &a_modeloOtimizacao){
+bool MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaidaDados, const IdIteracao a_idIteracao, const IdProcesso a_idProcesso, ModeloOtimizacao &a_modeloOtimizacao){
 
 	try {
+
+		int encerrar_iteracao = 0;
 
 		if (a_idProcesso == IdProcesso_mestre) {
 
 			const double tempo_execucao       = getElementoVetor(AttVetorMetodoSolucao_tempo_execucao, a_idIteracao, double());
 
 			const double tempo_execucao_total = getAtributo(AttComumMetodoSolucao_tempo_execucao_total, double());
+			if (getSizeVetor(AttVetorMetodoSolucao_tempo_execucao_acumulado) > 0) {
+				const IdIteracao idIter_eval = IdIteracao(getIteradorFinal(AttVetorMetodoSolucao_tempo_execucao_acumulado, IdIteracao()) + 1);
+				if (a_idIteracao > idIter_eval) {
+					for (IdIteracao idIter = idIter_eval; idIter < a_idIteracao; idIter++)
+						addElemento(AttVetorMetodoSolucao_tempo_execucao_acumulado, idIter, 0.0);
+				}
+			}
 			addElemento(AttVetorMetodoSolucao_tempo_execucao_acumulado, a_idIteracao, tempo_execucao_total);
 
 			const double custo_inferior = getElementoVetor(AttVetorMetodoSolucao_custo_inferior, a_idIteracao, double());
 
-			double custo_superior = getElementoVetor(AttVetorMetodoSolucao_custo_superior, a_idIteracao, double());
+			const double custo_superior = getElementoVetor(AttVetorMetodoSolucao_custo_superior, a_idIteracao, double());
 
 			const double brecha = 100.0*(custo_superior - custo_inferior) / custo_superior;
 
@@ -1165,7 +1231,23 @@ void MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaida
 			setMatriz(AttMatrizMetodoSolucao_custo_inferior, SmartEnupla<IdIteracao, SmartEnupla<IdCenario, double>>());
 			setMatriz(AttMatrizMetodoSolucao_custo_superior, SmartEnupla<IdIteracao, SmartEnupla<IdCenario, double>>());
 
+			if (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_convergencia, TipoConvergencia()) == TipoConvergencia_gap) {
+
+				const double brecha_num = (custo_superior - custo_inferior) / custo_superior;
+
+				if (brecha_num < a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tolerancia_convergencia, double()))
+					encerrar_iteracao = 1;
+
+			} // if (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_convergencia, TipoConvergencia()) == TipoConvergencia_gap) {
+
 		} // if (a_idProcesso == IdProcesso_mestre) {
+
+		MPI_Bcast(&encerrar_iteracao, 1, MPI_INT, getRank(IdProcesso_mestre), MPI_COMM_WORLD);
+
+		if (encerrar_iteracao == 1)
+			return true;
+
+		return false;
 
 	} // try {
 	catch (const std::exception&erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_avaliarSolucao(" + getFullString(a_idIteracao) + "," + getFullString(a_idProcesso) + ",a_modeloOtimizacao): \n" + std::string(erro.what())); }

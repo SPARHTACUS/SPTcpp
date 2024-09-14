@@ -1409,6 +1409,7 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 						else if (attComumDados == AttComumDados_exibir_na_tela_resultado_solver) {}
 						else if (attComumDados == AttComumDados_calcular_cenario_hidrologico_pre_otimizacao) {}
 						else if (attComumDados == AttComumDados_imprimir_cenario_hidrologico_pre_otimizacao) {}
+						else if (attComumDados == AttComumDados_coficiente_evaporacao_regra_especial) {}
 						else if (attComumDados == AttComumDados_nao_utilizar_restricoes_simples_em_restricoes_eletricas) {}
 						else if (attComumDados == AttComumDados_nao_utilizar_restricoes_simples_em_restricoes_hidraulicas) {}
 						else if (attComumDados == AttComumDados_representar_defluencia_disponivel_em_restricoes_hidraulicas) {}
@@ -4363,7 +4364,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 						for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 							const double volume_minimo = getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo, double());
 							const double volume_util = getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, periodo, double());
-							vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).calculaAproximacaoLinearEvaporacao(volume_minimo, volume_minimo + volume_util, periodo);
+							vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).calculaAproximacaoLinearEvaporacao(volume_minimo, volume_minimo + volume_util, periodo, getAtributo(AttComumDados_coficiente_evaporacao_regra_especial, bool()));
 						}
 
 					}

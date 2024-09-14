@@ -3038,8 +3038,22 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 
 				if (tempo_viagem_agua > 0) {
 					Periodo periodo_lag = Periodo(a_period.getTipoPeriodo(), Periodo(TipoPeriodo_horario, a_period) - tempo_viagem_agua);
-					// Variável QDLAG
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDLAG(a_TSS, a_dados, a_idEstagio, a_period, idHidreletrica_montante, periodo_lag), posEquQMT, -1.0);
+
+					int equQD = getEquLinear_QDseExistir(a_TSS, a_idEstagio, periodo_lag, idHidreletrica_montante);
+
+					if (equQD == -1) {
+						equQD = addEquLinear_QD(a_TSS, a_idEstagio, periodo_lag, idHidreletrica_montante);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equQD, 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDLAG(a_TSS, a_dados, a_idEstagio, a_period, idHidreletrica_montante, periodo_lag), equQD, 1.0);
+					}
+
+					const int varQD_pat = addVarDecisao_QD(a_TSS, a_idEstagio, periodo_lag, a_idPat, idHidreletrica_montante, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+
+					// Variável QD_pat
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQD_pat, equQD, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_period, a_idPat, double()));
+
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQD_pat, posEquQMT, -1.0);
+
 				}
 				else {
 
@@ -3296,8 +3310,21 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 
 				if (tempo_viagem_agua > 0) {
 					Periodo periodo_lag = Periodo(a_period.getTipoPeriodo(), Periodo(TipoPeriodo_horario, a_period) - tempo_viagem_agua);
-					// Variável QDLAG
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDLAG(a_TSS, a_dados, a_idEstagio, a_period, idHidreletrica_montante, periodo_lag), posEquQMT, -1.0);
+
+					int equQD = getEquLinear_QDseExistir(a_TSS, a_idEstagio, periodo_lag, idHidreletrica_montante);
+
+					if (equQD == -1) {
+						equQD = addEquLinear_QD(a_TSS, a_idEstagio, periodo_lag, idHidreletrica_montante);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equQD, 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDLAG(a_TSS, a_dados, a_idEstagio, a_period, idHidreletrica_montante, periodo_lag), equQD, 1.0);
+					}
+
+					const int varQD_pat = addVarDecisao_QD(a_TSS, a_idEstagio, periodo_lag, a_idPat, idHidreletrica_montante, 0.0, vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+
+					// Variável QD_pat
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQD_pat, equQD, -a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_period, a_idPat, double()));
+
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQD_pat, posEquQMT, -1.0);
 				}
 				else
 					// Variável QD
@@ -4648,7 +4675,6 @@ void ModeloOtimizacao::criarRestricoesFuncaoProducaoHidreletrica(const TipoSubpr
 
 						if (a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_period, i, double()) > 0.0)
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMED(a_TSS, a_idEstagio, a_period, a_idHidreletrica), posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_VH, a_period, i, double()));
-
 					} // for (int i = 1; i <= numero_planos; i++) {
 
 				}//if ((a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_turbinada_maxima, a_period, double()) > 0) && (a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_turbinada_disponivel_maxima, a_period, double()) > 0)) {

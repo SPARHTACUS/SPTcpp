@@ -1442,6 +1442,11 @@ m(IdVariavelRealizacaoInterna)
 	m(TipoEstudo, simulacao)  
 DEFINE_SMART_ENUM(TipoEstudo, TIPO_ESTUDO)
 
+#define TIPO_CONVERGENCIA(m)\
+	m(TipoConvergencia, sem_criterio)  \
+	m(TipoConvergencia, gap) 
+DEFINE_SMART_ENUM(TipoConvergencia, TIPO_CONVERGENCIA)
+
 #define TIPO_CONTRATO(m)\
 	m(TipoContrato, importacao)  \
 	m(TipoContrato, exportacao) 
@@ -1741,6 +1746,7 @@ m(TipoAfluencia)                     \
 m(TipoAversaoRisco)                  \
 m(TipoContrato)                      \
 m(TipoCombustivel)                   \
+m(TipoConvergencia)                   \
 m(TipoCorrelacaoVariaveisAleatorias) \
 m(TipoMetodoSolver)                  \
 m(TipoDetalhamentoProducaoHidreletrica)\

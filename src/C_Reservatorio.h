@@ -102,7 +102,7 @@ public:
 
 	double getAreaFromVolume(const Periodo a_periodo, const double a_volume) const;
 
-	void calculaAproximacaoLinearEvaporacao(const double a_volumeMinimo, const double a_volumeMaximo, const Periodo a_periodo);
+	void calculaAproximacaoLinearEvaporacao(const double a_volumeMinimo, const double a_volumeMaximo, const Periodo a_periodo, bool a_regra_esp = false);
 
 	void calculaAproximacaoLinearEvaporacao(const double a_volumeUtil, const Periodo a_periodo);
 
