@@ -9,7 +9,8 @@
 //     c_classe,   smrtAtt,     nomeAtributo,          tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
 #define ATT_VETOR_REE(m)  \
-      m(ReservatorioEquivalente,  AttVetor,         produtibilidade_ENA,          double,         0,       50000,             0,    Periodo)
+      m(ReservatorioEquivalente,  AttVetor,               produtibilidade_ENA,          double,         0,       50000,             0,    Periodo) \
+      m(ReservatorioEquivalente,  AttVetor,     produtibilidade_acumulada_EAR,          double,         0,       50000,             0,    Periodo)
 
 
 
