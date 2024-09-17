@@ -5029,14 +5029,13 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							double tolerancia_convergencia;
-
-							if (atributo == "")
+												if (atributo == "")
 								tolerancia_convergencia = 0.00001; //Default
 							else
 								tolerancia_convergencia = atof(atributo.c_str()) / 100;
 
 							if (!dadosPreConfig_instanciados) {
-								a_dados.setAtributo(AttComumDados_tolerancia_convergencia, tolerancia_convergencia);
+								a_dados.setAtributo(AttComumDados_tolerancia_convergencia, tolerancia_convergencia * 0.01);
 								a_dados.setAtributo(AttComumDados_tipo_convergencia, TipoConvergencia_gap);
 							}
 

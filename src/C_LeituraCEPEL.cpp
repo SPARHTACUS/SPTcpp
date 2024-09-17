@@ -4247,6 +4247,17 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 			const double conversao_MWporVazao_em_MWhporVolume = 1e6 / 3600.0;
 
+			const double taxa_desconto_anual = a_dados.getAtributo(AttComumDados_taxa_desconto_anual, double());
+
+			const double taxa_desconto_hor = std::pow(1.0 + taxa_desconto_anual, 1.0 / (12)) - 1;
+
+			double num_hor = 0.0;
+			for (Periodo period = a_horizonte_estudo.getIteradorInicial(); period <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(period))
+				num_hor += double(period.getMinutos()) / 60.0;
+
+			//const double desagio_cortes = std::pow(1.0 - taxa_desconto_hor, num_hor);
+			const double desagio_cortes = 1.0;
+
 			const IdEstagio idEstagio_pos_estudo = IdEstagio(a_dados.getAtributo(AttComumDados_estagio_final, IdEstagio()) + 1);
 
 			Estagio estagio_pos_estudo;
@@ -4838,11 +4849,14 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 						// RHS
 						if (true) {
 
-							rhs_corte.at(IdRealizacao_1) = rhs_valor * numero_horas_estagio_NEWAVE;
+							rhs_corte.at(IdRealizacao_1) = desagio_cortes * rhs_valor * numero_horas_estagio_NEWAVE;
 
 						}
 
 						SmartEnupla<IdVariavelEstado, double> estados_vazios;
+
+						for (IdVariavelEstado idVar = coeficientes_corte.at(IdRealizacao_1).getIteradorInicial(); idVar <= coeficientes_corte.at(IdRealizacao_1).getIteradorFinal(); idVar++)
+							coeficientes_corte.at(IdRealizacao_1).at(idVar) *= desagio_cortes;
 
 						estagio_pos_estudo.instanciarCorteBenders(rhs_corte, coeficientes_corte, estados_vazios);
 
