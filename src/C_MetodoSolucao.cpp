@@ -73,13 +73,19 @@ MetodoSolucao::~MetodoSolucao(){
 
 void MetodoSolucao::incrementarTempoExecucao(const IdIteracao a_idIteracao, const double a_tempo_adicional) {
 
-	try{
+	try {
 
 		if (getSizeVetor(AttVetorMetodoSolucao_tempo_execucao) == 0)
 			addElemento(AttVetorMetodoSolucao_tempo_execucao, a_idIteracao, a_tempo_adicional);
 		else {
-			if (getIteradorFinal(AttVetorMetodoSolucao_tempo_execucao, IdIteracao()) < a_idIteracao)
+			if (getIteradorFinal(AttVetorMetodoSolucao_tempo_execucao, IdIteracao()) < a_idIteracao) {
+				const IdIteracao idIter_eval = IdIteracao(getIteradorFinal(AttVetorMetodoSolucao_tempo_execucao, IdIteracao()) + 1);
+				if (a_idIteracao > idIter_eval) {
+					for (IdIteracao idIter = idIter_eval; idIter < a_idIteracao; idIter++)
+						addElemento(AttVetorMetodoSolucao_tempo_execucao, idIter, 0.0);
+				}
 				addElemento(AttVetorMetodoSolucao_tempo_execucao, a_idIteracao, a_tempo_adicional);
+			}
 			else {
 				const double tempo_anterior = getElementoVetor(AttVetorMetodoSolucao_tempo_execucao, a_idIteracao, double());
 				setElemento(AttVetorMetodoSolucao_tempo_execucao, a_idIteracao, a_tempo_adicional + tempo_anterior);

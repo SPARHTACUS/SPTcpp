@@ -5029,14 +5029,15 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							double tolerancia_convergencia;
-
-							if (atributo == "")
+												if (atributo == "")
 								tolerancia_convergencia = 0.00001; //Default
 							else
 								tolerancia_convergencia = atof(atributo.c_str()) / 100;
 
-							//if (!dadosPreConfig_instanciados)
-							//a_dados.setAtributo(AttComumDados_tolerancia_convergencia, tolerancia_convergencia);
+							if (!dadosPreConfig_instanciados) {
+								a_dados.setAtributo(AttComumDados_tolerancia_convergencia, tolerancia_convergencia * 0.01);
+								a_dados.setAtributo(AttComumDados_tipo_convergencia, TipoConvergencia_gap);
+							}
 
 						}//try {
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro GP: \n" + std::string(erro.what())); }
@@ -17141,7 +17142,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 			//////////////////////////////////
 			//Dados padrao do CP modo DC
-			a_dados.setAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, true);
+			a_dados.setAtributo(AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel, false);
 			a_dados.setAtributo(AttComumDados_representar_todos_balancos_hidricos_por_volume, true);
 			a_dados.setAtributo(AttComumDados_representar_defluencia_disponivel_em_restricoes_hidraulicas, false);
 			a_dados.setAtributo(AttComumDados_representar_turbinamento_disponivel_em_restricoes_hidraulicas, false);
@@ -17157,6 +17158,8 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			a_dados.setAtributo(AttComumDados_tipo_processamento_paralelo, TipoProcessamentoParalelo_por_abertura);
 			a_dados.setAtributo(AttComumDados_numero_maximo_iteracoes, 20);
 			a_dados.setAtributo(AttComumDados_iteracao_inicial, IdIteracao_1);
+
+			a_dados.setAtributo(AttComumDados_coficiente_evaporacao_regra_especial, true);
 
 			a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("DadosSaidaMP//Otimizacao//AcoplamentoPreEstudo"));
 			a_dados.setAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco_CVAR);
@@ -17211,7 +17214,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		if (a_dados.getSizeVetor(AttVetorDados_lambda_CVAR) == 0) {
 
 			SmartEnupla<IdEstagio, double> vetor_lambda_CVAR(IdEstagio_1, std::vector<double>(int(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()), 0.0));
-			vetor_lambda_CVAR.setElemento(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), 0.35);
+			vetor_lambda_CVAR.setElemento(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), 0.0);
 
 			a_dados.setVetor(AttVetorDados_lambda_CVAR, vetor_lambda_CVAR);
 		}//if (a_dados.getSizeVetor(AttVetorDados_lambda_CVAR) == 0) {
@@ -17219,7 +17222,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		////
 		if (a_dados.getSizeVetor(AttVetorDados_alpha_CVAR) == 0) {
 			SmartEnupla<IdEstagio, double> vetor_alpha_CVAR(IdEstagio_1, std::vector<double>(int(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()), 0.0));
-			vetor_alpha_CVAR.setElemento(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), 0.25);
+			vetor_alpha_CVAR.setElemento(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal(), 0.0);
 
 			a_dados.setVetor(AttVetorDados_alpha_CVAR, vetor_alpha_CVAR);
 

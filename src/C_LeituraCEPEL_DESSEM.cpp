@@ -1601,8 +1601,10 @@ void LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16(Dados& a_dados, const 
 						if (a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_evaporacao) == 0)
 							a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_evaporacao, SmartEnupla<IdMes, double>(IdMes_1, std::vector<double>(IdMes_12, 0.0)));
 
-						for (IdMes idMes = IdMes_1; idMes <= IdMes_12; idMes++)
-							a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_evaporacao, idMes, evaporacao.at(int(idMes) - 1));
+						if (a_codigo_usina_alvo != 176) { // 176 COMP_MOX Somente é utilizada para acoplar com cortes. Não deve possuir evaporação
+							for (IdMes idMes = IdMes_1; idMes <= IdMes_12; idMes++)
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_evaporacao, idMes, evaporacao.at(int(idMes) - 1));
+						}
 
 						if (lista_hidreletrica_sem_capacidade.getElemento(idHidreletrica)) {
 							a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_morto_completo, SmartEnupla<Periodo, int>(horizonte_estudo, 1));

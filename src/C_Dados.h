@@ -79,8 +79,10 @@
       m(Dados,  AttComum,                                  metodo_solver,                   TipoMetodoSolver,         min,         max,  dual_simplex,      nao) \
 	  m(Dados,  AttComum,                                 foco_numerico,                                 int,           0,           4,             2,      nao) \
 	  m(Dados,  AttComum,                                  escalonamento,                                int,           0,           4,             1,      nao) \
-	  m(Dados,  AttComum,                         tolerancia_otimalidade,                             double,        1e-12,        1e-2,          1e-6,      nao) \
-	  m(Dados,  AttComum,                         tolerancia_viabilidade,                             double,        1e-12,        1e-2,          1e-6,      nao) \
+	  m(Dados,  AttComum,                         tolerancia_otimalidade,                             double,        1e-14,        1e-2,          1e-13,      nao) \
+	  m(Dados,  AttComum,                         tolerancia_viabilidade,                             double,        1e-14,        1e-2,          1e-13,      nao) \
+	  m(Dados,  AttComum,                        tolerancia_convergencia,                             double,        1e-14,        1e-2,           1e-6,      nao) \
+	  m(Dados,  AttComum,                              tipo_convergencia,                   TipoConvergencia,         min,          max,  sem_criterio,      nao) \
 	  m(Dados,  AttComum,           multiplicador_tempo_limite_resolucao,                             double,         min,         max,            -1,      nao) \
 	  m(Dados,  AttComum,            numero_maximo_tentativas_resolucao,                                 int,           1,        1000,           100,      nao) \
 	  m(Dados,  AttComum,                    tipo_selecao_solucao_proxy,             TipoSelecaoSolucaoProxy,         min,         max,           min,      nao) \
@@ -108,6 +110,7 @@
       m(Dados,  AttComum,  representar_potencia_termo_disponivel_em_restricoes_hidraulicas,             bool,         min,         max,           sim,      nao) \
       m(Dados,  AttComum,           nao_utilizar_restricoes_simples_em_restricoes_eletricas,            bool,         min,         max,           nao,      nao) \
       m(Dados,  AttComum,           nao_utilizar_restricoes_simples_em_restricoes_hidraulicas,          bool,         min,         max,         nao,      nao) \
+      m(Dados,  AttComum,                            coficiente_evaporacao_regra_especial,          bool,         min,         max,         nao,      nao) \
       m(Dados,  AttComum,               maior_estagio_impressao_versao_alternativa_cortes,         IdEstagio,      min,         max,            12,      nao) \
       m(Dados,  AttComum,                              mes_penalizacao_volume_util_minimo,             IdMes,      nenhum,         max,            11,      nao) \
       m(Dados,  AttComum,                  custo_acumulado_penalizacao_volume_util_minimo,            double,           0,         max,             0,      nao) \

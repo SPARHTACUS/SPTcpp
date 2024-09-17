@@ -106,18 +106,7 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		const IdProcesso maior_processo = arranjoResolucao.getMaiorId(IdProcesso());
 		const int numero_processos_paralelos = int(arranjoResolucao.getMaiorId(IdProcesso()));
 
-
-		if (true) {
-			int barreira = 0;
-
-			if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-				for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
-					MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
-			}
-			else
-				MPI_Recv(&barreira, 1, MPI_INT, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
-
+		MPI_Barrier(MPI_COMM_WORLD);
 
 		const bool imprimir_att_operacionais_sem_recarregar = false;
 
@@ -1117,57 +1106,50 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 			for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= estagio_final; idEstagio++)
 				desagio_acumulado_horizonte_estudo.addElemento(idEstagio, SmartEnupla<Periodo, double>(getElementosMatriz(AttMatrizDados_percentual_duracao_horizonte_estudo, idEstagio, Periodo(), double()), 1.0));
 
-			Periodo periodo_referencia = getAtributo(AttComumDados_periodo_referencia, Periodo());
-			Periodo periodo_referencia_anual = Periodo(TipoPeriodo_anual, periodo_referencia.getAno());
-			Periodo periodo_referencia_minuto = Periodo(TipoPeriodo(TipoPeriodo_Excedente - 1), periodo_referencia);
+			const Periodo period_ref = getAtributo(AttComumDados_periodo_referencia, Periodo());
+			const Periodo period_ref_next = period_ref + 1;
 
-			double desagio_acumulado = 1.0;
+			const double taxa_desconto_min = std::pow(1.0 + taxa_desconto_anual, 1.0 / (365.0 * 24.0 * 60.0)) - 1;
 
-			Periodo periodo_estudo = horizonte_estudo.getIteradorInicial();
+			int num_min = 0;
+			for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= estagio_final; idEstagio++) {
 
-			for (Periodo periodo = periodo_referencia_minuto; periodo < periodo_referencia + 1; periodo++) {
+				for (Periodo period = desagio_acumulado_horizonte_estudo.at(idEstagio).getIteradorInicial(); period <= desagio_acumulado_horizonte_estudo.at(idEstagio).getIteradorFinal(); desagio_acumulado_horizonte_estudo.at(idEstagio).incrementarIterador(period)) {
 
-				if (periodo > periodo_referencia_anual + 1)
-					periodo_referencia_anual++;
+					const int num_min_per = period.getMinutos();
 
-				const double taxa_desconto_minuto = std::pow((1.0 + taxa_desconto_anual), 1.0 / double(periodo_referencia_anual.getMinutos())) - 1.0;
+					if (period >= period_ref_next) {
 
-				desagio_acumulado *= 1.0 / (1.0 + taxa_desconto_minuto);
+						const double desagio = (std::pow(1.0 - taxa_desconto_min, num_min + num_min_per) - std::pow(1.0 - taxa_desconto_min, num_min)) / (std::log(1.0 - taxa_desconto_min) * num_min_per);
 
-				if ((periodo_estudo.sobreposicao(periodo) > 0.0) && (periodo_estudo.sobreposicao(periodo_referencia) == 1.0))
-					horizonte_estudo.incrementarIterador(periodo_estudo);
+						desagio_acumulado_horizonte_estudo.at(idEstagio).at(period) = desagio;
+						
+					}
+					else {
 
-			} // for (Periodo periodo = periodo_referencia_minuto; periodo < periodo_referencia + 1; periodo++) {
+						if (period < period_ref)
+							throw std::invalid_argument("Error. Period ref must initiate at the begining of the horizon for appropriate interest computation.");
 
-			while (true) {
+						const double superp = period.sobreposicao(period_ref);
 
-				periodo_referencia_minuto = Periodo(TipoPeriodo(TipoPeriodo_Excedente - 1), periodo_referencia_anual);
+						if (superp < 1.0) {
 
-				const double taxa_desconto_minuto = std::pow((1.0 + taxa_desconto_anual), 1.0 / double(periodo_referencia_anual.getMinutos())) - 1.0;
+							const int num_min_out = num_min_per * superp;
 
-				for (Periodo periodo = periodo_referencia_minuto; periodo < periodo_referencia_anual + 1; periodo++) {
+							const double desagio = (std::pow(1.0 - taxa_desconto_min, num_min + num_min_per) - std::pow(1.0 - taxa_desconto_min, num_min + num_min_out)) / (std::log(1.0 - taxa_desconto_min) * (num_min_per - num_min_out));
 
-					if (periodo_estudo.sobreposicao(periodo)) {
+							desagio_acumulado_horizonte_estudo.at(idEstagio).at(period) = desagio;
 
-						desagio_acumulado_horizonte_estudo.at(horizonte_estudo.at(periodo_estudo)).at(periodo_estudo) = desagio_acumulado;
+						}
 
-						if (periodo_estudo == periodo_final_horizonte_estudo)
-							break;
+					}
 
-						horizonte_estudo.incrementarIterador(periodo_estudo);
+					num_min += num_min_per;
 
-					} // if (periodo_estudo.sobreposicao(periodo)) {
+				}
 
-					desagio_acumulado *= 1.0 / (1.0 + taxa_desconto_minuto);
+			}
 
-				} // for (Periodo periodo = periodo_estudo_minuto; periodo < periodo_estudo_anual + 1; periodo++) {
-
-				if (periodo_referencia_anual.getAno() > (periodo_final_horizonte_estudo + 1).getAno())
-					break;
-
-				periodo_referencia_anual++;
-
-			} // while (true) {
 
 			setMatriz_forced(AttMatrizDados_desagio_acumulado_horizonte_estudo, desagio_acumulado_horizonte_estudo);
 
@@ -1409,6 +1391,7 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 						else if (attComumDados == AttComumDados_exibir_na_tela_resultado_solver) {}
 						else if (attComumDados == AttComumDados_calcular_cenario_hidrologico_pre_otimizacao) {}
 						else if (attComumDados == AttComumDados_imprimir_cenario_hidrologico_pre_otimizacao) {}
+						else if (attComumDados == AttComumDados_coficiente_evaporacao_regra_especial) {}
 						else if (attComumDados == AttComumDados_nao_utilizar_restricoes_simples_em_restricoes_eletricas) {}
 						else if (attComumDados == AttComumDados_nao_utilizar_restricoes_simples_em_restricoes_hidraulicas) {}
 						else if (attComumDados == AttComumDados_representar_defluencia_disponivel_em_restricoes_hidraulicas) {}
@@ -4390,7 +4373,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 						for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 							const double volume_minimo = getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo, double());
 							const double volume_util = getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, periodo, double());
-							vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).calculaAproximacaoLinearEvaporacao(volume_minimo, volume_minimo + volume_util, periodo);
+							vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).calculaAproximacaoLinearEvaporacao(volume_minimo, volume_minimo + volume_util, periodo, getAtributo(AttComumDados_coficiente_evaporacao_regra_especial, bool()));
 						}
 
 					}
