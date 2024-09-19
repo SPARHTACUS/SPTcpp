@@ -41,6 +41,8 @@
 	  m(Reservatorio,  AttVetor,                              evaporacao,            double,        min,          max,             0,          IdMes) \
 	  m(Reservatorio,  AttVetor,                coef_linear_evaporacao_0,            double,        min,          max,             0,        Periodo) \
 	  m(Reservatorio,  AttVetor,                coef_linear_evaporacao_1,            double,        min,          max,             0,        Periodo) \
+	  m(Reservatorio,  AttVetor,             coef_linear_cota_montante_0,            double,        min,          max,             0,        Periodo) \
+	  m(Reservatorio,  AttVetor,             coef_linear_cota_montante_1,            double,        min,          max,             0,        Periodo) \
 	  m(Reservatorio,  AttVetor,                   volume_morto_completo,              int,          0,            1,             0,        Periodo) \
 	  m(Reservatorio,  AttVetor,                   enchendo_volume_morto,              int,          0,            1,             0,        Periodo) \
 	  m(Reservatorio,  AttVetor,                         cota_referencia,            double,          0,        10000,             0,        Periodo) \
@@ -107,6 +109,13 @@ public:
 	void calculaAproximacaoLinearEvaporacao(const double a_volumeUtil, const Periodo a_periodo);
 
 	void calculaAproximacaoLinearEvaporacao(const Periodo a_periodo);
+
+
+	void calculaAproximacaoLinearCotaMontante(const double a_volumeMinimo, const double a_volumeMaximo, const Periodo a_periodo);
+
+	void calculaAproximacaoLinearCotaMontante(const double a_volumeUtil, const Periodo a_periodo);
+
+	void calculaAproximacaoLinearCotaMontante(const Periodo a_periodo);
 
 
 	static bool isReservatorioDeRegularizacao(const Periodo a_periodo, const double a_volume_util_operacional, const double a_turbinamento_maximo);

@@ -3212,8 +3212,8 @@ void LeituraCEPEL::leitura_OPERUH_201904_DES16(Dados& a_dados, const std::string
 						tipo.erase(std::remove(tipo.begin(), tipo.end(), ' '), tipo.end());
 
 						switch (int(std::stoi(tipo))) {
-						case 1: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_volume_reservatorio);   elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }
-						case 2: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_volume_util);           elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }
+						case 1: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_nivel_final);   elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }
+						case 2: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_volume_final);           elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }
 						case 3: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_vazao_turbinada);       elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }
 						case 4: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_vazao_vertida);         elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }
 						case 5: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_vazao_desviada);        elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }

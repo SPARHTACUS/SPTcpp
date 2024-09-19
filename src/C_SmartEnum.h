@@ -1679,13 +1679,12 @@ DEFINE_SMART_ENUM(TipoAfluencia, TIPO_AFLUENCIA)
     m(TipoVariavelRestricaoOperativa, vazao_bombeada)                  \
     m(TipoVariavelRestricaoOperativa, vazao_turbinada)                 \
     m(TipoVariavelRestricaoOperativa, vazao_vertida)                   \
-	m(TipoVariavelRestricaoOperativa, volume_util)                     \
-    m(TipoVariavelRestricaoOperativa, volume_reservatorio)             \
+    m(TipoVariavelRestricaoOperativa, volume_final)                    \
     m(TipoVariavelRestricaoOperativa, volume_defluente)                \
     m(TipoVariavelRestricaoOperativa, volume_desviado)                 \
     m(TipoVariavelRestricaoOperativa, volume_bombeado)                 \
     m(TipoVariavelRestricaoOperativa, producao_hidreletrica)           \
-    m(TipoVariavelRestricaoOperativa, nivel_reservatorio)
+    m(TipoVariavelRestricaoOperativa, nivel_final)
 DEFINE_SMART_ENUM(TipoVariavelRestricaoOperativa, TIPO_VARIAVEL_RESTRICAO_HIDRAULICA)
 
 #define TIPO_MODELOEVAPORACAO(m)                           \

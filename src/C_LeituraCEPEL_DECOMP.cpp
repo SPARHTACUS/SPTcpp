@@ -8221,7 +8221,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							if (line_size >= 38) {
 
 								if (atributo == "VARM")
-									tipoVariavelRestricaoOperativa = TipoVariavelRestricaoOperativa_volume_util;
+									tipoVariavelRestricaoOperativa = TipoVariavelRestricaoOperativa_volume_final;
 								else if (atributo == "VDEF")
 									tipoVariavelRestricaoOperativa = TipoVariavelRestricaoOperativa_volume_defluente;
 								else if (atributo == "VDES")
@@ -8231,7 +8231,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 							}//if (line_size >= 38) {
 							else
-								tipoVariavelRestricaoOperativa = TipoVariavelRestricaoOperativa_volume_util; //Valor default
+								tipoVariavelRestricaoOperativa = TipoVariavelRestricaoOperativa_volume_final; //Valor default
 
 							//Se for um dado de vazão convertida em volume então divide pelo conversor_vazao_m3s_em_volume_hm3 para obter o coeficiente de participação na restrição e logo na construção das restrições é multiplicado pelo conversor do periodo SPT
 							if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_desviado || tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_defluente)
@@ -8292,7 +8292,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								}//else {				
 
 							}//if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_bombeado) {
-							else if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_util || tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_desviado || tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_defluente) {
+							else if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_final || tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_desviado || tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_defluente) {
 
 								const int hidreletrica_codigo_usina = atoi(atributo.c_str());
 
@@ -8343,7 +8343,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								}//else {
 
-							}//else if(tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_armazenado || tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_desviado || tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_defluente) {
+							}//else if(tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_final || tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_desviado || tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_volume_defluente) {
 
 						}//try {
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro CV: \n" + std::string(erro.what())); }
@@ -9280,7 +9280,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								restricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica_energia_armazenada);
 								restricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_tipoUnidadeRestricaoHidraulica, tipoUnidadeRestricaoHidraulica);
-								restricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE, penalidade);
+								restricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_penalidade, penalidade);
 
 								lista_codigo_ONS_restricao_operativa_UHE_energia_armazenada.setElemento(idRestricaoOperativaUHE, codigo_restricao_operativa_RHE_energia);
 
@@ -14050,7 +14050,7 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 							elementoSistema.setAtributo(AttComumElementoSistema_idElementoSistema, idElementoSistema);
 							elementoSistema.setAtributo(AttComumElementoSistema_tipo_elemento, TipoElementoSistema_hidreletrica);
 							elementoSistema.setAtributo(AttComumElementoSistema_hidreletrica, idHidreletrica);
-							elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_volume_util);
+							elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_volume_final);
 
 							///////////////////////////////////
 							//Cálculo da energia_maxima_REE

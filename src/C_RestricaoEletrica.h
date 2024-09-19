@@ -9,7 +9,7 @@
 	  m(RestricaoEletrica,  AttComum,                nome,              string,         min,          max,        Nenhum,      sim) \
 	  m(RestricaoEletrica,  AttComum,             lim_inf,              double,           0,          max,             0,      nao) \
 	  m(RestricaoEletrica,  AttComum,             lim_sup,              double,           0,          max,             0,      nao) \
-	  m(RestricaoEletrica,  AttComum, penalidade_restricao_eletrica,    double,           0,          max,          5000,      sim) 
+	  m(RestricaoEletrica,  AttComum,          penalidade,    double,           0,          max,          5000,      sim) 
 //               c_classe,   smrtAtt,        nomeAtributo,                tipo,  lowerBound,   upperBound,  initialValue, mustRead?
 
 

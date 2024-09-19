@@ -4464,8 +4464,8 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			Periodo periodo_penalizacao_VMINOP = Periodo(TipoPeriodo_minuto, Periodo(mes_referencia_penalizacao_VMINOP, periodo_pos_estudo.getAno()) + 1) - 1;
 			if (periodo_pos_estudo.getMes() > mes_referencia_penalizacao_VMINOP)
 				periodo_penalizacao_VMINOP = Periodo(TipoPeriodo_minuto, Periodo(mes_referencia_penalizacao_VMINOP, IdAno(int(periodo_pos_estudo.getAno()) + 1)) + 1) - 1;
-			const std::string strVarDecisaoZP0_VF_FINFIdEstagio = std::string("VarDecisaoZP0_VF_FINF," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_penalizacao_VMINOP));
-			estados.addElemento(estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, strVarDecisaoZP0_VF_FINFIdEstagio, -1, -1), 0.0);
+			const std::string strVarDecisaoZP0_VF_LINFIdEstagio = std::string("VarDecisaoZP0_VF_LINF," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_penalizacao_VMINOP));
+			estados.addElemento(estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, strVarDecisaoZP0_VF_LINFIdEstagio, -1, -1), 0.0);
 
 
 			const double perc_pat1 = a_percentual_duracao_patamar_carga_original.at(a_horizonte_estudo.getIteradorFinal()).at(IdPatamarCarga_1);
@@ -4836,7 +4836,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 							} // if (estados_GNL.at(idUTE).size() > 0) {
 						} // for (IdTermeletrica idUTE = idTermeletricaIni; idUTE < idTermeletricaOut; a_dados.vetorTermeletrica.incr(idUTE)) {
 
-						// Variavel ZP0_VF_FINF					
+						// Variavel ZP0_VF_LINF					
 						if (true) {
 							const IdVariavelEstado idVariavelEstado_VMINOP = estados.getIteradorFinal();
 							coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado_VMINOP) = 0.0;

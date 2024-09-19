@@ -239,6 +239,28 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		validacao_operacional_Termeletrica(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 
+
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		//
+		//                                                                        Carregar Arquivos de Restricao Hidraulica Especial
+		//
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
+
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
+
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
+
+		// ElementoSistema
+
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m2);
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
+
+		validacao_operacional_RestricaoOperativaUHE(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+
+
+
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		//
 		//                                                                        Carregar Arquivos de Hidreletrica
@@ -388,27 +410,6 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("INTERCAMBIO_HIDRAULICO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
 
 		validacao_operacional_Intercambio_Hidraulico(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
-
-
-
-		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-		//
-		//                                                                        Carregar Arquivos de Restricao Hidraulica Especial
-		//
-		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
-
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
-		
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m1);
-
-		// ElementoSistema
-
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttComumOperacional.csv", *this, TipoAcessoInstancia_m2);
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", *this, TipoAcessoInstancia_m2);
-
-		validacao_operacional_RestricaoOperativaUHE(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 
 
@@ -1134,7 +1135,7 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 
 						if (superp < 1.0) {
 
-							const int num_min_out = num_min_per * superp;
+							const int num_min_out = int(num_min_per * superp);
 
 							const double desagio = (std::pow(1.0 - taxa_desconto_min, num_min + num_min_per) - std::pow(1.0 - taxa_desconto_min, num_min + num_min_out)) / (std::log(1.0 - taxa_desconto_min) * (num_min_per - num_min_out));
 
@@ -3842,7 +3843,7 @@ bool Dados::isRestricaoOperativaUHE_simples(const IdRestricaoOperativaUHE a_idRe
 		if (tipoVariavelRestricaoOperativa == TipoVariavelRestricaoOperativa_Nenhum)
 			throw std::invalid_argument("Argumento " + getFullString(AttComumElementoSistema_tipoVariavelRestricaoOperativa) + " invalido.");
 
-		if ((tipoVariavelRestricaoOperativa != TipoVariavelRestricaoOperativa_vazao_defluente) && (tipoVariavelRestricaoOperativa != TipoVariavelRestricaoOperativa_vazao_desviada) && (tipoVariavelRestricaoOperativa != TipoVariavelRestricaoOperativa_vazao_bombeada) && (tipoVariavelRestricaoOperativa != TipoVariavelRestricaoOperativa_vazao_turbinada) && (tipoVariavelRestricaoOperativa != TipoVariavelRestricaoOperativa_volume_util))
+		if ((tipoVariavelRestricaoOperativa != TipoVariavelRestricaoOperativa_vazao_defluente) && (tipoVariavelRestricaoOperativa != TipoVariavelRestricaoOperativa_vazao_desviada) && (tipoVariavelRestricaoOperativa != TipoVariavelRestricaoOperativa_vazao_bombeada) && (tipoVariavelRestricaoOperativa != TipoVariavelRestricaoOperativa_vazao_turbinada) && (tipoVariavelRestricaoOperativa != TipoVariavelRestricaoOperativa_volume_final))
 			return false;
 
 		if (getSize1Matriz(a_idRestricaoOperativaUHE, IdElementoSistema_1, AttMatrizElementoSistema_fator_participacao) > 0) {
@@ -3953,6 +3954,37 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 	try {
 
+		SmartEnupla<IdHidreletrica, int> isUHEcomRHnivel;
+
+		for (IdRestricaoOperativaUHE idRH = getMenorId(IdRestricaoOperativaUHE()); idRH < getIdOut(IdRestricaoOperativaUHE()); idRH++) {
+			for (IdElementoSistema idEl = IdElementoSistema_1; idEl <= getMaiorId(idRH, IdElementoSistema()); idEl++) {
+				const std::string strVarElm = getString(getAtributo(idRH, idEl, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()));
+				if (strVarElm.find("nivel") != std::string::npos) {
+					const IdHidreletrica idUHEvar = getAtributo(idRH, idEl, AttComumElementoSistema_hidreletrica, IdHidreletrica());
+
+					if (isUHEcomRHnivel.size() == 0)
+						isUHEcomRHnivel.addElemento(idUHEvar, 1);
+					else if (IdHidreletrica(isUHEcomRHnivel.getIteradorFinal() + 1) < idUHEvar) {
+						for (IdHidreletrica idUHE = IdHidreletrica(isUHEcomRHnivel.getIteradorFinal() + 1); idUHE < idUHEvar; idUHE++)
+							isUHEcomRHnivel.addElemento(idUHE, 0);
+						isUHEcomRHnivel.addElemento(idUHEvar, 1);
+					}
+					else if (isUHEcomRHnivel.getIteradorFinal() < idUHEvar) {
+						isUHEcomRHnivel.addElemento(idUHEvar, 1);
+					}
+					else if (idUHEvar < IdHidreletrica(isUHEcomRHnivel.getIteradorInicial() - 1)) {
+						for (IdHidreletrica idUHE = IdHidreletrica(isUHEcomRHnivel.getIteradorInicial() - 1); idUHE > idUHEvar; idUHE--)
+							isUHEcomRHnivel.addElemento(idUHE, 0);
+						isUHEcomRHnivel.addElemento(idUHEvar, 1);
+					}
+					else if (idUHEvar < isUHEcomRHnivel.getIteradorInicial()) {
+						isUHEcomRHnivel.addElemento(idUHEvar, 1);
+					}
+					else
+						isUHEcomRHnivel.setElemento(idUHEvar, 1);
+				}
+			}
+		}
 
 		adicionaHidreletricasMontante();
 
@@ -4281,7 +4313,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 						if ((getAtributo(AttComumDados_nao_utilizar_restricoes_simples_em_restricoes_hidraulicas, bool())) && (a_imprimir_atributos_sem_recarregar)) {
 							for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= getMaiorId(IdRestricaoOperativaUHE()); idRestricaoOperativaUHE++) {
-								if ((getAtributo(idRestricaoOperativaUHE, IdElementoSistema_1, AttComumElementoSistema_hidreletrica, IdHidreletrica()) == idHidreletrica) && (getAtributo(idRestricaoOperativaUHE, IdElementoSistema_1, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()) == TipoVariavelRestricaoOperativa_volume_util) && (isRestricaoOperativaUHE_simples(idRestricaoOperativaUHE)))
+								if ((getAtributo(idRestricaoOperativaUHE, IdElementoSistema_1, AttComumElementoSistema_hidreletrica, IdHidreletrica()) == idHidreletrica) && (getAtributo(idRestricaoOperativaUHE, IdElementoSistema_1, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()) == TipoVariavelRestricaoOperativa_volume_final) && (isRestricaoOperativaUHE_simples(idRestricaoOperativaUHE)))
 									vetor_idRestricaoOperativaUHE_comUHE_volume_util.push_back(idRestricaoOperativaUHE);
 							}
 						} // if (getAtributo(AttComumDados_nao_utilizar_restricoes_simples_em_restricoes_hidraulicas, bool())) {
@@ -4384,6 +4416,61 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 						preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_coef_linear_evaporacao_0) = nao_operacional_informado;
 						preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_coef_linear_evaporacao_1) = nao_operacional_informado;
 					}
+
+					
+					if (isUHEcomRHnivel.size() > 0) {
+						if ((isUHEcomRHnivel.getIteradorInicial() <= idHidreletrica) && (idHidreletrica <= isUHEcomRHnivel.getIteradorFinal())) {
+							if (isUHEcomRHnivel.at(idHidreletrica) == 1) {
+
+								if ((getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_cota_montante_0) == 0) && (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_cota_montante_1) == 0)) {
+
+									if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_volume_0) > 0)
+										preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_poli_cota_volume_0) = nao_premissa_informado;
+									else
+										throw std::invalid_argument("Necessario atributo " + getFullString(AttVetorReservatorio_poli_cota_volume_0) + " para calculo de cota_montante");
+
+										if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_volume_1) > 0)
+											preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_poli_cota_volume_1) = nao_premissa_informado;
+										else
+											throw std::invalid_argument("Necessario atributo " + getFullString(AttVetorReservatorio_poli_cota_volume_1) + " para calculo de cota_montante");
+
+									if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_volume_2) > 0)
+										preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_poli_cota_volume_2) = nao_premissa_informado;
+									else
+										throw std::invalid_argument("Necessario atributo " + getFullString(AttVetorReservatorio_poli_cota_volume_2) + " para calculo de cota_montante");
+
+									if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_volume_3) > 0)
+										preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_poli_cota_volume_3) = nao_premissa_informado;
+									else
+										throw std::invalid_argument("Necessario atributo " + getFullString(AttVetorReservatorio_poli_cota_volume_3) + " para calculo de cota_montante");
+
+									if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_volume_4) > 0)
+										preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_poli_cota_volume_4) = nao_premissa_informado;
+									else
+										throw std::invalid_argument("Necessario atributo " + getFullString(AttVetorReservatorio_poli_cota_volume_4) + " para calculo de cota_montante");
+
+									preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_coef_linear_cota_montante_0) = sim_operacional;
+									preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_coef_linear_cota_montante_1) = sim_operacional;
+
+									for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
+										const double volume_minimo = getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo, double());
+										const double volume_util = getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, periodo, double());
+										vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).calculaAproximacaoLinearCotaMontante(volume_minimo, volume_minimo + volume_util, periodo);
+									}
+
+								}
+								else if ((getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_cota_montante_0) == 0) || (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_cota_montante_1) == 0))
+									throw std::invalid_argument("Ambos atributos " + getFullString(AttVetorReservatorio_coef_linear_cota_montante_0) + " e " + getFullString(AttVetorReservatorio_coef_linear_cota_montante_1) + " devem ser informados em " + getFullString(idHidreletrica));
+
+								else {
+									preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_coef_linear_cota_montante_0) = nao_operacional_informado;
+									preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_coef_linear_cota_montante_1) = nao_operacional_informado;
+								}
+							}
+						}
+					}
+					
+
 
 					if ((getSize1Matriz(idHidreletrica, IdReservatorio_1, AttMatrizReservatorio_volume_meta) > 0) && (getAtributo(AttComumDados_tipo_estudo, TipoEstudo()) == TipoEstudo_simulacao)) {
 						if (getAtributo(AttComumDados_numero_cenarios, int()) != getSize1Matriz(idHidreletrica, IdReservatorio_1, AttMatrizReservatorio_volume_meta))
@@ -7342,6 +7429,8 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 		instanciaCotaJusanteUsinaJusante();
 
+		validaElementoSistemaRestricaoOperativaUHE();
+
 		if (!a_imprimir_atributos_sem_recarregar) {
 
 
@@ -7385,7 +7474,6 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_CONJUNTO_UNIDADE_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_m4);
 
 		} // (!a_imprimir_atributos_sem_recarregar) {
-
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validacao_operacional_Hidreletrica(a_entradaSaidaDados, " + a_diretorio_att_operacional + "," + a_diretorio_att_premissa + "): \n" + std::string(erro.what())); }
@@ -8518,7 +8606,7 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 					else
 						a_entradaSaidaDados.setAppendArquivo(true);
 
-					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RESTRICAO_ELETRICA_AttComumOperacional.csv", idRestricaoEletrica, *this, std::vector<AttComumRestricaoEletrica> {AttComumRestricaoEletrica_idRestricaoEletrica, AttComumRestricaoEletrica_nome, AttComumRestricaoEletrica_penalidade_restricao_eletrica});
+					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RESTRICAO_ELETRICA_AttComumOperacional.csv", idRestricaoEletrica, *this, std::vector<AttComumRestricaoEletrica> {AttComumRestricaoEletrica_idRestricaoEletrica, AttComumRestricaoEletrica_nome, AttComumRestricaoEletrica_penalidade});
 
 					if (idRestricaoEletrica == IdRestricaoEletrica_1)
 						a_entradaSaidaDados.setAppendArquivo(false);
@@ -11604,70 +11692,60 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 		const IdRestricaoOperativaUHE maiorIdRestricaoOperativaUHE = getMaiorId(IdRestricaoOperativaUHE());
 		for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE; idRestricaoOperativaUHE++) {
 
-			if ((getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf) == 0) || (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup) == 0)) {
+			const TipoRestricaoHidraulica tipoVarRH = getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica());
 
-				calcular_att_operacionais_restricao_operativa_UHE = true;
+			const std::string strVarRH = getString(tipoVarRH);
 
-				bool preencher_limite_inferior = false;
-				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf) == 0) {
-					preencher_limite_inferior = true;
-					if (getSizeVetor(idRestricaoOperativaUHE, AttVetorRestricaoOperativaUHE_lim_inf) == 0)
-						vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setVetor_forced(AttVetorRestricaoOperativaUHE_lim_inf, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_lim_inf, double())));
-				}
-
-				bool preencher_limite_superior = false;
-				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup) == 0) {
-					preencher_limite_superior = true;
-					if (getSizeVetor(idRestricaoOperativaUHE, AttVetorRestricaoOperativaUHE_lim_sup) == 0)
-						vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setVetor_forced(AttVetorRestricaoOperativaUHE_lim_sup, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_lim_sup, double())));
-				}
-
-				for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
-
-					const IdPatamarCarga maiorIdPatamarCarga = getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
-					for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-
-						if (preencher_limite_inferior)
-							vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).addElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, getElementoVetor(idRestricaoOperativaUHE, AttVetorRestricaoOperativaUHE_lim_inf, periodo, double()));
-
-						if (preencher_limite_superior)
-							vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).addElemento(AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, getElementoVetor(idRestricaoOperativaUHE, AttVetorRestricaoOperativaUHE_lim_sup, periodo, double()));
-
-						const double limite_inferior = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, double());
-						const double limite_superior = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, double());
-
-						if (limite_inferior > limite_superior)
-							throw std::invalid_argument("limite_inferior maior que limite_superior em " + getString(periodo) + " em " + getString(idPatamarCarga) + " em " + getString(idRestricaoOperativaUHE));
-
-					} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
-				} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
-
-			} // if ((getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf) == 0) || (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup) == 0)) {
-
-			if (getSizeVetor(idRestricaoOperativaUHE, AttVetorRestricaoOperativaUHE_lim_sup_folga_inf) == 0) {
-				vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setVetor_forced(AttVetorRestricaoOperativaUHE_lim_sup_folga_inf, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_lim_sup_folga_inf, double())));
-			}//if (getSizeVetor(AttVetorRestricaoOperativaUHE_lim_sup_folga_inf) == 0) {
+			TipoVariavelRestricaoOperativa tipoVarFirstElem = TipoVariavelRestricaoOperativa_Nenhum;
+			std::string strVarFirstElem = "";
 
 			const IdElementoSistema maiorIdElementoSistema = getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 
 			for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema; idElementoSistema++) {
 
-				if (getSize1Matriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao) == 0) {
+				const TipoVariavelRestricaoOperativa tipoVarElem = getAtributo(idRestricaoOperativaUHE, idElementoSistema, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa());
 
-					calcular_att_operacionais_elemento_sistema = true;
+				if (tipoVarElem == TipoVariavelRestricaoOperativa_Nenhum)
+					throw std::invalid_argument(getFullString(tipoVarElem) + " em " + getFullString(idElementoSistema) + " nao compativel com " + getFullString(tipoVarRH) + " em " + getFullString(idRestricaoOperativaUHE));
 
-					if (getSizeVetor(idRestricaoOperativaUHE, idElementoSistema, AttVetorElementoSistema_fator_participacao) == 0)
-						vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).vetorElementoSistema.at(idElementoSistema).setVetor_forced(AttVetorElementoSistema_fator_participacao, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idRestricaoOperativaUHE, idElementoSistema, AttComumElementoSistema_fator_participacao, double())));
+				const std::string strVarElm = getString(tipoVarElem);
 
-					for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
+				if (tipoVarRH != TipoRestricaoHidraulica_Nenhum) {
 
-						const IdPatamarCarga maiorIdPatamarCarga = getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
-						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++)
-							vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).vetorElementoSistema.at(idElementoSistema).addElemento(AttMatrizElementoSistema_fator_participacao, periodo, idPatamarCarga, getElementoVetor(idRestricaoOperativaUHE, idElementoSistema, AttVetorElementoSistema_fator_participacao, periodo, double()));
+					if ((strVarRH.find("volume") != std::string::npos) && (strVarElm.find("volume") == std::string::npos))
+						throw std::invalid_argument(getFullString(tipoVarElem) + " em " + getFullString(idElementoSistema) + " nao compativel com " + getFullString(tipoVarRH) + " em " + getFullString(idRestricaoOperativaUHE));
 
-					} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+					else if ((strVarRH.find("vazao") != std::string::npos) && (strVarElm.find("vazao") == std::string::npos))
+						throw std::invalid_argument(getFullString(tipoVarElem) + " em " + getFullString(idElementoSistema) + " nao compativel com " + getFullString(tipoVarRH) + " em " + getFullString(idRestricaoOperativaUHE));
 
-				} // if (getSize1Matriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao) == 0) {
+					else if ((strVarRH.find("nivel") != std::string::npos) && (strVarElm.find("nivel") == std::string::npos))
+						throw std::invalid_argument(getFullString(tipoVarElem) + " em " + getFullString(idElementoSistema) + " nao compativel com " + getFullString(tipoVarRH) + " em " + getFullString(idRestricaoOperativaUHE));
+
+					else if ((strVarRH.find("producao") != std::string::npos) && (strVarElm.find("producao") == std::string::npos))
+						throw std::invalid_argument(getFullString(tipoVarElem) + " em " + getFullString(idElementoSistema) + " nao compativel com " + getFullString(tipoVarRH) + " em " + getFullString(idRestricaoOperativaUHE));
+
+				}
+				else {
+					
+					if (tipoVarFirstElem == TipoVariavelRestricaoOperativa_Nenhum) {
+						tipoVarFirstElem = tipoVarElem;
+						strVarFirstElem = strVarElm;
+					}
+					else {
+						if ((strVarFirstElem.find("volume") != std::string::npos) && (strVarElm.find("volume") == std::string::npos))
+							throw std::invalid_argument(getFullString(tipoVarElem) + " em " + getFullString(idElementoSistema) + " nao compativel com outros elementos em " + getFullString(idRestricaoOperativaUHE));
+
+						else if ((strVarFirstElem.find("vazao") != std::string::npos) && (strVarElm.find("vazao") == std::string::npos))
+							throw std::invalid_argument(getFullString(tipoVarElem) + " em " + getFullString(idElementoSistema) + " nao compativel com outros elementos em " + getFullString(idRestricaoOperativaUHE));
+
+						else if ((strVarFirstElem.find("nivel") != std::string::npos) && (strVarElm.find("nivel") == std::string::npos))
+							throw std::invalid_argument(getFullString(tipoVarElem) + " em " + getFullString(idElementoSistema) + " nao compativel com outros elementos em " + getFullString(idRestricaoOperativaUHE));
+
+						else if ((strVarFirstElem.find("producao") != std::string::npos) && (strVarElm.find("producao") == std::string::npos))
+							throw std::invalid_argument(getFullString(tipoVarElem) + " em " + getFullString(idElementoSistema) + "nao compativel com outros elementos em " + getFullString(idRestricaoOperativaUHE));
+
+					}
+				}
 
 			} // for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema; idElementoSistema++) {
 
@@ -11797,7 +11875,7 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 					else
 						a_entradaSaidaDados.setAppendArquivo(true);
 
-					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv", idRestricaoOperativaUHE, *this, std::vector<AttComumRestricaoOperativaUHE> {AttComumRestricaoOperativaUHE_idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, AttComumRestricaoOperativaUHE_penalidade_restricao_operativa_UHE});
+					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv", idRestricaoOperativaUHE, *this, std::vector<AttComumRestricaoOperativaUHE> {AttComumRestricaoOperativaUHE_idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, AttComumRestricaoOperativaUHE_penalidade});
 
 					if (idRestricaoOperativaUHE == IdRestricaoOperativaUHE_1)
 						a_entradaSaidaDados.setAppendArquivo(false);
@@ -11837,16 +11915,7 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 
 			if (!a_imprimir_atributos_sem_recarregar) {
 
-				if (true) {
-					int barreira = 0;
-
-					if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
-							MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
-					}
-					else
-						MPI_Recv(&barreira, 1, MPI_INT, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-				}
+				MPI_Barrier(MPI_COMM_WORLD);
 
 				//
 				// Esvazia Atributos
@@ -11887,42 +11956,114 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 void Dados::validaRestricaoOperativaUHE() {
 	try {
 
-		validaElementoSistemaRestricaoOperativaUHE();
-
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
 		const Periodo periodo_estudo_inicial = horizonte_estudo.getIteradorInicial();
 		const Periodo periodo_final_estudo = horizonte_estudo.getIteradorFinal();
 
+		const double vlr_min = getdoubleFromChar("min");
+		const double vlr_max = getdoubleFromChar("max");
+
 		const IdRestricaoOperativaUHE maiorIdRestricaoOperativaUHE = getMaiorId(IdRestricaoOperativaUHE());
 
-		for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE; idRestricaoOperativaUHE++) {
+		for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
+			for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE; idRestricaoOperativaUHE++) {
 
-			const IdElementoSistema maiorIdElementoSistema = getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
+				const IdElementoSistema maiorIdElementoSistema = getMaiorId(idRestricaoOperativaUHE, IdElementoSistema());
 
-			if (maiorIdElementoSistema == IdElementoSistema_Nenhum)
-				throw std::invalid_argument("Necessario incluir elementosSistema em " + getFullString(idRestricaoOperativaUHE));
+				if (maiorIdElementoSistema == IdElementoSistema_Nenhum)
+					throw std::invalid_argument("Necessario incluir elementosSistema em " + getFullString(idRestricaoOperativaUHE));
 
-			if ((getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf) > 0) && (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup) > 0)) {
+				double lim_inf = vlr_min;
+				double lim_sup = vlr_max;
+				double var_abs_inf_lag1 = vlr_min;
+				double var_abs_sup_lag1 = vlr_max;
+				double var_rel_inf_lag1 = vlr_min;
+				double var_rel_sup_lag1 = vlr_max;
 
-				for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
+				const IdPatamarCarga maiorIdPatamarCarga = getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
 
-					const IdPatamarCarga maiorIdPatamarCarga = getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
-					for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+				int any_valor_restrito_var = 0;
+				SmartEnupla<IdPatamarCarga, int> any_valor_restrito_lim(IdPatamarCarga_1, std::vector<int>(maiorIdPatamarCarga, 0));
 
-						const double limite_inferior = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, double());
-						const double limite_superior = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, double());
+				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+					lim_inf = vlr_min;
+					lim_sup = vlr_max;
+					if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf) > 0)
+						lim_inf = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, double());
+					if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup) > 0)
+						lim_sup = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, double());
 
-						if (limite_inferior > limite_superior)
-							throw std::invalid_argument("limite_inferior maior que limite_superior em " + getString(periodo) + " em " + getFullString(idPatamarCarga) + " em " + getFullString(idRestricaoOperativaUHE));
+					if ((vlr_min < lim_inf) && (lim_sup < vlr_max)) {
+						if (lim_inf > lim_sup)
+							throw std::invalid_argument("lim_inf maior a lim_sup em " + getString(periodo) + " em " + getFullString(idPatamarCarga) + " em " + getFullString(idRestricaoOperativaUHE));
+					}
+					if ((vlr_min < lim_inf) || (lim_sup < vlr_max))
+						any_valor_restrito_lim.at(idPatamarCarga) = 1;
+				} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-					} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-				} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_inf_lag1) > 0) {
+					if (getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_inf_lag1, periodo, IdPatamarCarga()) > IdPatamarCarga_1) 
+						throw std::invalid_argument("var_abs_inf_lag1 com mais de 1 patamar em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+					var_abs_inf_lag1 = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_inf_lag1, periodo, IdPatamarCarga_1, double());
+				}
+				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_sup_lag1) > 0) {
+					if (getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_sup_lag1, periodo, IdPatamarCarga()) > IdPatamarCarga_1)
+						throw std::invalid_argument("var_abs_inf_lag1 com mais de 1 patamar em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+					var_abs_sup_lag1 = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_sup_lag1, periodo, IdPatamarCarga_1, double());
+				}
 
-			} // if ((getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf) > 0) && (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup) > 0)) {
+				if ((vlr_min < fabs(var_abs_inf_lag1)) && (fabs(var_abs_inf_lag1) < vlr_max) && (vlr_min < fabs(var_abs_sup_lag1)) && (fabs(var_abs_sup_lag1) < vlr_max)) {
+					if ((var_abs_inf_lag1 < 0) && (-var_abs_inf_lag1 > var_abs_sup_lag1))
+						throw std::invalid_argument("-var_abs_inf_lag1 abs maior var_abs_sup_lag1 em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
 
-		} // for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE; idRestricaoOperativaUHE++) {
+					if ((var_abs_sup_lag1 < 0) && (var_abs_inf_lag1 > -var_abs_sup_lag1))
+						throw std::invalid_argument("-var_abs_sup_lag1 abs menor var_abs_inf_lag1 em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+				}
+				if (((vlr_min < fabs(var_abs_inf_lag1)) && (fabs(var_abs_inf_lag1) < vlr_max)) || ((vlr_min < fabs(var_abs_sup_lag1)) && (fabs(var_abs_sup_lag1) < vlr_max)))
+					any_valor_restrito_var = 1;
+
+				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_inf_lag1) > 0) {
+					if (getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_inf_lag1, periodo, IdPatamarCarga()) > IdPatamarCarga_1)
+						throw std::invalid_argument("var_rel_inf_lag1 com mais de 1 patamar em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+					var_rel_inf_lag1 = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_inf_lag1, periodo, IdPatamarCarga_1, double());
+				}
+				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_sup_lag1) > 0) {
+					if (getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_sup_lag1, periodo, IdPatamarCarga()) > IdPatamarCarga_1)
+						throw std::invalid_argument("var_rel_inf_lag1 com mais de 1 patamar em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+					var_rel_sup_lag1 = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_sup_lag1, periodo, IdPatamarCarga_1, double());
+				}
+
+				if ((vlr_min < fabs(var_rel_inf_lag1)) && (fabs(var_rel_inf_lag1) < vlr_max) && (vlr_min < fabs(var_rel_sup_lag1)) && (fabs(var_rel_sup_lag1) < vlr_max)) {
+					if ((var_rel_inf_lag1 < 0) && (-var_rel_inf_lag1 > var_rel_sup_lag1))
+						throw std::invalid_argument("-var_rel_inf_lag1 maior a var_rel_sup_lag1 em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+					if ((var_rel_sup_lag1 < 0) && (var_rel_inf_lag1 > -var_rel_sup_lag1))
+						throw std::invalid_argument("-var_rel_sup_lag1 menor a var_rel_inf_lag1 em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+				}
+				if (((vlr_min < fabs(var_rel_inf_lag1)) && (fabs(var_rel_inf_lag1) < vlr_max)) || ((vlr_min < fabs(var_rel_sup_lag1)) && (fabs(var_rel_sup_lag1) < vlr_max)))
+					any_valor_restrito_var = 1;
+
+				SmartEnupla<IdPatamarCarga, int> num_elem_fp(IdPatamarCarga_1, std::vector<int>(maiorIdPatamarCarga, 0));
+				for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema; idElementoSistema++) {
+					if (getSize1Matriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao) > 0) {
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, periodo, IdPatamarCarga()); idPatamarCarga++) {
+							if (getElementoMatriz(idRestricaoOperativaUHE, idElementoSistema, AttMatrizElementoSistema_fator_participacao, periodo, idPatamarCarga, double()) != 0.0)
+								num_elem_fp.at(idPatamarCarga)++;
+						}
+					}
+				}
+
+				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+					if ((any_valor_restrito_lim.at(idPatamarCarga) == 1) && (num_elem_fp.at(idPatamarCarga) == 0))
+						throw std::invalid_argument("Nao ha elementos com fator participacao diferente de zero em " + getString(periodo) + " em " + getString(idPatamarCarga) + " em " + getFullString(idRestricaoOperativaUHE));
+				}
+
+				if ((any_valor_restrito_var == 1) && (num_elem_fp.at(IdPatamarCarga_1) == 0))
+					throw std::invalid_argument("Nao ha elementos com fator participacao diferente de zero em " + getString(periodo) + " em " + getString(IdPatamarCarga_1) + " em " + getFullString(idRestricaoOperativaUHE));
+
+			} // for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE; idRestricaoOperativaUHE++) {
+		} // for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validaRestricaoOperativaUHE(): \n" + std::string(erro.what())); }

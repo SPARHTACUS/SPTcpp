@@ -4676,23 +4676,23 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 				// Volume Minimo
 				//
 				
-				if (nome.at(0) == "VarDecisaoZP0_VF_FINF") {
+				if (nome.at(0) == "VarDecisaoZP0_VF_LINF") {
 				
 					Periodo periodo_penalizacao(nome.at(2));
 
-					const int varZP0_VF_FINF = criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_FINF(a_TSS, a_dados, idEstagio, periodo_penalizacao);
+					const int varZP0_VF_LINF = criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_LINF(a_TSS, a_dados, idEstagio, periodo_penalizacao);
 
-					if (varZP0_VF_FINF > -1)
-						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varZP0_VF_FINF);
+					if (varZP0_VF_LINF > -1)
+						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varZP0_VF_LINF);
 				
 					else{
 						estagio.anularVariavelEstadoCorteBenders(idVariavelEstado);
 						estagio.vetorVariavelEstado.rem(idVariavelEstado);
 						if (a_idProcesso == IdProcesso_mestre)
-							std::cout << "VarDecisaoZP0_VF_FINF " << getFullString(idVariavelEstado) << " nao criada por falta de restricao de volume util minimo no modelo." << std::endl;
+							std::cout << "VarDecisaoZP0_VF_LINF " << getFullString(idVariavelEstado) << " nao criada por falta de restricao de volume util minimo no modelo." << std::endl;
 					}				
 
-				} // if (nome.at(0) == "VarDecisaoZP0_VF_FINF") {
+				} // if (nome.at(0) == "VarDecisaoZP0_VF_LINF") {
 				
 
 				//
