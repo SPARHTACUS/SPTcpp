@@ -290,8 +290,6 @@ public:
 
 	void validaRestricaoOperativaUHE();
 
-	void validaElementoSistemaRestricaoOperativaUHE();
-
 	bool valida_historico_AfluenciaEmHidreletrica(const AttVetorAfluencia a_attVetorAfluencia);
 
 	void calcular_historico_afluencia_incremental_com_natural();
