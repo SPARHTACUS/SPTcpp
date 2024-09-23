@@ -368,7 +368,7 @@ private:
 
 	SmartEnupla<IdContrato, int> lista_codigo_ONS_contrato = SmartEnupla<IdContrato, int>(IdContrato_1, std::vector<int>(IdContrato(int(IdContrato_Excedente) - 1), -1));
 
-	SmartEnupla<IdUsinaEolica, int> lista_codigo_ONS_usina_eolica = SmartEnupla<IdUsinaEolica, int>(IdUsinaEolica_1, std::vector<int>(IdUsinaEolica(int(IdUsinaEolica_Excedente) - 1), -1));
+	SmartEnupla<IdRenovavel, int> lista_codigo_ONS_usina_eolica = SmartEnupla<IdRenovavel, int>(IdRenovavel_1, std::vector<int>(IdRenovavel(int(IdRenovavel_Excedente) - 1), -1));
 
 	SmartEnupla<IdRestricaoEletrica, int> lista_codigo_ONS_restricao_eletrica = SmartEnupla<IdRestricaoEletrica, int>(IdRestricaoEletrica_1, std::vector<int>(IdRestricaoEletrica(int(IdRestricaoEletrica_Excedente) - 1), -1));
 

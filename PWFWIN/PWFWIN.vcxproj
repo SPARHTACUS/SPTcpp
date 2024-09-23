@@ -26,7 +26,7 @@
     <ClCompile Include="..\src\C_DiscretizacaoTemporal.cpp" />
     <ClCompile Include="..\src\C_ElementoSistema.cpp" />
     <ClCompile Include="..\src\C_EntradaSaidaDados.cpp" />
-    <ClCompile Include="..\src\C_Eolica.cpp" />
+    <ClCompile Include="..\src\C_Renovavel.cpp" />
     <ClCompile Include="..\src\C_RestricaoCenario.cpp" />
     <ClCompile Include="..\src\C_EstagioOtimizacao.cpp" />
     <ClCompile Include="..\src\C_FuncaoProducaoHidreletrica.cpp" />
@@ -82,7 +82,7 @@
     <ClInclude Include="..\src\C_DiscretizacaoTemporal.h" />
     <ClInclude Include="..\src\C_ElementoSistema.h" />
     <ClInclude Include="..\src\C_EntradaSaidaDados.h" />
-    <ClInclude Include="..\src\C_Eolica.h" />
+    <ClInclude Include="..\src\C_Renovavel.h" />
     <ClInclude Include="..\src\C_RestricaoCenario.h" />
     <ClInclude Include="..\src\C_EstagioOtimizacao.h" />
     <ClInclude Include="..\src\C_FuncaoProducaoHidreletrica.h" />

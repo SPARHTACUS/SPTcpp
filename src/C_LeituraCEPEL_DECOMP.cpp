@@ -15044,8 +15044,6 @@ void LeituraCEPEL::atualizar_valores_periodos_horizonte_expandido_restricao_elet
 
 		if (true) {
 			int pos_elemento = 1;
-			attMatrizRestricaoEletrica.addElemento(pos_elemento, AttMatrizRestricaoEletrica_percentual_variacao_patamar_carga);
-			pos_elemento++;
 			attMatrizRestricaoEletrica.addElemento(pos_elemento, AttMatrizRestricaoEletrica_lim_inf);
 			pos_elemento++;
 			attMatrizRestricaoEletrica.addElemento(pos_elemento, AttMatrizRestricaoEletrica_lim_sup);
@@ -16587,7 +16585,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						elementoSistema.setAtributo(AttComumElementoSistema_unidadeTermeletrica, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_unidadeTermeletrica, IdUnidadeUTE()));
 						elementoSistema.setAtributo(AttComumElementoSistema_contrato           , dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_contrato           , IdContrato()));
 						elementoSistema.setAtributo(AttComumElementoSistema_intercambio        , dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_intercambio        , IdIntercambio()));
-						elementoSistema.setAtributo(AttComumElementoSistema_eolica             , dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_eolica             , IdUsinaEolica()));
+						elementoSistema.setAtributo(AttComumElementoSistema_renovavel             , dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_renovavel             , IdRenovavel()));
 						elementoSistema.setAtributo(AttComumElementoSistema_usina_elevatoria   , dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_usina_elevatoria   , IdUsinaElevatoria()));
 						elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()));
 
@@ -16766,7 +16764,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						elementoSistema.setAtributo(AttComumElementoSistema_unidadeTermeletrica           , dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_unidadeTermeletrica, IdUnidadeUTE()));
 						elementoSistema.setAtributo(AttComumElementoSistema_contrato                      , dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_contrato, IdContrato()));
 						elementoSistema.setAtributo(AttComumElementoSistema_intercambio                   , dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_intercambio, IdIntercambio()));
-						elementoSistema.setAtributo(AttComumElementoSistema_eolica                        , dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_eolica, IdUsinaEolica()));
+						elementoSistema.setAtributo(AttComumElementoSistema_renovavel                        , dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_renovavel, IdRenovavel()));
 						elementoSistema.setAtributo(AttComumElementoSistema_usina_elevatoria              , dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_usina_elevatoria, IdUsinaElevatoria()));
 						elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()));
 

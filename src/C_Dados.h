@@ -17,7 +17,7 @@
 #include "C_UsinaElevatoria.h"
 #include "C_Contrato.h"
 #include "C_ReservaPotencia.h"
-#include "C_Eolica.h"
+#include "C_Renovavel.h"
 #include "C_DiscretizacaoTemporal.h"
 #include "C_Regua11.h"
 #include "C_IntercambioHidraulico.h"
@@ -117,8 +117,7 @@
       m(Dados,  AttComum,               taxa_considerar_tempo_viagem_agua,                            double,           0,           1,           0.2,      nao) \
       m(Dados,  AttComum,                     tipo_processamento_paralelo,         TipoProcessamentoParalelo,         min,         max,   por_cenario,      nao) \
       m(Dados,  AttComum,                                 imprimir_info_media,                          bool,         min,         max,           nao,      nao) \
-      m(Dados,  AttComum,              imprimir_cortes_NW_com_reducao_estados,                          bool,         min,         max,           nao,      nao) \
-      m(Dados,  AttComum,                          considerar_variaveis_folga,                          bool,         min,         max,           sim,      nao)
+      m(Dados,  AttComum,              imprimir_cortes_NW_com_reducao_estados,                          bool,         min,         max,           nao,      nao) 
 
 
 //   c_classe,   smrtAtt,                                    nomeAtributo,                              tipo,  lowerBound,  upperBound,         initialValue, mustRead?
@@ -157,7 +156,7 @@
     m(Dados, UsinaElevatoria)        \
     m(Dados, Contrato)               \
     m(Dados, ReservaPotencia)        \
-    m(Dados, UsinaEolica)            \
+    m(Dados, Renovavel)            \
     m(Dados, Discretizacao)          \
     m(Dados, Regua11)                \
     m(Dados, DemandaEspecial)        \
@@ -242,7 +241,7 @@ public:
 
 	void validacao_operacional_DemandaEspecial(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
-	void validacao_operacional_Eolica(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
+	void validacao_operacional_Renovaveis(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
 	void validacao_operacional_BaciaHidrografica(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
@@ -276,8 +275,6 @@ public:
 
 	void validaPatamarCarga();
 
-	void validaRestricaoEletrica();
-
 	void validaElementoSistemaRestricaoEletrica();
 
 	void validaAgrupamentoIntercambio();
@@ -288,7 +285,8 @@ public:
 	void validaUsinaNaoSimuladaEmSubmercado();
 	void validaUsinaNaoSimuladaEmSubmercado(const IdSubmercado a_idSubmercado);
 
-	void validaRestricaoOperativaUHE();
+	void validaHorizonteRestricaoEletrica();
+	void validaHorizonteRestricaoOperativaUHE();
 
 	bool valida_historico_AfluenciaEmHidreletrica(const AttVetorAfluencia a_attVetorAfluencia);
 

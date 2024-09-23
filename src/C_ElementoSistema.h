@@ -15,7 +15,7 @@
 	  m(ElementoSistema,  AttComum,               unidadeTermeletrica,                     IdUnidadeUTE,      Nenhum,         max,        Nenhum,      sim) \
 	  m(ElementoSistema,  AttComum,                          contrato,                       IdContrato,      Nenhum,         max,        Nenhum,      sim) \
 	  m(ElementoSistema,  AttComum,                       intercambio,                    IdIntercambio,      Nenhum,         max,        Nenhum,      sim) \
-	  m(ElementoSistema,  AttComum,                            eolica,                    IdUsinaEolica,      Nenhum,         max,        Nenhum,      sim) \
+	  m(ElementoSistema,  AttComum,                         renovavel,                    IdRenovavel,      Nenhum,         max,        Nenhum,      sim) \
       m(ElementoSistema,  AttComum,                  usina_elevatoria,                IdUsinaElevatoria,      Nenhum,         max,        Nenhum,      sim) \
       m(ElementoSistema,  AttComum,   tipoVariavelRestricaoOperativa,    TipoVariavelRestricaoOperativa,         min,         max,           min,      nao) \
 	  m(ElementoSistema,  AttComum,                fator_participacao,                           double,         -10,          10,             0,      nao)

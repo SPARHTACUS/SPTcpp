@@ -2387,7 +2387,7 @@ void LeituraCEPEL::leitura_EOLICA_201904_DES16(Dados& a_dados, const std::string
 
 		std::ifstream myfile(a_nomeArquivo);
 		std::string line;
-		IdUsinaEolica idUsinaEolica;
+		IdRenovavel idRenovavel;
 
 		if (myfile.is_open()) {
 
@@ -2408,59 +2408,59 @@ void LeituraCEPEL::leitura_EOLICA_201904_DES16(Dados& a_dados, const std::string
 
 					if (dado.at(0) == "EOLICA") {
 
-						const IdUsinaEolica idUsinaEolica_inicializado = getIdFromCodigoONS(lista_codigo_ONS_usina_eolica, std::stoi(dado.at(1)));
+						const IdRenovavel idRenovavel_inicializado = getIdFromCodigoONS(lista_codigo_ONS_usina_eolica, std::stoi(dado.at(1)));
 
-						if (idUsinaEolica_inicializado != IdUsinaEolica_Nenhum) {
-							idUsinaEolica = idUsinaEolica_inicializado;
-							a_dados.vetorUsinaEolica.at(idUsinaEolica).setAtributoFromString(AttComumUsinaEolica_nome, dado.at(2));
-							a_dados.vetorUsinaEolica.at(idUsinaEolica).setAtributoFromString(AttComumUsinaEolica_geracao_maxima, dado.at(3));
-							a_dados.vetorUsinaEolica.at(idUsinaEolica).setAtributoFromString(AttComumUsinaEolica_fator_capacidade, dado.at(4));
-							a_dados.vetorUsinaEolica.at(idUsinaEolica).setAtributoFromString(AttComumUsinaEolica_constrained_off, dado.at(5));
-						}//if (idUsinaEolicaInstanciada.size() != 0) { 
+						if (idRenovavel_inicializado != IdRenovavel_Nenhum) {
+							idRenovavel = idRenovavel_inicializado;
+							a_dados.vetorRenovavel.at(idRenovavel).setAtributoFromString(AttComumRenovavel_nome, dado.at(2));
+							a_dados.vetorRenovavel.at(idRenovavel).setAtributoFromString(AttComumRenovavel_geracao_maxima, dado.at(3));
+							a_dados.vetorRenovavel.at(idRenovavel).setAtributoFromString(AttComumRenovavel_fator_capacidade, dado.at(4));
+							a_dados.vetorRenovavel.at(idRenovavel).setAtributoFromString(AttComumRenovavel_constrained_off, dado.at(5));
+						}//if (idRenovavelInstanciada.size() != 0) { 
 
 						else {
-							idUsinaEolica = a_dados.vetorUsinaEolica.getMaiorId();
-							if (idUsinaEolica == IdUsinaEolica_Nenhum) { idUsinaEolica = IdUsinaEolica_1; }
-							else { idUsinaEolica++; }
+							idRenovavel = a_dados.vetorRenovavel.getMaiorId();
+							if (idRenovavel == IdRenovavel_Nenhum) { idRenovavel = IdRenovavel_1; }
+							else { idRenovavel++; }
 
-							UsinaEolica usinaEolica;
-							usinaEolica.setAtributo(AttComumUsinaEolica_idUsinaEolica, idUsinaEolica);
-							usinaEolica.setAtributoFromString(AttComumUsinaEolica_nome, dado.at(2));
-							usinaEolica.setAtributoFromString(AttComumUsinaEolica_geracao_maxima, dado.at(3));
-							usinaEolica.setAtributoFromString(AttComumUsinaEolica_fator_capacidade, dado.at(4));
-							usinaEolica.setAtributoFromString(AttComumUsinaEolica_constrained_off, dado.at(5));
-							a_dados.vetorUsinaEolica.add(usinaEolica);
+							Renovavel usinaEolica;
+							usinaEolica.setAtributo(AttComumRenovavel_idRenovavel, idRenovavel);
+							usinaEolica.setAtributoFromString(AttComumRenovavel_nome, dado.at(2));
+							usinaEolica.setAtributoFromString(AttComumRenovavel_geracao_maxima, dado.at(3));
+							usinaEolica.setAtributoFromString(AttComumRenovavel_fator_capacidade, dado.at(4));
+							usinaEolica.setAtributoFromString(AttComumRenovavel_constrained_off, dado.at(5));
+							a_dados.vetorRenovavel.add(usinaEolica);
 
-							lista_codigo_ONS_usina_eolica.setElemento(idUsinaEolica, std::atoi(dado.at(1).c_str()));
+							lista_codigo_ONS_usina_eolica.setElemento(idRenovavel, std::atoi(dado.at(1).c_str()));
 
 						}//else {
 
-						//a_dados.vetorUsinaEolica.at(idUsinaEolica).setMatriz(AttMatrizUsinaEolica_geracao, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 0.0))));
+						//a_dados.vetorRenovavel.at(idRenovavel).setMatriz(AttMatrizRenovavel_geracao, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 0.0))));
 
 					}//if (dado[0] == "EOLICA") {
 
 					if (dado[0] == "EOLICASUBM") {
 						const IdSubmercado idSubmercado = getIdSubmercadoFromMnemonico(dado.at(2));
 
-						const IdUsinaEolica idUsinaEolica_inicializado = getIdFromCodigoONS(lista_codigo_ONS_usina_eolica, std::stoi(dado.at(1)));
+						const IdRenovavel idRenovavel_inicializado = getIdFromCodigoONS(lista_codigo_ONS_usina_eolica, std::stoi(dado.at(1)));
 
-						if (idUsinaEolica_inicializado == IdUsinaEolica_Nenhum)
-							throw std::invalid_argument("Nao inicializada idUsinaEolica com codigo_CEPEL_" + dado.at(1));
+						if (idRenovavel_inicializado == IdRenovavel_Nenhum)
+							throw std::invalid_argument("Nao inicializada idRenovavel com codigo_CEPEL_" + dado.at(1));
 
-						const IdUsinaEolica  idUsinaEolica = idUsinaEolica_inicializado;
+						const IdRenovavel  idRenovavel = idRenovavel_inicializado;
 
-						a_dados.vetorUsinaEolica.at(idUsinaEolica).setAtributo(AttComumUsinaEolica_submercado, idSubmercado);
+						a_dados.vetorRenovavel.at(idRenovavel).setAtributo(AttComumRenovavel_submercado, idSubmercado);
 					}//if (dado[0] == "EOLICASUBM") {
 
 
 					if (dado[0] == "EOLICABARRA") {
 
-						const IdUsinaEolica idUsinaEolica = getIdFromCodigoONS(lista_codigo_ONS_usina_eolica, std::stoi(dado.at(1)));
+						const IdRenovavel idRenovavel = getIdFromCodigoONS(lista_codigo_ONS_usina_eolica, std::stoi(dado.at(1)));
 
-						if (idUsinaEolica == IdUsinaEolica_Nenhum)
-							throw std::invalid_argument("Nao inicializada idUsinaEolica com codigo_CEPEL_" + dado.at(1));
+						if (idRenovavel == IdRenovavel_Nenhum)
+							throw std::invalid_argument("Nao inicializada idRenovavel com codigo_CEPEL_" + dado.at(1));
 
-						a_dados.vetorUsinaEolica.at(idUsinaEolica).setAtributo(AttComumUsinaEolica_barra, std::stoi(dado.at(2)));
+						a_dados.vetorRenovavel.at(idRenovavel).setAtributo(AttComumRenovavel_barra, std::stoi(dado.at(2)));
 					}//if (dado[0] == "EOLICASUBM") {
 
 
@@ -2516,20 +2516,20 @@ void LeituraCEPEL::leitura_EOLICA_201904_DES16(Dados& a_dados, const std::string
 								periodo_final_geracao = Periodo(TipoPeriodo_meia_hora, idDiaFinal, idMesFinal, idAnoFinal, idHorFinal, IdMin_0);
 						}
 
-						const IdUsinaEolica idUsinaEolica_inicializado = getIdFromCodigoONS(lista_codigo_ONS_usina_eolica, std::stoi(dado.at(1)));
+						const IdRenovavel idRenovavel_inicializado = getIdFromCodigoONS(lista_codigo_ONS_usina_eolica, std::stoi(dado.at(1)));
 
-						if (idUsinaEolica_inicializado == IdUsinaEolica_Nenhum)
-							throw std::invalid_argument("Nao inicializada idUsinaEolica com codigo_CEPEL_" + dado.at(1));
+						if (idRenovavel_inicializado == IdRenovavel_Nenhum)
+							throw std::invalid_argument("Nao inicializada idRenovavel com codigo_CEPEL_" + dado.at(1));
 
-						const IdUsinaEolica  idUsinaEolica = idUsinaEolica_inicializado;
+						const IdRenovavel  idRenovavel = idRenovavel_inicializado;
 
-						if (a_dados.getSize1Matriz(idUsinaEolica, AttMatrizUsinaEolica_geracao) == 0)
+						if (a_dados.getSize1Matriz(idRenovavel, AttMatrizRenovavel_geracao) == 0)
 							for (Periodo periodo = periodo_inicial_estudo_meia; periodo < periodo_inicial_geracao; periodo++)
-								a_dados.vetorUsinaEolica.at(idUsinaEolica).addElemento(AttMatrizUsinaEolica_geracao, periodo, IdPatamarCarga_1, 0.0);
+								a_dados.vetorRenovavel.at(idRenovavel).addElemento(AttMatrizRenovavel_geracao, periodo, IdPatamarCarga_1, 0.0);
 
 						const double valor = std::stod(dado.at(8));
 
-						if (idUsinaEolica == IdUsinaEolica_9)
+						if (idRenovavel == IdRenovavel_9)
 							int aa = 1;
 
 						if (valor == 2)
@@ -2537,7 +2537,7 @@ void LeituraCEPEL::leitura_EOLICA_201904_DES16(Dados& a_dados, const std::string
 
 						for (Periodo periodo = periodo_inicial_geracao; periodo < periodo_final_geracao; periodo++)
 							if (periodo <= periodo_final_estudo_meia)
-								a_dados.vetorUsinaEolica.at(idUsinaEolica).addElemento(AttMatrizUsinaEolica_geracao, periodo, IdPatamarCarga_1, valor);
+								a_dados.vetorRenovavel.at(idRenovavel).addElemento(AttMatrizRenovavel_geracao, periodo, IdPatamarCarga_1, valor);
 
 
 					}//if (dado[0] == "EOLICA-GERACAO") {
@@ -2572,21 +2572,21 @@ void LeituraCEPEL::validarGeracaoMediaRenovaveis(Dados& a_dados){
 		const Periodo periodo_inicial_estudo_meia = Periodo(TipoPeriodo_meia_hora, periodo_inicial_estudo);
 		const Periodo periodo_final_estudo_meia   = Periodo(TipoPeriodo_meia_hora, periodo_final_estudo + 1) - 1;
 
-		const IdUsinaEolica  maiorIdUsinaEolica = a_dados.getMaiorId(IdUsinaEolica());
+		const IdRenovavel  maiorIdRenovavel = a_dados.getMaiorId(IdRenovavel());
 
-		for (IdUsinaEolica idUsinaEolica = IdUsinaEolica_1; idUsinaEolica <= maiorIdUsinaEolica; idUsinaEolica++) {
+		for (IdRenovavel idRenovavel = IdRenovavel_1; idRenovavel <= maiorIdRenovavel; idRenovavel++) {
 
 			SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> geracao(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(1, 0.0)));
 
-			if (a_dados.getSize1Matriz(idUsinaEolica, AttMatrizUsinaEolica_geracao) == 0)
-				a_dados.vetorUsinaEolica.at(idUsinaEolica).setMatriz_forced(AttMatrizUsinaEolica_geracao, geracao);
+			if (a_dados.getSize1Matriz(idRenovavel, AttMatrizRenovavel_geracao) == 0)
+				a_dados.vetorRenovavel.at(idRenovavel).setMatriz_forced(AttMatrizRenovavel_geracao, geracao);
 
 			else {
-				const Periodo periodo_final_registro = a_dados.getIterador1Final(idUsinaEolica, AttMatrizUsinaEolica_geracao, Periodo());
+				const Periodo periodo_final_registro = a_dados.getIterador1Final(idRenovavel, AttMatrizRenovavel_geracao, Periodo());
 
 				if (periodo_final_registro < periodo_final_estudo_meia) {
 					for (Periodo periodo = periodo_final_registro + 1; periodo <= periodo_final_estudo_meia; periodo++)
-						a_dados.vetorUsinaEolica.at(idUsinaEolica).addElemento(AttMatrizUsinaEolica_geracao, periodo, IdPatamarCarga_1, 0.0);
+						a_dados.vetorRenovavel.at(idRenovavel).addElemento(AttMatrizRenovavel_geracao, periodo, IdPatamarCarga_1, 0.0);
 				}
 
 				for (Periodo periodo_estudo = horizonte_estudo.getIteradorInicial(); periodo_estudo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_estudo)) {
@@ -2599,7 +2599,7 @@ void LeituraCEPEL::validarGeracaoMediaRenovaveis(Dados& a_dados){
 					int divisor = 0;
 
 					for (Periodo periodo_estudo_meia = periodo_estudo_inicial_meia; periodo_estudo_meia <= periodo_estudo_final_meia; periodo_estudo_meia++) {
-						valor += a_dados.getElementoMatriz(idUsinaEolica, AttMatrizUsinaEolica_geracao, periodo_estudo_meia, IdPatamarCarga_1, double());
+						valor += a_dados.getElementoMatriz(idRenovavel, AttMatrizRenovavel_geracao, periodo_estudo_meia, IdPatamarCarga_1, double());
 						divisor++;
 					}
 
@@ -2609,11 +2609,11 @@ void LeituraCEPEL::validarGeracaoMediaRenovaveis(Dados& a_dados){
 
 				}
 
-				a_dados.vetorUsinaEolica.at(idUsinaEolica).setMatriz_forced(AttMatrizUsinaEolica_geracao, geracao);
+				a_dados.vetorRenovavel.at(idRenovavel).setMatriz_forced(AttMatrizRenovavel_geracao, geracao);
 
 			}
 
-		} // for (IdUsinaEolica idUsinaEolica = IdUsinaEolica_1; idUsinaEolica <= maiorIdUsinaEolica; idUsinaEolica++) {
+		} // for (IdRenovavel idRenovavel = IdRenovavel_1; idRenovavel <= maiorIdRenovavel; idRenovavel++) {
 
 	}//try {
 
@@ -3218,7 +3218,7 @@ void LeituraCEPEL::leitura_OPERUH_201904_DES16(Dados& a_dados, const std::string
 						case 4: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_vazao_vertida);         elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }
 						case 5: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_vazao_desviada);        elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }
 						case 6: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_vazao_defluente);       elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5)));	break; }
-						case 7: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_producao_hidreletrica); elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }
+						case 7: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_potencia_disponivel); elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }
 						case 8: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_vazao_bombeada);        elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }
 						case 9: { elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_vazao_afluente);        elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, std::stod(line.substr(43, 5))); break; }
 						}//switch (std::stoi(line.substr(40, 2))) {
@@ -4637,25 +4637,25 @@ void LeituraCEPEL::leitura_REE_201904_DES16(Dados& a_dados, const std::string a_
 
 						idElementoSistema = IdElementoSistema(a_dados.getMaiorId(idRestricaoEletricaFE, IdElementoSistema()) + 1);
 
-						const IdUsinaEolica idUsinaEolica_inicializado = getIdFromCodigoONS(lista_codigo_ONS_usina_eolica, std::stoi(line.substr(26, 5)));
+						const IdRenovavel idRenovavel_inicializado = getIdFromCodigoONS(lista_codigo_ONS_usina_eolica, std::stoi(line.substr(26, 5)));
 
-						IdUsinaEolica idUsinaEolica;
+						IdRenovavel idRenovavel;
 
-						if (idUsinaEolica_inicializado != IdUsinaEolica_Nenhum) {
-							idUsinaEolica = idUsinaEolica_inicializado;
-						}//if (idUsinaEolicaInstanciada.size() != 0) { 
+						if (idRenovavel_inicializado != IdRenovavel_Nenhum) {
+							idRenovavel = idRenovavel_inicializado;
+						}//if (idRenovavelInstanciada.size() != 0) { 
 
 						else {
-							idUsinaEolica = a_dados.vetorUsinaEolica.getMaiorId();
-							if (idUsinaEolica == IdUsinaEolica_Nenhum) { idUsinaEolica = IdUsinaEolica_1; }
-							else { idUsinaEolica++; }
+							idRenovavel = a_dados.vetorRenovavel.getMaiorId();
+							if (idRenovavel == IdRenovavel_Nenhum) { idRenovavel = IdRenovavel_1; }
+							else { idRenovavel++; }
 
-							UsinaEolica usinaEolica;
-							usinaEolica.setAtributo(AttComumUsinaEolica_idUsinaEolica, idUsinaEolica);
+							Renovavel usinaEolica;
+							usinaEolica.setAtributo(AttComumRenovavel_idRenovavel, idRenovavel);
 
-							lista_codigo_ONS_usina_eolica.setElemento(idUsinaEolica, std::stoi(line.substr(26, 5)));
+							lista_codigo_ONS_usina_eolica.setElemento(idRenovavel, std::stoi(line.substr(26, 5)));
 
-							a_dados.vetorUsinaEolica.add(usinaEolica);
+							a_dados.vetorRenovavel.add(usinaEolica);
 
 						}// else
 
@@ -4663,8 +4663,8 @@ void LeituraCEPEL::leitura_REE_201904_DES16(Dados& a_dados, const std::string a_
 
 						ElementoSistema elementoSistema;
 						elementoSistema.setAtributo(AttComumElementoSistema_idElementoSistema, idElementoSistema);
-						elementoSistema.setAtributo(AttComumElementoSistema_tipo_elemento, TipoElementoSistema_eolica);
-						elementoSistema.setAtributo(AttComumElementoSistema_eolica, idUsinaEolica);
+						elementoSistema.setAtributo(AttComumElementoSistema_tipo_elemento, TipoElementoSistema_renovavel);
+						elementoSistema.setAtributo(AttComumElementoSistema_renovavel, idRenovavel);
 						elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, fator_participacao);
 						a_dados.vetorRestricaoEletrica.at(idRestricaoEletricaFE).vetorElementoSistema.add(elementoSistema);
 						a_dados.vetorRestricaoEletrica.at(idRestricaoEletricaFE).vetorElementoSistema.at(idElementoSistema).setVetor(AttVetorElementoSistema_fator_participacao, SmartEnupla<Periodo, double>(a_horizonte_estudo, 0.0));
@@ -4829,7 +4829,7 @@ void LeituraCEPEL::validacoes_DESSEM(Dados& a_dados, const std::string a_diretor
 
 		a_dados.validacao_operacional_DemandaEspecial(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
-		a_dados.validacao_operacional_Eolica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+		a_dados.validacao_operacional_Renovaveis(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		//a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 
