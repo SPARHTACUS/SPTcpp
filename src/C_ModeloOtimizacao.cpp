@@ -119,15 +119,15 @@ void ModeloOtimizacao::instanciarCorteBenders(const IdEstagio a_idEstagio, const
 						const int pos_zf = getPosIneLinear_CB_ZFseExistir(tss, estagio_anterior, idReal, idCorte_old);
 
 						if (pos_zf > -1) {
-							name_IneLinear_CB_ZF_3.at(tss).at(estagio_anterior).at(pos_zf) = getNomePrintIneLinear_CB_ZF(tss, estagio_anterior, idReal, idCorte);
-							vetorEstagio.at(estagio_anterior).getSolver(tss)->setNomeRestricao(indx_IneLinear_CB_ZF_3.at(tss).at(estagio_anterior).at(pos_zf), getNomeSolverIneLinear_CB_ZF(tss, estagio_anterior, idReal, idCorte));
+							name_IneLinear_CB_ZF_3_1.at(tss).at(estagio_anterior).at(pos_zf) = getNomePrintIneLinear_CB_ZF(tss, estagio_anterior, idReal, idCorte);
+							vetorEstagio.at(estagio_anterior).getSolver(tss)->setNomeRestricao(indx_IneLinear_CB_ZF_3_1.at(tss).at(estagio_anterior).at(pos_zf), getNomeSolverIneLinear_CB_ZF(tss, estagio_anterior, idReal, idCorte));
 						}
 
 						const int pos_zt = getPosIneLinear_CB_ZTseExistir(tss, estagio_anterior, idReal, idCorte_old);
 
 						if (pos_zt > -1) {
-							name_IneLinear_CB_ZT_3.at(tss).at(estagio_anterior).at(pos_zt) = getNomePrintIneLinear_CB_ZT(tss, estagio_anterior, idReal, idCorte);
-							vetorEstagio.at(estagio_anterior).getSolver(tss)->setNomeRestricao(indx_IneLinear_CB_ZT_3.at(tss).at(estagio_anterior).at(pos_zt), getNomeSolverIneLinear_CB_ZT(tss, estagio_anterior, idReal, idCorte));
+							name_IneLinear_CB_ZT_3_1.at(tss).at(estagio_anterior).at(pos_zt) = getNomePrintIneLinear_CB_ZT(tss, estagio_anterior, idReal, idCorte);
+							vetorEstagio.at(estagio_anterior).getSolver(tss)->setNomeRestricao(indx_IneLinear_CB_ZT_3_1.at(tss).at(estagio_anterior).at(pos_zt), getNomeSolverIneLinear_CB_ZT(tss, estagio_anterior, idReal, idCorte));
 						}
 
 					} // for (TipoSubproblemaSolver tss = TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1); tss < TipoSubproblemaSolver_Excedente; tss++) {
@@ -4395,9 +4395,9 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 						if (getIneLinear_CB_ZFseExistir(a_TSS, estagio_final, idRealizacao, idCorteBenders) > -1)
 							throw std::invalid_argument("Conteudo ja existente " +  getFullString(idCorteBenders));
 
-						alocIneLinear_CB_ZF_3(a_TSS, estagio_final);
-						name_IneLinear_CB_ZF_3.at(a_TSS).at(estagio_final).push_back(getNomePrintIneLinear_CB_ZF(a_TSS, estagio_final, idRealizacao, idCorteBenders));
-						indx_IneLinear_CB_ZF_3.at(a_TSS).at(estagio_final).push_back(indice_corte);
+						alocIneLinear_CB_ZF_3_1(a_TSS, estagio_final);
+						name_IneLinear_CB_ZF_3_1.at(a_TSS).at(estagio_final).push_back(getNomePrintIneLinear_CB_ZF(a_TSS, estagio_final, idRealizacao, idCorteBenders));
+						indx_IneLinear_CB_ZF_3_1.at(a_TSS).at(estagio_final).push_back(indice_corte);
 
 						vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(varZF, indice_corte, 1.0);
 

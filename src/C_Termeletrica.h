@@ -31,6 +31,11 @@
 
 #define ATT_VETOR_TERMELETRICA(m)  \
 	  m(Termeletrica,  AttVetor,            tipo_detalhamento_producao,  TipoDetalhamentoProducaoTermeletrica,         min,              max,           min,        Periodo) \
+	  m(Termeletrica,  AttVetor,                              power_up,                                double,           0,              max,             0,        int) \
+	  m(Termeletrica,  AttVetor,                            power_down,                                double,           0,              max,             0,        int) \
+	  m(Termeletrica,  AttVetor,                              time_up,                                    int,           0,              max,             0,        int) \
+	  m(Termeletrica,  AttVetor,                            time_down,                                    int,           0,              max,             0,        int) \
+	  m(Termeletrica,  AttVetor,       representacao_discreta_producao,                                   int,           0,                1,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,                 potencia_minima_media,                                double,           0,              max,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,                 potencia_maxima_media,                                double,           0,              max,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,      potencia_disponivel_minima_media,                                double,           0,              max,             0,        Periodo) \

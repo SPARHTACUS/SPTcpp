@@ -100,22 +100,22 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_1_ESTAGIO(m)         m(1, IdEstagio)
 
 #define VARIAVEL_DECISAO_1(m)\
-	m(  VarDecisao,     ZP0,                      1,    ITERADORES_1_ESTAGIO)  \
-	m(  VarDecisao,     ZO0,                      1,    ITERADORES_1_ESTAGIO)  \
-	m(  VarDecisao,     ZT,                       1,    ITERADORES_1_ESTAGIO)  \
-	m(  VarDecisao,     ZI,                       1,    ITERADORES_1_ESTAGIO)  \
-	m(  VarDecisao,     ZP,                       1,    ITERADORES_1_ESTAGIO)  \
-	m(  VarDecisao,     ZF,                       1,    ITERADORES_1_ESTAGIO)  
-   //   Elemento,       Nome,               NroIter,    Iteradores,                                         
+	m(  VarDecisao,     ZP0,                      1, 1,    ITERADORES_1_ESTAGIO)  \
+	m(  VarDecisao,     ZO0,                      1, 1,    ITERADORES_1_ESTAGIO)  \
+	m(  VarDecisao,     ZT,                       1, 1,    ITERADORES_1_ESTAGIO)  \
+	m(  VarDecisao,     ZI,                       1, 1,    ITERADORES_1_ESTAGIO)  \
+	m(  VarDecisao,     ZP,                       1, 1,    ITERADORES_1_ESTAGIO)  \
+	m(  VarDecisao,     ZF,                       1, 1,    ITERADORES_1_ESTAGIO)  
+   //   Elemento,       Nome,               NroIter, Id,    Iteradores,                                         
 
 #define EQUACAO_LINEAR_1(m)\
-	m(  EquLinear,     ZP0,                   1,    ITERADORES_1_ESTAGIO)  \
-	m(  EquLinear,     ZO0,                   1,    ITERADORES_1_ESTAGIO)  \
-	m(  EquLinear,     ZT,                    1,    ITERADORES_1_ESTAGIO)  \
-	m(  EquLinear,     ZT_MESTRE,             1,    ITERADORES_1_ESTAGIO)  \
-	m(  EquLinear,     ZI,                    1,    ITERADORES_1_ESTAGIO)  \
-	m(  EquLinear,     ZP,                    1,    ITERADORES_1_ESTAGIO)  \
-	m(  EquLinear,     ZF,                    1,    ITERADORES_1_ESTAGIO)  
+	m(  EquLinear,     ZP0,                   1, 1,    ITERADORES_1_ESTAGIO)  \
+	m(  EquLinear,     ZO0,                   1, 1,    ITERADORES_1_ESTAGIO)  \
+	m(  EquLinear,     ZT,                    1, 1,    ITERADORES_1_ESTAGIO)  \
+	m(  EquLinear,     ZT_MESTRE,             1, 1,    ITERADORES_1_ESTAGIO)  \
+	m(  EquLinear,     ZI,                    1, 1,    ITERADORES_1_ESTAGIO)  \
+	m(  EquLinear,     ZP,                    1, 1,    ITERADORES_1_ESTAGIO)  \
+	m(  EquLinear,     ZF,                    1, 1,    ITERADORES_1_ESTAGIO)  
    //   Elemento,     Nome,                           NroIter,    Iteradores,                                   
 
 
@@ -128,24 +128,24 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_3_ESTAGIO_REALIZACAO(m)         m(1, IdEstagio) m(2, IdRealizacao)
 
 #define VARIAVEL_DECISAO_2(m)\
-	m(  VarDecisao,     ZF,                      2,   ITERADORES_3_ESTAGIO_REALIZACAO)  \
-	m(  VarDecisao,     ZT,                      2,   ITERADORES_3_ESTAGIO_REALIZACAO)  \
-	m(  VarDecisao,     ZP0_VF_LINF,             2,   ITERADORES_2_ESTAGIO_PERIODO)  \
-	m(  VarDecisao,     ZP0_VF_LINF_ADD,         2,   ITERADORES_2_ESTAGIO_PERIODO)  \
-	m(  VarDecisao,     ZO0,                     2,    ITERADORES_2_ESTAGIO_PERIODO)  \
-	m(  VarDecisao,     ZO,                      2,    ITERADORES_2_ESTAGIO_PERIODO)  \
-	m(  VarDecisao,     ZP0,                     2,    ITERADORES_2_ESTAGIO_PERIODO)  \
-	m(  VarDecisao,     ZP,                      2,    ITERADORES_2_ESTAGIO_PERIODO)  \
-	m(  VarDecisao,     ESTADO,                  2,    ITERADORES_2_ESTAGIO_VARIAVELESTADO)  
+	m(  VarDecisao,     ZF,                      2, 1,   ITERADORES_3_ESTAGIO_REALIZACAO)  \
+	m(  VarDecisao,     ZT,                      2, 1,   ITERADORES_3_ESTAGIO_REALIZACAO)  \
+	m(  VarDecisao,     ZP0_VF_LINF,             2, 1,   ITERADORES_2_ESTAGIO_PERIODO)  \
+	m(  VarDecisao,     ZP0_VF_LINF_ADD,         2, 1,   ITERADORES_2_ESTAGIO_PERIODO)  \
+	m(  VarDecisao,     ZO0,                     2, 1,    ITERADORES_2_ESTAGIO_PERIODO)  \
+	m(  VarDecisao,     ZO,                      2, 1,    ITERADORES_2_ESTAGIO_PERIODO)  \
+	m(  VarDecisao,     ZP0,                     2, 1,    ITERADORES_2_ESTAGIO_PERIODO)  \
+	m(  VarDecisao,     ZP,                      2, 1,    ITERADORES_2_ESTAGIO_PERIODO)  \
+	m(  VarDecisao,     ESTADO,                  2, 1,    ITERADORES_2_ESTAGIO_VARIAVELESTADO)  
    //   Elemento,       Nome,               NroIter,    Iteradores,                                         
 
 
 #define EQUACAO_LINEAR_2(m)\
-	m(  EquLinear,     ZP0_VF_LINF,         2,    ITERADORES_2_ESTAGIO_PERIODO)  \
-	m(  EquLinear,     ZP0,                 2,    ITERADORES_2_ESTAGIO_PERIODO)  \
-	m(  EquLinear,     ZP,                  2,    ITERADORES_2_ESTAGIO_PERIODO)  \
-	m(  EquLinear,     ZO0,                 2,    ITERADORES_2_ESTAGIO_PERIODO)  \
-	m(  EquLinear,     ZO,                  2,    ITERADORES_2_ESTAGIO_PERIODO)  
+	m(  EquLinear,     ZP0_VF_LINF,         2, 1,    ITERADORES_2_ESTAGIO_PERIODO)  \
+	m(  EquLinear,     ZP0,                 2, 1,    ITERADORES_2_ESTAGIO_PERIODO)  \
+	m(  EquLinear,     ZP,                  2, 1,    ITERADORES_2_ESTAGIO_PERIODO)  \
+	m(  EquLinear,     ZO0,                 2, 1,    ITERADORES_2_ESTAGIO_PERIODO)  \
+	m(  EquLinear,     ZO,                  2, 1,    ITERADORES_2_ESTAGIO_PERIODO)  
 
    //   Elemento,     Nome,                           NroIter,    Iteradores,                                   
 
@@ -158,109 +158,140 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA(m)          m(1, IdEstagio) m(2, Periodo)        m(3, IdTermeletrica)
 #define ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA(m)          m(1, IdEstagio) m(2, Periodo)        m(3, IdHidreletrica)
 #define ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO(m)            m(1, IdEstagio) m(2, Periodo)        m(3, IdSubmercado)
+#define ITERADORES_3_ESTAGIO_PERIODO_INTERCAMBIO(m)           m(1, IdEstagio) m(2, Periodo)        m(3, IdIntercambio)
 #define ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA(m)      m(1, IdEstagio) m(2, Periodo)        m(3, IdRestricaoEletrica)
 #define ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE(m) m(1, IdEstagio) m(2, Periodo)        m(3, IdRestricaoOperativaUHE)
+#define ITERADORES_3_ESTAGIO_PERIODO_CONTRATO(m)              m(1, IdEstagio) m(2, Periodo)        m(3, IdContrato)
 #define ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA(m)       m(1, IdEstagio) m(2, Periodo)        m(3, IdUsinaElevatoria)
 #define ITERADORES_3_ESTAGIO_PERIODO_VARIAVELALEATORIA(m)     m(1, IdEstagio) m(2, Periodo)        m(3, IdVariavelAleatoria)
+#define ITERADORES_3_ESTAGIO_PERIODO_PLESPECIAL(m)            m(1, IdEstagio) m(2, Periodo)        m(3, IdDemandaEspecial)
+#define ITERADORES_3_ESTAGIO_PERIODO_RENOVAVEL(m)             m(1, IdEstagio) m(2, Periodo)        m(3, IdRenovavel)
 #define ITERADORES_3_ESTAGIO_REALIZACAO_CORTEBENDERS(m)       m(1, IdEstagio) m(2, IdRealizacao)   m(3, IdCorteBenders)
 
 #define VARIAVEL_DECISAO_3(m)\
-	m(  VarDecisao,   ZP,               3,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA)  \
-	m(  VarDecisao,   ZO,               3,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA)  \
-	m(  VarDecisao,   ZP0_VF_LINF,      3,         ITERADORES_3_ESTAGIO_PERIODO_PERIODO)  \
-	m(  VarDecisao,   QINC,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   QINC_FINF,              3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   ENA,              3,         ITERADORES_3_ESTAGIO_PERIODO_PERIODO)  \
-	m(  VarDecisao,   QEVA,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   QEVA_REL,           3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   QEVA_FINF,          3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-    m(  VarDecisao,   QDEF,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-    m(  VarDecisao,   QDEF_FINF,          3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-    m(  VarDecisao,   QDEF_FSUP,          3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   VI,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   VF,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   HF,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   VMED,             3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-    m(  VarDecisao,   VF_FINF,          3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   VMORTO_FINF,      3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   PL,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
-	m(  VarDecisao,   PBOMDISP,           3,         ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA)  \
-	m(  VarDecisao,   PD,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
-	m(  VarDecisao,   PHDISP,           3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-    m(  VarDecisao,   PHDISPMETA,       3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-    m(  VarDecisao,   PHDISPMETA_FINF,  3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-    m(  VarDecisao,   PHDISPMETA_FSUP,  3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   QVER,               3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   QTURDISP,           3,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   PTDISP,           3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA)  \
-	m(  VarDecisao,   PTDISPCOM,        3,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA)  \
-	m(  VarDecisao,   PI,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
-	m(  VarDecisao,   PN,               3,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
-    m(  VarDecisao,   RE,               3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
-    m(  VarDecisao,   RE_LINF_FINF,    3,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
-    m(  VarDecisao,   RE_LSUP_FSUP,    3,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
-    m(  VarDecisao,   RE_VINF_FINF,    3,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
-    m(  VarDecisao,   RE_VSUP_FSUP,    3,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
-    m(  VarDecisao,   RH,               3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,   RH_LINF_FINF,    3,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,   RH_LSUP_FSUP,    3,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,   RH_VINF_FINF,    3,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,   RH_VSUP_FSUP,    3,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,   RHA_FINF,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,   RHA_FSUP,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,   RHV_FINF,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,   RHV_FSUP,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,   RHE_FINF,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,   RHE_FSUP,         3,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)
+	m(  VarDecisao,   ZP,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA)  \
+	m(  VarDecisao,   ZO,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA)  \
+	m(  VarDecisao,   ZP0_VF_LINF,      3, 1,         ITERADORES_3_ESTAGIO_PERIODO_PERIODO)  \
+	m(  VarDecisao,   QINC,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   QINC_FINF,              3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   ENA,              3, 1,         ITERADORES_3_ESTAGIO_PERIODO_PERIODO)  \
+	m(  VarDecisao,   QEVA,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   QEVA_REL,           3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   QEVA_FINF,          3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+    m(  VarDecisao,   QTUR,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+    m(  VarDecisao,   QDEF,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+    m(  VarDecisao,   QDEF_FINF,          3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+    m(  VarDecisao,   QDEF_FSUP,          3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   VI,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   VF,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   HF,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   VMED,             3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+    m(  VarDecisao,   VF_FINF,          3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   VMORTO_FINF,      3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   PL,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
+	m(  VarDecisao,   PLE,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_PLESPECIAL)  \
+	m(  VarDecisao,   PBOMDISP,           3, 1,         ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA)  \
+	m(  VarDecisao,   QBOM,           3, 1,         ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA)  \
+	m(  VarDecisao,   PD,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
+	m(  VarDecisao,   PH,              3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   PHDISP,           3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+    m(  VarDecisao,   PHDISPMETA,       3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+    m(  VarDecisao,   PHDISPMETA_FINF,  3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+    m(  VarDecisao,   PHDISPMETA_FSUP,  3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   QVER,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   QTURDISP,           3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  VarDecisao,   PT,           3, 1,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA)  \
+	m(  VarDecisao,   PTDISP,           3, 1,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA)  \
+	m(  VarDecisao,   PTDISPCOM,        3, 1,         ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA)  \
+	m(  VarDecisao,   PI,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_INTERCAMBIO)  \
+	m(  VarDecisao,   PI,               3, 2,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
+	m(  VarDecisao,   PR,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RENOVAVEL)  \
+	m(  VarDecisao,   PN,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
+    m(  VarDecisao,   RE,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  VarDecisao,   RE_LINF_FINF,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  VarDecisao,   RE_LSUP_FSUP,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  VarDecisao,   RE_VAINF_FINF,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  VarDecisao,   RE_VRINF_FINF,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  VarDecisao,   RE_VASUP_FSUP,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  VarDecisao,   RE_VRSUP_FSUP,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  VarDecisao,   RH,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RH_LINF_FINF,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RH_LSUP_FSUP,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RH_VAINF_FINF,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RH_VRINF_FINF,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RH_VASUP_FSUP,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RH_VRSUP_FSUP,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RHA_FINF,         3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RHA_FSUP,         3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RHV_FINF,         3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RHV_FSUP,         3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RHE_FINF,         3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RHE_FSUP,         3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)
    //   Elemento,     Nome,       NroIter,         Iteradores,                                                        
 
 #define EQUACAO_LINEAR_3(m)\
-	m(  EquLinear,   ZP,                3,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA)  \
-	m(  EquLinear,   ZO,                3,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA)  \
-	m(  EquLinear,   ZP0_VF_LINF,       3,   ITERADORES_3_ESTAGIO_PERIODO_PERIODO)  \
-	m(  EquLinear,   BH_VOL,            3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  EquLinear,   HF,               3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  EquLinear,   VMED,              3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  EquLinear,   QINC,                3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  EquLinear,   PL,                3,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
-	m(  EquLinear,   PD,                3,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
-	m(  EquLinear,   PI,                3,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
-	m(  EquLinear,   PBOMDISP,            3,   ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA)  \
-	m(  EquLinear,   PHDISP,            3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  EquLinear,   PTDISP,            3,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA)  \
-	m(  EquLinear,   PTDISPCOM,         3,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA)  \
-	m(  EquLinear,   PN,                3,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
-	m(  EquLinear,   QEVA,                3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  EquLinear,   QEVA_REL,            3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  EquLinear,   QTURDISP,            3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  EquLinear,   QDEF,                3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  EquLinear,   QVER,                3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  EquLinear,   RE,                3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
-	m(  EquLinear,   RH,                3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  EquLinear,   PHDISPMETA,        3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  
+	m(  EquLinear,   ZP,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA)  \
+	m(  EquLinear,   ZO,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA)  \
+	m(  EquLinear,   ZP0_VF_LINF,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_PERIODO)  \
+	m(  EquLinear,   BH_VOL,            3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,   HF,               3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,   VMED,              3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,   QINC,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,   PCON,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_CONTRATO)  \
+	m(  EquLinear,   PL,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
+	m(  EquLinear,   PLE,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_PLESPECIAL)  \
+	m(  EquLinear,   PD,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
+	m(  EquLinear,   PI,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_INTERCAMBIO)  \
+	m(  EquLinear,   PI,                3, 2,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
+	m(  EquLinear,   PBOMDISP,            3, 1,   ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA)  \
+	m(  EquLinear,   QBOM,            3, 1,   ITERADORES_3_ESTAGIO_PERIODO_USINAELEVATORIA)  \
+	m(  EquLinear,   PH,            3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,   PHDISP,            3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,   PT,            3, 1,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA)  \
+	m(  EquLinear,   PTDISP,            3, 1,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA)  \
+	m(  EquLinear,   PTDISPCOM,         3, 1,   ITERADORES_3_ESTAGIO_PERIODO_TERMELETRICA)  \
+	m(  EquLinear,   PN,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
+	m(  EquLinear,   PR,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RENOVAVEL)  \
+	m(  EquLinear,   QEVA,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,   QEVA_REL,            3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,   QTURDISP,            3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,   QTUR,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,   QDEF,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,   QVER,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,   RE,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+	m(  EquLinear,   RH,                3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  EquLinear,   PHDISPMETA,        3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  
 	//  Elemento,    Nome,                                     NroIter,   Iteradores,                                         
 
 #define INEQUACAO_LINEAR_3(m)\
-	m(  IneLinear,   CB_ZF,     3,   ITERADORES_3_ESTAGIO_REALIZACAO_CORTEBENDERS)  \
-	m(  IneLinear,   CB_ZT,     3,   ITERADORES_3_ESTAGIO_REALIZACAO_CORTEBENDERS)  \
-    m(  IneLinear,   RE_LINF,       3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
-    m(  IneLinear,   RE_LSUP,       3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
-    m(  IneLinear,   RE_VINF,       3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
-    m(  IneLinear,   RE_VSUP,       3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
-    m(  IneLinear,   RH_LINF,       3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,   RH_LSUP,       3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,   RH_VINF,       3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,   RH_VSUP,       3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,   RHV,       3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,   RHV_LINF,  3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,   RHV_LSUP,  3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,   RHE_LINF,  3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,   RHE_LSUP,  3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,   RHA_LINF,  3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,   RHA_LSUP,  3,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
-	m(  IneLinear,   QDEF_LINF,   3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-    m(  IneLinear,   QDEF_LSUP,   3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-    m(  IneLinear,   VF_LINF,   3,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  
+	m(  IneLinear,   CB_ZF,     3, 1,   ITERADORES_3_ESTAGIO_REALIZACAO_CORTEBENDERS)  \
+	m(  IneLinear,   CB_ZT,     3, 1,   ITERADORES_3_ESTAGIO_REALIZACAO_CORTEBENDERS)  \
+	m(  IneLinear,   PCON_VASUP,         3, 1,    ITERADORES_3_ESTAGIO_PERIODO_CONTRATO)  \
+	m(  IneLinear,   PCON_VRSUP,         3, 1,    ITERADORES_3_ESTAGIO_PERIODO_CONTRATO)  \
+	m(  IneLinear,   PCON_VAINF,          3, 1,    ITERADORES_3_ESTAGIO_PERIODO_CONTRATO)  \
+	m(  IneLinear,   PCON_VRINF,          3, 1,    ITERADORES_3_ESTAGIO_PERIODO_CONTRATO)  \
+    m(  IneLinear,   RE_LINF,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  IneLinear,   RE_LSUP,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  IneLinear,   RE_VAINF,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  IneLinear,   RE_VRINF,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  IneLinear,   RE_VASUP,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  IneLinear,   RE_VRSUP,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  IneLinear,   RH_LINF,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,   RH_LSUP,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,   RH_VAINF,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,   RH_VRINF,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,   RH_VASUP,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,   RH_VRSUP,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,   RHV,       3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,   RHV_LINF,  3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,   RHV_LSUP,  3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,   RHE_LINF,  3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,   RHE_LSUP,  3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,   RHA_LINF,  3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,   RHA_LSUP,  3, 1,   ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+	m(  IneLinear,   QDEF_LINF,   3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+    m(  IneLinear,   QDEF_LSUP,   3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+    m(  IneLinear,   VF_LINF,   3, 1,   ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  
    //   Elemento,    Nome,                                     NroIter,   Iteradores,                                                 
 
 //
@@ -272,138 +303,141 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO(m)               m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdTermeletrica)
+#define ITERADORES_4_ESTAGIO_PERIODO_TERMELETRICA_UNIDADEUTE(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdTermeletrica) m(4, IdUnidadeUTE)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA(m)          m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdUsinaElevatoria)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RENOVAVEL(m)              m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdRenovavel)
-#define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_CONTRATO(m)                 m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdContrato)
+#define ITERADORES_4_ESTAGIO_PERIODO_CONTRATO_TIPOCONTRATO(m)                 m(1, IdEstagio) m(2, Periodo) m(3, IdContrato) m(4, TipoContrato)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA(m)        m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdRestricaoEletrica)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_AGRUPAMENTOPI(m)            m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdAgrupamentoIntercambio)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PI(m)                       m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdIntercambio)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PLESPECIAL(m)               m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdDemandaEspecial)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE(m)    m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdRestricaoOperativaUHE)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdIntercambioHidraulico)
-
+#define ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_HIDRELETRICA(m)          m(1, IdEstagio) m(2, Periodo) m(3, IdHidreletrica) m(4, IdHidreletrica)
+#define ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTO(m)          m(1, IdEstagio) m(2, Periodo) m(3, IdHidreletrica) m(4, IdConjuntoHidraulico)
 
 
 
 #define VARIAVEL_DECISAO_4(m)\
-	m(  VarDecisao,    ENA,                  4,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_REE)  \
-	m(  VarDecisao,    PH,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  VarDecisao,    PH_REL,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  VarDecisao,    PH_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  VarDecisao,    PHDISP,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  VarDecisao,    PHDISP_REL,           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  VarDecisao,    PHDISP_FINF,          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  VarDecisao,    QBOM,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
-    m(  VarDecisao,    QBOM_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
-    m(  VarDecisao,    QBOMDISP,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
-    m(  VarDecisao,    QBOMDISP_FINF,          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
-    m(  VarDecisao,    QTURDISP,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  VarDecisao,    QTURDISP_FINF,          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  VarDecisao,    QTUR,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  VarDecisao,    QTUR_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  VarDecisao,    QVER,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  VarDecisao,    QMON,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  VarDecisao,    QDEF_LAG,                4,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA)  \
-    m(  VarDecisao,    QDEF_LAG_ADD,            4,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA)  \
-    m(  VarDecisao,    QDEF,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  VarDecisao,    QDEF_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  VarDecisao,    QDEF_FSUP,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  VarDecisao,    PL,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
-	m(  VarDecisao,    PLE,			         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PLESPECIAL)  \
-	m(  VarDecisao,    CIMP,		         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_CONTRATO)  \
-	m(  VarDecisao,    CEXP,		         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_CONTRATO)  \
-	m(  VarDecisao,    PBOMDISP,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
-	m(  VarDecisao,    PI,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PI)  \
-    m(  VarDecisao,    PI_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PI)  \
-	m(  VarDecisao,    PT,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    PR,			         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RENOVAVEL)  \
-	m(  VarDecisao,    PTUTIL,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    UTE_ON_T,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    UTE_OFF_T,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    ACIO_T,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    PT_REL,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    PT_FINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    PT_FSUP,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    PTDISP,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    PTDISP_REL,           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    PTDISP_FINF,          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    PTDISP_FSUP,          4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    PTDISPCOM,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    PTDISPPRECOM,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    PTDISPCOM_FINF,       4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  VarDecisao,    PTDISPCOM_FSUP,       4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-    m(  VarDecisao,    RE,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
-    m(  VarDecisao,    RE_LINF_FINF,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
-    m(  VarDecisao,    RE_LSUP_FSUP,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
-    m(  VarDecisao,    RE_VINF_FINF,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
-    m(  VarDecisao,    RE_VSUP_FSUP,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
-    m(  VarDecisao,    RH,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,    RH_LINF_FINF,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,    RH_LSUP_FSUP,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,    RH_VINF_FINF,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,    RH_VSUP_FSUP,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,    RHQ_FINF,             4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-    m(  VarDecisao,    RHQ_FSUP,             4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-	m(  VarDecisao,    QILS_TRI,             4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO)  \
-    m(  VarDecisao,    QILS_TRI_FINF,        4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO)  \
-    m(  VarDecisao,    QILS_TRI_REL,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO)  \
-    m(  VarDecisao,    QRET,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  VarDecisao,    QRET_FINF,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)
+	m(  VarDecisao,    ENA,                  4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_REE)  \
+	m(  VarDecisao,    PH,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  VarDecisao,    PH_REL,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  VarDecisao,    PH_FINF,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  VarDecisao,    PH,                   4, 2,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTO)  \
+	m(  VarDecisao,    PHDISP,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTO)  \
+	m(  VarDecisao,    PHDISP,               4, 2,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  VarDecisao,    PHDISP_REL,           4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  VarDecisao,    PHDISP_FINF,          4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  VarDecisao,    QBOM,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
+    m(  VarDecisao,    QBOM_FINF,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
+    m(  VarDecisao,    QBOMDISP,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
+    m(  VarDecisao,    QBOMDISP_FINF,          4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
+    m(  VarDecisao,    QTURDISP,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  VarDecisao,    QTURDISP_FINF,          4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  VarDecisao,    QTUR,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  VarDecisao,    QTUR_FINF,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  VarDecisao,    QDES,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_HIDRELETRICA)  \
+	m(  VarDecisao,    QVER,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  VarDecisao,    QMON,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  VarDecisao,    QDEF_LAG,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA)  \
+    m(  VarDecisao,    QDEF_LAG_ADD,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA)  \
+    m(  VarDecisao,    QDEF,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  VarDecisao,    QDEF_FINF,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  VarDecisao,    QDEF_FSUP,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  VarDecisao,    PL,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
+	m(  VarDecisao,    PLE,			         4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PLESPECIAL)  \
+	m(  VarDecisao,    PCON,		         4, 1,    ITERADORES_4_ESTAGIO_PERIODO_CONTRATO_TIPOCONTRATO)  \
+	m(  VarDecisao,    PBOMDISP,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
+	m(  VarDecisao,    PI,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PI)  \
+    m(  VarDecisao,    PI_FINF,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PI)  \
+	m(  VarDecisao,    PT,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    PR,			         4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RENOVAVEL)  \
+	m(  VarDecisao,    PTUTIL,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    UTE_ON_T,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    UTE_OFF_T,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    ACIO_T,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    PT_REL,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    PT_FINF,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    PT_FSUP,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    PT,               4, 2,    ITERADORES_4_ESTAGIO_PERIODO_TERMELETRICA_UNIDADEUTE)  \
+	m(  VarDecisao,    PTDISP,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_TERMELETRICA_UNIDADEUTE)  \
+	m(  VarDecisao,    PTDISP,               4, 2,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    PTDISP_REL,           4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    PTDISP_FINF,          4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    PTDISP_FSUP,          4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    PTDISPCOM,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    PTDISPPRECOM,         4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    PTDISPCOM_FINF,       4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  VarDecisao,    PTDISPCOM_FSUP,       4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+    m(  VarDecisao,    RE,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
+    m(  VarDecisao,    RE_LINF_FINF,         4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
+    m(  VarDecisao,    RE_LSUP_FSUP,         4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
+    m(  VarDecisao,    RH,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,    RH_LINF_FINF,         4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,    RH_LSUP_FSUP,         4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,    RHQ_FINF,             4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,    RHQ_FSUP,             4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
+	m(  VarDecisao,    QILS_TRI,             4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO)  \
+    m(  VarDecisao,    QILS_TRI_FINF,        4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO)  \
+    m(  VarDecisao,    QILS_TRI_REL,         4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO)  \
+    m(  VarDecisao,    QRET,                 4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  VarDecisao,    QRET_FINF,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)
    //   Elemento,      Nome,             NroIter,    Iteradores,                                                                    
 
 #define EQUACAO_LINEAR_4(m)\
-	m(  EquLinear,    PL,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
-	m(  EquLinear,    BH_VAZ,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  EquLinear,    QMON,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  EquLinear,    QDEF,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  EquLinear,    QDEF_LAG,            4,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA)  \
-	m(  EquLinear,    QTUR,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  EquLinear,    QTURDISP,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  EquLinear,    PT_REL,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  EquLinear,    PTDISP,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  EquLinear,    PTDISPCOM,         4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  EquLinear,    PTDISPCOM_REL,     4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  EquLinear,    PT,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  EquLinear,    UTE_BIN,           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-    m(  EquLinear,    PTDISP_REL,        4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  EquLinear,    PBOMDISP,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
-	m(  EquLinear,    PH,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  EquLinear,    PH_REL,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  EquLinear,    PHDISP,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  EquLinear,    PHDISP_REL,        4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  EquLinear,    RE,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
-    m(  EquLinear,    RH,                4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-    m(  EquLinear,    QRET_REL,            4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO)  \
-    m(  EquLinear,    QRET_LINF,           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  EquLinear,    QBOMDISP,           4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)
+	m(  EquLinear,    PL,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
+	m(  EquLinear,    BH_VAZ,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  EquLinear,    QMON,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  EquLinear,    QDES,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_HIDRELETRICA)  \
+    m(  EquLinear,    QDEF,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  EquLinear,    QDEF_LAG,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA)  \
+	m(  EquLinear,    QTUR,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  EquLinear,    QTURDISP,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  EquLinear,    PT_REL,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  EquLinear,    PT,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_TERMELETRICA_UNIDADEUTE)  \
+	m(  EquLinear,    PTDISP,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_TERMELETRICA_UNIDADEUTE)  \
+	m(  EquLinear,    PTDISP,            4, 2,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  EquLinear,    PTDISPCOM,         4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  EquLinear,    PTDISPCOM_REL,     4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  EquLinear,    PT,                4, 2,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  EquLinear,    UTE_BIN,           4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+    m(  EquLinear,    PTDISP_REL,        4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  EquLinear,    PBOMDISP,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
+	m(  EquLinear,    PH,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTO)  \
+	m(  EquLinear,    PHDISP,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTO)  \
+	m(  EquLinear,    PH,                4, 2,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  EquLinear,    PH_REL,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  EquLinear,    PHDISP,            4, 2,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  EquLinear,    PHDISP_REL,        4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  EquLinear,    RE,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
+    m(  EquLinear,    RH,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
+    m(  EquLinear,    QRET_REL,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO)  \
+    m(  EquLinear,    QRET_LINF,           4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  EquLinear,    QBOMDISP,           4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)
    //   Elemento,     Nome,                                        NroIter,    Iteradores,                                                                   
 
 #define INEQUACAO_LINEAR_4(m)\
-	m(  IneLinear,    PI_AGRUP,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_AGRUPAMENTOPI)  \
-	m(  IneLinear,    VMORTO_ENCH,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  IneLinear,    QDEF_LINF,                  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  IneLinear,    QDEF_LSUP,                  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-	m(  IneLinear,    UTE_EQV,                  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-    m(  IneLinear,    RE_LINF,					  4,   ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
-    m(  IneLinear,    RE_LSUP,					  4,   ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
-    m(  IneLinear,    RE_VINF,					    4,   ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
-    m(  IneLinear,    RE_VSUP,				      4,   ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
-    m(  IneLinear,    RH_LINF,					  4,   ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,    RH_LSUP,					  4,   ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,    RH_VINF,					    4,   ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,    RH_VSUP,				      4,   ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,    RHQ_LINF,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-    m(  IneLinear,    RHQ_LSUP,                 4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
-	m(  IneLinear,    PTUTIL,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  IneLinear,    PT_ON,                    4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  IneLinear,    PT_OFF,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  IneLinear,    PTDISP_LINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-	m(  IneLinear,    PTDISP_LSUP,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
-    m(  IneLinear,    QBOM_LINF,                  4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
-    m(  IneLinear,    QBOMDISP_LINF,              4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
-    m(  IneLinear,    QTURDISP_REL,               4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  IneLinear,    QTUR_REL,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  IneLinear,    PI_REL,                   4,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PI)
+	m(  IneLinear,    PI_AGRUP,                 4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_AGRUPAMENTOPI)  \
+	m(  IneLinear,    VMORTO_ENCH,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  IneLinear,    QDEF_LINF,                  4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  IneLinear,    QDEF_LSUP,                  4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+	m(  IneLinear,    UTE_EQV,                  4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+    m(  IneLinear,    RE_LINF,					  4, 1,   ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
+    m(  IneLinear,    RE_LSUP,					  4, 1,   ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOELETRICA)  \
+    m(  IneLinear,    RH_LINF,					  4, 1,   ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,    RH_LSUP,					  4, 1,   ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,    RHQ_LINF,                 4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
+    m(  IneLinear,    RHQ_LSUP,                 4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESTRICAOOPERATIVAUHE)  \
+	m(  IneLinear,    PTUTIL,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  IneLinear,    PT_ON,                    4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  IneLinear,    PT_OFF,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  IneLinear,    PTDISP_LINF,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+	m(  IneLinear,    PTDISP_LSUP,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
+    m(  IneLinear,    QBOM_LINF,                  4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
+    m(  IneLinear,    QBOMDISP_LINF,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_USINAELEVATORIA)  \
+    m(  IneLinear,    QTURDISP_REL,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  IneLinear,    QTUR_REL,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
+    m(  IneLinear,    PI_REL,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_PI)
    //   Elemento,     Nome,                                          NroIter,    Iteradores,                                                                 
 
 
@@ -411,75 +445,82 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 // ITERADORES 5
 //
 
-#define ITERADORES_5_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA_REE(m)                        m(1, IdEstagio) m(2, Periodo) m(3, Periodo) m(4, IdHidreletrica) m(5, IdReservatorioEquivalente) 
+#define ITERADORES_5_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA_REE(m)                        m(1, IdEstagio) m(2, Periodo) m(3, Periodo) m(4, IdHidreletrica) m(5, IdReservatorioEquivalente)
+#define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_CONTRATO_TIPOCONTRATO(m)              m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdContrato) m(5, TipoContrato)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_USINANAOSIMULADA(m)        m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado) m(5, IdUsinaNaoSimulada)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_PATAMARPD(m)               m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado) m(5, IdPatamarDeficit)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_INT(m)                   m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, int)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_HIDRELETRICA(m)          m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, IdHidreletrica)
+#define ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADE(m)         m(1, IdEstagio) m(2, Periodo) m(3, IdHidreletrica) m(4, IdConjuntoHidraulico) m(5, IdUnidadeUHE)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO(m)    m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, IdConjuntoHidraulico)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE(m)            m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdTermeletrica) m(5, IdUnidadeUTE)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA(m)          m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdIntercambioHidraulico) m(5, IdHidreletrica)
 #define ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA(m)   m(1, IdEstagio) m(2, Periodo) m(3, Periodo) m(4, IdProcessoEstocastico) m(5, IdVariavelAleatoria)
 
 #define VARIAVEL_DECISAO_5(m)\
-	m(  VarDecisao,    ENA,         5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA_REE)  \
-	m(  VarDecisao,    PH,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
-	m(  VarDecisao,    PH_REL,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
-	m(  VarDecisao,    PH_FINF,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
-	m(  VarDecisao,    PHDISP,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
-	m(  VarDecisao,    PHDISP_REL,  5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
-	m(  VarDecisao,    PHDISP_FINF, 5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
-    m(  VarDecisao,    QTURDISP,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
-    m(  VarDecisao,    QTUR,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
-    m(  VarDecisao,    QTUR_FINF,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
-	m(  VarDecisao,    PN,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_USINANAOSIMULADA)  \
-	m(  VarDecisao,    PT,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  VarDecisao,    PTUTIL,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  VarDecisao,    PT_TRAJ_ACIO,5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  VarDecisao,    PT_TRAJ_DESL,5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  VarDecisao,    UTE_ON_T,    5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  VarDecisao,    UTE_OFF_T,   5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  VarDecisao,    ACIO_T,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  VarDecisao,    PT_REL,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  VarDecisao,    PT_FINF,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  VarDecisao,    PTDISP,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  VarDecisao,    RP,          5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
-	m(  VarDecisao,    YP,          5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
-	m(  VarDecisao,    YP_FINF,         5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
-	m(  VarDecisao,    YP_ADD,      5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
-	m(  VarDecisao,    PD,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_PATAMARPD)  \
-    m(  VarDecisao,    QRET,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA)  \
-    m(  VarDecisao,    QRET_FINF,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA)  \
-    m(  VarDecisao,    QRET_REL,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA)  \
-    m(  VarDecisao,    QDES,          5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_HIDRELETRICA)  \
-    m(  VarDecisao,    QDES_FINF,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_HIDRELETRICA)   
+	m(  VarDecisao,    ENA,         5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA_REE)  \
+	m(  VarDecisao,    PH,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
+	m(  VarDecisao,    PH_REL,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
+	m(  VarDecisao,    PH_FINF,     5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
+	m(  VarDecisao,    PH,      5, 2,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADE)  \
+	m(  VarDecisao,    PHDISP,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADE)  \
+	m(  VarDecisao,    PHDISP,      5, 2,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
+	m(  VarDecisao,    PHDISP_REL,  5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
+	m(  VarDecisao,    PHDISP_FINF, 5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
+    m(  VarDecisao,    QTURDISP,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
+    m(  VarDecisao,    QTUR,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
+    m(  VarDecisao,    QTUR_FINF,     5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
+	m(  VarDecisao,    PN,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_USINANAOSIMULADA)  \
+	m(  VarDecisao,    PCON,        5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_CONTRATO_TIPOCONTRATO)  \
+	m(  VarDecisao,    PT,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  VarDecisao,    PTUTIL,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  VarDecisao,    PT_TRAJ_ACIO,5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  VarDecisao,    PT_TRAJ_DESL,5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  VarDecisao,    UTE_ON_T,    5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  VarDecisao,    UTE_OFF_T,   5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  VarDecisao,    ACIO_T,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  VarDecisao,    PT_REL,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  VarDecisao,    PT_FINF,     5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  VarDecisao,    PTDISP,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  VarDecisao,    RP,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
+	m(  VarDecisao,    YP,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
+	m(  VarDecisao,    YP_FINF,         5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
+	m(  VarDecisao,    YP_ADD,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
+	m(  VarDecisao,    PD,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_PATAMARPD)  \
+    m(  VarDecisao,    QRET,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA)  \
+    m(  VarDecisao,    QRET_FINF,     5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA)  \
+    m(  VarDecisao,    QRET_REL,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA)  \
+    m(  VarDecisao,    QDES,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_HIDRELETRICA)  \
+    m(  VarDecisao,    QDES_FINF,     5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_HIDRELETRICA)   
    //   Elemento,      Nome,  NroIter,     Iteradores,                                                                               
 
 
 #define EQUACAO_LINEAR_5(m)\
-	m(  EquLinear,    YP,             5,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)      \
-	m(  EquLinear,    QTUR,             5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
-	m(  EquLinear,    QTUR_REL,         5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
-	m(  EquLinear,    QTURDISP,         5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
-	m(  EquLinear,    PT,             5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)      \
-	m(  EquLinear,    PT_REL,         5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)      \
-	m(  EquLinear,    PTDISP,         5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)      \
-    m(  EquLinear,    PTDISP_REL,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)      \
-	m(  EquLinear,    UTE_BIN,        5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)      \
-	m(  EquLinear,    PH,             5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
-	m(  EquLinear,    PH_REL,         5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
-	m(  EquLinear,    PHDISP,         5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
-	m(  EquLinear,    PHDISP_REL,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      
+	m(  EquLinear,    YP,             5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)      \
+	m(  EquLinear,    QTUR,             5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
+	m(  EquLinear,    QTUR_REL,         5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
+	m(  EquLinear,    QTURDISP,         5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
+	m(  EquLinear,    PT,             5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)      \
+	m(  EquLinear,    PT_REL,         5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)      \
+	m(  EquLinear,    PTDISP,         5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)      \
+    m(  EquLinear,    PTDISP_REL,     5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)      \
+	m(  EquLinear,    UTE_BIN,        5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)      \
+	m(  EquLinear,    PH,             5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
+	m(  EquLinear,    PH_REL,         5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
+	m(  EquLinear,    PH,             5, 2,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADE)      \
+	m(  EquLinear,    PHDISP,         5, 1,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADE)      \
+	m(  EquLinear,    PHDISP,         5, 2,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
+	m(  EquLinear,    PHDISP_REL,     5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      
    //   Elemento,      Nome,                                  NroIter,     Iteradores,                                                                         
 
 #define INEQUACAO_LINEAR_5(m)\
-	m(  IneLinear,    PH,            5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_INT)  \
-	m(  IneLinear,    PTUTIL,        5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  IneLinear,    PT_ON,         5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  IneLinear,    PT_OFF,        5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  IneLinear,    UTE_ON_T,      5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  IneLinear,    UTE_OFF_T,     5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-    m(  IneLinear,    QDES_LINF,       5,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_HIDRELETRICA)  
+	m(  IneLinear,    PH,            5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_INT)  \
+	m(  IneLinear,    PTUTIL,        5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  IneLinear,    PT_ON,         5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  IneLinear,    PT_OFF,        5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  IneLinear,    UTE_ON_T,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+	m(  IneLinear,    UTE_OFF_T,     5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
+    m(  IneLinear,    QDES_LINF,       5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_HIDRELETRICA)  
    //   Elemento,      Nome,                         NroIter,     Iteradores,                                                                   
 
 //
@@ -492,34 +533,34 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA_HIDRELETRICA(m) m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdIntercambioHidraulico) m(5, IdHidreletrica) m(6, IdHidreletrica)
 
 #define VARIAVEL_DECISAO_6(m)\
-	m(  VarDecisao,     PH,          6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
-	m(  VarDecisao,     PH_REL,      6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
-	m(  VarDecisao,     PH_FINF,     6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
-	m(  VarDecisao,     PH_FSUP,     6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
-	m(  VarDecisao,     PHDISP,      6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
-	m(  VarDecisao,     PHDISP_REL,  6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
-	m(  VarDecisao,     PHDISP_FINF, 6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
-    m(  VarDecisao,     QTURDISP,      6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
-    m(  VarDecisao,     QTUR,          6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
-    m(  VarDecisao,     QTUR_FINF,     6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
-    m(  VarDecisao,     QRET,          6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA_HIDRELETRICA)
+	m(  VarDecisao,     PH,          6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
+	m(  VarDecisao,     PH_REL,      6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
+	m(  VarDecisao,     PH_FINF,     6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
+	m(  VarDecisao,     PH_FSUP,     6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
+	m(  VarDecisao,     PHDISP,      6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
+	m(  VarDecisao,     PHDISP_REL,  6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
+	m(  VarDecisao,     PHDISP_FINF, 6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
+    m(  VarDecisao,     QTURDISP,      6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
+    m(  VarDecisao,     QTUR,          6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
+    m(  VarDecisao,     QTUR_FINF,     6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)  \
+    m(  VarDecisao,     QRET,          6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA_HIDRELETRICA)
    //   Elemento,       Nome,  NroIter,    Iteradores,                                                                                                
 
 
 #define EQUACAO_LINEAR_6(m)\
-	m(  EquLinear,     QTUR_REL,         6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)      \
-	m(  EquLinear,     QTURDISP,         6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)      \
-	m(  EquLinear,     PH,             6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)      \
-	m(  EquLinear,     PH_REL,         6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)      \
-	m(  EquLinear,     PHDISP,         6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)      \
-	m(  EquLinear,     PHDISP_REL,     6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)      
+	m(  EquLinear,     QTUR_REL,         6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)      \
+	m(  EquLinear,     QTURDISP,         6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)      \
+	m(  EquLinear,     PH,             6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)      \
+	m(  EquLinear,     PH_REL,         6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)      \
+	m(  EquLinear,     PHDISP,         6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)      \
+	m(  EquLinear,     PHDISP_REL,     6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE)      
    //   Elemento,       Nome,                                  NroIter,    Iteradores,                                                                                                 
 
 #define INEQUACAO_LINEAR_6(m)\
-	m(  IneLinear,     UTE_ON_T_LINF,         6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO)  \
-	m(  IneLinear,     UTE_ON_T_LSUP,         6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO)  \
-	m(  IneLinear,     UTE_ON_T,              6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO)  \
-	m(  IneLinear,     PH,                    6,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_INT)  
+	m(  IneLinear,     UTE_ON_T_LINF,         6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO)  \
+	m(  IneLinear,     UTE_ON_T_LSUP,         6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO)  \
+	m(  IneLinear,     UTE_ON_T,              6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO)  \
+	m(  IneLinear,     PH,                    6, 1,    ITERADORES_6_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_INT)  
    //   Elemento,       Nome,                             NroIter,    Iteradores,                                                                                      
 
 
@@ -532,10 +573,10 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 
 #define INEQUACAO_LINEAR_7(m)\
-	m(  IneLinear,     UTE_OFF_T_LINF,    7,    ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO_INT)  \
-	m(  IneLinear,     UTE_OFF_T_LSUP,    7,    ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO_INT)  \
-	m(  IneLinear,     UTE_OFF_T,         7,    ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO_INT)  \
-	m(  IneLinear,     PH,                7,    ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE_INT)  
+	m(  IneLinear,     UTE_OFF_T_LINF,    7, 1,    ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO_INT)  \
+	m(  IneLinear,     UTE_OFF_T_LSUP,    7, 1,    ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO_INT)  \
+	m(  IneLinear,     UTE_OFF_T,         7, 1,    ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE_PERIODO_INT)  \
+	m(  IneLinear,     PH,                7, 1,    ITERADORES_7_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADEUHE_INT)  
    //   Elemento,      Nome,                        NroIter,    Iteradores,                                                                                   
 
 
@@ -747,8 +788,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		
 		void criarVariaveisIntercambio(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat);
 		
-		void criarVariaveisContrato(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat);
-
 		void criarVariaveisRenovaveis(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat);
 
 		void criarVariaveisDemandaEspecial(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat);
@@ -826,6 +865,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		void criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_periodIni_stage, Periodo& a_periodPrev, Periodo& a_period, Periodo& a_periodNext, const IdPatamarCarga a_idPat);
 		int criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, Periodo& a_periodNext, const IdPatamarCarga a_idPatamarCarga, const IdRestricaoEletrica a_idRE);
+
+		void criarContratos(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_periodIni_stage, Periodo& a_periodPrev, Periodo& a_period, Periodo& a_periodNext, const IdPatamarCarga a_idPat);
 
 		void criarRestricoesHidraulicaEspecial_vazao_afluente(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_estudo);
 

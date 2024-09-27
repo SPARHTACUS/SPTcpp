@@ -4295,11 +4295,7 @@ void LeituraCEPEL::leitura_REE_201904_DES16(Dados& a_dados, const std::string a_
 							contrato.setAtributo(AttComumContrato_nome, line.substr(7, 10));
 							contrato.setAtributo(AttComumContrato_submercado, idSubmercado);
 							a_dados.vetorContrato.add(contrato);
-							a_dados.vetorContrato.at(idContrato).setVetor(AttVetorContrato_variacao_acrescimo_maxima, SmartEnupla<Periodo, double >(a_horizonte_estudo, 10000000));
-							a_dados.vetorContrato.at(idContrato).setVetor(AttVetorContrato_variacao_decrescimo_maxima, SmartEnupla<Periodo, double >(a_horizonte_estudo, 0));
-							a_dados.vetorContrato.at(idContrato).setMatriz(AttMatrizContrato_energia_maxima, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(a_horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 100000.0))));
-							a_dados.vetorContrato.at(idContrato).setMatriz(AttMatrizContrato_energia_minima, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(a_horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 0.0))));
-							a_dados.vetorContrato.at(idContrato).setMatriz(AttMatrizContrato_preco_energia_imp_exp, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(a_horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 0.0))));
+							a_dados.vetorContrato.at(idContrato).setMatriz(AttMatrizContrato_custo, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(a_horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 0.0))));
 
 
 							lista_codigo_ONS_contrato.setElemento(idContrato, std::stoi(line.substr(3, 3)));
@@ -4308,21 +4304,39 @@ void LeituraCEPEL::leitura_REE_201904_DES16(Dados& a_dados, const std::string a_
 						}
 
 						if (std::stoi(line.substr(23, 1)) == 1) {
-							if (std::stoi(line.substr(41, 1)) == 1) { a_dados.vetorContrato.at(idContrato).setAtributo(AttComumContrato_tipo_unidade, TipoUnidadeRestricaoContrato_percentual); }
-							a_dados.vetorContrato.at(idContrato).setAtributo(AttComumContrato_tipo_restricao, TipoRestricaoContrato_rampa);
-							a_dados.vetorContrato.at(idContrato).setAtributo(AttComumContrato_energia_imp_exp_periodo_anterior, std::stod(line.substr(73, 10)));
-							for (Periodo periodo = getPeriodoInicialResticao(periodo_inicial_restricao, a_horizonte_estudo); periodo <= getPeriodoFinalResticao(periodo_final_restricao, a_horizonte_estudo); a_horizonte_estudo.incrementarIterador(periodo)) {
-								a_dados.vetorContrato.at(idContrato).setElemento(AttVetorContrato_variacao_acrescimo_maxima, periodo, std::stod(line.substr(43, 10)));
-								a_dados.vetorContrato.at(idContrato).setElemento(AttVetorContrato_variacao_decrescimo_maxima, periodo, std::stod(line.substr(53, 10)));
+							if (std::stoi(line.substr(41, 1)) == 1) {
+								a_dados.vetorContrato.at(idContrato).setAtributo(AttComumContrato_tipo_unidade, TipoUnidadeRestricaoContrato_percentual);
+								a_dados.vetorContrato.at(idContrato).setMatriz(AttMatrizContrato_var_rel_sup, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(a_horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 100000.0))));
+								a_dados.vetorContrato.at(idContrato).setMatriz(AttMatrizContrato_var_rel_inf, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(a_horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 0.0))));
+								a_dados.vetorContrato.at(idContrato).setAtributo(AttComumContrato_tipo_restricao, TipoRestricaoContrato_rampa);
+								a_dados.vetorContrato.at(idContrato).setAtributo(AttComumContrato_vlr_ini, std::stod(line.substr(73, 10)));
+								for (Periodo periodo = getPeriodoInicialResticao(periodo_inicial_restricao, a_horizonte_estudo); periodo <= getPeriodoFinalResticao(periodo_final_restricao, a_horizonte_estudo); a_horizonte_estudo.incrementarIterador(periodo)) {
+									a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_var_rel_sup, periodo, IdPatamarCarga_1, std::stod(line.substr(43, 10)));
+									a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_var_rel_inf, periodo, IdPatamarCarga_1, std::stod(line.substr(53, 10)));
+									a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_custo, periodo, IdPatamarCarga_1, std::stod(line.substr(63, 10)));
+								}
+							}
+							else {
+								a_dados.vetorContrato.at(idContrato).setMatriz(AttMatrizContrato_var_abs_sup, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(a_horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 100000.0))));
+								a_dados.vetorContrato.at(idContrato).setMatriz(AttMatrizContrato_var_abs_inf, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(a_horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 0.0))));
+								a_dados.vetorContrato.at(idContrato).setAtributo(AttComumContrato_tipo_restricao, TipoRestricaoContrato_rampa);
+								a_dados.vetorContrato.at(idContrato).setAtributo(AttComumContrato_vlr_ini, std::stod(line.substr(73, 10)));
+								for (Periodo periodo = getPeriodoInicialResticao(periodo_inicial_restricao, a_horizonte_estudo); periodo <= getPeriodoFinalResticao(periodo_final_restricao, a_horizonte_estudo); a_horizonte_estudo.incrementarIterador(periodo)) {
+									a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_var_abs_sup, periodo, IdPatamarCarga_1, std::stod(line.substr(43, 10)));
+									a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_var_abs_inf, periodo, IdPatamarCarga_1, std::stod(line.substr(53, 10)));
+									a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_custo, periodo, IdPatamarCarga_1, std::stod(line.substr(63, 10)));
+								}
 							}
 						}//if(std::stoi(line.substr(23, 1)) == 1 ){ 
 
 						if (std::stoi(line.substr(23, 1)) == 2) {
 							a_dados.vetorContrato.at(idContrato).setAtributo(AttComumContrato_tipo_restricao, TipoRestricaoContrato_limite);
+							a_dados.vetorContrato.at(idContrato).setMatriz(AttMatrizContrato_lim_sup, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(a_horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 100000.0))));
+							a_dados.vetorContrato.at(idContrato).setMatriz(AttMatrizContrato_lim_inf, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(a_horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 0.0))));
 							for (Periodo periodo = getPeriodoInicialResticao(periodo_inicial_restricao, a_horizonte_estudo); periodo <= getPeriodoFinalResticao(periodo_final_restricao, a_horizonte_estudo); a_horizonte_estudo.incrementarIterador(periodo)) {
-								a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_energia_maxima, periodo, IdPatamarCarga_1, std::stod(line.substr(53, 10)));
-								a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_energia_minima, periodo, IdPatamarCarga_1, std::stod(line.substr(43, 10)));
-								a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_preco_energia_imp_exp, periodo, IdPatamarCarga_1, std::stod(line.substr(63, 10)));
+								a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_lim_sup, periodo, IdPatamarCarga_1, std::stod(line.substr(53, 10)));
+								a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_lim_inf, periodo, IdPatamarCarga_1, std::stod(line.substr(43, 10)));
+								a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_custo, periodo, IdPatamarCarga_1, std::stod(line.substr(63, 10)));
 							}
 						}//if(std::stoi(line.substr(23, 1)) == 2 ){ 
 					}

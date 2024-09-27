@@ -7321,9 +7321,9 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								/////////////////////////////////////
 
-								contrato.setMatriz(AttMatrizContrato_energia_minima, matriz_zero);
-								contrato.setMatriz(AttMatrizContrato_energia_maxima, matriz_zero);
-								contrato.setMatriz(AttMatrizContrato_preco_energia_imp_exp, matriz_zero);
+								contrato.setMatriz(AttMatrizContrato_lim_inf, matriz_zero);
+								contrato.setMatriz(AttMatrizContrato_lim_sup, matriz_zero);
+								contrato.setMatriz(AttMatrizContrato_custo, matriz_zero);
 
 								a_dados.vetorContrato.add(contrato);
 
@@ -7351,9 +7351,9 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 										if (periodo >= horizonte_otimizacao_DC.at(idEstagio_contrato)) {
 
-											a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_energia_minima, periodo, idPatamarCarga, limite_inferior.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
-											a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_energia_maxima, periodo, idPatamarCarga, limite_superior.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
-											a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_preco_energia_imp_exp, periodo, idPatamarCarga, custo.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+											a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_lim_inf, periodo, idPatamarCarga, limite_inferior.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+											a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_lim_sup, periodo, idPatamarCarga, limite_superior.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+											a_dados.vetorContrato.at(idContrato).setElemento(AttMatrizContrato_custo, periodo, idPatamarCarga, custo.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
 
 										}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_contrato)) {
 
