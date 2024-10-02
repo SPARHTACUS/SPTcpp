@@ -8,6 +8,7 @@
 	  m(Renovavel,  AttComum,         idRenovavel,  IdRenovavel,         min,         max,           min,      sim) \
 	  m(Renovavel,  AttComum,            submercado,   IdSubmercado,         min,         max,           min,      nao) \
 	  m(Renovavel,  AttComum,                  nome,         string,         min,         max,        Nenhum,      nao) \
+	  m(Renovavel,  AttComum,            tipo_usina,         string,         min,         max,        Nenhum,      nao) \
 	  m(Renovavel,  AttComum,                 barra,            int,           0,         max,             0,      nao) \
 	  m(Renovavel,  AttComum,       constrained_off,           bool,       false,        true,         false,      nao) \
 	  m(Renovavel,  AttComum,      fator_capacidade,         double,           0,         max,             0,      nao) \

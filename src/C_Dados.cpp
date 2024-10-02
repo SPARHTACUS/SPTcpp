@@ -8208,6 +8208,7 @@ void Dados::validacao_operacional_Renovaveis(EntradaSaidaDados a_entradaSaidaDad
 
 		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 		const IdRenovavel maiorIdRenovavel = getMaiorId(IdRenovavel());
+		const IdRenovavel IdRenovavelOut = getIdOut(IdRenovavel());
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
 		const Periodo periodo_estudo_inicial = horizonte_estudo.getIteradorInicial();
@@ -8221,7 +8222,7 @@ void Dados::validacao_operacional_Renovaveis(EntradaSaidaDados a_entradaSaidaDad
 		} // for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
 
-		for (IdRenovavel idRenovavel = IdRenovavel_1; idRenovavel <= maiorIdRenovavel; idRenovavel++) {
+		for (IdRenovavel idRenovavel = getMenorId(IdRenovavel()); idRenovavel < IdRenovavelOut; incr(idRenovavel)) {
 			if (getSize1Matriz(idRenovavel, AttMatrizRenovavel_geracao) == 0)
 				throw std::invalid_argument("Necessario informar a geracao em " + getFullString(idRenovavel));
 		}
