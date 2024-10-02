@@ -150,7 +150,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 
 			valor = linha.substr(0, pos).c_str();
 
-			cabecalho.push_back(valor);
+			cabecalho.push_back(remEspacosEntreStr(valor));
 
 			linha = linha.substr(pos + 1, linha.length());
 
@@ -215,7 +215,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 
 			if (pos == std::string::npos) {
 				if (fimDeArquivo != "") {
-					if (!strCompara(valor, fimDeArquivo))
+					if (!strCompara(remEspacosEntreStr(valor), fimDeArquivo))
 						std::cout << "Aviso! Arquivo " + caminhoArquivo + " nao finalizado com " << fimDeArquivo << std::endl;
 				} // if (fimDeArquivo != "") {
 				break;
@@ -224,14 +224,14 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 			valor = linha.substr(0, pos).c_str();
 
 			if (fimDeArquivo != "") {
-				if (strCompara(valor, fimDeArquivo))
+				if (strCompara(remEspacosEntreStr(valor), fimDeArquivo))
 					break;
 			} // if (fimDeArquivo != "") {
 
 			std::string idMembro = "";
 
 			if (a_tipoAcesso >= TipoAcessoInstancia_m1) {
-				idMembro = valor;
+				idMembro = remEspacosEntreStr(valor);
 
 				if (!findStringNoVetor(idMembro, vetorIdMembro))
 					vetorIdMembro.push_back(idMembro);
@@ -247,7 +247,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
 
-				idM2 = valor;
+				idM2 = remEspacosEntreStr(valor);
 
 				if (!findStringNoVetor(idM2, vetorIdM2))
 					vetorIdM2.push_back(idM2);
@@ -263,7 +263,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
 
-				idM3 = valor;
+				idM3 = remEspacosEntreStr(valor);
 
 				if (!findStringNoVetor(idM3, vetorIdM3))
 					vetorIdM3.push_back(idM3);
@@ -278,7 +278,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
 
-				idM4 = valor;
+				idM4 = remEspacosEntreStr(valor);
 
 				if (!findStringNoVetor(idM4, vetorIdM4))
 					vetorIdM4.push_back(idM4);
@@ -319,7 +319,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
 
-				vetorValores.push_back(valor);
+				vetorValores.push_back(remEspacosEntreStr(valor));
 
 			} // if (a_tipoAcesso == TipoAcessoInstancia_direto) {
 
@@ -332,7 +332,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttComum(const std::string a_nomeArqu
 
 					valor = linha.substr(0, pos).c_str();
 
-					vetorValores.push_back(valor);
+					vetorValores.push_back(remEspacosEntreStr(valor));
 
 					linha = linha.substr(pos + 1, linha.length());
 
@@ -483,7 +483,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttVetor(const std::string a_nomeArqu
 			if (valor.size() == 0)
 				break;
 
-			cabecalho.push_back(valor);
+			cabecalho.push_back(remEspacosEntreStr(valor));
 
 			linha = linha.substr(pos + 1, linha.length());
 
@@ -553,7 +553,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttVetor(const std::string a_nomeArqu
 
 			if (pos == std::string::npos) {
 				if (fimDeArquivo != "") {
-					if (!strCompara(valor, fimDeArquivo))
+					if (!strCompara(remEspacosEntreStr(valor), fimDeArquivo))
 						std::cout << "Aviso! Arquivo " + caminhoArquivo + " nao finalizado com FIM" << std::endl;
 				} // if (fimDeArquivo != "") {
 				break;
@@ -568,7 +568,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttVetor(const std::string a_nomeArqu
 
 			std::string idM1 = "";
 			if (a_tipoAcesso >= TipoAcessoInstancia_m1) {
-				idM1 = valor;
+				idM1 = remEspacosEntreStr(valor);
 				linha = linha.substr(pos + 1, linha.length());
 			}
 
@@ -576,7 +576,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttVetor(const std::string a_nomeArqu
 			if (a_tipoAcesso >= TipoAcessoInstancia_m2) {
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
-				idM2 = valor;
+				idM2 = remEspacosEntreStr(valor);
 				linha = linha.substr(pos + 1, linha.length());
 			} // if (a_tipoAcesso >= TipoAcessoInstancia_m2) {
 
@@ -584,7 +584,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttVetor(const std::string a_nomeArqu
 			if (a_tipoAcesso >= TipoAcessoInstancia_m3) {
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
-				idM3 = valor;
+				idM3 = remEspacosEntreStr(valor);
 				linha = linha.substr(pos + 1, linha.length());
 			} // if (a_tipoAcesso >= TipoAcessoInstancia_m3) {
 
@@ -592,7 +592,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttVetor(const std::string a_nomeArqu
 			if (a_tipoAcesso >= TipoAcessoInstancia_m4) {
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
-				idM4 = valor;
+				idM4 = remEspacosEntreStr(valor);
 				linha = linha.substr(pos + 1, linha.length());
 			} // if (a_tipoAcesso >= TipoAcessoInstancia_m4) {
 
@@ -601,7 +601,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttVetor(const std::string a_nomeArqu
 				valor = linha.substr(0, pos).c_str();
 			}
 
-			attVetor = valor;
+			attVetor = remEspacosEntreStr(valor);
 			linha = linha.substr(pos + 1, linha.length());
 
 			vector_data.reserve(vetorIter.size());
@@ -622,7 +622,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttVetor(const std::string a_nomeArqu
 				if (valor.size() == 0)
 					break;
 
-				vector_data.push_back(valor);
+				vector_data.push_back(remEspacosEntreStr(valor));
 
 				linha = linha.substr(pos + 1, linha.length());
 
@@ -785,7 +785,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 			if (valor.size() == 0)
 				break;
 
-			cabecalho.push_back(valor);
+			cabecalho.push_back(remEspacosEntreStr(valor));
 
 			linha = linha.substr(pos + 1, linha.length());
 
@@ -872,13 +872,13 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 			valor = linha.substr(0, pos).c_str();
 
 			if (fimDeArquivo.size() > 0) {
-				if (strCompara(valor, fimDeArquivo))
+				if (strCompara(remEspacosEntreStr(valor), fimDeArquivo))
 					break;
 			} // if (fimDeArquivo != "") {
 
 			std::string idM1 = "";
 			if (a_tipoAcesso >= TipoAcessoInstancia_m1) {
-				idM1 = valor;
+				idM1 = remEspacosEntreStr(valor);
 				linha = linha.substr(pos + 1, linha.length());
 			}
 
@@ -886,7 +886,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 			if (a_tipoAcesso >= TipoAcessoInstancia_m2) {
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
-				idM2 = valor;
+				idM2 = remEspacosEntreStr(valor);
 				linha = linha.substr(pos + 1, linha.length());
 			} // if (a_tipoAcesso >= TipoAcessoInstancia_m2) {
 
@@ -894,7 +894,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 			if (a_tipoAcesso >= TipoAcessoInstancia_m3) {
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
-				idM3 = valor;
+				idM3 = remEspacosEntreStr(valor);
 				linha = linha.substr(pos + 1, linha.length());
 			} // if (a_tipoAcesso >= TipoAcessoInstancia_m3) {
 
@@ -902,7 +902,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 			if (a_tipoAcesso >= TipoAcessoInstancia_m4) {
 				pos = linha.find(separadorCSV);
 				valor = linha.substr(0, pos).c_str();
-				idM4 = valor;
+				idM4 = remEspacosEntreStr(valor);
 				linha = linha.substr(pos + 1, linha.length());
 			} // if (a_tipoAcesso >= TipoAcessoInstancia_m4) {
 
@@ -911,7 +911,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 				valor = linha.substr(0, pos).c_str();
 			}
 
-			const std::string attMatriz = valor;
+			const std::string attMatriz = remEspacosEntreStr(valor);
 			linha = linha.substr(pos + 1, linha.length());
 
 			if (!strCompara(idM1, last_idM1) || !strCompara(idM2, last_idM2) || !strCompara(idM3, last_idM3) || !strCompara(idM4, last_idM4) || !strCompara(attMatriz, last_attMatriz)) {
@@ -970,7 +970,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 			pos = linha.find(separadorCSV);
 			valor = linha.substr(0, pos).c_str();
 
-			vectorIter1.push_back(valor);
+			vectorIter1.push_back(remEspacosEntreStr(valor));
 
 			linha = linha.substr(pos + 1, linha.length());
 
@@ -989,7 +989,7 @@ void EntradaSaidaDados::carregarArquivoCSV_AttMatriz(const std::string a_nomeArq
 				if (valor.size() == 0)
 					break;
 
-				vector_data.at(idx).push_back(valor);
+				vector_data.at(idx).push_back(remEspacosEntreStr(valor));
 
 				linha = linha.substr(pos + 1, linha.length());
 

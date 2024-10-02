@@ -10,19 +10,25 @@
       m(Termeletrica,  AttComum,                      idTermeletrica,                       IdTermeletrica,        min,          max,             1,      sim) \
 	  m(Termeletrica,  AttComum,                                nome,                               string,        min,          max,             1,      sim) \
 	  m(Termeletrica,  AttComum,                          submercado,                         IdSubmercado,     Nenhum,          max,        Nenhum,      sim) \
-	  m(Termeletrica,  AttComum,                    tipo_combustivel,                      TipoCombustivel,     Nenhum,          max,        Nenhum,         nao) \
+	  m(Termeletrica,  AttComum,                    tipo_combustivel,                      TipoCombustivel,     Nenhum,          max,        Nenhum,      nao) \
       m(Termeletrica,  AttComum,          tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica,        min,          max,     por_usina,      nao) \
+	  m(Termeletrica,  AttComum,                unidades_simultaneas,                                 bool,      false,         true,          true,      nao) \
 	  m(Termeletrica,  AttComum,                    considerar_usina,                                 bool,      false,         true,          true,      nao) \
 	  m(Termeletrica,  AttComum,     representacao_discreta_producao,                                 bool,      false,         true,         false,      nao) \
+	  m(Termeletrica,  AttComum,                     rampa_transicao,                               double,        min,          max,             0,      nao) \
+	  m(Termeletrica,  AttComum,                            time_ini,                               double,     -50000,        50000,             0,      nao) \
+	  m(Termeletrica,  AttComum,                           power_ini,                               double,          0,        50000,             0,      nao) \
+	  m(Termeletrica,  AttComum,                             ramp_up,                               double,          0,        50000,             0,      nao) \
+	  m(Termeletrica,  AttComum,                           ramp_down,                               double,          0,        50000,             0,      nao) \
 	  m(Termeletrica,  AttComum,                     potencia_maxima,                               double,          0,        50000,             0,      nao) \
 	  m(Termeletrica,  AttComum,                     potencia_minima,                               double,          0,        50000,             0,      nao) \
 	  m(Termeletrica,  AttComum,                   custo_de_operacao,                               double,          0,        10000,             0,      nao) \
 	  m(Termeletrica,  AttComum,                 fator_de_capacidade,                               double,          0,            1,             1,      nao) \
 	  m(Termeletrica,  AttComum,           indisponibilidade_forcada,                               double,          0,            1,             0,      nao) \
 	  m(Termeletrica,  AttComum,        indisponibilidade_programada,                               double,          0,          1.0,             0,      nao) \
-	  m(Termeletrica,  AttComum,lag_mensal_potencia_disponivel_comandada,                               int,          0,           12,             0,         nao) \
-	  m(Termeletrica,  AttComum,                        codigo_usina,                                  int,          0,          999,             1,         nao) \
-      m(Termeletrica,  AttComum,                    entrada_operacao,                              Periodo,     01/1900,     01/2100,       01/1900,         nao) \
+	  m(Termeletrica,  AttComum,lag_mensal_potencia_disponivel_comandada,                               int,          0,           12,             0,     nao) \
+	  m(Termeletrica,  AttComum,                        codigo_usina,                                  int,          0,          999,             1,      nao) \
+      m(Termeletrica,  AttComum,                    entrada_operacao,                              Periodo,     01/1900,     01/2100,       01/1900,      nao) \
       m(Termeletrica,  AttComum,         penalidade_violacao_comando,                               double,          0,          max,             0,      nao) \
       m(Termeletrica,  AttComum,        penalidade_violacao_potencia,                               double,          0,          max,             0,      nao) 
 
@@ -31,10 +37,8 @@
 
 #define ATT_VETOR_TERMELETRICA(m)  \
 	  m(Termeletrica,  AttVetor,            tipo_detalhamento_producao,  TipoDetalhamentoProducaoTermeletrica,         min,              max,           min,        Periodo) \
-	  m(Termeletrica,  AttVetor,                              power_up,                                double,           0,              max,             0,        int) \
-	  m(Termeletrica,  AttVetor,                            power_down,                                double,           0,              max,             0,        int) \
-	  m(Termeletrica,  AttVetor,                              time_up,                                    int,           0,              max,             0,        int) \
-	  m(Termeletrica,  AttVetor,                            time_down,                                    int,           0,              max,             0,        int) \
+	  m(Termeletrica,  AttVetor,                          ramp_turnon,                                double,            1,              max,             0,        int) \
+	  m(Termeletrica,  AttVetor,                        ramp_shutdown,                                double,            1,              max,             0,        int) \
 	  m(Termeletrica,  AttVetor,       representacao_discreta_producao,                                   int,           0,                1,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,                 potencia_minima_media,                                double,           0,              max,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,                 potencia_maxima_media,                                double,           0,              max,             0,        Periodo) \
