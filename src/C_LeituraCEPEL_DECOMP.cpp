@@ -7396,7 +7396,10 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							atributo = line.substr(11, 10);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-							//const string nome = atributo;
+							std::string nome = "not_define";
+
+							if (atributo != "")
+								nome = atributo;
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Campo 5 -  Índice do estágio.
@@ -7487,6 +7490,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								contrato.setAtributo(AttComumContrato_idContrato, idContrato);
 								contrato.setAtributo(AttComumContrato_tipo_contrato, tipo_contrato);
 								contrato.setAtributo(AttComumContrato_submercado, idSubmercado);
+								contrato.setAtributo(AttComumContrato_nome, nome);
 								contrato.setAtributo(AttComumContrato_tipo_restricao, TipoRestricaoContrato_limite);
 								contrato.setAtributo(AttComumContrato_tipo_unidade, TipoUnidadeRestricaoContrato_MW);
 
