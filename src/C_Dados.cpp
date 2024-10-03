@@ -8338,7 +8338,7 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 
 				for (IdRestricaoEletrica idRestricaoEletrica = idREIni; idRestricaoEletrica < idREOut; incr(idRestricaoEletrica)) {
 
-					bool any_var = false;
+					bool any_var = true;
 					if ((getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_var_abs_inf) > 0) || (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_var_abs_sup) > 0) ||
 						(getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_var_rel_inf) > 0) || (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_var_rel_sup) > 0))
 						any_var = true;
@@ -8358,14 +8358,55 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 					else
 						a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RESTRICAO_ELETRICA_AttComumOperacional.csv", idRestricaoEletrica, *this, std::vector<AttComumRestricaoEletrica> {AttComumRestricaoEletrica_idRestricaoEletrica, AttComumRestricaoEletrica_nome, AttComumRestricaoEletrica_vlr_ini, AttComumRestricaoEletrica_penalidade});
 
-					if (idRestricaoEletrica == idREIni)
-						a_entradaSaidaDados.setAppendArquivo(false);
-					else
-						a_entradaSaidaDados.setAppendArquivo(true);
+					if (idRestricaoEletrica == idREIni) {
+						bool any_ini = false;
+			
+						if (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_inf) > 0) {
+							a_entradaSaidaDados.setAppendArquivo(any_ini);
+							any_ini = true;
+							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_lim_inf);
+						}
+						if (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_sup) > 0) {
+							a_entradaSaidaDados.setAppendArquivo(any_ini);
+							any_ini = true;
+							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_lim_sup);
+						}
 
-					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_lim_inf);
-					a_entradaSaidaDados.setAppendArquivo(true);
-					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_lim_sup);
+						if (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_var_abs_inf) > 0) {
+							a_entradaSaidaDados.setAppendArquivo(any_ini);
+							any_ini = true;
+							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_var_abs_inf);
+						}
+
+
+						if (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_var_abs_sup) > 0) {
+							a_entradaSaidaDados.setAppendArquivo(any_ini);
+							any_ini = true;
+							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_var_abs_sup);
+						}
+
+						if (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_var_rel_inf) > 0) {
+							a_entradaSaidaDados.setAppendArquivo(any_ini);
+							any_ini = true;
+							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_var_rel_inf);
+						}
+				
+						if (getSize1Matriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_var_rel_sup) > 0) {
+							a_entradaSaidaDados.setAppendArquivo(any_ini);
+							any_ini = true;
+							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_var_rel_sup);
+						}
+					}
+
+					else {
+						a_entradaSaidaDados.setAppendArquivo(true);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_lim_inf);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_lim_sup);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_var_abs_inf);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_var_abs_sup);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_var_rel_inf);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoEletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoEletrica_var_rel_sup);
+					}
 
 					if (idRestricaoEletrica == idREIni)
 						a_entradaSaidaDados.setAppendArquivo(false);
@@ -11421,6 +11462,8 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 					}
 				}
 
+				bool any_vector = false;
+
 				for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = idRHIni; idRestricaoOperativaUHE < idRHOut; incr(idRestricaoOperativaUHE)) {
 
 
@@ -11439,23 +11482,61 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 					else
 						a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv", idRestricaoOperativaUHE, *this, std::vector<AttComumRestricaoOperativaUHE> {AttComumRestricaoOperativaUHE_idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, AttComumRestricaoOperativaUHE_vlr_ini, AttComumRestricaoOperativaUHE_penalidade});
 
-					if (idRestricaoOperativaUHE == idRHIni)
-						a_entradaSaidaDados.setAppendArquivo(false);
-					else
+					if (idRestricaoOperativaUHE == idRHIni) {
+						bool any_ini = false;
+
+						if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf) > 0) {
+							a_entradaSaidaDados.setAppendArquivo(any_ini);
+							any_ini = true;
+							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_lim_inf);
+						}
+						if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup) > 0) {
+							a_entradaSaidaDados.setAppendArquivo(any_ini);
+							any_ini = true;
+							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_lim_sup);
+						}
+
+						if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_inf) > 0) {
+							a_entradaSaidaDados.setAppendArquivo(any_ini);
+							any_ini = true;
+							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_var_abs_inf);
+						}
+
+						if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_sup) > 0) {
+							a_entradaSaidaDados.setAppendArquivo(any_ini);
+							any_ini = true;
+							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_var_abs_sup);
+						}
+
+						if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_inf) > 0) {
+							a_entradaSaidaDados.setAppendArquivo(any_ini);
+							any_ini = true;
+							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_var_rel_inf);
+						}
+
+						if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_sup) > 0) {
+							a_entradaSaidaDados.setAppendArquivo(any_ini);
+							any_ini = true;
+							a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_var_rel_sup);
+						}
+					}
+
+					else {
 						a_entradaSaidaDados.setAppendArquivo(true);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_lim_inf);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_lim_sup);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_var_abs_inf);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_var_abs_sup);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_var_rel_inf);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_var_rel_sup);
+					}
 
-					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_lim_inf);
-					a_entradaSaidaDados.setAppendArquivo(true);
-					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRestricaoOperativaUHE_lim_sup);
 
-
-					if (idRestricaoOperativaUHE == idRHIni)
-						a_entradaSaidaDados.setAppendArquivo(false);
-					else
-						a_entradaSaidaDados.setAppendArquivo(true);
-
-					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorPeriodo.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, AttVetorRestricaoOperativaUHE_lim_sup_folga_inf);
-
+					if (getSizeVetor(idRestricaoOperativaUHE, AttVetorRestricaoOperativaUHE_lim_sup_folga_inf) > 0) {
+						a_entradaSaidaDados.setAppendArquivo(any_vector);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("RESTRICAO_OPERATIVA_UHE_AttVetorOperacional_PorPeriodo.csv", idRestricaoOperativaUHE, *this, periodo_estudo_inicial, periodo_final_estudo, AttVetorRestricaoOperativaUHE_lim_sup_folga_inf);
+						any_vector = true;
+					}
 
 					if (idRestricaoOperativaUHE == idRHIni)
 						a_entradaSaidaDados.setAppendArquivo(false);

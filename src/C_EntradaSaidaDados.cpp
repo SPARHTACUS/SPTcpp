@@ -6,7 +6,7 @@
 // Um número de caracteres muito grande pode estourar o buffer da string;
 
 static int const numCaract = 300000;
-static int const numLinhas = 950000;
+static int const numLinhas = 5000000;
 
 static int const tempo_maximo_tentativa_escrita_arquivo = 300000; // Milisegundos
 
