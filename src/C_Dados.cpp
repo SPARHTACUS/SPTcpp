@@ -11411,14 +11411,18 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 				//
 				// Imprime Atributos Operacionais
 				//
+				bool any_var = false;
+				for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = idRHIni; idRestricaoOperativaUHE < idRHOut; incr(idRestricaoOperativaUHE)) {
+			
+					if ((getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_inf) > 0) || (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_sup) > 0) ||
+						(getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_inf) > 0) || (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_sup) > 0)) {
+						any_var = true;
+						break;
+					}
+				}
 
 				for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = idRHIni; idRestricaoOperativaUHE < idRHOut; incr(idRestricaoOperativaUHE)) {
 
-
-					bool any_var = false;
-					if ((getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_inf) > 0) || (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_sup) > 0) ||
-						(getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_inf) > 0) || (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_sup) > 0))
-						any_var = true;
 
 					if (idRestricaoOperativaUHE < menorIdRestricaoOperativaUHE_nao_operacional)
 						a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
