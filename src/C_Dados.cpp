@@ -3956,6 +3956,9 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				if (strVarElm.find("nivel") != std::string::npos) {
 					const IdHidreletrica idUHEvar = getAtributo(idRH, idEl, AttComumElementoSistema_hidreletrica, IdHidreletrica());
 
+					if (idUHEvar == IdHidreletrica_Nenhum)
+						throw std::invalid_argument("Erro: " + getFullString(idRH) + " " + getFullString(idEl));
+
 					if (isUHEcomRHnivel.size() == 0)
 						isUHEcomRHnivel.addElemento(idUHEvar, 1);
 					else if (IdHidreletrica(isUHEcomRHnivel.getIteradorFinal() + 1) < idUHEvar) {
@@ -11738,7 +11741,7 @@ void Dados::validaHorizonteRestricaoOperativaUHE() {
 					any_valor_restrito_var = 1;
 					const double vlr_ini = getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_vlr_ini, double());
 					if ((periodo == periodo_estudo_inicial) && ((vlr_ini <= vlr_min) || (vlr_max <= vlr_ini)))
-						throw std::invalid_argument("Invalid " + getFullString(AttComumRestricaoOperativaUHE_vlr_ini) + " em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+						throw std::invalid_argument("Invalid " + getFullString(AttComumRestricaoOperativaUHE_vlr_ini) + " em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
 				}
 
 				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_inf) > 0) {
@@ -11762,7 +11765,7 @@ void Dados::validaHorizonteRestricaoOperativaUHE() {
 					any_valor_restrito_var = 1;
 					const double vlr_ini = getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_vlr_ini, double());
 					if ((periodo == periodo_estudo_inicial) && ((vlr_ini <= vlr_min) || (vlr_max <= vlr_ini)))
-						throw std::invalid_argument("Invalid " + getFullString(AttComumRestricaoOperativaUHE_vlr_ini) + " em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+						throw std::invalid_argument("Invalid " + getFullString(AttComumRestricaoOperativaUHE_vlr_ini) + " em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
 				}
 
 				SmartEnupla<IdPatamarCarga, int> num_elem_fp(IdPatamarCarga_1, std::vector<int>(maiorIdPatamarCarga, 0));
