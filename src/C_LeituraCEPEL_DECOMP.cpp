@@ -17598,6 +17598,40 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 				}//for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= maiorIdRestricaoEletrica_REF; idRestricaoEletrica++) {
 
+				//*******************************************************************
+				//3. Atualiza INTERCAMBIOS no CP (a exceção de Itaipu e Ande)
+				//   Deixa o lim_sup aberto para os períodos dentro do horizonte_PD
+				//*******************************************************************
+
+				const IdIntercambio maiorIdIntercambio = a_dados.getMaiorId(IdIntercambio());
+				for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= maiorIdIntercambio; idIntercambio++) {
+
+					const IdSubmercado submercado_origem = a_dados.vetorIntercambio.at(idIntercambio).getAtributo(AttComumIntercambio_submercado_origem, IdSubmercado());
+					const IdSubmercado submercado_destino = a_dados.vetorIntercambio.at(idIntercambio).getAtributo(AttComumIntercambio_submercado_destino, IdSubmercado());
+
+					if (submercado_origem != IdSubmercado_ITAIPU && submercado_destino != IdSubmercado_ITAIPU && submercado_origem != IdSubmercado_ANDE && submercado_destino != IdSubmercado_ANDE) {
+
+						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+							if (periodo <= periodo_REF) {//Abre os limites da restrição para os periodos anteriores ao último periodo_REF (perioodo_final do horizonte_PD)
+
+								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+									a_dados.vetorIntercambio.at(idIntercambio).setElemento(AttMatrizIntercambio_potencia_maxima, periodo, idPatamarCarga, getdoubleFromChar("max"));
+								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+							}//if (periodo <= periodo_REF) {
+							else
+								break; //Evita percorrer o horizonte todo
+
+						}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+					}//if (submercado_origem != IdSubmercado_ITAIPU && submercado_destino != IdSubmercado_ITAIPU && submercado_origem != IdSubmercado_ANDE && submercado_destino != IdSubmercado_ANDE) {
+
+				}//for (IdIntercambio idIntercambio = IdIntercambio_1; idIntercambio <= maiorIdIntercambio; idIntercambio++) {
+
+
 			}//try {
 			catch (const std::exception& erro) { throw std::invalid_argument("Erro is_carregar_PD_restricoes_eletricas: \n" + std::string(erro.what())); }
 
