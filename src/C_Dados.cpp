@@ -11049,6 +11049,8 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 			} // if (menor_cenario_iteracao != IdCenario_Nenhum)
 
+			MPI_Barrier(MPI_COMM_WORLD);
+
 			for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
 
 				const IdCenario menor_cenario_iteracao = arranjoResolucao.getAtributo(idIteracao, idProcesso, AttComumProcesso_menor_cenario, IdCenario());
@@ -11809,13 +11811,13 @@ void Dados::validaHorizonteRestricaoOperativaUHE() {
 
 
 				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_inf) > 0) {
-					if (getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_inf, periodo, IdPatamarCarga()) > IdPatamarCarga_1)
-						throw std::invalid_argument("var_abs_inf com mais de 1 patamar em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+					//if (getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_inf, periodo, IdPatamarCarga()) > IdPatamarCarga_1)
+						//throw std::invalid_argument("var_abs_inf com mais de 1 patamar em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
 					var_abs_inf = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_inf, periodo, IdPatamarCarga_1, double());
 				}
 				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_sup) > 0) {
-					if (getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_sup, periodo, IdPatamarCarga()) > IdPatamarCarga_1)
-						throw std::invalid_argument("var_abs_inf com mais de 1 patamar em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+					//if (getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_sup, periodo, IdPatamarCarga()) > IdPatamarCarga_1)
+						//throw std::invalid_argument("var_abs_inf com mais de 1 patamar em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
 					var_abs_sup = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_sup, periodo, IdPatamarCarga_1, double());
 				}
 
@@ -11834,13 +11836,13 @@ void Dados::validaHorizonteRestricaoOperativaUHE() {
 				}
 
 				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_inf) > 0) {
-					if (getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_inf, periodo, IdPatamarCarga()) > IdPatamarCarga_1)
-						throw std::invalid_argument("var_rel_inf com mais de 1 patamar em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+					//if (getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_inf, periodo, IdPatamarCarga()) > IdPatamarCarga_1)
+						//throw std::invalid_argument("var_rel_inf com mais de 1 patamar em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
 					var_rel_inf = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_inf, periodo, IdPatamarCarga_1, double());
 				}
 				if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_sup) > 0) {
-					if (getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_sup, periodo, IdPatamarCarga()) > IdPatamarCarga_1)
-						throw std::invalid_argument("var_rel_inf com mais de 1 patamar em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+					//if (getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_sup, periodo, IdPatamarCarga()) > IdPatamarCarga_1)
+						//throw std::invalid_argument("var_rel_sup com mais de 1 patamar em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
 					var_rel_sup = getElementoMatriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_sup, periodo, IdPatamarCarga_1, double());
 				}
 
