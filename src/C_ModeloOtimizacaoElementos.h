@@ -119,13 +119,13 @@ void alocVlrConstr##Elem##_##Nome##_##Nro##_##Seq(const TipoSubproblemaSolver a_
 		else if (a_idEstagio < vlrC_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).getIteradorInicial()) {	\
 			for (IdEstagio idEstagio = IdEstagio(vlrC_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).getIteradorInicial() - 1); idEstagio >= a_idEstagio; idEstagio--){\
 				vlrC_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).addElemento(idEstagio, std::vector<std::string>());\
-				vlrCV_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).addElemento(a_idEstagio, std::vector<std::vector<std::vector<int>>>());\
+				vlrCV_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).addElemento(idEstagio, std::vector<std::vector<std::vector<int>>>());\
 			}\
 		}\
 		else if (vlrC_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).getIteradorFinal() < a_idEstagio) {	\
 			for (IdEstagio idEstagio = IdEstagio(vlrC_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).getIteradorFinal() + 1); idEstagio <= a_idEstagio; idEstagio++){\
 				vlrC_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).addElemento(idEstagio, std::vector<std::string>());\
-				vlrCV_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).addElemento(a_idEstagio, std::vector<std::vector<std::vector<int>>>());\
+				vlrCV_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).addElemento(idEstagio, std::vector<std::vector<std::vector<int>>>());\
 			}\
 		}\
 	} \
