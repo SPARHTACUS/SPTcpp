@@ -17403,36 +17403,41 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						restricaoEletrica.setAtributo(AttComumRestricaoEletrica_penalidade, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getAtributo(AttComumRestricaoEletrica_penalidade, double()));
 						a_dados.vetorRestricaoEletrica.add(restricaoEletrica);
 
-						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
-						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_menos_inf(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
-						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_inf(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero_lim(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_menos_inf_lim(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_inf_lim(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+
+						//Os atributos de variação só tem por construção IdPatamarCarga_1
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero_var(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 0.0)));
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_menos_inf_var(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, getdoubleFromChar("min"))));
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_inf_var(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, getdoubleFromChar("max"))));
 
 						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
-							matriz_zero.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
-							matriz_menos_inf.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("min"))));
-							matriz_inf.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("max"))));
+							matriz_zero_lim.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+							matriz_menos_inf_lim.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("min"))));
+							matriz_inf_lim.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("max"))));
 
 						}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 						if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_lim_inf) > 0)
-							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_lim_inf, matriz_menos_inf);
+							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_lim_inf, matriz_menos_inf_lim);
 						
 						if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_lim_sup) > 0)
-							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_lim_sup, matriz_inf);
+							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_lim_sup, matriz_inf_lim);
 						
 						if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_var_abs_inf) > 0)
-							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_var_abs_inf, matriz_inf);
+							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_var_abs_inf, matriz_inf_var);
 						
 						if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_var_abs_sup) > 0)
-							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_var_abs_sup, matriz_inf);
+							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_var_abs_sup, matriz_inf_var);
 						
 						if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_var_rel_inf) > 0)
-							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_var_rel_inf, matriz_inf);
+							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_var_rel_inf, matriz_inf_var);
 						
 						if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_var_rel_sup) > 0)
-							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_var_rel_sup, matriz_inf);
+							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz(AttMatrizRestricaoEletrica_var_rel_sup, matriz_inf_var);
 
 						////////////////////////////////
 						//Elementos Restrição
@@ -17491,7 +17496,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							////
 
-							elementoSistema.setMatriz(AttMatrizElementoSistema_fator_participacao, matriz_zero);
+							elementoSistema.setMatriz(AttMatrizElementoSistema_fator_participacao, matriz_zero_lim); //Para restrições var pode ter a estrutura das restrições lim
 							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).vetorElementoSistema.add(elementoSistema);
 
 						}//for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema_PD; idElementoSistema++) {
@@ -17540,32 +17545,32 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									////
 
-									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+									//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-										if(dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_lim_inf) > 0)
-											a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getElementoMatriz(AttMatrizRestricaoEletrica_lim_inf, periodo_PD, idPatamarCarga, double()));
+									if(dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_lim_inf) > 0)
+										a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_inf, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getElementoMatriz(AttMatrizRestricaoEletrica_lim_inf, periodo_PD, IdPatamarCarga_1, double()));
 										
-										if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_lim_sup) > 0)
-											a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getElementoMatriz(AttMatrizRestricaoEletrica_lim_sup, periodo_PD, idPatamarCarga, double()));
+									if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_lim_sup) > 0)
+										a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getElementoMatriz(AttMatrizRestricaoEletrica_lim_sup, periodo_PD, IdPatamarCarga_1, double()));
 
-										if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_var_abs_inf) > 0)
-											a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_var_abs_inf, periodo, idPatamarCarga, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getElementoMatriz(AttMatrizRestricaoEletrica_var_abs_inf, periodo_PD, idPatamarCarga, double()));
+									if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_var_abs_inf) > 0)
+										a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_var_abs_inf, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getElementoMatriz(AttMatrizRestricaoEletrica_var_abs_inf, periodo_PD, IdPatamarCarga_1, double()));
 
-										if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_var_abs_sup) > 0)
-											a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_var_abs_sup, periodo, idPatamarCarga, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getElementoMatriz(AttMatrizRestricaoEletrica_var_abs_sup, periodo_PD, idPatamarCarga, double()));
+									if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_var_abs_sup) > 0)
+										a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_var_abs_sup, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getElementoMatriz(AttMatrizRestricaoEletrica_var_abs_sup, periodo_PD, IdPatamarCarga_1, double()));
 
-										if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_var_rel_inf) > 0)
-											a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_var_rel_inf, periodo, idPatamarCarga, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getElementoMatriz(AttMatrizRestricaoEletrica_var_rel_inf, periodo_PD, idPatamarCarga, double()));
+									if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_var_rel_inf) > 0)
+										a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_var_rel_inf, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getElementoMatriz(AttMatrizRestricaoEletrica_var_rel_inf, periodo_PD, IdPatamarCarga_1, double()));
 
-										if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_var_rel_sup) > 0)
-											a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_var_rel_sup, periodo, idPatamarCarga, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getElementoMatriz(AttMatrizRestricaoEletrica_var_rel_sup, periodo_PD, idPatamarCarga, double()));
+									if (dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getSizeMatriz(AttMatrizRestricaoEletrica_var_rel_sup) > 0)
+										a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_var_rel_sup, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).getElementoMatriz(AttMatrizRestricaoEletrica_var_rel_sup, periodo_PD, IdPatamarCarga_1, double()));
 
 
-										for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema_PD; idElementoSistema++) {
-											a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).vetorElementoSistema.at(idElementoSistema).setElemento(AttMatrizElementoSistema_fator_participacao, periodo, idPatamarCarga, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getElementoMatriz(AttMatrizElementoSistema_fator_participacao, periodo_PD, idPatamarCarga, double()));
-										}//for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema_PD; idElementoSistema++) {
+									for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema_PD; idElementoSistema++) {
+										a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).vetorElementoSistema.at(idElementoSistema).setElemento(AttMatrizElementoSistema_fator_participacao, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getElementoMatriz(AttMatrizElementoSistema_fator_participacao, periodo_PD, IdPatamarCarga_1, double()));
+									}//for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema_PD; idElementoSistema++) {
 
-									}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+									//}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
 								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
 
@@ -17726,36 +17731,41 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						restricaoOperativaUHE.setAtributo(AttComumRestricaoOperativaUHE_vlr_ini, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getAtributo(AttComumRestricaoOperativaUHE_vlr_ini, double()));
 						a_dados.vetorRestricaoOperativaUHE.add(restricaoOperativaUHE);
 
-						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
-						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_menos_inf(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
-						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_inf(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero_lim(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_menos_inf_lim(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_inf_lim(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+
+						//Os atributos de variação só tem por construção IdPatamarCarga_1
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero_var(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, 0.0)));
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_menos_inf_var(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, getdoubleFromChar("min"))));
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_inf_var(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(IdPatamarCarga_1, getdoubleFromChar("max"))));
 
 						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
-							matriz_zero.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
-							matriz_menos_inf.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("min"))));
-							matriz_inf.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("max"))));
+							matriz_zero_lim.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+							matriz_menos_inf_lim.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("min"))));
+							matriz_inf_lim.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("max"))));
 
 						}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 						if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_lim_inf) > 0)
-							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_lim_inf, matriz_menos_inf);
+							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_lim_inf, matriz_menos_inf_lim);
 
 						if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_lim_sup) > 0)
-							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_lim_sup, matriz_inf);
+							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_lim_sup, matriz_inf_lim);
 
 						if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_var_abs_inf) > 0)
-							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_var_abs_inf, matriz_inf);
+							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_var_abs_inf, matriz_inf_var);
 
 						if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_var_abs_sup) > 0)
-							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_var_abs_sup, matriz_inf);
+							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_var_abs_sup, matriz_inf_var);
 
 						if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_var_rel_inf) > 0)
-							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_var_rel_inf, matriz_inf);
+							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_var_rel_inf, matriz_inf_var);
 
 						if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_var_rel_sup) > 0)
-							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_var_rel_sup, matriz_inf);
+							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setMatriz(AttMatrizRestricaoOperativaUHE_var_rel_sup, matriz_inf_var);
 
 						////////////////////////////////
 						//Elementos Restrição
@@ -17782,7 +17792,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							////
 
-							elementoSistema.setMatriz(AttMatrizElementoSistema_fator_participacao, matriz_zero);
+							elementoSistema.setMatriz(AttMatrizElementoSistema_fator_participacao, matriz_zero_lim);//Para restrições var pode ter a estrutura das restrições lim
 							a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).vetorElementoSistema.add(elementoSistema);
 
 						}//for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema_PD; idElementoSistema++) {
@@ -17836,31 +17846,31 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									//////
 
-									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+									//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-										if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_lim_inf) > 0)
-											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_lim_inf, periodo_PD, idPatamarCarga, double()));
+									if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_lim_inf) > 0)
+										a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_lim_inf, periodo_PD, IdPatamarCarga_1, double()));
 
-										if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_lim_sup) > 0)
-											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_lim_sup, periodo_PD, idPatamarCarga, double()));
+									if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_lim_sup) > 0)
+										a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_sup, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_lim_sup, periodo_PD, IdPatamarCarga_1, double()));
 
-										if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_var_abs_inf) > 0)
-											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_var_abs_inf, periodo, idPatamarCarga, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_var_abs_inf, periodo_PD, idPatamarCarga, double()));
+									if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_var_abs_inf) > 0)
+										a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_var_abs_inf, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_var_abs_inf, periodo_PD, IdPatamarCarga_1, double()));
 
-										if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_var_abs_sup) > 0)
-											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_var_abs_sup, periodo, idPatamarCarga, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_var_abs_sup, periodo_PD, idPatamarCarga, double()));
+									if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_var_abs_sup) > 0)
+										a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_var_abs_sup, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_var_abs_sup, periodo_PD, IdPatamarCarga_1, double()));
 
-										if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_var_rel_inf) > 0)
-											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_var_rel_inf, periodo, idPatamarCarga, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_var_rel_inf, periodo_PD, idPatamarCarga, double()));
+									if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_var_rel_inf) > 0)
+										a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_var_rel_inf, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_var_rel_inf, periodo_PD, IdPatamarCarga_1, double()));
 
-										if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_var_rel_sup) > 0)
-											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_var_rel_sup, periodo, idPatamarCarga, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_var_rel_sup, periodo_PD, idPatamarCarga, double()));
+									if (dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getSizeMatriz(AttMatrizRestricaoOperativaUHE_var_rel_sup) > 0)
+										a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_var_rel_sup, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).getElementoMatriz(AttMatrizRestricaoOperativaUHE_var_rel_sup, periodo_PD, IdPatamarCarga_1, double()));
 
-										for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema_PD; idElementoSistema++) {
-											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).vetorElementoSistema.at(idElementoSistema).setElemento(AttMatrizElementoSistema_fator_participacao, periodo, idPatamarCarga, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getElementoMatriz(AttMatrizElementoSistema_fator_participacao, periodo_PD, idPatamarCarga, double()));
-										}//for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema_PD; idElementoSistema++) {
+									for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema_PD; idElementoSistema++) {
+										a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).vetorElementoSistema.at(idElementoSistema).setElemento(AttMatrizElementoSistema_fator_participacao, periodo, IdPatamarCarga_1, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getElementoMatriz(AttMatrizElementoSistema_fator_participacao, periodo_PD, IdPatamarCarga_1, double()));
+									}//for (IdElementoSistema idElementoSistema = IdElementoSistema_1; idElementoSistema <= maiorIdElementoSistema_PD; idElementoSistema++) {
 
-									}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+									//}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
 								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
 
