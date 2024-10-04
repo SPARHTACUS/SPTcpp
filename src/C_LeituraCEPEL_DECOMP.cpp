@@ -17907,6 +17907,19 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 				}//for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE_REF; idRestricaoOperativaUHE++) {
 
+				//*******************************************************************
+				//3. Atualiza AttVetorRestricaoOperativaUHE_lim_sup_folga_inf
+				// a partir do horizonte CP deixa lim_sup_folga_inf = inf
+				//*******************************************************************
+				for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE_REF; idRestricaoOperativaUHE++) {
+					if (a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getSizeVetor(AttVetorRestricaoOperativaUHE_lim_sup_folga_inf) > 0) {
+						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+							if (periodo >= periodo_REF)
+								a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttVetorRestricaoOperativaUHE_lim_sup_folga_inf, periodo, getdoubleFromChar("max"));
+						}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+					}//if (a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getSizeVetor(AttVetorRestricaoOperativaUHE_lim_sup_folga_inf) > 0) {
+				}//for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE_REF; idRestricaoOperativaUHE++) {
+
 			}//try {
 			catch (const std::exception& erro) { throw std::invalid_argument("Erro is_carregar_PD_restricoes_hidraulicas: \n" + std::string(erro.what())); }
 
