@@ -51,17 +51,17 @@
       m(Hidreletrica,  AttComum, percentual_retorno_vazao_desviada,                               double,          0,            1,                 0,         nao) \
       m(Hidreletrica,  AttComum,           penalidade_turbinamento,                               double,          0,          max,                 0,         sim) \
       m(Hidreletrica,  AttComum,             penalidade_vertimento,                               double,          0,          max,             0.001,         sim) \
-      m(Hidreletrica,  AttComum,            penalidade_desvio_agua,                               double,          0,          max,               5000,         sim) \
-	  m(Hidreletrica,  AttComum,    penalidade_turbinamento_minimo,                               double,          0,          max,               5000,         sim) \
-	  m(Hidreletrica,  AttComum, penalidade_vazao_defluente_minima,                               double,          0,          max,               5000,         sim) \
-	  m(Hidreletrica,  AttComum, penalidade_vazao_defluente_maxima,                               double,          0,          max,               5000,         sim) \
-      m(Hidreletrica,  AttComum,  penalidade_vazao_desviada_minima,                               double,          0,          max,               5000,         sim) \
-	  m(Hidreletrica,  AttComum,  penalidade_afluencia_incremental,                               double,          0,          max,               5000,         sim) \
+      m(Hidreletrica,  AttComum,            penalidade_desvio_agua,                               double,          0,          max,              10000,         sim) \
+	  m(Hidreletrica,  AttComum,    penalidade_turbinamento_minimo,                               double,          0,          max,              10000,         sim) \
+	  m(Hidreletrica,  AttComum, penalidade_vazao_defluente_minima,                               double,          0,          max,              10000,         sim) \
+	  m(Hidreletrica,  AttComum, penalidade_vazao_defluente_maxima,                               double,          0,          max,              10000,         sim) \
+      m(Hidreletrica,  AttComum,  penalidade_vazao_desviada_minima,                               double,          0,          max,              10000,         sim) \
+	  m(Hidreletrica,  AttComum,  penalidade_afluencia_incremental,                               double,          0,          max,              10000,         sim) \
       m(Hidreletrica,  AttComum,         penalidade_vazao_retirada,                               double,          0,          max,              10000,         sim) \
 	  m(Hidreletrica,  AttComum,          penalidade_volume_minimo,                               double,          0,          max,              10000,         sim) \
-	  m(Hidreletrica,  AttComum,     penalidade_volume_util_minimo,                               double,          0,          max,                600,         não) \
+	  m(Hidreletrica,  AttComum,     penalidade_volume_util_minimo,                               double,          0,          max,              10000,         não) \
 	  m(Hidreletrica,  AttComum,             penalidade_evaporacao,                               double,          0,          max,              10000,         sim) \
-      m(Hidreletrica,  AttComum,        penalidade_potencia_minima,                               double,          0,          max,               5000,         sim) \
+      m(Hidreletrica,  AttComum,        penalidade_potencia_minima,                               double,          0,          max,              10000,         sim) \
       m(Hidreletrica,  AttComum,      considerar_tempo_viagem_agua,                               bool,        false,         true,              false,         nao) \
       m(Hidreletrica,  AttComum,                  queda_referencia,                               double,          0,         1000,                  0,         nao) \
       m(Hidreletrica,  AttComum,                 volume_referencia,                               double,          0,       100000,                  0,         nao) \

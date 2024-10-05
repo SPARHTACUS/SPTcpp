@@ -4031,7 +4031,7 @@ void ModeloOtimizacao::criarRestricoesFuncaoProducaoHidreletrica(const TipoSubpr
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPH_FPH_FINF, getEquLinear_ZP(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getAtributo(a_idHidreletrica, AttComumHidreletrica_penalidade_potencia_minima, double()));
 							}
 
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPH_FPH_FINF, posRestricaoPH, -1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPH_FPH_FINF, posRestricaoPH, 1.0);
 						}
 
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posRestricaoPH, a_dados.getElementoMatriz(a_idHidreletrica, IdFuncaoProducaoHidreletrica_1, AttMatrizFuncaoProducaoHidreletrica_RHS, a_period, i, double()));
