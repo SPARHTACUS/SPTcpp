@@ -607,7 +607,7 @@ DEFINE_SMART_ENUM(IdElementoSistema, ID_ELEMENTO_SISTEMA)
 
 #define ID_SUBMERCADO(m)    \
 	m(IdSubmercado, SUDESTE) m(IdSubmercado, SUL) m(IdSubmercado, NORDESTE) m(IdSubmercado, NORTE) m(IdSubmercado, IMPERATRIZ) m(IdSubmercado, ITAIPU) m(IdSubmercado, IVAIPORA) m(IdSubmercado, ANDE)\
-	m(IdSubmercado,    1) m(IdSubmercado,    2) m(IdSubmercado,    3) m(IdSubmercado,    4) m(IdSubmercado,    5) m(IdSubmercado,    6) m(IdSubmercado,    7) m(IdSubmercado,    8) m(IdSubmercado,    9) m(IdSubmercado,   10)\
+	m(IdSubmercado,  SIN) m(IdSubmercado,    1) m(IdSubmercado,    2) m(IdSubmercado,    3) m(IdSubmercado,    4) m(IdSubmercado,    5) m(IdSubmercado,    6) m(IdSubmercado,    7) m(IdSubmercado,    8) m(IdSubmercado,    9) m(IdSubmercado,   10)\
 	m(IdSubmercado,   11) m(IdSubmercado,   12) m(IdSubmercado,   13) m(IdSubmercado,   14) m(IdSubmercado,   15) m(IdSubmercado,   16) m(IdSubmercado,   17) m(IdSubmercado,   18) m(IdSubmercado,   19) m(IdSubmercado,   20)
 DEFINE_SMART_ENUM(IdSubmercado, ID_SUBMERCADO)
 //m(IdSubmercado, SUDESTE) m(IdSubmercado, SUL) m(IdSubmercado, NORDESTE) m(IdSubmercado, NORTE) m(IdSubmercado, IMPERATRIZ) m(IdSubmercado, IVAIPORA) m(IdSubmercado, ITAIPU) m(IdSubmercado, ANDE)\
