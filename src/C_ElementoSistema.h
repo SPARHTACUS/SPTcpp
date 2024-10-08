@@ -17,6 +17,8 @@
 	  m(ElementoSistema,  AttComum,                       intercambio,                    IdIntercambio,      Nenhum,         max,        Nenhum,      nao) \
 	  m(ElementoSistema,  AttComum,                         renovavel,                    IdRenovavel,      Nenhum,         max,        Nenhum,      nao) \
       m(ElementoSistema,  AttComum,                  usina_elevatoria,                IdUsinaElevatoria,      Nenhum,         max,        Nenhum,      nao) \
+      m(ElementoSistema,  AttComum,                          demanda,                      IdSubmercado,      Nenhum,         max,        Nenhum,      nao) \
+      m(ElementoSistema,  AttComum,                   demandaliquida,                      IdSubmercado,      Nenhum,         max,        Nenhum,      nao) \
       m(ElementoSistema,  AttComum,   tipoVariavelRestricaoOperativa,    TipoVariavelRestricaoOperativa,         min,         max,           min,      sim) \
 	  m(ElementoSistema,  AttComum,                fator_participacao,                           double,         -10,          10,             0,      nao)
 //              c_classe,   smrtAtt,          nomeAtributo,          tipo,  lowerBound,  upperBound,  initialValue, mustRead?

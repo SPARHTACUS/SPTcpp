@@ -236,6 +236,8 @@ public:
 	void validacao_operacional_Intercambio(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
 	void validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
+	
+	void validacao_operacional_ReservaPotencia(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
 	void validacao_operacional_Contrato(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
@@ -274,8 +276,6 @@ public:
 	void validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_premissa, const ProcessoEstocastico& a_processoEstocastico);
 
 	void validaPatamarCarga();
-
-	void validaElementoSistemaRestricaoEletrica();
 
 	void validaAgrupamentoIntercambio();
 
