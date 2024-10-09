@@ -17,6 +17,7 @@
     <ClCompile Include="..\src\C_BaciaHidrografica.cpp" />
     <ClCompile Include="..\src\C_ConjuntoHidraulico.cpp" />
     <ClCompile Include="..\src\C_Contrato.cpp" />
+    <ClCompile Include="..\src\C_ControleCotaVazao.cpp" />
     <ClCompile Include="..\src\C_CorteBenders.cpp" />
     <ClCompile Include="..\src\C_Dados.cpp" />
     <ClCompile Include="..\src\C_Dados_CP.cpp" />
@@ -49,7 +50,6 @@
     <ClCompile Include="..\src\C_Processo.cpp" />
     <ClCompile Include="..\src\C_ProcessoEstocastico.cpp" />
     <ClCompile Include="..\src\C_ReservatorioEquivalente.cpp" />
-    <ClCompile Include="..\src\C_Regua11.cpp" />
     <ClCompile Include="..\src\C_ReservaPotencia.cpp" />
     <ClCompile Include="..\src\C_Reservatorio.cpp" />
     <ClCompile Include="..\src\C_RestricaoEletrica.cpp" />
@@ -75,6 +75,7 @@
     <ClInclude Include="..\src\C_BaciaHidrografica.h" />
     <ClInclude Include="..\src\C_ConjuntoHidraulico.h" />
     <ClInclude Include="..\src\C_Contrato.h" />
+    <ClInclude Include="..\src\C_ControleCotaVazao.h" />
     <ClInclude Include="..\src\C_CorteBenders.h" />
     <ClInclude Include="..\src\C_Dados.h" />
     <ClInclude Include="..\src\C_Defluencia.h" />
@@ -101,7 +102,6 @@
     <ClInclude Include="..\src\C_Processo.h" />
     <ClInclude Include="..\src\C_ProcessoEstocastico.h" />
     <ClInclude Include="..\src\C_ReservatorioEquivalente.h" />
-    <ClInclude Include="..\src\C_Regua11.h" />
     <ClInclude Include="..\src\C_ReservaPotencia.h" />
     <ClInclude Include="..\src\C_Reservatorio.h" />
     <ClInclude Include="..\src\C_RestricaoEletrica.h" />

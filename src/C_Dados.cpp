@@ -415,6 +415,22 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		//
+		//                                                                        Carregar Arquivos Restricao de Controle Cota Vazao
+		//
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("CONTROLE_COTA_VAZAO_AttComumOperacional.csv", *this, TipoAcessoInstancia_m1);
+
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("CONTROLE_COTA_VAZAO_ANTERIOR_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("CONTROLE_COTA_VAZAO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m1);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("CONTROLE_COTA_VAZAO_AttVetorOperacional_PorInteiro.csv", *this, TipoAcessoInstancia_m1);
+
+		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("CONTROLE_COTA_VAZAO_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_m1);
+
+		validacao_operacional_ControleCotaVazao(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+
+		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		//
 		//                                                                        Carregar Arquivos de Intercambio Hidraulico
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -8642,6 +8658,46 @@ void Dados::validacao_operacional_ReservaPotencia(EntradaSaidaDados a_entradaSai
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validacao_operacional_ReservaPotencia(a_entradaSaidaDados, " + a_diretorio_att_operacional + "," + a_diretorio_att_premissa + "): \n" + std::string(erro.what())); }
 
+}
+
+void Dados::validacao_operacional_ControleCotaVazao(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar){
+
+	try{
+
+		if (vetorControleCotaVazao.numObjetos() == 0)
+			return;
+
+		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+
+		const Periodo periodIni = horizonte_estudo.getIteradorInicial();
+		const Periodo periodEnd = horizonte_estudo.getIteradorFinal();
+
+		const IdControleCotaVazao idConHQOut = getIdOut(IdControleCotaVazao());
+		const IdControleCotaVazao idConHQIni = getMenorId(IdControleCotaVazao());
+
+		for (Periodo period = periodIni; period <= periodEnd; horizonte_estudo.incrementarIterador(period)) {
+
+			for (IdControleCotaVazao idConHQ = idConHQIni; idConHQ < idConHQOut; incr(idConHQ)) {
+
+				const int iterIni = getIterador2Inicial(idConHQ, AttMatrizControleCotaVazao_num_horas_lag, period, int());
+				const int iterEnd = getIterador2Final(idConHQ, AttMatrizControleCotaVazao_num_horas_lag, period, int());
+
+				if (getSize1Matriz(idConHQ, AttMatrizControleCotaVazao_var_abs_inf) > 0) {
+					if ((getIterador2Inicial(idConHQ, AttMatrizControleCotaVazao_var_abs_inf, period, int()) != iterIni) || (getIterador2Final(idConHQ, AttMatrizControleCotaVazao_var_abs_inf, period, int()) != iterEnd))
+						throw std::invalid_argument("Numero de elementos invalidos em " + getFullString(AttMatrizControleCotaVazao_var_abs_inf) + " em " + getFullString(period));
+				}
+
+				if (getSize1Matriz(idConHQ, AttMatrizControleCotaVazao_var_abs_sup) > 0) {
+					if ((getIterador2Inicial(idConHQ, AttMatrizControleCotaVazao_var_abs_sup, period, int()) != iterIni) || (getIterador2Final(idConHQ, AttMatrizControleCotaVazao_var_abs_sup, period, int()) != iterEnd))
+						throw std::invalid_argument("Numero de elementos invalidos em " + getFullString(AttMatrizControleCotaVazao_var_abs_sup) + " em " + getFullString(period));
+				}
+
+			} // for (IdControleCotaVazao idConHQ = idConHQIni; idConHQ < idConHQOut; incr(idConHQ)) {
+
+		}
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validacao_operacional_ControleCotaVazao(a_entradaSaidaDados, " + a_diretorio_att_operacional + "," + a_diretorio_att_premissa + "): \n" + std::string(erro.what())); }
 }
 
 

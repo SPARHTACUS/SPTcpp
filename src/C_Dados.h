@@ -19,7 +19,7 @@
 #include "C_ReservaPotencia.h"
 #include "C_Renovavel.h"
 #include "C_DiscretizacaoTemporal.h"
-#include "C_Regua11.h"
+#include "C_ControleCotaVazao.h"
 #include "C_IntercambioHidraulico.h"
 #include "C_DemandaEspecial.h"
 #include "C_EstruturaResultados.h"
@@ -158,7 +158,7 @@
     m(Dados, ReservaPotencia)        \
     m(Dados, Renovavel)            \
     m(Dados, Discretizacao)          \
-    m(Dados, Regua11)                \
+    m(Dados, ControleCotaVazao)                \
     m(Dados, DemandaEspecial)        \
     m(Dados, IntercambioHidraulico)
 
@@ -238,6 +238,7 @@ public:
 	void validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 	
 	void validacao_operacional_ReservaPotencia(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
+	void validacao_operacional_ControleCotaVazao(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
 	void validacao_operacional_Contrato(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 

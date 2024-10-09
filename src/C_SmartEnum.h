@@ -625,18 +625,18 @@ DEFINE_SMART_ENUM(IdSubmercado, ID_SUBMERCADO)
 	m(IdPatamarDeficit, 10)
 DEFINE_SMART_ENUM(IdPatamarDeficit, ID_PATAMAR_DEFICIT)
 
-#define ID_REGUA_11(m)\
-	m(IdRegua11, 1)\
-	m(IdRegua11, 2)\
-	m(IdRegua11, 3)\
-	m(IdRegua11, 4)\
-	m(IdRegua11, 5)\
-	m(IdRegua11, 6)\
-	m(IdRegua11, 7)\
-	m(IdRegua11, 8)\
-	m(IdRegua11, 9)\
-	m(IdRegua11, 10)
-DEFINE_SMART_ENUM(IdRegua11, ID_REGUA_11)
+#define ID_CONTROLE_COTA_VAZAO(m)\
+	m(IdControleCotaVazao, 1)\
+	m(IdControleCotaVazao, 2)\
+	m(IdControleCotaVazao, 3)\
+	m(IdControleCotaVazao, 4)\
+	m(IdControleCotaVazao, 5)\
+	m(IdControleCotaVazao, 6)\
+	m(IdControleCotaVazao, 7)\
+	m(IdControleCotaVazao, 8)\
+	m(IdControleCotaVazao, 9)\
+	m(IdControleCotaVazao, 10)
+DEFINE_SMART_ENUM(IdControleCotaVazao, ID_CONTROLE_COTA_VAZAO)
 
 #define ID_AREA(m)\
 	m(IdArea, 1)\
@@ -1369,7 +1369,7 @@ m(IdPolinomioJusante)           \
 m(IdProcesso)                   \
 m(IdProcessoEstocastico)        \
 m(IdRealizacao)                 \
-m(IdRegua11)                    \
+m(IdControleCotaVazao)                    \
 m(IdReservaPotencia)            \
 m(IdReservatorio)               \
 m(IdReservatorioEquivalente)    \
