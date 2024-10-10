@@ -1994,16 +1994,16 @@ void LeituraCEPEL::leitura_COTASR11_201904_DES16(Dados& a_dados, const std::stri
 
 					Periodo periodo = Periodo(TipoPeriodo_meia_hora, idDiaInicial, idMesInicial, idAnoInicial, idHoraInicial, idMinInicial);
 
-					IdRegua11 idRegua11 = a_dados.vetorRegua11.getMaiorId();
+					IdControleCotaVazao idControleCotaVazao = a_dados.vetorControleCotaVazao.getMaiorId();
 
-					if (idRegua11 == IdRegua11_Nenhum) {
-						idRegua11 = IdRegua11_1;
-						Regua11 regua11;
-						regua11.setAtributo(AttComumRegua11_idRegua11, idRegua11);
-						a_dados.vetorRegua11.add(regua11);
-					}//if (idRegua11 == IdRegua11_Nenhum) {
+					if (idControleCotaVazao == IdControleCotaVazao_Nenhum) {
+						idControleCotaVazao = IdControleCotaVazao_1;
+						ControleCotaVazao regua11;
+						regua11.setAtributo(AttComumControleCotaVazao_idControleCotaVazao, idControleCotaVazao);
+						a_dados.vetorControleCotaVazao.add(regua11);
+					}//if (idControleCotaVazao == IdControleCotaVazao_Nenhum) {
 
-					a_dados.vetorRegua11.at(idRegua11).addElemento(AttVetorRegua11_nivel_dia_anterior, periodo, std::stod(line.substr(16, 10)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).addElemento(AttVetorControleCotaVazao_nivel_dia_anterior, periodo, std::stod(line.substr(16, 10)));
 
 				}//if (teste_comentario != "&") {
 
@@ -3082,43 +3082,43 @@ void LeituraCEPEL::leitura_DADGER_201904_DES16(Dados& a_dados, const std::string
 					const Periodo periodo_inicial_restricao = getPeriodoInicial(a_dados, line.substr(4, 2), line.substr(7, 2), line.substr(10, 1));
 					const Periodo periodo_final_restricao = getPeriodoFinal(a_dados, line.substr(12, 2), line.substr(15, 2), line.substr(18, 2));
 
-					IdRegua11 idRegua11 = a_dados.vetorRegua11.getMaiorId();
+					IdControleCotaVazao idControleCotaVazao = a_dados.vetorControleCotaVazao.getMaiorId();
 
-					if (idRegua11 == IdRegua11_Nenhum) {
-						idRegua11 = IdRegua11_1;
-						Regua11 regua11;
-						regua11.setAtributo(AttComumRegua11_idRegua11, idRegua11);
+					if (idControleCotaVazao == IdControleCotaVazao_Nenhum) {
+						idControleCotaVazao = IdControleCotaVazao_1;
+						ControleCotaVazao regua11;
+						regua11.setAtributo(AttComumControleCotaVazao_idControleCotaVazao, idControleCotaVazao);
 
-						a_dados.vetorRegua11.add(regua11);
+						a_dados.vetorControleCotaVazao.add(regua11);
 
-					}//if (idRegua11 == IdRegua11_Nenhum) {
+					}//if (idControleCotaVazao == IdControleCotaVazao_Nenhum) {
 
-					a_dados.vetorRegua11.at(idRegua11).setAtributo(AttComumRegua11_coeficiente_0, std::stod(line.substr(59, 15)));
-					a_dados.vetorRegua11.at(idRegua11).setAtributo(AttComumRegua11_coeficiente_1, std::stod(line.substr(74, 15)));
-					a_dados.vetorRegua11.at(idRegua11).setAtributo(AttComumRegua11_coeficiente_2, std::stod(line.substr(89, 15)));
-					a_dados.vetorRegua11.at(idRegua11).setAtributo(AttComumRegua11_coeficiente_3, std::stod(line.substr(104, 15)));
-					a_dados.vetorRegua11.at(idRegua11).setAtributo(AttComumRegua11_coeficiente_4, std::stod(line.substr(119, 15)));
-					a_dados.vetorRegua11.at(idRegua11).setAtributo(AttComumRegua11_coeficiente_5, std::stod(line.substr(134, 15)));
-					a_dados.vetorRegua11.at(idRegua11).setAtributo(AttComumRegua11_coeficiente_6, std::stod(line.substr(149, 15)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setAtributo(AttComumControleCotaVazao_coeficiente_0, std::stod(line.substr(59, 15)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setAtributo(AttComumControleCotaVazao_coeficiente_1, std::stod(line.substr(74, 15)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setAtributo(AttComumControleCotaVazao_coeficiente_2, std::stod(line.substr(89, 15)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setAtributo(AttComumControleCotaVazao_coeficiente_3, std::stod(line.substr(104, 15)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setAtributo(AttComumControleCotaVazao_coeficiente_4, std::stod(line.substr(119, 15)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setAtributo(AttComumControleCotaVazao_coeficiente_5, std::stod(line.substr(134, 15)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setAtributo(AttComumControleCotaVazao_coeficiente_6, std::stod(line.substr(149, 15)));
 
-					if(a_dados.getSizeVetor(idRegua11, AttVetorRegua11_variacao_maxima_horaria) == 0)
-						a_dados.vetorRegua11.at(idRegua11).setVetor(AttVetorRegua11_variacao_maxima_horaria, SmartEnupla<Periodo, double>(a_horizonte_estudo, 0));
+					if(a_dados.getSizeVetor(idControleCotaVazao, AttVetorControleCotaVazao_variacao_maxima_horaria) == 0)
+						a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setVetor(AttVetorControleCotaVazao_variacao_maxima_horaria, SmartEnupla<Periodo, double>(a_horizonte_estudo, 0));
 					
-					if (a_dados.getSizeVetor(idRegua11, AttVetorRegua11_variacao_maxima_diaria) == 0)
-						a_dados.vetorRegua11.at(idRegua11).setVetor(AttVetorRegua11_variacao_maxima_diaria, SmartEnupla<Periodo, double>(a_horizonte_estudo, 0));
+					if (a_dados.getSizeVetor(idControleCotaVazao, AttVetorControleCotaVazao_variacao_maxima_diaria) == 0)
+						a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setVetor(AttVetorControleCotaVazao_variacao_maxima_diaria, SmartEnupla<Periodo, double>(a_horizonte_estudo, 0));
 
 					std::string variacaoMaximaHoraria = line.substr(30, 10); variacaoMaximaHoraria.erase(std::remove(variacaoMaximaHoraria.begin(), variacaoMaximaHoraria.end(), ' '), variacaoMaximaHoraria.end());
 					std::string variacaoMaximaDiaria = line.substr(40, 10); variacaoMaximaDiaria.erase(std::remove(variacaoMaximaDiaria.begin(), variacaoMaximaDiaria.end(), ' '), variacaoMaximaDiaria.end());
 
 					if (!variacaoMaximaHoraria.empty()) {
 						for (Periodo periodo = getPeriodoInicialResticao(periodo_inicial_restricao, horizonte_estudo); periodo <= getPeriodoFinalResticao(periodo_final_restricao, horizonte_estudo); horizonte_estudo.incrementarIterador(periodo)) {
-							a_dados.vetorRegua11.at(idRegua11).setElemento(AttVetorRegua11_variacao_maxima_horaria, periodo, std::stod(variacaoMaximaDiaria));
+							a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setElemento(AttVetorControleCotaVazao_variacao_maxima_horaria, periodo, std::stod(variacaoMaximaDiaria));
 						}
 					}//if (!variacaoMaximaHoraria.empty()) {
 
 					if (!variacaoMaximaDiaria.empty()) {
 						for (Periodo periodo = getPeriodoInicialResticao(periodo_inicial_restricao, horizonte_estudo); periodo <= getPeriodoFinalResticao(periodo_final_restricao, horizonte_estudo); horizonte_estudo.incrementarIterador(periodo)) {
-							a_dados.vetorRegua11.at(idRegua11).setElemento(AttVetorRegua11_variacao_maxima_diaria, periodo, std::stod(variacaoMaximaDiaria));
+							a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setElemento(AttVetorControleCotaVazao_variacao_maxima_diaria, periodo, std::stod(variacaoMaximaDiaria));
 						}
 					}//if (!variacaoMaximaDiaria.empty()) {
 
@@ -3723,24 +3723,24 @@ void LeituraCEPEL::leitura_REE_201904_DES16(Dados& a_dados, const std::string a_
 					const IdHidreletrica idHidreletrica_itaipu = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, 66);
 					const IdHidreletrica idHidreletrica_SaltoCaxias = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, 82);
 
-					IdRegua11 idRegua11 = a_dados.vetorRegua11.getMaiorId();
+					IdControleCotaVazao idControleCotaVazao = a_dados.vetorControleCotaVazao.getMaiorId();
 
-					if (idRegua11 == IdRegua11_Nenhum) {
-						idRegua11 = IdRegua11_1;
-						Regua11 regua11;
-						regua11.setAtributo(AttComumRegua11_idRegua11, idRegua11);
+					if (idControleCotaVazao == IdControleCotaVazao_Nenhum) {
+						idControleCotaVazao = IdControleCotaVazao_1;
+						ControleCotaVazao regua11;
+						regua11.setAtributo(AttComumControleCotaVazao_idControleCotaVazao, idControleCotaVazao);
 						
-						a_dados.vetorRegua11.add(regua11);
+						a_dados.vetorControleCotaVazao.add(regua11);
 
-					}//if (idRegua11 == IdRegua11_Nenhum) {
+					}//if (idControleCotaVazao == IdControleCotaVazao_Nenhum) {
 
-					a_dados.vetorRegua11.at(idRegua11).setAtributo(AttComumRegua11_coeficiente_0, std::stod(line.substr(9, 15)));
-					a_dados.vetorRegua11.at(idRegua11).setAtributo(AttComumRegua11_coeficiente_1, std::stod(line.substr(24, 15)));
-					a_dados.vetorRegua11.at(idRegua11).setAtributo(AttComumRegua11_coeficiente_2, std::stod(line.substr(39, 15)));
-					a_dados.vetorRegua11.at(idRegua11).setAtributo(AttComumRegua11_coeficiente_3, std::stod(line.substr(54, 15)));
-					a_dados.vetorRegua11.at(idRegua11).setAtributo(AttComumRegua11_coeficiente_4, std::stod(line.substr(69, 15)));
-					a_dados.vetorRegua11.at(idRegua11).addElemento(AttVetorRegua11_hidreletrica, 1, idHidreletrica_itaipu);
-					a_dados.vetorRegua11.at(idRegua11).addElemento(AttVetorRegua11_hidreletrica, 2, idHidreletrica_SaltoCaxias);
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setAtributo(AttComumControleCotaVazao_coeficiente_0, std::stod(line.substr(9, 15)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setAtributo(AttComumControleCotaVazao_coeficiente_1, std::stod(line.substr(24, 15)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setAtributo(AttComumControleCotaVazao_coeficiente_2, std::stod(line.substr(39, 15)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setAtributo(AttComumControleCotaVazao_coeficiente_3, std::stod(line.substr(54, 15)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).setAtributo(AttComumControleCotaVazao_coeficiente_4, std::stod(line.substr(69, 15)));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).addElemento(AttVetorControleCotaVazao_hidreletrica, 1, idHidreletrica_itaipu);
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao).addElemento(AttVetorControleCotaVazao_hidreletrica, 2, idHidreletrica_SaltoCaxias);
 
 				}//if (line.substr(0, 2) == "IT") {
 

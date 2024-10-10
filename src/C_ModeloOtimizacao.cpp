@@ -6037,14 +6037,14 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 
 				if (getRank(a_idProcesso) < numero_elementos_resto) {
 					pos_inicial = getRank(a_idProcesso) * (numero_elementos_consolidar + 1);
-					pos_final = pos_inicial + numero_elementos_consolidar + 1;
+					pos_final = pos_inicial + numero_elementos_consolidar;
 				}
 				else {
 					pos_inicial = numero_elementos_resto + (getRank(a_idProcesso) * numero_elementos_consolidar);
-					pos_final = pos_inicial + numero_elementos_consolidar;
+					pos_final = pos_inicial + numero_elementos_consolidar - 1;
 				}
 
-				for (int i = pos_inicial; i < pos_final; i++) {
+				for (int i = pos_inicial; i <= pos_final; i++) {
 
 					const std::string elem_str = lista_elemento_impressao.at(a_TSS).at(i);
 
