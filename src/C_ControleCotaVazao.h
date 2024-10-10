@@ -21,6 +21,7 @@
 	  m(ControleCotaVazao,  AttVetor,               cota_anterior,           double,           0,         max,             0,  Periodo)\
 	  m(ControleCotaVazao,  AttVetor,          nivel_dia_anterior,           double,           0,         max,             0,  Periodo)\
 	  m(ControleCotaVazao,  AttVetor,       hidreletrica_montante,   IdHidreletrica,         min,         max,           min,      int)\
+	  m(ControleCotaVazao,  AttVetor,          fator_participacao,           double,         min,         max,             1,      int)\
 	  m(ControleCotaVazao,  AttVetor,                hidreletrica,   IdHidreletrica,         min,         max,           min,      int)\
 	  m(ControleCotaVazao,  AttVetor,    coef_linear_cota_vazao_0,           double,         min,         max,             0,  Periodo)\
 	  m(ControleCotaVazao,  AttVetor,    coef_linear_cota_vazao_1,           double,         min,         max,             0,  Periodo)\

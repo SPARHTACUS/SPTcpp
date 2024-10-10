@@ -6356,7 +6356,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_HQ(const 
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equHQ, a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_0, periodo, double()));
 						for (int h = a_dados.getIteradorInicial(a_idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, int()); h <= a_dados.getIteradorFinal(a_idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, int()); h++) {
 							const IdHidreletrica idUHE = a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, h, IdHidreletrica());
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, periodo, idUHE), equHQ, -a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo, double()));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, periodo, idUHE), equHQ, -a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_fator_participacao, h, double()) * a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo, double()));
 						}
 					}
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varHQ, equHQ, -sobreposicao);
@@ -8749,7 +8749,7 @@ void ModeloOtimizacao::criarControleCotaVazao(const TipoSubproblemaSolver a_TSS,
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equHQ, a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_0, a_period, double()));
 				for (int h = a_dados.getIteradorInicial(idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, int()); h <= a_dados.getIteradorFinal(idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, int()); h++) {
 					const IdHidreletrica idUHE = a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, h, IdHidreletrica());
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_period, idUHE), equHQ, -a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, a_period, double()));
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_period, idUHE), equHQ, -a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_fator_participacao, h, double()) * a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, a_period, double()));
 				}
 
 				//
