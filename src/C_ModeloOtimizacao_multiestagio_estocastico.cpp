@@ -8817,9 +8817,6 @@ void ModeloOtimizacao::criarReservaPotencia(const TipoSubproblemaSolver a_TSS, D
 
 			const int varPRES = criarReservaPotencia(a_TSS, a_dados, a_idEstagio, a_period, a_idPat, idPRES);
 
-			if (a_dados.getSize1Matriz(idPRES, AttMatrizReservaPotencia_reserva_minima) > 0)
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPRES, a_dados.getElementoMatriz(idPRES, AttMatrizReservaPotencia_reserva_minima, a_period, a_idPat, double()));
-
 		}// for (IdReservaPotencia idPRES = idPRESIni; idPRES < idPRESOut; a_dados.incr(idPRES)) {
 
 	} // try{
@@ -8853,6 +8850,9 @@ int ModeloOtimizacao::criarReservaPotencia(const TipoSubproblemaSolver a_TSS, Da
 		equPRES_pat = addEquLinear_PRES(a_TSS, a_idEstagio, a_period, a_idPat, a_idPRES);
 		varPRES_pat = addVarDecisao_PRES(a_TSS, a_idEstagio, a_period, a_idPat, a_idPRES, a_dados.getElementoMatriz(a_idPRES, AttMatrizReservaPotencia_reserva_minima, a_period, a_idPat, double()), infinito, 0.0);
 		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPRES_pat, equPRES_pat, 1.0);
+		const int inePRES_pat = addIneLinear_PRES(a_TSS, a_idEstagio, a_period, a_idPat, a_idPRES);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPRES_pat, inePRES_pat, 1.0);
+		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(inePRES_pat, a_dados.getElementoMatriz(a_idPRES, AttMatrizReservaPotencia_reserva_minima, a_period, a_idPat, double()));
 
 		if (idPatEnd > IdPatamarCarga_1) {
 
@@ -8944,12 +8944,12 @@ int ModeloOtimizacao::criarReservaPotencia(const TipoSubproblemaSolver a_TSS, Da
 
 				// Demanda
 				else if ((idUHE == IdHidreletrica_Nenhum) && (idConUHE == IdConjuntoHidraulico_Nenhum) && (idUniUHE == IdUnidadeUHE_Nenhum) && (idUTE == IdTermeletrica_Nenhum) && (idUniUTE == IdUnidadeUTE_Nenhum) && (idINT == IdIntercambio_Nenhum) && (idREN == IdRenovavel_Nenhum) && (idDEM != IdSubmercado_Nenhum) && (idDEMLIQ == IdSubmercado_Nenhum)) {
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PL(a_TSS, a_idEstagio, a_period, a_idPat, idDEM), equPRES_pat, -fator_participacao);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PL(a_TSS, a_idEstagio, a_period, a_idPat, idDEM), inePRES_pat, -fator_participacao);
 				}
 
 				// Demanda Liquida
 				else if ((idUHE == IdHidreletrica_Nenhum) && (idConUHE == IdConjuntoHidraulico_Nenhum) && (idUniUHE == IdUnidadeUHE_Nenhum) && (idUTE == IdTermeletrica_Nenhum) && (idUniUTE == IdUnidadeUTE_Nenhum) && (idINT == IdIntercambio_Nenhum) && (idREN == IdRenovavel_Nenhum) && (idDEM == IdSubmercado_Nenhum) && (idDEMLIQ != IdSubmercado_Nenhum)) {
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PL_LIQ(a_TSS, a_idEstagio, a_period, a_idPat, idDEMLIQ), equPRES_pat, -fator_participacao);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PL_LIQ(a_TSS, a_idEstagio, a_period, a_idPat, idDEMLIQ), inePRES_pat, -fator_participacao);
 				}
 
 				else

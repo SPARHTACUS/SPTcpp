@@ -5814,12 +5814,13 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 			!getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, bool()) && !getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()))
 			return;
 
-		if (isPrintElemSync < 2) {
+		const IdProcesso maior_processo = arranjoResolucao.getMaiorId(IdProcesso());
+
+		if ((isPrintElemSync < 2) && (maior_processo > IdProcesso_mestre))  {
 
 			std::vector<std::vector<std::string>> lista_elemento_impressao_sync(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
 
 			const IdProcesso idProcesso_local = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
-			const IdProcesso maior_processo = arranjoResolucao.getMaiorId(IdProcesso());
 
 			for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= maior_processo; idProcesso++) {
 
@@ -5883,7 +5884,7 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 
 			MPI_Barrier(MPI_COMM_WORLD);
 
-		} // if (isPrintElemSync < 2) {
+		} // if ((isPrintElemSync < 2) && (maior_processo > IdProcesso_mestre))  {
 
 		const string diretorio = a_entradaSaidaDados.getDiretorioSaida();
 
