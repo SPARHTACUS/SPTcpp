@@ -862,7 +862,10 @@ void Dados::validaTermeletrica(const IdTermeletrica a_menorIdTermeletrica, const
 
 								double potencia_disponivel_minima_total = 0.0;
 
-								for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= getMaiorId(idUTE, IdUnidadeUTE()); idUnidadeUTE++) {
+								const IdUnidadeUTE idUnidadeUTEIni = vetorTermeletrica.at(idUTE).getMenorId(IdUnidadeUTE());
+								const IdUnidadeUTE idUnidadeUTEOut = vetorTermeletrica.at(idUTE).getIdOut(IdUnidadeUTE());
+
+								for (IdUnidadeUTE idUnidadeUTE = idUnidadeUTEIni; idUnidadeUTE < idUnidadeUTEOut; vetorTermeletrica.at(idUTE).vetorUnidadeUTE.incr(idUnidadeUTE)) {
 
 									double potencia_disponivel_minima_unidade = -1.0;
 									double potencia_disponivel_maxima_unidade = -1.0;
@@ -881,7 +884,7 @@ void Dados::validaTermeletrica(const IdTermeletrica a_menorIdTermeletrica, const
 									if (potencia_disponivel_minima_unidade > -1.0)
 										potencia_disponivel_minima_total += potencia_disponivel_minima_unidade;
 
-								} // for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= maiorIdUnidadeUTE; idUnidadeUTE++) {
+								} // for 
 
 								if (potencia_disponivel_minima > -1.0)
 									if (potencia_disponivel_minima_total > potencia_disponivel_minima)
@@ -893,9 +896,10 @@ void Dados::validaTermeletrica(const IdTermeletrica a_menorIdTermeletrica, const
 
 					}
 
-					const IdUnidadeUTE maiorIdUnidadeUTE = getMaiorId(idUTE, IdUnidadeUTE());
+					const IdUnidadeUTE idUnidadeUTEIni = vetorTermeletrica.at(idUTE).getMenorId(IdUnidadeUTE());
+					const IdUnidadeUTE idUnidadeUTEOut = vetorTermeletrica.at(idUTE).getIdOut(IdUnidadeUTE());
 
-					for (IdUnidadeUTE idUnidade = IdUnidadeUTE_1; idUnidade <= maiorIdUnidadeUTE; idUnidade++) {
+					for (IdUnidadeUTE idUnidade = idUnidadeUTEIni; idUnidade < idUnidadeUTEOut; vetorTermeletrica.at(idUTE).vetorUnidadeUTE.incr(idUnidade)) {
 
 
 						//if (((getAtributo(idUTE, idUnidade, AttComumUnidadeUTE_status) != TipoStatusUnidadeUTE_desligada) && ((getAtributo(idUTE, idUnidade, AttComumUnidadeUTE_horas_neste_status) != 0)  || (getAtributo(idUTE, idUnidade, AttComumUnidadeUTE_min_neste_status) != 0)) && (getAtributo(idUTE, idUnidade, AttComumUnidadeUTE_geracao_inicial) != 0) )
@@ -928,7 +932,7 @@ void Dados::validaTermeletrica(const IdTermeletrica a_menorIdTermeletrica, const
 
 						} // if ((getSize1Matriz(idUTE, idUnidade, AttMatrizUnidadeUTE_potencia_disponivel_minima) != 0) && (getSize1Matriz(idUTE, idUnidade, AttMatrizUnidadeUTE_potencia_disponivel_maxima) != 0)) {
 
-					} // for (IdUnidadeUTE idUnidade = IdUnidadeUTE_1; idUnidade <= maiorIdUnidadeUTE; idUnidade++) {
+					} // for 
 
 
 				} // if (considerar_usina){
@@ -2368,9 +2372,10 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 			} // if (maiorIdUnidadeUTE == IdUnidadeUTE_Nenhum) {
 
+			const IdUnidadeUTE idUnidadeUTEIni = vetorTermeletrica.at(idTermeletrica).getMenorId(IdUnidadeUTE());
+			const IdUnidadeUTE idUnidadeUTEOut = vetorTermeletrica.at(idTermeletrica).getIdOut(IdUnidadeUTE());
 
-
-			for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= maiorIdUnidadeUTE; idUnidadeUTE++) {
+			for (IdUnidadeUTE idUnidadeUTE = idUnidadeUTEIni; idUnidadeUTE < idUnidadeUTEOut; vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.incr(idUnidadeUTE)) {
 
 				preencher_AttVetorUnidadeUTE.at(idTermeletrica).addElemento(idUnidadeUTE, SmartEnupla<AttVetorUnidadeUTE, PreencherAtributo>(AttVetorUnidadeUTE(AttVetorUnidadeUTE_Nenhum + 1), std::vector<PreencherAtributo>(AttVetorUnidadeUTE(AttVetorUnidadeUTE_Excedente - 1), nao_sem_utilizacao)));
 				preencher_AttMatrizUnidadeUTE.at(idTermeletrica).addElemento(idUnidadeUTE, SmartEnupla<AttMatrizUnidadeUTE, PreencherAtributo>(AttMatrizUnidadeUTE(AttMatrizUnidadeUTE_Nenhum + 1), std::vector<PreencherAtributo>(AttMatrizUnidadeUTE(AttMatrizUnidadeUTE_Excedente - 1), nao_sem_utilizacao)));
@@ -2752,7 +2757,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
 								vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.at(idUnidadeUTE).addElemento(AttMatrizUnidadeUTE_potencia_util, periodo, idPatamarCarga, (getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double()) - getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, double())));
 
-			} // for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= maiorIdUnidadeUTE; idUnidadeUTE++) {
+			} // for 
 
 
 			// -------------------------------------------
@@ -2799,7 +2804,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 					double potencia_maxima = 0.0;
 
-					for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= getMaiorId(idTermeletrica, IdUnidadeUTE()); idUnidadeUTE++) {
+					for (IdUnidadeUTE idUnidadeUTE = idUnidadeUTEIni; idUnidadeUTE < idUnidadeUTEOut; vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.incr(idUnidadeUTE)) {
 						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
 							potencia_maxima += getElementoMatriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double()) * getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, double());
 					}
@@ -3109,8 +3114,10 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 					}//if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_meta) > 0) {
 
-					const IdUnidadeUTE maiorIdUnidadeUTE = getMaiorId(idTermeletrica, IdUnidadeUTE());
-					for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= maiorIdUnidadeUTE; idUnidadeUTE++) {
+					const IdUnidadeUTE idUnidadeUTEIni = vetorTermeletrica.at(idTermeletrica).getMenorId(IdUnidadeUTE());
+					const IdUnidadeUTE idUnidadeUTEOut = vetorTermeletrica.at(idTermeletrica).getIdOut(IdUnidadeUTE());
+
+					for (IdUnidadeUTE idUnidadeUTE = idUnidadeUTEIni; idUnidadeUTE < idUnidadeUTEOut; vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.incr(idUnidadeUTE)) {
 
 						// ------------------
 						//
@@ -3227,7 +3234,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 						} // for (AttMatrizUnidadeUTE attMatrizUnidadeUTE = AttMatrizUnidadeUTE(AttMatrizUnidadeUTE_Nenhum + 1); attMatrizUnidadeUTE < AttMatrizUnidadeUTE_Excedente; attMatrizUnidadeUTE++) {
 
-					} //for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= maiorIdUnidadeUTE; idUnidadeUTE++) {
+					} //for 
 
 				} // for (IdTermeletrica idTermeletrica = getMenorId(IdTermeletrica()); idTermeletrica <= maiorIdTermeletrica; vetorTermeletrica.incr(idTermeletrica)) {
 
