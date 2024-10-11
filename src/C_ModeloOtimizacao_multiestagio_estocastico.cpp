@@ -5812,7 +5812,7 @@ void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a
 
 								// Potencia Por UnidadeUTE
 								//
-								addVarDecisao_PT(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, a_period, a_idPat, double()) + a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_period, a_idPat, double());
+								addVarDecisao_PT(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, a_period, a_idPat, double()) + a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_period, a_idPat, double()));
 								addVarDecisao_PTUTIL(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_period, a_idPat, double()), 0.0);
 								addVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, infinito, 0.0);
 								addVarDecisao_UTE_ON_T(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 1.0, 1.0, 0.0);
