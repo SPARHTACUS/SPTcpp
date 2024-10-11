@@ -5712,6 +5712,8 @@ void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a
 		const IdTermeletrica idUTEOut = a_dados.getIdOut(IdTermeletrica());
 		for (IdTermeletrica idUTE = idUTEIni; idUTE < idUTEOut; a_dados.vetorTermeletrica.incr(idUTE)) {
 
+			IdUnidadeUTE idUnUTE_equiv = IdUnidadeUTE_Nenhum;
+
 			if (a_dados.getAtributo(idUTE, AttComumTermeletrica_considerar_usina, bool())) {
 
 				const TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao = a_dados.getAtributo(idUTE, AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica());
@@ -5766,8 +5768,8 @@ void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a
 
 					for (IdUnidadeUTE idUnidadeUTE = IdUnidadeUTE_1; idUnidadeUTE <= a_dados.getMaiorId(idUTE, IdUnidadeUTE()); idUnidadeUTE++) {
 
-						//if (a_dados.getElementoVetor(idUTE, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade, a_period, double()) > 0.0) {
-						if (true) {
+						if (a_dados.getElementoVetor(idUTE, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade, a_period, double()) > 0.0) {
+
 							disponivel = true;
 
 							// REPRESENTAÇÃO DISCRETA 
@@ -5790,21 +5792,40 @@ void ModeloOtimizacao::criarVariaveisTermeletricas(const TipoSubproblemaSolver a
 
 							}//if (a_dados.getAtributo(idUTE, AttComumTermeletrica_representacao_discreta_producao,  bool())) {
 
+							else {
 
-							// Potencia Por UnidadeUTE
-							//
-							addVarDecisao_PT(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_maxima, a_period, a_idPat, double()), 0.0);
-							addVarDecisao_PTUTIL(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_period, a_idPat, double()), 0.0);
-							addVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, infinito, 0.0);
-							addVarDecisao_UTE_ON_T(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 1.0, 1.0, 0.0);
+								if ((a_dados.getAtributo(idUTE, AttComumTermeletrica_unidades_simultaneas, bool())) && (idUnUTE_equiv == IdUnidadeUTE_Nenhum)) {
+									double pot_max = 0.0;
+									for (IdUnidadeUTE idUnUTE_ = IdUnidadeUTE_1; idUnUTE_ <= a_dados.getMaiorId(idUTE, IdUnidadeUTE()); idUnUTE_++) {
+										if (a_dados.getElementoVetor(idUTE, idUnUTE_, AttVetorUnidadeUTE_disponibilidade, a_period, double()) > 0.0) {
+											const double pot_max_ = a_dados.getElementoMatriz(idUTE, idUnUTE_, AttMatrizUnidadeUTE_potencia_minima, a_period, a_idPat, double()) + a_dados.getElementoMatriz(idUTE, idUnUTE_, AttMatrizUnidadeUTE_potencia_util, a_period, a_idPat, double());
+											if (pot_max < pot_max_) {
+												pot_max = pot_max_;
+												idUnUTE_equiv = idUnUTE_;
+											}
+										}
+									}
+								} // if ((a_dados.getAtributo(idUTE, AttComumTermeletrica_unidades_simultaneas, bool())) && (idUnUTE_equiv == IdUnidadeUTE_Nenhum)) {
+							}
+
+							if ((idUnUTE_equiv != IdUnidadeUTE_Nenhum) && (idUnUTE_equiv == idUnidadeUTE)) {
+
+								// Potencia Por UnidadeUTE
+								//
+								addVarDecisao_PT(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, a_period, a_idPat, double()) + a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_period, a_idPat, double());
+								addVarDecisao_PTUTIL(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_period, a_idPat, double()), 0.0);
+								addVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, infinito, 0.0);
+								addVarDecisao_UTE_ON_T(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 1.0, 1.0, 0.0);
 
 
-							//
-							// Potencia Disponivel Por UnidadeUTE
-							//
+								//
+								// Potencia Disponivel Por UnidadeUTE
+								//
 
-							if (a_dados.getSize1Matriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima) > 0)
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE), a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, a_period, a_idPat, double()));
+								if (a_dados.getSize1Matriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima) > 0)
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE), a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, a_period, a_idPat, double()));
+
+							} // if ((idUnUTE_equiv != IdUnidadeUTE_Nenhum) && (idUnUTE_equiv == idUnidadeUTE)) {
 
 						} // if (a_dados.getElementoVetor(idUTE, idUnidadeUTE, AttVetorUnidadeUTE_disponibilidade, a_period, double()) > 0.0) {
 
