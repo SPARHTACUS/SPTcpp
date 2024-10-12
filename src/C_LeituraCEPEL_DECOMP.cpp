@@ -17158,6 +17158,9 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						if (!dados_PD.vetorTermeletrica.isInstanciado(idTermeletrica_CP)) {
 
+							//AttComum
+							a_dados.vetorTermeletrica.at(idTermeletrica_CP).setAtributo(AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica_por_unidade);
+
 							const IdUnidadeUTE idUnidadeUTEIni_CP = a_dados.vetorTermeletrica.at(idTermeletrica_CP).getMenorId(IdUnidadeUTE());
 							const IdUnidadeUTE idUnidadeUTEOut_CP = a_dados.vetorTermeletrica.at(idTermeletrica_CP).getIdOut(IdUnidadeUTE());
 
