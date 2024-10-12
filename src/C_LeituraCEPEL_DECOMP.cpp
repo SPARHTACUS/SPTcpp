@@ -17170,6 +17170,9 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							for (IdUnidadeUTE idUnidade_CP = idUnidadeUTEIni_CP; idUnidade_CP < idUnidadeUTEOut_CP; a_dados.vetorTermeletrica.at(idTermeletrica_CP).vetorUnidadeUTE.incr(idUnidade_CP)) {
 
+								//AttComum
+								a_dados.vetorTermeletrica.at(idTermeletrica_CP).vetorUnidadeUTE.at(idUnidade_CP).setAtributo(AttComumUnidadeUTE_nome, a_dados.vetorTermeletrica.at(idTermeletrica_CP).getAtributo(AttComumTermeletrica_nome, std::string()));
+
 								//AttVetor
 								if (a_dados.vetorTermeletrica.at(idTermeletrica_CP).vetorUnidadeUTE.at(idUnidade_CP).getSizeVetor(AttVetorUnidadeUTE_representacao_discreta_producao) == 0)
 									a_dados.vetorTermeletrica.at(idTermeletrica_CP).vetorUnidadeUTE.at(idUnidade_CP).setVetor(AttVetorUnidadeUTE_representacao_discreta_producao, SmartEnupla<Periodo, int>(horizonte_estudo, 0));

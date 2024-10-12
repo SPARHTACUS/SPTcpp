@@ -3149,8 +3149,8 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 							a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
 							a_entradaSaidaDados.setAppendArquivo(impresso_AttComumUnidadeUTE);
-							const std::vector<AttComumUnidadeUTE> lista_TERMELETRICA_CONJUNTO_UNIDADE_AttComumOperacional{ AttComumUnidadeUTE_idUnidadeUTE, AttComumUnidadeUTE_nome, AttComumUnidadeUTE_submercado, AttComumUnidadeUTE_status, AttComumUnidadeUTE_t_on, AttComumUnidadeUTE_t_of,\
-																															AttComumUnidadeUTE_unidade_equivalente, AttComumUnidadeUTE_geracao_inicial, AttComumUnidadeUTE_horas_neste_status, AttComumUnidadeUTE_min_neste_status };
+							const std::vector<AttComumUnidadeUTE> lista_TERMELETRICA_CONJUNTO_UNIDADE_AttComumOperacional{ AttComumUnidadeUTE_idUnidadeUTE, AttComumUnidadeUTE_nome, AttComumUnidadeUTE_submercado, AttComumUnidadeUTE_ramp_up, AttComumUnidadeUTE_ramp_down, AttComumUnidadeUTE_min_time_up,\
+																															AttComumUnidadeUTE_min_time_down, AttComumUnidadeUTE_timi_ini, AttComumUnidadeUTE_power_ini };
 
 							a_entradaSaidaDados.imprimirArquivoCSV_AttComum("TERMELETRICA_UNIDADE_AttComumOperacional.csv", idTermeletrica, idUnidadeUTE, *this, lista_TERMELETRICA_CONJUNTO_UNIDADE_AttComumOperacional);
 							impresso_AttComumUnidadeUTE = true;
