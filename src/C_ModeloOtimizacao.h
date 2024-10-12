@@ -125,11 +125,12 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 #define ITERADORES_2_ESTAGIO_PERIODO(m)            m(1, IdEstagio) m(2, Periodo)
 #define ITERADORES_2_ESTAGIO_VARIAVELESTADO(m)     m(1, IdEstagio) m(2, IdVariavelEstado)
-#define ITERADORES_3_ESTAGIO_REALIZACAO(m)         m(1, IdEstagio) m(2, IdRealizacao)
+#define ITERADORES_2_ESTAGIO_REALIZACAO(m)         m(1, IdEstagio) m(2, IdRealizacao)
 
 #define VARIAVEL_DECISAO_2(m)\
-	m(  VarDecisao,     ZF,                      2, 1,   ITERADORES_3_ESTAGIO_REALIZACAO)  \
-	m(  VarDecisao,     ZT,                      2, 1,   ITERADORES_3_ESTAGIO_REALIZACAO)  \
+	m(  VarDecisao,   ENA,              2, 1,         ITERADORES_2_ESTAGIO_PERIODO)  \
+	m(  VarDecisao,     ZF,                      2, 1,   ITERADORES_2_ESTAGIO_REALIZACAO)  \
+	m(  VarDecisao,     ZT,                      2, 1,   ITERADORES_2_ESTAGIO_REALIZACAO)  \
 	m(  VarDecisao,     ZP0_VF_LINF,             2, 1,   ITERADORES_2_ESTAGIO_PERIODO)  \
 	m(  VarDecisao,     ZP0_VF_LINF_ADD,         2, 1,   ITERADORES_2_ESTAGIO_PERIODO)  \
 	m(  VarDecisao,     ZO0,                     2, 1,    ITERADORES_2_ESTAGIO_PERIODO)  \
@@ -168,20 +169,22 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_3_ESTAGIO_PERIODO_RENOVAVEL(m)             m(1, IdEstagio) m(2, Periodo)        m(3, IdRenovavel)
 #define ITERADORES_3_ESTAGIO_PERIODO_RESERVAPOTENCIA(m)       m(1, IdEstagio) m(2, Periodo)        m(3, IdReservaPotencia)
 #define ITERADORES_3_ESTAGIO_PERIODO_CONTROLEHQ(m)            m(1, IdEstagio) m(2, Periodo)        m(3, IdControleCotaVazao)
+#define ITERADORES_3_ESTAGIO_PERIODO_REE(m)                   m(1, IdEstagio) m(2, Periodo)        m(3, IdReservatorioEquivalente)
 #define ITERADORES_3_ESTAGIO_REALIZACAO_CORTEBENDERS(m)       m(1, IdEstagio) m(2, IdRealizacao)   m(3, IdCorteBenders)
 
 #define VARIAVEL_DECISAO_3(m)\
+	m(  VarDecisao,   ENA,              3, 1,    ITERADORES_3_ESTAGIO_PERIODO_REE)  \
 	m(  VarDecisao,   ZP,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA)  \
 	m(  VarDecisao,   ZO,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_PATAMARCARGA)  \
 	m(  VarDecisao,   ZP0_VF_LINF,      3, 1,         ITERADORES_3_ESTAGIO_PERIODO_PERIODO)  \
 	m(  VarDecisao,   QINC,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
 	m(  VarDecisao,   QINC_FINF,              3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
-	m(  VarDecisao,   ENA,              3, 1,         ITERADORES_3_ESTAGIO_PERIODO_PERIODO)  \
 	m(  VarDecisao,   QEVA,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
 	m(  VarDecisao,   QEVA_REL,           3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
 	m(  VarDecisao,   QEVA_FINF,          3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
     m(  VarDecisao,   QTUR,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
     m(  VarDecisao,   QDEF,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
+    m(  VarDecisao,   QDEF_ADD,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
     m(  VarDecisao,   QDEF_FINF,          3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
     m(  VarDecisao,   QDEF_FSUP,          3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
 	m(  VarDecisao,   VI,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_HIDRELETRICA)  \
@@ -317,8 +320,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 #define ITERADORES_4_ESTAGIO_PERIODO_SSE_PATDEFICIT(m)                           m(1, IdEstagio) m(2, Periodo) m(3, IdSubmercado) m(4, IdPatamarDeficit)
 #define ITERADORES_4_ESTAGIO_PERIODO_SSE_USINANSIMU(m)                           m(1, IdEstagio) m(2, Periodo) m(3, IdSubmercado) m(4, IdUsinaNaoSimulada)
-#define ITERADORES_4_ESTAGIO_PERIODO_PERIODO_REE(m)                           m(1, IdEstagio) m(2, Periodo) m(3, Periodo) m(4, IdReservatorioEquivalente)
-#define ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA(m)                  m(1, IdEstagio) m(2, Periodo) m(3, Periodo) m(4, IdHidreletrica)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESERVAPOTENCIA(m)                  m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdReservaPotencia)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO(m)               m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdSubmercado)
 #define ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA(m)             m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica)
@@ -336,11 +337,10 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_HIDRELETRICA(m)            m(1, IdEstagio) m(2, Periodo) m(3, IdHidreletrica) m(4, IdHidreletrica)
 #define ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTO(m)                 m(1, IdEstagio) m(2, Periodo) m(3, IdHidreletrica) m(4, IdConjuntoHidraulico)
 #define ITERADORES_4_ESTAGIO_PERIODO_CONTROLEHQ_DOUBLE(m)                    m(1, IdEstagio) m(2, Periodo) m(3, IdControleCotaVazao) m(4, double)
-
+#define ITERADORES_4_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA(m)   m(1, IdEstagio) m(2, Periodo) m(3, IdProcessoEstocastico) m(4, IdVariavelAleatoria)
 
 
 #define VARIAVEL_DECISAO_4(m)\
-	m(  VarDecisao,    ENA,                  4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_REE)  \
 	m(  VarDecisao,    PH,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
 	m(  VarDecisao,    PH_REL,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
 	m(  VarDecisao,    PH_FPH_FINF,          4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
@@ -362,13 +362,15 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,    QDES,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_HIDRELETRICA)  \
 	m(  VarDecisao,    QVER,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
 	m(  VarDecisao,    QMON,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  VarDecisao,    QDEF_LAG,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA)  \
-    m(  VarDecisao,    QDEF_LAG_ADD,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA)  \
     m(  VarDecisao,    QDEF,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
     m(  VarDecisao,    QDEF_FINF,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
     m(  VarDecisao,    QDEF_FSUP,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
 	m(  VarDecisao,    HQ_VAINF_FINF,            4, 1,   ITERADORES_4_ESTAGIO_PERIODO_CONTROLEHQ_DOUBLE)  \
 	m(  VarDecisao,    HQ_VASUP_FSUP,           4, 1,   ITERADORES_4_ESTAGIO_PERIODO_CONTROLEHQ_DOUBLE)  \
+	m(  VarDecisao,    RP,          4, 1,     ITERADORES_4_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
+	m(  VarDecisao,    YP,          4, 1,     ITERADORES_4_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
+	m(  VarDecisao,    YP_FINF,         4, 1,     ITERADORES_4_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
+	m(  VarDecisao,    YP_ADD,      4, 1,     ITERADORES_4_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
 	m(  VarDecisao,    PI,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
 	m(  VarDecisao,    PL,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
 	m(  VarDecisao,    PL_LIQ,                   4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
@@ -418,11 +420,12 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
    //   Elemento,      Nome,             NroIter,    Iteradores,                                                                    
 
 #define EQUACAO_LINEAR_4(m)\
+	m(  EquLinear,    PRES,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESERVAPOTENCIA)  \
+	m(  EquLinear,    YP,             4, 1,     ITERADORES_4_ESTAGIO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)      \
 	m(  EquLinear,    PN,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
 	m(  EquLinear,    PN,                4, 2,    ITERADORES_4_ESTAGIO_PERIODO_SSE_USINANSIMU)  \
 	m(  EquLinear,    PR,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
 	m(  EquLinear,    PI,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
-	m(  EquLinear,    PRES,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESERVAPOTENCIA)  \
 	m(  EquLinear,    PL,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
 	m(  EquLinear,    PL_LIQ,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
 	m(  EquLinear,    PD,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_SSE_PATDEFICIT)  \
@@ -431,7 +434,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  EquLinear,    QMON,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
     m(  EquLinear,    QDES,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_HIDRELETRICA)  \
     m(  EquLinear,    QDEF,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
-    m(  EquLinear,    QDEF_LAG,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PERIODO_HIDRELETRICA)  \
 	m(  EquLinear,    QTUR,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
 	m(  EquLinear,    QTURDISP,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
 	m(  EquLinear,    PT_REL,            4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA)  \
@@ -461,6 +463,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
    //   Elemento,     Nome,                                        NroIter,    Iteradores,                                                                   
 
 #define INEQUACAO_LINEAR_4(m)\
+	m(  IneLinear,    PRES,                4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_RESERVAPOTENCIA)  \
 	m(  IneLinear,    PI_AGRUP,                 4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_AGRUPAMENTOPI)  \
 	m(  IneLinear,    VMORTO_ENCH,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
 	m(  IneLinear,    QDEF_LINF,                  4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
@@ -502,7 +505,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO(m)    m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdHidreletrica) m(5, IdConjuntoHidraulico)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE(m)            m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdTermeletrica) m(5, IdUnidadeUTE)
 #define ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA(m)          m(1, IdEstagio) m(2, Periodo) m(3, IdPatamarCarga) m(4, IdIntercambioHidraulico) m(5, IdHidreletrica)
-#define ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA(m)   m(1, IdEstagio) m(2, Periodo) m(3, Periodo) m(4, IdProcessoEstocastico) m(5, IdVariavelAleatoria)
 #define ITERADORES_5_ESTAGIO_PERIODO_PI_SSE_SEE(m)									    m(1, IdEstagio) m(2, Periodo) m(3, IdIntercambio) m(4, IdSubmercado) m(5, IdSubmercado)
 
 #define VARIAVEL_DECISAO_5(m)\
@@ -532,10 +534,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,    PT_REL,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
 	m(  VarDecisao,    PT_FINF,     5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
 	m(  VarDecisao,    PTDISP,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_TERMELETRICA_UNIDADEUTE)  \
-	m(  VarDecisao,    RP,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
-	m(  VarDecisao,    YP,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
-	m(  VarDecisao,    YP_FINF,         5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
-	m(  VarDecisao,    YP_ADD,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)  \
 	m(  VarDecisao,    PD,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO_PATAMARPD)  \
     m(  VarDecisao,    QRET,          5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA)  \
     m(  VarDecisao,    QRET_FINF,     5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_PIHIDRAULICO_HIDRELETRICA)  \
@@ -546,7 +544,6 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 
 #define EQUACAO_LINEAR_5(m)\
-	m(  EquLinear,    YP,             5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PERIODO_PROCESSOESTOCASTICO_VARIAVELALEATORIA)      \
 	m(  EquLinear,    QTUR,             5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
 	m(  EquLinear,    QTUR_REL,         5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
 	m(  EquLinear,    QTURDISP,         5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)      \
@@ -830,9 +827,9 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		void instanciarProcessoEstocastico(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados);
 
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_LINF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_penalizacao);
-		int criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF_LAG(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdHidreletrica a_idHidreletrica, Periodo &a_periodo_lag);
+		int criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdHidreletrica a_idHidreletrica, Periodo &a_periodo_lag);
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_HQ(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_lag, const IdControleCotaVazao a_idConHQ, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizon);
-		int criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, Periodo &a_periodo_lag, const double a_grau_liberdade, std::vector<IdHidreletrica> a_idHidreletrica = std::vector<IdHidreletrica>());
+		int criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, Periodo &a_periodo_lag, const double a_grau_liberdade, std::vector<IdHidreletrica> a_idHidreletrica = std::vector<IdHidreletrica>());
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdPatamarCarga a_idPatamarCarga, const IdTermeletrica a_idTermeletrica, const double a_potencia_disponivel_minima, const double a_potencia_disponivel_maxima);
 
 		void criarModeloOtimizacao(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados);

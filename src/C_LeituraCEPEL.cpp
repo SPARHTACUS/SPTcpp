@@ -4273,7 +4273,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			estagio_pos_estudo.alocarCorteBenders(8000);
 
 			const std::string strVarDecisaoVIIdEstagioPeriodo = std::string("VarDecisaoVI," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_pos_estudo));
-			const std::string strVarDecisaoENAIdEstagioPeriodo = std::string("VarDecisaoENA," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_pos_estudo));
+			const std::string strVarDecisaoENAIdEstagio = std::string("VarDecisaoENA," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())));
 			const std::string strVarDecisaoPTDISPCOMIdEstagio = std::string("VarDecisaoPTDISPCOM," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())));
 
 			//Processo estocástico
@@ -4343,7 +4343,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 					for (IdReservatorioEquivalente idREE = coeficiente_ENA.getIteradorInicial(); idREE <= coeficiente_ENA.getIteradorFinal(); idREE++) {
 
-						estados_ENA.at(idREE).at(lag) = estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, std::string(strVarDecisaoENAIdEstagioPeriodo + "," + getString(periodo_lag) + "," + getString(idREE)), -1, -1);
+						estados_ENA.at(idREE).at(lag) = estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, std::string(strVarDecisaoENAIdEstagio + "," + getString(periodo_lag) + "," + getString(idREE)), -1, -1);
 						estados.addElemento(estados_ENA.at(idREE).at(lag), 0.0);
 
 					}//for (IdReservatorioEquivalente idREE = coeficiente_ENA.getIteradorInicial(); idREE <= coeficiente_ENA.getIteradorFinal(); idREE++) {

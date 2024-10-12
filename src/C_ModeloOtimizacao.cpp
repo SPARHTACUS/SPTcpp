@@ -4075,25 +4075,23 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 								else if (nome.at(0) == "VarDecisaoYP") {
 
-									Periodo periodo = Periodo(nome.at(2));
-
-									const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(3).c_str());
+									const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(2).c_str());
 
 									if (idProcessoEstocastico != getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()))
 										throw std::invalid_argument(getFullString(idProcessoEstocastico) + " do acoplamento incompativel com " + getFullString(a_dados.processoEstocastico_hidrologico.getAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico())) + " do modelo");
 
-									const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(4).c_str());
+									const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(3).c_str());
 
-									Periodo periodo_lag = Periodo(nome.at(5));
+									Periodo periodo_lag = Periodo(nome.at(4));
 
-									const double grau_liberdade = getdoubleFromChar(nome.at(6).c_str());
+									const double grau_liberdade = getdoubleFromChar(nome.at(5).c_str());
 
-									if (nome.size() < 8)
+									if (nome.size() < 7)
 										throw std::invalid_argument(getFullString(idVariavelEstado_corte) + " com termos ausentes de VarDecisaoYP.");
 
 									std::vector<IdHidreletrica> listaHidreletrica;
 									std::vector<IdHidreletrica> listaHidreletricaNaoInstanciadaNoModelo;
-									for (int i = 7; i < nome.size(); i++) {
+									for (int i = 6; i < nome.size(); i++) {
 										const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(i).c_str());
 										if (idHidreletrica == IdHidreletrica_Nenhum)
 											throw std::invalid_argument("Nao encontrado IdHidreletrica escrito como " + nome.at(i) + " em " + getFullString(idVariavelEstado_corte));
@@ -4119,7 +4117,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 										throw std::invalid_argument(getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) + " em " + getFullString(idVariavelEstado_corte) + " nao foi instanciado no modelo.");
 
 									else if (listaHidreletricaNaoInstanciadaNoModelo.size() == 0) {
-										const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, periodo, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica);
+										const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica);
 										if (varYP == -1)
 											throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
 										vetorEstagio_aux.at(idEstagio).setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado_corte, a_TSS, varYP);
@@ -4775,7 +4773,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 						throw std::invalid_argument(getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) + " em " + getFullString(idVariavelEstado) + " nao foi instanciado no modelo.");
 
 					else if (listaHidreletricaNaoInstanciadaNoModelo.size() == 0) {
-						const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, periodo, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica);
+						const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica);
 						if (varYP == -1)
 							throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varYP);
@@ -4790,13 +4788,11 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 					try {
 
-						const Periodo periodo = Periodo(nome.at(2));
+						const Periodo periodo_lag = Periodo(nome.at(2));
 
-						const Periodo periodo_lag = Periodo(nome.at(3));
+						const IdReservatorioEquivalente idREE = getIdReservatorioEquivalenteFromChar(nome.at(3).c_str());
 
-						const IdReservatorioEquivalente idREE = getIdReservatorioEquivalenteFromChar(nome.at(4).c_str());
-
-						int varENA_REE = getVarDecisao_ENAseExistir(a_TSS, estagio_final, periodo, periodo_lag, idREE);
+						int varENA_REE = getVarDecisao_ENAseExistir(a_TSS, estagio_final, periodo_lag, idREE);
 
 						if (varENA_REE == -1) {
 
@@ -4804,7 +4800,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 							const double limite_inferior = 0.0;
 							const double limite_superior = 0.0;
 
-							varENA_REE = addVarDecisao_ENA(a_TSS, estagio_final, periodo, periodo_lag, idREE, limite_inferior, limite_superior, 0.0);
+							varENA_REE = addVarDecisao_ENA(a_TSS, estagio_final, periodo_lag, idREE, limite_inferior, limite_superior, 0.0);
 
 						}
 
@@ -4816,165 +4812,23 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 				} // else if (nome.at(0) == "VarDecisaoENA") {
 
-				/*
-				
-				else if (nome.at(0) == "VarDecisaoENA") {
 
-					try {
-
-						const Periodo periodo = Periodo(nome.at(2));
-
-						const Periodo periodo_lag = Periodo(nome.at(3));
-
-						const IdReservatorioEquivalente idREE = getIdReservatorioEquivalenteFromChar(nome.at(4).c_str());
-
-						bool any_UHE_REE = false;
-
-						for (IdHidreletrica idHidreletrica = a_dados.getMenorId(IdHidreletrica()); idHidreletrica <= a_dados.getMaiorId(IdHidreletrica()); a_dados.vetorHidreletrica.incr(idHidreletrica)) {					
-
-
-							//
-							// Verifica necesidade de carregar fatores de conversão
-							//
-
-							bool carregar_conversao_ENA = false;
-							if ((!is_conversao_ENA_carregado) && (a_dados.getMaiorId(idHidreletrica, IdReservatorioEquivalente()) == IdReservatorioEquivalente_Nenhum))
-								carregar_conversao_ENA = true;
-							
-							if (carregar_conversao_ENA) {
-								if (!a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_REE_conversao_ENA_acoplamento.csv", a_dados, TipoAcessoInstancia_m2))
-									throw std::invalid_argument("Nao foi possivel carregar arquivo HIDRELETRICA_REE_conversao_ENA_acoplamento.csv necessario para conversao de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
-								is_conversao_ENA_carregado = true;
-
-								estagio.vetorRestricaoCenario.alocar(int(IdRestricaoCenario_Excedente) - 1);
-
-							}
-
-							if (a_dados.isInstanciado(idHidreletrica, idREE)) {
-
-								any_UHE_REE = true;
-
-								bool is_valores_0 = false;
-								bool is_valores_1 = false;
-
-								if (a_dados.getSize1Matriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0) > 0)
-									is_valores_0 = true;
-								if (a_dados.getSize1Matriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1) > 0)
-									is_valores_1 = true;
-
-								const int varENA = addVarDecisao_ENA(a_TSS, idEstagio, periodo, periodo_lag, idHidreletrica, idREE, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
-
-								const int equENA = addEquLinear_ENA(a_TSS, idEstagio, periodo, periodo_lag, idHidreletrica, idREE);
-
-								vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA, equENA, 1.0);
-
-								SmartEnupla<IdCenario, double> valores_0;
-								SmartEnupla<int, SmartEnupla<IdCenario, double>> valores_1;
-
-								const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, periodo, IdProcessoEstocastico_hidrologico_hidreletrica, IdVariavelAleatoria(idHidreletrica), periodo_lag, 0.0, std::vector<IdHidreletrica>{idHidreletrica});
-								if (varYP == -1)
-									throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(periodo_lag) + "," + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
-
-
-								for (IdCenario idCenario = cenarioInicial; idCenario <= cenarioFinal; idCenario++) {
-
-									if (is_valores_0) {
-										if (valores_0.size() == 0)
-											valores_0 = enupla_inicializacao;
-										valores_0.at(idCenario) = a_dados.getElementoMatriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0, periodo_lag, idCenario, double());
-									}
-
-									if (is_valores_1) {
-										if (valores_1.size() == 0)
-											valores_1 = SmartEnupla<int, SmartEnupla<IdCenario, double>>(varYP, std::vector<SmartEnupla<IdCenario, double>>(1, enupla_inicializacao));
-
-										else if (varYP < valores_1.getIteradorInicial()) {
-
-											SmartEnupla<int, SmartEnupla<IdCenario, double>> valores_1_aux(varYP, std::vector<SmartEnupla<IdCenario, double>>(valores_1.getIteradorFinal() - varYP + 1, SmartEnupla<IdCenario, double>()));
-
-											valores_1_aux.at(varYP) = enupla_inicializacao;
-
-											for (int pos = valores_1.getIteradorInicial(); pos <= valores_1.getIteradorFinal(); pos++)
-												valores_1_aux.at(pos) = valores_1.at(pos);
-
-											valores_1 = valores_1_aux;
-										}
-
-										else if (valores_1.getIteradorFinal() < varYP) {
-											for (int pos = valores_1.getIteradorFinal() + 1; pos < varYP; pos++)
-												valores_1.addElemento(pos, SmartEnupla<IdCenario, double>());
-											valores_1.addElemento(varYP, enupla_inicializacao);
-										}
-
-										valores_1.at(varYP).at(idCenario) = -a_dados.getElementoMatriz(idHidreletrica, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1, periodo_lag, idCenario, double());
-									}
-
-								} // for (IdCenario idCenario = cenarioInicial; idCenario <= cenarioFinal; idCenario++) {
-
-
-								vetorEstagio.at(idEstagio).addRestricaoCenario(a_TSS, getNomeVarDecisao_ENA(a_TSS, idEstagio, periodo, periodo_lag, idHidreletrica, idREE), equENA, valores_0, valores_1);
-
-								int varENA_REE = getVarDecisao_ENAseExistir(a_TSS, idEstagio, periodo, periodo_lag, idREE);
-								int equENA_REE = getEquLinear_ENAseExistir(a_TSS, idEstagio, periodo, periodo_lag, idREE);
-
-								if (varENA_REE == -1) {
-									equENA_REE = addEquLinear_ENA(a_TSS, idEstagio, periodo, periodo_lag, idREE);
-									varENA_REE = addVarDecisao_ENA(a_TSS, idEstagio, periodo, periodo_lag, idREE, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
-									vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA_REE, equENA_REE, 1.0);
-
-									int varENA_SIN = getVarDecisao_ENAseExistir(a_TSS, idEstagio, periodo, periodo_lag);
-									int equENA_SIN = getEquLinear_ENAseExistir(a_TSS, idEstagio, periodo, periodo_lag);
-									if (varENA_SIN == -1) {
-										equENA_SIN = addEquLinear_ENA(a_TSS, idEstagio, periodo, periodo_lag);
-										varENA_SIN = addVarDecisao_ENA(a_TSS, idEstagio, periodo, periodo_lag, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
-										vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA_SIN, equENA_SIN, 1.0);
-									}
-									vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA_REE, equENA_SIN, -1.0);
-
-								}
-
-								vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varENA, equENA_REE, -1.0);
-
-								estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varENA_REE);
-
-							} // if (a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorioEquivalente.isInstanciado(idREE)) {
-						}
-
-						if (!any_UHE_REE)
-							throw std::invalid_argument("Nao foram encontrados hidreletricas associadas ao REE de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
-
-					}
-					catch (const std::exception& erro) { throw std::invalid_argument("VarDecisaoENA " + getFullString(idVariavelEstado) + " : \n" + std::string(erro.what())); }
-
-				} // else if (nome.at(0) == "VarDecisaoENA") {
-				*/
-				
 				//
 				// Defluencia viajante
 				//
 
-				else if (nome.at(0) == "VarDecisaoQDEF_LAG") {
+				else if (nome.at(0) == "VarDecisaoQDEF") {
 
-					Periodo periodo = Periodo(nome.at(2));
-					Periodo periodo_lag = Periodo(nome.at(3));
-					const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(4).c_str());
+					Periodo periodo_lag = Periodo(nome.at(2));
+					const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
 
-					if (periodo.getTipoPeriodo() != periodo_lag.getTipoPeriodo())
-						throw std::invalid_argument("Ambos os periodos devem ser do mesmo tipo em " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
-
-					const int tempo_viagem_agua_estado = Periodo(TipoPeriodo_horario, periodo) - Periodo(TipoPeriodo_horario, periodo_lag);
-					const int tempo_viagem_agua = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_tempo_viagem_agua, int());
-
-					if (tempo_viagem_agua_estado != tempo_viagem_agua)
-						throw std::invalid_argument("Tempo de viagem da agua " + getString(tempo_viagem_agua) + "h em " + getFullString(idHidreletrica) + " nao compativel com " + getString(tempo_viagem_agua_estado) + "h em " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
-
-					const int varQDEF_LAG = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF_LAG(a_TSS, a_dados, idEstagio, periodo, idHidreletrica, periodo_lag);
-					if (varQDEF_LAG == -1)
-						throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDEF_LAG de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
+					const int varQDEF = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, idEstagio, idHidreletrica, periodo_lag);
+					if (varQDEF == -1)
+						throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDEF de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 					else
-						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varQDEF_LAG);
+						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varQDEF);
 
-				} // else if (nome.at(0) == "VarDecisaoQDEF_LAG") {
+				} // else if (nome.at(0) == "VarDecisaoQDEF") {
 
 				else if (nome.at(0) == "VarDecisaoPTDISPCOM") {
 
@@ -5069,6 +4923,10 @@ INEQUACAO_LINEAR_7(DECLARAR_IMPRIMIR_VALOR);
 void ModeloOtimizacao::imprimirSolucaoPorEstagio(const IdProcesso a_idProcesso, const IdEstagio a_idEstagio, const std::string a_subdiretorio, EntradaSaidaDados a_entradaSaidaDados) {
 
 	try {
+
+		if (!getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool()) && !getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, bool()) &&
+			!getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, bool()) && !getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()))
+			return;
 
 		const std::string diretorio = a_entradaSaidaDados.getDiretorioSaida() + "//" + a_subdiretorio;
 
@@ -5952,12 +5810,17 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 
 		MPI_Barrier(MPI_COMM_WORLD);
 
-		if (isPrintElemSync < 2) {
+		if (!getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario, bool()) && !getAtributo(AttComumModeloOtimizacao_imprimir_variavel_decisao_por_estagio_por_cenario_por_realizacao, bool()) &&
+			!getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario, bool()) && !getAtributo(AttComumModeloOtimizacao_imprimir_restricao_por_estagio_por_cenario_por_realizacao, bool()))
+			return;
+
+		const IdProcesso maior_processo = arranjoResolucao.getMaiorId(IdProcesso());
+
+		if ((isPrintElemSync < 2) && (maior_processo > IdProcesso_mestre))  {
 
 			std::vector<std::vector<std::string>> lista_elemento_impressao_sync(TipoSubproblemaSolver_Excedente, std::vector<std::string>());
 
 			const IdProcesso idProcesso_local = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
-			const IdProcesso maior_processo = arranjoResolucao.getMaiorId(IdProcesso());
 
 			for (IdProcesso idProcesso = IdProcesso_mestre; idProcesso <= maior_processo; idProcesso++) {
 
@@ -6021,7 +5884,7 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 
 			MPI_Barrier(MPI_COMM_WORLD);
 
-		} // if (isPrintElemSync < 2) {
+		} // if ((isPrintElemSync < 2) && (maior_processo > IdProcesso_mestre))  {
 
 		const string diretorio = a_entradaSaidaDados.getDiretorioSaida();
 

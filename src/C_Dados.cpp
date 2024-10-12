@@ -11310,21 +11310,23 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 						std::vector<int> valores_recv;
 
+						MPI_Barrier(MPI_COMM_WORLD);
+
 						if (idProcesso != idProcesso_local) {
 							double vlr_size_rcv = 0;
-							MPI_Recv(&vlr_size_rcv, 1, MPI_DOUBLE, getRank(idProcesso), getRank(idProcesso_local), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+							MPI_Recv(&vlr_size_rcv, 1, MPI_DOUBLE, getRank(idProcesso), getRank(idProcesso_local) + int(idIteracao) * 100, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 							if (vlr_size_rcv > 0) {
 								valores_recv = std::vector<int>(int(vlr_size_rcv), 0);
-								MPI_Recv(&valores_recv[0], int(vlr_size_rcv), MPI_INT, getRank(idProcesso), int(idProcesso_local) + 100, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+								MPI_Recv(&valores_recv[0], int(vlr_size_rcv), MPI_INT, getRank(idProcesso), int(idProcesso_local) + int(idIteracao) * 1000, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 							}
 						}
 						else {
 							for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
 								if (idProcesso_aux != idProcesso_local) {
 									double vlr_size = double(valores.size());
-									MPI_Send(&vlr_size, 1, MPI_DOUBLE, getRank(idProcesso_aux), getRank(idProcesso_aux), MPI_COMM_WORLD);
+									MPI_Send(&vlr_size, 1, MPI_DOUBLE, getRank(idProcesso_aux), getRank(idProcesso_aux) + int(idIteracao) * 100, MPI_COMM_WORLD);
 									if (vlr_size > 0)
-										MPI_Send(&valores[0], int(vlr_size), MPI_INT, getRank(idProcesso_aux), int(idProcesso_aux) + 100, MPI_COMM_WORLD);
+										MPI_Send(&valores[0], int(vlr_size), MPI_INT, getRank(idProcesso_aux), int(idProcesso_aux) + int(idIteracao) * 1000, MPI_COMM_WORLD);
 								}
 							}
 							valores_recv = valores;
