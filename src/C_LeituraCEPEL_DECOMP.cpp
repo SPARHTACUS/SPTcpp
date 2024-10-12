@@ -17337,7 +17337,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_minima = a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidadeUTEIni_CP).getMatriz(AttMatrizUnidadeUTE_potencia_minima, Periodo(), IdPatamarCarga(), double());
 							const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> potencia_util = a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidadeUTEIni_CP).getMatriz(AttMatrizUnidadeUTE_potencia_util, Periodo(), IdPatamarCarga(), double());
 
-							const std::string nome = a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidadeUTEIni_CP).getAtributo(AttComumUnidadeUTE_nome, std::string());
+							const std::string nome = dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidadeUTEIni_PD).getAtributo(AttComumUnidadeUTE_nome, std::string());
 
 							//Remove o idUnidadeUTEIni_CP
 							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.rem(idUnidadeUTEIni_CP);
