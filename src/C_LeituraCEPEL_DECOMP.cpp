@@ -17366,8 +17366,6 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 								UnidadeUTE unidadeUTE;
 
 								unidadeUTE.setAtributo(AttComumUnidadeUTE_idUnidadeUTE, idUnidade_PD);
-								unidadeUTE.setAtributo(AttComumUnidadeUTE_nome, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_nome, std::string()));
-
 								a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.add(unidadeUTE);
 
 								//AttMatriz
@@ -17378,6 +17376,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							}//if (!a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.isInstanciado(idUnidade_PD)) {
 
 							//AttComum
+							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_nome, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_nome, std::string()));
 							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_ramp_up, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_ramp_up, double()));
 							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_ramp_down, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_ramp_down, double()));
 							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_min_time_up, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_min_time_up, double()));
