@@ -3084,17 +3084,19 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 							else {
 
-								a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
+								if (getAtributo(idTermeletrica, AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica()) == TipoDetalhamentoProducaoTermeletrica_por_usina) {
 
-								a_entradaSaidaDados.setAppendArquivo(impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga.at(1));
-								a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("TERMELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idTermeletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, attMatrizTermeletrica);
-								impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga.at(1) = true;
+									a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
-								if (!a_imprimir_atributos_sem_recarregar) {
-									vetorTermeletrica.at(idTermeletrica).clear(attMatrizTermeletrica);
-									recarregar_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga = true;
-								}
+									a_entradaSaidaDados.setAppendArquivo(impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga.at(1));
+									a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("TERMELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", idTermeletrica, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, attMatrizTermeletrica);
+									impresso_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga.at(1) = true;
 
+									if (!a_imprimir_atributos_sem_recarregar) {
+										vetorTermeletrica.at(idTermeletrica).clear(attMatrizTermeletrica);
+										recarregar_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga = true;
+									}
+								}/ if (getAtributo(idTermeletrica, AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica()) == TipoDetalhamentoProducaoTermeletrica_por_usina) {
 							}
 
 						} // else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(attMatrizTermeletrica) == sim_operacional) || ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(attMatrizTermeletrica) == nao_operacional_informado) && (a_imprimir_atributos_sem_recarregar))) {
