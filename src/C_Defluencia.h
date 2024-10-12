@@ -10,7 +10,7 @@
 //       c_classe,   smrtAtt,                nomeAtributo,                 tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
 #define ATT_VETOR_DEFLUENCIA(m)  \
-      m(Defluencia,  AttVetor,           vazao_defluencia,               double,          0,          max,             0,    Periodo) 
+      m(Defluencia,  AttVetor,           vazao_defluencia,               double,          0,          max,             0,    Periodo)
 //        c_classe,   smrtAtt,               nomeAtributo,                 Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define SMART_ELEMENTO_DEFLUENCIA(m) \

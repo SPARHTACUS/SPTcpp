@@ -502,7 +502,8 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 
 							if (q_max > vazao_maxima_gerador || cota_negativa) { q_max = vazao_maxima_gerador; }
 
-							a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_vazao_turbinada_maxima, periodo, q_max);
+							if(a_dados.vetorHidreletrica.at(idHidreletrica).getElementoVetor(AttVetorHidreletrica_vazao_turbinada_maxima, periodo, double()) > q_max)
+								a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_vazao_turbinada_maxima, periodo, q_max);
 
 						}//for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo)) {
 
