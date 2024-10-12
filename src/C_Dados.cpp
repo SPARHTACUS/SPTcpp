@@ -3096,7 +3096,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 										vetorTermeletrica.at(idTermeletrica).clear(attMatrizTermeletrica);
 										recarregar_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga = true;
 									}
-								}/ if (getAtributo(idTermeletrica, AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica()) == TipoDetalhamentoProducaoTermeletrica_por_usina) {
+								}// if (getAtributo(idTermeletrica, AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica()) == TipoDetalhamentoProducaoTermeletrica_por_usina) {
 							}
 
 						} // else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(attMatrizTermeletrica) == sim_operacional) || ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(attMatrizTermeletrica) == nao_operacional_informado) && (a_imprimir_atributos_sem_recarregar))) {
