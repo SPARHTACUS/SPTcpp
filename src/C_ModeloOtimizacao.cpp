@@ -531,8 +531,8 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado_posEstudo(cons
 
 						//******************************************************************************
 
-						const Periodo periodo_lag = Periodo(nome.at(3));
-						const IdReservatorioEquivalente idREE = getIdReservatorioEquivalenteFromChar(nome.at(4).c_str());
+						const Periodo periodo_lag = Periodo(nome.at(2));
+						const IdReservatorioEquivalente idREE = getIdReservatorioEquivalenteFromChar(nome.at(3).c_str());
 						TipoSubproblemaSolver tSS = getAtributo(idEstagio_futuro, idVariavelEstado, AttComumVariavelEstado_tipoSubproblemaSolverEstagioAnterior, TipoSubproblemaSolver());
 						const int idVariavelDecisao = getAtributo(idEstagio_futuro, idVariavelEstado, AttComumVariavelEstado_idVariavelDecisaoEstagioAnterior, int());
 
