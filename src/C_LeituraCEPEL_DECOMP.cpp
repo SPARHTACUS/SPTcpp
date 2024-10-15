@@ -19603,13 +19603,6 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			if (get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados) < horizonte_estudo.getIteradorFinal())
 				must_read_nwlistcf = true;
 
-			/*
-			entradaSaidaDados.carregarArquivoCSV_AttComum("TERMELETRICA_AttComumOperacional.csv", a_dados, TipoAcessoInstancia_m1);
-			entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", a_dados, TipoAcessoInstancia_m1);
-			entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("TERMELETRICA_UNIDADE_AttComumOperacional.csv", a_dados, TipoAcessoInstancia_m2);
-			entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("TERMELETRICA_UNIDADE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", a_dados, TipoAcessoInstancia_m2);
-			*/
-
 			leitura_cortes_NEWAVE(a_dados, horizonte_estudo, nomeArquivo_cortes_NW, must_read_nwlistcf, diretorio_att_premissas, maior_ONS_REE, horizonte_processo_estocastico, percentual_duracao_patamar_carga_original);
 
 		}//if (idProcesso == IdProcesso_mestre && nomeArquivo_cortes_NW != "nenhum") {

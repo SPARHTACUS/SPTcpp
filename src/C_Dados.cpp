@@ -3000,7 +3000,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 						a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
 						a_entradaSaidaDados.setAppendArquivo(impresso_AttComumTermeletrica);
-						const std::vector<AttComumTermeletrica> lista_TERMELETRICA_AttComumOperacional{ AttComumTermeletrica_idTermeletrica,    AttComumTermeletrica_nome, AttComumTermeletrica_submercado, AttComumTermeletrica_codigo_usina, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, AttComumTermeletrica_tipo_detalhamento_producao, AttComumTermeletrica_representacao_discreta_producao, AttComumTermeletrica_penalidade_violacao_potencia, AttComumTermeletrica_penalidade_violacao_comando };
+						const std::vector<AttComumTermeletrica> lista_TERMELETRICA_AttComumOperacional{ AttComumTermeletrica_idTermeletrica,    AttComumTermeletrica_nome, AttComumTermeletrica_submercado, AttComumTermeletrica_codigo_usina, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, AttComumTermeletrica_tipo_detalhamento_producao, AttComumTermeletrica_representacao_discreta_producao, AttComumTermeletrica_penalidade_violacao_potencia, AttComumTermeletrica_penalidade_violacao_comando, AttComumTermeletrica_unidades_simultaneas };
 						a_entradaSaidaDados.imprimirArquivoCSV_AttComum("TERMELETRICA_AttComumOperacional.csv", idTermeletrica, *this, lista_TERMELETRICA_AttComumOperacional);
 						impresso_AttComumTermeletrica = true;
 
@@ -8641,6 +8641,8 @@ void Dados::validacao_operacional_ReservaPotencia(EntradaSaidaDados a_entradaSai
 				//
 				// Imprime Atributos Operacionais
 				//
+
+				a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
 				a_entradaSaidaDados.setAppendArquivo(true);
 				a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RESERVA_POTENCIA_AttComumOperacional.csv", IdReservaPotencia_Nenhum, *this, std::vector<AttComumReservaPotencia>{AttComumReservaPotencia_idReservaPotencia, AttComumReservaPotencia_nome, AttComumReservaPotencia_area});
