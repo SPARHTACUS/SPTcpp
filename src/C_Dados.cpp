@@ -2242,11 +2242,12 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 					potencia_maxima_termeletrica = matriz_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina);
 				} // if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_usina).size() > 0) {
 
+				/*
 				if (vetor_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade).size() > 0) {
 					preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_potencia_maxima) = sim_operacional;
 					potencia_maxima_termeletrica = matriz_zero.at(idTermeletrica).at(TipoDetalhamentoProducaoTermeletrica_por_unidade);
 				}
-
+				*/
 			} // if ((getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) == 0) && (termeletrica_com_unidade)) {
 
 			else if (getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_maxima) > 0) {
@@ -3084,7 +3085,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 							else {
 
-								if (getAtributo(idTermeletrica, AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica()) == TipoDetalhamentoProducaoTermeletrica_por_usina) {
+								if (getSize1Matriz(idTermeletrica, attMatrizTermeletrica) > 0) {
 
 									a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
@@ -3096,7 +3097,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 										vetorTermeletrica.at(idTermeletrica).clear(attMatrizTermeletrica);
 										recarregar_AttMatrizTermeletrica_PorPeriodoPorIdPatamarCarga = true;
 									}
-								}// if (getAtributo(idTermeletrica, AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica()) == TipoDetalhamentoProducaoTermeletrica_por_usina) {
+								}// if (getSize1Matriz(idTermeletrica, attMatrizTermeletrica) > 0) {
 							}
 
 						} // else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(attMatrizTermeletrica) == sim_operacional) || ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(attMatrizTermeletrica) == nao_operacional_informado) && (a_imprimir_atributos_sem_recarregar))) {
