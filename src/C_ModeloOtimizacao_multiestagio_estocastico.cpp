@@ -5147,56 +5147,73 @@ void ModeloOtimizacao::criarTermeletricas(const TipoSubproblemaSolver a_TSS, Dad
 
 						disponivel = true;
 
-						const double potencia_minima = a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_minima, a_period, a_idPat, double());
 						const double potencia_maxima = a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_minima, a_period, a_idPat, double()) + a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_util, a_period, a_idPat, double());
-
-						double potencia_disponivel_minima = potencia_minima * disponibilidade;
-						if (a_dados.getSize1Matriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima) > 0) {
-							if (a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima, a_period, a_idPat, double()) > potencia_disponivel_minima)
-								potencia_disponivel_minima = potencia_disponivel_minima;
-						}
-						double potencia_disponivel_maxima = potencia_maxima * disponibilidade;
-						if (a_dados.getSize1Matriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima) > 0) {
-							if (a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima, a_period, a_idPat, double()) < potencia_disponivel_maxima)
-								potencia_disponivel_maxima = potencia_disponivel_maxima;
-						}
-
-						if (potencia_disponivel_minima > potencia_disponivel_maxima)
-							throw std::invalid_argument("Error with power in " + getFullString(idUTE) + " on " + getFullString(a_period) + " and " + getFullString(a_idPat));
-
+				
 						const int varPT_pat = addVarDecisao_PT(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, potencia_maxima, 0.0);
-						const int varPTDISP_pat = addVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, potencia_disponivel_maxima, 0.0);
+						const int varPTDISP_pat = addVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, infinito, 0.0);
 
+						// PTDISP = DISP * PT
 						const int equPTDISP_pat = addEquLinear_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, equPTDISP_pat, 1.0);
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPT_pat, equPTDISP_pat, -disponibilidade);
 
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, getEquLinear_ZO(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_custo_de_operacao, a_period, a_idPat, double()));
 
+						// PTDISP + PTDISP_LINF_FINF >= PTDISP_LINF
+						const int inePTDISP_LINF_pat = addIneLinear_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
+						const int varPTDISP_LINF_pat = addVarDecisao_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, 0.0, 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, inePTDISP_LINF_pat, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_pat, inePTDISP_LINF_pat, -1.0);
+
+						// PTDISP - PTDISP_LSUP_FSUP <= PTDISP_LSUP
+						const int inePTDISP_LSUP_pat = addIneLinear_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
+						const int varPTDISP_LSUP_pat = addVarDecisao_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, infinito, 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, inePTDISP_LSUP_pat, -1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_pat, inePTDISP_LSUP_pat, 1.0);
+
 						if (representacao_discreta_producao) {
 
-							const int inePTDISP_LINF_pat = addIneLinear_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, inePTDISP_LINF_pat, 1.0);
-
-							const int inePTDISP_LSUP_pat = addIneLinear_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, inePTDISP_LSUP_pat, -1.0);
-
-							// Criar métodos recursivos para determinar estados de LINF e LSUP a partir de subproblema binário em t=0
-							const int varPTDISP_LINF_pat = addVarDecisao_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, infinito, 0.0);
-							const int varPTDISP_LSUP_pat = addVarDecisao_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, infinito, 0.0);
-
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_pat, inePTDISP_LINF_pat, -1.0);
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_pat, inePTDISP_LINF_pat,  1.0);
+							// Criar métodos recursivos para determinar estados de varPTDISP_LINF e varPTDISP_LSUP a partir de subproblema binário em t=0
 
 						} // if (representacao_discreta_producao) {
 
-						else {
-							if (potencia_minima > 0)
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPT_pat, potencia_minima);
+						else if (!representacao_discreta_producao) {
 
-							if (potencia_disponivel_minima > 0)
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPTDISP_pat, potencia_disponivel_minima);
-						}
+							if (lag_mensal_potencia_disponivel_comandada > 0) {
+								// Folgas são adicionadas para o caso de comando divergir de limites disponíveis no período e patamar
+								const int varPTDISP_LINF_FINF_pat = addVarDecisao_PTDISP_LINF_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, infinito, 0.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_FINF_pat, inePTDISP_LINF_pat, 1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_FINF_pat, getEquLinear_ZP(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getAtributo(idUTE, AttComumTermeletrica_penalidade_violacao_potencia, double()));
+
+								const int varPTDISP_LSUP_FSUP_pat = addVarDecisao_PTDISP_LSUP_FSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, infinito, 0.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_FSUP_pat, inePTDISP_LSUP_pat, 1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_FSUP_pat, getEquLinear_ZP(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getAtributo(idUTE, AttComumTermeletrica_penalidade_violacao_potencia, double()));
+							} // if (lag_mensal_potencia_disponivel_comandada > 0) {
+
+							double potencia_disponivel_minima = 0.0;
+							if (a_dados.getSize1Matriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima) > 0) {
+								if (a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima, a_period, a_idPat, double()) > potencia_disponivel_minima)
+									potencia_disponivel_minima = a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima, a_period, a_idPat, double());
+							}
+
+							double potencia_disponivel_maxima = potencia_maxima * disponibilidade;
+							if (a_dados.getSize1Matriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima) > 0) {
+								if (a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima, a_period, a_idPat, double()) < potencia_disponivel_maxima) 
+									potencia_disponivel_maxima = a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima, a_period, a_idPat, double());
+							}
+
+							if (potencia_disponivel_minima > potencia_disponivel_maxima)
+								throw std::invalid_argument("Error with power in " + getFullString(idUTE) + " on " + getFullString(a_period) + " and " + getFullString(a_idPat));
+
+							if (potencia_disponivel_minima > 0) {
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPTDISP_LINF_pat, potencia_disponivel_minima);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varPTDISP_LINF_pat, potencia_disponivel_minima);
+							}
+
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPTDISP_LSUP_pat, potencia_disponivel_maxima);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varPTDISP_LSUP_pat, potencia_disponivel_maxima);
+
+						} // else if (!representacao_discreta_producao) {
 
 					} // if (disponibilidade > 0.0) {
 				} // if (tipo_detalhamento_producao == TipoDetalhamentoProducaoTermeletrica_por_usina) {
@@ -5239,58 +5256,85 @@ void ModeloOtimizacao::criarTermeletricas(const TipoSubproblemaSolver a_TSS, Dad
 
 								disponivel = true;
 
-								const double potencia_minima = a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, a_period, a_idPat, double());
 								const double potencia_maxima = a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, a_period, a_idPat, double()) + a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, a_period, a_idPat, double());
 
-								double potencia_disponivel_minima = potencia_minima * disponibilidade;
-								if (a_dados.getSize1Matriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima) > 0) {
-									if (a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima, a_period, a_idPat, double()) > potencia_disponivel_minima)
-										potencia_disponivel_minima = potencia_disponivel_minima;
-								}
-								double potencia_disponivel_maxima = potencia_maxima * disponibilidade;
-								if (a_dados.getSize1Matriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima) > 0) {
-									if (a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, a_period, a_idPat, double()) < potencia_disponivel_maxima)
-										potencia_disponivel_maxima = potencia_disponivel_maxima;
-								}
-
-								if (potencia_disponivel_minima > potencia_disponivel_maxima)
-									throw std::invalid_argument("Error with power in " + getFullString(idUTE) + " on " + getFullString(a_period) + " and " + getFullString(a_idPat));
-
 								const int varPT_pat = addVarDecisao_PT(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, potencia_maxima, 0.0);
-								const int varPTDISP_pat = addVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, potencia_disponivel_maxima, 0.0);
+								const int varPTDISP_pat = addVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, infinito, 0.0);
 
+								// PTDISP = DISP * PT
 								const int equPTDISP_pat = addEquLinear_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE);
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, equPTDISP_pat, 1.0);
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPT_pat, equPTDISP_pat, -disponibilidade);
 
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, getEquLinear_ZO(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_custo_de_operacao, a_period, a_idPat, double()));
 
+								// PTDISP + PTDISP_LINF_FINF(se necessario) >= PTDISP_LINF
+								const int inePTDISP_LINF_pat = addIneLinear_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE);
+								const int varPTDISP_LINF_pat = addVarDecisao_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, 0.0, 0.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, inePTDISP_LINF_pat, 1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_pat, inePTDISP_LINF_pat, -1.0);
+
+								// PTDISP - PTDISP_LSUP_FSUP(se necessario) <= PTDISP_LSUP
+								const int inePTDISP_LSUP_pat = addIneLinear_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE);
+								const int varPTDISP_LSUP_pat = addVarDecisao_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, infinito, 0.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, inePTDISP_LSUP_pat, -1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_pat, inePTDISP_LSUP_pat, 1.0);
+
 								if (representacao_discreta_producao) {
 
-									const int inePTDISP_LINF_pat = addIneLinear_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE);
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, inePTDISP_LINF_pat, 1.0);
-
-									const int inePTDISP_LSUP_pat = addIneLinear_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE);
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, inePTDISP_LSUP_pat, -1.0);
-
-									// Criar métodos recursivos para determinar estados de LINF e LSUP a partir de subproblema binário em t=0
-									const int varPTDISP_LINF_pat = addVarDecisao_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, infinito, 0.0);
-									const int varPTDISP_LSUP_pat = addVarDecisao_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, infinito, 0.0);
-
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_pat, inePTDISP_LINF_pat, -1.0);
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_pat, inePTDISP_LINF_pat, 1.0);
+									// Criar métodos recursivos para determinar estados de varPTDISP_LINF e varPTDISP_LSUP a partir de subproblema binário em t=0
 
 								} // if (representacao_discreta_producao) {
 
-								else {
-									if (potencia_minima > 0)
-										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPT_pat, potencia_minima);
+								else if (!representacao_discreta_producao) {
 
-									if (potencia_disponivel_minima > 0)
-										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPTDISP_pat, potencia_disponivel_minima);
-								}
+									if (lag_mensal_potencia_disponivel_comandada > 0) {
+										// Folgas são adicionadas para o caso de comando divergir de limites disponíveis no período e patamar
+										const int varPTDISP_LINF_FINF_pat = addVarDecisao_PTDISP_LINF_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, infinito, 0.0);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_FINF_pat, inePTDISP_LINF_pat, 1.0);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_FINF_pat, getEquLinear_ZP(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getAtributo(idUTE, AttComumTermeletrica_penalidade_violacao_potencia, double()));
+
+										const int varPTDISP_LSUP_FSUP_pat = addVarDecisao_PTDISP_LSUP_FSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUnidadeUTE, 0.0, infinito, 0.0);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_FSUP_pat, inePTDISP_LSUP_pat, 1.0);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_FSUP_pat, getEquLinear_ZP(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getAtributo(idUTE, AttComumTermeletrica_penalidade_violacao_potencia, double()));
+									} // if (lag_mensal_potencia_disponivel_comandada > 0) {
+
+									double potencia_disponivel_minima = 0.0;
+									if (a_dados.getSize1Matriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima) > 0) {
+										if (a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima, a_period, a_idPat, double()) > potencia_disponivel_minima)
+											potencia_disponivel_minima = a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima, a_period, a_idPat, double());
+									}
+									double potencia_disponivel_maxima = potencia_maxima * disponibilidade;
+									if (a_dados.getSize1Matriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima) > 0) {
+										if (a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, a_period, a_idPat, double()) < potencia_disponivel_maxima)
+											potencia_disponivel_maxima = a_dados.getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, a_period, a_idPat, double());
+									}
+
+									if (potencia_disponivel_minima > 0) {
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPTDISP_LINF_pat, potencia_disponivel_minima);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varPTDISP_LINF_pat, potencia_disponivel_minima);
+									}
+
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varPTDISP_LSUP_pat, potencia_disponivel_maxima);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varPTDISP_LSUP_pat, potencia_disponivel_maxima);
+
+								} // else if (!representacao_discreta_producao) {
+
 
 								// Variaveis para contabilizacao do despacho global da UTE
+
+								double potencia_disponivel_minima_ute = 0.0;
+								if (a_dados.getSize1Matriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima) > 0) {
+									if (a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima, a_period, a_idPat, double()) > potencia_disponivel_minima_ute)
+										potencia_disponivel_minima_ute = a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima, a_period, a_idPat, double());
+								}
+
+								double potencia_disponivel_maxima_ute = infinito;
+								if (a_dados.getSize1Matriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima) > 0) {
+									if (a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima, a_period, a_idPat, double()) < potencia_disponivel_maxima_ute)
+										potencia_disponivel_maxima_ute = a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima, a_period, a_idPat, double());
+								}
+
 								int equPT_pat_ute = getEquLinear_PTseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
 								if (equPT_pat_ute == -1) {
 									equPT_pat_ute = addEquLinear_PT(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
@@ -5302,10 +5346,32 @@ void ModeloOtimizacao::criarTermeletricas(const TipoSubproblemaSolver a_TSS, Dad
 								int equPTDISP_pat_ute = getEquLinear_PTDISPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
 								if (equPTDISP_pat_ute == -1) {
 									equPTDISP_pat_ute = addEquLinear_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
-									const int varPTDISP_pat_ute = addVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, infinito, 0.0);
+									const int varPTDISP_pat_ute = addVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, potencia_disponivel_minima_ute, potencia_disponivel_maxima_ute, 0.0);
 									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat_ute, equPTDISP_pat_ute, 1.0);
 								}
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, equPTDISP_pat_ute, -1.0);
+
+								int equPTDISP_LINF_pat_ute = getEquLinear_PTDISP_LINFseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
+								if (equPTDISP_LINF_pat_ute == -1) {
+									equPTDISP_LINF_pat_ute = addEquLinear_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
+									const int varPTDISP_LINF_pat_ute = addVarDecisao_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, infinito, 0.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_pat_ute, equPTDISP_LINF_pat_ute, 1.0);
+								}
+								if (potencia_disponivel_minima_ute == 0.0)
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_pat, equPTDISP_LINF_pat_ute, -1.0);
+								else
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equPTDISP_LINF_pat_ute, potencia_disponivel_minima_ute);
+
+								int equPTDISP_LSUP_pat_ute = getEquLinear_PTDISP_LSUPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
+								if (equPTDISP_LSUP_pat_ute == -1) {
+									equPTDISP_LSUP_pat_ute = addEquLinear_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
+									const int varPTDISP_LSUP_pat_ute = addVarDecisao_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, infinito, 0.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_pat_ute, equPTDISP_LSUP_pat_ute, 1.0);
+								}
+								if (potencia_disponivel_maxima_ute == infinito)
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_pat, equPTDISP_LSUP_pat_ute, -1.0);
+								else
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equPTDISP_LSUP_pat_ute, potencia_disponivel_maxima_ute);
 
 							} // if (disponibilidade > 0.0) {
 						} // if ((idUnUTE_equiv == IdUnidadeUTE_Nenhum) || (idUnidadeUTE == idUnUTE_equiv)) {
@@ -5318,11 +5384,10 @@ void ModeloOtimizacao::criarTermeletricas(const TipoSubproblemaSolver a_TSS, Dad
 
 				if (disponivel) {
 
-					const int varPT_pat = getVarDecisao_PT(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
-					const int varPTDISP_pat = getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
-
 					const IdSubmercado idSSE = a_dados.getAtributo(idUTE, AttComumTermeletrica_submercado, IdSubmercado());
 
+					// varPTDISP
+					const int varPTDISP_pat = getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
 					int varPTDISP_pat_sse = getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idSSE);
 					int equPTDISP_pat_sse = getEquLinear_PTDISPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idSSE);
 					if (varPTDISP_pat_sse == -1) {
@@ -5341,9 +5406,50 @@ void ModeloOtimizacao::criarTermeletricas(const TipoSubproblemaSolver a_TSS, Dad
 					} // if (varPTDISP_sse == -1) {
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat_sse, equPTDISP_pat_sin, -1.0);
 
+					// varPTDISP_LINF
+					const int varPTDISP_LINF_pat = getVarDecisao_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
+					int varPTDISP_LINF_pat_sse = getVarDecisao_PTDISP_LINFseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idSSE);
+					int equPTDISP_LINF_pat_sse = getEquLinear_PTDISP_LINFseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idSSE);
+					if (varPTDISP_LINF_pat_sse == -1) {
+						varPTDISP_LINF_pat_sse = addVarDecisao_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idSSE, 0.0, infinito, 0.0);
+						equPTDISP_LINF_pat_sse = addEquLinear_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idSSE);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_pat_sse, equPTDISP_LINF_pat_sse, 1.0);
+					} // if (varPTDISP_LINF_sse == -1) {
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_pat, equPTDISP_LINF_pat_sse, -1.0);
+
+					int varPTDISP_LINF_pat_sin = getVarDecisao_PTDISP_LINFseExistir(a_TSS, a_idEstagio, a_period, a_idPat, IdSubmercado_SIN);
+					int equPTDISP_LINF_pat_sin = getEquLinear_PTDISP_LINFseExistir(a_TSS, a_idEstagio, a_period, a_idPat, IdSubmercado_SIN);
+					if (varPTDISP_LINF_pat_sin == -1) {
+						varPTDISP_LINF_pat_sin = addVarDecisao_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, IdSubmercado_SIN, 0.0, infinito, 0.0);
+						equPTDISP_LINF_pat_sin = addEquLinear_PTDISP_LINF(a_TSS, a_idEstagio, a_period, a_idPat, IdSubmercado_SIN);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_pat_sin, equPTDISP_LINF_pat_sin, 1.0);
+					} // if (varPTDISP_LINF_sse == -1) {
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_pat_sse, equPTDISP_LINF_pat_sin, -1.0);
+
+					// varPTDISP_LSUP
+					const int varPTDISP_LSUP_pat = getVarDecisao_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
+					int varPTDISP_LSUP_pat_sse = getVarDecisao_PTDISP_LSUPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idSSE);
+					int equPTDISP_LSUP_pat_sse = getEquLinear_PTDISP_LSUPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idSSE);
+					if (varPTDISP_LSUP_pat_sse == -1) {
+						varPTDISP_LSUP_pat_sse = addVarDecisao_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idSSE, 0.0, infinito, 0.0);
+						equPTDISP_LSUP_pat_sse = addEquLinear_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, idSSE);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_pat_sse, equPTDISP_LSUP_pat_sse, 1.0);
+					} // if (varPTDISP_LSUP_sse == -1) {
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_pat, equPTDISP_LSUP_pat_sse, -1.0);
+
+					int varPTDISP_LSUP_pat_sin = getVarDecisao_PTDISP_LSUPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, IdSubmercado_SIN);
+					int equPTDISP_LSUP_pat_sin = getEquLinear_PTDISP_LSUPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, IdSubmercado_SIN);
+					if (varPTDISP_LSUP_pat_sin == -1) {
+						varPTDISP_LSUP_pat_sin = addVarDecisao_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, IdSubmercado_SIN, 0.0, infinito, 0.0);
+						equPTDISP_LSUP_pat_sin = addEquLinear_PTDISP_LSUP(a_TSS, a_idEstagio, a_period, a_idPat, IdSubmercado_SIN);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_pat_sin, equPTDISP_LSUP_pat_sin, 1.0);
+					} // if (varPTDISP_LSUP_sse == -1) {
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_pat_sse, equPTDISP_LSUP_pat_sin, -1.0);
+
 					// Variável media
 					if (idPatEnd > IdPatamarCarga_1) {
 
+						const int varPT_pat = getVarDecisao_PT(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
 						int varPT = getVarDecisao_PTseExistir(a_TSS, a_idEstagio, a_period, idUTE);
 						int equPT = getEquLinear_PTseExistir(a_TSS, a_idEstagio, a_period, idUTE);
 						if (varPT == -1) {
@@ -5431,11 +5537,10 @@ void ModeloOtimizacao::criarComandoTermeletricas(const TipoSubproblemaSolver a_T
 		//
 		// Formulacao
 		// 
-		//   PTDISP_per + PTDISPCOM_FINF_per >= sobr(per,perPreCom) * sumPat(durPat * PTDISPCOM_perPreCom) + sobr(per,perCom) * PTDISPCOM_perCom
-		//	 PTDISP_per - PTDISPCOM_FSUP_per <= sobr(per,perPreCom) * sumPat(durPat * PTDISPCOM_perPreCom) + sobr(per,perCom) * PTDISPCOM_perCom
+		//   PTDISP_per = sobr(per,perPreCom) * sumPat(durPat * PTDISPCOM_perPreCom) + sobr(per,perCom) * PTDISPCOM_perCom
 		//
 
-		// Períodos precom com Potencia já comandada. Restrições por patamar de carga
+		// Períodos precom com Potencia já comandada. Variáveis por patamar de carga
 		if (a_dados.getSize1Matriz(a_idUTE, AttMatrizTermeletrica_potencia_disponivel_comandada) > 0) {
 
 			const Periodo periodEnd_precom = a_dados.getIterador1Final(a_idUTE, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
@@ -5469,25 +5574,12 @@ void ModeloOtimizacao::criarComandoTermeletricas(const TipoSubproblemaSolver a_T
 								if (varPTDISPCOM_pat == -1)
 									varPTDISPCOM_pat = addVarDecisao_PTDISPCOM(a_TSS, a_idEstagio, period_preCom, idPat, a_idUTE, potencia_disponivel_comandada, potencia_disponivel_comandada, 0.0);
 
-								int inePTDISPCOM_LINF = getIneLinear_PTDISPCOM_LINFseExistir(a_TSS, a_idEstagio, a_period, a_idUTE);
-								if (inePTDISPCOM_LINF == -1) {
-									inePTDISPCOM_LINF = addIneLinear_PTDISPCOM_LINF(a_TSS, a_idEstagio, a_period, a_idUTE);
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP, inePTDISPCOM_LINF, 1.0);
-									const int varPTDISPCOM_FINF = addVarDecisao_PTDISPCOM_FINF(a_TSS, a_idEstagio, a_period, a_idUTE, 0.0, infinito, 0.0);
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_FINF, getEquLinear_ZP(a_TSS, a_idEstagio, a_period), -a_dados.getAtributo(a_idUTE, AttComumTermeletrica_penalidade_violacao_comando, double()));
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_FINF, inePTDISPCOM_LINF, 1.0);
+								int equPTDISPCOM = getEquLinear_PTDISPCOMseExistir(a_TSS, a_idEstagio, a_period, a_idUTE);
+								if (equPTDISPCOM == -1) {
+									equPTDISPCOM = addEquLinear_PTDISPCOM(a_TSS, a_idEstagio, a_period, a_idUTE);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP, equPTDISPCOM, 1.0);
 								}
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_pat, inePTDISPCOM_LINF, -sobreposicao * perc_dur_pat);
-
-								int inePTDISPCOM_LSUP = getIneLinear_PTDISPCOM_LSUPseExistir(a_TSS, a_idEstagio, a_period, a_idUTE);
-								if (inePTDISPCOM_LSUP == -1) {
-									inePTDISPCOM_LSUP = addIneLinear_PTDISPCOM_LSUP(a_TSS, a_idEstagio, a_period, a_idUTE);
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP, inePTDISPCOM_LSUP, -1.0);
-									const int varPTDISPCOM_FSUP = addVarDecisao_PTDISPCOM_FSUP(a_TSS, a_idEstagio, a_period, a_idUTE, 0.0, infinito, 0.0);
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_FSUP, getEquLinear_ZP(a_TSS, a_idEstagio, a_period), -a_dados.getAtributo(a_idUTE, AttComumTermeletrica_penalidade_violacao_comando, double()));
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_FSUP, inePTDISPCOM_LSUP, 1.0);
-								}
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_pat, inePTDISPCOM_LSUP, sobreposicao * perc_dur_pat);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM_pat, equPTDISPCOM, -sobreposicao * perc_dur_pat);
 
 							} // for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= idPatEnd; idPat++) {
 
@@ -5509,11 +5601,6 @@ void ModeloOtimizacao::criarComandoTermeletricas(const TipoSubproblemaSolver a_T
 			return;
 
 		// Períodos mensais com Potencia a comandar recursivamente
-		//
-		// Formulacao
-		// 
-		//  sobr * PTDISP =  PTDISPCOM_mes
-		//
 
 		const Periodo period_min_end = Periodo(TipoPeriodo_minuto, a_period + 1) - 1;
 		const Periodo period_month_end = Periodo(TipoPeriodo_mensal, period_min_end.getMes(), period_min_end.getAno());
@@ -5644,19 +5731,12 @@ void ModeloOtimizacao::criarComandoTermeletricas(const TipoSubproblemaSolver a_T
 
 				int varPTDISPCOM = getVarDecisao_PTDISPCOMseExistir(a_TSS, a_idEstagio, period_month, a_idUTE);
 
-				int inePTDISPCOM_LINF = getIneLinear_PTDISPCOM_LINFseExistir(a_TSS, a_idEstagio, a_period, a_idUTE);
-				if (inePTDISPCOM_LINF == -1) {
-					inePTDISPCOM_LINF = addIneLinear_PTDISPCOM_LINF(a_TSS, a_idEstagio, a_period, a_idUTE);
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP, inePTDISPCOM_LINF, 1.0);
+				int equPTDISPCOM = getEquLinear_PTDISPCOMseExistir(a_TSS, a_idEstagio, a_period, a_idUTE);
+				if (equPTDISPCOM == -1) {
+					equPTDISPCOM = addEquLinear_PTDISPCOM(a_TSS, a_idEstagio, a_period, a_idUTE);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP, equPTDISPCOM, 1.0);
 				}
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM, inePTDISPCOM_LINF, -periods_month.at_rIt(period_month));
-
-				int inePTDISPCOM_LSUP = getIneLinear_PTDISPCOM_LSUPseExistir(a_TSS, a_idEstagio, a_period, a_idUTE);
-				if (inePTDISPCOM_LSUP == -1) {
-					inePTDISPCOM_LSUP = addIneLinear_PTDISPCOM_LSUP(a_TSS, a_idEstagio, a_period, a_idUTE);
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP, inePTDISPCOM_LSUP, -1.0);
-				}
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM, inePTDISPCOM_LSUP, periods_month.at_rIt(period_month));
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISPCOM, equPTDISPCOM, -periods_month.at_rIt(period_month));
 
 			} // if (varPTDISPCOM == -1) {
 		} // for (Periodo period_month = periods_month.getIteradorInicial(); period_month <= periods_month.getIteradorFinal(); periods_month.incrementarIterador(period_month)) {
