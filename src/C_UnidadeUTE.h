@@ -23,7 +23,7 @@
       m(UnidadeUTE,  AttComum,                    ramp_down,               double,           0,         max,           max,     nao) \
       m(UnidadeUTE,  AttComum,                  min_time_up,               double,           0,       10000,             0,     nao) \
       m(UnidadeUTE,  AttComum,                min_time_down,               double,           0,       10000,             0,     nao) \
-      m(UnidadeUTE,  AttComum,                     timi_ini,               double,         min,         max,           min,     nao) \
+      m(UnidadeUTE,  AttComum,                     time_ini,               double,         min,         max,           min,     nao) \
       m(UnidadeUTE,  AttComum,                    power_ini,               double,           0,       10000,             0,     nao)
 //     c_classe,    smrtAtt,                   nomeAtributo,           tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
