@@ -4439,7 +4439,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 				if (a_dados.getAtributo(idUTE, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int()) > 0) {
 
-					IdUnidadeUTE idUnidadeUTEIni = a_dados.vetorTermeletrica.at(idUTE).getMenorId(IdUnidadeUTE());
+					const IdUnidadeUTE idUnidadeUTEEnd = a_dados.vetorTermeletrica.at(idUTE).getMaiorId(IdUnidadeUTE());
+					
+					const IdUnidadeUTE idUnidadeUTEIni = a_dados.vetorTermeletrica.at(idUTE).getMenorId(IdUnidadeUTE());
 					const IdUnidadeUTE idUnidadeUTEOut = a_dados.vetorTermeletrica.at(idUTE).getIdOut(IdUnidadeUTE());
 
 					const IdSubmercado idSubmercado = a_dados.getAtributo(idUTE, AttComumTermeletrica_submercado, IdSubmercado());
@@ -4458,20 +4460,19 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 							potencia_maxima = potencia_minima + a_dados.getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_util, a_horizonte_estudo.getIteradorFinal(), idPat, double()) * percentual_duracao;
 						}//if (a_dados.getSizeMatriz(idUTE, AttMatrizTermeletrica_potencia_minima) > 0 && a_dados.getSizeMatriz(idUTE, AttMatrizTermeletrica_potencia_util) > 0) {
 						else if (a_dados.vetorTermeletrica.at(idUTE).getSize1Matriz(idUnidadeUTEIni, AttMatrizUnidadeUTE_potencia_minima) > 0 && a_dados.vetorTermeletrica.at(idUTE).getSize1Matriz(idUnidadeUTEIni, AttMatrizUnidadeUTE_potencia_util) > 0) {
-
-							if(a_dados.vetorTermeletrica.at(idUTE).getAtributo(AttComumTermeletrica_unidades_simultaneas, bool()))//Para usinas a ciclo combinado o potencia_maxima é a informada para a última unidade equivalente
-								idUnidadeUTEIni = a_dados.vetorTermeletrica.at(idUTE).getMaiorId(IdUnidadeUTE());
-
-							for (IdUnidadeUTE idUnidade = idUnidadeUTEIni; idUnidade < idUnidadeUTEOut; a_dados.vetorTermeletrica.at(idUTE).vetorUnidadeUTE.incr(idUnidade)) {
-								potencia_minima += a_dados.vetorTermeletrica.at(idUTE).getElementoMatriz(idUnidadeUTEIni, AttMatrizUnidadeUTE_potencia_minima, a_horizonte_estudo.getIteradorFinal(), idPat, double()) * percentual_duracao;
-								potencia_maxima += (a_dados.vetorTermeletrica.at(idUTE).getElementoMatriz(idUnidadeUTEIni, AttMatrizUnidadeUTE_potencia_minima, a_horizonte_estudo.getIteradorFinal(), idPat, double()) + a_dados.vetorTermeletrica.at(idUTE).getElementoMatriz(idUnidadeUTEIni, AttMatrizUnidadeUTE_potencia_util, a_horizonte_estudo.getIteradorFinal(), idPat, double())) * percentual_duracao;
-							
-							}//for (IdUnidadeUTE idUnidade = idUnidadeUTEIni; idUnidade < idUnidadeUTEOut; a_dados.vetorTermeletrica.at(idUTE).vetorUnidadeUTE.incr(idUnidade)) {
-
+							if (a_dados.vetorTermeletrica.at(idUTE).getAtributo(AttComumTermeletrica_unidades_simultaneas, bool())) {//para usinas convencionais faz o somatório das potências das unidades
+								for (IdUnidadeUTE idUnidade = idUnidadeUTEIni; idUnidade < idUnidadeUTEOut; a_dados.vetorTermeletrica.at(idUTE).vetorUnidadeUTE.incr(idUnidade)) {
+									potencia_minima += a_dados.vetorTermeletrica.at(idUTE).getElementoMatriz(idUnidadeUTEIni, AttMatrizUnidadeUTE_potencia_minima, a_horizonte_estudo.getIteradorFinal(), idPat, double()) * percentual_duracao;
+									potencia_maxima += (a_dados.vetorTermeletrica.at(idUTE).getElementoMatriz(idUnidadeUTEIni, AttMatrizUnidadeUTE_potencia_minima, a_horizonte_estudo.getIteradorFinal(), idPat, double()) + a_dados.vetorTermeletrica.at(idUTE).getElementoMatriz(idUnidadeUTEIni, AttMatrizUnidadeUTE_potencia_util, a_horizonte_estudo.getIteradorFinal(), idPat, double())) * percentual_duracao;
+								}//for (IdUnidadeUTE idUnidade = idUnidadeUTEIni; idUnidade < idUnidadeUTEOut; a_dados.vetorTermeletrica.at(idUTE).vetorUnidadeUTE.incr(idUnidade)) {
+							}//if (a_dados.vetorTermeletrica.at(idUTE).getAtributo(AttComumTermeletrica_unidades_simultaneas, bool())) {
+							else {//Para usinas a ciclo combinado o potencia_maxima é a informada para a última unidade equivalente e potencia_minima da primeira unidde equivalente							
+								potencia_minima = a_dados.vetorTermeletrica.at(idUTE).getElementoMatriz(idUnidadeUTEIni, AttMatrizUnidadeUTE_potencia_minima, a_horizonte_estudo.getIteradorFinal(), idPat, double()) * percentual_duracao;
+								potencia_maxima = (a_dados.vetorTermeletrica.at(idUTE).getElementoMatriz(idUnidadeUTEEnd, AttMatrizUnidadeUTE_potencia_minima, a_horizonte_estudo.getIteradorFinal(), idPat, double()) + a_dados.vetorTermeletrica.at(idUTE).getElementoMatriz(idUnidadeUTEEnd, AttMatrizUnidadeUTE_potencia_util, a_horizonte_estudo.getIteradorFinal(), idPat, double())) * percentual_duracao;
+							}//else {
 						}//else if (a_dados.vetorTermeletrica.at(idUTE).getSizeMatriz(idUnidadeUTEIni, AttMatrizUnidadeUTE_potencia_minima) > 0 && a_dados.vetorTermeletrica.at(idUTE).getSizeMatriz(idUnidadeUTEIni, AttMatrizUnidadeUTE_potencia_util) > 0) {
 						else { throw std::invalid_argument("Deve ser informado: AttMatrizTermeletrica_potencia_minima e AttMatrizTermeletrica_potencia_util ou AttMatrizUnidadeUTE_potencia_minima e  AttMatrizUnidadeUTE_potencia_minima_potencia_util na termeletrica: " + getString(idUTE)); }
 											
-
 					}
 					
 					estados_GNL.at(idUTE).at(idSubmercado).at(1) = estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, std::string(strVarDecisaoPTDISPCOMIdEstagio + "," + getString(periodo_pos_estudo + 1) + "," + getString(idUTE) + "," + getString(potencia_minima) + "," + getString(potencia_maxima)), -1, -1);

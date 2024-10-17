@@ -836,13 +836,15 @@ void Dados::validaTermeletrica(const IdTermeletrica a_menorIdTermeletrica, const
 							double potencia_disponivel_minima = -1.0;
 							double potencia_disponivel_maxima = -1.0;
 
-							if (getSize1Matriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima) != 0)
+							if (getSize1Matriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima) != 0) {
 								if ((getIterador1Inicial(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima, Periodo()) <= periodo) && (periodo <= getIterador1Final(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima, Periodo())))
 									potencia_disponivel_minima = getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima, periodo, idPatamarCarga, double());
+							}
 
-							if (getSize1Matriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima) != 0)
+							if (getSize1Matriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima) != 0) {
 								if ((getIterador1Inicial(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima, Periodo()) <= periodo) && (periodo <= getIterador1Final(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima, Periodo())))
 									potencia_disponivel_maxima = getElementoMatriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, idPatamarCarga, double());
+							}
 
 							if ((potencia_disponivel_minima > -1.0) && (potencia_disponivel_maxima > -1.0) && (potencia_disponivel_minima > potencia_disponivel_maxima))
 								throw std::invalid_argument("Potencia minima da  " + getFullString(idUTE) + " no " + getFullString(periodo) + " no " + getFullString(idPatamarCarga) + "  maior que a potencia maxima");
@@ -870,13 +872,15 @@ void Dados::validaTermeletrica(const IdTermeletrica a_menorIdTermeletrica, const
 									double potencia_disponivel_minima_unidade = -1.0;
 									double potencia_disponivel_maxima_unidade = -1.0;
 
-									if (getSize1Matriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima) != 0)
+									if (getSize1Matriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima) != 0) {
 										if ((getIterador1Inicial(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima, Periodo()) <= periodo) && (periodo <= getIterador1Final(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima, Periodo())))
 											potencia_disponivel_minima_unidade = getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima, periodo, idPatamarCarga, double());
+									}
 
-									if (getSize1Matriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima) != 0)
+									if (getSize1Matriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima) != 0) {
 										if ((getIterador1Inicial(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, Periodo()) <= periodo) && (periodo <= getIterador1Final(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, Periodo())))
 											potencia_disponivel_maxima_unidade = getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, periodo, idPatamarCarga, double());
+									}
 
 									if ((potencia_disponivel_minima_unidade > -1.0) && (potencia_disponivel_maxima_unidade > -1.0) && (potencia_disponivel_minima_unidade > potencia_disponivel_maxima_unidade))
 										throw std::invalid_argument("Potencia minima da  " + getFullString(idUTE) + " no " + getFullString(periodo) + " no " + getFullString(idPatamarCarga) + "  maior que a potencia maxima");
