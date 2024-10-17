@@ -3893,6 +3893,8 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 			}
 		} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
+		const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> horizon = a_dados.getMatriz(AttMatrizDados_percentual_duracao_patamar_carga, Periodo(), IdPatamarCarga(), double());
+
 		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 			if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio)) {
 				SmartEnupla<IdVariavelAleatoria, std::vector<IdHidreletrica>> isIdHidreletricaNosEstadosYP(IdVariavelAleatoria_1, std::vector<std::vector<IdHidreletrica>>(IdVariavelAleatoria(IdVariavelAleatoria_Excedente - 1), std::vector<IdHidreletrica>()));
@@ -4036,12 +4038,26 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 								const std::vector<std::string> nome = vetorEstagio_aux.at(idEstagio).getNomeVariavelEstado(idVariavelEstado_corte);
 
-								if ((nome.at(0) != "VarDecisaoYP") && (nome.at(0) != "VarDecisaoVI")) {
+								if ((nome.at(0) != "VarDecisaoYP") && (nome.at(0) != "VarDecisaoVI") && (nome.at(0) != "VarDecisaoQDEF")) {
 									throw std::invalid_argument(getFullString(idVariavelEstado_corte) + " " + vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()) + " presente no corte, nao consta no modelo em " + getFullString(idEstagio));
 								}
 
+								//
+								// Defluencia viajante
+								//
 
-								if (nome.at(0) == "VarDecisaoVI") {
+								if (nome.at(0) == "VarDecisaoQDEF") {
+
+									Periodo periodo_lag = Periodo(nome.at(2));
+									const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
+
+									const int varQDEF = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, idEstagio, idHidreletrica, periodo_lag, horizon);
+									if (varQDEF == -1)
+										throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDEF de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
+
+								} // else if (nome.at(0) == "VarDecisaoQDEF") {
+
+								else if (nome.at(0) == "VarDecisaoVI") {
 
 									const Periodo periodo(nome.at(2));
 

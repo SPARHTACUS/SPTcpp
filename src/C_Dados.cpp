@@ -3813,25 +3813,6 @@ void Dados::validaProdutibilidadeENA(EntradaSaidaDados a_entradaSaidaDados, cons
 } // void Dados::validaHidreletrica(){
 
 
-void Dados::valida_considerar_tempo_viagem_agua(const IdHidreletrica a_idHidreletrica) {
-	try {
-
-		const Periodo periodo_inicial = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial();
-		const Periodo periodo_final = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorFinal();
-
-		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).incrementarIterador(periodo)) {
-
-			const double proporcao_tempo_viagem_no_periodo = getAtributo(a_idHidreletrica, AttComumHidreletrica_tempo_viagem_agua, int()) * std::pow(periodo.getHoras(), -1);
-
-			if (proporcao_tempo_viagem_no_periodo >= getAtributo(AttComumDados_taxa_considerar_tempo_viagem_agua, double()))
-				vetorHidreletrica.at(a_idHidreletrica).setAtributo(AttComumHidreletrica_considerar_tempo_viagem_agua, true);
-
-		} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).incrementarIterador(periodo)) {
-
-	} // try{
-	catch (const std::exception& erro) { throw std::invalid_argument("Dados::valida_considerar_tempo_viagem_agua(): " + getFullString(a_idHidreletrica) + std::string(erro.what())); }
-} // void Dados::validaHidreletrica(){
-
 bool Dados::isRestricaoEletrica_simples(const IdRestricaoEletrica a_idRestricaoEletrica){
 
 	try{
@@ -4571,7 +4552,6 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 				catch (const std::exception& erro) { throw std::invalid_argument("RESERVATORIO em " + getFullString(idHidreletrica) + ": \n" + std::string(erro.what())); }
 
 
-
 				// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 				//
 				//                                                                                   Hidreletrica
@@ -4580,6 +4560,15 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 				preencher_AttVetorHidreletrica.at(idHidreletrica) = SmartEnupla<AttVetorHidreletrica, PreencherAtributo>(AttVetorHidreletrica(AttVetorHidreletrica_Nenhum + 1), std::vector<PreencherAtributo>(AttVetorHidreletrica(AttVetorHidreletrica_Excedente - 1), nao_sem_utilizacao));
 				preencher_AttMatrizHidreletrica.at(idHidreletrica) = SmartEnupla<AttMatrizHidreletrica, PreencherAtributo>(AttMatrizHidreletrica(AttMatrizHidreletrica_Nenhum + 1), std::vector<PreencherAtributo>(AttMatrizHidreletrica(AttMatrizHidreletrica_Excedente - 1), nao_sem_utilizacao));
+
+
+
+				if (getAtributo(idHidreletrica, AttComumHidreletrica_tempo_viagem_agua, int()) > 0) {
+					if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_horizonte_defluencia_viajante) == 0) {
+						preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_horizonte_defluencia_viajante) = sim_operacional;
+						vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_horizonte_defluencia_viajante, formarHorizonteDefluenciaViajante(idHidreletrica, horizonte_estudo));
+					}
+				}
 
 
 				// ------------------------------------
@@ -6420,14 +6409,6 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 					} // if (vetor_idRestricaoOperativaUHE_comUHE_vazao_defluente.size() > 0) {
 
 				} // if (true) {
-
-
-				// ------------------------------------
-				//
-				// AttComumHidreletrica
-				//
-				// ------------------------------------
-				valida_considerar_tempo_viagem_agua(idHidreletrica);
 
 			}
 
@@ -11530,6 +11511,83 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao(): \n" + std::string(erro.what())); }
 
+}
+
+SmartEnupla<Periodo, Periodo> Dados::formarHorizonteDefluenciaViajante(const IdHidreletrica a_idUHE, const SmartEnupla<Periodo, IdEstagio> &a_horizon){
+
+
+	try {
+
+
+		const double tva_min = double(getAtributo(a_idUHE, AttComumHidreletrica_tempo_viagem_agua, int()) * 60);
+
+		if (tva_min == 0.0)
+			return SmartEnupla<Periodo, Periodo>();
+
+		const double frac_considerar_tva   = getAtributo(AttComumDados_taxa_considerar_tempo_viagem_agua, double());
+		const double frac_formar_horizonte = getAtributo(AttComumDados_fracao_de_tempo_viagem_agua_para_formar_horizonte_viajante, double());
+
+		const double num_min_formar_horizonte = frac_formar_horizonte * tva_min;
+
+		SmartEnupla<Periodo, Periodo> horizonte_viajante(a_horizon, Periodo(IdAno_1900));
+
+		Periodo perIni = a_horizon.getIteradorInicial();
+		Periodo perEnd = a_horizon.getIteradorFinal();
+
+		IdEstagio idEstagio_prev = IdEstagio_Nenhum;
+
+		for (Periodo period = perIni; period <= perEnd; a_horizon.incrementarIterador(period)) {
+
+			const IdEstagio idEstagio = a_horizon.at_rIt(period);
+
+			const double num_min_period = double(period.getMinutos());
+			const double frac_period = tva_min / num_min_period;
+
+			if (frac_period >= frac_considerar_tva) {
+				const Periodo   period_stage = getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
+
+				const double formar_horizonte_period = std::abs(num_min_period - num_min_formar_horizonte);
+				const double formar_horizonte_stage = std::abs(double(period_stage.getMinutos()) - num_min_formar_horizonte);
+
+				bool is_formar_horizonte_stage = false;
+				if (formar_horizonte_period <= formar_horizonte_stage) {
+					is_formar_horizonte_stage = false;
+					if (idEstagio_prev == idEstagio) {
+						Periodo period_prev = period;
+						a_horizon.decrementarIterador(period_prev);
+						if (horizonte_viajante.at_rIt(period_prev).isValido()) {
+							if (horizonte_viajante.at_rIt(period_prev) == period_stage)
+								is_formar_horizonte_stage = true;
+						}
+					}
+				}
+				else if (formar_horizonte_period > formar_horizonte_stage) {
+					is_formar_horizonte_stage = true;
+					if (idEstagio_prev == idEstagio) {
+						Periodo period_prev = period;
+						a_horizon.decrementarIterador(period_prev);
+						if (horizonte_viajante.at_rIt(period_prev).isValido()) {
+							if (horizonte_viajante.at_rIt(period_prev) == period_prev)
+								is_formar_horizonte_stage = false;
+						}
+					}
+				}
+
+				if (is_formar_horizonte_stage)
+					horizonte_viajante.at_rIt(period) = period_stage;
+				else
+					horizonte_viajante.at_rIt(period) = period;
+
+			}
+
+			idEstagio_prev = idEstagio;
+
+		} // for (Periodo period = perIni; period <= perEnd; a_horizon.incrementarIterador(period)) {
+
+		return horizonte_viajante;
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("Dados::formarHorizonteDefluenciaViajante(" + getFullString(a_idUHE) + "): \n" + std::string(erro.what())); }
 }
 
 void Dados::adicionaHidreletricasMontante() {

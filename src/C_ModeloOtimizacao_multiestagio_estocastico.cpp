@@ -1998,8 +1998,13 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 				const int tempo_viagem_agua = a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_tempo_viagem_agua, int());
 
 				if (tempo_viagem_agua > 0) {
-					Periodo periodo_lag = Periodo(a_period.getTipoPeriodo(), Periodo(TipoPeriodo_horario, a_period) - tempo_viagem_agua);
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, a_idEstagio, idHidreletrica_montante, periodo_lag, a_horizon), posEquQMON, -1.0);
+					const Periodo periodo_ref = a_dados.getElementoVetor(idHidreletrica_montante, AttVetorHidreletrica_horizonte_defluencia_viajante, a_period, Periodo());
+					if (periodo_ref != Periodo(IdAno_1900)) {
+						Periodo periodo_lag = Periodo(periodo_ref.getTipoPeriodo(), Periodo(TipoPeriodo_horario, periodo_ref) - tempo_viagem_agua);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, a_idEstagio, idHidreletrica_montante, periodo_lag, a_horizon), posEquQMON, -1.0);
+					}
+					else
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_period, a_idPat, idHidreletrica_montante), posEquQMON, -1.0);
 				}
 				else {
 
@@ -2255,10 +2260,13 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 				const int tempo_viagem_agua = a_dados.getAtributo(idHidreletrica_montante, AttComumHidreletrica_tempo_viagem_agua, int());
 
 				if (tempo_viagem_agua > 0) {
-					//Periodo periodo_lag = Periodo(a_period.getTipoPeriodo(), Periodo(TipoPeriodo_horario, a_period) - tempo_viagem_agua);
-					const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
-					Periodo periodo_lag = Periodo(periodo_otimizacao.getTipoPeriodo(), Periodo(TipoPeriodo_horario, periodo_otimizacao) - tempo_viagem_agua);
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, a_idEstagio, idHidreletrica_montante, periodo_lag, a_horizon), posEquQMON, -1.0);
+					const Periodo periodo_ref = a_dados.getElementoVetor(idHidreletrica_montante, AttVetorHidreletrica_horizonte_defluencia_viajante, a_period, Periodo());
+					if (periodo_ref != Periodo(IdAno_1900)) {
+						Periodo periodo_lag = Periodo(periodo_ref.getTipoPeriodo(), Periodo(TipoPeriodo_horario, periodo_ref) - tempo_viagem_agua);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, a_idEstagio, idHidreletrica_montante, periodo_lag, a_horizon), posEquQMON, -1.0);
+					}
+					else
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_period, a_idPat, idHidreletrica_montante), posEquQMON, -1.0);
 				}
 				else
 					// Variável QD

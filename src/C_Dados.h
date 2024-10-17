@@ -114,7 +114,8 @@
       m(Dados,  AttComum,               maior_estagio_impressao_versao_alternativa_cortes,         IdEstagio,      min,         max,            12,      nao) \
       m(Dados,  AttComum,                              mes_penalizacao_volume_util_minimo,             IdMes,      nenhum,         max,            11,      nao) \
       m(Dados,  AttComum,                  custo_acumulado_penalizacao_volume_util_minimo,            double,           0,         max,             0,      nao) \
-      m(Dados,  AttComum,               taxa_considerar_tempo_viagem_agua,                            double,           0,           1,           0.2,      nao) \
+      m(Dados,  AttComum,  taxa_considerar_tempo_viagem_agua,                            double,           0,           1,           0.2,      nao) \
+      m(Dados,  AttComum,  fracao_de_tempo_viagem_agua_para_formar_horizonte_viajante,                            double,           0,           1,           0.2,      nao) \
       m(Dados,  AttComum,                     tipo_processamento_paralelo,         TipoProcessamentoParalelo,         min,         max,   por_cenario,      nao) \
       m(Dados,  AttComum,                                 imprimir_info_media,                          bool,         min,         max,           nao,      nao) \
       m(Dados,  AttComum,              imprimir_cortes_NW_com_reducao_estados,                          bool,         min,         max,           nao,      nao) 
@@ -302,8 +303,6 @@ public:
 
 	void valida_preconfig_hidraulica(const SmartEnupla<IdHidreletrica, IdHidreletrica> a_lista_jusante_hidreletrica, const SmartEnupla<IdHidreletrica, IdHidreletrica> a_lista_jusante_desvio_hidreletrica);
 
-	void valida_considerar_tempo_viagem_agua(const IdHidreletrica a_idHidreletrica);
-
 	bool isRestricaoEletrica_simples(const IdRestricaoEletrica a_idRestricao_eletrica);
 	bool isRestricaoOperativaUHE_simples(const IdRestricaoOperativaUHE a_idRestricaoOperacionalUHE);
 
@@ -318,6 +317,8 @@ public:
 
 	void definirCenariosPorProcessosEmArranjoResolucao();
 	void mapearCenariosAberturasPorIteracaoEmArranjoResolucao();
+
+	SmartEnupla<Periodo, Periodo> formarHorizonteDefluenciaViajante(const IdHidreletrica a_idUHE, const SmartEnupla<Periodo, IdEstagio> &a_horizon);
 
 	void adicionaHidreletricasMontante();
 
