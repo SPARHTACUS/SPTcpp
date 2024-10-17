@@ -17387,7 +17387,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_ramp_down, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_ramp_down, double()));
 							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_min_time_up, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_min_time_up, double()));
 							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_min_time_down, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_min_time_down, double()));
-							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_timi_ini, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_timi_ini, double()));
+							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_time_ini, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_time_ini, double()));
 							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_power_ini, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_power_ini, double()));
 
 							//Atualiza AttVetor x int				

@@ -870,11 +870,11 @@ void Dados::validaTermeletrica(const IdTermeletrica a_menorIdTermeletrica, const
 									double potencia_disponivel_minima_unidade = -1.0;
 									double potencia_disponivel_maxima_unidade = -1.0;
 
-									if (getSize1Matriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_minima) != 0)
+									if (getSize1Matriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima) != 0)
 										if ((getIterador1Inicial(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima, Periodo()) <= periodo) && (periodo <= getIterador1Final(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima, Periodo())))
 											potencia_disponivel_minima_unidade = getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_minima, periodo, idPatamarCarga, double());
 
-									if (getSize1Matriz(idUTE, AttMatrizTermeletrica_potencia_disponivel_maxima) != 0)
+									if (getSize1Matriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima) != 0)
 										if ((getIterador1Inicial(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, Periodo()) <= periodo) && (periodo <= getIterador1Final(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, Periodo())))
 											potencia_disponivel_maxima_unidade = getElementoMatriz(idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_disponivel_maxima, periodo, idPatamarCarga, double());
 
@@ -3151,7 +3151,7 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 							a_entradaSaidaDados.setAppendArquivo(impresso_AttComumUnidadeUTE);
 							const std::vector<AttComumUnidadeUTE> lista_TERMELETRICA_CONJUNTO_UNIDADE_AttComumOperacional{ AttComumUnidadeUTE_idUnidadeUTE, AttComumUnidadeUTE_nome, AttComumUnidadeUTE_submercado, AttComumUnidadeUTE_ramp_up, AttComumUnidadeUTE_ramp_down, AttComumUnidadeUTE_min_time_up,\
-																															AttComumUnidadeUTE_min_time_down, AttComumUnidadeUTE_timi_ini, AttComumUnidadeUTE_power_ini };
+																															AttComumUnidadeUTE_min_time_down, AttComumUnidadeUTE_time_ini, AttComumUnidadeUTE_power_ini };
 
 							a_entradaSaidaDados.imprimirArquivoCSV_AttComum("TERMELETRICA_UNIDADE_AttComumOperacional.csv", idTermeletrica, idUnidadeUTE, *this, lista_TERMELETRICA_CONJUNTO_UNIDADE_AttComumOperacional);
 							impresso_AttComumUnidadeUTE = true;
@@ -8644,7 +8644,7 @@ void Dados::validacao_operacional_ReservaPotencia(EntradaSaidaDados a_entradaSai
 
 				a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
-				a_entradaSaidaDados.setAppendArquivo(true);
+				a_entradaSaidaDados.setAppendArquivo(false);
 				a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RESERVA_POTENCIA_AttComumOperacional.csv", IdReservaPotencia_Nenhum, *this, std::vector<AttComumReservaPotencia>{AttComumReservaPotencia_idReservaPotencia, AttComumReservaPotencia_nome, AttComumReservaPotencia_area});
 				a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RESERVA_POTENCIA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", IdReservaPotencia_Nenhum, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizReservaPotencia_reserva_minima);
 				
@@ -11270,7 +11270,9 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 								//else {
 								for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso_aux++) {
 									if (arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()) != IdCenario_Nenhum) {
-										for (IdCenario idCenario = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario()); idCenario <= arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario()); idCenario++) {
+										const IdCenario idCenarioIni = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_menor_cenario, IdCenario());
+										const IdCenario idCenarioEnd = arranjoResolucao.getAtributo(idIteracao, idProcesso_aux, AttComumProcesso_maior_cenario, IdCenario());
+										for (IdCenario idCenario = idCenarioIni; idCenario <= idCenarioEnd; idCenario++) {
 											const SmartEnupla<Periodo, IdRealizacao> mapeamento_espaco_amostral_idCenario = mapeamento_espaco_amostral.at(idCenario);
 											for (IdEstagio idEstagio_past = estagio_inicial; idEstagio_past <= idEstagio; idEstagio_past++) {
 												if (IdAbertura(mapeamento_espaco_amostral_idCenario_iteracao.at_rIt(periodos.at(idEstagio_past))) !=

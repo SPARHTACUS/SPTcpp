@@ -5349,6 +5349,16 @@ void ModeloOtimizacao::criarTermeletricas(const TipoSubproblemaSolver a_TSS, Dad
 								if (equPTDISP_pat_ute == -1) {
 									equPTDISP_pat_ute = addEquLinear_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
 									const int varPTDISP_pat_ute = addVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, potencia_disponivel_minima_ute, potencia_disponivel_maxima_ute, 0.0);
+									if (potencia_disponivel_minima_ute > 0.0) {
+										const int varPTDISP_LINF_FINF_pat_ute = addVarDecisao_PTDISP_LINF_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, infinito, 0.0);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_FINF_pat_ute, getEquLinear_ZP(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getAtributo(idUTE, AttComumTermeletrica_penalidade_violacao_potencia, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LINF_FINF_pat_ute, equPTDISP_pat_ute, -1.0);
+									}
+									if (potencia_disponivel_maxima_ute < infinito) {
+										const int varPTDISP_LSUP_FSUP_pat_ute = addVarDecisao_PTDISP_LSUP_FSUP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, 0.0, infinito, 0.0);
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_FSUP_pat_ute, getEquLinear_ZP(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getAtributo(idUTE, AttComumTermeletrica_penalidade_violacao_potencia, double()));
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_LSUP_FSUP_pat_ute, equPTDISP_pat_ute, 1.0);
+									}
 									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat_ute, equPTDISP_pat_ute, 1.0);
 								}
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPTDISP_pat, equPTDISP_pat_ute, -1.0);
