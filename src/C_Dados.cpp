@@ -11554,7 +11554,7 @@ SmartEnupla<Periodo, Periodo> Dados::formarHorizonteDefluenciaViajante(const IdH
 				const double formar_horizonte_stage = std::abs(double(period_stage.getMinutos()) - num_min_formar_horizonte);
 
 				bool is_formar_horizonte_stage = false;
-				if (formar_horizonte_period <= formar_horizonte_stage) {
+				if ((formar_horizonte_period <= formar_horizonte_stage) || (num_min_formar_horizonte == 0)) {
 					is_formar_horizonte_stage = false;
 					if (idEstagio_prev == idEstagio) {
 						Periodo period_prev = period;

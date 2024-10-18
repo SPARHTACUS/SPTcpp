@@ -3939,60 +3939,45 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 					bool modelo_e_cortes_estados_identicos = true;
 
+					if (maiorIdVarivelEstado != maiorIdVarivelEstado)
+						modelo_e_cortes_estados_identicos = false;
+
 					for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVarivelEstado; idVariavelEstado++) {
 
 						if (vetorEstagio.at(idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
-							IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_Nenhum;
+							const std::vector<std::string> nome_estados = vetorEstagio.at(idEstagio).getNomeVariavelEstado(idVariavelEstado);
 
-							try {
+							for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
 
-								if (idVariavelEstado <= maiorIdVarivelEstado_corte) {
+								if (variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) == IdVariavelEstado_Nenhum) {
 
-									if (!strCompara(getAtributo(idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, std::string()), vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado, AttComumVariavelEstado_nome, std::string()))) {
+									if (vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado_corte)) {
 
-										modelo_e_cortes_estados_identicos = false;
+										const std::vector<std::string> nome_estados_aux = vetorEstagio_aux.at(idEstagio).getNomeVariavelEstado(idVariavelEstado_corte);
 
-										for (idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
-
-											if (vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado_corte)) {
-
-												const std::vector<std::string> nome_estados = vetorEstagio.at(idEstagio).getNomeVariavelEstado(idVariavelEstado);
-												const std::vector<std::string> nome_estados_aux = vetorEstagio_aux.at(idEstagio).getNomeVariavelEstado(idVariavelEstado_corte);
-
-												if (nome_estados.size() == nome_estados_aux.size()) {
-													bool is_nomes_iguais = true;
-													for (int i = 0; i < int(nome_estados.size()); i++) {
-														if (!strCompara(nome_estados.at(i), nome_estados_aux.at(i))) {
-															is_nomes_iguais = false; break;
-														}
-													}
-													if (is_nomes_iguais) {
-														variaveis_estado_modelo_encontradas.at(idVariavelEstado) = idVariavelEstado_corte;
-														variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) = idVariavelEstado;
-														numero_variaveis_estado_modelo_encontradas++;
-														numero_variaveis_estado_cortes_encontradas++;
-														break;
-													}
-												} // if (nome_estados.size() == nome_estados_aux.size()) {
+										if (nome_estados.size() == nome_estados_aux.size()) {
+											bool is_nomes_iguais = true;
+											for (int i = 0; i < int(nome_estados.size()); i++) {
+												if (!strCompara(nome_estados.at(i), nome_estados_aux.at(i))) {
+													is_nomes_iguais = false; break;
+												}
 											}
-
-										} // for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
-
-									} // if (!strCompara(getAtributo(idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, std::string()), vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado, AttComumVariavelEstado_nome, std::string()))) {
-									else {
-										variaveis_estado_modelo_encontradas.at(idVariavelEstado) = idVariavelEstado;
-										variaveis_estado_cortes_encontradas.at(idVariavelEstado) = idVariavelEstado;
-										numero_variaveis_estado_modelo_encontradas++;
-										numero_variaveis_estado_cortes_encontradas++;
+											if (is_nomes_iguais) {
+												variaveis_estado_modelo_encontradas.at(idVariavelEstado) = idVariavelEstado_corte;
+												variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) = idVariavelEstado;
+												numero_variaveis_estado_modelo_encontradas++;
+												numero_variaveis_estado_cortes_encontradas++;
+												break;
+											}
+										} // if (nome_estados.size() == nome_estados_aux.size()) {
 									}
-								} // if (idVariavelEstado <= maiorIdVarivelEstado_corte) {
+								}
 
-							} // try {
+							} // for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
 
-							catch (const std::exception& erro) {
-								throw std::invalid_argument("Erro " + getFullString(idEstagio) + ", " + getFullString(idVariavelEstado) + ", Corte: " + getFullString(idVariavelEstado_corte) + ", \n" + std::string(erro.what()));
-							}
+							if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) == IdVariavelEstado_Nenhum)
+								modelo_e_cortes_estados_identicos = false;
 
 						}
 					} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVarivelEstado; idVariavelEstado++) {
@@ -4011,7 +3996,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 									const std::vector<std::string> nome = vetorEstagio.at(idEstagio).getNomeVariavelEstado(idVariavelEstado);
 
-									if ((nome.at(0) != "VarDecisaoYP") && (nome.at(0) != "VarDecisaoVI")) {
+									if ((nome.at(0) != "YP") && (nome.at(0) != "VI") && (nome.at(0) != "QDEF")) {
 										throw std::invalid_argument(getFullString(idVariavelEstado) + " " + getAtributo(idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, std::string()) + " presente no modelo, nao consta no corte em " + getFullString(idEstagio));
 									}
 
@@ -4038,7 +4023,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 								const std::vector<std::string> nome = vetorEstagio_aux.at(idEstagio).getNomeVariavelEstado(idVariavelEstado_corte);
 
-								if ((nome.at(0) != "VarDecisaoYP") && (nome.at(0) != "VarDecisaoVI") && (nome.at(0) != "VarDecisaoQDEF")) {
+								if ((nome.at(0) != "YP") && (nome.at(0) != "VI") && (nome.at(0) != "QDEF")) {
 									throw std::invalid_argument(getFullString(idVariavelEstado_corte) + " " + vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()) + " presente no corte, nao consta no modelo em " + getFullString(idEstagio));
 								}
 
@@ -4046,7 +4031,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 								// Defluencia viajante
 								//
 
-								if (nome.at(0) == "VarDecisaoQDEF") {
+								if (nome.at(0) == "QDEF") {
 
 									Periodo periodo_lag = Periodo(nome.at(2));
 									const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
@@ -4055,9 +4040,9 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 									if (varQDEF == -1)
 										throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDEF de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
 
-								} // else if (nome.at(0) == "VarDecisaoQDEF") {
+								} // else if (nome.at(0) == "QDEF") {
 
-								else if (nome.at(0) == "VarDecisaoVI") {
+								else if (nome.at(0) == "VI") {
 
 									const Periodo periodo(nome.at(2));
 
@@ -4087,9 +4072,9 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 									else
 										vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.rem(idVariavelEstado_corte);
 
-								} // if (nome.at(0) == "VarDecisaoVI") {
+								} // if (nome.at(0) == "VI") {
 
-								else if (nome.at(0) == "VarDecisaoYP") {
+								else if (nome.at(0) == "YP") {
 
 									const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(2).c_str());
 
@@ -4139,7 +4124,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 										vetorEstagio_aux.at(idEstagio).setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado_corte, a_TSS, varYP);
 									}
 
-								} // else if (nome.at(0) == "VarDecisaoYP") {
+								} // else if (nome.at(0) == "YP") {
 
 
 							} // if (variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) == IdVariavelEstado_Nenhum) {

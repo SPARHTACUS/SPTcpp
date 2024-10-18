@@ -340,8 +340,6 @@ Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const Periodo& a_periodo) {
 }
 
 Periodo::Periodo(const std::string a_periodo) {
-	if (a_periodo == "0Nenhum/0Nenhum/Nenhum-0Nenhum:0Nenhum:-Nenhum")
-		return;
 	inicializaAtributos();
 	setPeriodo(TipoPeriodo_Nenhum, a_periodo);
 }
