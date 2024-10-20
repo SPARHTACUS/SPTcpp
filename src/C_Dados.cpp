@@ -2720,8 +2720,8 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 					else if ((preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_premissa) || (preencher_AttMatrizTermeletrica.at(idTermeletrica).at(AttMatrizTermeletrica_custo_de_operacao) == sim_operacional))
 						preencher_AttMatrizUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttMatrizUnidadeUTE_custo_de_operacao) = nao_premissa_informado;
 
-					else
-						throw std::invalid_argument("O atributo " + getFullString(AttMatrizUnidadeUTE_custo_de_operacao) + " nao deve ser informado em " + getFullString(idTermeletrica) + " " + getFullString(idUnidadeUTE));
+					//else
+						//throw std::invalid_argument("O atributo " + getFullString(AttMatrizUnidadeUTE_custo_de_operacao) + " nao deve ser informado em " + getFullString(idTermeletrica) + " " + getFullString(idUnidadeUTE));
 
 				} // if (getSize1Matriz(idTermeletrica, idUnidadeUTE, AttMatrizUnidadeUTE_custo_de_operacao) > 0) {
 
@@ -8613,7 +8613,7 @@ void Dados::validacao_operacional_ReservaPotencia(EntradaSaidaDados a_entradaSai
 
 		} // for (IdReservaPotencia idReservaPotencia = idREIni; idReservaPotencia < idREOut; incr(idReservaPotencia)) {
 
-		if (a_imprimir_att_operacionais_sem_recarregar) {
+		if ((a_imprimir_att_operacionais_sem_recarregar) && (idREIni != IdReservaPotencia_Nenhum)) {
 
 			if (idProcesso == IdProcesso_mestre) {
 
