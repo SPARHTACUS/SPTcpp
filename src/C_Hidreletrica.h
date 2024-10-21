@@ -62,7 +62,6 @@
 	  m(Hidreletrica,  AttComum,     penalidade_volume_util_minimo,                               double,          0,          max,              10000,         não) \
 	  m(Hidreletrica,  AttComum,             penalidade_evaporacao,                               double,          0,          max,              10000,         sim) \
       m(Hidreletrica,  AttComum,        penalidade_potencia_minima,                               double,          0,          max,              10000,         sim) \
-      m(Hidreletrica,  AttComum,      considerar_tempo_viagem_agua,                               bool,        false,         true,              false,         nao) \
       m(Hidreletrica,  AttComum,                  queda_referencia,                               double,          0,         1000,                  0,         nao) \
       m(Hidreletrica,  AttComum,                 volume_referencia,                               double,          0,       100000,                  0,         nao) \
       m(Hidreletrica,  AttComum,                tipo_regularizacao,                    TipoRegularizacao,     Nenhum,          max,             Nenhum,         nao) \
@@ -93,6 +92,7 @@
 	  m(Hidreletrica,  AttVetor,                    potencia_maxima_media,                                double,          0,          max,           max,    Periodo) \
       m(Hidreletrica,  AttVetor,         potencia_disponivel_minima_media,                                double,          0,        50000,             0,    Periodo) \
 	  m(Hidreletrica,  AttVetor,         potencia_disponivel_maxima_media,                                double,          0,          max,           max,    Periodo) \
+	  m(Hidreletrica,  AttVetor,            horizonte_defluencia_viajante,                               Periodo,        min,          max,           max,    Periodo) \
       m(Hidreletrica,  AttVetor,                           vazao_retirada,                                double,     -50000,        50000,             0,    Periodo) \
 	  m(Hidreletrica,  AttVetor,                indisponibilidade_forcada,                                double,          0,            1,             0,    Periodo) \
       m(Hidreletrica,  AttVetor,             indisponibilidade_programada,                                double,          0,            1,             0,    Periodo) \
