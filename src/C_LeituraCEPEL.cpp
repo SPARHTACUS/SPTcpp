@@ -4272,9 +4272,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 			estagio_pos_estudo.alocarCorteBenders(8000);
 
-			const std::string strVarDecisaoVIIdEstagioPeriodo = std::string("VarDecisaoVI," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_pos_estudo));
-			const std::string strVarDecisaoENAIdEstagio = std::string("VarDecisaoENA," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())));
-			const std::string strVarDecisaoPTDISPCOMIdEstagio = std::string("VarDecisaoPTDISPCOM," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())));
+			const std::string strVarDecisaoVIIdEstagioPeriodo = std::string("VI," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_pos_estudo));
+			const std::string strVarDecisaoENAIdEstagio = std::string("ENA," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())));
+			const std::string strVarDecisaoPTDISPCOMIdEstagio = std::string("PTDISPCOM," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())));
 
 			//Processo estocástico
 			const IdTermeletrica	idTermeletricaIni = a_dados.getMenorId(IdTermeletrica());

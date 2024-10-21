@@ -15,14 +15,18 @@
 	  m(Renovavel,  AttComum,        geracao_maxima,         double,           0,         max,             0,      nao) 
 //       c_classe,   smrtAtt,           nomeAtributo,           tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
+#define ATT_VETOR_RENOVAVEL(m)  \
+	  m(Renovavel,  AttVetor,  constrained_off,      int,            0,          1,              0,      Periodo) 
+//       c_classe,   smrtAtt,     nomeAtributo,     Tipo,   lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define ATT_MATRIZ_RENOVAVEL(m)  \
-	  m(Renovavel,  AttMatriz,       geracao,     double,          0,          max,             0,  Periodo, IdPatamarCarga) 
+	  m(Renovavel,  AttMatriz,       geracao,     double,          0,          max,             0,  Periodo, IdPatamarCarga)
 //         c_classe,   smrtAtt,  nomeAtributo,       Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 
 #define SMART_ELEMENTO_RENOVAVEL(m) \
 	m(Renovavel, AttComum, ATT_COMUM_RENOVAVEL) \
+    m(Renovavel, AttVetor, ATT_VETOR_RENOVAVEL) \
 	m(Renovavel, AttMatriz, ATT_MATRIZ_RENOVAVEL) 
 
 DEFINE_SMART_ELEMENTO(Renovavel, SMART_ELEMENTO_RENOVAVEL)

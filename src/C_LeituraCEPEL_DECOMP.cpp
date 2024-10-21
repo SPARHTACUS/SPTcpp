@@ -16457,6 +16457,19 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		if(dadosPreConfig_submercado_operacional && dadosPreConfig_submercado_premissa){ throw std::invalid_argument("Encontrado arquivo operacional e arquivo premissa da demanda, selecionar apenas um deles em: " + a_diretorio);}
 		if(dadosPreConfig_usina_nao_simulada_operacional && dadosPreConfig_usina_nao_simulada_premissa){ throw std::invalid_argument("Encontrado arquivo operacional e arquivo premissa das usinas nao simuladas, selecionar apenas um deles em: " + a_diretorio);}
 
+
+		//****************************************
+		//Arquivos Renovavel
+		//****************************************
+		bool is_carregar_PD_renovavel = false;
+		bool dadosPreConfig_renovavel_attComum_operacional = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("RENOVAVEL_AttComumOperacional.csv", dados_PD, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_renovavel_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("RENOVAVEL_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_renovavel_attMatriz_operacional = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("RENOVAVEL_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m1);
+
+		if (dadosPreConfig_renovavel_attComum_operacional && dadosPreConfig_renovavel_attVetor_operacional && dadosPreConfig_renovavel_attMatriz_operacional)
+			is_carregar_PD_renovavel = true;
+
+
 		//****************************************
 		//Arquivo Intercambio
 		//****************************************
@@ -16672,7 +16685,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		//SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga
 		/////////////////////////////////////////////////////////////////////////////
 
-		if (dadosPreConfig_usina_nao_simulada_operacional) {
+		if (dadosPreConfig_usina_nao_simulada_operacional && !is_carregar_PD_renovavel) {
 
 			try {
 
@@ -16933,7 +16946,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		//SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga
 		//////////////////////////////////////////////////////////////////////////////
 
-		if (dadosPreConfig_usina_nao_simulada_premissa) {
+		if (dadosPreConfig_usina_nao_simulada_premissa && !is_carregar_PD_renovavel) {
 
 			try {
 
@@ -17092,6 +17105,149 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 			catch (const std::exception& erro) { throw std::invalid_argument("Erro dadosPreConfig_usina_nao_simulada_premissa: \n" + std::string(erro.what())); }
 
 		}//if (dadosPreConfig_usina_nao_simulada_premissa) {
+
+		//////////////////////////////////////////////////////////////////////////////
+		//RENOVAVEL_AttComumOperacional
+		//RENOVAVEL_AttVetorOperacional_PorPeriodo
+		//RENOVAVEL_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga
+		//////////////////////////////////////////////////////////////////////////////
+
+		if (is_carregar_PD_renovavel) {
+
+			try {
+
+				std::cout << "Carregando arquivo de preConfiguracao: RENOVAVEL_AttComumOperacional.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: RENOVAVEL_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: RENOVAVEL_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
+
+				//*******************************************************************
+				//  1. Instancia renovavel PD no CP
+				//   Testa se o renovavel existe no CP. Caso contrário, o instancia com valores default
+				//   Depois atualiza estes valores com a sobreposição dos periodos_CP e periodos_PD
+				// 
+				//  2. Zera USINA_NAO_SIMULADA dentro do período PD
+				//*******************************************************************
+
+				Periodo periodo_REF = horizonte_estudo.getIteradorInicial(); //Período a partir do qual vão ser consideradas as restrições originais (atualiza-se a partir do periodo_final_PD)
+
+				const IdRenovavel idRenovavelIni_PD = dados_PD.getMenorId(IdRenovavel());
+				const IdRenovavel idRenovavelOut_PD = dados_PD.getIdOut(IdRenovavel());
+
+				for (IdRenovavel idRenovavel_PD = idRenovavelIni_PD; idRenovavel_PD < idRenovavelOut_PD; dados_PD.vetorRenovavel.incr(idRenovavel_PD)) {
+
+					//Validação do horizonte_informacao_PD_pre_config
+					std::vector<Periodo> periodos_PD = dados_PD.vetorRenovavel.at(idRenovavel_PD).getMatriz(AttMatrizRenovavel_geracao, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+
+					const Periodo periodo_inicial_PD = periodos_PD.at(0);
+					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
+
+					validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+
+					////////////////////////////////////////
+					//Instancia novas renovaveis PD no CP
+					////////////////////////////////////////
+
+					if (!a_dados.vetorRenovavel.isInstanciado(idRenovavel_PD)) {
+
+						Renovavel renovavel;
+
+						renovavel.setAtributo(AttComumRenovavel_idRenovavel, idRenovavel_PD);
+
+						renovavel.setAtributo(AttComumRenovavel_nome, dados_PD.vetorRenovavel.at(idRenovavel_PD).getAtributo(AttComumRenovavel_nome, std::string()));
+						renovavel.setAtributo(AttComumRenovavel_tipo_usina, dados_PD.vetorRenovavel.at(idRenovavel_PD).getAtributo(AttComumRenovavel_tipo_usina, std::string()));
+						renovavel.setAtributo(AttComumRenovavel_submercado, dados_PD.vetorRenovavel.at(idRenovavel_PD).getAtributo(AttComumRenovavel_submercado, IdSubmercado()));
+
+						a_dados.vetorRenovavel.add(renovavel);
+
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_menos_inf(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_inf(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+
+						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+							matriz_zero.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+							matriz_menos_inf.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("min"))));
+							matriz_inf.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("max"))));
+
+						}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+						a_dados.vetorRenovavel.at(idRenovavel_PD).setMatriz(AttMatrizRenovavel_geracao, matriz_zero);
+						a_dados.vetorRenovavel.at(idRenovavel_PD).setVetor(AttVetorRenovavel_constrained_off, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
+
+					}//if (!a_dados.vetorRenovavel.isInstanciado(idRenovavel_PD)) {
+
+					/////////////////////////////////////////////////////////////////////////////////////
+					//Atualiza valores
+					/////////////////////////////////////////////////////////////////////////////////////
+
+					SmartEnupla<Periodo, bool> horizonte_info_PD;
+
+					for (int pos = 0; pos < int(periodos_PD.size()); pos++)
+						horizonte_info_PD.addElemento(periodos_PD.at(pos), true);
+
+					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+						for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+							const double sobreposicao = periodo.sobreposicao(periodo_PD);
+
+							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+								if (periodo > periodo_REF)//Atualiza o periodo_REF para depois atualizar os limites do conjunto de restrições originais
+									periodo_REF = periodo;
+
+								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorRenovavel.at(idRenovavel_PD).getIterador2Final(AttMatrizRenovavel_geracao, periodo_PD, IdPatamarCarga());
+
+								if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
+									throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
+
+								//AttVetor
+								a_dados.vetorRenovavel.at(idRenovavel_PD).setElemento(AttVetorRenovavel_constrained_off, periodo, dados_PD.vetorRenovavel.at(idRenovavel_PD).getElementoVetor(AttVetorRenovavel_constrained_off, periodo_PD, int()));
+
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+									//AttMatriz
+									a_dados.vetorRenovavel.at(idRenovavel_PD).setElemento(AttMatrizRenovavel_geracao, periodo, idPatamarCarga, dados_PD.vetorRenovavel.at(idRenovavel_PD).getElementoMatriz(AttMatrizRenovavel_geracao, periodo_PD, idPatamarCarga, double()));
+								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+					}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+				}//for (IdRenovavel idRenovavel_PD = idRenovavelIni_PD; idRenovavel_PD < idRenovavelOut_PD; dados_PD.vetorRenovavel.incr(idRenovavel_PD)) {
+
+				////////////////////////////////////////////////////
+				//  2. Zera USINA_NAO_SIMULADA dentro do período PD
+
+				const IdSubmercado idSubmercadoIni_CP = a_dados.getMenorId(IdSubmercado());
+				const IdSubmercado idSubmercadoOut_CP = a_dados.getIdOut(IdSubmercado());
+
+				for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+					if (periodo <= periodo_REF) {//Zera potencia_minima / potencia_maxima para os periodos anteriores ao último periodo_REF (perioodo_final do horizonte_PD)
+
+						for (IdSubmercado idSubmercado_CP = idSubmercadoIni_CP; idSubmercado_CP < idSubmercadoOut_CP; a_dados.vetorSubmercado.incr(idSubmercado_CP)) {
+
+							const IdUsinaNaoSimulada idUsinaNaoSimuladaIni = a_dados.vetorSubmercado.at(idSubmercado_CP).getMenorId(IdUsinaNaoSimulada());
+							const IdUsinaNaoSimulada idUsinaNaoSimuladaOut = a_dados.vetorSubmercado.at(idSubmercado_CP).getIdOut(IdUsinaNaoSimulada());
+
+							for (IdUsinaNaoSimulada idUsinaNaoSimulada = idUsinaNaoSimuladaIni; idUsinaNaoSimulada < idUsinaNaoSimuladaOut; a_dados.vetorSubmercado.at(idSubmercado_CP).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+								a_dados.vetorSubmercado.at(idSubmercado_CP).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, IdPatamarCarga_1, 0.0);
+								a_dados.vetorSubmercado.at(idSubmercado_CP).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).setElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, IdPatamarCarga_1, 0.0);
+							}//for (IdUsinaNaoSimulada idUsinaNaoSimulada = idUsinaNaoSimuladaIni; idUsinaNaoSimulada < idUsinaNaoSimuladaOut; a_dados.vetorSubmercado.at(idSubmercado_CP).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+						}//for (IdSubmercado idSubmercado_CP = idSubmercadoIni_CP; idSubmercado_CP < idSubmercadoOut_CP; a_dados.vetorSubmercado.incr(idSubmercado_CP)) {
+
+					}//if (periodo <= periodo_REF) {
+
+				}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+			}//try {
+			catch (const std::exception& erro) { throw std::invalid_argument("Erro is_carregar_PD_renovavel: \n" + std::string(erro.what())); }
+
+		}//is_carregar_PD_renovavel
 
 		//////////////////////////////////////////////////////////////////////////////
 		//TERMELETRICA

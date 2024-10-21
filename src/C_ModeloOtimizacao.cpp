@@ -4676,7 +4676,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 				// Volume Minimo
 				//
 				
-				if (nome.at(0) == "VarDecisaoZP0_VF_LINF") {
+				if (nome.at(0) == "ZP0_VF_LINF") {
 				
 					Periodo periodo_penalizacao(nome.at(2));
 
@@ -4689,17 +4689,17 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 						estagio.anularVariavelEstadoCorteBenders(idVariavelEstado);
 						estagio.vetorVariavelEstado.rem(idVariavelEstado);
 						if (a_idProcesso == IdProcesso_mestre)
-							std::cout << "VarDecisaoZP0_VF_LINF " << getFullString(idVariavelEstado) << " nao criada por falta de restricao de volume util minimo no modelo." << std::endl;
+							std::cout << "ZP0_VF_LINF " << getFullString(idVariavelEstado) << " nao criada por falta de restricao de volume util minimo no modelo." << std::endl;
 					}				
 
-				} // if (nome.at(0) == "VarDecisaoZP0_VF_LINF") {
+				} // if (nome.at(0) == "ZP0_VF_LINF") {
 				
 
 				//
 				// Volume Inicial
 				//
 
-				else if (nome.at(0) == "VarDecisaoVI") {
+				else if (nome.at(0) == "VI") {
 
 					const Periodo periodo(nome.at(2));
 
@@ -4723,13 +4723,13 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 					} // else if (varVF == -1)
 
-				} // if (nome.at(0) == "VarDecisaoVI") {
+				} // if (nome.at(0) == "VI") {
 
 				//
 				// Afluencia Processo Estocastico
 				//
 
-				else if (nome.at(0) == "VarDecisaoYP") {
+				else if (nome.at(0) == "YP") {
 
 					Periodo periodo = Periodo(nome.at(2));
 
@@ -4745,7 +4745,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					const double grau_liberdade = getdoubleFromChar(nome.at(6).c_str());
 
 					if (nome.size() < 8)
-						throw std::invalid_argument(getFullString(idVariavelEstado) + " com termos ausentes de VarDecisaoYP.");
+						throw std::invalid_argument(getFullString(idVariavelEstado) + " com termos ausentes de YP.");
 
 					std::vector<IdHidreletrica> listaHidreletrica;
 					std::vector<IdHidreletrica> listaHidreletricaNaoInstanciadaNoModelo;
@@ -4780,13 +4780,13 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 							throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
 						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varYP);
 					}
-				} // else if (nome.at(0) == "VarDecisaoYP") {
+				} // else if (nome.at(0) == "YP") {
 
 				//
 				// Energia Natural Afluente Acoplamento
 				//
 
-				else if (nome.at(0) == "VarDecisaoENA") {
+				else if (nome.at(0) == "ENA") {
 
 					try {
 
@@ -4810,16 +4810,16 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varENA_REE);
 
 					}
-					catch (const std::exception& erro) { throw std::invalid_argument("VarDecisaoENA " + getFullString(idVariavelEstado) + " : \n" + std::string(erro.what())); }
+					catch (const std::exception& erro) { throw std::invalid_argument("ENA " + getFullString(idVariavelEstado) + " : \n" + std::string(erro.what())); }
 
-				} // else if (nome.at(0) == "VarDecisaoENA") {
+				} // else if (nome.at(0) == "ENA") {
 
 
 				//
 				// Defluencia viajante
 				//
 
-				else if (nome.at(0) == "VarDecisaoQDEF") {
+				else if (nome.at(0) == "QDEF") {
 
 					Periodo periodo_lag = Periodo(nome.at(2));
 					const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
@@ -4830,9 +4830,9 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					else
 						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varQDEF);
 
-				} // else if (nome.at(0) == "VarDecisaoQDEF") {
+				} // else if (nome.at(0) == "QDEF") {
 
-				else if (nome.at(0) == "VarDecisaoPTDISPCOM") {
+				else if (nome.at(0) == "PTDISPCOM") {
 
 					Periodo periodo_comando = Periodo(nome.at(2));
 					const IdTermeletrica idTermeletrica = getIdTermeletricaFromChar(nome.at(3).c_str());
@@ -4847,7 +4847,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					else
 						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varPTDISPCOM);
 
-				} // else if (nome.at(0) == "VarDecisaoPTDISPCOM") {
+				} // else if (nome.at(0) == "PTDISPCOM") {
 
 				else
 				throw std::invalid_argument("Variavel de estado " + nome.at(0) + " nao compativel com modelo em " + getFullString(idEstagio));
