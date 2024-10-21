@@ -16596,7 +16596,8 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 		//reservatório
 		bool dadosPreConfig_hidreletrica_reservatorio_attComum_operacional = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv", dados_PD, TipoAcessoInstancia_m2);
-		bool dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m2);
+		bool dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional = true;
+		//bool dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m2);
 
 		//defluência
 		bool dadosPreConfig_hidreletrica_defluencia_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m2);
@@ -18758,15 +18759,25 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							ElementoSistema elementoSistema;
 							elementoSistema.setAtributo(AttComumElementoSistema_idElementoSistema, idElementoSistema);
 
-							elementoSistema.setAtributo(AttComumElementoSistema_tipo_elemento, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_tipo_elemento, TipoElementoSistema()));
-							elementoSistema.setAtributo(AttComumElementoSistema_conjuntohidraulico, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_conjuntohidraulico, IdConjuntoHidraulico()));
-							elementoSistema.setAtributo(AttComumElementoSistema_hidreletrica, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_hidreletrica, IdHidreletrica()));
-							elementoSistema.setAtributo(AttComumElementoSistema_termeletrica, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_termeletrica, IdTermeletrica()));
-							elementoSistema.setAtributo(AttComumElementoSistema_demandaEspecial, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_demandaEspecial, IdDemandaEspecial()));
-							elementoSistema.setAtributo(AttComumElementoSistema_unidadeTermeletrica, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_unidadeTermeletrica, IdUnidadeUTE()));
-							elementoSistema.setAtributo(AttComumElementoSistema_contrato, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_contrato, IdContrato()));
-							elementoSistema.setAtributo(AttComumElementoSistema_renovavel, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_renovavel, IdRenovavel()));
-							elementoSistema.setAtributo(AttComumElementoSistema_usina_elevatoria, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_usina_elevatoria, IdUsinaElevatoria()));
+							const IdUnidadeUHE unidadehidraulica          = dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_unidadehidraulica, IdUnidadeUHE());
+							const IdConjuntoHidraulico conjuntohidraulico = dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_conjuntohidraulico, IdConjuntoHidraulico());
+							const IdHidreletrica hidreletrica             = dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_hidreletrica, IdHidreletrica());
+							const IdTermeletrica termeletrica             = dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_termeletrica, IdTermeletrica());
+							const IdDemandaEspecial demandaEspecial       = dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_demandaEspecial, IdDemandaEspecial());
+							const IdUnidadeUTE unidadeTermeletrica        = dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_unidadeTermeletrica, IdUnidadeUTE());
+							const IdContrato contrato                     = dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_contrato, IdContrato());
+							const IdRenovavel renovavel                   = dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_renovavel, IdRenovavel());
+							const IdUsinaElevatoria usina_elevatoria      = dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_usina_elevatoria, IdUsinaElevatoria());
+
+							elementoSistema.setAtributo(AttComumElementoSistema_unidadehidraulica, unidadehidraulica);
+							elementoSistema.setAtributo(AttComumElementoSistema_conjuntohidraulico, conjuntohidraulico);
+							elementoSistema.setAtributo(AttComumElementoSistema_hidreletrica, hidreletrica);
+							elementoSistema.setAtributo(AttComumElementoSistema_termeletrica, termeletrica);
+							elementoSistema.setAtributo(AttComumElementoSistema_demandaEspecial, demandaEspecial);
+							elementoSistema.setAtributo(AttComumElementoSistema_unidadeTermeletrica, unidadeTermeletrica);
+							elementoSistema.setAtributo(AttComumElementoSistema_contrato, contrato);
+							elementoSistema.setAtributo(AttComumElementoSistema_renovavel, renovavel);
+							elementoSistema.setAtributo(AttComumElementoSistema_usina_elevatoria, usina_elevatoria);
 							elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()));
 
 							//Mapea o idIntercambio
@@ -18801,6 +18812,12 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							}//if (idIntercambio_PD != IdIntercambio_Nenhum) {
 
 							elementoSistema.setAtributo(AttComumElementoSistema_intercambio, idIntercambio_CP);
+
+							if (unidadehidraulica == IdUnidadeUHE_Nenhum && conjuntohidraulico == IdConjuntoHidraulico_Nenhum && hidreletrica == IdHidreletrica_Nenhum  \
+								&& termeletrica == IdTermeletrica_Nenhum && demandaEspecial == IdDemandaEspecial_Nenhum && unidadeTermeletrica == IdUnidadeUTE_Nenhum \
+								&& contrato == IdContrato_Nenhum && renovavel == IdRenovavel_Nenhum && usina_elevatoria == IdUsinaElevatoria_Nenhum && idIntercambio_CP == IdIntercambio_Nenhum)
+								throw std::invalid_argument("dadosPreConfig_PD com todos os elementos com id_Nenhum em idRestricaoEletrica: " + getString(idRestricaoEletrica_PD));
+
 
 							////
 
@@ -19086,16 +19103,18 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							ElementoSistema elementoSistema;
 							elementoSistema.setAtributo(AttComumElementoSistema_idElementoSistema, idElementoSistema);
 
-							elementoSistema.setAtributo(AttComumElementoSistema_tipo_elemento, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_tipo_elemento, TipoElementoSistema()));
-							elementoSistema.setAtributo(AttComumElementoSistema_conjuntohidraulico, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_conjuntohidraulico, IdConjuntoHidraulico()));
-							elementoSistema.setAtributo(AttComumElementoSistema_hidreletrica, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_hidreletrica, IdHidreletrica()));
-							elementoSistema.setAtributo(AttComumElementoSistema_termeletrica, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_termeletrica, IdTermeletrica()));
-							elementoSistema.setAtributo(AttComumElementoSistema_demandaEspecial, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_demandaEspecial, IdDemandaEspecial()));
-							elementoSistema.setAtributo(AttComumElementoSistema_unidadeTermeletrica, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_unidadeTermeletrica, IdUnidadeUTE()));
-							elementoSistema.setAtributo(AttComumElementoSistema_contrato, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_contrato, IdContrato()));
-							elementoSistema.setAtributo(AttComumElementoSistema_intercambio, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_intercambio, IdIntercambio()));
-							elementoSistema.setAtributo(AttComumElementoSistema_renovavel, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_renovavel, IdRenovavel()));
-							elementoSistema.setAtributo(AttComumElementoSistema_usina_elevatoria, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_usina_elevatoria, IdUsinaElevatoria()));
+							const IdUnidadeUHE         unidadehidraulica  = dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_unidadehidraulica, IdUnidadeUHE());
+							const IdConjuntoHidraulico conjuntohidraulico = dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_conjuntohidraulico, IdConjuntoHidraulico());
+							const IdHidreletrica       hidreletrica       = dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_hidreletrica, IdHidreletrica());
+							const IdUsinaElevatoria    usina_elevatoria   = dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_usina_elevatoria, IdUsinaElevatoria());
+
+							if(unidadehidraulica == IdUnidadeUHE_Nenhum && conjuntohidraulico == IdConjuntoHidraulico_Nenhum && hidreletrica == IdHidreletrica_Nenhum && usina_elevatoria == IdUsinaElevatoria_Nenhum)
+								throw std::invalid_argument("dadosPreConfig_PD com todos os elementos com id_Nenhum em idRestricaoOperativaUHE: " + getString(idRestricaoOperativaUHE_PD));
+
+							elementoSistema.setAtributo(AttComumElementoSistema_unidadehidraulica, unidadehidraulica);
+							elementoSistema.setAtributo(AttComumElementoSistema_conjuntohidraulico, conjuntohidraulico);
+							elementoSistema.setAtributo(AttComumElementoSistema_hidreletrica, hidreletrica);
+							elementoSistema.setAtributo(AttComumElementoSistema_usina_elevatoria, usina_elevatoria);
 							elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, dados_PD.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()));
 
 							////

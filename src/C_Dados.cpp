@@ -2034,13 +2034,12 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 				if ((tipo_detalhamento_producao != TipoDetalhamentoProducaoTermeletrica_sem_producao) && (!termeletrica_com_unidade))
 					throw std::invalid_argument("O atributo " + getFullString(AttComumTermeletrica_tipo_detalhamento_producao) + " nao deve ser " + getFullString(tipo_detalhamento_producao) + " caso nao sejam informadas unidades em " + getFullString(idTermeletrica) + ".");
 
-				preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_tipo_detalhamento_producao) = sim_operacional;
+				//preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_tipo_detalhamento_producao) = sim_operacional;
 				vetorTermeletrica.at(idTermeletrica).setVetor_forced(AttVetorTermeletrica_tipo_detalhamento_producao, SmartEnupla<Periodo, TipoDetalhamentoProducaoTermeletrica>(horizonte_estudo, tipo_detalhamento_producao));
 
 			} // if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao) == 0) {
-
-			else if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao) > 0)
-				preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_tipo_detalhamento_producao) = nao_operacional_informado;
+			//else if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_tipo_detalhamento_producao) > 0)
+				//preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_tipo_detalhamento_producao) = nao_operacional_informado;
 
 
 			for (TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao = TipoDetalhamentoProducaoTermeletrica(1); tipo_detalhamento_producao < TipoDetalhamentoProducaoTermeletrica_Excedente; tipo_detalhamento_producao++) {
@@ -2079,6 +2078,25 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 				}
 
 			} // for (TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao = TipoDetalhamentoProducaoTermeletrica(1); tipo_detalhamento_producao < TipoDetalhamentoProducaoTermeletrica_Excedente; tipo_detalhamento_producao++) {
+
+			// ------------------------------------
+			//
+			// AttVetorTermeletrica_representacao_discreta_producao
+			//
+			// ------------------------------------
+			// 
+
+
+			if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_representacao_discreta_producao) == 0) {
+
+				preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_representacao_discreta_producao) = sim_operacional;
+				vetorTermeletrica.at(idTermeletrica).setVetor_forced(AttVetorTermeletrica_representacao_discreta_producao, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
+
+			} // if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_representacao_discreta_producao) == 0) {
+
+			else if (getSizeVetor(idTermeletrica, AttVetorTermeletrica_representacao_discreta_producao) > 0)
+				preencher_AttVetorTermeletrica.at(idTermeletrica).at(AttVetorTermeletrica_representacao_discreta_producao) = nao_operacional_informado;
+
 
 
 			// -------------------------------------
@@ -8464,7 +8482,7 @@ void Dados::validacao_operacional_RestricaoEletrica(EntradaSaidaDados a_entradaS
 					else
 						a_entradaSaidaDados.setAppendArquivo(true);
 
-					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttComumOperacional.csv", idRestricaoEletrica, IdElementoSistema_Nenhum, *this, std::vector<AttComumElementoSistema> {AttComumElementoSistema_idElementoSistema, AttComumElementoSistema_tipo_elemento, AttComumElementoSistema_unidadehidraulica, AttComumElementoSistema_conjuntohidraulico, AttComumElementoSistema_hidreletrica, AttComumElementoSistema_termeletrica, AttComumElementoSistema_demandaEspecial, AttComumElementoSistema_unidadeTermeletrica, AttComumElementoSistema_contrato, AttComumElementoSistema_intercambio, AttComumElementoSistema_renovavel, AttComumElementoSistema_usina_elevatoria, AttComumElementoSistema_tipoVariavelRestricaoOperativa});
+					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttComumOperacional.csv", idRestricaoEletrica, IdElementoSistema_Nenhum, *this, std::vector<AttComumElementoSistema> {AttComumElementoSistema_idElementoSistema, AttComumElementoSistema_unidadehidraulica, AttComumElementoSistema_conjuntohidraulico, AttComumElementoSistema_hidreletrica, AttComumElementoSistema_termeletrica, AttComumElementoSistema_demandaEspecial, AttComumElementoSistema_unidadeTermeletrica, AttComumElementoSistema_contrato, AttComumElementoSistema_intercambio, AttComumElementoSistema_renovavel, AttComumElementoSistema_usina_elevatoria, AttComumElementoSistema_tipoVariavelRestricaoOperativa});
 
 					if (idRestricaoEletrica == idREIni)
 						a_entradaSaidaDados.setAppendArquivo(false);
@@ -11886,7 +11904,7 @@ void Dados::validacao_operacional_RestricaoOperativaUHE(EntradaSaidaDados a_entr
 					else
 						a_entradaSaidaDados.setAppendArquivo(true);
 
-					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttComumOperacional.csv", idRestricaoOperativaUHE, IdElementoSistema_Nenhum, *this, std::vector<AttComumElementoSistema> {AttComumElementoSistema_idElementoSistema, AttComumElementoSistema_tipo_elemento, AttComumElementoSistema_unidadehidraulica, AttComumElementoSistema_conjuntohidraulico, AttComumElementoSistema_hidreletrica, AttComumElementoSistema_termeletrica, AttComumElementoSistema_unidadeTermeletrica, AttComumElementoSistema_contrato, AttComumElementoSistema_intercambio, AttComumElementoSistema_renovavel, AttComumElementoSistema_usina_elevatoria, AttComumElementoSistema_tipoVariavelRestricaoOperativa});
+					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttComumOperacional.csv", idRestricaoOperativaUHE, IdElementoSistema_Nenhum, *this, std::vector<AttComumElementoSistema> {AttComumElementoSistema_idElementoSistema, AttComumElementoSistema_unidadehidraulica, AttComumElementoSistema_conjuntohidraulico, AttComumElementoSistema_hidreletrica, AttComumElementoSistema_termeletrica, AttComumElementoSistema_unidadeTermeletrica, AttComumElementoSistema_contrato, AttComumElementoSistema_intercambio, AttComumElementoSistema_renovavel, AttComumElementoSistema_usina_elevatoria, AttComumElementoSistema_tipoVariavelRestricaoOperativa});
 
 					if (idRestricaoOperativaUHE == idRHIni)
 						a_entradaSaidaDados.setAppendArquivo(false);
