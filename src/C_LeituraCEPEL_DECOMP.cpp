@@ -16551,20 +16551,20 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		if (dadosPreConfig_reserva_potencia_attComum_operacional && dadosPreConfig_reserva_potencia_attMatriz_operacional && dadosPreConfig_reserva_potencia_elemento_sistema_attComum_operacional && dadosPreConfig_reserva_potencia_elemento_sistema_attMatriz_operacional)
 			is_carregar_PD_reserva_potencia = true;
 
-		/*
 		//****************************************
-		//Arquivos Cota R11
+		//Arquivos controle_cota_vazao
 		//****************************************
-		bool is_carregar_PD_cota_r11 = false;
-		bool dadosPreConfig_cota_r11_attComum_operacional = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("COTAR11_AttComumOperacional.csv", dados_PD, TipoAcessoInstancia_m1);
-		bool dadosPreConfig_cota_r11_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("COTAR11_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m1);
-		bool dadosPreConfig_cota_r11_attVetor_polinomio = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("COTAR11_AttVetorPolinomio_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m1);
-		bool dadosPreConfig_cota_r11_attVetor_cota_passada = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("COTAR11_COTAPASSADA_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m1);
+		bool is_carregar_PD_controle_cota_vazao = false;
+		bool dadosPreConfig_controle_cota_vazao_attComum_operacional = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("CONTROLE_COTA_VAZAO_AttComumOperacional.csv", dados_PD, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_controle_cota_vazao_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("CONTROLE_COTA_VAZAO_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_controle_cota_vazao_attVetor_int = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("CONTROLE_COTA_VAZAO_AttVetorOperacional_PorInteiro.csv", dados_PD, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_controle_cota_vazao_attVetor_cota_passada = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("CONTROLE_COTA_VAZAO_ANTERIOR_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_controle_cota_vazao_attMatriz_operacional = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("CONTROLE_COTA_VAZAO_AttMatrizOperacional_PorPeriodoPorInteiro.csv", dados_PD, TipoAcessoInstancia_m1);
 
-		if (dadosPreConfig_cota_r11_attComum_operacional && dadosPreConfig_cota_r11_attVetor_operacional && dadosPreConfig_cota_r11_attVetor_polinomio && dadosPreConfig_cota_r11_attVetor_cota_passada)
-			is_carregar_PD_cota_r11 = true;
-		*/
-
+		if (dadosPreConfig_controle_cota_vazao_attComum_operacional && dadosPreConfig_controle_cota_vazao_attVetor_operacional && dadosPreConfig_controle_cota_vazao_attVetor_int\
+			&& dadosPreConfig_controle_cota_vazao_attVetor_cota_passada && dadosPreConfig_controle_cota_vazao_attMatriz_operacional)
+			is_carregar_PD_controle_cota_vazao = true;
+		
 		//****************************************
 		//Arquivos Termeletrica
 		//****************************************
@@ -16596,14 +16596,14 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 		//reservatório
 		bool dadosPreConfig_hidreletrica_reservatorio_attComum_operacional = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv", dados_PD, TipoAcessoInstancia_m2);
-		bool dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional = true;
-		//bool dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m2);
+		bool dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m2);
 
 		//defluência
 		bool dadosPreConfig_hidreletrica_defluencia_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m2);
 
+		//Nota: dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional  não é obrigatório
 		if (dadosPreConfig_hidreletrica_attComum_operacional && dadosPreConfig_hidreletrica_attMatriz_operacional && dadosPreConfig_hidreletrica_attVetor_operacional \
-			&& dadosPreConfig_hidreletrica_reservatorio_attComum_operacional && dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional && dadosPreConfig_hidreletrica_defluencia_attVetor_operacional)
+			&& dadosPreConfig_hidreletrica_reservatorio_attComum_operacional  && dadosPreConfig_hidreletrica_defluencia_attVetor_operacional)
 			is_carregar_PD_hidreletricas = true;
 
 
@@ -17800,7 +17800,9 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
 				std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
 				std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv..." << std::endl;
-				std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
+				
+				if(dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional)
+					std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
 
 				//*******************************************************************
 				//   Instancia termelétricas PD no CP
@@ -18408,19 +18410,20 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		//COTAR11_AttVetorPolinomio_PorPeriodo
 		//COTAR11_COTAPASSADA_AttVetorOperacional_PorPeriodo
 		//////////////////////////////////////////////////////////////////////////////
-		/*
-		if (is_carregar_PD_cota_r11) {
+		
+		if (is_carregar_PD_controle_cota_vazao) {
 
 			try {
 
-				std::cout << "Carregando arquivo de preConfiguracao: COTAR11_AttComumOperacional.csv..." << std::endl;
-				std::cout << "Carregando arquivo de preConfiguracao: COTAR11_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
-				std::cout << "Carregando arquivo de preConfiguracao: COTAR11_AttVetorPolinomio_PorPeriodo.csv..." << std::endl;
-				std::cout << "Carregando arquivo de preConfiguracao: COTAR11_COTAPASSADA_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: CONTROLE_COTA_VAZAO_AttComumOperacional.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: CONTROLE_COTA_VAZAO_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: CONTROLE_COTA_VAZAO_AttVetorOperacional_PorInteiro.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: CONTROLE_COTA_VAZAO_ANTERIOR_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: CONTROLE_COTA_VAZAO_AttMatrizOperacional_PorPeriodoPorInteiro.csv..." << std::endl;
 
 				//*******************************************************************
-				//   Instancia cota_r11 PD no CP
-				//   Testa se a cota_r11 existe no CP. Caso contrário, o instancia com valores default
+				//   Instancia controle_cota_vazao PD no CP
+				//   Testa se a controle_cota_vazao existe no CP. Caso contrário, o instancia com valores default
 				//   Depois atualiza estes valores com a sobreposição dos periodos_CP e periodos_PD
 				//*******************************************************************
 
@@ -18430,7 +18433,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				for (IdControleCotaVazao idControleCotaVazao_PD = idControleCotaVazaoIni_PD; idControleCotaVazao_PD < idControleCotaVazaoOut_PD; dados_PD.vetorControleCotaVazao.incr(idControleCotaVazao_PD)) {
 
 					//Validação do horizonte_informacao_PD_pre_config
-					std::vector<Periodo> periodos_PD = dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getVetor(AttVetorControleCotaVazao_var_abs_sup_1hora, Periodo(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+					std::vector<Periodo> periodos_PD = dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getVetor(AttVetorControleCotaVazao_coef_linear_cota_vazao_0, Periodo(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
 
 					const Periodo periodo_inicial_PD = periodos_PD.at(0);
 					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
@@ -18446,52 +18449,35 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						ControleCotaVazao controleCotaVazao;
 
 						controleCotaVazao.setAtributo(AttComumControleCotaVazao_idControleCotaVazao, idControleCotaVazao_PD);
-						controleCotaVazao.setAtributo(AttComumControleCotaVazao_vlr_ini, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getAtributo(AttComumControleCotaVazao_vlr_ini, double()));
+						controleCotaVazao.setAtributo(AttComumControleCotaVazao_nome, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getAtributo(AttComumControleCotaVazao_nome, std::string()));
+						controleCotaVazao.setAtributo(AttComumControleCotaVazao_penalidade, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getAtributo(AttComumControleCotaVazao_penalidade, double()));
 
 						a_dados.vetorControleCotaVazao.add(controleCotaVazao);
 
-						//AQUI!!!!
+						const int int_size = dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getIterador2Final(AttMatrizControleCotaVazao_num_horas_lag, periodo_inicial_PD, int());
 
-						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
-						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_menos_inf(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
-						SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_inf(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+						SmartEnupla<Periodo, SmartEnupla<int, double>> matriz_zero(horizonte_estudo, SmartEnupla<int, double>(1, std::vector<double>(int_size, 0.0)));
+						SmartEnupla<Periodo, SmartEnupla<int, double>> matriz_inf(horizonte_estudo, SmartEnupla<int, double>(1, std::vector<double>(int_size, getdoubleFromChar("max"))));
+						SmartEnupla<Periodo, SmartEnupla<int, double>> matriz_menos_inf(horizonte_estudo, SmartEnupla<int, double>(1, std::vector<double>(int_size, getdoubleFromChar("min"))));
 
-						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+						//AttMatriz
+						a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setMatriz(AttMatrizControleCotaVazao_num_horas_lag, matriz_zero);
+						a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setMatriz(AttMatrizControleCotaVazao_var_abs_inf, matriz_menos_inf);
+						a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setMatriz(AttMatrizControleCotaVazao_var_abs_sup, matriz_inf);
 
-							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
-							matriz_zero.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
-							matriz_menos_inf.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("min"))));
-							matriz_inf.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("max"))));
+						//AttVetor
+						a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setVetor(AttVetorControleCotaVazao_coef_linear_cota_vazao_0, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
+						a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setVetor(AttVetorControleCotaVazao_coef_linear_cota_vazao_1, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
 
-						}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+					}//if (!a_dados.vetorControleCotaVazao.isInstanciado(idControleCotaVazao_PD)) {
 
-						a_dados.vetorReservaPotencia.at(idReservaPotencia_PD).setMatriz(AttMatrizReservaPotencia_reserva_minima, matriz_zero);
-
-						//Instanciar os elementos
-
-						const IdElementoSistema idElementoSistemaIni = dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).getMenorId(IdElementoSistema());
-						const IdElementoSistema idElementoSistemaOut = dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).getIdOut(IdElementoSistema());
-
-						for (IdElementoSistema idElementoSistema = idElementoSistemaIni; idElementoSistema < idElementoSistemaOut; dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.incr(idElementoSistema)) {
-
-							ElementoSistema elementoSistema;
-							elementoSistema.setAtributo(AttComumElementoSistema_idElementoSistema, idElementoSistema);
-
-							elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()));
-							elementoSistema.setAtributo(AttComumElementoSistema_termeletrica, dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_termeletrica, IdTermeletrica()));
-							elementoSistema.setAtributo(AttComumElementoSistema_hidreletrica, dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_hidreletrica, IdHidreletrica()));
-							elementoSistema.setAtributo(AttComumElementoSistema_demanda, dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_demanda, IdSubmercado()));
-
-							elementoSistema.setMatriz(AttMatrizElementoSistema_fator_participacao, matriz_zero);
-							a_dados.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.add(elementoSistema);
-
-						}//for (IdElementoSistema idElementoSistema = idElementoSistemaIni; idElementoSistema < idElementoSistemaOut; dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.incr(idElementoSistema)) {
-
-					}//if (!a_dados.vetorReservaPotencia.isInstanciado(idReservaPotencia_PD)) {
+					//AttVetor
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setVetor(AttVetorControleCotaVazao_cota_anterior, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getVetor(AttVetorControleCotaVazao_cota_anterior, Periodo(), double()));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setVetor(AttVetorControleCotaVazao_hidreletrica_montante, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getVetor(AttVetorControleCotaVazao_hidreletrica_montante, int(), IdHidreletrica()));
+					a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setVetor(AttVetorControleCotaVazao_fator_participacao, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getVetor(AttVetorControleCotaVazao_fator_participacao, int(), double()));
 
 					/////////////////////////////////////////////////////////////////////////////////////
-					//Atualiza reserva_minima
-					// fator_participacao
+					//Atualiza matrizes/vetor que dependem do periodo
 					/////////////////////////////////////////////////////////////////////////////////////
 
 					SmartEnupla<Periodo, bool> horizonte_info_PD;
@@ -18507,22 +18493,18 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
 
-								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
-								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).getIterador2Final(AttMatrizReservaPotencia_reserva_minima, periodo_PD, IdPatamarCarga());
+								//AttMatriz
+								const int int_size = dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getIterador2Final(AttMatrizControleCotaVazao_num_horas_lag, periodo_PD, int());
 
-								if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
-									throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
+								for (int pos = 1; pos <= int_size; pos++) {				
+									a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setElemento(AttMatrizControleCotaVazao_num_horas_lag, periodo, pos, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getElementoMatriz(AttMatrizControleCotaVazao_num_horas_lag, periodo_PD, pos, double()));
+									a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setElemento(AttMatrizControleCotaVazao_var_abs_sup, periodo, pos, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getElementoMatriz(AttMatrizControleCotaVazao_var_abs_sup, periodo_PD, pos, double()));
+									a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setElemento(AttMatrizControleCotaVazao_var_abs_inf, periodo, pos, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getElementoMatriz(AttMatrizControleCotaVazao_var_abs_inf, periodo_PD, pos, double()));
+								}//for (int pos = 1; pos <= int_size; pos++) {
 
-								//AttMatriz Reserva
-								a_dados.vetorReservaPotencia.at(idReservaPotencia_PD).setElemento(AttMatrizReservaPotencia_reserva_minima, periodo, IdPatamarCarga_1, dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).getElementoMatriz(AttMatrizReservaPotencia_reserva_minima, periodo_PD, IdPatamarCarga_1, double()));
-
-								//AttMatriz ElementoSistema
-								const IdElementoSistema idElementoSistemaIni = dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).getMenorId(IdElementoSistema());
-								const IdElementoSistema idElementoSistemaOut = dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).getIdOut(IdElementoSistema());
-
-								for (IdElementoSistema idElementoSistema = idElementoSistemaIni; idElementoSistema < idElementoSistemaOut; dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.incr(idElementoSistema)) {
-									a_dados.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.at(idElementoSistema).setElemento(AttMatrizElementoSistema_fator_participacao, periodo, IdPatamarCarga_1, dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.at(idElementoSistema).getElementoMatriz(AttMatrizElementoSistema_fator_participacao, periodo_PD, IdPatamarCarga_1, double()));
-								}//for (IdElementoSistema idElementoSistema = idElementoSistemaIni; idElementoSistema < idElementoSistemaOut; dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.incr(idElementoSistema)) {
+								//AttVetor
+								a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setElemento(AttVetorControleCotaVazao_coef_linear_cota_vazao_0, periodo, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getElementoVetor(AttVetorControleCotaVazao_coef_linear_cota_vazao_0, periodo_PD, double()));
+								a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setElemento(AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getElementoVetor(AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo_PD, double()));
 
 							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
 
@@ -18533,10 +18515,10 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				}//for (IdControleCotaVazao idControleCotaVazao_PD = idControleCotaVazaoIni_PD; idControleCotaVazao_PD < idControleCotaVazaoOut_PD; dados_PD.vetorControleCotaVazao.incr(idControleCotaVazao_PD)) {
 
 			}//try {
-			catch (const std::exception& erro) { throw std::invalid_argument("Erro is_carregar_PD_cota_r11: \n" + std::string(erro.what())); }
+			catch (const std::exception& erro) { throw std::invalid_argument("Erro is_carregar_PD_controle_cota_vazao: \n" + std::string(erro.what())); }
 
-		}//is_carregar_PD_cota_r11
-		*/
+		}//is_carregar_PD_controle_cota_vazao
+		
 		//////////////////////////////////////////////////////////////////////////////
 		//RESTRICAO_ELETRICA_AttComumOperacional
 		//RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga
@@ -19835,6 +19817,10 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		a_dados.validacao_operacional_DemandaEspecial(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 		
 		a_dados.validacao_operacional_ReservaPotencia(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+		
+		a_dados.validacao_operacional_Renovaveis(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+		
+		a_dados.validacao_operacional_ControleCotaVazao(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 
 		////////////////

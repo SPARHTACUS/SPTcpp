@@ -8311,10 +8311,14 @@ void Dados::validacao_operacional_Renovaveis(EntradaSaidaDados a_entradaSaidaDad
 					a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
 					a_entradaSaidaDados.setAppendArquivo(false);
-					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RENOVAVEL_AttComumOperacional.csv", IdRenovavel_Nenhum, *this);
+					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("RENOVAVEL_AttComumOperacional.csv", IdRenovavel_Nenhum, *this, std::vector<AttComumRenovavel>{AttComumRenovavel_idRenovavel, AttComumRenovavel_nome, AttComumRenovavel_tipo_usina, AttComumRenovavel_submercado});
 
 					a_entradaSaidaDados.setAppendArquivo(false);
 					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("RENOVAVEL_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", IdRenovavel_Nenhum, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizRenovavel_geracao);
+
+					a_entradaSaidaDados.setAppendArquivo(false);
+					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("RENOVAVEL_AttVetorOperacional_PorPeriodo.csv", IdRenovavel_Nenhum, *this, periodo_estudo_inicial, periodo_final_estudo, AttVetorRenovavel_constrained_off);
+
 				}
 			} // if (idProcesso == IdProcesso_mestre){
 		}
@@ -8692,12 +8696,14 @@ void Dados::validacao_operacional_ReservaPotencia(EntradaSaidaDados a_entradaSai
 
 }
 
-void Dados::validacao_operacional_ControleCotaVazao(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar){
+void Dados::validacao_operacional_ControleCotaVazao(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar){
 
 	try{
 
 		if (vetorControleCotaVazao.numObjetos() == 0)
 			return;
+
+		const IdProcesso idProcesso = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
@@ -8707,12 +8713,21 @@ void Dados::validacao_operacional_ControleCotaVazao(EntradaSaidaDados a_entrada_
 		const IdControleCotaVazao idConHQOut = getIdOut(IdControleCotaVazao());
 		const IdControleCotaVazao idConHQIni = getMenorId(IdControleCotaVazao());
 
+		int maior_iterEnd_vetor = 0; //Parâmetro para impressão
+		int maior_iterEnd_matriz = 0; //Parâmetro para impressão
+
 		for (Periodo period = periodIni; period <= periodEnd; horizonte_estudo.incrementarIterador(period)) {
 
 			for (IdControleCotaVazao idConHQ = idConHQIni; idConHQ < idConHQOut; incr(idConHQ)) {
 
 				const int iterIni = getIterador2Inicial(idConHQ, AttMatrizControleCotaVazao_num_horas_lag, period, int());
 				const int iterEnd = getIterador2Final(idConHQ, AttMatrizControleCotaVazao_num_horas_lag, period, int());
+
+				if (iterEnd > maior_iterEnd_matriz)
+					maior_iterEnd_matriz = iterEnd;
+
+				if (getIteradorFinal(idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, int()) > maior_iterEnd_vetor)
+					maior_iterEnd_vetor = getIteradorFinal(idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, int());
 
 				if (getSize1Matriz(idConHQ, AttMatrizControleCotaVazao_var_abs_inf) > 0) {
 					if ((getIterador2Inicial(idConHQ, AttMatrizControleCotaVazao_var_abs_inf, period, int()) != iterIni) || (getIterador2Final(idConHQ, AttMatrizControleCotaVazao_var_abs_inf, period, int()) != iterEnd))
@@ -8727,6 +8742,34 @@ void Dados::validacao_operacional_ControleCotaVazao(EntradaSaidaDados a_entrada_
 			} // for (IdControleCotaVazao idConHQ = idConHQIni; idConHQ < idConHQOut; incr(idConHQ)) {
 
 		}
+
+		//////
+
+		if ((a_imprimir_att_operacionais_sem_recarregar) && (idConHQIni != IdControleCotaVazao_Nenhum)) {
+
+			if (idProcesso == IdProcesso_mestre) {
+
+				const Periodo periodIni_past = getIteradorInicial(idConHQIni, AttVetorControleCotaVazao_cota_anterior, Periodo());
+				const Periodo periodEnd_past = getIteradorFinal(idConHQIni, AttVetorControleCotaVazao_cota_anterior, Periodo());
+
+				//
+				// Imprime Atributos Operacionais
+				//
+
+				a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
+
+				a_entradaSaidaDados.setAppendArquivo(false);
+				a_entradaSaidaDados.imprimirArquivoCSV_AttComum("CONTROLE_COTA_VAZAO_AttComumOperacional.csv", IdControleCotaVazao_Nenhum, *this, std::vector<AttComumControleCotaVazao>{AttComumControleCotaVazao_idControleCotaVazao, AttComumControleCotaVazao_nome, AttComumControleCotaVazao_penalidade});
+				a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("CONTROLE_COTA_VAZAO_AttMatrizOperacional_PorPeriodoPorInteiro.csv", IdControleCotaVazao_Nenhum, *this, periodIni, periodEnd, 1, maior_iterEnd_matriz, std::vector<AttMatrizControleCotaVazao>{AttMatrizControleCotaVazao_num_horas_lag, AttMatrizControleCotaVazao_var_abs_inf, AttMatrizControleCotaVazao_var_abs_sup});
+				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("CONTROLE_COTA_VAZAO_AttVetorOperacional_PorPeriodo.csv", IdControleCotaVazao_Nenhum, *this, periodIni, periodEnd, std::vector<AttVetorControleCotaVazao>{AttVetorControleCotaVazao_coef_linear_cota_vazao_0, AttVetorControleCotaVazao_coef_linear_cota_vazao_1});
+				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("CONTROLE_COTA_VAZAO_AttVetorOperacional_PorInteiro.csv", IdControleCotaVazao_Nenhum, *this, 1, maior_iterEnd_vetor, std::vector<AttVetorControleCotaVazao>{AttVetorControleCotaVazao_hidreletrica_montante, AttVetorControleCotaVazao_fator_participacao});
+				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("CONTROLE_COTA_VAZAO_ANTERIOR_AttVetorOperacional_PorPeriodo.csv", IdControleCotaVazao_Nenhum, *this, periodIni_past, periodEnd_past, std::vector<AttVetorControleCotaVazao>{AttVetorControleCotaVazao_cota_anterior});
+
+				
+			} // if (idProcesso == IdProcesso_mestre){
+
+		} // if ((a_imprimir_att_operacionais_sem_recarregar) && (idConHQIni != IdControleCotaVazao_Nenhum)) {
+
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::validacao_operacional_ControleCotaVazao(a_entradaSaidaDados, " + a_diretorio_att_operacional + "," + a_diretorio_att_premissa + "): \n" + std::string(erro.what())); }
