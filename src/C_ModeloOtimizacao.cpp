@@ -4223,7 +4223,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 					requestCorteBenders(a_idProcesso, idEstagio, a_diretorio_impressao_selecao_cortes, a_entradaSaidaDados);
 
-					if (getAtributo(idEstagio, AttComumEstagio_selecao_cortes_nivel_dominancia, int()) == 0)
+					if ((getAtributo(idEstagio, AttComumEstagio_selecao_cortes_nivel_dominancia, int()) == 0) && (a_dados.getAtributo(AttComumDados_tipo_estudo, TipoEstudo()) == TipoEstudo_simulacao))
 						removerCorteBenders(idEstagio);
 
 				} // if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
