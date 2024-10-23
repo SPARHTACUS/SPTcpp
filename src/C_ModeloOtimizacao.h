@@ -750,7 +750,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		double get_afluencia_natural_posto(Dados& a_dados, const Periodo a_periodoPE, const int a_codigo_posto, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const IdProcessoEstocastico a_idProcessoEstocastico);
 		double get_afluencia_incremental_from_idVariavelAleatoria(const IdVariavelAleatoria a_idVariavelAleatoria, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodoPE);
 		IdMes get_IdMes_operativo(const Periodo a_periodoPE, const Periodo a_periodo_inicial_semanal);
-		bool get_is_variavelEstado_ENA();
+		bool anyVarEstadoENA();
 
 	private:
 

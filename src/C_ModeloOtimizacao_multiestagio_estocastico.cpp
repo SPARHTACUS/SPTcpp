@@ -6035,10 +6035,10 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(cons
 
 				if (sobreposicao > 0.0) {
 					for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPat++) {
-						int varQDEF = getVarDecisao_QDEFseExistir(a_TSS, a_idEstagio, periodo, idPat, a_idHidreletrica);
-						if (varQDEF < 0)
-							varQDEF = addVarDecisao_QDEF(a_TSS, a_idEstagio, periodo, idPat, a_idHidreletrica, 0.0, infinito, 0.0);
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEF, equQDEF, -sobreposicao * a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPat, double()));
+						int varQDEF_pat = getVarDecisao_QDEFseExistir(a_TSS, a_idEstagio, periodo, idPat, a_idHidreletrica);
+						if (varQDEF_pat < 0)
+							varQDEF_pat = addVarDecisao_QDEF(a_TSS, a_idEstagio, periodo, idPat, a_idHidreletrica, 0.0, infinito, 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQDEF_pat, equQDEF, -sobreposicao * a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPat, double()));
 					}
 					if (!sobreposicao_encontrada)
 						sobreposicao_encontrada = true;
