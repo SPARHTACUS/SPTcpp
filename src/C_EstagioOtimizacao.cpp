@@ -48,26 +48,34 @@ Estagio::~Estagio(){
 } // Estagio::~Estagio(){
 
 
-IdVariavelEstado Estagio::addVariavelEstado(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const int a_idVariavelDecisaoEstagioAnterior) {
+IdVariavelEstado Estagio::addVariavelEstado(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const int a_idVariavelDecisaoEstagioAnterior, bool is_externa) {
 
 	try {
 
 		const IdVariavelEstado maiorIdVariavelEstado = getMaiorId(IdVariavelEstado());
 
-		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado(IdVariavelEstado_Nenhum + 1); idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
+		for (IdVariavelEstado idVariavelEstado = maiorIdVariavelEstado; idVariavelEstado > IdVariavelEstado_Nenhum; idVariavelEstado--) {
 
-			if (strCompara(getAtributo(idVariavelEstado, AttComumVariavelEstado_nome, string()), a_nome)) {
+			if (vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
-				if (getElementoVetor(idVariavelEstado, AttVetorVariavelEstado_idVariavelDecisao, a_TSS, int()) != -1)
-					throw std::invalid_argument("O atributo " + getFullString(AttVetorVariavelEstado_idVariavelDecisao) + " ja foi instanciado.");
+				if (strCompara(getAtributo(idVariavelEstado, AttComumVariavelEstado_nome, string()), a_nome)) {
 
-				vetorVariavelEstado.at(idVariavelEstado).setElemento(AttVetorVariavelEstado_idVariavelDecisao, a_TSS, a_idVariavelDecisao);
+					if ((getElementoVetor(idVariavelEstado, AttVetorVariavelEstado_idVariavelDecisao, a_TSS, int()) == a_idVariavelDecisao) && (getAtributo(idVariavelEstado, AttComumVariavelEstado_tipoSubproblemaSolverEstagioAnterior, TipoSubproblemaSolver()) == a_TSS) &&
+						(getAtributo(idVariavelEstado, AttComumVariavelEstado_idVariavelDecisaoEstagioAnterior, int()) == a_idVariavelDecisaoEstagioAnterior))
+						return idVariavelEstado;
 
-				return idVariavelEstado;
+					if (getElementoVetor(idVariavelEstado, AttVetorVariavelEstado_idVariavelDecisao, a_TSS, int()) != -1)
+						throw std::invalid_argument("O atributo " + getFullString(AttVetorVariavelEstado_idVariavelDecisao) + " ja foi instanciado com varDecisao " + getString(getElementoVetor(idVariavelEstado, AttVetorVariavelEstado_idVariavelDecisao, a_TSS, int())) + ".");
 
-			} // if (strCompara(getAtributo(idVariavelEstado, AttComumVariavelEstado_nome, string()), a_nome)) {
+					vetorVariavelEstado.at(idVariavelEstado).setElemento(AttVetorVariavelEstado_idVariavelDecisao, a_TSS, a_idVariavelDecisao);
 
-		} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado(IdVariavelEstado_Nenhum + 1); idVariavelEstado <= maiorIdVariavelEstado; idVariavelEstado++) {
+					return idVariavelEstado;
+
+				} // if (strCompara(getAtributo(idVariavelEstado, AttComumVariavelEstado_nome, string()), a_nome)) {
+
+			} // if (vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
+
+		} // for (IdVariavelEstado idVariavelEstado = maiorIdVariavelEstado; idVariavelEstado >= menorIdVariavelEstado; idVariavelEstado--) {
 
 		const IdVariavelEstado idVariavelEstado = IdVariavelEstado(maiorIdVariavelEstado + 1);
 
@@ -79,6 +87,7 @@ IdVariavelEstado Estagio::addVariavelEstado(const TipoSubproblemaSolver a_TSS, c
 		vetorVariavelEstado.at(idVariavelEstado).setAtributo(AttComumVariavelEstado_nome, a_nome);
 		vetorVariavelEstado.at(idVariavelEstado).setAtributo(AttComumVariavelEstado_tipoSubproblemaSolverEstagioAnterior, a_TSS);
 		vetorVariavelEstado.at(idVariavelEstado).setAtributo(AttComumVariavelEstado_idVariavelDecisaoEstagioAnterior, a_idVariavelDecisaoEstagioAnterior);
+		vetorVariavelEstado.at(idVariavelEstado).setAtributo(AttComumVariavelEstado_is_externa, is_externa);
 
 		vetorVariavelEstado.at(idVariavelEstado).setVetor_forced(AttVetorVariavelEstado_idVariavelDecisao, SmartEnupla<TipoSubproblemaSolver, int>(TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1), std::vector<int>(TipoSubproblemaSolver(TipoSubproblemaSolver_Excedente - 1), -1)));
 
@@ -87,7 +96,7 @@ IdVariavelEstado Estagio::addVariavelEstado(const TipoSubproblemaSolver a_TSS, c
 		return idVariavelEstado;
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("Estagio(" + getString(getIdObjeto()) + ")::addVariavelEstado(" + getString(a_TSS) + "," + a_nome + "," + getString(a_idVariavelDecisao) + "," + getString(a_idVariavelDecisaoEstagioAnterior) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("Estagio(" + getString(getIdObjeto()) + ")::addVariavelEstado(" + getString(a_TSS) + "," + a_nome + "," + getString(a_idVariavelDecisao) + "," + getString(a_idVariavelDecisaoEstagioAnterior) + "," + getString(is_externa) + "): \n" + std::string(erro.what())); }
 
 } // IdVariavelEstado Estagio::adicionarVariavelEstado(const string a_nome, const IdEstagio a_idEstagio, const int a_indice_variavel_decisao, const IdEstagio a_idEstagioDE, const int a_indice_variavel_decisaoDE){
 

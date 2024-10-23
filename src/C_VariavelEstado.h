@@ -6,6 +6,7 @@
 #define ATT_COMUM_VARIAVEL_ESTADO(m)  \
 	  m(VariavelEstado,  AttComum,                     idVariavelEstado,      IdVariavelEstado,         min,          max,           min,      sim) \
 	  m(VariavelEstado,  AttComum,                                 nome,                string,         min,          max,        Nenhum,      sim) \
+	  m(VariavelEstado,  AttComum,                           is_externa,                  bool,         min,          max,           nao,      nao) \
 	  m(VariavelEstado,  AttComum, tipoSubproblemaSolverEstagioAnterior, TipoSubproblemaSolver,      Nenhum,          max,        Nenhum,      sim) \
 	  m(VariavelEstado,  AttComum,     idVariavelDecisaoEstagioAnterior,                   int,          -1,          max,            -1,      sim) 
 //     c_classe,   smrtAtt,                                nomeAtributo,                  tipo,  lowerBound,   upperBound,  initialValue, mustRead?
