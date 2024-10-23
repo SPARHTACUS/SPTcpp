@@ -16443,20 +16443,26 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		entradaSaidaDados.setDiretorioEntrada(a_diretorio);
 
 		//****************************************
-		//Arquivos Demanda e Usinas não Simuladas
+		//Arquivos Demanda
 		//****************************************
-		
 		//Arquivos operacional: Valor absoluto das variáveis
-		bool dadosPreConfig_submercado_operacional         = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m1);
-		bool dadosPreConfig_usina_nao_simulada_operacional = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m2);
-
 		//Arquivos premissa: Modulação em p.u (shaped) das variáveis
+		bool dadosPreConfig_submercado_operacional         = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m1);	
 		bool dadosPreConfig_submercado_premissa            = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m1);
-		bool dadosPreConfig_usina_nao_simulada_premissa    = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m2);
 
 		if(dadosPreConfig_submercado_operacional && dadosPreConfig_submercado_premissa){ throw std::invalid_argument("Encontrado arquivo operacional e arquivo premissa da demanda, selecionar apenas um deles em: " + a_diretorio);}
-		if(dadosPreConfig_usina_nao_simulada_operacional && dadosPreConfig_usina_nao_simulada_premissa){ throw std::invalid_argument("Encontrado arquivo operacional e arquivo premissa das usinas nao simuladas, selecionar apenas um deles em: " + a_diretorio);}
 
+
+
+		//****************************************
+		//Arquivos Usinas não Simuladas
+		//****************************************
+		//Arquivos operacional: Valor absoluto das variáveis
+		//Arquivos premissa: Modulação em p.u (shaped) das variáveis
+		bool dadosPreConfig_usina_nao_simulada_operacional = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m2);
+		bool dadosPreConfig_usina_nao_simulada_premissa = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m2);
+
+		if (dadosPreConfig_usina_nao_simulada_operacional && dadosPreConfig_usina_nao_simulada_premissa) { throw std::invalid_argument("Encontrado arquivo operacional e arquivo premissa das usinas nao simuladas, selecionar apenas um deles em: " + a_diretorio); }
 
 		//****************************************
 		//Arquivos Renovavel
@@ -19395,6 +19401,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
 
+		const std::string nomeFile_PD_preConfig = a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG" + "//DadosEntradaPD_PRECONFIG";
 
 		////////////////////////////////////////////////////
 		// Detecta se existe arquivo de cortes NEWAVE
@@ -19725,6 +19732,176 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			}
 		}
 
+		//****************************************************************
+		//Atualiza processo estocástico se tem informação na preConfig PD
+		//****************************************************************
+		if (true) {
+
+			Dados dados_PD;
+
+			EntradaSaidaDados entradaSaidaDadosPD;
+			entradaSaidaDadosPD.setDiretorioEntrada(nomeFile_PD_preConfig);
+
+			//****************************************
+			//Processo estocástico
+			//****************************************
+			bool is_carregar_PD_processo_estocastico = false;
+
+			bool dadosPreConfig_processo_estocastico_attMatriz = entradaSaidaDadosPD.carregarArquivoCSV_AttMatriz_seExistir("PROCESSO_ESTOCASTICO_mapeamento_espaco_amostral.csv", dados_PD.processoEstocastico_hidrologico, TipoAcessoInstancia_direto);
+			bool dadosPreConfig_var_aleatoria_attMatriz_int = entradaSaidaDadosPD.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_coeficiente_linear_auto_correlacao.csv", dados_PD.processoEstocastico_hidrologico, TipoAcessoInstancia_m1);
+			bool dadosPreConfig_var_aleatoria_attMatriz_real = entradaSaidaDadosPD.carregarArquivoCSV_AttMatriz_seExistir("VARIAVEL_ALEATORIA_residuo_espaco_amostral.csv", dados_PD.processoEstocastico_hidrologico, TipoAcessoInstancia_m1);
+			bool dadosPreConfig_var_aleatoria_attVetor_operacional = entradaSaidaDadosPD.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_tipo_relaxacao.csv", dados_PD.processoEstocastico_hidrologico, TipoAcessoInstancia_m1);
+
+			bool dadosPreConfig_var_aleatoria_interna_attComum = entradaSaidaDadosPD.carregarArquivoCSV_AttComum_seExistir("VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv", dados_PD.processoEstocastico_hidrologico, TipoAcessoInstancia_m2);
+			bool dadosPreConfig_var_aleatoria_interna_attMatriz = entradaSaidaDadosPD.carregarArquivoCSV_AttVetor_seExistir("VARIAVEL_ALEATORIA_INTERNA_coeficiente_participacao.csv", dados_PD.processoEstocastico_hidrologico, TipoAcessoInstancia_m2);
+
+			if (dadosPreConfig_processo_estocastico_attMatriz && dadosPreConfig_var_aleatoria_attMatriz_int && dadosPreConfig_var_aleatoria_attMatriz_real\
+				&& dadosPreConfig_var_aleatoria_attVetor_operacional && dadosPreConfig_var_aleatoria_interna_attComum && dadosPreConfig_var_aleatoria_interna_attMatriz)
+				is_carregar_PD_processo_estocastico = true;
+
+			//////////////////////////////////////////////////////////////////////////////
+			//PROCESSO_ESTOCASTICO_mapeamento_espaco_amostral
+			//VARIAVEL_ALEATORIA_coeficiente_linear_auto_correlacao
+			//VARIAVEL_ALEATORIA_residuo_espaco_amostral
+			//VARIAVEL_ALEATORIA_tipo_relaxacao
+			//VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional
+			//VARIAVEL_ALEATORIA_INTERNA_coeficiente_participacao
+			//////////////////////////////////////////////////////////////////////////////
+
+			if (is_carregar_PD_processo_estocastico) {
+
+				try {
+
+					std::cout << "Carregando arquivo de preConfiguracao: PROCESSO_ESTOCASTICO_mapeamento_espaco_amostral.csv..." << std::endl;
+					std::cout << "Carregando arquivo de preConfiguracao: VARIAVEL_ALEATORIA_coeficiente_linear_auto_correlacao.csv..." << std::endl;
+					std::cout << "Carregando arquivo de preConfiguracao: VARIAVEL_ALEATORIA_residuo_espaco_amostral.csv..." << std::endl;
+					std::cout << "Carregando arquivo de preConfiguracao: VARIAVEL_ALEATORIA_tipo_relaxacao.csv..." << std::endl;
+					std::cout << "Carregando arquivo de preConfiguracao: VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv..." << std::endl;
+					std::cout << "Carregando arquivo de preConfiguracao: VARIAVEL_ALEATORIA_INTERNA_coeficiente_participacao.csv..." << std::endl;
+
+					//*******************************************************************
+					//   Utiliza a estrutura do processo estocástico do CP
+					//   Realiza as seguintes validações antes de incluir os valores do proc.estocástico PD in CP:
+					// (i) O horizonte do proc. estocástico CP e PD são iguais na sobreposição (deve realizar com os mesmos períodos)
+					// (ii) O mapeamento_espaco_amostral até o período_final PD deve coincidir com o mapeamento de todos os cenários CP
+					// (iii) Todas as var_aleatoria_interna do CP devem estar contidas no PD
+					//*******************************************************************
+
+					Periodo periodoPE_inicial_PD = dados_PD.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo());
+					Periodo periodoPE_final_PD = dados_PD.processoEstocastico_hidrologico.getIterador2Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo());
+
+					std::vector<Periodo> periodos_PE_PD = dados_PD.processoEstocastico_hidrologico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao()).at(IdCenario_1).getIteradores(periodoPE_inicial_PD, periodoPE_final_PD);
+					SmartEnupla<Periodo, bool> horizonte_PE_PD;
+
+					for (int pos = 0; pos < int(periodos_PE_PD.size()); pos++)
+						horizonte_PE_PD.addElemento(periodos_PE_PD.at(pos), true);
+
+					/////
+					Periodo periodoPE_inicial_CP = a_dados.processoEstocastico_hidrologico.getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo());
+					Periodo periodoPE_final_CP = a_dados.processoEstocastico_hidrologico.getIterador2Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo());
+
+					std::vector<Periodo> periodos_PE_CP = a_dados.processoEstocastico_hidrologico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao()).at(IdCenario_1).getIteradores(periodoPE_inicial_CP, periodoPE_final_CP);
+					SmartEnupla<Periodo, bool> horizonte_PE_CP;
+
+					for (int pos = 0; pos < int(periodos_PE_CP.size()); pos++)
+						horizonte_PE_CP.addElemento(periodos_PE_CP.at(pos), true);
+
+					//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					// (i) O horizonte do proc. estocástico CP e PD são iguais na sobreposição (deve realizar com os mesmos períodos)
+					for (Periodo periodo_PD = periodoPE_inicial_PD; periodo_PD <= periodoPE_final_PD; horizonte_PE_PD.incrementarIterador(periodo_PD)) {
+						try {
+							horizonte_PE_CP.getElemento(periodo_PD);
+						}
+						catch (const std::exception& erro) { throw std::invalid_argument("Processo estocastico da preConfig PD nao compativel com processo estocastico CP: \n" + std::string(erro.what())); }
+					}//for (Periodo periodo_PD = periodoPE_inicial_PD; periodo_PD <= periodoPE_final_PD; horizonte_PE_PD.incrementarIterador(periodo_PD)) {
+
+					//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					// (ii) O mapeamento_espaco_amostral até o período_final PD deve coincidir com o mapeamento de todos os cenários CP
+
+					const IdCenario idCenarioIni_PD = dados_PD.processoEstocastico_hidrologico.getIterador1Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario());
+					const IdCenario idCenarioEnd_PD = dados_PD.processoEstocastico_hidrologico.getIterador1Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario());
+
+					if (idCenarioIni_PD != idCenarioEnd_PD || idCenarioIni_PD != IdCenario_1)
+						throw std::invalid_argument("Processo estocastico da preConfig PD deve ter um unico cenario");
+
+					const IdCenario idCenarioIni_CP = a_dados.processoEstocastico_hidrologico.getIterador1Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario());
+					const IdCenario idCenarioEnd_CP = a_dados.processoEstocastico_hidrologico.getIterador1Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario());
+
+					for (Periodo periodo_PD = periodoPE_inicial_PD; periodo_PD <= periodoPE_final_PD; horizonte_PE_PD.incrementarIterador(periodo_PD)) {
+						const IdRealizacao idRealizacao_PD = dados_PD.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, periodo_PD, IdRealizacao());
+
+						if (idRealizacao_PD != IdRealizacao_1)
+							throw std::invalid_argument("Implementado somente para processo estocastico da preConfig PD deterministico");
+
+						for (IdCenario idCenario_CP = idCenarioIni_CP; idCenario_CP <= idCenarioEnd_CP; idCenario_CP++) {
+							if (a_dados.processoEstocastico_hidrologico.getElementoMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario_CP, periodo_PD, IdRealizacao()) != idRealizacao_PD)
+								throw std::invalid_argument("Processo estocastico da preConfig PD incompativel com o processo estocastico do CP");
+						}//for (IdCenario idCenario_CP = idCenarioIni_CP; idCenario_CP <= idCenarioEnd_CP; idCenario_CP++) {
+					}//for (Periodo periodo_PD = periodoPE_inicial_PD; periodo_PD <= periodoPE_final_PD; horizonte_PE_PD.incrementarIterador(periodo_PD)) {
+
+					//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+					const IdVariavelAleatoria idVariavelAleatoriaEnd_PD = dados_PD.processoEstocastico_hidrologico.vetorVariavelAleatoria.getMaiorId();
+					const IdVariavelAleatoria idVariavelAleatoriaEnd_CP = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.getMaiorId();
+
+					for (IdVariavelAleatoria idVariavelAleatoria_CP = IdVariavelAleatoria_1; idVariavelAleatoria_CP <= idVariavelAleatoriaEnd_CP; idVariavelAleatoria_CP++) {
+
+						if (a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVariavelAleatoria_CP).vetorVariavelAleatoriaInterna.getMaiorId() != IdVariavelAleatoriaInterna_1)
+							throw std::invalid_argument("Nao implementado para idVariavelAleatoria composta por multiplas IdVariavelAleatoriaInterna");
+
+						std::string nome_var_interna_CP = a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVariavelAleatoria_CP).vetorVariavelAleatoriaInterna.at(IdVariavelAleatoriaInterna_1).getAtributo(AttComumVariavelAleatoriaInterna_nome, std::string());
+
+						if (nome_var_interna_CP != "IdHidreletrica_168_ENA_SOBRADINHO" && nome_var_interna_CP != "IdHidreletrica_172_ENA_ITAPARICA" && nome_var_interna_CP != "IdHidreletrica_178_ENA_XINGO" && nome_var_interna_CP != "IdHidreletrica_176_COMPPAFMOX") {
+
+							IdVariavelAleatoria idVariavelAleatoria_PD = IdVariavelAleatoria_Nenhum;
+
+							for (IdVariavelAleatoria idVariavelAleatoria_PD_aux = IdVariavelAleatoria_1; idVariavelAleatoria_PD_aux <= idVariavelAleatoriaEnd_PD; idVariavelAleatoria_PD_aux++) {
+
+								if (dados_PD.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVariavelAleatoria_PD_aux).vetorVariavelAleatoriaInterna.getMaiorId() != IdVariavelAleatoriaInterna_1)
+									throw std::invalid_argument("Nao implementado para idVariavelAleatoria composta por multiplas IdVariavelAleatoriaInterna");
+
+								if (nome_var_interna_CP == dados_PD.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVariavelAleatoria_PD_aux).vetorVariavelAleatoriaInterna.at(IdVariavelAleatoriaInterna_1).getAtributo(AttComumVariavelAleatoriaInterna_nome, std::string()))
+									idVariavelAleatoria_PD = idVariavelAleatoria_PD_aux;
+
+							}//for (IdVariavelAleatoria idVariavelAleatoria_PD_aux = IdVariavelAleatoria_1; idVariavelAleatoria_PD_aux <= idVariavelAleatoriaEnd_PD; idVariavelAleatoria_PD_aux++) {
+
+							//(iii) Todas as var_aleatoria_interna do CP devem estar contidas no PD
+							if (idVariavelAleatoria_PD == IdVariavelAleatoria_Nenhum)
+								throw std::invalid_argument("Nao identificada IdVariavelAleatoriaInterna_PD com nome_CP: " + nome_var_interna_CP);
+
+							//Atualiza valores
+							for (Periodo periodo_PD = periodoPE_inicial_PD; periodo_PD <= periodoPE_final_PD; horizonte_PE_PD.incrementarIterador(periodo_PD)) {
+
+								//////////////////////
+								//VarAleatoriaInterna
+								// //////////////////////
+								//AttVetor
+								a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVariavelAleatoria_CP).vetorVariavelAleatoriaInterna.at(IdVariavelAleatoriaInterna_1).setElemento(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodo_PD, dados_PD.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVariavelAleatoria_PD).vetorVariavelAleatoriaInterna.at(IdVariavelAleatoriaInterna_1).getElementoVetor(AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodo_PD, double()));
+
+								//////////////////////
+								//VarAleatoria
+								//////////////////////
+								//AttMatriz
+								const int size2coef = a_dados.processoEstocastico_hidrologico.getIterador2Final(idVariavelAleatoria_CP, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_PD, int());
+
+								if (size2coef != 1 || size2coef != dados_PD.processoEstocastico_hidrologico.getIterador2Final(idVariavelAleatoria_PD, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_PD, int()))
+									throw std::invalid_argument("Nao implementado para coeficiente_linear_auto_correlacao > 1");
+
+								a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVariavelAleatoria_CP).setElemento(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_PD, size2coef, dados_PD.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVariavelAleatoria_PD).getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_PD, size2coef, double()));
+								a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVariavelAleatoria_CP).setElemento(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_PD, IdRealizacao_1, dados_PD.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVariavelAleatoria_PD).getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_PD, IdRealizacao_1, double()));
+
+							}//for (Periodo periodo_PD = periodoPE_inicial_PD; periodo_PD <= periodoPE_final_PD; horizonte_PE_PD.incrementarIterador(periodo_PD)) {
+
+						}//if(nome_var_interna_CP != "IdHidreletrica_168_ENA_SOBRADINHO" && nome_var_interna_CP != "IdHidreletrica_172_ENA_ITAPARICA" && nome_var_interna_CP != "IdHidreletrica_178_ENA_XINGO" && nome_var_interna_CP != "IdHidreletrica_176_COMPPAFMOX"){
+
+					}//for (IdVariavelAleatoria idVariavelAleatoria_CP = IdVariavelAleatoria_1; idVariavelAleatoria_CP <= idVariavelAleatoriaEnd_CP; idVariavelAleatoria_CP++) {
+
+				}//try {
+				catch (const std::exception& erro) { throw std::invalid_argument("Erro is_carregar_PD_processo_estocastico: \n" + std::string(erro.what())); }
+
+			}//is_carregar_PD_processo_estocastico
+
+		}//if (true) {
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 		
@@ -19744,6 +19921,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		if (processoEstocasticoHidrologicoPreConfig_instanciado)
 			horizonte_processo_estocastico = SmartEnupla<Periodo, bool>(a_dados.processoEstocastico_hidrologico.getElementosMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo(), IdRealizacao()), true);
+
 
 		// Esvazia todos atributos do proc. estocástico hidrológico exceto AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral
 		if (true) {
@@ -19774,12 +19952,13 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		
 		calculaEngolimentoMaximo(a_dados, horizonte_estudo, horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal()), lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC, menor_cenario, maior_cenario);
 
-		////////////////////////////////////
+		//************************************************************************************************************************************
 		//Pre-config da programação diária
-		// //Nota: depois do engolimento máximo para a vazao_turbinada_disponivel_maxima
-		////////////////////////////////////
-		atualizar_valores_com_DadosEntradaPD_PRECONFIG(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG" + "//DadosEntradaPD_PRECONFIG");
-
+		// Notas:
+		// Tem que estar DEPOIS do cálculo do engolimento máximo para instanciar a vazao_turbinada_disponivel_maxima
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		atualizar_valores_com_DadosEntradaPD_PRECONFIG(a_dados, nomeFile_PD_preConfig);
+		//************************************************************************************************************************************
 
 		//Algumas usinas podem ter instanciado o volume_util_maximo no método determina_restricoes_hidraulicas_especiais() e precisa verificar com o percentual_volume_util_maximo
 		atualiza_volume_util_maximo_com_percentual_volume_util_maximo(a_dados); 
