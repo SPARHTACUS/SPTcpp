@@ -17951,6 +17951,12 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 			try {
 
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				//Premissa:
+				//O AttVetorHidreletrica_vazao_turbinada_maxima vai ser mantido sempre o valor mais restrito entre o CP e a preConfig PD
+				// O valor do CP vem do cálculo do engolimento máximo
+				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 				std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_AttComumOperacional.csv..." << std::endl;
 				std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
 				std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
@@ -18069,7 +18075,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						
 						if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_por_usina) {
 
-							if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_turbinada_maxima) == 0)
+							if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_turbinada_maxima) == 0)//Este Att é definido no cálculo do engolimento máximo, vai ser mantido sempre o valor mais restrito entre o CP e a preConfig PD
 								throw std::invalid_argument("Deve ser informado o AttVetorHidreletrica_vazao_turbinada_maxima da usina: " + getString(idHidreletrica_CP));
 
 							if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_turbinada_minima) == 0)
@@ -18135,7 +18141,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						}//if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorDefluencia.isInstanciado(IdDefluencia_passada)) {
 
 						/////////////////////////////////////////////////////////////////////////////////////
-						//2.1. Atualiza matrizes dentro do horizonte PD
+						//2.1. Atualiza AttVetor /AttMatriz dentro do horizonte PD
 						/////////////////////////////////////////////////////////////////////////////////////
 
 						SmartEnupla<Periodo, bool> horizonte_info_PD;
@@ -18161,6 +18167,13 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_por_usina)
 										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_disponibilidade, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_disponibilidade, periodo_PD, double()));
 									
+									//AttVetorHidreletrica_vazao_turbinada_maxima
+									//Atualiza se o valor PD é mais restrito que o valor CP
+									if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_turbinada_maxima, periodo, double()) > dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_turbinada_maxima, periodo_PD, double())) {
+										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_vazao_turbinada_maxima, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_turbinada_maxima, periodo_PD, double()));
+									}
+
+
 									a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_vazao_retirada, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_retirada, periodo_PD, double()));
 									//a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_tipo_detalhamento_producao, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_tipo_detalhamento_producao, periodo_PD, double()));
 
@@ -18211,7 +18224,6 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 
 		}//if (is_carregar_PD_hidreletricas) {
-
 
 		//////////////////////////////////////////////////////////////////////////////
 		//CONTRATO_AttComumOperacional
