@@ -3694,6 +3694,28 @@ void ModeloOtimizacao::exportarCorteBenders(const IdProcesso a_idProcesso, const
 
 } // void ModeloOtimizacao::exportarCorteBenders(const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, EntradaSaidaDados a_entradaSaidaDados){
 
+void ModeloOtimizacao::excluirArquivosCorteBenders(const IdProcesso a_idProcesso, const IdEstagio a_estagio, EntradaSaidaDados a_entradaSaidaDados) {
+
+	try {
+
+		std::string diretorio_saida = a_entradaSaidaDados.getDiretorioSaida();
+
+		if (a_idProcesso == IdProcesso_mestre)
+			diretorio_saida += "//Cortes";
+		else
+			diretorio_saida += "//Cortes//" + getFullString(a_idProcesso);
+
+		deletarArquivo(diretorio_saida + getFullString(a_estagio) + "_estagio.csv");
+		deletarArquivo(diretorio_saida + getFullString(a_estagio) + "_estado.csv");
+		deletarArquivo(diretorio_saida + getFullString(a_estagio) + "_corteBenders_rhs.csv");
+		deletarArquivo(diretorio_saida + getFullString(a_estagio) + "_corteBenders_estado.csv");
+		deletarArquivo(diretorio_saida + getFullString(a_estagio) + "_corteBenders_coeficientes.csv");
+
+	} // try
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::excluirArquivosCorteBenders(" + getFullString(a_idProcesso) + "," + getFullString(a_estagio) + ",a_entradaSaidaDados): \n" + std::string(erro.what())); }
+
+} // void ModeloOtimizacao::exportarCorteBenders(const IdEstagio a_estagio_inicial, const IdEstagio a_estagio_final, EntradaSaidaDados a_entradaSaidaDados){
+
 void ModeloOtimizacao::exportarVersaoAlternativaCorteBenders(const IdProcesso a_idProcesso, const IdEstagio a_estagio, EntradaSaidaDados a_entradaSaidaDados) {
 
 	try {
