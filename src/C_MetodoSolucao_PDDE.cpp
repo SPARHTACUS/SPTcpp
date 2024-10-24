@@ -609,7 +609,14 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 						a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao);
 					else
 						a_entradaSaidaDados.setDiretorioSaida(diretorio);
+
 					a_modeloOtimizacao.exportarCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
+
+					if (a_idIteracao > IdIteracao_0) {
+						const IdIteracao idIterLast = IdIteracao(a_idIteracao - 1);
+						const std::string diretorio_iteracao_last = diretorio + "//" + getFullString(idIterLast) + "//Backward";
+						a_modeloOtimizacao.excluirArquivosCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
+					}
 
 					a_entradaSaidaDados.setAppendArquivo(false);
 					a_entradaSaidaDados.setDiretorioSaida(diretorio);
