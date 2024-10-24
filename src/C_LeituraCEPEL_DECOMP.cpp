@@ -16443,7 +16443,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		entradaSaidaDados.setDiretorioEntrada(a_diretorio);
 
 		//****************************************
-		//Arquivos Demanda
+		//Arquivos Submercado
 		//****************************************
 		//Arquivos operacional: Valor absoluto das variáveis
 		//Arquivos premissa: Modulação em p.u (shaped) das variáveis
@@ -16452,7 +16452,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 		if(dadosPreConfig_submercado_operacional && dadosPreConfig_submercado_premissa){ throw std::invalid_argument("Encontrado arquivo operacional e arquivo premissa da demanda, selecionar apenas um deles em: " + a_diretorio);}
 
-
+		bool is_carregar_PD_submercado_patamar_deficit = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("SUBMERCADO_PATAMAR_DEFICIT_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m2);
 
 		//****************************************
 		//Arquivos Usinas não Simuladas
@@ -17112,6 +17112,156 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 			catch (const std::exception& erro) { throw std::invalid_argument("Erro dadosPreConfig_usina_nao_simulada_premissa: \n" + std::string(erro.what())); }
 
 		}//if (dadosPreConfig_usina_nao_simulada_premissa) {
+
+		//////////////////////////////////////////////////////////////////////////////
+		//SUBMERCADO_PATAMAR_DEFICIT_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga
+		//////////////////////////////////////////////////////////////////////////////
+
+		if (is_carregar_PD_submercado_patamar_deficit) {
+
+			try {
+
+				std::cout << "Carregando arquivo de preConfiguracao: SUBMERCADO_PATAMAR_DEFICIT_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
+
+				///////////////////////////////////////////////////////////
+				//Instancia AttMatrizPatamarDeficit_potencia_maxima no CP
+				//No DC é informado o AttMatrizPatamarDeficit_percentual
+				///////////////////////////////////////////////////////////
+
+				const IdSubmercado idSubmercadoIni_CP = a_dados.getMenorId(IdSubmercado());
+				const IdSubmercado idSubmercadoOut_CP = a_dados.getIdOut(IdSubmercado());
+
+				for (IdSubmercado idSubmercado_CP = idSubmercadoIni_CP; idSubmercado_CP < idSubmercadoOut_CP; a_dados.vetorSubmercado.incr(idSubmercado_CP)) {
+
+					const IdPatamarDeficit idPatamarDeficitIni_CP = a_dados.vetorSubmercado.at(idSubmercado_CP).getMenorId(IdPatamarDeficit());
+					const IdPatamarDeficit idPatamarDeficitOut_CP = a_dados.vetorSubmercado.at(idSubmercado_CP).getIdOut(IdPatamarDeficit());
+
+					for (IdPatamarDeficit idPatamarDeficit_CP = idPatamarDeficitIni_CP; idPatamarDeficit_CP < idPatamarDeficitOut_CP; a_dados.vetorSubmercado.at(idSubmercado_CP).vetorPatamarDeficit.incr(idPatamarDeficit_CP)) {
+
+						if (a_dados.getSize1Matriz(idSubmercado_CP, idPatamarDeficit_CP, AttMatrizPatamarDeficit_potencia_maxima) == 0 && a_dados.getSize1Matriz(idSubmercado_CP, idPatamarDeficit_CP, AttMatrizPatamarDeficit_percentual) == 0)
+							throw std::invalid_argument("Nao instanciado no CP: AttMatrizPatamarDeficit_potencia_maxima ou AttMatrizPatamarDeficit_percentual");
+						else if (a_dados.getSize1Matriz(idSubmercado_CP, idPatamarDeficit_CP, AttMatrizPatamarDeficit_potencia_maxima) == 0 && a_dados.getSize1Matriz(idSubmercado_CP, idPatamarDeficit_CP, AttMatrizPatamarDeficit_percentual) > 0) {
+
+							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+									const double potencia_maxima = a_dados.vetorSubmercado.at(idSubmercado_CP).getElementoMatriz(AttMatrizSubmercado_demanda, periodo, idPatamarCarga, double()) * a_dados.vetorSubmercado.at(idSubmercado_CP).vetorPatamarDeficit.at(idPatamarDeficit_CP).getElementoMatriz(AttMatrizPatamarDeficit_percentual, periodo, idPatamarCarga, double());
+									a_dados.vetorSubmercado.at(idSubmercado_CP).vetorPatamarDeficit.at(idPatamarDeficit_CP).addElemento(AttMatrizPatamarDeficit_potencia_maxima, periodo, idPatamarCarga, potencia_maxima);
+
+								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+							}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+						}//else if (a_dados.getSize1Matriz(idSubmercado_CP, idPatamarDeficit_CP, AttMatrizPatamarDeficit_potencia_maxima) == 0 && a_dados.getSize1Matriz(idSubmercado_CP, idPatamarDeficit_CP, AttMatrizPatamarDeficit_percentual) > 0) {
+
+					}//for (IdPatamarDeficit idPatamarDeficit_CP = idPatamarDeficitIni_CP; idPatamarDeficit_CP < idPatamarDeficitOut_CP; a_dados.vetorSubmercado.at(idSubmercado_CP).vetorPatamarDeficit.incr(idPatamarDeficit_CP)) {
+
+				}//for (IdSubmercado idSubmercado_CP = idSubmercadoIni_CP; idSubmercado_CP < idSubmercadoOut_CP; a_dados.vetorSubmercado.incr(idSubmercado_CP)) {
+
+				//*******************************************************************
+				//   Instancia patamar deficit PD no CP
+				//   Testa se o patamar deficit existe no CP. Caso contrário, o instancia com valores default
+				//   Depois atualiza estes valores com a sobreposição dos periodos_CP e periodos_PD
+				//*******************************************************************
+
+				const IdSubmercado idSubmercadoIni_PD = dados_PD.getMenorId(IdSubmercado());
+				const IdSubmercado idSubmercadoOut_PD = dados_PD.getIdOut(IdSubmercado());
+
+				for (IdSubmercado idSubmercado_PD = idSubmercadoIni_PD; idSubmercado_PD < idSubmercadoOut_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
+
+					if(!a_dados.vetorSubmercado.isInstanciado(idSubmercado_PD))
+						throw std::invalid_argument("Nao instanciado no CP o submercado: " + getString(idSubmercado_PD));
+
+					const IdPatamarDeficit idPatamarDeficitIni_PD = dados_PD.vetorSubmercado.at(idSubmercado_PD).getMenorId(IdPatamarDeficit());
+					const IdPatamarDeficit idPatamarDeficitOut_PD = dados_PD.vetorSubmercado.at(idSubmercado_PD).getIdOut(IdPatamarDeficit());
+
+					for (IdPatamarDeficit idPatamarDeficit_PD = idPatamarDeficitIni_PD; idPatamarDeficit_PD < idPatamarDeficitOut_PD; dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.incr(idPatamarDeficit_PD)) {
+
+						//Validação do horizonte_informacao_PD_pre_config
+						std::vector<Periodo> periodos_PD = dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.at(idPatamarDeficit_PD).getMatriz(AttMatrizPatamarDeficit_custo, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+
+						const Periodo periodo_inicial_PD = periodos_PD.at(0);
+						const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
+
+						validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+
+						////////////////////////////////////////
+						//Instancia novos PatamarDeficit PD no CP
+						////////////////////////////////////////
+
+						if (!a_dados.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.isInstanciado(idPatamarDeficit_PD)) {
+
+							PatamarDeficit patamarDeficit;
+
+							patamarDeficit.setAtributo(AttComumPatamarDeficit_idPatamarDeficit, idPatamarDeficit_PD);
+
+							a_dados.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.add(patamarDeficit);
+
+							SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_zero(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+							SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_menos_inf(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+							SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_inf(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>());
+
+							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+								matriz_zero.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, 0.0)));
+								matriz_menos_inf.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("min"))));
+								matriz_inf.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(maiorIdPatamarCarga, getdoubleFromChar("max"))));
+
+							}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+							a_dados.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.at(idPatamarDeficit_PD).setMatriz(AttMatrizPatamarDeficit_custo, matriz_inf);
+							a_dados.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.at(idPatamarDeficit_PD).setMatriz(AttMatrizPatamarDeficit_potencia_maxima, matriz_zero);
+
+						}//if (!a_dados.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.isInstanciado(idPatamarDeficit_PD)) {
+
+						/////////////////////////////////////////////////////////////////////////////////////
+						//Atualiza AttMatriz
+						/////////////////////////////////////////////////////////////////////////////////////
+
+						SmartEnupla<Periodo, bool> horizonte_info_PD;
+
+						for (int pos = 0; pos < int(periodos_PD.size()); pos++)
+							horizonte_info_PD.addElemento(periodos_PD.at(pos), true);
+
+						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+							for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+								const double sobreposicao = periodo.sobreposicao(periodo_PD);
+
+								if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+									const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+									const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.at(idPatamarDeficit_PD).getIterador2Final(AttMatrizPatamarDeficit_custo, periodo_PD, IdPatamarCarga());
+
+									if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
+										throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
+
+									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+										a_dados.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.at(idPatamarDeficit_PD).setElemento(AttMatrizPatamarDeficit_custo, periodo, idPatamarCarga, dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.at(idPatamarDeficit_PD).getElementoMatriz(AttMatrizPatamarDeficit_custo, periodo_PD, idPatamarCarga, double()));
+										a_dados.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.at(idPatamarDeficit_PD).setElemento(AttMatrizPatamarDeficit_potencia_maxima, periodo, idPatamarCarga, dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.at(idPatamarDeficit_PD).getElementoMatriz(AttMatrizPatamarDeficit_potencia_maxima, periodo_PD, idPatamarCarga, double()));
+
+									}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+							}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+						}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+					}//for (IdPatamarDeficit idPatamarDeficit_PD = idPatamarDeficitIni_PD; idPatamarDeficit_PD < idPatamarDeficitOut_PD; dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.incr(idPatamarDeficit_PD)) {
+
+				}//for (IdSubmercado idSubmercado_PD = idSubmercadoIni_PD; idSubmercado_PD < idSubmercadoOut_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
+
+			}//try {
+			catch (const std::exception& erro) { throw std::invalid_argument("Erro is_carregar_PD_submercado_patamar_deficit: \n" + std::string(erro.what())); }
+
+		}//is_carregar_PD_submercado_patamar_deficit
 
 		//////////////////////////////////////////////////////////////////////////////
 		//RENOVAVEL_AttComumOperacional
