@@ -3908,7 +3908,8 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 					vetorEstagio_aux.add(estagio_aux);
 					a_entradaSaidaDados.carregarArquivoCSV_AttComum(getFullString(idEstagio) + "_estagio.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_direto);
 					a_entradaSaidaDados.carregarArquivoCSV_AttVetor(getFullString(idEstagio) + "_corteBenders_rhs.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
-					a_entradaSaidaDados.carregarArquivoCSV_AttVetor(getFullString(idEstagio) + "_corteBenders_estado.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
+					if (getAtributo(idEstagio, AttComumEstagio_selecao_cortes_nivel_dominancia, int()) > 0)
+						a_entradaSaidaDados.carregarArquivoCSV_AttVetor(getFullString(idEstagio) + "_corteBenders_estado.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
 					a_entradaSaidaDados.carregarArquivoCSV_AttMatriz(getFullString(idEstagio) + "_corteBenders_coeficientes.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
 					a_entradaSaidaDados.carregarArquivoCSV_AttComum(getFullString(idEstagio) + "_estado.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
 				} // if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
@@ -3976,9 +3977,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 									if (vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado_corte)) {
 
-										const std::string nome_estado_corte = vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string());
-
-										if (nome_estado == nome_estado_corte) {
+										if (nome_estado == vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.at(idVariavelEstado_corte).getAtributo(AttComumVariavelEstado_nome, std::string())) {
 											variaveis_estado_modelo_encontradas.at(idVariavelEstado) = idVariavelEstado_corte;
 											variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) = idVariavelEstado;
 											numero_variaveis_estado_modelo_encontradas++;
@@ -4217,7 +4216,8 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 								for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= variaveis_estado_modelo_encontradas.getIteradorFinal(); idVariavelEstado++) {
 
 									if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) == IdVariavelEstado_Nenhum) {
-										corteBenders.addElemento(AttVetorCorteBenders_estado, idVariavelEstado, 0.0);
+										if (vetorEstagio_aux.at(idEstagio).getSizeVetor(idCorteBenders, AttVetorCorteBenders_estado) > 0)
+											corteBenders.addElemento(AttVetorCorteBenders_estado, idVariavelEstado, 0.0);
 
 										for (IdRealizacao idRealizacao = idRealizacao_inicial; idRealizacao <= idRealizacao_final; idRealizacao++)
 											corteBenders.addElemento(AttMatrizCorteBenders_coeficiente, idRealizacao, idVariavelEstado, 0.0);
@@ -4225,7 +4225,8 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 									}
 
 									else if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) != IdVariavelEstado_Nenhum) {
-										corteBenders.addElemento(AttVetorCorteBenders_estado, idVariavelEstado, vetorEstagio_aux.at(idEstagio).getElementoVetor(idCorteBenders, AttVetorCorteBenders_estado, variaveis_estado_modelo_encontradas.at(idVariavelEstado), double()));
+										if (vetorEstagio_aux.at(idEstagio).getSizeVetor(idCorteBenders, AttVetorCorteBenders_estado) > 0)
+											corteBenders.addElemento(AttVetorCorteBenders_estado, idVariavelEstado, vetorEstagio_aux.at(idEstagio).getElementoVetor(idCorteBenders, AttVetorCorteBenders_estado, variaveis_estado_modelo_encontradas.at(idVariavelEstado), double()));
 
 										for (IdRealizacao idRealizacao = idRealizacao_inicial; idRealizacao <= idRealizacao_final; idRealizacao++)
 											corteBenders.addElemento(AttMatrizCorteBenders_coeficiente, idRealizacao, idVariavelEstado, vetorEstagio_aux.at(idEstagio).getElementoMatriz(idCorteBenders, AttMatrizCorteBenders_coeficiente, idRealizacao, variaveis_estado_modelo_encontradas.at(idVariavelEstado), double()));

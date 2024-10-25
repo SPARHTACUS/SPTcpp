@@ -615,6 +615,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 					if (a_idIteracao > IdIteracao_0) {
 						const IdIteracao idIterLast = IdIteracao(a_idIteracao - 1);
 						const std::string diretorio_iteracao_last = diretorio + "//" + getFullString(idIterLast) + "//Backward";
+						a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao_last);
 						a_modeloOtimizacao.excluirArquivosCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
 					}
 
