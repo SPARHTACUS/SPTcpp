@@ -3677,7 +3677,7 @@ void ModeloOtimizacao::exportarCorteBenders(const IdProcesso a_idProcesso, const
 		if (a_idProcesso == IdProcesso_mestre)
 			a_entradaSaidaDados.setDiretorioSaida(diretorio_saida + "//Cortes");
 		else
-			a_entradaSaidaDados.setDiretorioSaida(diretorio_saida + "//Cortes//" + getFullString(a_idProcesso));
+			a_entradaSaidaDados.setDiretorioSaida(diretorio_saida + "//Cortes//" + getFullString(a_idProcesso) + "//");
 
 		a_entradaSaidaDados.setAppendArquivo(false);
 
@@ -3701,7 +3701,7 @@ void ModeloOtimizacao::excluirArquivosCorteBenders(const IdProcesso a_idProcesso
 		std::string diretorio_saida = a_entradaSaidaDados.getDiretorioSaida();
 
 		if (a_idProcesso == IdProcesso_mestre)
-			diretorio_saida += "//Cortes";
+			diretorio_saida += "//Cortes//";
 		else
 			diretorio_saida += "//Cortes//" + getFullString(a_idProcesso);
 
