@@ -109,9 +109,9 @@ void Reservatorio::calculaAproximacaoLinearEvaporacao(const double a_volumeMinim
 
 			for (int i = 0; i < numeroPontos; i++) {
 
-				gradeVolume.push_back(  (a_volumeMaximo - a_volumeMinimo) * double(double(i) / double(numeroPontos)));
+				gradeVolume.push_back(a_volumeMinimo + (a_volumeMaximo - a_volumeMinimo) * double(double(i) / double(numeroPontos)));
 
-				const double area = getAreaFromVolume(a_periodo, (gradeVolume.at(i)) + a_volumeMinimo);
+				const double area = getAreaFromVolume(a_periodo, (gradeVolume.at(i)));
 
 				const double evap = area * coefEvaporacao;
 
@@ -192,9 +192,9 @@ void Reservatorio::calculaAproximacaoLinearCotaMontante(const double a_volumeMin
 
 			for (int i = 0; i < numeroPontos; i++) {
 
-				gradeVolume.push_back((a_volumeMaximo - a_volumeMinimo) * double(double(i) / double(numeroPontos)));
+				gradeVolume.push_back(a_volumeMinimo + (a_volumeMaximo - a_volumeMinimo) * double(double(i) / double(numeroPontos)));
 
-				const double cota = getCota(a_periodo, (gradeVolume.at(i)) + a_volumeMinimo);
+				const double cota = getCota(a_periodo, (gradeVolume.at(i)));
 
 				gradeCota.push_back(cota);
 

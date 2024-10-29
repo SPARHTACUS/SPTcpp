@@ -4017,7 +4017,7 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 		for (IdRestricaoOperativaUHE idRH = getMenorId(IdRestricaoOperativaUHE()); idRH < getIdOut(IdRestricaoOperativaUHE()); idRH++) {
 			for (IdElementoSistema idEl = IdElementoSistema_1; idEl <= getMaiorId(idRH, IdElementoSistema()); idEl++) {
 				const std::string strVarElm = getString(getAtributo(idRH, idEl, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()));
-				if (strVarElm.find("nivel") != std::string::npos && strVarElm.find("vazao_bombeada") != std::string::npos) {
+				if (strVarElm.find("nivel") != std::string::npos) {
 					const IdHidreletrica idUHEvar = getAtributo(idRH, idEl, AttComumElementoSistema_hidreletrica, IdHidreletrica());
 
 					if (idUHEvar == IdHidreletrica_Nenhum)

@@ -112,6 +112,7 @@
       m(Dados,  AttComum,           nao_utilizar_restricoes_simples_em_restricoes_hidraulicas,          bool,         min,         max,         nao,      nao) \
       m(Dados,  AttComum,                            coficiente_evaporacao_regra_especial,          bool,         min,         max,         nao,      nao) \
       m(Dados,  AttComum,               maior_estagio_impressao_versao_alternativa_cortes,         IdEstagio,      min,         max,            12,      nao) \
+      m(Dados,  AttComum,               iteracao_maxima_cortes_externos,                          IdIteracao,      min,         max,            1,      nao) \
       m(Dados,  AttComum,                              mes_penalizacao_volume_util_minimo,             IdMes,      nenhum,         max,            11,      nao) \
       m(Dados,  AttComum,                  custo_acumulado_penalizacao_volume_util_minimo,            double,           0,         max,             0,      nao) \
       m(Dados,  AttComum,  taxa_considerar_tempo_viagem_agua,                            double,           0,           1,           0.2,      nao) \

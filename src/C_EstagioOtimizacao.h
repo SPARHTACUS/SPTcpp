@@ -59,6 +59,9 @@ public:
 	void esvaziar();
 	virtual ~Estagio();
 
+	bool anyCorteExterno = false;
+	bool anyVarEstadoExterna = false;
+
 	DECLARA_SMART_ELEMENTO(Estagio, SMART_ELEMENTO_ESTAGIO_OTIMIZACAO)
 
 	IdVariavelEstado            addVariavelEstado           (const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const int a_idVariavelDecisaoEstagioAnterior, bool is_externa = false);
@@ -79,8 +82,8 @@ public:
 
 	void selecaoSolucaoProxy(const int a_numero_aberturas_solucao_proxy);
 
-	void instanciarCorteBenders(const SmartEnupla<IdRealizacao, double> &a_rhs, const SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> &a_coeficiente, const SmartEnupla<IdVariavelEstado, double> &a_estado);
-	void instanciarCorteBenders(const SmartEnupla<IdRealizacao, double> &a_rhs, const SmartEnupla<IdRealizacao, double> &a_rhs_primal, const SmartEnupla<IdRealizacao, double> &a_rhs_estado, const SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> &a_coeficiente, const SmartEnupla<IdVariavelEstado, double> &a_estado);
+	void instanciarCorteBenders(const SmartEnupla<IdRealizacao, double> &a_rhs, const SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> &a_coeficiente, const SmartEnupla<IdVariavelEstado, double> &a_estado, const bool a_is_externo = false);
+	void instanciarCorteBenders(const SmartEnupla<IdRealizacao, double> &a_rhs, const SmartEnupla<IdRealizacao, double> &a_rhs_primal, const SmartEnupla<IdRealizacao, double> &a_rhs_estado, const SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> &a_coeficiente, const SmartEnupla<IdVariavelEstado, double> &a_estado, const bool a_is_externo = false);
 
 	SmartEnupla<IdCorteBenders, IdCorteBenders> sequenciarCorteBenders();
 
