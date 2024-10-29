@@ -18169,10 +18169,16 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									
 									//AttVetorHidreletrica_vazao_turbinada_maxima
 									//Atualiza se o valor PD é mais restrito que o valor CP
-									if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_turbinada_maxima, periodo, double()) > dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_turbinada_maxima, periodo_PD, double())) {
-										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_vazao_turbinada_maxima, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_turbinada_maxima, periodo_PD, double()));
-									}
 
+									if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_por_usina) {
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_turbinada_maxima) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_turbinada_maxima, periodo, double()) > dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_turbinada_maxima, periodo_PD, double())) {
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_vazao_turbinada_maxima, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_turbinada_maxima, periodo_PD, double()));
+											}
+										}//if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_turbinada_maxima) > 0) {
+
+									}//if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_por_usina) {
 
 									a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_vazao_retirada, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_retirada, periodo_PD, double()));
 									//a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_tipo_detalhamento_producao, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_tipo_detalhamento_producao, periodo_PD, double()));
@@ -19395,6 +19401,34 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 								a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttVetorRestricaoOperativaUHE_lim_sup_folga_inf, periodo, getdoubleFromChar("max"));
 						}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 					}//if (a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getSizeVetor(AttVetorRestricaoOperativaUHE_lim_sup_folga_inf) > 0) {
+				}//for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE_REF; idRestricaoOperativaUHE++) {
+
+				//4. Valida lim_sup e lim_inf
+
+				for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE_REF; idRestricaoOperativaUHE++) {
+
+					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+						const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+							double lim_inf = getdoubleFromChar("min");
+							double lim_sup = getdoubleFromChar("max");
+
+							if (a_dados.getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_inf) > 0)
+								lim_inf = a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getElementoMatriz(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, double());
+
+							if (a_dados.getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup) > 0)
+								lim_sup = a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getElementoMatriz(AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, double());
+
+							if (lim_inf > lim_sup)
+								throw std::invalid_argument("lim_inf > lim_sup na idRestricaoOperativaUHE: " + getString(idRestricaoOperativaUHE) + " e nome: " + a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
+
+						}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+					}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
 				}//for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE_REF; idRestricaoOperativaUHE++) {
 
 			}//try {

@@ -12201,7 +12201,7 @@ void Dados::validaHorizonteRestricaoOperativaUHE() {
 
 					if ((vlr_min < lim_inf) && (lim_sup < vlr_max)) {
 						if (lim_inf > lim_sup)
-							throw std::invalid_argument("lim_inf maior que lim_sup em " + getString(periodo) + " em " + getFullString(idPatamarCarga) + " em " + getFullString(idRestricaoOperativaUHE));
+							throw std::invalid_argument("lim_inf maior que lim_sup em " + getString(periodo) + " em " + getFullString(idPatamarCarga) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
 					}
 					if ((vlr_min < lim_inf) || (lim_sup < vlr_max))
 						any_valor_restrito_lim.at(idPatamarCarga) = 1;
@@ -12221,10 +12221,10 @@ void Dados::validaHorizonteRestricaoOperativaUHE() {
 
 				if ((vlr_min < fabs(var_abs_inf)) && (fabs(var_abs_inf) < vlr_max) && (vlr_min < fabs(var_abs_sup)) && (fabs(var_abs_sup) < vlr_max)) {
 					if ((var_abs_inf < 0) && (-var_abs_inf > var_abs_sup))
-						throw std::invalid_argument("-var_abs_inf abs maior que var_abs_sup em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+						throw std::invalid_argument("-var_abs_inf abs maior que var_abs_sup em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
 
 					if ((var_abs_sup < 0) && (var_abs_inf > -var_abs_sup))
-						throw std::invalid_argument("-var_abs_sup abs menor que var_abs_inf em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+						throw std::invalid_argument("-var_abs_sup abs menor que var_abs_inf em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
 				}
 				if (((vlr_min < fabs(var_abs_inf)) && (fabs(var_abs_inf) < vlr_max)) || ((vlr_min < fabs(var_abs_sup)) && (fabs(var_abs_sup) < vlr_max))) {
 					any_valor_restrito_var = 1;
@@ -12246,9 +12246,9 @@ void Dados::validaHorizonteRestricaoOperativaUHE() {
 
 				if ((vlr_min < fabs(var_rel_inf)) && (fabs(var_rel_inf) < vlr_max) && (vlr_min < fabs(var_rel_sup)) && (fabs(var_rel_sup) < vlr_max)) {
 					if ((var_rel_inf < 0) && (-var_rel_inf > var_rel_sup))
-						throw std::invalid_argument("-var_rel_inf maior que var_rel_sup em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+						throw std::invalid_argument("-var_rel_inf maior que var_rel_sup em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
 					if ((var_rel_sup < 0) && (var_rel_inf > -var_rel_sup))
-						throw std::invalid_argument("-var_rel_sup menor que var_rel_inf em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE));
+						throw std::invalid_argument("-var_rel_sup menor que var_rel_inf em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
 				}
 				if (((vlr_min < fabs(var_rel_inf)) && (fabs(var_rel_inf) < vlr_max)) || ((vlr_min < fabs(var_rel_sup)) && (fabs(var_rel_sup) < vlr_max))) {
 					any_valor_restrito_var = 1;
@@ -12271,7 +12271,7 @@ void Dados::validaHorizonteRestricaoOperativaUHE() {
 								if (getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup) > 0)
 									idPatEnd_lim_sup = getIterador2Final(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_lim_sup, periodo, IdPatamarCarga());
 								if ((idPatamarCarga > idPatEnd_lim_inf) && (idPatamarCarga > idPatEnd_lim_sup))
-									throw std::invalid_argument("Ha valores nao necessarios de fator participacao para restricao de limite em " + getString(periodo) + " em " + getFullString(idPatamarCarga) + " em " + getFullString(idRestricaoOperativaUHE) + " em " + getFullString(idElementoSistema));
+									throw std::invalid_argument("Ha valores nao necessarios de fator participacao para restricao de limite em " + getString(periodo) + " em " + getFullString(idPatamarCarga) + " em " + getFullString(idRestricaoOperativaUHE) + " em " + getFullString(idElementoSistema) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
 							}
 						}
 					}
@@ -12279,11 +12279,11 @@ void Dados::validaHorizonteRestricaoOperativaUHE() {
 
 				for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 					if ((any_valor_restrito_lim.at(idPatamarCarga) == 1) && (num_elem_fp.at(idPatamarCarga) == 0))
-						throw std::invalid_argument("Nao ha elementos com fator participacao diferente de zero para restricoes de limite em " + getString(periodo) + " em " + getFullString(idPatamarCarga) + " em " + getFullString(idRestricaoOperativaUHE));
+						throw std::invalid_argument("Nao ha elementos com fator participacao diferente de zero para restricoes de limite em " + getString(periodo) + " em " + getFullString(idPatamarCarga) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
 				}
 
 				if ((any_valor_restrito_var == 1) && (num_elem_fp.at(IdPatamarCarga_1) == 0))
-					throw std::invalid_argument("Nao ha elementos com fator participacao diferente de zero para restricao de variacao em " + getString(periodo) + " em " + getFullString(IdPatamarCarga_1) + " em " + getFullString(idRestricaoOperativaUHE));
+					throw std::invalid_argument("Nao ha elementos com fator participacao diferente de zero para restricao de variacao em " + getString(periodo) + " em " + getFullString(IdPatamarCarga_1) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
 
 			} // for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE; idRestricaoOperativaUHE++) {
 		} // for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
