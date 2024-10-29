@@ -185,6 +185,8 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 					valores_tratamento.at(1).push_back(getFullString(idEstagio) + ";" + getFullString(a_idProcesso) + ";");
 				} // if (imprimir_tempos) {
 
+				a_modeloOtimizacao.ativarCortesExternos(idEstagio);
+
 				for (int c = 0; c < numero_cenarios; c++) {
 
 					const IdCenario idCenario = IdCenario(menor_cenario + c);
@@ -480,6 +482,9 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 				a_modeloOtimizacao.atualizarModeloOtimizacaoComVariavelEstado(idEstagio, idCenario_estado, vlr_var_estado);
 
+				if (c == 0)
+					a_modeloOtimizacao.anularCortesExternos(idEstagio);
+
 				for (IdAbertura idAbertura = menor_abertura_em_cenario_estado; idAbertura <= maior_abertura_em_cenario_estado; idAbertura++) {
 
 					try {
@@ -547,6 +552,10 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 
 			if ((idEstagio > IdEstagio_1) || (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_calcular_custo_primal_via_subproblema_mestre, bool())))
 				executarPDDE_calcularCorteBenders_new(tSS, a_idIteracao, idEstagio, status_otimizacao, custo_total, sol_inf_var_dinamica, solucao_dual_var_dinamica, limite_inferior_var_dinamica, limite_superior_var_dinamica, sol_dual_var_estado, vlr_var_estado, a_modeloOtimizacao);
+
+			a_entradaSaidaDados.setDiretorioSaida(diretorio_iteracao);
+			a_modeloOtimizacao.removerCortesBendersExternos(idEstagio, a_idIteracao, a_idProcesso, a_entradaSaidaDados);
+			a_modeloOtimizacao.removerVarEstadoExterna(idEstagio, a_idIteracao);
 
 			auto stop_clock_corte = std::chrono::high_resolution_clock::now();
 
@@ -1290,7 +1299,6 @@ void MetodoSolucao::executarPDDE_calcularCorteBenders_new(const TipoSubproblemaS
 		else
 			executarPDDE_calcularCorteBendersMultiCut_new(a_idIteracao, a_idEstagio, a_custo_total, a_sol_dual_var_estado, map_solucao_dual_proxy, a_vlr_var_estado, a_modeloOtimizacao);
 
-
 	} // try {
 	catch (const std::exception& erro) { throw std::invalid_argument("MetodoSolucao(" + getString(getIdObjeto()) + ")::executarPDDE_calcularCorteBenders_new(" + getFullString(a_idEstagio) + ",...,a_modeloOtimizacao): \n" + std::string(erro.what())); }
 
@@ -1519,8 +1527,10 @@ void MetodoSolucao::executarPDDE_calcularCorteBendersSingleCut(const IdIteracao 
 					lista_enupla_rhs.at(IdRealizacao_1) += lista_custo_total.at(idCenario).at(idAbertura) * probabilidade_CVaR;
 
 					for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado < inicia_estado.getIteradorFinal(); idVariavelEstado++) {
-						lista_enupla_rhs.at(IdRealizacao_1) -= lista_sol_dual.at(idCenario).at(idAbertura).at(idVariavelEstado) * lista_estado.at(idCenario).at(idVariavelEstado) * probabilidade_CVaR;
-						lista_enupla_coeficiente.at(IdRealizacao_1).at(idVariavelEstado) += lista_sol_dual.at(idCenario).at(idAbertura).at(idVariavelEstado) * probabilidade_CVaR;
+						if (!a_modeloOtimizacao.getAtributo(a_idEstagio, idVariavelEstado, AttComumVariavelEstado_is_externa, bool())) {
+							lista_enupla_rhs.at(IdRealizacao_1) -= lista_sol_dual.at(idCenario).at(idAbertura).at(idVariavelEstado) * lista_estado.at(idCenario).at(idVariavelEstado) * probabilidade_CVaR;
+							lista_enupla_coeficiente.at(IdRealizacao_1).at(idVariavelEstado) += lista_sol_dual.at(idCenario).at(idAbertura).at(idVariavelEstado) * probabilidade_CVaR;
+						}
 					} // for (int e = 0; e < ne; e++) {
 				} // for (IdAbertura idAbertura = IdAbertura_1; idAbertura <= maior_abertura; idAbertura++) {
 
@@ -1528,6 +1538,7 @@ void MetodoSolucao::executarPDDE_calcularCorteBendersSingleCut(const IdIteracao 
 
 			} // if (sem_corte.at(idCenario) == 0) {
 		} // for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
+
 
 
 	} // try {
