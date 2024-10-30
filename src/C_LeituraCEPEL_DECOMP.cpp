@@ -17675,8 +17675,8 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						//potencia_disponivel_comandada
 
-						if (a_dados.vetorTermeletrica.at(idTermeletrica_PD).getAtributo(AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int()) > 0 && a_dados.getSize1Matriz(idTermeletrica_PD,AttMatrizTermeletrica_potencia_disponivel_comandada) == 0)
-							a_dados.vetorTermeletrica.at(idTermeletrica_PD).setMatriz(AttMatrizTermeletrica_potencia_disponivel_comandada, matriz_zero);
+						if (dados_PD.getSize1Matriz(idTermeletrica_PD,AttMatrizTermeletrica_potencia_disponivel_comandada) > 0)
+							a_dados.vetorTermeletrica.at(idTermeletrica_PD).setMatriz_forced(AttMatrizTermeletrica_potencia_disponivel_comandada, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).getMatriz(AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo(), IdPatamarCarga(), double()));
 
 
 						////////////////////////////////////////
@@ -17834,6 +17834,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						for (int pos = 0; pos < int(periodos_PD.size()); pos++)
 							horizonte_info_PD.addElemento(periodos_PD.at(pos), true);
 
+
 						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 							for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
@@ -17848,12 +17849,6 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
 										throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
 
-									//Termelétrica
-									//potencia_disponivel_comandada
-									if (dados_PD.getSize1Matriz(idTermeletrica_PD,AttMatrizTermeletrica_potencia_disponivel_comandada) > 0)
-										a_dados.vetorTermeletrica.at(idTermeletrica_PD).setElemento(AttMatrizTermeletrica_potencia_disponivel_comandada, periodo, IdPatamarCarga_1, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).getElementoMatriz(AttMatrizTermeletrica_potencia_disponivel_comandada, periodo_PD, IdPatamarCarga_1, double()));
-
-									
 									//Unidades
 
 									const bool unidades_simultaneas = a_dados.vetorTermeletrica.at(idTermeletrica_PD).getAtributo(AttComumTermeletrica_unidades_simultaneas, bool());
