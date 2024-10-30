@@ -2519,7 +2519,7 @@ void ModeloOtimizacao::criarRestricoesEvaporacao(const TipoSubproblemaSolver a_T
 		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEVA_REL(a_TSS, a_idEstagio, a_period, a_idHidreletrica), posEquEV_REL, 1.0);
 		if (getVarDecisao_QEVA_FINFseExistir(a_TSS, a_idEstagio, a_period, a_idHidreletrica) > -1) {
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEVA_FINF(a_TSS, a_idEstagio, a_period, a_idHidreletrica), posEquEV_REL, 1.0);
-			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QEVA_FINF(a_TSS, a_idEstagio, a_period, a_idHidreletrica), 1.5 * a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, a_period, double()));
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(getVarDecisao_QEVA_FINF(a_TSS, a_idEstagio, a_period, a_idHidreletrica), a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, a_period, double()) + a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_1, a_period, double()) * a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, a_period, double()));
 		}
 
 	}// try
