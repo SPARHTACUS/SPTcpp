@@ -16585,9 +16585,9 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		bool dadosPreConfig_unidade_termeletrica_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_UNIDADE_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m2);
 		bool dadosPreConfig_unidade_termeletrica_attVetor_operacional_int = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_UNIDADE_AttVetorOperacional_PorInteiro.csv", dados_PD, TipoAcessoInstancia_m2);
 
-
+		//dadosPreConfig_unidade_termeletrica_attVetor_operacional_int é opcional
 		if (dadosPreConfig_termeletrica_attComum_operacional && dadosPreConfig_termeletrica_attMatriz_operacional && dadosPreConfig_termeletrica_comando_attMatriz_operacional && dadosPreConfig_unidade_termeletrica_attComum_operacional \
-			&& dadosPreConfig_unidade_termeletrica_attMatriz_operacional && dadosPreConfig_unidade_termeletrica_attVetor_operacional && dadosPreConfig_unidade_termeletrica_attVetor_operacional_int)
+			&& dadosPreConfig_unidade_termeletrica_attMatriz_operacional && dadosPreConfig_unidade_termeletrica_attVetor_operacional)
 			is_carregar_PD_termeletricas = true;
 
 		//****************************************
@@ -16599,6 +16599,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		bool dadosPreConfig_hidreletrica_attComum_operacional = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_AttComumOperacional.csv", dados_PD, TipoAcessoInstancia_m1);
 		bool dadosPreConfig_hidreletrica_attMatriz_operacional = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m1);
 		bool dadosPreConfig_hidreletrica_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_hidreletrica_attVetor_premissa = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AttVetorPremissa_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m1);
 
 		//reservatório
 		bool dadosPreConfig_hidreletrica_reservatorio_attComum_operacional = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv", dados_PD, TipoAcessoInstancia_m2);
@@ -16607,9 +16608,9 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		//defluência
 		bool dadosPreConfig_hidreletrica_defluencia_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m2);
 
-		//Nota: dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional  não é obrigatório
-		if (dadosPreConfig_hidreletrica_attComum_operacional && dadosPreConfig_hidreletrica_attMatriz_operacional && dadosPreConfig_hidreletrica_attVetor_operacional \
-			&& dadosPreConfig_hidreletrica_reservatorio_attComum_operacional  && dadosPreConfig_hidreletrica_defluencia_attVetor_operacional)
+		//Nota: dadosPreConfig_hidreletrica_reservatorio_attComum_operacional/dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional não são obrigatórios
+		if (dadosPreConfig_hidreletrica_attComum_operacional && dadosPreConfig_hidreletrica_attMatriz_operacional  \
+			&& dadosPreConfig_hidreletrica_attVetor_operacional && dadosPreConfig_hidreletrica_defluencia_attVetor_operacional)
 			is_carregar_PD_hidreletricas = true;
 
 
@@ -17419,7 +17420,10 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				std::cout << "Carregando arquivo de preConfiguracao: TERMELETRICA_COMANDO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
 				std::cout << "Carregando arquivo de preConfiguracao: TERMELETRICA_UNIDADE_AttComumOperacional.csv..." << std::endl;
 				std::cout << "Carregando arquivo de preConfiguracao: TERMELETRICA_UNIDADE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
-				std::cout << "Carregando arquivo de preConfiguracao: TERMELETRICA_UNIDADE_AttVetorOperacional_PorInteiro.csv..." << std::endl;
+				
+				if(dadosPreConfig_unidade_termeletrica_attVetor_operacional_int)
+					std::cout << "Carregando arquivo de preConfiguracao: TERMELETRICA_UNIDADE_AttVetorOperacional_PorInteiro.csv..." << std::endl;
+				
 				std::cout << "Carregando arquivo de preConfiguracao: TERMELETRICA_UNIDADE_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
 
 				//*******************************************************************
@@ -17741,9 +17745,13 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_time_ini, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_time_ini, double()));
 							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_power_ini, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_power_ini, double()));
 
-							//Atualiza AttVetor x int				
-							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setVetor(AttVetorUnidadeUTE_ramp_shutdown, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getVetor(AttVetorUnidadeUTE_ramp_shutdown, int(), double()));
-							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setVetor(AttVetorUnidadeUTE_ramp_turnon, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getVetor(AttVetorUnidadeUTE_ramp_turnon, int(), double()));
+							//Atualiza AttVetor x int
+							
+							if(dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getSizeVetor(AttVetorUnidadeUTE_ramp_shutdown) > 0)
+								a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setVetor(AttVetorUnidadeUTE_ramp_shutdown, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getVetor(AttVetorUnidadeUTE_ramp_shutdown, int(), double()));
+							
+							if (dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getSizeVetor(AttVetorUnidadeUTE_ramp_turnon) > 0)
+								a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setVetor(AttVetorUnidadeUTE_ramp_turnon, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getVetor(AttVetorUnidadeUTE_ramp_turnon, int(), double()));
 
 							//AttVetor
 							if (a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getSizeVetor(AttVetorUnidadeUTE_representacao_discreta_producao) == 0)
@@ -17956,14 +17964,19 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
 				std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
 				std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
-				std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv..." << std::endl;
 				
+				if (dadosPreConfig_hidreletrica_reservatorio_attComum_operacional)
+					std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv..." << std::endl;
+
 				if(dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional)
 					std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
 
+				if (dadosPreConfig_hidreletrica_attVetor_premissa)
+					std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv..." << std::endl;
+
 				//*******************************************************************
-				//   Instancia termelétricas PD no CP
-				//   Testa se a termelétrica existe no CP. Caso contrário, o instancia com valores default
+				//   Instanciahidrelétricas PD no CP
+				//   Testa se a hidrelétrica existe no CP. Caso contrário, o instancia com valores default
 				//   Depois atualiza estes valores com a sobreposição dos periodos_CP e periodos_PD
 				//*******************************************************************
 
@@ -17991,11 +18004,15 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				///////////////////////////////////////////////////////////////
 
 				for (IdHidreletrica idHidreletrica_CP = idHidreletricaIni_CP; idHidreletrica_CP < idHidreletricaOut_CP; a_dados.vetorHidreletrica.incr(idHidreletrica_CP)) {
-					if (!dados_PD.vetorHidreletrica.isInstanciado(idHidreletrica_CP)) {
-						//throw std::invalid_argument("Nao instanciada informacao na pre-Config PD da usina: " + getString(idHidreletrica_CP));
-						std::cout << "Nao encontrada na pre-Config PD a usina: " << getString(idHidreletrica_CP) << std::endl;
+					
+					//Hidrelétricas "fictícias" para o cálculo das ENAs no CP (não existem na info PD)
+					if (idHidreletrica_CP != IdHidreletrica_168_ENA_SOBRADINHO && idHidreletrica_CP != IdHidreletrica_172_ENA_ITAPARICA && idHidreletrica_CP != IdHidreletrica_178_ENA_XINGO && idHidreletrica_CP != IdHidreletrica_176_COMPPAFMOX) {
 
-					}
+						if (!dados_PD.vetorHidreletrica.isInstanciado(idHidreletrica_CP))
+							throw std::invalid_argument("Nao instanciada informacao na pre-Config PD da usina: " + getString(idHidreletrica_CP));
+						
+					}//if (idHidreletrica_CP != IdHidreletrica_168_ENA_SOBRADINHO && idHidreletrica_CP != IdHidreletrica_172_ENA_ITAPARICA && idHidreletrica_CP != IdHidreletrica_178_ENA_XINGO && idHidreletrica_CP != IdHidreletrica_176_COMPPAFMOX) {
+
 				}//for (IdHidreletrica idHidreletrica_CP = idHidreletricaIni_CP; idHidreletrica_CP < idHidreletricaOut_CP; a_dados.vetorHidreletrica.incr(idHidreletrica_CP)) {
 
 				///////////////////////////////////////////////////////////////
@@ -18039,16 +18056,34 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_potencia_minima, potencia_minima);
-						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_potencia_maxima, potencia_maxima);
-						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_potencia_disponivel_minima, matriz_zero);
-						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_potencia_disponivel_maxima, matriz_zero);
-						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_vazao_turbinada_disponivel_minima, matriz_zero);
-						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_vazao_turbinada_disponivel_maxima, matriz_zero);
+						if (a_dados.getSize1Matriz(idHidreletrica_CP, AttMatrizHidreletrica_potencia_minima) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_potencia_minima, potencia_minima);
+
+						if (a_dados.getSize1Matriz(idHidreletrica_CP, AttMatrizHidreletrica_potencia_maxima) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_potencia_maxima, potencia_maxima);
+
+						if (a_dados.getSize1Matriz(idHidreletrica_CP, AttMatrizHidreletrica_vazao_defluente_minima) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_vazao_defluente_minima, matriz_zero);
+
+						if (a_dados.getSize1Matriz(idHidreletrica_CP, AttMatrizHidreletrica_vazao_defluente_maxima) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_vazao_defluente_maxima, matriz_inf);
+						
+						/////////////////////
+						//Os atributos "disponiveis" são atualizados para o horizonte todo com a disponibilidade os valores "instantâneos" (por isso, estão instanciados com a matriz_zero)
+						if (a_dados.getSize1Matriz(idHidreletrica_CP, AttMatrizHidreletrica_potencia_disponivel_minima) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_potencia_disponivel_minima, matriz_zero);
+						
+						if (a_dados.getSize1Matriz(idHidreletrica_CP, AttMatrizHidreletrica_potencia_disponivel_maxima) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_potencia_disponivel_maxima, matriz_zero);
+						
+						if (a_dados.getSize1Matriz(idHidreletrica_CP, AttMatrizHidreletrica_vazao_turbinada_disponivel_minima) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_vazao_turbinada_disponivel_minima, matriz_zero);
+						
+						if (a_dados.getSize1Matriz(idHidreletrica_CP, AttMatrizHidreletrica_vazao_turbinada_disponivel_maxima) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica_CP).setMatriz(AttMatrizHidreletrica_vazao_turbinada_disponivel_maxima, matriz_zero);
+						/////////////////////
 
 					}//if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_por_usina) {
-
-
 
 					if (dados_PD.vetorHidreletrica.isInstanciado(idHidreletrica_CP)) {
 
@@ -18066,8 +18101,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_representacao_discreta_producao, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_representacao_discreta_producao, bool()));
 						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_tempo_viagem_agua, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tempo_viagem_agua, int()));
 
-						//AttVetor
-						
+						//AttVetor					
 						if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_por_usina) {
 
 							if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_turbinada_maxima) == 0)//Este Att é definido no cálculo do engolimento máximo, vai ser mantido sempre o valor mais restrito entre o CP e a preConfig PD
@@ -18113,9 +18147,11 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_retirada) == 0)
 							a_dados.vetorHidreletrica.at(idHidreletrica_CP).setVetor(AttVetorHidreletrica_vazao_retirada, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
 
-						//AttMatriz
-						//não estão sendo usadas info matriz do PD por enquanto....
-
+						//Reservatório
+						if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).isInstanciado(IdReservatorio_1)) {//Carrega info do Reservatório se foi carregado na pre-config
+							//AttComum
+							a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_util_inicial, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_volume_util_inicial, double()));
+						}//if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).isInstanciado(IdReservatorio_1)) {
 
 						//defluencia
 						if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorDefluencia.isInstanciado(IdDefluencia_passada)) {
@@ -18158,6 +18194,9 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
 										throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
 
+									//************
+									//Hidreletrica
+									//************
 									//AttVetor
 									if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_por_usina)
 										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_disponibilidade, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_disponibilidade, periodo_PD, double()));
@@ -18178,13 +18217,141 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_vazao_retirada, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_retirada, periodo_PD, double()));
 									//a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_tipo_detalhamento_producao, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_tipo_detalhamento_producao, periodo_PD, double()));
 
+									//AttMatriz
+									if (dados_PD.getSize1Matriz(idHidreletrica_CP, AttMatrizHidreletrica_potencia_maxima) == 0)
+										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttMatrizHidreletrica_potencia_maxima, periodo, IdPatamarCarga_1, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoMatriz(AttMatrizHidreletrica_potencia_maxima, periodo_PD, IdPatamarCarga_1, double()));
+
+									if (dados_PD.getSize1Matriz(idHidreletrica_CP, AttMatrizHidreletrica_potencia_minima) == 0)
+										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttMatrizHidreletrica_potencia_minima, periodo, IdPatamarCarga_1, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoMatriz(AttMatrizHidreletrica_potencia_minima, periodo_PD, IdPatamarCarga_1, double()));
+
+									if (dados_PD.getSize1Matriz(idHidreletrica_CP, AttMatrizHidreletrica_vazao_defluente_maxima) == 0)
+										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttMatrizHidreletrica_vazao_defluente_maxima, periodo, IdPatamarCarga_1, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoMatriz(AttMatrizHidreletrica_vazao_defluente_maxima, periodo_PD, IdPatamarCarga_1, double()));
+
+									if (dados_PD.getSize1Matriz(idHidreletrica_CP, AttMatrizHidreletrica_vazao_defluente_minima) == 0)
+										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttMatrizHidreletrica_vazao_defluente_minima, periodo, IdPatamarCarga_1, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoMatriz(AttMatrizHidreletrica_vazao_defluente_minima, periodo_PD, IdPatamarCarga_1, double()));
+
+									//************
+									//Reservatorio
+									//************
+									//Premissa: volume_util_minimo / volume_util_maximo são função do volume_minimo e volume_maximo por período (são atualizados na validação Hidrelétrica)
+									if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).isInstanciado(IdReservatorio_1)) {
+										//AttVetor
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_minimo) > 0) {
+
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_minimo) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_minimo, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_volume_minimo, double())));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_minimo, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_minimo, periodo_PD, double()));
+
+										}//if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_minimo) > 0) {
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_morto_completo) > 0) {
+
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_morto_completo) == 0)//Set vetor com true
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_morto_completo, SmartEnupla<Periodo, int>(horizonte_estudo, 1));
+
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_morto_completo, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_morto_completo, periodo_PD, int()));
+										}
+										
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_enchendo_volume_morto) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_enchendo_volume_morto) == 0)//Set vetor com false
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_enchendo_volume_morto, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
+										
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_enchendo_volume_morto, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_enchendo_volume_morto, periodo_PD, int()));
+										}
+
+										//AttVetor Premissas
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_maximo) > 0) {
+											
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_maximo) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_volume_maximo, double())));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_maximo, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_maximo, periodo_PD, double()));
+										}
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_0) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_0) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_0, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_0, double())));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_volume_0, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_0, periodo_PD, double()));
+										}
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_1) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_1) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_1, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_1, double())));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_volume_1, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_1, periodo_PD, double()));
+										}
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_2) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_2) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_2, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_2, double())));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_volume_2, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_2, periodo_PD, double()));
+										}
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_3) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_3) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_3, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_3, double())));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_volume_3, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_3, periodo_PD, double()));
+										}
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_4) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_4) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_4, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_4, double())));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_volume_4, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_4, periodo_PD, double()));
+										}
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_0) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_0) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_0, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_0, double())));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_area_0, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_area_0, periodo_PD, double()));
+										}
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_1) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_1) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_1, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_1, double())));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_area_1, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_area_1, periodo_PD, double()));
+										}
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_2) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_2) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_2, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_2, double())));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_area_2, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_area_2, periodo_PD, double()));
+										}
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_3) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_3) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_3, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_3, double())));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_area_3, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_area_3, periodo_PD, double()));
+										}
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_4) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_4) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_4, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_4, double())));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_area_4, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_area_4, periodo_PD, double()));
+										}
+
+									}//if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).isInstanciado(IdReservatorio_1)) {
+
 								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
 
 							}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
 						}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-						//Calcula potencia_disponivel_minima / potencia_disponivel_maxima
+						//////////////////////////////////////////////////////////////////
+						//2.2 Calcula potencia_disponivel_minima / potencia_disponivel_maxima
+						// vazao_turbinada_disponivel_minima / vazao_turbinada_disponivel_maxima
+						//////////////////////////////////////////////////////////////////
 
 						if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_por_usina) {
 
@@ -19401,6 +19568,15 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				//4. Valida lim_sup e lim_inf
 
 				for (IdRestricaoOperativaUHE idRestricaoOperativaUHE = IdRestricaoOperativaUHE_1; idRestricaoOperativaUHE <= maiorIdRestricaoOperativaUHE_REF; idRestricaoOperativaUHE++) {
+
+					if (a_dados.getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_sup) > 0 || a_dados.getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_abs_inf) > 0 \
+						|| a_dados.getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_sup) > 0 || a_dados.getSize1Matriz(idRestricaoOperativaUHE, AttMatrizRestricaoOperativaUHE_var_rel_inf) > 0) {
+
+						if(a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getAtributo(AttComumRestricaoOperativaUHE_vlr_ini, double()) == getdoubleFromChar("max"))
+							throw std::invalid_argument("Restricao de variacao com vlr_ini infinito na idRestricaoOperativaUHE: " + getString(idRestricaoOperativaUHE) + " e nome: " + a_dados.getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
+
+					}
+
 
 					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
