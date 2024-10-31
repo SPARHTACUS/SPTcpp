@@ -18226,62 +18226,112 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									//************
 									//Reservatorio
 									//************
+									//Premissa: volume_util_minimo / volume_util_maximo são função do volume_minimo e volume_maximo por período (são atualizados na validação Hidrelétrica)
 									if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).isInstanciado(IdReservatorio_1)) {
 										//AttVetor
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_minimo) > 0)
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_minimo) > 0) {
+
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_minimo) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_minimo, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_volume_minimo, double())));
+
 											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_minimo, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_minimo, periodo_PD, double()));
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_morto_completo) > 0)
-											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_morto_completo, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_morto_completo, periodo_PD, double()));
+										}//if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_minimo) > 0) {
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_util_minimo) > 0)
-											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_util_minimo, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_util_minimo, periodo_PD, double()));
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_morto_completo) > 0) {
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_util_maximo) > 0)
-											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_util_maximo, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_util_maximo, periodo_PD, double()));
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_morto_completo) == 0)//Set vetor com true
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_morto_completo, SmartEnupla<Periodo, int>(horizonte_estudo, 1));
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_enchendo_volume_morto) > 0)
-											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_enchendo_volume_morto, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_enchendo_volume_morto, periodo_PD, double()));
+
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_morto_completo, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_morto_completo, periodo_PD, int()));
+										}
+										
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_enchendo_volume_morto) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_enchendo_volume_morto) == 0)//Set vetor com false
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_enchendo_volume_morto, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
+										
+											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_enchendo_volume_morto, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_enchendo_volume_morto, periodo_PD, int()));
+										}
 
 										//AttVetor Premissas
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_maximo) > 0)
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_maximo) > 0) {
+											
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_maximo) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_volume_maximo, double())));
+
 											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_volume_maximo, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_volume_maximo, periodo_PD, double()));
+										}
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_0) > 0)
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_0) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_0) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_0, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_0, double())));
+
 											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_volume_0, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_0, periodo_PD, double()));
+										}
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_1) > 0)
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_1) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_1) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_1, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_1, double())));
+
 											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_volume_1, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_1, periodo_PD, double()));
+										}
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_2) > 0)
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_2) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_2) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_2, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_2, double())));
+
 											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_volume_2, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_2, periodo_PD, double()));
+										}
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_3) > 0)
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_3) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_3) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_3, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_3, double())));
+
 											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_volume_3, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_3, periodo_PD, double()));
-										
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_4) > 0)
+										}
+
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_4) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_volume_4) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_4, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_4, double())));
+
 											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_volume_4, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_volume_4, periodo_PD, double()));
+										}
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_0) > 0)
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_0) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_0) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_0, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_0, double())));
+
 											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_area_0, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_area_0, periodo_PD, double()));
+										}
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_1) > 0)
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_1) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_1) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_1, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_1, double())));
+
 											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_area_1, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_area_1, periodo_PD, double()));
+										}
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_2) > 0)
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_2) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_2) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_2, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_2, double())));
+
 											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_area_2, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_area_2, periodo_PD, double()));
+										}
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_3) > 0)
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_3) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_3) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_3, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_3, double())));
+
 											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_area_3, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_area_3, periodo_PD, double()));
+										}
 
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_4) > 0)
+										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_4) > 0) {
+											if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_poli_cota_area_4) == 0)//Set vetor com o AttComum
+												a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_4, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_4, double())));
+
 											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_poli_cota_area_4, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_poli_cota_area_4, periodo_PD, double()));
-
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_percentual_volume_util_maximo) > 0)
-											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_percentual_volume_util_maximo, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_percentual_volume_util_maximo, periodo_PD, double()));
-
-										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_percentual_volume_util_minimo) > 0)
-											a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_percentual_volume_util_minimo, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(AttVetorReservatorio_percentual_volume_util_minimo, periodo_PD, double()));
+										}
 
 									}//if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).isInstanciado(IdReservatorio_1)) {
 
