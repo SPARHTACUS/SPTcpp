@@ -16585,9 +16585,9 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		bool dadosPreConfig_unidade_termeletrica_attVetor_operacional = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_UNIDADE_AttVetorOperacional_PorPeriodo.csv", dados_PD, TipoAcessoInstancia_m2);
 		bool dadosPreConfig_unidade_termeletrica_attVetor_operacional_int = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("TERMELETRICA_UNIDADE_AttVetorOperacional_PorInteiro.csv", dados_PD, TipoAcessoInstancia_m2);
 
-
+		//dadosPreConfig_unidade_termeletrica_attVetor_operacional_int é opcional
 		if (dadosPreConfig_termeletrica_attComum_operacional && dadosPreConfig_termeletrica_attMatriz_operacional && dadosPreConfig_termeletrica_comando_attMatriz_operacional && dadosPreConfig_unidade_termeletrica_attComum_operacional \
-			&& dadosPreConfig_unidade_termeletrica_attMatriz_operacional && dadosPreConfig_unidade_termeletrica_attVetor_operacional && dadosPreConfig_unidade_termeletrica_attVetor_operacional_int)
+			&& dadosPreConfig_unidade_termeletrica_attMatriz_operacional && dadosPreConfig_unidade_termeletrica_attVetor_operacional)
 			is_carregar_PD_termeletricas = true;
 
 		//****************************************
@@ -17420,7 +17420,10 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				std::cout << "Carregando arquivo de preConfiguracao: TERMELETRICA_COMANDO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
 				std::cout << "Carregando arquivo de preConfiguracao: TERMELETRICA_UNIDADE_AttComumOperacional.csv..." << std::endl;
 				std::cout << "Carregando arquivo de preConfiguracao: TERMELETRICA_UNIDADE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
-				std::cout << "Carregando arquivo de preConfiguracao: TERMELETRICA_UNIDADE_AttVetorOperacional_PorInteiro.csv..." << std::endl;
+				
+				if(dadosPreConfig_unidade_termeletrica_attVetor_operacional_int)
+					std::cout << "Carregando arquivo de preConfiguracao: TERMELETRICA_UNIDADE_AttVetorOperacional_PorInteiro.csv..." << std::endl;
+				
 				std::cout << "Carregando arquivo de preConfiguracao: TERMELETRICA_UNIDADE_AttVetorOperacional_PorPeriodo.csv..." << std::endl;
 
 				//*******************************************************************
@@ -17742,9 +17745,13 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_time_ini, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_time_ini, double()));
 							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setAtributo(AttComumUnidadeUTE_power_ini, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getAtributo(AttComumUnidadeUTE_power_ini, double()));
 
-							//Atualiza AttVetor x int				
-							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setVetor(AttVetorUnidadeUTE_ramp_shutdown, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getVetor(AttVetorUnidadeUTE_ramp_shutdown, int(), double()));
-							a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setVetor(AttVetorUnidadeUTE_ramp_turnon, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getVetor(AttVetorUnidadeUTE_ramp_turnon, int(), double()));
+							//Atualiza AttVetor x int
+							
+							if(dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getSizeVetor(AttVetorUnidadeUTE_ramp_shutdown) > 0)
+								a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setVetor(AttVetorUnidadeUTE_ramp_shutdown, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getVetor(AttVetorUnidadeUTE_ramp_shutdown, int(), double()));
+							
+							if (dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getSizeVetor(AttVetorUnidadeUTE_ramp_turnon) > 0)
+								a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).setVetor(AttVetorUnidadeUTE_ramp_turnon, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getVetor(AttVetorUnidadeUTE_ramp_turnon, int(), double()));
 
 							//AttVetor
 							if (a_dados.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidade_PD).getSizeVetor(AttVetorUnidadeUTE_representacao_discreta_producao) == 0)
