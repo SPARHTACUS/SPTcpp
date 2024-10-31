@@ -36,7 +36,6 @@
 
 
 #define ATT_VETOR_TERMELETRICA(m)  \
-	  m(Termeletrica,  AttVetor,            tipo_detalhamento_producao,  TipoDetalhamentoProducaoTermeletrica,         min,              max,           min,        Periodo) \
 	  m(Termeletrica,  AttVetor,                          ramp_turnon,                                double,            1,              max,             0,        int) \
 	  m(Termeletrica,  AttVetor,                        ramp_shutdown,                                double,            1,              max,             0,        int) \
 	  m(Termeletrica,  AttVetor,       representacao_discreta_producao,                                   int,           0,                1,             0,        Periodo) \

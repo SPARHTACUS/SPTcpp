@@ -3703,7 +3703,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const TipoSubproblemaSolver a_T
 					// Defluencia Hidrelétrica Folga Minima (QDEF_FINF)
 					if (a_dados.getSizeVetor(idUHE, AttVetorHidreletrica_vazao_defluente_minima) > 0.0) {
 						if (a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_vazao_defluente_minima, a_period, double()) > 0.0) {
-							if (getVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, a_period, idUHE) < 0)
+							if (getVarDecisao_QDEF_FINFseExistir(a_TSS, a_idEstagio, a_period, idUHE) < 0)
 								addVarDecisao_QDEF_FINF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
 
 							if (getVarDecisao_QDEFseExistir(a_TSS, a_idEstagio, a_period, idUHE) < 0)
@@ -3721,7 +3721,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const TipoSubproblemaSolver a_T
 					// Defluencia Hidrelétrica Folga Maxima (QDEF_FSUP)
 					if (a_dados.getSizeVetor(idUHE, AttVetorHidreletrica_vazao_defluente_maxima) > 0.0) {
 						if ((a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_vazao_defluente_maxima, a_period, double()) > 0.0) && (a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_vazao_defluente_maxima, a_period, double()) != getdoubleFromChar("max"))) {
-							if (getVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, a_period, idUHE) < 0)
+							if (getVarDecisao_QDEF_FSUPseExistir(a_TSS, a_idEstagio, a_period, idUHE) < 0)
 								addVarDecisao_QDEF_FSUP(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
 
 							if (getVarDecisao_QDEFseExistir(a_TSS, a_idEstagio, a_period, idUHE) < 0)
