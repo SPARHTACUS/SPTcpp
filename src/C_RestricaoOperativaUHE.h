@@ -29,10 +29,10 @@
 #define ATT_MATRIZ_REST_OPER_LIMITE_UHE(m)  \
 	  m(RestricaoOperativaUHE,  AttMatriz,    var_abs_inf,     double,          min,          max,             max,  Periodo, IdPatamarCarga) \
 	  m(RestricaoOperativaUHE,  AttMatriz,    var_abs_sup,     double,          min,          max,             max,  Periodo, IdPatamarCarga) \
-	  m(RestricaoOperativaUHE,  AttMatriz,    var_rel_inf,     double,          min,          max,             max,  Periodo, IdPatamarCarga) \
-	  m(RestricaoOperativaUHE,  AttMatriz,    var_rel_sup,     double,          min,          max,             max,  Periodo, IdPatamarCarga) \
-	  m(RestricaoOperativaUHE,  AttMatriz,             lim_inf,     double,          min,          max,             max,  Periodo, IdPatamarCarga) \
-      m(RestricaoOperativaUHE,  AttMatriz,             lim_sup,     double,          min,          max,             max,  Periodo, IdPatamarCarga) 
+	  m(RestricaoOperativaUHE,  AttMatriz,    var_rel_inf,     double,          0.0,          max,             max,  Periodo, IdPatamarCarga) \
+	  m(RestricaoOperativaUHE,  AttMatriz,    var_rel_sup,     double,          0.0,          max,             max,  Periodo, IdPatamarCarga) \
+	  m(RestricaoOperativaUHE,  AttMatriz,        lim_inf,     double,          min,          max,             max,  Periodo, IdPatamarCarga) \
+      m(RestricaoOperativaUHE,  AttMatriz,        lim_sup,     double,          min,          max,             max,  Periodo, IdPatamarCarga) 
 
 //Nota: lim_inf/lim_sup com valor max não é considerado dentro do modelo
 

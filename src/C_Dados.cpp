@@ -10395,11 +10395,8 @@ void Dados::validaContrato() {
 				}
 
 				if ((vlr_min < fabs(var_abs_inf)) && (fabs(var_abs_inf) < vlr_max) && (vlr_min < fabs(var_abs_sup)) && (fabs(var_abs_sup) < vlr_max)) {
-					if ((var_abs_inf < 0) && (-var_abs_inf > var_abs_sup))
-						throw std::invalid_argument("-var_abs_inf abs maior que var_abs_sup em " + getString(periodo) + " em " + getFullString(idContrato));
-
-					if ((var_abs_sup < 0) && (var_abs_inf > -var_abs_sup))
-						throw std::invalid_argument("-var_abs_sup abs menor que var_abs_inf em " + getString(periodo) + " em " + getFullString(idContrato));
+					if (var_abs_inf > var_abs_sup)
+						throw std::invalid_argument("var_abs_inf maior que var_abs_sup em " + getString(periodo) + " em " + getFullString(idContrato));
 				}
 				if (((vlr_min < fabs(var_abs_inf)) && (fabs(var_abs_inf) < vlr_max)) || ((vlr_min < fabs(var_abs_sup)) && (fabs(var_abs_sup) < vlr_max))) {
 					any_valor_restrito_var = 1;
@@ -10420,10 +10417,8 @@ void Dados::validaContrato() {
 				}
 
 				if ((vlr_min < fabs(var_rel_inf)) && (fabs(var_rel_inf) < vlr_max) && (vlr_min < fabs(var_rel_sup)) && (fabs(var_rel_sup) < vlr_max)) {
-					if ((var_rel_inf < 0) && (-var_rel_inf > var_rel_sup))
-						throw std::invalid_argument("-var_rel_inf maior que var_rel_sup em " + getString(periodo) + " em " + getFullString(idContrato));
-					if ((var_rel_sup < 0) && (var_rel_inf > -var_rel_sup))
-						throw std::invalid_argument("-var_rel_sup menor que var_rel_inf em " + getString(periodo) + " em " + getFullString(idContrato));
+					if (var_rel_inf > var_rel_sup)
+						throw std::invalid_argument("var_rel_inf maior que var_rel_sup em " + getString(periodo) + " em " + getFullString(idContrato));
 				}
 				if (((vlr_min < fabs(var_rel_inf)) && (fabs(var_rel_inf) < vlr_max)) || ((vlr_min < fabs(var_rel_sup)) && (fabs(var_rel_sup) < vlr_max))) {
 					any_valor_restrito_var = 1;
@@ -12032,11 +12027,8 @@ void Dados::validaHorizonteRestricaoEletrica() {
 				}
 
 				if ((vlr_min < fabs(var_abs_inf)) && (fabs(var_abs_inf) < vlr_max) && (vlr_min < fabs(var_abs_sup)) && (fabs(var_abs_sup) < vlr_max)) {
-					if ((var_abs_inf < 0) && (-var_abs_inf > var_abs_sup))
-						throw std::invalid_argument("-var_abs_inf abs maior que var_abs_sup em " + getString(periodo) + " em " + getFullString(idRestricaoEletrica));
-
-					if ((var_abs_sup < 0) && (var_abs_inf > -var_abs_sup))
-						throw std::invalid_argument("-var_abs_sup abs menor que var_abs_inf em " + getString(periodo) + " em " + getFullString(idRestricaoEletrica));
+					if (var_abs_inf > var_abs_sup)
+						throw std::invalid_argument("var_abs_inf maior que var_abs_sup em " + getString(periodo) + " em " + getFullString(idRestricaoEletrica));
 				}
 				if (((vlr_min < fabs(var_abs_inf)) && (fabs(var_abs_inf) < vlr_max)) || ((vlr_min < fabs(var_abs_sup)) && (fabs(var_abs_sup) < vlr_max))) {
 					any_valor_restrito_var = 1;
@@ -12057,10 +12049,8 @@ void Dados::validaHorizonteRestricaoEletrica() {
 				}
 
 				if ((vlr_min < fabs(var_rel_inf)) && (fabs(var_rel_inf) < vlr_max) && (vlr_min < fabs(var_rel_sup)) && (fabs(var_rel_sup) < vlr_max)) {
-					if ((var_rel_inf < 0) && (-var_rel_inf > var_rel_sup))
-						throw std::invalid_argument("-var_rel_inf maior que var_rel_sup em " + getString(periodo) + " em " + getFullString(idRestricaoEletrica));
-					if ((var_rel_sup < 0) && (var_rel_inf > -var_rel_sup))
-						throw std::invalid_argument("-var_rel_sup menor que var_rel_inf em " + getString(periodo) + " em " + getFullString(idRestricaoEletrica));
+					if (var_rel_inf > var_rel_sup)
+						throw std::invalid_argument("var_rel_inf maior que var_rel_sup em " + getString(periodo) + " em " + getFullString(idRestricaoEletrica));
 				}
 				if (((vlr_min < fabs(var_rel_inf)) && (fabs(var_rel_inf) < vlr_max)) || ((vlr_min < fabs(var_rel_sup)) && (fabs(var_rel_sup) < vlr_max))) {
 					any_valor_restrito_var = 1;
@@ -12178,11 +12168,8 @@ void Dados::validaHorizonteRestricaoOperativaUHE() {
 				}
 
 				if ((vlr_min < fabs(var_abs_inf)) && (fabs(var_abs_inf) < vlr_max) && (vlr_min < fabs(var_abs_sup)) && (fabs(var_abs_sup) < vlr_max)) {
-					if ((var_abs_inf < 0) && (-var_abs_inf > var_abs_sup))
-						throw std::invalid_argument("-var_abs_inf abs maior que var_abs_sup em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
-
-					if ((var_abs_sup < 0) && (var_abs_inf > -var_abs_sup))
-						throw std::invalid_argument("-var_abs_sup abs menor que var_abs_inf em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
+					if (var_abs_inf > var_abs_sup)
+						throw std::invalid_argument("var_abs_inf maior que var_abs_sup em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
 				}
 				if (((vlr_min < fabs(var_abs_inf)) && (fabs(var_abs_inf) < vlr_max)) || ((vlr_min < fabs(var_abs_sup)) && (fabs(var_abs_sup) < vlr_max))) {
 					any_valor_restrito_var = 1;
@@ -12203,10 +12190,8 @@ void Dados::validaHorizonteRestricaoOperativaUHE() {
 				}
 
 				if ((vlr_min < fabs(var_rel_inf)) && (fabs(var_rel_inf) < vlr_max) && (vlr_min < fabs(var_rel_sup)) && (fabs(var_rel_sup) < vlr_max)) {
-					if ((var_rel_inf < 0) && (-var_rel_inf > var_rel_sup))
-						throw std::invalid_argument("-var_rel_inf maior que var_rel_sup em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
-					if ((var_rel_sup < 0) && (var_rel_inf > -var_rel_sup))
-						throw std::invalid_argument("-var_rel_sup menor que var_rel_inf em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
+					if (var_rel_inf > var_rel_sup)
+						throw std::invalid_argument("var_rel_inf maior que var_rel_sup em " + getString(periodo) + " em " + getFullString(idRestricaoOperativaUHE) + " nome: " + getAtributo(idRestricaoOperativaUHE, AttComumRestricaoOperativaUHE_nome, std::string()));
 				}
 				if (((vlr_min < fabs(var_rel_inf)) && (fabs(var_rel_inf) < vlr_max)) || ((vlr_min < fabs(var_rel_sup)) && (fabs(var_rel_sup) < vlr_max))) {
 					any_valor_restrito_var = 1;

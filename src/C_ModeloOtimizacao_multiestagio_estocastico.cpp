@@ -6870,7 +6870,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicas(const TipoSubproblemaSolver a_
 			if (a_idPat == idPatEndPer) {
 
 				//******************************************************
-				//Formulacao: RH + RH_FINF >= RH_lag1 - var_abs_inf
+				//Formulacao: RH + RH_FINF >= RH_lag1 + var_abs_inf
 				//******************************************************
 
 				if (a_dados.getSize1Matriz(idRH, AttMatrizRestricaoOperativaUHE_var_abs_inf) > 0) {
@@ -6896,7 +6896,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicas(const TipoSubproblemaSolver a_
 									varRH_prev = addVarDecisao_RH(a_TSS, a_idEstagio, a_periodPrev, idRH, 0.0, infinito, 0.0);
 									vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_RH(a_TSS, a_idEstagio, a_periodPrev, idRH)), varRH_prev, criarRestricoesHidraulicas(a_TSS, a_dados, IdEstagio(a_idEstagio - 1), a_periodPrev, a_period, IdPatamarCarga_Nenhum, idRH));
 								}
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRH_VINF, -var_abs_inf);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRH_VINF, var_abs_inf);
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRH_prev, ineRH_VINF, -1.0);
 							}
 						} // if (getIneLinear_RH_VINFseExistir(a_TSS, a_idEstagio, a_period, idRH) == -1) {
@@ -6940,7 +6940,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicas(const TipoSubproblemaSolver a_
 				} // if (a_dados.getSize1Matriz(idRH, AttMatrizRestricaoOperativaUHE_lim_sup) > 0) {
 
 				//************************************************************
-				//Formulacao: RH + RH_FINF >= RH_lag1 * (1 - var_rel_inf)
+				//Formulacao: RH + RH_FINF >= RH_lag1 * var_rel_inf
 				//************************************************************
 
 				if (a_dados.getSize1Matriz(idRH, AttMatrizRestricaoOperativaUHE_var_rel_inf) > 0) {
@@ -6966,7 +6966,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicas(const TipoSubproblemaSolver a_
 									varRH_prev = addVarDecisao_RH(a_TSS, a_idEstagio, a_periodPrev, idRH, 0.0, infinito, 0.0);
 									vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_RH(a_TSS, a_idEstagio, a_periodPrev, idRH)), varRH_prev, criarRestricoesHidraulicas(a_TSS, a_dados, IdEstagio(a_idEstagio - 1), a_periodPrev, a_period, IdPatamarCarga_Nenhum, idRH));
 								}
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRH_prev, ineRH_VINF, -(1.0 - var_rel_inf));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRH_prev, ineRH_VINF, - var_rel_inf);
 							}
 						} // if (getIneLinear_RH_VINFseExistir(a_TSS, a_idEstagio, a_period, idRH) == -1) {
 
@@ -6974,7 +6974,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicas(const TipoSubproblemaSolver a_
 				} // if (a_dados.getSize1Matriz(idRH, AttMatrizRestricaoOperativaUHE_lim_inf) > 0) {
 
 				//************************************************************
-				//Formulacao: RH + RH_FSUP <= RH_lag1 * (1 + var_rel_sup)
+				//Formulacao: RH + RH_FSUP <= RH_lag1 * var_rel_sup
 				//************************************************************
 
 				if (a_dados.getSize1Matriz(idRH, AttMatrizRestricaoOperativaUHE_var_rel_sup) > 0) {
@@ -7000,7 +7000,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicas(const TipoSubproblemaSolver a_
 									varRH_prev = addVarDecisao_RH(a_TSS, a_idEstagio, a_periodPrev, idRH, 0.0, infinito, 0.0);
 									vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_RH(a_TSS, a_idEstagio, a_periodPrev, idRH)), varRH_prev, criarRestricoesHidraulicas(a_TSS, a_dados, IdEstagio(a_idEstagio - 1), a_periodPrev, a_period, IdPatamarCarga_Nenhum, idRH));
 								}
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRH_prev, ineRH_VSUP, 1.0 + var_rel_sup);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRH_prev, ineRH_VSUP, var_rel_sup);
 							}
 						} // if (getIneLinear_RH_VSUPseExistir(a_TSS, a_idEstagio, a_period, idRH) == -1) {
 
@@ -7461,7 +7461,7 @@ void ModeloOtimizacao::criarContratos(const TipoSubproblemaSolver a_TSS, Dados& 
 			if (a_idPat == idPatEndPer) {
 
 				//******************************************************
-				//Formulacao: PCON >= PCON_prev - var_abs_inf
+				//Formulacao: PCON >= PCON_prev + var_abs_inf
 				//******************************************************
 
 				if (a_dados.getSize1Matriz(idCon, AttMatrizContrato_var_abs_inf) > 0) {
@@ -7499,7 +7499,7 @@ void ModeloOtimizacao::criarContratos(const TipoSubproblemaSolver a_TSS, Dados& 
 									varPCON_prev_lastStage = addVarDecisao_PCON(a_TSS, IdEstagio(a_idEstagio - 1), a_periodPrev, idCon, tipo_contrato, 0.0, infinito, 0.0);
 								vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_PCON(a_TSS, a_idEstagio, a_periodPrev, idCon, tipo_contrato)), varPCON_prev, varPCON_prev_lastStage);
 							}
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(inePCON_VINF, -var_abs_inf);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(inePCON_VINF, var_abs_inf);
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPCON_prev, inePCON_VINF, -1.0);
 						}
 
@@ -7553,7 +7553,7 @@ void ModeloOtimizacao::criarContratos(const TipoSubproblemaSolver a_TSS, Dados& 
 				} // if (a_dados.getSize1Matriz(idCon, AttMatrizContrato_lim_sup) > 0) {
 
 				//************************************************************
-				//Formulacao: PCON >= PCON_lag1 * (1 - var_rel_inf)
+				//Formulacao: PCON >= PCON_lag1 * var_rel_inf
 				//************************************************************
 
 				if (a_dados.getSize1Matriz(idCon, AttMatrizContrato_var_rel_inf) > 0) {
@@ -7591,14 +7591,14 @@ void ModeloOtimizacao::criarContratos(const TipoSubproblemaSolver a_TSS, Dados& 
 									varPCON_prev_lastStage = addVarDecisao_PCON(a_TSS, IdEstagio(a_idEstagio - 1), a_periodPrev, idCon, tipo_contrato, 0.0, infinito, 0.0);
 								vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_PCON(a_TSS, a_idEstagio, a_periodPrev, idCon, tipo_contrato)), varPCON_prev, varPCON_prev_lastStage);
 							}
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPCON_prev, inePCON_VINF, -(1.0 + var_rel_inf));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPCON_prev, inePCON_VINF, -var_rel_inf);
 						}
 
 					} // if ((var_rel_inf > vlr_min) && (var_rel_inf < vlr_max)) {
 				} // if (a_dados.getSize1Matriz(idCon, AttMatrizContrato_lim_inf) > 0) {
 
 				//************************************************************
-				//Formulacao: PCON <= PCON_lag1 * (1 + var_rel_sup)
+				//Formulacao: PCON <= PCON_lag1 * var_rel_sup
 				//************************************************************
 
 				if (a_dados.getSize1Matriz(idCon, AttMatrizContrato_var_rel_sup) > 0) {
@@ -7636,7 +7636,7 @@ void ModeloOtimizacao::criarContratos(const TipoSubproblemaSolver a_TSS, Dados& 
 									varPCON_prev_lastStage = addVarDecisao_PCON(a_TSS, IdEstagio(a_idEstagio - 1), a_periodPrev, idCon, tipo_contrato, 0.0, infinito, 0.0);
 								vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_PCON(a_TSS, a_idEstagio, a_periodPrev, idCon, tipo_contrato)), varPCON_prev, varPCON_prev_lastStage);
 							}
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPCON_prev, inePCON_VSUP, (1.0 + var_rel_sup));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPCON_prev, inePCON_VSUP, var_rel_sup);
 						}
 
 					} // if ((var_rel_sup > vlr_min) && (var_rel_sup < vlr_max)) {
@@ -7828,7 +7828,7 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 			if (a_idPat == idPatEndPer) {
 
 				//******************************************************
-				//Formulacao: RE + RE_FINF >= RE_lag1 - var_abs_inf
+				//Formulacao: RE + RE_FINF >= RE_lag1 + var_abs_inf
 				//******************************************************
 
 				if (a_dados.getSize1Matriz(idRE, AttMatrizRestricaoEletrica_var_abs_inf) > 0) {
@@ -7854,7 +7854,7 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 									varRE_prev = addVarDecisao_RE(a_TSS, a_idEstagio, a_periodPrev, idRE, 0.0, infinito, 0.0);
 									vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_RE(a_TSS, a_idEstagio, a_periodPrev, idRE)), varRE_prev, criarRestricoesEletricas(a_TSS, a_dados, IdEstagio(a_idEstagio - 1), a_periodPrev, a_period, IdPatamarCarga_Nenhum, idRE));
 								}
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRE_VINF, -var_abs_inf);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRE_VINF, var_abs_inf);
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRE_prev, ineRE_VINF, -1.0);
 							}
 						} // if (getIneLinear_RE_VINFseExistir(a_TSS, a_idEstagio, a_period, idRE) == -1) {
@@ -7898,13 +7898,13 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 				} // if (a_dados.getSize1Matriz(idRE, AttMatrizRestricaoEletrica_lim_sup) > 0) {
 
 				//************************************************************
-				//Formulacao: RE + RE_FINF >= RE_lag1 * (1 - var_rel_inf)
+				//Formulacao: RE + RE_FINF >= RE_lag1 * var_rel_inf
 				//************************************************************
 
 				if (a_dados.getSize1Matriz(idRE, AttMatrizRestricaoEletrica_var_rel_inf) > 0) {
 					const double var_rel_inf = a_dados.getElementoMatriz(idRE, AttMatrizRestricaoEletrica_var_rel_inf, a_period, IdPatamarCarga_1, double());
 
-					if ((vlr_min != var_rel_inf) && (vlr_max != var_rel_inf)) {
+					if (vlr_max != var_rel_inf) {
 
 						const int varRE = criarRestricoesEletricas(a_TSS, a_dados, a_idEstagio, a_period, a_periodNext, IdPatamarCarga_Nenhum, idRE);
 						if (getIneLinear_RE_VRINFseExistir(a_TSS, a_idEstagio, a_period, idRE) == -1) {
@@ -7924,15 +7924,15 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 									varRE_prev = addVarDecisao_RE(a_TSS, a_idEstagio, a_periodPrev, idRE, 0.0, infinito, 0.0);
 									vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_RE(a_TSS, a_idEstagio, a_periodPrev, idRE)), varRE_prev, criarRestricoesEletricas(a_TSS, a_dados, IdEstagio(a_idEstagio - 1), a_periodPrev, a_period, IdPatamarCarga_Nenhum, idRE));
 								}
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRE_prev, ineRE_VINF, -(1.0 - var_rel_inf));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRE_prev, ineRE_VINF, -var_rel_inf);
 							}
 						} // if (getIneLinear_RE_VINFseExistir(a_TSS, a_idEstagio, a_period, idRE) == -1) {
 
-					} // if ((vlr_min != var_rel_inf) && (vlr_max != var_rel_inf)) {
+					} // if (vlr_max != var_rel_inf) {
 				} // if (a_dados.getSize1Matriz(idRE, AttMatrizRestricaoEletrica_lim_inf) > 0) {
 
 				//************************************************************
-				//Formulacao: RE + RE_FSUP <= RE_lag1 * (1 + var_rel_sup)
+				//Formulacao: RE + RE_FSUP <= RE_lag1 * var_rel_sup
 				//************************************************************
 
 				if (a_dados.getSize1Matriz(idRE, AttMatrizRestricaoEletrica_var_rel_sup) > 0) {
@@ -7958,7 +7958,7 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 									varRE_prev = addVarDecisao_RE(a_TSS, a_idEstagio, a_periodPrev, idRE, 0.0, infinito, 0.0);
 									vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_RE(a_TSS, a_idEstagio, a_periodPrev, idRE)), varRE_prev, criarRestricoesEletricas(a_TSS, a_dados, IdEstagio(a_idEstagio - 1), a_periodPrev, a_period, IdPatamarCarga_Nenhum, idRE));
 								}
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRE_prev, ineRE_VSUP, 1.0 + var_rel_sup);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRE_prev, ineRE_VSUP, var_rel_sup);
 							}
 						} // if (getIneLinear_RE_VSUPseExistir(a_TSS, a_idEstagio, a_period, idRE) == -1) {
 
