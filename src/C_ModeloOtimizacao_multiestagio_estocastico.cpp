@@ -5770,9 +5770,6 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 
 	try {
 
-		if ((!vetorEstagio.at(a_idEstagio).isSolverInstanciado(a_TSS)) || (a_TSS == TipoSubproblemaSolver_mestre) || (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica))
-			return -1;
-
 		const IdEstagio menor_estagio = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
 
 		if (a_idEstagio < menor_estagio) {
@@ -5781,6 +5778,9 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 			else
 				return -2;
 		}
+
+		if ((!vetorEstagio.at(a_idEstagio).isSolverInstanciado(a_TSS)) || (a_TSS == TipoSubproblemaSolver_mestre) || (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica))
+			return -1;
 
 		const int lag_mensal_potencia_comandada = a_dados.getAtributo(a_idUTE, AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada, int());
 		if (lag_mensal_potencia_comandada == 0)
