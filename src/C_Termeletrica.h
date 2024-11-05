@@ -59,8 +59,7 @@
 	  m(Termeletrica,  AttMatriz,                potencia_maxima,        double,          0,          max,             0,  Periodo,   IdPatamarCarga) \
 	  m(Termeletrica,  AttMatriz,     potencia_disponivel_minima,        double,          0,          max,             0,  Periodo,   IdPatamarCarga) \
 	  m(Termeletrica,  AttMatriz,     potencia_disponivel_maxima,        double,          0,          max,             0,  Periodo,   IdPatamarCarga) \
-	  m(Termeletrica,  AttMatriz,  potencia_disponivel_comandada,        double,          0,          max,             0,  Periodo,   IdPatamarCarga) \
-	  m(Termeletrica,  AttMatriz,       potencia_disponivel_meta,        double,          0,          max,             0,  IdCenario, Periodo) 
+	  m(Termeletrica,  AttMatriz,  potencia_disponivel_comandada,        double,          0,          max,             0,  Periodo,   IdPatamarCarga) 
 //          c_classe,    smrtAtt,                   nomeAtributo,          Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define MEMBRO_TERMELETRICA(m)          \

@@ -114,11 +114,7 @@
       m(Hidreletrica,  AttMatriz,                   vazao_defluente_minima,     double,          0,      50000,              0,  Periodo, IdPatamarCarga) \
       m(Hidreletrica,  AttMatriz,                   vazao_defluente_maxima,     double,          0,        max,            max,  Periodo, IdPatamarCarga) \
       m(Hidreletrica,  AttMatriz,                    vazao_desviada_minima,     double,          0,      50000,              0,  Periodo, IdPatamarCarga) \
-      m(Hidreletrica,  AttMatriz,                    vazao_desviada_maxima,     double,          0,        max,            max,  Periodo, IdPatamarCarga) \
-      m(Hidreletrica,  AttMatriz,                 potencia_disponivel_meta,     double,          0,        max,              0,  IdCenario, Periodo) \
-      m(Hidreletrica,  AttMatriz,          vazao_turbinada_disponivel_meta,     double,          0,        max,              0,  IdCenario, Periodo) \
-      m(Hidreletrica,  AttMatriz,                       vazao_vertida_meta,     double,          0,        max,              0,  IdCenario, Periodo) \
-      m(Hidreletrica,  AttMatriz,                     vazao_evaporada_meta,     double,        min,        max,              0,  IdCenario, Periodo)
+      m(Hidreletrica,  AttMatriz,                    vazao_desviada_maxima,     double,          0,        max,            max,  Periodo, IdPatamarCarga) 
 //          c_classe,    smrtAtt,                             nomeAtributo,       Tipo, lowerBound,   upperBound,  initialValue, TipoIterador
 
 #define MEMBRO_HIDRELETRICA(m)                  \

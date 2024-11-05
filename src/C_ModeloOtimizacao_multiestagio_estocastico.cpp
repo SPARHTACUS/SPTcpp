@@ -2078,7 +2078,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVazao(const TipoSu
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEVA_REL(a_TSS, a_idEstagio, a_period, a_idHidreletrica), posEquBH, 1.0);
 
 			// CRIA RESTRIÇÃO EVAPORAÇÃO
-			if (a_idPat == IdPatamarCarga_1 && a_dados.getSize1Matriz(a_idHidreletrica, AttMatrizHidreletrica_vazao_evaporada_meta) == 0)
+			if (a_idPat == IdPatamarCarga_1)
 				criarRestricoesEvaporacao(a_TSS, a_dados, a_idEstagio, a_period, a_idHidreletrica, a_periodNext);
 		}
 
@@ -2246,8 +2246,7 @@ void ModeloOtimizacao::criarRestricoesBalancoHidraulicoUsinaByVolume(const TipoS
 
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QEVA_REL(a_TSS, a_idEstagio, a_period, a_idHidreletrica), posEquBH, conversor_vazao_volume_periodo);
 
-				if (a_dados.getSize1Matriz(a_idHidreletrica, AttMatrizHidreletrica_vazao_evaporada_meta) == 0)
-					criarRestricoesEvaporacao(a_TSS, a_dados, a_idEstagio, a_period, a_idHidreletrica, a_periodNext);
+				criarRestricoesEvaporacao(a_TSS, a_dados, a_idEstagio, a_period, a_idHidreletrica, a_periodNext);
 			}
 
 			// Variável VI
@@ -2868,21 +2867,6 @@ void ModeloOtimizacao::criarRestricoesCustoPenalidade(const TipoSubproblemaSolve
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idUHE), posEquZP, -a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
 
 
-			if (a_dados.getSize1Matriz(idUHE, AttMatrizHidreletrica_potencia_disponivel_meta) > 0) {
-
-				if (a_idPat == IdPatamarCarga_1) {
-
-					if (getVarDecisao_PHDISPMETA_FINFseExistir(a_TSS, a_idEstagio, a_period, idUHE) > -1)
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISPMETA_FINF(a_TSS, a_idEstagio, a_period, idUHE), posEquZP, -5000);
-
-					if (getVarDecisao_PHDISPMETA_FSUPseExistir(a_TSS, a_idEstagio, a_period, idUHE) > -1)
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISPMETA_FSUP(a_TSS, a_idEstagio, a_period, idUHE), posEquZP, -5000);
-
-
-				}//if (a_idPat == IdPatamarCarga_1) {
-
-			}//if (a_dados.getSize1Matriz(idUHE, AttMatrizHidreletrica_potencia_disponivel_meta) > 0) {
-
 			for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= a_dados.getMaiorId(idUHE, IdConjuntoHidraulico()); idConjuntoHidraulico++) {
 
 				//
@@ -3314,37 +3298,6 @@ void ModeloOtimizacao::criarVariaveisVolume(const TipoSubproblemaSolver a_TSS, D
 
 			} // if (a_dados.getAtributo(idUHE, AttComumHidreletrica_considerar_usina, bool())){
 
-			if (a_dados.getSize1Matriz(idUHE, IdReservatorio_1, AttMatrizReservatorio_volume_meta) > 0) {
-
-				if (a_dados.getElementoMatriz(idUHE, IdReservatorio_1, AttMatrizReservatorio_volume_meta, IdCenario_1, a_period, double()) != getdoubleFromChar("max")) {
-
-					IdVariavelEstado idVariavelEstado = IdVariavelEstado_Nenhum;
-
-					if (a_period == a_periodEnd_stage) {
-
-						const int varDecisao_VF = getVarDecisao_VF(a_TSS, a_idEstagio, a_period, idUHE);
-						idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeSolverVarDecisao_VF(a_TSS, a_idEstagio, a_period, idUHE), varDecisao_VF, -1);
-
-					}//if (a_period == a_periodEnd_stage) {
-					else {
-						//Pega o VI do periodo_seguinte
-
-						const int varDecisao_VI = getVarDecisao_VI(a_TSS, a_idEstagio, a_periodNext, idUHE);
-						idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeSolverVarDecisao_VI(a_TSS, a_idEstagio, a_periodNext, idUHE), varDecisao_VI, -1);
-
-					}//else {
-
-					const IdCenario menor_cenario = IdCenario_1;
-					const IdCenario maior_cenario = arranjoResolucao.getAtributo(AttComumArranjoResolucao_maior_cenario, IdCenario());
-
-					vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
-					for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
-						vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idUHE, IdReservatorio_1, AttMatrizReservatorio_volume_meta, idCenario, a_period, double()));
-
-				}//if (a_dados.getElementoMatriz(idUHE, IdReservatorio_1, AttMatrizReservatorio_volume_meta, IdCenario_1, a_period, double()) != getdoubleFromChar("min")) {
-
-			} // if (a_dados.getSize1Matriz(idUHE, IdReservatorio_1, AttMatrizReservatorio_volume_meta) > 0) {
-
 		} // for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE < idUHEOut; a_dados.vetorHidreletrica.incr(idUHE)) {
 
 	}// try
@@ -3428,31 +3381,7 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const TipoSubproblemaSolver a_T
 
 				if (a_idPat == IdPatamarCarga_1) {
 
-					if (a_dados.getSize1Matriz(idUHE, AttMatrizHidreletrica_vazao_evaporada_meta) > 0) {
-
-						//Evaporacao_meta
-
-						// EVAPORAÇÃO RELAXADA(QEVA_REL)
-						const int varQE_REL = addVarDecisao_QEVA_REL(a_TSS, a_idEstagio, a_period, idUHE, -infinito, infinito, 0.0);
-
-						if (a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_vazao_evaporada_meta, IdCenario_1, a_period, double()) != getdoubleFromChar("max")) {
-
-							const IdVariavelEstado idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeSolverVarDecisao_QEVA_REL(a_TSS, a_idEstagio, a_period, idUHE), varQE_REL, -1);
-
-							const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
-							const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_menor_cenario, IdCenario());
-							const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_maior_cenario, IdCenario());
-
-							vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
-							for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
-								vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_vazao_evaporada_meta, idCenario, a_period, double()));
-
-						} // if (a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_vazao_evaporada_meta, IdCenario_1, a_period, double()) != getdoubleFromChar("max")) {
-
-					} // if (a_dados.getSize1Matriz(idUHE, AttMatrizHidreletrica_vazao_evaporada_meta > 0)) {
-					else {
-
-						if ((a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, a_period, double()) != 0) || (a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_1, a_period, double()) != 0)) {
+					if ((a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, a_period, double()) != 0) || (a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_1, a_period, double()) != 0)) {
 
 							// EVAPORAÇÃO (QEVA)
 							addVarDecisao_QEVA(a_TSS, a_idEstagio, a_period, idUHE, -infinito, infinito, 0.0);
@@ -3465,37 +3394,6 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const TipoSubproblemaSolver a_T
 								addVarDecisao_QEVA_FINF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, 0.0, 0.0);
 
 						}//if ((a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, a_period, double()) != 0) || (a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_1, a_period, double()) != 0)) {
-
-					}//else {
-
-					if (a_dados.getSize1Matriz(idUHE, AttMatrizHidreletrica_vazao_vertida_meta)) {
-
-						if (a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_vazao_vertida_meta, IdCenario_1, a_period, double()) != getdoubleFromChar("max")) {
-
-							int varQVER = getVarDecisao_QVERseExistir(a_TSS, a_idEstagio, a_period, idUHE);
-							if (varQVER < 0)
-								varQVER = addVarDecisao_QVER(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
-
-							if (getEquLinear_QVERseExistir(a_TSS, a_idEstagio, a_period, idUHE) == -1) {
-								const int posEquQVER = addEquLinear_QVER(a_TSS, a_idEstagio, a_period, idUHE);
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQVER, 0.0);
-								// Variável QVER Media
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QVER(a_TSS, a_idEstagio, a_period, idUHE), posEquQVER, 1.0);
-							}
-
-							const IdVariavelEstado idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeSolverVarDecisao_QVER(a_TSS, a_idEstagio, a_period, idUHE), varQVER, -1);
-
-							const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
-							const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_menor_cenario, IdCenario());
-							const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_maior_cenario, IdCenario());
-
-							vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
-							for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
-								vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_vazao_vertida_meta, idCenario, a_period, double()));
-
-						} // if (a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_vazao_vertida_meta, IdCenario_1, a_period, double()) != getdoubleFromChar("max")) {
-
-					} // if (a_dados.getSize1Matriz(idUHE, AttMatrizHidreletrica_vazao_vertida_meta)) {
 
 
 					// Defluencia Hidrelétrica Folga Minima (QDEF_FINF)
@@ -3859,52 +3757,6 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const TipoSubproblemaSolver a_T
 						if (varPHDISP_pat == -1)
 							varPHDISP_pat = addVarDecisao_PHDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, 0.0, infinito, 0.0);
 
-						if (getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_period, idUHE) == -1) {
-
-							if (a_dados.getSize1Matriz(idUHE, AttMatrizHidreletrica_potencia_disponivel_meta) > 0) {
-
-								if (a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_potencia_disponivel_meta, IdCenario_1, a_period, double()) != getdoubleFromChar("max")) {
-
-									int varPHDISP = getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_period, idUHE);
-
-									if (varPHDISP < 0)
-										varPHDISP = addVarDecisao_PHDISP(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
-
-									const int varPHDISPMETA = addVarDecisao_PHDISPMETA(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
-									const int varPHDISPMETA_FINF = addVarDecisao_PHDISPMETA_FINF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
-									const int varPHDISPMETA_FSUP = addVarDecisao_PHDISPMETA_FSUP(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
-
-									const IdVariavelEstado idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeSolverVarDecisao_PHDISPMETA(a_TSS, a_idEstagio, a_period, idUHE), varPHDISPMETA, -1);
-
-									const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
-									const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_menor_cenario, IdCenario());
-									const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_maior_cenario, IdCenario());
-
-									vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
-									for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
-										vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_potencia_disponivel_meta, idCenario, a_period, double()));
-
-									//Adiciona Restriçao PHDISP = PHDISPMETA + PHDISPMETA_FSUP - PHDISPMETA_FINF
-									const int posEquPHDISP = addEquLinear_PHDISPMETA(a_TSS, a_idEstagio, a_period, idUHE);
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquPHDISP, 0.0);
-
-									//PHDISP
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPHDISP, posEquPHDISP, 1.0);
-
-									//PHDISPMETA
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPHDISPMETA, posEquPHDISP, -1.0);
-
-									//PHDISPMETA_FSUP
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPHDISPMETA_FSUP, posEquPHDISP, -1.0);
-
-									//PHDISPMETA_FINF
-									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPHDISPMETA_FINF, posEquPHDISP, 1.0);
-
-								} // if (a_dados.getSize1Matriz(idUHE, AttMatrizHidreletrica_potencia_disponivel_meta)) {
-
-							} // if (a_dados.getSize1Matriz(idUHE, AttMatrizHidreletrica_potencia_disponivel_meta) > 0) {
-						} // if (getVarDecisao_PHDISPseExistir(a_idEstagio, a_period, idUHE) == -1) {
-
 						if (a_dados.getSize1Matriz(idUHE, AttMatrizHidreletrica_potencia_disponivel_minima) > 0) {
 
 							if (a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_potencia_disponivel_minima, a_period, a_idPat, double()) > a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_potencia_minima, a_period, a_idPat, double()) * a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_disponibilidade, a_period, double())) {
@@ -4022,33 +3874,6 @@ void ModeloOtimizacao::criarVariaveisHidraulicas(const TipoSubproblemaSolver a_T
 					int varQTURDISP_pat = getVarDecisao_QTURDISPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUHE);
 					if (varQTURDISP_pat == -1)
 						varQTURDISP_pat = addVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, 0.0, infinito, 0.0);
-
-					if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idEstagio, a_period, idUHE) == -1) {
-
-						if (a_dados.getSize1Matriz(idUHE, AttMatrizHidreletrica_vazao_turbinada_disponivel_meta) > 0) {
-
-							if (a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_vazao_turbinada_disponivel_meta, IdCenario_1, a_period, double()) != getdoubleFromChar("max")) {
-
-								int varQTURDISP = getVarDecisao_QTURDISPseExistir(a_TSS, a_idEstagio, a_period, idUHE);
-
-								if (varQTURDISP < 0)
-									varQTURDISP = addVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
-
-								const IdVariavelEstado idVariavelEstado = vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, getNomeSolverVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_period, idUHE), varQTURDISP, -1);
-
-								const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
-								const IdCenario menor_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_menor_cenario, IdCenario());
-								const IdCenario maior_cenario = a_dados.arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_maior_cenario, IdCenario());
-
-								vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, menor_cenario, menor_cenario, maior_cenario, 0.0);
-								for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++)
-									vetorEstagio.at(a_idEstagio).addValorVariavelEstado(idVariavelEstado, idCenario, IdCenario_Nenhum, IdCenario_Nenhum, a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_vazao_turbinada_disponivel_meta, idCenario, a_period, double()));
-
-							} // if (a_dados.getElementoMatriz(idUHE, AttMatrizHidreletrica_vazao_turbinada_disponivel_meta, IdCenario_1, a_period, double()) != getdoubleFromChar("max")) {
-
-						} // if (a_dados.getSize1Matriz(idUHE, AttMatrizHidreletrica_vazao_turbinada_disponivel_meta) > 0) {
-
-					} // if (getVarDecisao_QTURDISPseExistir(a_idEstagio, a_period, idUHE) == -1) {
 
 					// Variável QTURDISP media
 					int varQTURDISP = getVarDecisao_QTURDISPseExistir(a_TSS, a_idEstagio, a_period, idUHE);

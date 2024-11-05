@@ -66,13 +66,10 @@
       m(Reservatorio,  AttVetor,                      volume_util_maximo,            double,          0,       100000,             0,        Periodo)
 //          c_classe,   smrtAtt,                nomeAtributo,              Tipo, lowerBound,   upperBound,  initialValue,      TipoIterador
 
-#define ATT_MATRIZ_RESERVATORIO(m)  \
-      m(Reservatorio,  AttMatriz,                          volume_meta,     double,          0,      max,         0,  IdCenario, Periodo) 
 
 #define SMART_ELEMENTO_RESERVATORIO(m) \
 	m(Reservatorio, AttComum, ATT_COMUM_RESERVATORIO) \
-	m(Reservatorio, AttVetor, ATT_VETOR_RESERVATORIO) \
-	m(Reservatorio, AttMatriz, ATT_MATRIZ_RESERVATORIO) 
+	m(Reservatorio, AttVetor, ATT_VETOR_RESERVATORIO) 
 
 DEFINE_SMART_ELEMENTO(Reservatorio, SMART_ELEMENTO_RESERVATORIO)
 
