@@ -3694,49 +3694,6 @@ void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_
 }//void LeituraCEPEL::inicializa_Submercados_Intercambios_Nao_Registrados() {
 
 
-void LeituraCEPEL::adicionaIntercambiosHidraulicosApartirJusanteDesvio(Dados& a_dados) {
-
-	try {
-
-		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
-
-		const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
-		const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
-
-		for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-
-			const IdHidreletrica idHidreletrica_jusante_desvio = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica());
-
-			if (idHidreletrica_jusante_desvio != IdHidreletrica_Nenhum) {
-
-				const SmartEnupla<Periodo, double> vetor_zero(horizonte_estudo, 0.0);
-				const SmartEnupla<Periodo, double> desvio_agua_maximo(horizonte_estudo, 99999);//Valor não informado nos decks
-
-				const IdIntercambioHidraulico idIntercambioHidraulico = IdIntercambioHidraulico(a_dados.getMaiorId(IdIntercambioHidraulico()) + 1);
-
-				IntercambioHidraulico intercambioHidraulico;
-				intercambioHidraulico.setAtributo(AttComumIntercambioHidraulico_idIntercambioHidraulico, idIntercambioHidraulico);
-
-				a_dados.vetorIntercambioHidraulico.add(intercambioHidraulico);
-
-				a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico).setAtributo(AttComumIntercambioHidraulico_tipo_intercambio_hidraulico, TipoIntercambioHidraulico_desvio);
-
-				a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico).setAtributo(AttComumIntercambioHidraulico_hidreletrica_origem, idHidreletrica);
-				a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico).setAtributo(AttComumIntercambioHidraulico_hidreletrica_destino, idHidreletrica_jusante_desvio);
-
-				a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico).setVetor(AttVetorIntercambioHidraulico_desvio_agua_minimo, vetor_zero);
-				a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico).setVetor(AttVetorIntercambioHidraulico_desvio_agua_maximo, desvio_agua_maximo);
-
-			}//if (idHidreletricajusante_desvio != IdHidreletrica_Nenhum) {
-
-		}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
-
-	} // try{
-	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::adicionaIntercambiosHidraulicosApartirJusanteDesvio(Dados &a_dados): \n" + std::string(erro.what())); }
-
-} // void LeituraCEPEL::adicionaIntercambiosHidraulicosApartirJusanteDesvio() {
-
-
 void LeituraCEPEL::adicionaLimitesDesvioApartirJusanteDesvio(Dados& a_dados) {
 
 	try {

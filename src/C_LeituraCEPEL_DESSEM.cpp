@@ -95,9 +95,6 @@ void LeituraCEPEL::leitura_DESSEM(Dados& a_dados, const std::string a_nomeArquiv
 		// CALCULA REGULARIZAÇÃO HIDRELETRICAS
 		calculaRegularizacaoUHE(a_dados);
 
-		//Instancia intercâmbio hidráulicos das jusantes_desvio
-		adicionaIntercambiosHidraulicosApartirJusanteDesvio(a_dados);
-
 		validacoes_DESSEM(a_dados, a_nomePasta);
 
 	}//try {
@@ -1856,96 +1853,7 @@ void LeituraCEPEL::leitura_ILSTRI_201904_DES16(Dados& a_dados, const std::string
 
 	try {
 
-		std::ifstream myfile(a_nomeArquivo);
-		std::string line;
-		std::vector<std::string> nivelReservatorio(12);
 
-		const int codigo_ONS_ilha_solteira = 34; //Código ilha solteira do HIDR.dat
-		const int codigo_ONS_tres_irmaos = 43;   //Código três irmãos do HIDR.dat
-
-		const IdHidreletrica idHidreletrica_ilha_solteira = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_ONS_ilha_solteira);
-		const IdHidreletrica idHidreletrica_tres_irmaos = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_ONS_tres_irmaos);
-
-
-		if (myfile.is_open()) {
-
-			const IdIntercambioHidraulico idIntercambioHidraulico_ilha_solteira = IdIntercambioHidraulico(a_dados.getMaiorId(IdIntercambioHidraulico()) + 1);
-			IntercambioHidraulico intercambioHidraulico_ilha_solteira;
-			intercambioHidraulico_ilha_solteira.setAtributo(AttComumIntercambioHidraulico_idIntercambioHidraulico, idIntercambioHidraulico_ilha_solteira);
-			a_dados.vetorIntercambioHidraulico.add(intercambioHidraulico_ilha_solteira);
-			a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_ilha_solteira).setAtributo(AttComumIntercambioHidraulico_tipo_intercambio_hidraulico, TipoIntercambioHidraulico_pereira_barreto);
-			a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_ilha_solteira).setAtributo(AttComumIntercambioHidraulico_hidreletrica_origem, idHidreletrica_ilha_solteira);
-			a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_ilha_solteira).setAtributo(AttComumIntercambioHidraulico_hidreletrica_destino, idHidreletrica_tres_irmaos);
-
-
-			const IdIntercambioHidraulico idIntercambioHidraulico_tres_irmaos = IdIntercambioHidraulico(a_dados.getMaiorId(IdIntercambioHidraulico()) + 1);
-			IntercambioHidraulico intercambioHidraulico_tres_irmaos;
-			intercambioHidraulico_tres_irmaos.setAtributo(AttComumIntercambioHidraulico_idIntercambioHidraulico, idIntercambioHidraulico_tres_irmaos);
-			a_dados.vetorIntercambioHidraulico.add(intercambioHidraulico_tres_irmaos);
-			a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_tres_irmaos).setAtributo(AttComumIntercambioHidraulico_tipo_intercambio_hidraulico, TipoIntercambioHidraulico_pereira_barreto);
-			a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_tres_irmaos).setAtributo(AttComumIntercambioHidraulico_hidreletrica_origem, idHidreletrica_tres_irmaos);
-			a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_tres_irmaos).setAtributo(AttComumIntercambioHidraulico_hidreletrica_destino, idHidreletrica_ilha_solteira);
-
-			int contLinha = 0;
-
-			while (std::getline(myfile, line)) {
-
-				strNormalizada(line);
-
-				std::string lineStr = line;
-				lineStr.erase(std::remove(lineStr.begin(), lineStr.end(), ' '), lineStr.end());
-
-				if (line.substr(0, 3) == "NIV") {
-
-					for (int i = 0; i < 12; i++) {
-						if (i == 0) {
-							a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_ilha_solteira).addElemento(AttVetorIntercambioHidraulico_nivel_reservatorio, i + 1, std::stod(line.substr(4, 6)));
-							a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_tres_irmaos).addElemento(AttVetorIntercambioHidraulico_nivel_reservatorio, i + 1, std::stod(line.substr(4, 6)));
-						}
-						else if (i != 0) {
-							a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_ilha_solteira).addElemento(AttVetorIntercambioHidraulico_nivel_reservatorio, i + 1, std::stod(line.substr((i * 7) + 4, 6)));
-							a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_tres_irmaos).addElemento(AttVetorIntercambioHidraulico_nivel_reservatorio, i + 1, std::stod(line.substr((i * 7) + 4, 6)));
-						}
-					}//for (int i = 0; i < 12; i++) {
-
-				}//if (line.substr(0, 3) == "NIV" ) {
-
-				if (lineStr != "" && line.substr(0, 1) != "&") {
-
-					if (line.substr(0, 3) != "NIV" && line.substr(0, 3) != "NOR" && line.substr(0, 3) != "MAX") {
-						contLinha++;
-
-						a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_ilha_solteira).addElemento(AttVetorIntercambioHidraulico_desnivel, contLinha, std::stod(line.substr(0, 3)));
-						a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_tres_irmaos).addElemento(AttVetorIntercambioHidraulico_desnivel, contLinha, std::stod(line.substr(0, 3)));
-
-
-						for (int i = 1; i <= 12; i++) {
-							std::string vazao;
-							if (i == 1) { vazao = line.substr(4, 6); }
-							if (i != 1) { vazao = line.substr((((i - 1) * 7) + 4), 6); }
-
-							vazao.erase(std::remove(vazao.begin(), vazao.end(), ' '), vazao.end());
-
-							if (vazao.empty()) { vazao = "0"; }
-
-							a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_ilha_solteira).addElemento(AttMatrizIntercambioHidraulico_vazao, contLinha, i, std::stod(vazao));
-							a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico_tres_irmaos).addElemento(AttMatrizIntercambioHidraulico_vazao, contLinha, i, std::stod(vazao));
-
-						}//for (int i = 0; i < 12; i++) {
-
-
-
-					}//if (line.substr(0, 3) != "NIV") {
-
-				}//if (lineStr != "") {
-
-			}// while (std::getline(myfile, line)) {
-
-			myfile.close();
-
-		}// if (myfile.is_open()) {
-
-		else  throw std::invalid_argument("Nao foi possivel abrir o arquivo" + a_nomeArquivo + ".");
 
 	} // 	try {
 
@@ -2645,23 +2553,6 @@ void LeituraCEPEL::leitura_DADGER_201904_DES16(Dados& a_dados, const std::string
 					Periodo periodo_inicial_restricao = getPeriodoInicial(a_dados, line.substr(4, 2), line.substr(9, 2), line.substr(14, 1));
 
 					std::string patamar = line.substr(33, 6); patamar.erase(std::remove(patamar.begin(), patamar.end(), ' '), patamar.end());
-
-					IdDiscretizacao idDiscretizacao = a_dados.vetorDiscretizacao.getMaiorId();
-
-					if (idDiscretizacao == IdDiscretizacao_Nenhum) { idDiscretizacao = IdDiscretizacao_1; }
-					else { idDiscretizacao++; }
-
-					Discretizacao discretizacao;
-					discretizacao.setAtributo(AttComumDiscretizacao_idDiscretizacao, idDiscretizacao);
-					discretizacao.setAtributo(AttComumDiscretizacao_inicio_periodo, periodo_inicial_restricao);
-					discretizacao.setAtributo(AttComumDiscretizacao_duracao_periodo, std::stod(line.substr(19, 5)));
-					discretizacao.setAtributo(AttComumDiscretizacao_rede, bool(std::stoi(line.substr(29, 1))));
-
-					if (patamar == "LEVE" || patamar == "leve") { discretizacao.setAtributo(AttComumDiscretizacao_patamar, TipoPatamar_leve); }
-					if (patamar == "MEDIA" || patamar == "media") { discretizacao.setAtributo(AttComumDiscretizacao_patamar, TipoPatamar_media); }
-					if (patamar == "PESADA" || patamar == "pesada") { discretizacao.setAtributo(AttComumDiscretizacao_patamar, TipoPatamar_pesada); }
-
-					a_dados.vetorDiscretizacao.add(discretizacao);
 
 				}//if (line.substr(0, 2) == "TM") {
 
@@ -4071,32 +3962,6 @@ void LeituraCEPEL::leitura_REE_201904_DES16(Dados& a_dados, const std::string a_
 
 				// DESVIO DE AGUA 
 				if (lerRegistro("DA", line.substr(0, 2), a_registro)) {
-					try {
-						LeituraCEPEL leituraCEPEL;
-						const Periodo periodo_inicial_restricao = getPeriodoInicial(a_dados, line.substr(8, 2), line.substr(11, 2), line.substr(14, 1));
-						const Periodo periodo_final_restricao = getPeriodoFinal(a_dados, line.substr(16, 2), line.substr(19, 2), line.substr(22, 1));
-
-						const IdHidreletrica idHidreletrica = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, std::stoi(line.substr(4, 3)));
-
-						const IdIntercambioHidraulico idIntercambioHidraulico = IdIntercambioHidraulico(a_dados.getMaiorId(IdIntercambioHidraulico()) + 1);
-						IntercambioHidraulico intercambioHidraulico;
-						intercambioHidraulico.setAtributo(AttComumIntercambioHidraulico_idIntercambioHidraulico, idIntercambioHidraulico);
-						intercambioHidraulico.setAtributo(AttComumIntercambioHidraulico_tipo_intercambio_hidraulico, TipoIntercambioHidraulico_retirada);
-
-						a_dados.vetorIntercambioHidraulico.add(intercambioHidraulico);
-
-						a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico).setAtributo(AttComumIntercambioHidraulico_hidreletrica_origem, idHidreletrica);
-						a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico).setAtributo(AttComumIntercambioHidraulico_hidreletrica_destino, IdHidreletrica_Nenhum);
-
-						a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico).setVetor(AttVetorIntercambioHidraulico_desvio_agua_minimo, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
-						a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico).setVetor(AttVetorIntercambioHidraulico_desvio_agua_maximo, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
-
-						for (Periodo periodo = getPeriodoInicialResticao(periodo_inicial_restricao, a_horizonte_estudo); periodo <= getPeriodoFinalResticao(periodo_final_restricao, a_horizonte_estudo); a_horizonte_estudo.incrementarIterador(periodo)) {
-							a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico).setElemento(AttVetorIntercambioHidraulico_desvio_agua_minimo, periodo, std::stod(line.substr(24, 10)));
-							a_dados.vetorIntercambioHidraulico.at(idIntercambioHidraulico).setElemento(AttVetorIntercambioHidraulico_desvio_agua_maximo, periodo, std::stod(line.substr(24, 10)));
-						}//for (Periodo periodo = periodo_inicial_restricao; periodo <= periodo_final_restricao; horizonte_estudo.incrementarIterador(periodo)) {
-					}
-					catch (const std::exception& erro) { throw std::invalid_argument("lerRegistro(DA, linha ( " + line + ") ): \n" + std::string(erro.what())); }
 
 				}//if (lerRegistro("DA", line.substr(0, 2), a_registro)) {
 

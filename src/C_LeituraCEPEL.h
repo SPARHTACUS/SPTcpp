@@ -779,10 +779,6 @@ private:
 	
 	bool aplicarModificacaoJUSENA(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const ModificacaoUHE& a_modificacaoUHE);
 
-	//Cria os intercâmbios hidráulicos correspondentes à jusante desvio 
-
-	void adicionaIntercambiosHidraulicosApartirJusanteDesvio(Dados& a_dados);
-
 	void adicionaLimitesDesvioApartirJusanteDesvio(Dados& a_dados);
 
 };
