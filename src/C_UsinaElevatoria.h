@@ -26,9 +26,7 @@
 	  m(UsinaElevatoria,  AttVetor,     vazao_bombeada_minima,                double,          0,        50000,             0,      Periodo) \
 	  m(UsinaElevatoria,  AttVetor,     vazao_bombeada_maxima,                double,          0,          max,           max,      Periodo) \
 	  m(UsinaElevatoria,  AttVetor,     vazao_bombeada_disponivel_minima,     double,          0,        50000,             0,      Periodo) \
-	  m(UsinaElevatoria,  AttVetor,     vazao_bombeada_disponivel_maxima,     double,          0,          max,           max,      Periodo) \
-	  m(UsinaElevatoria,  AttVetor,     vazao_bombeada_disponivel_minima_media,     double,          0,          max,           max,      Periodo) \
-	  m(UsinaElevatoria,  AttVetor,     vazao_bombeada_disponivel_maxima_media,     double,          0,          max,           max,      Periodo) 
+	  m(UsinaElevatoria,  AttVetor,     vazao_bombeada_disponivel_maxima,     double,          0,          max,           max,      Periodo)
 //             c_classe,   smrtAtt,           nomeAtributo,       Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 

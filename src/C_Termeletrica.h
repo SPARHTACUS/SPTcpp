@@ -39,12 +39,6 @@
 	  m(Termeletrica,  AttVetor,                          ramp_turnon,                                double,            1,              max,             0,        int) \
 	  m(Termeletrica,  AttVetor,                        ramp_shutdown,                                double,            1,              max,             0,        int) \
 	  m(Termeletrica,  AttVetor,       representacao_discreta_producao,                                   int,           0,                1,             0,        Periodo) \
-	  m(Termeletrica,  AttVetor,                 potencia_minima_media,                                double,           0,              max,             0,        Periodo) \
-	  m(Termeletrica,  AttVetor,                 potencia_maxima_media,                                double,           0,              max,             0,        Periodo) \
-	  m(Termeletrica,  AttVetor,      potencia_disponivel_minima_media,                                double,           0,              max,             0,        Periodo) \
-	  m(Termeletrica,  AttVetor,      potencia_disponivel_maxima_media,                                double,           0,              max,             0,        Periodo) \
-	  m(Termeletrica,  AttVetor,                   potencia_util_media,                                double,           0,              max,             0,        Periodo) \
-	  m(Termeletrica,  AttVetor,               custo_de_operacao_media,                                double,           0,              max,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,                   fator_de_capacidade,                                double,           0,            1.001,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,                       disponibilidade,                                double,           0,            1.001,             0,        Periodo) \
 	  m(Termeletrica,  AttVetor,             indisponibilidade_forcada,                                double,           0,            1.001,             0,        Periodo) \

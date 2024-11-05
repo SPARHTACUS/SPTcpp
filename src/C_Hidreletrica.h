@@ -77,21 +77,11 @@
 	  m(Hidreletrica,  AttVetor,              cota_montante_usina_jusante,                                double,          0,         1000,             0,    Periodo) \
 	  m(Hidreletrica,  AttVetor,                   vazao_turbinada_minima,                                double,          0,        50000,             0,    Periodo) \
 	  m(Hidreletrica,  AttVetor,                   vazao_turbinada_maxima,                                double,          0,        50000,             0,    Periodo) \
-      m(Hidreletrica,  AttVetor,  vazao_turbinada_disponivel_minima_media,                                double,          0,        50000,             0,    Periodo) \
-	  m(Hidreletrica,  AttVetor,  vazao_turbinada_disponivel_maxima_media,                                double,          0,          max,             0,    Periodo) \
 	  m(Hidreletrica,  AttVetor,                         canal_fuga_medio,                                double,          0,        10000,             0,    Periodo) \
 	  m(Hidreletrica,  AttVetor,                   vazao_defluente_minima,                                double,          0,        50000,             0,    Periodo) \
 	  m(Hidreletrica,  AttVetor,                   vazao_defluente_maxima,                                double,          0,          max,           max,    Periodo) \
-      m(Hidreletrica,  AttVetor,             vazao_defluente_minima_media,                                double,          0,        50000,             0,    Periodo) \
-	  m(Hidreletrica,  AttVetor,             vazao_defluente_maxima_media,                                double,          0,          max,           max,    Periodo) \
       m(Hidreletrica,  AttVetor,                    vazao_desviada_minima,                                double,          0,        50000,             0,    Periodo) \
 	  m(Hidreletrica,  AttVetor,                    vazao_desviada_maxima,                                double,          0,          max,           max,    Periodo) \
-      m(Hidreletrica,  AttVetor,              vazao_desviada_minima_media,                                double,          0,        50000,             0,    Periodo) \
-	  m(Hidreletrica,  AttVetor,              vazao_desviada_maxima_media,                                double,          0,          max,           max,    Periodo) \
-      m(Hidreletrica,  AttVetor,                    potencia_minima_media,                                double,          0,        50000,             0,    Periodo) \
-	  m(Hidreletrica,  AttVetor,                    potencia_maxima_media,                                double,          0,          max,           max,    Periodo) \
-      m(Hidreletrica,  AttVetor,         potencia_disponivel_minima_media,                                double,          0,        50000,             0,    Periodo) \
-	  m(Hidreletrica,  AttVetor,         potencia_disponivel_maxima_media,                                double,          0,          max,           max,    Periodo) \
 	  m(Hidreletrica,  AttVetor,            horizonte_defluencia_viajante,                               Periodo,        min,          max,           max,    Periodo) \
       m(Hidreletrica,  AttVetor,                           vazao_retirada,                                double,     -50000,        50000,             0,    Periodo) \
 	  m(Hidreletrica,  AttVetor,                indisponibilidade_forcada,                                double,          0,            1,             0,    Periodo) \
