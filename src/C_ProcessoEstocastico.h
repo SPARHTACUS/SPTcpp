@@ -113,6 +113,19 @@ public:
 	};
 
 	template<typename IdFisico>
+	std::vector<IdFisico> getIdFisicoFromIdVariavelAleatoria(const IdVariavelAleatoria a_idVariavelAleatoria, const IdFisico a_IdFisico) {
+		try {
+			const IdVariavelAleatoriaInterna idVarInEnd = getMaiorId(a_idVariavelAleatoria, IdVariavelAleatoriaInterna());
+			std::vector<IdFisico> return_list_idFisico;
+			for (IdVariavelAleatoriaInterna idVarInterna = IdVariavelAleatoriaInterna_1; idVarInterna <= idVarInEnd; idVarInterna++) {
+				return_list_idFisico.push_back(getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(a_idVariavelAleatoria, idVarInterna, a_IdFisico));
+			}
+			return return_list_idFisico;
+		}
+		catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getIdFisicoFromIdVariavelAleatoria(" + getFullString(a_idVariavelAleatoria) + "): \n" + std::string(erro.what())); }
+	};
+
+	template<typename IdFisico>
 	IdVariavelAleatoriaInterna getIdVariavelAleatoriaInternaFromIdVariavelAleatoriaIdFisico(const IdVariavelAleatoria a_idVariavelAleatoria, const IdFisico a_idFisico) {
 		try {
 			for (IdVariavelAleatoriaInterna idVarInterna = IdVariavelAleatoriaInterna_1; idVarInterna <= getMaiorId(a_idVariavelAleatoria, IdVariavelAleatoriaInterna()); idVarInterna++) {

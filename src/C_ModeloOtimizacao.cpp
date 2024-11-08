@@ -710,7 +710,7 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelEstado_posEstudo(cons
 									lista_codPosto_idHidreletrica.at(a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_codigo_posto, int())) = idHidreletrica;
 									IdVariavelAleatoria        idVariavelAleatoria = IdVariavelAleatoria_Nenhum;
 									IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_Nenhum;
-									getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdHidreletrica(idProcessoEstocastico, idVariavelAleatoria, idVariavelAleatoriaInterna, idHidreletrica);
+									vetorProcessoEstocastico.at(idProcessoEstocastico).getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(idVariavelAleatoria, idVariavelAleatoriaInterna, idHidreletrica);
 									mapIdVar.at(idHidreletrica) = idVariavelAleatoria;
 									mapIdVarInterna.at(idHidreletrica) = idVariavelAleatoriaInterna;
 								}//for (IdHidreletrica idHidreletrica = menorIdHidreletrica; idHidreletrica <= maiorIdHidreletrica; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
@@ -4954,23 +4954,23 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 				// Volume Minimo
 				//
 				
-				if (nome.at(0) == "ZP0_VF_LINF") {
+				if (nome.at(0) == "ZP0_VH_LINF") {
 				
 					Periodo periodo_penalizacao(nome.at(2));
 
-					const int varZP0_VF_LINF = criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VF_LINF(a_TSS, a_dados, idEstagio, periodo_penalizacao);
+					const int varZP0_VH_LINF = criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VH_LINF(a_TSS, a_dados, idEstagio, periodo_penalizacao);
 
-					if (varZP0_VF_LINF > -1)
-						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varZP0_VF_LINF);
+					if (varZP0_VH_LINF > -1)
+						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varZP0_VH_LINF);
 				
 					else{
 						estagio.anularVariavelEstadoCorteBenders(idVariavelEstado);
 						estagio.vetorVariavelEstado.rem(idVariavelEstado);
 						if (a_idProcesso == IdProcesso_mestre)
-							std::cout << "ZP0_VF_LINF " << getFullString(idVariavelEstado) << " nao criada por falta de restricao de volume util minimo no modelo." << std::endl;
+							std::cout << "ZP0_VH_LINF " << getFullString(idVariavelEstado) << " nao criada por falta de restricao de volume util minimo no modelo." << std::endl;
 					}				
 
-				} // if (nome.at(0) == "ZP0_VF_LINF") {
+				} // if (nome.at(0) == "ZP0_VH_LINF") {
 				
 
 				//

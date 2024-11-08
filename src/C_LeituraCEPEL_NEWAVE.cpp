@@ -1965,7 +1965,6 @@ void LeituraCEPEL::leitura_CONFHD_201908_NW25(Dados &a_dados, std::string nomeAr
 						}
 
 						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_nome, nome);
-						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_considerar_usina, true);
 
 						/////////////////////////////////////////////////////////
 						//Caso especial: Usina Sobradinho -> codigo_usina = 169
@@ -2012,7 +2011,6 @@ void LeituraCEPEL::leitura_CONFHD_201908_NW25(Dados &a_dados, std::string nomeAr
 
 						a_dados.vetorHidreletrica.at(idHidreletrica_expansao).setAtributo(AttComumHidreletrica_nome, nome);
 						a_dados.vetorHidreletrica.at(idHidreletrica_expansao).setAtributo(AttComumHidreletrica_codigo_usina, codigo_usina);
-						a_dados.vetorHidreletrica.at(idHidreletrica_expansao).setAtributo(AttComumHidreletrica_considerar_usina, true);
 						a_dados.vetorHidreletrica.at(idHidreletrica_expansao).setAtributo(AttComumHidreletrica_codigo_posto, codigo_posto_CEPEL);
 						a_dados.vetorHidreletrica.at(idHidreletrica_expansao).setAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica_por_usina);
 
@@ -2101,7 +2099,6 @@ void LeituraCEPEL::leitura_CONFHD_201908_NW25(Dados &a_dados, std::string nomeAr
 							} // if (true) {
 
 							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_nome, nome);
-							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_considerar_usina, true);
 							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto, codigo_posto_CEPEL);
 
 							lista_IdSubmercado_hidreletrica.setElemento(idHidreletrica, IdSubmercado_Nenhum);

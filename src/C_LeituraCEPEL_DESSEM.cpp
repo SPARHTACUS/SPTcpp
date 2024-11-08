@@ -3652,17 +3652,17 @@ void LeituraCEPEL::leitura_REE_201904_DES16(Dados& a_dados, const std::string a_
 						for (Periodo periodo = a_horizonte_estudo.getIteradorInicial(); periodo <= a_horizonte_estudo.getIteradorFinal(); a_horizonte_estudo.incrementarIterador(periodo))
 							matriz_zero.setElemento(periodo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()), 0.0)));
 
-						if (a_dados.getSize1Matriz(idHidreletrica, IdConjuntoHidraulico_1, AttMatrizConjuntoHidraulico_potencia_minima) == 0)
-							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_1).setMatriz(AttMatrizConjuntoHidraulico_potencia_minima, matriz_zero);
+						if (a_dados.getSize1Matriz(idHidreletrica, IdConjuntoHidraulico_1, AttMatrizConjuntoHidraulico_potencia_disponivel_minima) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_1).setMatriz(AttMatrizConjuntoHidraulico_potencia_disponivel_minima, matriz_zero);
 
-						if (a_dados.getSize1Matriz(idHidreletrica, IdConjuntoHidraulico_1, AttMatrizConjuntoHidraulico_potencia_maxima) == 0)
-							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_1).setMatriz(AttMatrizConjuntoHidraulico_potencia_maxima, matriz_zero);
+						if (a_dados.getSize1Matriz(idHidreletrica, IdConjuntoHidraulico_1, AttMatrizConjuntoHidraulico_potencia_disponivel_maxima) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_1).setMatriz(AttMatrizConjuntoHidraulico_potencia_disponivel_maxima, matriz_zero);
 
-						if (a_dados.getSize1Matriz(idHidreletrica, IdConjuntoHidraulico_2, AttMatrizConjuntoHidraulico_potencia_minima) == 0)
-							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_2).setMatriz(AttMatrizConjuntoHidraulico_potencia_minima, matriz_zero);
+						if (a_dados.getSize1Matriz(idHidreletrica, IdConjuntoHidraulico_2, AttMatrizConjuntoHidraulico_potencia_disponivel_minima) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_2).setMatriz(AttMatrizConjuntoHidraulico_potencia_disponivel_minima, matriz_zero);
 
-						if (a_dados.getSize1Matriz(idHidreletrica, IdConjuntoHidraulico_2, AttMatrizConjuntoHidraulico_potencia_maxima) == 0)
-							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_2).setMatriz(AttMatrizConjuntoHidraulico_potencia_maxima, matriz_zero);
+						if (a_dados.getSize1Matriz(idHidreletrica, IdConjuntoHidraulico_2, AttMatrizConjuntoHidraulico_potencia_disponivel_maxima) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_2).setMatriz(AttMatrizConjuntoHidraulico_potencia_disponivel_maxima, matriz_zero);
 
 						if (a_dados.getSizeVetor(idSubmercado_ande, AttVetorSubmercado_demanda) == 0)
 							a_dados.vetorSubmercado.at(idSubmercado_ande).setVetor(AttVetorSubmercado_demanda, SmartEnupla<Periodo, double>(a_horizonte_estudo, 0.0));
@@ -3670,10 +3670,10 @@ void LeituraCEPEL::leitura_REE_201904_DES16(Dados& a_dados, const std::string a_
 						for (Periodo periodo = getPeriodoInicialResticao(periodo_inicial_restricao, a_horizonte_estudo); periodo <= getPeriodoFinalResticao(periodo_final_restricao, a_horizonte_estudo); a_horizonte_estudo.incrementarIterador(periodo)) {
 
 							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_1).setElemento(AttMatrizConjuntoHidraulico_potencia_minima, periodo, idPatamarCarga, std::stod(line.substr(26, 10)));
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_1).setElemento(AttMatrizConjuntoHidraulico_potencia_maxima, periodo, idPatamarCarga, std::stod(line.substr(36, 10)));
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_2).setElemento(AttMatrizConjuntoHidraulico_potencia_minima, periodo, idPatamarCarga, std::stod(line.substr(46, 10)));
-								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_2).setElemento(AttMatrizConjuntoHidraulico_potencia_maxima, periodo, idPatamarCarga, std::stod(line.substr(56, 10)));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_1).setElemento(AttMatrizConjuntoHidraulico_potencia_disponivel_minima, periodo, idPatamarCarga, std::stod(line.substr(26, 10)));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_1).setElemento(AttMatrizConjuntoHidraulico_potencia_disponivel_maxima, periodo, idPatamarCarga, std::stod(line.substr(36, 10)));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_2).setElemento(AttMatrizConjuntoHidraulico_potencia_disponivel_minima, periodo, idPatamarCarga, std::stod(line.substr(46, 10)));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico_2).setElemento(AttMatrizConjuntoHidraulico_potencia_disponivel_maxima, periodo, idPatamarCarga, std::stod(line.substr(56, 10)));
 							}
 
 							a_dados.vetorSubmercado.at(idSubmercado_ande).setElemento(AttVetorSubmercado_demanda, periodo, std::stod(line.substr(66, 10)));
