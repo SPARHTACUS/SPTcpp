@@ -6694,7 +6694,8 @@ void Dados::validacao_operacional_Contrato(EntradaSaidaDados a_entradaSaidaDados
 					a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
 					a_entradaSaidaDados.setAppendArquivo(false);
-					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("CONTRATO_AttComumOperacional.csv", IdContrato_Nenhum, *this);
+					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("CONTRATO_AttComumOperacional.csv", IdContrato_Nenhum, *this, \
+						std::vector<AttComumContrato>{AttComumContrato_idContrato, AttComumContrato_tipo_contrato, AttComumContrato_nome, AttComumContrato_submercado, AttComumContrato_vlr_ini});
 
 					std::vector<bool> isAttMatriz(AttMatrizContrato_Excedente, false);
 					for (IdContrato idCon = getMenorId(IdContrato()); idCon < getIdOut(IdContrato()); incr(idCon)) {

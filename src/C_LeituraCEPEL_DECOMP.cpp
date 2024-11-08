@@ -17386,7 +17386,6 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						contrato.setAtributo(AttComumContrato_nome, dados_PD.vetorContrato.at(idContrato_PD).getAtributo(AttComumContrato_nome, std::string()));
 						contrato.setAtributo(AttComumContrato_submercado, dados_PD.vetorContrato.at(idContrato_PD).getAtributo(AttComumContrato_submercado, IdSubmercado()));
 						contrato.setAtributo(AttComumContrato_tipo_contrato, dados_PD.vetorContrato.at(idContrato_PD).getAtributo(AttComumContrato_tipo_contrato, TipoContrato()));
-						contrato.setAtributo(AttComumContrato_titulacao_contrato, dados_PD.vetorContrato.at(idContrato_PD).getAtributo(AttComumContrato_titulacao_contrato, int()));
 						contrato.setAtributo(AttComumContrato_vlr_ini, dados_PD.vetorContrato.at(idContrato_PD).getAtributo(AttComumContrato_vlr_ini, double()));
 						a_dados.vetorContrato.add(contrato);
 
