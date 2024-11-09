@@ -2421,7 +2421,7 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 					int equQRET = getEquLinear_QRETseExistir(a_TSS, a_idEstagio, a_period, idUHE);
 					if (equQRET == -1) {
 						equQRET = addEquLinear_QRET(a_TSS, a_idEstagio, a_period, idUHE);
-						const int varQRET = addVarDecisao_QRET(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
+						const int varQRET = addVarDecisao_QRET(a_TSS, a_idEstagio, a_period, idUHE, -infinito, infinito, 0.0);
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQRET, equQRET, 1.0);
 					}
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQRET_pat, equQRET, -perc_dur_pat);
@@ -2474,7 +2474,7 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 
 			const double volume_util_maximo = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_period, double());
 			double volume_util_maximo_next = volume_util_maximo;
-			if ((a_period < a_periodNext) || (a_idEstagio < idStageEnd))
+			if ((a_period < a_periodEnd_stage) || (a_idEstagio < idStageEnd))
 				volume_util_maximo_next = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_periodNext, double());
 
 			// Restrições Balanço Hidraulico Por Volume (BH_VOL)
