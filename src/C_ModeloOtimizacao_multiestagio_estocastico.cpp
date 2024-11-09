@@ -1328,7 +1328,7 @@ void ModeloOtimizacao::criarFuncaoProducaoHidreletrica(const TipoSubproblemaSolv
 			if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_period, a_idPat, a_idHidreletrica) > -1) {
 
 				if ((a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_vazao_turbinada_maxima, a_period, double()) > 0) && \
-					(a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_potencia_maxima, a_period, a_idPat, double()) > 0)) {
+					(a_dados.getElementoVetor(a_idHidreletrica, AttVetorHidreletrica_potencia_maxima, a_period, double()) > 0)) {
 
 					for (int i = 1; i <= numero_planos; i++) {
 
@@ -2154,6 +2154,29 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 
 					disponivel = true;
 
+					const double vazao_turbinada_minima = a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_vazao_turbinada_minima, a_period, double());
+					const double vazao_turbinada_maxima = a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_vazao_turbinada_maxima, a_period, double());
+
+					//
+					// QH: Turbinamento Hidreletrico
+					//
+					const int varQTUR = addVarDecisao_QTUR(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, 0.0, vazao_turbinada_maxima, 0.0);
+					if (vazao_turbinada_minima > 0.0) {
+						const int varQTUR_FINF = addVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, 0.0, vazao_turbinada_minima, 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQTUR_FINF, getEquLinear_ZP(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
+						const int ineQTUR_LINF = addIneLinear_QTUR_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUHE);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQTUR, ineQTUR_LINF, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQTUR_FINF, ineQTUR_LINF, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineQTUR_LINF, vazao_turbinada_minima);
+					} // if (vazao_turbinada_minima > 0.0) {
+
+					const int varQTURDISP = addVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, vazao_turbinada_minima * disponibilidade, vazao_turbinada_maxima * disponibilidade, 0.0);
+					const int equQTURDISP = addEquLinear_QTURDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUHE);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQTURDISP, equQTURDISP, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQTUR, equQTURDISP, -disponibilidade);
+
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQTURDISP, getEquLinear_ZP(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_turbinamento, double()));
+
 					if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica) {
 
 						const double potencia_minima = a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_potencia_minima, a_period, double());
@@ -2201,36 +2224,7 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(inePHDISP_LINF, potencia_disponivel_minima);
 						} // if (potencia_disponivel_minima > 0.0) {
 
-						//
-						// FPH: Funcao de Producao Hidreletrica
-						//
-						criarFuncaoProducaoHidreletrica(a_TSS, a_dados, a_idEstagio, idUHE, a_idPat, a_period, a_periodNext, a_periodEnd_stage);
-
 					} // if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica) {
-
-					const double vazao_turbinada_minima = a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_vazao_turbinada_minima, a_period, double());
-					const double vazao_turbinada_maxima = a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_vazao_turbinada_maxima, a_period, double());
-
-					//
-					// QH: Turbinamento Hidreletrico
-					//
-					const int varQTUR = addVarDecisao_QTUR(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, 0.0, vazao_turbinada_maxima, 0.0);
-					if (vazao_turbinada_maxima > 0.0) {
-						const int varQTUR_FINF = addVarDecisao_QTUR_FINF(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, 0.0, vazao_turbinada_maxima, 0.0);
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQTUR_FINF, getEquLinear_ZP(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
-						const int ineQTUR_LINF = addIneLinear_QTUR_LINF(a_TSS, a_idEstagio, a_period, a_idPat, idUHE);
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQTUR, ineQTUR_LINF, 1.0);
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQTUR_FINF, ineQTUR_LINF, 1.0);
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineQTUR_LINF, vazao_turbinada_maxima);
-					} // if (vazao_turbinada_maxima > 0.0) {
-					
-					const int varQTURDISP = addVarDecisao_QTURDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, vazao_turbinada_minima * disponibilidade, vazao_turbinada_maxima * disponibilidade, 0.0);
-					const int equQTURDISP = addEquLinear_QTURDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUHE);
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQTURDISP, equQTURDISP, 1.0);
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQTUR, equQTURDISP, -disponibilidade);
-
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQTURDISP, getEquLinear_ZP(a_TSS, a_idEstagio, a_period, a_idPat), -a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_turbinamento, double()));
-
 				} // if (a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_disponibilidade, a_period, double()) > 0.0) {
 
 			} // if (tipo_detalhamento_producao_hidreletrica == TipoDetalhamentoProducaoHidreletrica_por_usina) {
@@ -2471,6 +2465,12 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 		//
 		// ------------------------------------------------------------------------------------------------------------------------------------------------------
 		for (IdHidreletrica idUHE = idUHEIni; idUHE < idUHEOut; a_dados.vetorHidreletrica.incr(idUHE)) {
+
+			//
+			// FPH: Funcao de Producao Hidreletrica
+			//
+			if (getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUHE) > -1)
+				criarFuncaoProducaoHidreletrica(a_TSS, a_dados, a_idEstagio, idUHE, a_idPat, a_period, a_periodNext, a_periodEnd_stage);
 
 			const double volume_util_maximo = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_period, double());
 			double volume_util_maximo_next = volume_util_maximo;
