@@ -17092,8 +17092,11 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						//Reservatório
 						if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).isInstanciado(IdReservatorio_1)) {//Carrega info do Reservatório se foi carregado na pre-config
+							
+							a_dados.volume_inicial_carregado_from_operacional = true;
 							//AttComum
 							a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_util_inicial, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_volume_util_inicial, double()));
+							a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_percentual_volume_util_inicial, 0.0);
 						}//if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).isInstanciado(IdReservatorio_1)) {
 
 						//defluencia
@@ -17190,6 +17193,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									//************
 									//Premissa: volume_util_minimo / volume_util_maximo são função do volume_minimo e volume_maximo por período (são atualizados na validação Hidrelétrica)
 									if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).isInstanciado(IdReservatorio_1)) {
+
 										//AttVetor
 										if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_volume_minimo) > 0) {
 
