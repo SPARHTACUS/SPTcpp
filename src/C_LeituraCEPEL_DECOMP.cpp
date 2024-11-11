@@ -17850,14 +17850,26 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							const IdIntercambio        idIntercambio_PD        = dados_PD.vetorRestricaoEletrica.at(idRestricaoEletrica_PD).vetorElementoSistema.at(idElementoSistema).getAtributo(AttComumElementoSistema_intercambio, IdIntercambio());
 
 
+							if (idConjuntoHidraulico_PD == IdConjuntoHidraulico_Nenhum && idHidreletrica_PD == IdHidreletrica_Nenhum  \
+								&& idTermeletrica_PD == IdTermeletrica_Nenhum && idDemandaEspecial_PD == IdDemandaEspecial_Nenhum && idUnidadeUTE_PD == IdUnidadeUTE_Nenhum \
+								&& idContrato_PD == IdContrato_Nenhum && idRenovavel_PD == IdRenovavel_Nenhum && idUsinaElevatoria_PD == IdUsinaElevatoria_Nenhum && idIntercambio_PD == IdIntercambio_Nenhum) {
+
+								is_all_elementos_restricao_in_CP = false;
+								std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) + " | todos os ids_Nenhum"  << std::endl;
+								break;
+
+							}
+								
 							if (idConjuntoHidraulico_PD != IdConjuntoHidraulico_Nenhum) {
 								is_all_elementos_restricao_in_CP = false;
+								std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) << std::endl;
 								break;
 							}//if (idHidreletrica_PD != IdHidreletrica_Nenhum) {
 
 							if (idHidreletrica_PD != IdHidreletrica_Nenhum) {
 								if (!a_dados.vetorHidreletrica.isInstanciado(idHidreletrica_PD)) {
 									is_all_elementos_restricao_in_CP = false;
+									std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) << std::endl;
 									break;
 								}//if (!a_dados.vetorHidreletrica.isInstanciado(idHidreletrica_PD)) {
 							}//if (idHidreletrica_PD != IdHidreletrica_Nenhum) {
@@ -17865,6 +17877,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							if (idTermeletrica_PD != IdTermeletrica_Nenhum) {
 								if (!a_dados.vetorTermeletrica.isInstanciado(idTermeletrica_PD)) {
 									is_all_elementos_restricao_in_CP = false;
+									std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) << std::endl;
 									break;
 								}//if (!a_dados.vetorTermeletrica.isInstanciado(idTermeletrica_PD)) {
 							}//if (idTermeletrica_PD != IdTermeletrica_Nenhum) {
@@ -17872,12 +17885,14 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							if (idDemandaEspecial_PD != IdDemandaEspecial_Nenhum) {
 								if (!a_dados.vetorDemandaEspecial.isInstanciado(idDemandaEspecial_PD)) {
 									is_all_elementos_restricao_in_CP = false;
+									std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) << std::endl;
 									break;
 								}//if (!a_dados.vetorDemandaEspecial.isInstanciado(idDemandaEspecial_PD)) {
 							}//if (idDemandaEspecial_PD != IdDemandaEspecial_Nenhum) {
 
 							if (idUnidadeUTE_PD != IdUnidadeUTE_Nenhum) {
 								is_all_elementos_restricao_in_CP = false;
+								std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) << std::endl;
 								break;
 							}//if (idHidreletrica_PD != IdHidreletrica_Nenhum) {
 
@@ -17885,13 +17900,16 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							if (idContrato_PD != IdContrato_Nenhum) {
 								if (!a_dados.vetorContrato.isInstanciado(idContrato_PD)) {
 									is_all_elementos_restricao_in_CP = false;
+									std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) << std::endl;
 									break;
 								}//if (!a_dados.vetorContrato.isInstanciado(idContrato_PD)) {
 							}//if (idContrato_PD != IdContrato_Nenhum) {
 
 							if (idRenovavel_PD != IdRenovavel_Nenhum) {
+								std::cout << "idRenovavel_PD: " << getString(idRenovavel_PD) + " | em idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) << std::endl;
 								if (!a_dados.vetorRenovavel.isInstanciado(idRenovavel_PD)) {
 									is_all_elementos_restricao_in_CP = false;
+									std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) << std::endl;
 									break;
 								}//if (!a_dados.vetorRenovavel.isInstanciado(idRenovavel_PD)) {
 							}//if (idRenovavel_PD != IdRenovavel_Nenhum) {
@@ -17899,6 +17917,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							if (idUsinaElevatoria_PD != IdUsinaElevatoria_Nenhum) {
 								if (!a_dados.vetorUsinaElevatoria.isInstanciado(idUsinaElevatoria_PD)) {
 									is_all_elementos_restricao_in_CP = false;
+									std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) << std::endl;
 									break;
 								}//if (!a_dados.vetorUsinaElevatoria.isInstanciado(idUsinaElevatoria_PD)) {
 							}//if (idUsinaElevatoria_PD != IdUsinaElevatoria_Nenhum) {
@@ -17929,6 +17948,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								if (idIntercambio_CP == IdIntercambio_Nenhum) {
 									is_all_elementos_restricao_in_CP = false;
+									std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) << std::endl;
 									break;
 								}//if (idIntercambio_CP == IdIntercambio_Nenhum) {
 
