@@ -4132,7 +4132,22 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_HQ(const 
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equHQ, a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_0, periodo, double()));
 						for (int h = a_dados.getIteradorInicial(a_idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, int()); h <= a_dados.getIteradorFinal(a_idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, int()); h++) {
 							const IdHidreletrica idUHE = a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, h, IdHidreletrica());
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, periodo, idUHE), equHQ, -a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_fator_participacao, h, double()) * a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo, double()));
+							const int tempo_viagem_agua = a_dados.getAtributo(idUHE, AttComumHidreletrica_tempo_viagem_agua, int());
+							bool tva_considerado = false;
+							if (tempo_viagem_agua > 0) {
+								const Periodo periodo_ref = a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_horizonte_defluencia_viajante, periodo, Periodo());
+								if (periodo_ref != Periodo(IdAno_1900)) {
+									Periodo periodo_lag = Periodo(periodo_ref.getTipoPeriodo(), Periodo(TipoPeriodo_horario, periodo_ref) - tempo_viagem_agua);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, a_idEstagio, idUHE, periodo_lag, a_horizon), equHQ, -a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_fator_participacao, h, double()) * a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo, double()));
+									tva_considerado = true;
+								}
+							}
+							if (!tva_considerado) {
+								if (a_horizon.at_rIt(periodo).getIteradorFinal() == IdPatamarCarga_1)
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, periodo, IdPatamarCarga_1, idUHE), equHQ, -a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_fator_participacao, h, double()) * a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo, double()));
+								else
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, periodo, idUHE), equHQ, -a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_fator_participacao, h, double()) * a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo, double()));
+							}
 						}
 					}
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varHQ, equHQ, -sobreposicao);
@@ -4165,19 +4180,27 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_HQ(const 
 
 				if (sobreposicao > 0.0) {
 
-					int varHQ = getVarDecisao_HQseExistir(a_TSS, a_idEstagio, periodo, a_idConHQ);
+					int varHQ_past = getVarDecisao_HQseExistir(a_TSS, a_idEstagio, periodo, a_idConHQ);
 
-					if (varHQ == -1)
-						varHQ = addVarDecisao_HQ(a_TSS, a_idEstagio, periodo, a_idConHQ, cota_anterior.at(periodo), cota_anterior.at(periodo), 0.0);
-
-					int equHQ = getEquLinear_HQseExistir(a_TSS, a_idEstagio, a_periodo_lag, a_idConHQ);
-
-					if (equHQ == -1) {
-						equHQ = addEquLinear_HQ(a_TSS, a_idEstagio, a_periodo_lag, a_idConHQ);
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varHQ, equHQ, 1.0);
+					if (varHQ_past == -1)
+						varHQ_past = addVarDecisao_HQ(a_TSS, a_idEstagio, periodo, a_idConHQ, cota_anterior.at(periodo), cota_anterior.at(periodo), 0.0);
+					else {
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varHQ_past, cota_anterior.at(periodo));
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varHQ_past, cota_anterior.at(periodo));
 					}
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varHQ, equHQ, -sobreposicao);
+					if (varHQ_past != varHQ) {
+
+						int equHQ = getEquLinear_HQseExistir(a_TSS, a_idEstagio, a_periodo_lag, a_idConHQ);
+
+						if (equHQ == -1) {
+							equHQ = addEquLinear_HQ(a_TSS, a_idEstagio, a_periodo_lag, a_idConHQ);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varHQ, equHQ, 1.0);
+						}
+
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varHQ_past, equHQ, -sobreposicao);
+
+					}
 
 					if (!sobreposicao_encontrada)
 						sobreposicao_encontrada = true;
@@ -4823,7 +4846,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicas(const TipoSubproblemaSolver a_
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRH_FINF, ineRH_VINF, 1.0);
 
 							if ((a_idEstagio == stageIni) && (a_period == a_periodIni_stage))
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRH_VINF, a_dados.getAtributo(idRH, AttComumRestricaoOperativaUHE_vlr_ini, double()) - var_abs_inf);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRH_VINF, a_dados.getAtributo(idRH, AttComumRestricaoOperativaUHE_vlr_ini, double()) + var_abs_inf);
 							else {
 								int varRH_prev = getVarDecisao_RHseExistir(a_TSS, a_idEstagio, a_periodPrev, idRH);
 								if ((varRH_prev == -1) && (a_periodPrev >= a_periodIni_stage))
@@ -4893,7 +4916,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicas(const TipoSubproblemaSolver a_
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRH_FINF, ineRH_VINF, 1.0);
 
 							if ((a_idEstagio == stageIni) && (a_period == a_periodIni_stage))
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRH_VINF, a_dados.getAtributo(idRH, AttComumRestricaoOperativaUHE_vlr_ini, double()) * (1.0 - var_rel_inf));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRH_VINF, a_dados.getAtributo(idRH, AttComumRestricaoOperativaUHE_vlr_ini, double()) * var_rel_inf);
 							else {
 								int varRH_prev = getVarDecisao_RHseExistir(a_TSS, a_idEstagio, a_periodPrev, idRH);
 								if ((varRH_prev == -1) && (a_periodPrev >= a_periodIni_stage))
@@ -4927,7 +4950,7 @@ void ModeloOtimizacao::criarRestricoesHidraulicas(const TipoSubproblemaSolver a_
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRH_FSUP, ineRH_VSUP, 1.0);
 
 							if ((a_idEstagio == stageIni) && (a_period == a_periodIni_stage))
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRH_VSUP, -a_dados.getAtributo(idRH, AttComumRestricaoOperativaUHE_vlr_ini, double()) * (1.0 + var_rel_sup));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRH_VSUP, -a_dados.getAtributo(idRH, AttComumRestricaoOperativaUHE_vlr_ini, double()) * var_rel_sup);
 							else {
 								int varRH_prev = getVarDecisao_RHseExistir(a_TSS, a_idEstagio, a_periodPrev, idRH);
 								if ((varRH_prev == -1) && (a_periodPrev >= a_periodIni_stage))
@@ -5423,7 +5446,7 @@ void ModeloOtimizacao::criarContratos(const TipoSubproblemaSolver a_TSS, Dados& 
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPCON, inePCON_VINF, 1.0);
 
 						if ((a_idEstagio == stageIni) && (a_period == a_periodIni_stage))
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(inePCON_VINF, a_dados.getAtributo(idCon, AttComumContrato_vlr_ini, double()) - var_abs_inf);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(inePCON_VINF, a_dados.getAtributo(idCon, AttComumContrato_vlr_ini, double()) + var_abs_inf);
 						else {
 							int varPCON_prev = getVarDecisao_PCONseExistir(a_TSS, a_idEstagio, a_periodPrev, idCon, tipo_contrato);
 							if ((varPCON_prev == -1) && (a_periodPrev >= a_periodIni_stage))
@@ -5515,7 +5538,7 @@ void ModeloOtimizacao::criarContratos(const TipoSubproblemaSolver a_TSS, Dados& 
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPCON, inePCON_VINF, 1.0);
 
 						if ((a_idEstagio == stageIni) && (a_period == a_periodIni_stage))
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(inePCON_VINF, a_dados.getAtributo(idCon, AttComumContrato_vlr_ini, double()) * (1 - var_rel_inf));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(inePCON_VINF, a_dados.getAtributo(idCon, AttComumContrato_vlr_ini, double()) * var_rel_inf);
 						else {
 							int varPCON_prev = getVarDecisao_PCONseExistir(a_TSS, a_idEstagio, a_periodPrev, idCon, tipo_contrato);
 							if ((varPCON_prev == -1) && (a_periodPrev >= a_periodIni_stage))
@@ -5560,7 +5583,7 @@ void ModeloOtimizacao::criarContratos(const TipoSubproblemaSolver a_TSS, Dados& 
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varPCON, inePCON_VSUP, -1.0);
 
 						if ((a_idEstagio == stageIni) && (a_period == a_periodIni_stage))
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(inePCON_VSUP, -a_dados.getAtributo(idCon, AttComumContrato_vlr_ini, double()) * (1.0 + var_rel_sup));
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(inePCON_VSUP, -a_dados.getAtributo(idCon, AttComumContrato_vlr_ini, double()) * var_rel_sup);
 						else {
 							int varPCON_prev = getVarDecisao_PCONseExistir(a_TSS, a_idEstagio, a_periodPrev, idCon, tipo_contrato);
 							if ((varPCON_prev == -1) && (a_periodPrev >= a_periodIni_stage))
@@ -5781,7 +5804,7 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRE_FINF, ineRE_VINF, 1.0);
 
 							if ((a_idEstagio == stageIni) && (a_period == a_periodIni_stage))
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRE_VINF, a_dados.getAtributo(idRE, AttComumRestricaoEletrica_vlr_ini, double()) - var_abs_inf);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRE_VINF, a_dados.getAtributo(idRE, AttComumRestricaoEletrica_vlr_ini, double()) + var_abs_inf);
 							else {
 								int varRE_prev = getVarDecisao_REseExistir(a_TSS, a_idEstagio, a_periodPrev, idRE);
 								if ((varRE_prev == -1) && (a_periodPrev >= a_periodIni_stage))
@@ -5851,7 +5874,7 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRE_FINF, ineRE_VINF, 1.0);
 
 							if ((a_idEstagio == stageIni) && (a_period == a_periodIni_stage))
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRE_VINF, a_dados.getAtributo(idRE, AttComumRestricaoEletrica_vlr_ini, double()) * (1.0 - var_rel_inf));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRE_VINF, a_dados.getAtributo(idRE, AttComumRestricaoEletrica_vlr_ini, double()) * var_rel_inf);
 							else {
 								int varRE_prev = getVarDecisao_REseExistir(a_TSS, a_idEstagio, a_periodPrev, idRE);
 								if ((varRE_prev == -1) && (a_periodPrev >= a_periodIni_stage))
@@ -5885,7 +5908,7 @@ void ModeloOtimizacao::criarRestricoesEletricas(const TipoSubproblemaSolver a_TS
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRE_FSUP, ineRE_VSUP, 1.0);
 
 							if ((a_idEstagio == stageIni) && (a_period == a_periodIni_stage))
-								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRE_VSUP, -a_dados.getAtributo(idRE, AttComumRestricaoEletrica_vlr_ini, double()) * (1.0 + var_rel_sup));
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineRE_VSUP, -a_dados.getAtributo(idRE, AttComumRestricaoEletrica_vlr_ini, double()) * var_rel_sup);
 							else {
 								int varRE_prev = getVarDecisao_REseExistir(a_TSS, a_idEstagio, a_periodPrev, idRE);
 								if ((varRE_prev == -1) && (a_periodPrev >= a_periodIni_stage))
@@ -6348,10 +6371,22 @@ void ModeloOtimizacao::criarControleCotaVazao(const TipoSubproblemaSolver a_TSS,
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(equHQ, a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_0, a_period, double()));
 				for (int h = a_dados.getIteradorInicial(idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, int()); h <= a_dados.getIteradorFinal(idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, int()); h++) {
 					const IdHidreletrica idUHE = a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_hidreletrica_montante, h, IdHidreletrica());
-					if (a_horizon.at_rIt(a_period).getIteradorFinal() == IdPatamarCarga_1)
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_period, IdPatamarCarga_1, idUHE), equHQ, -a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_fator_participacao, h, double()) * a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, a_period, double()));
-					else
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_period, idUHE), equHQ, -a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_fator_participacao, h, double()) * a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, a_period, double()));
+					const int tempo_viagem_agua = a_dados.getAtributo(idUHE, AttComumHidreletrica_tempo_viagem_agua, int());
+					bool tva_considerado = false;
+					if (tempo_viagem_agua > 0) {
+						const Periodo periodo_ref = a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_horizonte_defluencia_viajante, a_period, Periodo());
+						if (periodo_ref != Periodo(IdAno_1900)) {
+							Periodo periodo_lag = Periodo(periodo_ref.getTipoPeriodo(), Periodo(TipoPeriodo_horario, periodo_ref) - tempo_viagem_agua);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, a_idEstagio, idUHE, periodo_lag, a_horizon), equHQ, -a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_fator_participacao, h, double()) * a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, a_period, double()));
+							tva_considerado = true;
+						}
+					}
+					if (!tva_considerado) {
+						if (a_horizon.at_rIt(a_period).getIteradorFinal() == IdPatamarCarga_1)
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_period, IdPatamarCarga_1, idUHE), equHQ, -a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_fator_participacao, h, double()) * a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, a_period, double()));
+						else
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QDEF(a_TSS, a_idEstagio, a_period, idUHE), equHQ, -a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_fator_participacao, h, double()) * a_dados.getElementoVetor(idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, a_period, double()));
+					}
 				}
 
 				//
@@ -6360,16 +6395,16 @@ void ModeloOtimizacao::criarControleCotaVazao(const TipoSubproblemaSolver a_TSS,
 				for (int i = a_dados.getIterador2Inicial(idConHQ, AttMatrizControleCotaVazao_num_horas_lag, a_period, int()); i <= a_dados.getIterador2Final(idConHQ, AttMatrizControleCotaVazao_num_horas_lag, a_period, int()); i++) {
 
 					double var_abs_inf = vlr_min;
-					if (getSize1Matriz(idConHQ, AttMatrizControleCotaVazao_var_abs_inf) > 0)
+					if (a_dados.getSize1Matriz(idConHQ, AttMatrizControleCotaVazao_var_abs_inf) > 0)
 						var_abs_inf = a_dados.getElementoMatriz(idConHQ, AttMatrizControleCotaVazao_var_abs_inf, a_period, i, double());
 
 					double var_abs_sup = vlr_max;
-					if (getSize1Matriz(idConHQ, AttMatrizControleCotaVazao_var_abs_sup) > 0)
+					if (a_dados.getSize1Matriz(idConHQ, AttMatrizControleCotaVazao_var_abs_sup) > 0)
 						var_abs_sup = a_dados.getElementoMatriz(idConHQ, AttMatrizControleCotaVazao_var_abs_sup, a_period, i, double());
 
-					if ((vlr_min < var_abs_inf) || (var_abs_sup < vlr_max)) {
+					if ((vlr_min != var_abs_inf) || (var_abs_sup != vlr_max)) {
 
-						const double num_horas_lag = a_dados.getIterador2Inicial(idConHQ, AttMatrizControleCotaVazao_num_horas_lag, a_period, i, double());
+						const double num_horas_lag = a_dados.getElementoMatriz(idConHQ, AttMatrizControleCotaVazao_num_horas_lag, a_period, i, double());
 						const int num_minutos_lag = int(num_horas_lag * 60);
 
 						// Restricao entra como absoluta no período atual
@@ -6381,7 +6416,7 @@ void ModeloOtimizacao::criarControleCotaVazao(const TipoSubproblemaSolver a_TSS,
 								throw std::invalid_argument("Error getting HQ_LAG " + getFullString(period_lag) + " for " + getFullString(idConHQ) + " in " + getFullString(a_period) + " and lag " + getFullString(num_horas_lag));
 						} // if (num_minutos_lag > 0) {
 
-						if (vlr_min < var_abs_inf) {
+						if (vlr_min != var_abs_inf) {
 							const int varHQ_VAINF_FINF = addVarDecisao_HQ_VAINF_FINF(a_TSS, a_idEstagio, a_period, idConHQ, num_horas_lag, 0.0, infinito, 0.0);
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varHQ_VAINF_FINF, getEquLinear_ZP(a_TSS, a_idEstagio, a_period), -penalidade);
 							const int ineHQ_VAINF = addIneLinear_HQ_VAINF(a_TSS, a_idEstagio, a_period, idConHQ, num_horas_lag);
@@ -6392,7 +6427,7 @@ void ModeloOtimizacao::criarControleCotaVazao(const TipoSubproblemaSolver a_TSS,
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(var_HQ_LAG, ineHQ_VAINF, -1.0);
 						}
 
-						if (var_abs_sup < vlr_max) {
+						if (var_abs_sup != vlr_max) {
 							const int varHQ_VASUP_FSUP = addVarDecisao_HQ_VASUP_FSUP(a_TSS, a_idEstagio, a_period, idConHQ, num_horas_lag, 0.0, infinito, 0.0);
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varHQ_VASUP_FSUP, getEquLinear_ZP(a_TSS, a_idEstagio, a_period), -penalidade);
 							const int ineHQ_VASUP = addIneLinear_HQ_VASUP(a_TSS, a_idEstagio, a_period, idConHQ, num_horas_lag);

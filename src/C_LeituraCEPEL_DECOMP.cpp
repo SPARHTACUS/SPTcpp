@@ -17910,7 +17910,6 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							}//if (idContrato_PD != IdContrato_Nenhum) {
 
 							if (idRenovavel_PD != IdRenovavel_Nenhum) {
-								std::cout << "idRenovavel_PD: " << getString(idRenovavel_PD) + " | em idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) << std::endl;
 								if (!a_dados.vetorRenovavel.isInstanciado(idRenovavel_PD)) {
 									is_all_elementos_restricao_in_CP = false;
 									std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) << std::endl;

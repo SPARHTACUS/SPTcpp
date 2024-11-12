@@ -5778,10 +5778,10 @@ void LeituraCEPEL::atualizar_vetores_premissas_calculo_produtibilidades(Dados& a
 
 										const double valor = a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getElementoVetor(attVetorReservatorio.at(pos), periodo, double());
 
-										if (soma_sobreposicao == 0.0)
-											valor_aux = valor;
+										//if (soma_sobreposicao == 0.0)
+											//valor_aux = valor;
 
-										if (valor_aux != valor) { throw std::invalid_argument("Os valores no horizonte de estudo com sobreposicao devem ser iguais para o periodo : " + getString(periodo_alvo)); }
+										//if (valor_aux != valor) { throw std::invalid_argument("Os valores no horizonte de estudo com sobreposicao devem ser iguais para o periodo : " + getString(periodo_alvo)); }
 
 										is_sobreposicao_encontrada = true;
 										soma_sobreposicao += sobreposicao;
