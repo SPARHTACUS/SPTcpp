@@ -16892,6 +16892,9 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				if (dadosPreConfig_hidreletrica_attVetor_premissa)
 					std::cout << "Carregando arquivo de preConfiguracao: HIDRELETRICA_RESERVATORIO_AttVetorPremissa_PorPeriodo.csv..." << std::endl;
 
+				if (dadosPreConfig_hidreletrica_reservatorio_attComum_operacional || dadosPreConfig_hidreletrica_reservatorio_attVetor_operacional)
+					a_dados.setAtributo(AttComumDados_coficiente_evaporacao_regra_especial, false);
+
 				//*******************************************************************
 				//   Instanciahidrelétricas PD no CP
 				//   Testa se a hidrelétrica existe no CP. Caso contrário, o instancia com valores default
