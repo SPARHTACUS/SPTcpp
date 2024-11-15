@@ -8581,41 +8581,41 @@ int ModeloOtimizacao::criarReservaPotencia(const TipoSubproblemaSolver a_TSS, Da
 				// Hidreletrica
 				if ((idUHE != IdHidreletrica_Nenhum) && (idConUHE == IdConjuntoHidraulico_Nenhum) && (idUniUHE == IdUnidadeUHE_Nenhum) && (idUTE == IdTermeletrica_Nenhum) && (idUniUTE == IdUnidadeUTE_Nenhum) && (idINT == IdIntercambio_Nenhum) && (idREN == IdRenovavel_Nenhum) && (idDEM == IdSubmercado_Nenhum) && (idDEMLIQ == IdSubmercado_Nenhum)) {
 					if (tipoVarPRES == TipoVariavelRestricaoOperativa_potencia_disponivel)
-						varPot = getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUHE);
+						varPot = getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUHE);
 					else if (tipoVarPRES == TipoVariavelRestricaoOperativa_potencia)
-						varPot = getVarDecisao_PH(a_TSS, a_idEstagio, a_period, a_idPat, idUHE);
+						varPot = getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUHE);
 				}
 
 				// ConjuntoHidraulico
 				else if ((idUHE != IdHidreletrica_Nenhum) && (idConUHE != IdConjuntoHidraulico_Nenhum) && (idUniUHE == IdUnidadeUHE_Nenhum) && (idUTE == IdTermeletrica_Nenhum) && (idUniUTE == IdUnidadeUTE_Nenhum) && (idINT == IdIntercambio_Nenhum) && (idREN == IdRenovavel_Nenhum) && (idDEM == IdSubmercado_Nenhum) && (idDEMLIQ == IdSubmercado_Nenhum)) {
 					if (tipoVarPRES == TipoVariavelRestricaoOperativa_potencia_disponivel)
-						varPot = getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, idConUHE);
+						varPot = getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, idConUHE);
 					else if (tipoVarPRES == TipoVariavelRestricaoOperativa_potencia)
-						varPot = getVarDecisao_PH(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, idConUHE);
+						varPot = getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, idConUHE);
 				}
 
 				// UnidadeUHE
 				else if ((idUHE != IdHidreletrica_Nenhum) && (idConUHE != IdConjuntoHidraulico_Nenhum) && (idUniUHE != IdUnidadeUHE_Nenhum) && (idUTE == IdTermeletrica_Nenhum) && (idUniUTE == IdUnidadeUTE_Nenhum) && (idINT == IdIntercambio_Nenhum) && (idREN == IdRenovavel_Nenhum) && (idDEM == IdSubmercado_Nenhum) && (idDEMLIQ == IdSubmercado_Nenhum)) {
 					if (tipoVarPRES == TipoVariavelRestricaoOperativa_potencia_disponivel)
-						varPot = getVarDecisao_PHDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, idConUHE, idUniUHE);
+						varPot = getVarDecisao_PHDISPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, idConUHE, idUniUHE);
 					else if (tipoVarPRES == TipoVariavelRestricaoOperativa_potencia)
-						varPot = getVarDecisao_PH(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, idConUHE, idUniUHE);
+						varPot = getVarDecisao_PHseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUHE, idConUHE, idUniUHE);
 				}
 
 				// Termeletrica
 				else if ((idUHE == IdHidreletrica_Nenhum) && (idConUHE == IdConjuntoHidraulico_Nenhum) && (idUniUHE == IdUnidadeUHE_Nenhum) && (idUTE != IdTermeletrica_Nenhum) && (idUniUTE == IdUnidadeUTE_Nenhum) && (idINT == IdIntercambio_Nenhum) && (idREN == IdRenovavel_Nenhum) && (idDEM == IdSubmercado_Nenhum) && (idDEMLIQ == IdSubmercado_Nenhum)) {
 					if (tipoVarPRES == TipoVariavelRestricaoOperativa_potencia_disponivel)
-						varPot = getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
+						varPot = getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
 					else if (tipoVarPRES == TipoVariavelRestricaoOperativa_potencia)
-						varPot = getVarDecisao_PT(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
+						varPot = getVarDecisao_PTseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUTE);
 				}
 
 				// Unidade UTE Termeletrica
 				else if ((idUHE == IdHidreletrica_Nenhum) && (idConUHE == IdConjuntoHidraulico_Nenhum) && (idUniUHE == IdUnidadeUHE_Nenhum) && (idUTE != IdTermeletrica_Nenhum) && (idUniUTE != IdUnidadeUTE_Nenhum) && (idINT == IdIntercambio_Nenhum) && (idREN == IdRenovavel_Nenhum) && (idDEM == IdSubmercado_Nenhum) && (idDEMLIQ == IdSubmercado_Nenhum)) {
 					if (tipoVarPRES == TipoVariavelRestricaoOperativa_potencia_disponivel)
-						varPot = getVarDecisao_PTDISP(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUniUTE);
+						varPot = getVarDecisao_PTDISPseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUniUTE);
 					else if (tipoVarPRES == TipoVariavelRestricaoOperativa_potencia)
-						varPot = getVarDecisao_PT(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUniUTE);
+						varPot = getVarDecisao_PTseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idUTE, idUniUTE);
 				}
 
 				// Intercambio
@@ -8627,7 +8627,7 @@ int ModeloOtimizacao::criarReservaPotencia(const TipoSubproblemaSolver a_TSS, Da
 
 				// Renovavel
 				else if ((idUHE == IdHidreletrica_Nenhum) && (idConUHE == IdConjuntoHidraulico_Nenhum) && (idUniUHE == IdUnidadeUHE_Nenhum) && (idUTE == IdTermeletrica_Nenhum) && (idUniUTE == IdUnidadeUTE_Nenhum) && (idINT == IdIntercambio_Nenhum) && (idREN != IdRenovavel_Nenhum) && (idDEM == IdSubmercado_Nenhum) && (idDEMLIQ == IdSubmercado_Nenhum)) {
-					varPot = getVarDecisao_PR(a_TSS, a_idEstagio, a_period, a_idPat, idREN);
+					varPot = getVarDecisao_PRseExistir(a_TSS, a_idEstagio, a_period, a_idPat, idREN);
 				}
 
 				// Demanda
