@@ -17834,10 +17834,9 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 				//1. Instancia as restrições PD no CP
 				//   Deixa os limites abertos para os períodos fora do horizonte_PD
 				//*******************************************************************
-				const IdRestricaoEletrica idRestricaoEletricaOut_PD = dados_PD.getIdOut(IdRestricaoEletrica());
-				const IdRestricaoEletrica idRestricaoEletricaIni_PD = dados_PD.getMenorId(IdRestricaoEletrica());
+				const IdRestricaoEletrica maiorIdRestricaoEletrica_PD = dados_PD.getMaiorId(IdRestricaoEletrica());
 
-				for (IdRestricaoEletrica idRestricaoEletrica_PD = IdRestricaoEletrica_1; idRestricaoEletrica_PD <= idRestricaoEletricaOut_PD; dados_PD.vetorRestricaoEletrica.incr(idRestricaoEletrica_PD)) {
+				for (IdRestricaoEletrica idRestricaoEletrica_PD = IdRestricaoEletrica_1; idRestricaoEletrica_PD <= maiorIdRestricaoEletrica_PD; idRestricaoEletrica_PD++) {
 
 					bool is_all_elementos_restricao_in_CP = true;
 
