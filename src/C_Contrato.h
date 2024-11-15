@@ -11,7 +11,7 @@
 	  m(Contrato,  AttComum,                       submercado,                  IdSubmercado,         min,         max,           min,      CPPD) \
 	  m(Contrato,  AttComum,                   tipo_restricao,         TipoRestricaoContrato,      Nenhum,         max,        Nenhum,      CPPD) \
 	  m(Contrato,  AttComum,                     tipo_unidade,  TipoUnidadeRestricaoContrato,      Nenhum,         max,        Nenhum,      CPPD) \
-	  m(Contrato,  AttComum,               titulacao_contrato,                           int,          -1,           4,            -1,      CPPD) \
+	  m(Contrato,  AttComum,               titulacao_contrato,                           int,          -1,           4,            -1,       nao) \
 	  m(Contrato,  AttComum,                          vlr_ini,                        double,           0,         max,             0,      CPPD) 
 //       c_classe,   smrtAtt,                    nomeAtributo,                         tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 

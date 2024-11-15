@@ -16,8 +16,7 @@
 #define ATT_VETOR_PATAMAR_DEFICIT(m)  \
 	  m(PatamarDeficit,  AttVetor,                 custo,               double,            0,           max,             0,  Periodo) \
 	  m(PatamarDeficit,  AttVetor,            percentual,               double,            0,             1,             0,  Periodo) \
-	  m(PatamarDeficit,  AttVetor,           custo_media,               double,            0,           max,             0,  Periodo) \
-	  m(PatamarDeficit,  AttVetor, potencia_maxima_media,               double,            0,             1,             0,  Periodo) 
+	  m(PatamarDeficit,  AttVetor,           custo_media,               double,            0,           max,             0,  Periodo) 
 
 #define ATT_MATRIZ_PATAMAR_DEFICIT(m)  \
 	  m(PatamarDeficit,  AttMatriz,                potencia_maxima,               double,            0,           max,             0,  Periodo, IdPatamarCarga) \

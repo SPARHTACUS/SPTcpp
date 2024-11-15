@@ -15,8 +15,7 @@
 
 
 #define ATT_VETOR_SUBMERCADO(m)  \
-	  m(Submercado,  AttVetor,              demanda,               double,          0,          max,             0,     Periodo) \
-	  m(Submercado,  AttVetor,        demanda_media,               double,          0,          max,             0,     Periodo)
+	  m(Submercado,  AttVetor,              demanda,               double,          0,          max,             0,     Periodo)
 //        c_classe,   smrtAtt,         nomeAtributo,                 Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define ATT_MATRIZ_SUBMERCADO(m)  \

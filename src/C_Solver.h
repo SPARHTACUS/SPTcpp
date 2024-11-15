@@ -2856,6 +2856,10 @@ public:
 
     bool setNomeRestricao(const int a_posicaoRestricao, const std::string a_nome) {
         try {
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) { //restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2895,6 +2899,10 @@ public:
     }
 
     std::string getNomeRestricao(const int a_posicaoRestricao) {
+
+        if (a_posicaoRestricao == -1)
+            throw std::invalid_argument("Negative index for constraint.");
+
         const int rowIdx = origRowIdx.at(a_posicaoRestricao);
         if (rowIdx == -1) { //restricao ja foi removida do modelo
             throw std::invalid_argument(
@@ -2911,6 +2919,10 @@ public:
     }
 
     std::string getNomeVariavel(const int a_posicaoRestricaoVar) {
+
+        if (a_posicaoRestricaoVar == -1)
+            throw std::invalid_argument("Negative index for variable.");
+
         const int colIdx = origColIdx.at(a_posicaoRestricaoVar);
         if (colIdx == -1) { //restricao ja foi removida do modelo
             throw std::invalid_argument(
@@ -2930,6 +2942,9 @@ public:
     std::vector<std::vector<int>> getCofsRestricao(const int a_posicaoRestricao) { 
     
         try {
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
 
             std::vector<std::vector<int>> lista_coefs_vars;
 
@@ -3002,6 +3017,12 @@ public:
     bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
         try {
             
+            if (a_posicaoVariavel == -1)
+                throw std::invalid_argument("Negative index for variable.");
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -3046,6 +3067,9 @@ public:
     bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) {
         try {
             
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const double newRHS = (fabs(a_RHS) <= 1e-6) ? 0.0 : a_RHS;
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
@@ -3090,6 +3114,13 @@ public:
 
     double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const int a_pos = -1) {
         try {
+
+            if (a_posicaoVariavel == -1)
+                throw std::invalid_argument("Negative index for variable.");
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -3169,6 +3200,10 @@ public:
 
     double getRHSRestricao(const int a_posicaoRestricao) {
         try {
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -3204,6 +3239,10 @@ public:
 
     bool remRestricao(const int a_posicaoRestricao) {
         try {
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -3271,6 +3310,9 @@ public:
     bool addVarDinamica(const int a_posicao) {
         try {
             
+            if (a_posicao == -1)
+                throw std::invalid_argument("Negative index for variable.");
+
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -3423,6 +3465,10 @@ public:
 
     virtual void getLimiteInferiorVarDinamica(const int a_idx, double* a_array) {
         try {
+
+            if (a_idx == -1)
+                throw std::invalid_argument("Negative index.");
+
             for (int i = 0; i < lista_variavel_dinamica.size(); i++) {
                 a_array[a_idx + i] = getLimInferior(lista_variavel_dinamica[i]);
             }
@@ -3439,6 +3485,10 @@ public:
 
     virtual void  getLimiteSuperiorVarDinamica(const int a_idx, double* a_array) {
         try {
+
+            if (a_idx == -1)
+                throw std::invalid_argument("Negative index.");
+
             for (int i = 0; i < lista_variavel_dinamica.size(); i++) {
                 a_array[a_idx + i] = getLimSuperior(lista_variavel_dinamica[i]);
             }
@@ -3456,6 +3506,10 @@ public:
 
     virtual void  getReducedCostVarDinamica(const int a_idx, double* a_array) {
         try {
+
+            if (a_idx == -1)
+                throw std::invalid_argument("Negative index.");
+
             for (int i = 0; i < lista_variavel_dinamica.size(); i++) {
                 a_array[a_idx + i] = getReducedCost(lista_variavel_dinamica[i]);
             }
@@ -3475,6 +3529,10 @@ public:
 
     double getMultiplicador(const int a_posicaoRestricao) {
         try {
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
 
             if (rowIdx == -1) {
@@ -3493,6 +3551,10 @@ public:
 
     char getSinalRestricao(const int a_posicaoRestricao) {
         try {
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
 
             if (rowIdx == -1) {

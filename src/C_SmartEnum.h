@@ -651,49 +651,6 @@ DEFINE_SMART_ENUM(IdControleCotaVazao, ID_CONTROLE_COTA_VAZAO)
 	m(IdArea, 10)
 DEFINE_SMART_ENUM(IdArea, ID_AREA)
 
-#define ID_INTERCAMBIO_HIDRAULICO(m)\
-	m(IdIntercambioHidraulico,    1) m(IdIntercambioHidraulico,    2) m(IdIntercambioHidraulico,    3) m(IdIntercambioHidraulico,    4) m(IdIntercambioHidraulico,    5) m(IdIntercambioHidraulico,    6) m(IdIntercambioHidraulico,    7) m(IdIntercambioHidraulico,    8) m(IdIntercambioHidraulico,    9) m(IdIntercambioHidraulico,   10)\
-	m(IdIntercambioHidraulico,   11) m(IdIntercambioHidraulico,   12) m(IdIntercambioHidraulico,   13) m(IdIntercambioHidraulico,   14) m(IdIntercambioHidraulico,   15) m(IdIntercambioHidraulico,   16) m(IdIntercambioHidraulico,   17) m(IdIntercambioHidraulico,   18) m(IdIntercambioHidraulico,   19) m(IdIntercambioHidraulico,   20)\
-	m(IdIntercambioHidraulico,   21) m(IdIntercambioHidraulico,   22) m(IdIntercambioHidraulico,   23) m(IdIntercambioHidraulico,   24) m(IdIntercambioHidraulico,   25) m(IdIntercambioHidraulico,   26) m(IdIntercambioHidraulico,   27) m(IdIntercambioHidraulico,   28) m(IdIntercambioHidraulico,   29) m(IdIntercambioHidraulico,   30)\
-	m(IdIntercambioHidraulico,   31) m(IdIntercambioHidraulico,   32) m(IdIntercambioHidraulico,   33) m(IdIntercambioHidraulico,   34) m(IdIntercambioHidraulico,   35) m(IdIntercambioHidraulico,   36) m(IdIntercambioHidraulico,   37) m(IdIntercambioHidraulico,   38) m(IdIntercambioHidraulico,   39) m(IdIntercambioHidraulico,   40)\
-	m(IdIntercambioHidraulico,   41) m(IdIntercambioHidraulico,   42) m(IdIntercambioHidraulico,   43) m(IdIntercambioHidraulico,   44) m(IdIntercambioHidraulico,   45) m(IdIntercambioHidraulico,   46) m(IdIntercambioHidraulico,   47) m(IdIntercambioHidraulico,   48) m(IdIntercambioHidraulico,   49) m(IdIntercambioHidraulico,   50)\
-	m(IdIntercambioHidraulico,   51) m(IdIntercambioHidraulico,   52) m(IdIntercambioHidraulico,   53) m(IdIntercambioHidraulico,   54) m(IdIntercambioHidraulico,   55) m(IdIntercambioHidraulico,   56) m(IdIntercambioHidraulico,   57) m(IdIntercambioHidraulico,   58) m(IdIntercambioHidraulico,   59) m(IdIntercambioHidraulico,   60)\
-	m(IdIntercambioHidraulico,   61) m(IdIntercambioHidraulico,   62) m(IdIntercambioHidraulico,   63) m(IdIntercambioHidraulico,   64) m(IdIntercambioHidraulico,   65) m(IdIntercambioHidraulico,   66) m(IdIntercambioHidraulico,   67) m(IdIntercambioHidraulico,   68) m(IdIntercambioHidraulico,   69) m(IdIntercambioHidraulico,   70)\
-	m(IdIntercambioHidraulico,   71) m(IdIntercambioHidraulico,   72) m(IdIntercambioHidraulico,   73) m(IdIntercambioHidraulico,   74) m(IdIntercambioHidraulico,   75) m(IdIntercambioHidraulico,   76) m(IdIntercambioHidraulico,   77) m(IdIntercambioHidraulico,   78) m(IdIntercambioHidraulico,   79) m(IdIntercambioHidraulico,   80)\
-	m(IdIntercambioHidraulico,   81) m(IdIntercambioHidraulico,   82) m(IdIntercambioHidraulico,   83) m(IdIntercambioHidraulico,   84) m(IdIntercambioHidraulico,   85) m(IdIntercambioHidraulico,   86) m(IdIntercambioHidraulico,   87) m(IdIntercambioHidraulico,   88) m(IdIntercambioHidraulico,   89) m(IdIntercambioHidraulico,   90)\
-	m(IdIntercambioHidraulico,   91) m(IdIntercambioHidraulico,   92) m(IdIntercambioHidraulico,   93) m(IdIntercambioHidraulico,   94) m(IdIntercambioHidraulico,   95) m(IdIntercambioHidraulico,   96) m(IdIntercambioHidraulico,   97) m(IdIntercambioHidraulico,   98) m(IdIntercambioHidraulico,   99) m(IdIntercambioHidraulico,  100)\
-	m(IdIntercambioHidraulico,  101) m(IdIntercambioHidraulico,  102) m(IdIntercambioHidraulico,  103) m(IdIntercambioHidraulico,  104) m(IdIntercambioHidraulico,  105) m(IdIntercambioHidraulico,  106) m(IdIntercambioHidraulico,  107) m(IdIntercambioHidraulico,  108) m(IdIntercambioHidraulico,  109) m(IdIntercambioHidraulico,  110)\
-	m(IdIntercambioHidraulico,  111) m(IdIntercambioHidraulico,  112) m(IdIntercambioHidraulico,  113) m(IdIntercambioHidraulico,  114) m(IdIntercambioHidraulico,  115) m(IdIntercambioHidraulico,  116) m(IdIntercambioHidraulico,  117) m(IdIntercambioHidraulico,  118) m(IdIntercambioHidraulico,  119) m(IdIntercambioHidraulico,  120)\
-	m(IdIntercambioHidraulico,  121) m(IdIntercambioHidraulico,  122) m(IdIntercambioHidraulico,  123) m(IdIntercambioHidraulico,  124) m(IdIntercambioHidraulico,  125) m(IdIntercambioHidraulico,  126) m(IdIntercambioHidraulico,  127) m(IdIntercambioHidraulico,  128) m(IdIntercambioHidraulico,  129) m(IdIntercambioHidraulico,  130)\
-	m(IdIntercambioHidraulico,  131) m(IdIntercambioHidraulico,  132) m(IdIntercambioHidraulico,  133) m(IdIntercambioHidraulico,  134) m(IdIntercambioHidraulico,  135) m(IdIntercambioHidraulico,  136) m(IdIntercambioHidraulico,  137) m(IdIntercambioHidraulico,  138) m(IdIntercambioHidraulico,  139) m(IdIntercambioHidraulico,  140)\
-	m(IdIntercambioHidraulico,  141) m(IdIntercambioHidraulico,  142) m(IdIntercambioHidraulico,  143) m(IdIntercambioHidraulico,  144) m(IdIntercambioHidraulico,  145) m(IdIntercambioHidraulico,  146) m(IdIntercambioHidraulico,  147) m(IdIntercambioHidraulico,  148) m(IdIntercambioHidraulico,  149) m(IdIntercambioHidraulico,  150)\
-	m(IdIntercambioHidraulico,  151) m(IdIntercambioHidraulico,  152) m(IdIntercambioHidraulico,  153) m(IdIntercambioHidraulico,  154) m(IdIntercambioHidraulico,  155) m(IdIntercambioHidraulico,  156) m(IdIntercambioHidraulico,  157) m(IdIntercambioHidraulico,  158) m(IdIntercambioHidraulico,  159) m(IdIntercambioHidraulico,  160)\
-	m(IdIntercambioHidraulico,  161) m(IdIntercambioHidraulico,  162) m(IdIntercambioHidraulico,  163) m(IdIntercambioHidraulico,  164) m(IdIntercambioHidraulico,  165) m(IdIntercambioHidraulico,  166) m(IdIntercambioHidraulico,  167) m(IdIntercambioHidraulico,  168) m(IdIntercambioHidraulico,  169) m(IdIntercambioHidraulico,  170)\
-	m(IdIntercambioHidraulico,  171) m(IdIntercambioHidraulico,  172) m(IdIntercambioHidraulico,  173) m(IdIntercambioHidraulico,  174) m(IdIntercambioHidraulico,  175) m(IdIntercambioHidraulico,  176) m(IdIntercambioHidraulico,  177) m(IdIntercambioHidraulico,  178) m(IdIntercambioHidraulico,  179) m(IdIntercambioHidraulico,  180)\
-	m(IdIntercambioHidraulico,  181) m(IdIntercambioHidraulico,  182) m(IdIntercambioHidraulico,  183) m(IdIntercambioHidraulico,  184) m(IdIntercambioHidraulico,  185) m(IdIntercambioHidraulico,  186) m(IdIntercambioHidraulico,  187) m(IdIntercambioHidraulico,  188) m(IdIntercambioHidraulico,  189) m(IdIntercambioHidraulico,  190)\
-	m(IdIntercambioHidraulico,  191) m(IdIntercambioHidraulico,  192) m(IdIntercambioHidraulico,  193) m(IdIntercambioHidraulico,  194) m(IdIntercambioHidraulico,  195) m(IdIntercambioHidraulico,  196) m(IdIntercambioHidraulico,  197) m(IdIntercambioHidraulico,  198) m(IdIntercambioHidraulico,  199) m(IdIntercambioHidraulico,  200)\
-	m(IdIntercambioHidraulico,  201) m(IdIntercambioHidraulico,  202) m(IdIntercambioHidraulico,  203) m(IdIntercambioHidraulico,  204) m(IdIntercambioHidraulico,  205) m(IdIntercambioHidraulico,  206) m(IdIntercambioHidraulico,  207) m(IdIntercambioHidraulico,  208) m(IdIntercambioHidraulico,  209) m(IdIntercambioHidraulico,  210)\
-	m(IdIntercambioHidraulico,  211) m(IdIntercambioHidraulico,  212) m(IdIntercambioHidraulico,  213) m(IdIntercambioHidraulico,  214) m(IdIntercambioHidraulico,  215) m(IdIntercambioHidraulico,  216) m(IdIntercambioHidraulico,  217) m(IdIntercambioHidraulico,  218) m(IdIntercambioHidraulico,  219) m(IdIntercambioHidraulico,  220)\
-	m(IdIntercambioHidraulico,  221) m(IdIntercambioHidraulico,  222) m(IdIntercambioHidraulico,  223) m(IdIntercambioHidraulico,  224) m(IdIntercambioHidraulico,  225) m(IdIntercambioHidraulico,  226) m(IdIntercambioHidraulico,  227) m(IdIntercambioHidraulico,  228) m(IdIntercambioHidraulico,  229) m(IdIntercambioHidraulico,  230)\
-	m(IdIntercambioHidraulico,  231) m(IdIntercambioHidraulico,  232) m(IdIntercambioHidraulico,  233) m(IdIntercambioHidraulico,  234) m(IdIntercambioHidraulico,  235) m(IdIntercambioHidraulico,  236) m(IdIntercambioHidraulico,  237) m(IdIntercambioHidraulico,  238) m(IdIntercambioHidraulico,  239) m(IdIntercambioHidraulico,  240)\
-	m(IdIntercambioHidraulico,  241) m(IdIntercambioHidraulico,  242) m(IdIntercambioHidraulico,  243) m(IdIntercambioHidraulico,  244) m(IdIntercambioHidraulico,  245) m(IdIntercambioHidraulico,  246) m(IdIntercambioHidraulico,  247) m(IdIntercambioHidraulico,  248) m(IdIntercambioHidraulico,  249) m(IdIntercambioHidraulico,  250)\
-	m(IdIntercambioHidraulico,  251) m(IdIntercambioHidraulico,  252) m(IdIntercambioHidraulico,  253) m(IdIntercambioHidraulico,  254) m(IdIntercambioHidraulico,  255) m(IdIntercambioHidraulico,  256) m(IdIntercambioHidraulico,  257) m(IdIntercambioHidraulico,  258) m(IdIntercambioHidraulico,  259) m(IdIntercambioHidraulico,  260)\
-	m(IdIntercambioHidraulico,  261) m(IdIntercambioHidraulico,  262) m(IdIntercambioHidraulico,  263) m(IdIntercambioHidraulico,  264) m(IdIntercambioHidraulico,  265) m(IdIntercambioHidraulico,  266) m(IdIntercambioHidraulico,  267) m(IdIntercambioHidraulico,  268) m(IdIntercambioHidraulico,  269) m(IdIntercambioHidraulico,  270)\
-	m(IdIntercambioHidraulico,  271) m(IdIntercambioHidraulico,  272) m(IdIntercambioHidraulico,  273) m(IdIntercambioHidraulico,  274) m(IdIntercambioHidraulico,  275) m(IdIntercambioHidraulico,  276) m(IdIntercambioHidraulico,  277) m(IdIntercambioHidraulico,  278) m(IdIntercambioHidraulico,  279) m(IdIntercambioHidraulico,  280)\
-	m(IdIntercambioHidraulico,  281) m(IdIntercambioHidraulico,  282) m(IdIntercambioHidraulico,  283) m(IdIntercambioHidraulico,  284) m(IdIntercambioHidraulico,  285) m(IdIntercambioHidraulico,  286) m(IdIntercambioHidraulico,  287) m(IdIntercambioHidraulico,  288) m(IdIntercambioHidraulico,  289) m(IdIntercambioHidraulico,  290)\
-	m(IdIntercambioHidraulico,  291) m(IdIntercambioHidraulico,  292) m(IdIntercambioHidraulico,  293) m(IdIntercambioHidraulico,  294) m(IdIntercambioHidraulico,  295) m(IdIntercambioHidraulico,  296) m(IdIntercambioHidraulico,  297) m(IdIntercambioHidraulico,  298) m(IdIntercambioHidraulico,  299) m(IdIntercambioHidraulico,  300)\
-	m(IdIntercambioHidraulico,  301) m(IdIntercambioHidraulico,  302) m(IdIntercambioHidraulico,  303) m(IdIntercambioHidraulico,  304) m(IdIntercambioHidraulico,  305) m(IdIntercambioHidraulico,  306) m(IdIntercambioHidraulico,  307) m(IdIntercambioHidraulico,  308) m(IdIntercambioHidraulico,  309) m(IdIntercambioHidraulico,  310)\
-	m(IdIntercambioHidraulico,  311) m(IdIntercambioHidraulico,  312) m(IdIntercambioHidraulico,  313) m(IdIntercambioHidraulico,  314) m(IdIntercambioHidraulico,  315) m(IdIntercambioHidraulico,  316) m(IdIntercambioHidraulico,  317) m(IdIntercambioHidraulico,  318) m(IdIntercambioHidraulico,  319) m(IdIntercambioHidraulico,  320)\
-	m(IdIntercambioHidraulico,  321) m(IdIntercambioHidraulico,  322) m(IdIntercambioHidraulico,  323) m(IdIntercambioHidraulico,  324) m(IdIntercambioHidraulico,  325) m(IdIntercambioHidraulico,  326) m(IdIntercambioHidraulico,  327) m(IdIntercambioHidraulico,  328) m(IdIntercambioHidraulico,  329) m(IdIntercambioHidraulico,  330)\
-	m(IdIntercambioHidraulico,  331) m(IdIntercambioHidraulico,  332) m(IdIntercambioHidraulico,  333) m(IdIntercambioHidraulico,  334) m(IdIntercambioHidraulico,  335) m(IdIntercambioHidraulico,  336) m(IdIntercambioHidraulico,  337) m(IdIntercambioHidraulico,  338) m(IdIntercambioHidraulico,  339) m(IdIntercambioHidraulico,  340)\
-	m(IdIntercambioHidraulico,  341) m(IdIntercambioHidraulico,  342) m(IdIntercambioHidraulico,  343) m(IdIntercambioHidraulico,  344) m(IdIntercambioHidraulico,  345) m(IdIntercambioHidraulico,  346) m(IdIntercambioHidraulico,  347) m(IdIntercambioHidraulico,  348) m(IdIntercambioHidraulico,  349) m(IdIntercambioHidraulico,  350)\
-	m(IdIntercambioHidraulico,  351) m(IdIntercambioHidraulico,  352) m(IdIntercambioHidraulico,  353) m(IdIntercambioHidraulico,  354) m(IdIntercambioHidraulico,  355) m(IdIntercambioHidraulico,  356) m(IdIntercambioHidraulico,  357) m(IdIntercambioHidraulico,  358) m(IdIntercambioHidraulico,  359) m(IdIntercambioHidraulico,  360)\
-	m(IdIntercambioHidraulico,  361) m(IdIntercambioHidraulico,  362) m(IdIntercambioHidraulico,  363) m(IdIntercambioHidraulico,  364) m(IdIntercambioHidraulico,  365) m(IdIntercambioHidraulico,  366) m(IdIntercambioHidraulico,  367) m(IdIntercambioHidraulico,  368) m(IdIntercambioHidraulico,  369) m(IdIntercambioHidraulico,  370)\
-	m(IdIntercambioHidraulico,  371) m(IdIntercambioHidraulico,  372) m(IdIntercambioHidraulico,  373) m(IdIntercambioHidraulico,  374) m(IdIntercambioHidraulico,  375) m(IdIntercambioHidraulico,  376) m(IdIntercambioHidraulico,  377) m(IdIntercambioHidraulico,  378) m(IdIntercambioHidraulico,  379) m(IdIntercambioHidraulico,  380)\
-	m(IdIntercambioHidraulico,  381) m(IdIntercambioHidraulico,  382) m(IdIntercambioHidraulico,  383) m(IdIntercambioHidraulico,  384) m(IdIntercambioHidraulico,  385) m(IdIntercambioHidraulico,  386) m(IdIntercambioHidraulico,  387) m(IdIntercambioHidraulico,  388) m(IdIntercambioHidraulico,  389) m(IdIntercambioHidraulico,  390)\
-	m(IdIntercambioHidraulico,  391) m(IdIntercambioHidraulico,  392) m(IdIntercambioHidraulico,  393) m(IdIntercambioHidraulico,  394) m(IdIntercambioHidraulico,  395) m(IdIntercambioHidraulico,  396) m(IdIntercambioHidraulico,  397) m(IdIntercambioHidraulico,  398) m(IdIntercambioHidraulico,  399) m(IdIntercambioHidraulico,  400)
-DEFINE_SMART_ENUM(IdIntercambioHidraulico, ID_INTERCAMBIO_HIDRAULICO)
-
 #define ID_PATAMAR_CARGA(m)\
 	m(IdPatamarCarga,    1) m(IdPatamarCarga,    2) m(IdPatamarCarga,    3) m(IdPatamarCarga,    4) m(IdPatamarCarga,    5) m(IdPatamarCarga,    6) m(IdPatamarCarga,    7) m(IdPatamarCarga,    8) m(IdPatamarCarga,    9) m(IdPatamarCarga,   10)\
 	m(IdPatamarCarga,   11) m(IdPatamarCarga,   12) m(IdPatamarCarga,   13) m(IdPatamarCarga,   14) m(IdPatamarCarga,   15) m(IdPatamarCarga,   16) m(IdPatamarCarga,   17) m(IdPatamarCarga,   18) m(IdPatamarCarga,   19) m(IdPatamarCarga,   20)\
@@ -795,49 +752,6 @@ DEFINE_SMART_ENUM(IdDefluencia, ID_DEFLUENCIA)
 	m(IdRestricaoOperativaUHE,  381) m(IdRestricaoOperativaUHE,  382) m(IdRestricaoOperativaUHE,  383) m(IdRestricaoOperativaUHE,  384) m(IdRestricaoOperativaUHE,  385) m(IdRestricaoOperativaUHE,  386) m(IdRestricaoOperativaUHE,  387) m(IdRestricaoOperativaUHE,  388) m(IdRestricaoOperativaUHE,  389) m(IdRestricaoOperativaUHE,  390)\
 	m(IdRestricaoOperativaUHE,  391) m(IdRestricaoOperativaUHE,  392) m(IdRestricaoOperativaUHE,  393) m(IdRestricaoOperativaUHE,  394) m(IdRestricaoOperativaUHE,  395) m(IdRestricaoOperativaUHE,  396) m(IdRestricaoOperativaUHE,  397) m(IdRestricaoOperativaUHE,  398) m(IdRestricaoOperativaUHE,  399) m(IdRestricaoOperativaUHE,  400)
 DEFINE_SMART_ENUM(IdRestricaoOperativaUHE, ID_REST_OPER_LIMITE_UHE)
-
-#define ID_DISCRETIZACAO_TEMPORAL(m)\
-	m(IdDiscretizacao,    1) m(IdDiscretizacao,    2) m(IdDiscretizacao,    3) m(IdDiscretizacao,    4) m(IdDiscretizacao,    5) m(IdDiscretizacao,    6) m(IdDiscretizacao,    7) m(IdDiscretizacao,    8) m(IdDiscretizacao,    9) m(IdDiscretizacao,   10)\
-	m(IdDiscretizacao,   11) m(IdDiscretizacao,   12) m(IdDiscretizacao,   13) m(IdDiscretizacao,   14) m(IdDiscretizacao,   15) m(IdDiscretizacao,   16) m(IdDiscretizacao,   17) m(IdDiscretizacao,   18) m(IdDiscretizacao,   19) m(IdDiscretizacao,   20)\
-	m(IdDiscretizacao,   21) m(IdDiscretizacao,   22) m(IdDiscretizacao,   23) m(IdDiscretizacao,   24) m(IdDiscretizacao,   25) m(IdDiscretizacao,   26) m(IdDiscretizacao,   27) m(IdDiscretizacao,   28) m(IdDiscretizacao,   29) m(IdDiscretizacao,   30)\
-	m(IdDiscretizacao,   31) m(IdDiscretizacao,   32) m(IdDiscretizacao,   33) m(IdDiscretizacao,   34) m(IdDiscretizacao,   35) m(IdDiscretizacao,   36) m(IdDiscretizacao,   37) m(IdDiscretizacao,   38) m(IdDiscretizacao,   39) m(IdDiscretizacao,   40)\
-	m(IdDiscretizacao,   41) m(IdDiscretizacao,   42) m(IdDiscretizacao,   43) m(IdDiscretizacao,   44) m(IdDiscretizacao,   45) m(IdDiscretizacao,   46) m(IdDiscretizacao,   47) m(IdDiscretizacao,   48) m(IdDiscretizacao,   49) m(IdDiscretizacao,   50)\
-	m(IdDiscretizacao,   51) m(IdDiscretizacao,   52) m(IdDiscretizacao,   53) m(IdDiscretizacao,   54) m(IdDiscretizacao,   55) m(IdDiscretizacao,   56) m(IdDiscretizacao,   57) m(IdDiscretizacao,   58) m(IdDiscretizacao,   59) m(IdDiscretizacao,   60)\
-	m(IdDiscretizacao,   61) m(IdDiscretizacao,   62) m(IdDiscretizacao,   63) m(IdDiscretizacao,   64) m(IdDiscretizacao,   65) m(IdDiscretizacao,   66) m(IdDiscretizacao,   67) m(IdDiscretizacao,   68) m(IdDiscretizacao,   69) m(IdDiscretizacao,   70)\
-	m(IdDiscretizacao,   71) m(IdDiscretizacao,   72) m(IdDiscretizacao,   73) m(IdDiscretizacao,   74) m(IdDiscretizacao,   75) m(IdDiscretizacao,   76) m(IdDiscretizacao,   77) m(IdDiscretizacao,   78) m(IdDiscretizacao,   79) m(IdDiscretizacao,   80)\
-	m(IdDiscretizacao,   81) m(IdDiscretizacao,   82) m(IdDiscretizacao,   83) m(IdDiscretizacao,   84) m(IdDiscretizacao,   85) m(IdDiscretizacao,   86) m(IdDiscretizacao,   87) m(IdDiscretizacao,   88) m(IdDiscretizacao,   89) m(IdDiscretizacao,   90)\
-	m(IdDiscretizacao,   91) m(IdDiscretizacao,   92) m(IdDiscretizacao,   93) m(IdDiscretizacao,   94) m(IdDiscretizacao,   95) m(IdDiscretizacao,   96) m(IdDiscretizacao,   97) m(IdDiscretizacao,   98) m(IdDiscretizacao,   99) m(IdDiscretizacao,  100)\
-	m(IdDiscretizacao,  101) m(IdDiscretizacao,  102) m(IdDiscretizacao,  103) m(IdDiscretizacao,  104) m(IdDiscretizacao,  105) m(IdDiscretizacao,  106) m(IdDiscretizacao,  107) m(IdDiscretizacao,  108) m(IdDiscretizacao,  109) m(IdDiscretizacao,  110)\
-	m(IdDiscretizacao,  111) m(IdDiscretizacao,  112) m(IdDiscretizacao,  113) m(IdDiscretizacao,  114) m(IdDiscretizacao,  115) m(IdDiscretizacao,  116) m(IdDiscretizacao,  117) m(IdDiscretizacao,  118) m(IdDiscretizacao,  119) m(IdDiscretizacao,  120)\
-	m(IdDiscretizacao,  121) m(IdDiscretizacao,  122) m(IdDiscretizacao,  123) m(IdDiscretizacao,  124) m(IdDiscretizacao,  125) m(IdDiscretizacao,  126) m(IdDiscretizacao,  127) m(IdDiscretizacao,  128) m(IdDiscretizacao,  129) m(IdDiscretizacao,  130)\
-	m(IdDiscretizacao,  131) m(IdDiscretizacao,  132) m(IdDiscretizacao,  133) m(IdDiscretizacao,  134) m(IdDiscretizacao,  135) m(IdDiscretizacao,  136) m(IdDiscretizacao,  137) m(IdDiscretizacao,  138) m(IdDiscretizacao,  139) m(IdDiscretizacao,  140)\
-	m(IdDiscretizacao,  141) m(IdDiscretizacao,  142) m(IdDiscretizacao,  143) m(IdDiscretizacao,  144) m(IdDiscretizacao,  145) m(IdDiscretizacao,  146) m(IdDiscretizacao,  147) m(IdDiscretizacao,  148) m(IdDiscretizacao,  149) m(IdDiscretizacao,  150)\
-	m(IdDiscretizacao,  151) m(IdDiscretizacao,  152) m(IdDiscretizacao,  153) m(IdDiscretizacao,  154) m(IdDiscretizacao,  155) m(IdDiscretizacao,  156) m(IdDiscretizacao,  157) m(IdDiscretizacao,  158) m(IdDiscretizacao,  159) m(IdDiscretizacao,  160)\
-	m(IdDiscretizacao,  161) m(IdDiscretizacao,  162) m(IdDiscretizacao,  163) m(IdDiscretizacao,  164) m(IdDiscretizacao,  165) m(IdDiscretizacao,  166) m(IdDiscretizacao,  167) m(IdDiscretizacao,  168) m(IdDiscretizacao,  169) m(IdDiscretizacao,  170)\
-	m(IdDiscretizacao,  171) m(IdDiscretizacao,  172) m(IdDiscretizacao,  173) m(IdDiscretizacao,  174) m(IdDiscretizacao,  175) m(IdDiscretizacao,  176) m(IdDiscretizacao,  177) m(IdDiscretizacao,  178) m(IdDiscretizacao,  179) m(IdDiscretizacao,  180)\
-	m(IdDiscretizacao,  181) m(IdDiscretizacao,  182) m(IdDiscretizacao,  183) m(IdDiscretizacao,  184) m(IdDiscretizacao,  185) m(IdDiscretizacao,  186) m(IdDiscretizacao,  187) m(IdDiscretizacao,  188) m(IdDiscretizacao,  189) m(IdDiscretizacao,  190)\
-	m(IdDiscretizacao,  191) m(IdDiscretizacao,  192) m(IdDiscretizacao,  193) m(IdDiscretizacao,  194) m(IdDiscretizacao,  195) m(IdDiscretizacao,  196) m(IdDiscretizacao,  197) m(IdDiscretizacao,  198) m(IdDiscretizacao,  199) m(IdDiscretizacao,  200)\
-	m(IdDiscretizacao,  201) m(IdDiscretizacao,  202) m(IdDiscretizacao,  203) m(IdDiscretizacao,  204) m(IdDiscretizacao,  205) m(IdDiscretizacao,  206) m(IdDiscretizacao,  207) m(IdDiscretizacao,  208) m(IdDiscretizacao,  209) m(IdDiscretizacao,  210)\
-	m(IdDiscretizacao,  211) m(IdDiscretizacao,  212) m(IdDiscretizacao,  213) m(IdDiscretizacao,  214) m(IdDiscretizacao,  215) m(IdDiscretizacao,  216) m(IdDiscretizacao,  217) m(IdDiscretizacao,  218) m(IdDiscretizacao,  219) m(IdDiscretizacao,  220)\
-	m(IdDiscretizacao,  221) m(IdDiscretizacao,  222) m(IdDiscretizacao,  223) m(IdDiscretizacao,  224) m(IdDiscretizacao,  225) m(IdDiscretizacao,  226) m(IdDiscretizacao,  227) m(IdDiscretizacao,  228) m(IdDiscretizacao,  229) m(IdDiscretizacao,  230)\
-	m(IdDiscretizacao,  231) m(IdDiscretizacao,  232) m(IdDiscretizacao,  233) m(IdDiscretizacao,  234) m(IdDiscretizacao,  235) m(IdDiscretizacao,  236) m(IdDiscretizacao,  237) m(IdDiscretizacao,  238) m(IdDiscretizacao,  239) m(IdDiscretizacao,  240)\
-	m(IdDiscretizacao,  241) m(IdDiscretizacao,  242) m(IdDiscretizacao,  243) m(IdDiscretizacao,  244) m(IdDiscretizacao,  245) m(IdDiscretizacao,  246) m(IdDiscretizacao,  247) m(IdDiscretizacao,  248) m(IdDiscretizacao,  249) m(IdDiscretizacao,  250)\
-	m(IdDiscretizacao,  251) m(IdDiscretizacao,  252) m(IdDiscretizacao,  253) m(IdDiscretizacao,  254) m(IdDiscretizacao,  255) m(IdDiscretizacao,  256) m(IdDiscretizacao,  257) m(IdDiscretizacao,  258) m(IdDiscretizacao,  259) m(IdDiscretizacao,  260)\
-	m(IdDiscretizacao,  261) m(IdDiscretizacao,  262) m(IdDiscretizacao,  263) m(IdDiscretizacao,  264) m(IdDiscretizacao,  265) m(IdDiscretizacao,  266) m(IdDiscretizacao,  267) m(IdDiscretizacao,  268) m(IdDiscretizacao,  269) m(IdDiscretizacao,  270)\
-	m(IdDiscretizacao,  271) m(IdDiscretizacao,  272) m(IdDiscretizacao,  273) m(IdDiscretizacao,  274) m(IdDiscretizacao,  275) m(IdDiscretizacao,  276) m(IdDiscretizacao,  277) m(IdDiscretizacao,  278) m(IdDiscretizacao,  279) m(IdDiscretizacao,  280)\
-	m(IdDiscretizacao,  281) m(IdDiscretizacao,  282) m(IdDiscretizacao,  283) m(IdDiscretizacao,  284) m(IdDiscretizacao,  285) m(IdDiscretizacao,  286) m(IdDiscretizacao,  287) m(IdDiscretizacao,  288) m(IdDiscretizacao,  289) m(IdDiscretizacao,  290)\
-	m(IdDiscretizacao,  291) m(IdDiscretizacao,  292) m(IdDiscretizacao,  293) m(IdDiscretizacao,  294) m(IdDiscretizacao,  295) m(IdDiscretizacao,  296) m(IdDiscretizacao,  297) m(IdDiscretizacao,  298) m(IdDiscretizacao,  299) m(IdDiscretizacao,  300)\
-	m(IdDiscretizacao,  301) m(IdDiscretizacao,  302) m(IdDiscretizacao,  303) m(IdDiscretizacao,  304) m(IdDiscretizacao,  305) m(IdDiscretizacao,  306) m(IdDiscretizacao,  307) m(IdDiscretizacao,  308) m(IdDiscretizacao,  309) m(IdDiscretizacao,  310)\
-	m(IdDiscretizacao,  311) m(IdDiscretizacao,  312) m(IdDiscretizacao,  313) m(IdDiscretizacao,  314) m(IdDiscretizacao,  315) m(IdDiscretizacao,  316) m(IdDiscretizacao,  317) m(IdDiscretizacao,  318) m(IdDiscretizacao,  319) m(IdDiscretizacao,  320)\
-	m(IdDiscretizacao,  321) m(IdDiscretizacao,  322) m(IdDiscretizacao,  323) m(IdDiscretizacao,  324) m(IdDiscretizacao,  325) m(IdDiscretizacao,  326) m(IdDiscretizacao,  327) m(IdDiscretizacao,  328) m(IdDiscretizacao,  329) m(IdDiscretizacao,  330)\
-	m(IdDiscretizacao,  331) m(IdDiscretizacao,  332) m(IdDiscretizacao,  333) m(IdDiscretizacao,  334) m(IdDiscretizacao,  335) m(IdDiscretizacao,  336) m(IdDiscretizacao,  337) m(IdDiscretizacao,  338) m(IdDiscretizacao,  339) m(IdDiscretizacao,  340)\
-	m(IdDiscretizacao,  341) m(IdDiscretizacao,  342) m(IdDiscretizacao,  343) m(IdDiscretizacao,  344) m(IdDiscretizacao,  345) m(IdDiscretizacao,  346) m(IdDiscretizacao,  347) m(IdDiscretizacao,  348) m(IdDiscretizacao,  349) m(IdDiscretizacao,  350)\
-	m(IdDiscretizacao,  351) m(IdDiscretizacao,  352) m(IdDiscretizacao,  353) m(IdDiscretizacao,  354) m(IdDiscretizacao,  355) m(IdDiscretizacao,  356) m(IdDiscretizacao,  357) m(IdDiscretizacao,  358) m(IdDiscretizacao,  359) m(IdDiscretizacao,  360)\
-	m(IdDiscretizacao,  361) m(IdDiscretizacao,  362) m(IdDiscretizacao,  363) m(IdDiscretizacao,  364) m(IdDiscretizacao,  365) m(IdDiscretizacao,  366) m(IdDiscretizacao,  367) m(IdDiscretizacao,  368) m(IdDiscretizacao,  369) m(IdDiscretizacao,  370)\
-	m(IdDiscretizacao,  371) m(IdDiscretizacao,  372) m(IdDiscretizacao,  373) m(IdDiscretizacao,  374) m(IdDiscretizacao,  375) m(IdDiscretizacao,  376) m(IdDiscretizacao,  377) m(IdDiscretizacao,  378) m(IdDiscretizacao,  379) m(IdDiscretizacao,  380)\
-	m(IdDiscretizacao,  381) m(IdDiscretizacao,  382) m(IdDiscretizacao,  383) m(IdDiscretizacao,  384) m(IdDiscretizacao,  385) m(IdDiscretizacao,  386) m(IdDiscretizacao,  387) m(IdDiscretizacao,  388) m(IdDiscretizacao,  389) m(IdDiscretizacao,  390)\
-	m(IdDiscretizacao,  391) m(IdDiscretizacao,  392) m(IdDiscretizacao,  393) m(IdDiscretizacao,  394) m(IdDiscretizacao,  395) m(IdDiscretizacao,  396) m(IdDiscretizacao,  397) m(IdDiscretizacao,  398) m(IdDiscretizacao,  399) m(IdDiscretizacao,  400)
-DEFINE_SMART_ENUM(IdDiscretizacao, ID_DISCRETIZACAO_TEMPORAL)
 
 #define ID_RESTRICAO_ELETRICA(m)\
 	m(IdRestricaoEletrica,    1) m(IdRestricaoEletrica,    2) m(IdRestricaoEletrica,    3) m(IdRestricaoEletrica,    4) m(IdRestricaoEletrica,    5) m(IdRestricaoEletrica,    6) m(IdRestricaoEletrica,    7) m(IdRestricaoEletrica,    8) m(IdRestricaoEletrica,    9) m(IdRestricaoEletrica,   10)\
@@ -1310,7 +1224,6 @@ m(IdDemandaEspecial)            \
 m(IdDefluencia)                 \
 m(IdDia)                        \
 m(IdDiaSemana)                  \
-m(IdDiscretizacao)              \
 m(IdElementoSistema)            \
 m(IdEstacao)                    \
 m(IdEstagio)                    \
@@ -1318,7 +1231,6 @@ m(IdFuncaoProducaoHidreletrica) \
 m(IdGeracaoEletrica)            \
 m(IdHidreletrica)               \
 m(IdIntercambio)                \
-m(IdIntercambioHidraulico)      \
 m(IdIteracao)                   \
 m(IdHor)                        \
 m(IdMes)                        \
@@ -1643,11 +1555,6 @@ DEFINE_SMART_ENUM(TipoTermeletrica, TIPO_TERMELETRICA)
     m(TipoSolver, clp)                 
 DEFINE_SMART_ENUM(TipoSolver, TIPO_SOLVER)
 
-#define TIPO_INTERCAMBIOHIDRAULICO(m)\
-    m(TipoIntercambioHidraulico, pereira_barreto)       \
-    m(TipoIntercambioHidraulico, desvio)       \
-    m(TipoIntercambioHidraulico, retirada)              
-DEFINE_SMART_ENUM(TipoIntercambioHidraulico, TIPO_INTERCAMBIOHIDRAULICO)
 
 #define TIPO_RESTRICAO_HIDRAULICA(m)\
     m(TipoRestricaoHidraulica, volume_armazenado)         \
@@ -1697,7 +1604,6 @@ m(TipoEstudo)                        \
 m(TipoFuncaoProducaoHidreletrica)    \
 m(TipoGeracaoCenario)                \
 m(TipoGrandezaModificacao)           \
-m(TipoIntercambioHidraulico)         \
 m(TipoModeloGeracaoSinteticaCenario) \
 m(TipoLagAutocorrelacao) \
 m(TipoStatusUnidadeUTE)              \

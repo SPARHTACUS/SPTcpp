@@ -18,9 +18,7 @@
 #include "C_Contrato.h"
 #include "C_ReservaPotencia.h"
 #include "C_Renovavel.h"
-#include "C_DiscretizacaoTemporal.h"
 #include "C_ControleCotaVazao.h"
-#include "C_IntercambioHidraulico.h"
 #include "C_DemandaEspecial.h"
 #include "C_EstruturaResultados.h"
 #include "C_ArranjoResolucao.h"
@@ -118,7 +116,6 @@
       m(Dados,  AttComum,  taxa_considerar_tempo_viagem_agua,                            double,           0,           1,           0.2,      nao) \
       m(Dados,  AttComum,  fracao_de_tempo_viagem_agua_para_formar_horizonte_viajante,                            double,           0,           1,           0.2,      nao) \
       m(Dados,  AttComum,                     tipo_processamento_paralelo,         TipoProcessamentoParalelo,         min,         max,   por_cenario,      nao) \
-      m(Dados,  AttComum,                                 imprimir_info_media,                          bool,         min,         max,           nao,      nao) \
       m(Dados,  AttComum,              imprimir_cortes_NW_com_reducao_estados,                          bool,         min,         max,           nao,      nao) 
 
 
@@ -159,10 +156,8 @@
     m(Dados, Contrato)               \
     m(Dados, ReservaPotencia)        \
     m(Dados, Renovavel)            \
-    m(Dados, Discretizacao)          \
     m(Dados, ControleCotaVazao)                \
-    m(Dados, DemandaEspecial)        \
-    m(Dados, IntercambioHidraulico)
+    m(Dados, DemandaEspecial)        
 
 
 #define SMART_ELEMENTO_DADOS(m)           \
@@ -219,8 +214,6 @@ public:
 
 	void validaBaciaHidrografica();
 
-	void validaIntercambioHidraulico();
-
 	void validaUsinaElevatoria();
 
 	void validaContrato();
@@ -228,8 +221,6 @@ public:
 	void validacao_operacional_Dados(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
 	void validacao_operacional_Termeletrica(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
-
-	void validacao_operacional_Intercambio_Hidraulico(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
 	void validacao_operacional_Hidreletrica(EntradaSaidaDados a_entrada_saida_dados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_att_operacionais_sem_recarregar);
 
