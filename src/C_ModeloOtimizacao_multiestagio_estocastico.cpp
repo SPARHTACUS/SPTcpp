@@ -6391,7 +6391,7 @@ void ModeloOtimizacao::criarControleCotaVazao(const TipoSubproblemaSolver a_TSS,
 				if (a_dados.getSize1Matriz(idConHQ, AttMatrizControleCotaVazao_var_abs_sup) > 0)
 					var_abs_sup = a_dados.getElementoMatriz(idConHQ, AttMatrizControleCotaVazao_var_abs_sup, a_period, i, double());
 
-				if ((vlr_min != var_abs_inf) || (var_abs_sup != vlr_max)) {
+				if ((vlr_min < var_abs_inf) || (var_abs_sup < vlr_max)) {
 
 					const double num_horas_lag_max = a_dados.getElementoMatriz(idConHQ, AttMatrizControleCotaVazao_num_horas_lag, a_period, i, double());
 					const int num_minutos_lag_max = int(num_horas_lag_max * 60);
@@ -6411,7 +6411,7 @@ void ModeloOtimizacao::criarControleCotaVazao(const TipoSubproblemaSolver a_TSS,
 								throw std::invalid_argument("Error getting HQ_LAG " + getFullString(period_lag) + " for " + getFullString(idConHQ) + " in " + getFullString(a_period) + " and lag " + getFullString(num_horas_lag_max));
 						} // if (num_minutos_lag > 0) {
 
-						if (vlr_min != var_abs_inf) {
+						if (vlr_min < var_abs_inf) {
 							const int varHQ_VAINF_FINF = addVarDecisao_HQ_VAINF_FINF(a_TSS, a_idEstagio, a_period, period_lag, idConHQ, num_horas_lag_max, 0.0, infinito, 0.0);
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varHQ_VAINF_FINF, getEquLinear_ZP(a_TSS, a_idEstagio, a_period), -penalidade);
 							const int ineHQ_VAINF = addIneLinear_HQ_VAINF(a_TSS, a_idEstagio, a_period, period_lag, idConHQ, num_horas_lag_max);
@@ -6422,7 +6422,7 @@ void ModeloOtimizacao::criarControleCotaVazao(const TipoSubproblemaSolver a_TSS,
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(var_HQ_LAG, ineHQ_VAINF, -1.0);
 						}
 
-						if (var_abs_sup != vlr_max) {
+						if (var_abs_sup < vlr_max) {
 							const int varHQ_VASUP_FSUP = addVarDecisao_HQ_VASUP_FSUP(a_TSS, a_idEstagio, a_period, period_lag, idConHQ, num_horas_lag_max, 0.0, infinito, 0.0);
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varHQ_VASUP_FSUP, getEquLinear_ZP(a_TSS, a_idEstagio, a_period), -penalidade);
 							const int ineHQ_VASUP = addIneLinear_HQ_VASUP(a_TSS, a_idEstagio, a_period, period_lag, idConHQ, num_horas_lag_max);
