@@ -620,7 +620,7 @@ void ModeloOtimizacao::criarProcessoEstocasticoHidrologico(const TipoSubproblema
 		if (a_TSS == TipoSubproblemaSolver_mestre)
 			return;
 
-		if ((a_period > a_periodIni_stage) || (a_idPat > IdPatamarCarga_1))
+		if (a_idPat > IdPatamarCarga_1)
 			return;
 
 		const bool viabilidade_hidraulica = getAtributo(AttComumModeloOtimizacao_relaxar_afluencia_incremental_com_viabilidade_hidraulica, bool());
@@ -638,170 +638,178 @@ void ModeloOtimizacao::criarProcessoEstocasticoHidrologico(const TipoSubproblema
 			if (lista_hidreletrica.size() == 0)
 				throw std::invalid_argument("Nao foram encontradas hidreletricas associada a :" + getFullString(idProcEstocastico) + " " + getFullString(idVariavelAleatoria));
 
+			if (a_period == a_periodIni_stage){
+
+				for (Periodo periodSP = a_horizonSP.getIteradorInicial(); periodSP <= a_horizonSP.getIteradorFinal(); a_horizonSP.incrementarIterador(periodSP)) {
+
+					//
+					//
+					// Parcela referente ao processo estocastico
+					//
+					//
+
+					// varRP
+					const int varRP = addVarDecisao_RP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria, -infinito, infinito, 0.0);
+
+					vetorEstagio.at(a_idEstagio).addVariavelRealizacao(a_TSS, getNomeSolverVarDecisao_RP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria), varRP, idProcEstocastico, idVariavelAleatoria, periodSP, 1.0);
+
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varRP);
+
+					// varYP
+					const int varYP = addVarDecisao_YP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria, -infinito, infinito, 0.0);
+
+					// Restricao YP (YP = RP + SOMA(fp*YPt-1))
+					const int posEquYP = addEquLinear_YP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria);
+
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, posEquYP, 1.0);
+
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRP, posEquYP, -1.0);
+
+					const double grau_liberdade_var_aleatoria = vetorProcessoEstocastico.at(idProcEstocastico).getGrauLiberdade(idVariavelAleatoria);
+
+					// Variável do Processo Estocástico Hidrológico YP lag = 0 ... lag = np
+					if (getSize1Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) > 0) {
+
+						for (int lag = 1; lag <= getSize2Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodSP); lag++) {
+
+							if (getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodSP, lag, double()) != 0.0) {
+
+								Periodo periodo_lag = periodSP - lag;
+
+								int var_YP_LAG = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, a_idEstagio, idProcEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade_var_aleatoria);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(var_YP_LAG, posEquYP, -getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodSP, lag, double()));
+
+							} // if (getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodSP, lag, double()) > 0.0){
+						} // for (int lag = 1; lag <= getSize2Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, periodSP.getEstacao()); lag++) {
+					} // if (getSize1Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) > 0) {
+
+				} // for (Periodo periodSP = periodo_processo_estocastico_inicial; periodSP <= periodo_processo_estocastico_final; a_horizonte_processo_estocastico_estagio.incrementarIterador(periodSP)) {
+
+			} // if (a_period == a_periodIni_stage){
+
+
+			//
+			//
+			// Parcela referente às afluencias físicas
+			//
+			//
+
+			bool sobreposicao_encontrada = false;
 			for (Periodo periodSP = a_horizonSP.getIteradorInicial(); periodSP <= a_horizonSP.getIteradorFinal(); a_horizonSP.incrementarIterador(periodSP)) {
 
-				const TipoRelaxacaoVariavelAleatoria tipo_relaxacao = getElementoVetor(idProcEstocastico, idVariavelAleatoria, AttVetorVariavelAleatoria_tipo_relaxacao, periodSP, TipoRelaxacaoVariavelAleatoria());
+				const double sobreposicao = a_period.sobreposicao(periodSP);
 
-				//
-				//
-				// Parcela referente ao processo estocastico
-				//
-				//
+				if (sobreposicao > 0.0) {
 
-				// varRP
-				const int varRP = addVarDecisao_RP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria, -infinito, infinito, 0.0);
+					const TipoRelaxacaoVariavelAleatoria tipo_relaxacao = getElementoVetor(idProcEstocastico, idVariavelAleatoria, AttVetorVariavelAleatoria_tipo_relaxacao, periodSP, TipoRelaxacaoVariavelAleatoria());
 
-				vetorEstagio.at(a_idEstagio).addVariavelRealizacao(a_TSS, getNomeSolverVarDecisao_RP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria), varRP, idProcEstocastico, idVariavelAleatoria, periodSP, 1.0);
+					const int varDecYP = getVarDecisao_YP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria);
+					const int posEquYP = getEquLinear_YP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria);
 
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varRP);
+					for (int i = 0; i < int(lista_hidreletrica.size()); i++) {
+						const IdHidreletrica idUHE = lista_hidreletrica.at(i);
 
-				// varYP
-				const int varYP = addVarDecisao_YP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria, -infinito, infinito, 0.0);
+						const IdVariavelAleatoriaInterna idVarInt = vetorProcessoEstocastico.at(idProcEstocastico).getIdVariavelAleatoriaInternaFromIdVariavelAleatoriaIdFisico(idVariavelAleatoria, idUHE);
 
-				// Restricao YP (YP = RP + SOMA(fp*YPt-1))
-				const int posEquYP = addEquLinear_YP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria);
+						const double grau_liberdade = getAtributo(idProcEstocastico, idVariavelAleatoria, idVarInt, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
+						const double coeficiente_participacao = getElementoVetor(idProcEstocastico, idVariavelAleatoria, idVarInt, AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodSP, double());
 
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, posEquYP, 1.0);
+						// Afluencia Incremental (QINC): definida por periodo estudo
+						const int varQINC = addVarDecisao_QINC(a_TSS, a_idEstagio, a_period, idUHE, -infinito, infinito, 0.0);
 
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varRP, posEquYP, -1.0);
+						// Restricao Afluencia Incremental: definida por periodo estudo
+						const int posEquQINC = addEquLinear_QINC(a_TSS, a_idEstagio, a_period, idUHE);
 
-				const double grau_liberdade_var_aleatoria = vetorProcessoEstocastico.at(idProcEstocastico).getGrauLiberdade(idVariavelAleatoria);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQINC, -grau_liberdade * sobreposicao);
 
-				// Variável do Processo Estocástico Hidrológico YP lag = 0 ... lag = np
-				if (getSize1Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) > 0) {
+						// Variável QINC
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQINC, posEquQINC, 1.0);
 
-					for (int lag = 1; lag <= getSize2Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodSP); lag++) {
+						// Variável YP
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varDecYP, posEquQINC, -coeficiente_participacao * sobreposicao);
 
-						if (getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodSP, lag, double()) != 0.0) {
-				
-							Periodo periodo_lag = periodSP - lag;
+						if (tipo_relaxacao != TipoRelaxacaoVariavelAleatoria_sem_relaxacao) {
 
-							int var_YP_LAG = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, a_idEstagio, idProcEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade_var_aleatoria);
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(var_YP_LAG, posEquYP, -getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodSP, lag, double()));
+							if (true) {
+								// Variável Afluencia Incremental Folga (QINC_FINF): definida por periodo estudo (Quando penalizada ou utilizando viabilidade hidráulica)
+								int varQINC_FINF = getVarDecisao_QINC_FINFseExistir(a_TSS, a_idEstagio, a_period, idUHE);
 
-						} // if (getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodSP, lag, double()) > 0.0){
-					} // for (int lag = 1; lag <= getSize2Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, periodSP.getEstacao()); lag++) {
-				} // if (getSize1Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) > 0) {
+								if (varQINC_FINF == -1) {
 
-				//
-				//
-				// Parcela referente às afluencias físicas
-				//
-				//
+									if (viabilidade_hidraulica) {
 
-				bool sobreposicao_encontrada = false;
-				for (Periodo period = a_periodIni_stage; period <= a_periodEnd_stage; a_horizon.incrementarIterador(period)) {
+										if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica)
+											varQINC_FINF = addVarDecisao_QINC_FINF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, 0.0, 0.0);
 
-					const double sobreposicao = period.sobreposicao(periodSP);
+										else if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+											varQINC_FINF = addVarDecisao_QINC_FINF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 100.0);
 
-					if (sobreposicao > 0.0) {
+										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varQINC_FINF);
 
-						for (int i = 0; i < int(lista_hidreletrica.size()); i++) {
-							const IdHidreletrica idUHE = lista_hidreletrica.at(i);			
+										vetorEstagio.at(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeSolverVarDecisao_QINC_FINF(a_TSS, a_idEstagio, a_period, idUHE), varQINC_FINF, idProcEstocastico, idVariavelAleatoria, idVarInt, periodSP, sobreposicao, TipoValor_positivo, 1.0, 1.0);
 
-							const IdVariavelAleatoriaInterna idVarInt = vetorProcessoEstocastico.at(idProcEstocastico).getIdVariavelAleatoriaInternaFromIdVariavelAleatoriaIdFisico(idVariavelAleatoria, idUHE);
+									} // if (viabilidade_hidraulica) {
 
-							const double grau_liberdade = getAtributo(idProcEstocastico, idVariavelAleatoria, idVarInt, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
-							const double coeficiente_participacao = getElementoVetor(idProcEstocastico, idVariavelAleatoria, idVarInt, AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodSP, double());
-
-							// Afluencia Incremental (QINC): definida por periodo estudo
-							const int varQINC = addVarDecisao_QINC(a_TSS, a_idEstagio, period, idUHE, -infinito, infinito, 0.0);
-
-							// Restricao Afluencia Incremental: definida por periodo estudo
-							const int posEquQINC = addEquLinear_QINC(a_TSS, a_idEstagio, period, idUHE);
-
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquQINC, -grau_liberdade * sobreposicao);
-
-							// Variável QINC
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQINC, posEquQINC, 1.0);
-
-							// Variável YP
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, posEquQINC, -coeficiente_participacao * sobreposicao);
-
-							if (tipo_relaxacao != TipoRelaxacaoVariavelAleatoria_sem_relaxacao) {
-
-								if (true) {
-									// Variável Afluencia Incremental Folga (QINC_FINF): definida por periodo estudo (Quando penalizada ou utilizando viabilidade hidráulica)
-									int varQINC_FINF = getVarDecisao_QINC_FINFseExistir(a_TSS, a_idEstagio, period, idUHE);
-
-									if (varQINC_FINF == -1) {
-
-										if (viabilidade_hidraulica) {
-
-											if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica)
-												varQINC_FINF = addVarDecisao_QINC_FINF(a_TSS, a_idEstagio, period, idUHE, 0.0, 0.0, 0.0);
-
-											else if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
-												varQINC_FINF = addVarDecisao_QINC_FINF(a_TSS, a_idEstagio, period, idUHE, 0.0, infinito, 100.0);
-
-											vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varQINC_FINF);
-
-											vetorEstagio.at(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeSolverVarDecisao_QINC_FINF(a_TSS, a_idEstagio, period, idUHE), varQINC_FINF, idProcEstocastico, idVariavelAleatoria, idVarInt, periodSP, sobreposicao, TipoValor_positivo, 1.0, 1.0);
-
-										} // if (viabilidade_hidraulica) {
-
-										else if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_penalizacao)
-											varQINC_FINF = addVarDecisao_QINC_FINF(a_TSS, a_idEstagio, period, idUHE, 0.0, infinito, 0.0);
+									else if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_penalizacao)
+										varQINC_FINF = addVarDecisao_QINC_FINF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
 
 
-									} // if (varQINC_FINF == -1) {
+								} // if (varQINC_FINF == -1) {
 
-									// Variável Afluencia Incremental Folga (QINC_FINF): definida por periodo estudo
-									if (varQINC_FINF > -1) {
-										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQINC_FINF, posEquQINC, -sobreposicao);
-										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQINC_FINF, getEquLinear_ZP(a_TSS, a_idEstagio, period), -a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_afluencia_incremental, double()));
+								// Variável Afluencia Incremental Folga (QINC_FINF): definida por periodo estudo
+								if (varQINC_FINF > -1) {
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQINC_FINF, posEquQINC, -sobreposicao);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varQINC_FINF, getEquLinear_ZP(a_TSS, a_idEstagio, a_period), -a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_afluencia_incremental, double()));
+								}
+
+							} // if (true) {
+
+							// Variável Afluencia Proc. Estocastico Folga (YP_FINF): definida por periodo proc. estocastico (Quando truncada)
+							int varYP_FINF = getVarDecisao_YP_FINFseExistir(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria);
+
+							if (varYP_FINF == -1) {
+								if ((tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento) || (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao)) {
+									varYP_FINF = addVarDecisao_YP_FINF(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria, 0.0, 0.0, 0.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYP_FINF);
+									vetorEstagio.at(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeSolverVarDecisao_YP_FINF(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria), varYP_FINF, idProcEstocastico, idVariavelAleatoria, IdVariavelAleatoriaInterna_Nenhum, periodSP, sobreposicao, TipoValor_positivo, 1.0, 1.0);
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP_FINF, posEquYP, -1.0);
+								}
+
+							} // if (varYP_FINF == -1) {
+
+							if ((varYP_FINF > -1) && (getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, a_idEstagio, int()) == 1)) {
+
+								if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao) {
+									// Variável YP_FINF Truncamento
+									double penalidade = 0.0;
+									for (IdVariavelAleatoriaInterna idVarInt = IdVariavelAleatoriaInterna_1; idVarInt <= getMaiorId(idProcEstocastico, idVariavelAleatoria, IdVariavelAleatoriaInterna()); idVarInt++) {
+										const IdHidreletrica idUHE = vetorProcessoEstocastico.at(idProcEstocastico).getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(idVariavelAleatoria, idVarInt, IdHidreletrica());
+										penalidade += a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_afluencia_incremental, double()) * getElementoVetor(idProcEstocastico, idVariavelAleatoria, idVarInt, AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodSP, double());
 									}
+									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP_FINF, getEquLinear_ZP(a_TSS, a_idEstagio, a_period), -sobreposicao * penalidade);
 
-								} // if (true) {
+								} // if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao) {
+							} // if ((varYP_FINF > -1) && (getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, a_idEstagio, int()) == 1)) {
+						} // if (tipo_relaxacao != TipoRelaxacaoVariavelAleatoria_sem_relaxacao) {
+					} // for (int i = 0; i < int(lista_hidreletrica.size()); i++) {
 
-								// Variável Afluencia Proc. Estocastico Folga (YP_FINF): definida por periodo proc. estocastico (Quando truncada)
-								int varYP_FINF = getVarDecisao_YP_FINFseExistir(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria);
+					if (!sobreposicao_encontrada)
+						sobreposicao_encontrada = true;
+				}
+				else if ((sobreposicao == 0.0) && (sobreposicao_encontrada))
+					break;
 
-								if (varYP_FINF == -1) {
-									if ((tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento) || (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao)) {
-										varYP_FINF = addVarDecisao_YP_FINF(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria, 0.0, 0.0, 0.0);
-										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYP_FINF);
-										vetorEstagio.at(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeSolverVarDecisao_YP_FINF(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria), varYP_FINF, idProcEstocastico, idVariavelAleatoria, IdVariavelAleatoriaInterna_Nenhum, periodSP, sobreposicao, TipoValor_positivo, 1.0, 1.0);
-										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP_FINF, posEquYP, -1.0);
-									}
-
-								} // if (varYP_FINF == -1) {
-
-								if ((varYP_FINF > -1) && (getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, a_idEstagio, int()) == 1)) {
-
-									if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao) {
-										// Variável YP_FINF Truncamento
-										double penalidade = 0.0;
-										for (IdVariavelAleatoriaInterna idVarInt = IdVariavelAleatoriaInterna_1; idVarInt <= getMaiorId(idProcEstocastico, idVariavelAleatoria, IdVariavelAleatoriaInterna()); idVarInt++) {										
-											const IdHidreletrica idUHE = vetorProcessoEstocastico.at(idProcEstocastico).getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(idVariavelAleatoria, idVarInt, IdHidreletrica());
-											penalidade += a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_afluencia_incremental, double()) * getElementoVetor(idProcEstocastico, idVariavelAleatoria, idVarInt, AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodSP, double());
-										}
-										vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP_FINF, getEquLinear_ZP(a_TSS, a_idEstagio, period), -sobreposicao * penalidade);
-									
-									} // if (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao) {
-								} // if ((varYP_FINF > -1) && (getElementoVetor(AttVetorModeloOtimizacao_alguma_variavel_aleatoria_hidrologica_com_truncamento, a_idEstagio, int()) == 1)) {
-							} // if (tipo_relaxacao != TipoRelaxacaoVariavelAleatoria_sem_relaxacao) {
-						} // for (int i = 0; i < int(lista_hidreletrica.size()); i++) {
-
-						if (!sobreposicao_encontrada)
-							sobreposicao_encontrada = true;
-					}
-					else if ((sobreposicao == 0.0) && (sobreposicao_encontrada))
-						break;
-
-				} // for (Periodo period = a_horizon.getIteradorInicial(); period <= a_horizon.getIteradorFinal(); a_horizon.incrementarIterador(period)) {
-
-			} // for (Periodo periodSP = periodo_processo_estocastico_inicial; periodSP <= periodo_processo_estocastico_final; a_horizonte_processo_estocastico_estagio.incrementarIterador(periodSP)) {
+			} // for (Periodo a_period = a_horizon.getIteradorInicial(); a_period <= a_horizon.getIteradorFinal(); a_horizon.incrementarIterador(a_period)) {
 
 		} // for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= getMaiorId(idProcEstocastico, IdVariavelAleatoria()); idVariavelAleatoria++) {
 
 	}// try
 
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarVariaveisDecisao_Restricoes_ProcessoEstocasticoHidrologico(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::criarProcessoEstocasticoHidrologico(" + getFullString(a_TSS) + "," + getFullString(a_idEstagio) + "): \n" + std::string(erro.what())); }
 }
 
 
-void ModeloOtimizacao::criarBalancoHidraulicoPorVazao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_periodIni_stage, Periodo& a_periodEnd_stage, Periodo& a_periodPrev, Periodo & a_period, Periodo& a_periodNext, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPat, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizon) {
+void ModeloOtimizacao::criarBalancoHidraulicoPorVazao(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_periodIni_stage, Periodo& a_periodEnd_stage, Periodo& a_periodPrev, Periodo& a_period, Periodo& a_periodNext, const IdHidreletrica a_idHidreletrica, const IdPatamarCarga a_idPat, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizon) {
 
 	try {
 
@@ -2053,7 +2061,7 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 				// VF_prev: VI incorpora Volume Final do periodo anterior via variavel de estado
 				// 
 				if ((a_period == a_periodIni_stage) && (volume_util_maximo > 0.0) && (regularizacao_periodPrev || ((a_idEstagio == idStageIni) && (idStageIni > IdEstagio_1)))) {
-					if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
+					if ((a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica) || (getVarDecisao_VFseExistir(a_TSS, IdEstagio(a_idEstagio - 1), a_periodPrev, idUHE) == -1))
 						vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_VI(a_TSS, a_idEstagio, a_period, idUHE) + "," + getString(volume_util_maximo)), varVI, -1);
 					else
 						vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_VI(a_TSS, a_idEstagio, a_period, idUHE) + "," + getString(volume_util_maximo)), varVI, getVarDecisao_VF(a_TSS, IdEstagio(a_idEstagio - 1), a_periodPrev, idUHE));

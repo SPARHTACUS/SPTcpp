@@ -544,13 +544,13 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		if (!mapeamento_cenarios_aberturas)
 			mapearCenariosAberturasPorIteracaoEmArranjoResolucao();
 
+		validacao_mapeamento_cenarios_aberturas(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar, mapeamento_cenarios_aberturas);
+
 		//
 		// Esvazia Atributos Processo Estocástico Hidrológico
 		//
 
 		processoEstocastico_hidrologico = ProcessoEstocastico();
-
-		validacao_mapeamento_cenarios_aberturas(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar, mapeamento_cenarios_aberturas);
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::carregarArquivosEntrada(a_entradaSaidaDados): \n" + std::string(erro.what())); }
@@ -1087,7 +1087,7 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 			const Periodo period_ref = getAtributo(AttComumDados_periodo_referencia, Periodo());
 			const Periodo period_ref_next = period_ref + 1;
 
-			const double taxa_desconto_min = std::pow(1.0 + taxa_desconto_anual, 1.0 / (365.0 * 24.0 * 60.0)) - 1;
+			const double taxa_desconto_min = std::pow(1.0 + taxa_desconto_anual, 1.0 / (365.25 * 24.0 * 60.0)) - 1;
 
 			int num_min = 0;
 			for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= estagio_final; idEstagio++) {
@@ -4001,8 +4001,15 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 
 				//////////////////////
+				int instanciar_coef_evap = 0;
+				if ((getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0) == 0) && (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_1) == 0))
+					instanciar_coef_evap = 1;
+				else if ((getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0) > 0) && (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_1) > 0)) {
+					if ((getIteradorFinal(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, Periodo()) < periodo_final_estudo) && (getIteradorFinal(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_1, Periodo()) < periodo_final_estudo))
+						instanciar_coef_evap = 2;
+				}
 
-				if ((getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0) == 0) && (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_1) == 0)) {
+				if (instanciar_coef_evap > 0) {
 
 					if (getSizeVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_poli_cota_volume_0) > 0)
 						preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_poli_cota_volume_0) = nao_premissa_informado;
@@ -4064,7 +4071,14 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 					preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_coef_linear_evaporacao_0) = sim_operacional;
 					preencher_AttVetorReservatorio.at(idHidreletrica).at(AttVetorReservatorio_coef_linear_evaporacao_1) = sim_operacional;
 
-					for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
+
+					Periodo periodIni = periodo_estudo_inicial;
+					if (instanciar_coef_evap == 2) {
+						periodIni = getIteradorFinal(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_coef_linear_evaporacao_0, Periodo());
+						horizonte_estudo.incrementarIterador(periodIni);
+					}
+
+					for (Periodo periodo = periodIni; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 						const double volume_minimo = getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, periodo, double());
 						const double volume_util = getElementoVetor(idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, periodo, double());
 						vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).calculaAproximacaoLinearEvaporacao(volume_minimo, volume_minimo + volume_util, periodo, getAtributo(AttComumDados_coficiente_evaporacao_regra_especial, bool()));
@@ -9812,8 +9826,8 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 										for (IdCenario idCenario = idCenarioIni; idCenario <= idCenarioEnd; idCenario++) {
 											const SmartEnupla<Periodo, IdRealizacao> mapeamento_espaco_amostral_idCenario = mapeamento_espaco_amostral.at(idCenario);
 											for (IdEstagio idEstagio_past = estagio_inicial; idEstagio_past <= idEstagio; idEstagio_past++) {
-												if (IdAbertura(mapeamento_espaco_amostral_idCenario_iteracao.at_rIt(periodos.at(idEstagio_past))) !=
-													IdAbertura(mapeamento_espaco_amostral_idCenario.at_rIt(periodos.at(idEstagio_past))))
+												if (IdAbertura(mapeamento_espaco_amostral_idCenario_iteracao.at_rIt(*&periodos.at(idEstagio_past))) !=
+													IdAbertura(mapeamento_espaco_amostral_idCenario.at_rIt(*&periodos.at(idEstagio_past))))
 													break;
 												else if ((idEstagio_past == IdEstagio(idEstagio - 1)) && (idCenario < idCenario_mesmo_passado))
 													idCenario_mesmo_passado = idCenario;
@@ -9984,7 +9998,7 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 												// Em caso de cortes_multiplos == 1, preenche-se com a abertura do mapeamento do espaço amostral.
 												if (cortes_multiplos == 1) {
-													const IdAbertura idAbertura = IdAbertura(mapeamento_espaco_amostral.at(idCenario_estado).at_rIt(periodos.at(idEstagio)));
+													const IdAbertura idAbertura = IdAbertura(mapeamento_espaco_amostral.at(idCenario_estado).at_rIt(*&periodos.at(idEstagio)));
 
 													map_menor_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;
 													map_maior_abertura.at(idCenario_estado).at(idEstagio) = idAbertura;

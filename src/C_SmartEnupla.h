@@ -834,25 +834,25 @@ private:
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getPosStructEnd(): \n" + std::string(erro.what())); }
 	}
 
-	std::vector<int> getPosIdxStruct(Periodo &a_period) const {
+	void getPosIdxStruct(Periodo &a_period, int& a_pos, int& a_idx) const {
 		try {
-			const std::vector<int> pos_idx = getPosIdxStructIfAny(a_period);
 
-			if (pos_idx.size() == 0)
+			getPosIdxStructIfAny(a_period, a_pos, a_idx);
+
+			if ((a_pos == -2) || (a_idx == -2))
 				throw std::invalid_argument("Nao existem structPeriods definidas para o periodo " + getFullString(a_period));
 
-			return pos_idx;
 		}
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getPosIdxStruct(" + getString(a_period) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getPosIdxStruct(" + getString(a_period) + "," + getString(a_pos) + "," + getString(a_idx) + "): \n" + std::string(erro.what())); }
 	}
 
-	std::vector<int> getPosIdxStructIfAny(Periodo &a_period) const {
+	void getPosIdxStructIfAny(Periodo &a_period, int& a_pos, int& a_idx) const {
 		try {
 
 
-			std::vector<int> pos_idx_inPeriod = getPosIdxStructInPeriod(a_period);
-			if (pos_idx_inPeriod.size() > 0)
-				return pos_idx_inPeriod;
+			getPosIdxStructInPeriod(a_period, a_pos, a_idx);
+			if ((a_pos > -2) && (a_idx > -2))
+				return;
 
 			const int pos_end = int(list_structPeriod.size() - 1);
 			for (int pos = 0; pos <= pos_end; pos++) {
@@ -865,10 +865,12 @@ private:
 								a_period.codStructPeriod = code;
 								a_period.posStructPeriod = pos;
 								a_period.idxStructPeriod = idx;
-								return std::vector<int>{pos, idx};
+								a_pos = pos;
+								a_idx = idx;
+								return;
 							}
 							else
-								return std::vector<int>();
+								return;
 						}
 					}
 					else {
@@ -877,42 +879,51 @@ private:
 							a_period.codStructPeriod = code;
 							a_period.posStructPeriod = pos;
 							a_period.idxStructPeriod = idx;
-							return std::vector<int>{pos, idx};
+							a_pos = pos;
+							a_idx = idx;
+							return;
 						}
 						else
-							return std::vector<int>();
+							return;
 					}
 				}
 				catch (const std::exception& erro) { throw std::invalid_argument("Except: \n" + std::string(erro.what())); }
 
 			} // for (int pos = 0; pos <= pos_end; pos++) {
 
-			return std::vector<int>();
+			return;
 
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getPosIdxStructIfAny(" + getString(a_period) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getPosIdxStructIfAny(" + getString(a_period) + "," + getString(a_pos) + "," + getString(a_idx) + "): \n" + std::string(erro.what())); }
 	}; // int getIndice(Periodo a_iter, const int a_structPeriod) const {
 
-	std::vector<int> getPosIdxStructInPeriod(Periodo &a_period) const {
+	void getPosIdxStructInPeriod(Periodo &a_period, int& a_pos, int& a_idx) const {
 		try {
 
-			// return { pos , idx } where: pos >= 0 and idx >=-1 (-1 if structPeriod is empty);
+			// return { a_pos , a_idx } where: pos >= 0 and idx >=-1 (-1 if structPeriod is empty);
 
 			if (code == a_period.codStructPeriod) {
 				if ((a_period.posStructPeriod >= 0) && (a_period.idxStructPeriod >= 0)) {
-					if (list_structPeriod.at(a_period.posStructPeriod).isIdxValid(a_period.idxStructPeriod))
-						return std::vector<int>{a_period.posStructPeriod, a_period.idxStructPeriod};
+					if (list_structPeriod.at(a_period.posStructPeriod).isIdxValid(a_period.idxStructPeriod)) {
+						a_pos = a_period.posStructPeriod;
+						a_idx = a_period.idxStructPeriod;
+						return;
+					}
 				}
 				else if ((a_period.posStructPeriod >= 0) && (a_period.idxStructPeriod == -1)) {
-					if (list_structPeriod.at(a_period.posStructPeriod).isEmpty())
-						return std::vector<int>{a_period.posStructPeriod, a_period.idxStructPeriod};
+					if (list_structPeriod.at(a_period.posStructPeriod).isEmpty()) {
+						a_pos = a_period.posStructPeriod;
+						a_idx = a_period.idxStructPeriod;
+						return;
+					}
 				}
 			} // if (code == a_period.codStructPeriod) {
 
-			return std::vector<int>();
+			a_pos = -2;
+			a_idx = -2;
 
 		} // try{
-		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getPosIdxStructInPeriod(" + getString(a_period) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::getPosIdxStructInPeriod(" + getString(a_period) + "," + getString(a_pos) + "," + getString(a_idx) + "): \n" + std::string(erro.what())); }
 	}; // int getIndice(Periodo a_iter, const int a_structPeriod) const {
 
 
@@ -1084,12 +1095,15 @@ public:
 
 			Periodo perIni;
 
-			const std::vector<int> pos_idx = getPosIdxStructIfAny(a_period_externo);
-			if (pos_idx.size() > 0) {
-				if (pos_idx.at(1) > -1) {
-					perIni = list_structPeriod.at(pos_idx.at(0)).getPeriod(pos_idx.at(1));
-					perIni.posStructPeriod = pos_idx.at(0);
-					perIni.idxStructPeriod = pos_idx.at(1);
+			int posArg = -2;
+			int idxArg = -2;
+
+			getPosIdxStructIfAny(a_period_externo, posArg, idxArg);
+			if ((posArg > -2) && (idxArg > -2)) {
+				if (idxArg > -1) {
+					perIni = list_structPeriod.at(posArg).getPeriod(idxArg);
+					perIni.posStructPeriod = posArg;
+					perIni.idxStructPeriod = idxArg;
 					perIni.codStructPeriod = code;
 				}
 			}
@@ -1194,25 +1208,26 @@ public:
 			//////////////////////////////////////////////////
 			//Identifica a structPeriod a qual pertence o periodo
 			//////////////////////////////////////////////////
+			int posArg = -2;
+			int idxArg = -2;
+			getPosIdxStruct(a_period, posArg, idxArg);
 
-			std::vector<int> pos_idx = getPosIdxStruct(a_period);
-
-			if (pos_idx.at(1) < -1)
+			if (idxArg < -1)
 				throw std::invalid_argument("Period mismatch.");
-			else if (pos_idx.at(1) > -1) {
-				Periodo period_next = list_structPeriod.at(pos_idx.at(0)).getPeriodNext(pos_idx.at(1));
+			else if (idxArg > -1) {
+				Periodo period_next = list_structPeriod.at(posArg).getPeriodNext(idxArg);
 				if (period_next.isValido()) {
 					a_period = period_next;
 					a_period.codStructPeriod = code;
-					a_period.posStructPeriod = pos_idx.at(0);
-					a_period.idxStructPeriod = pos_idx.at(1) + 1;
+					a_period.posStructPeriod = posArg;
+					a_period.idxStructPeriod = idxArg + 1;
 					return;
 				}
 			}
 
 			const int pos_end = int(list_structPeriod.size() - 1);
 			// find next period in non empty structure
-			for (int pos = pos_idx.at(0) + 1; pos <= pos_end; pos++) {
+			for (int pos = posArg + 1; pos <= pos_end; pos++) {
 				if (!list_structPeriod.at(pos).isEmpty()) {
 					a_period = list_structPeriod.at(pos).getPeriodIni();
 					a_period.codStructPeriod = code;
@@ -1222,7 +1237,7 @@ public:
 				}
 			}
 
-			if ((pos_idx.at(0) == pos_end) && (pos_idx.at(1) == list_structPeriod.at(pos_idx.at(0)).getIdxEnd())) {
+			if ((posArg == pos_end) && (idxArg == list_structPeriod.at(posArg).getIdxEnd())) {
 				a_period++;
 				return;
 			}
@@ -1246,24 +1261,25 @@ public:
 			//////////////////////////////////////////////////
 			//Identifica a structPeriod a qual pertence o periodo
 			//////////////////////////////////////////////////
+			int posArg = -2;
+			int idxArg = -2;
+			getPosIdxStruct(a_period, posArg, idxArg);
 
-			std::vector<int> pos_idx = getPosIdxStruct(a_period);
-
-			if (pos_idx.at(1) < -1)
+			if (idxArg < -1)
 				throw std::invalid_argument("Period mismatch.");
-			else if (pos_idx.at(1) > -1) {
-				Periodo period_prev = list_structPeriod.at(pos_idx.at(0)).getPeriodPrev(pos_idx.at(1));
+			else if (idxArg > -1) {
+				Periodo period_prev = list_structPeriod.at(posArg).getPeriodPrev(idxArg);
 				if (period_prev.isValido()) {
 					a_period = period_prev;
 					a_period.codStructPeriod = code;
-					a_period.posStructPeriod = pos_idx.at(0);
-					a_period.idxStructPeriod = pos_idx.at(1) - 1;
+					a_period.posStructPeriod = posArg;
+					a_period.idxStructPeriod = idxArg - 1;
 					return;
 				}
 			}
 			// find next period in non empty structure
 			const int pos_ini = 0;
-			for (int pos = pos_idx.at(0) - 1; pos >= pos_ini; pos--) {
+			for (int pos = posArg - 1; pos >= pos_ini; pos--) {
 				if (!list_structPeriod.at(pos).isEmpty()) {
 					a_period = list_structPeriod.at(pos).getPeriodEnd();
 					a_period.codStructPeriod = code;
@@ -1273,7 +1289,7 @@ public:
 				}
 			}
 
-			if ((pos_idx.at(0) == pos_ini) && (pos_idx.at(1) == list_structPeriod.at(pos_idx.at(0)).getIdxIni())) {
+			if ((posArg == pos_ini) && (idxArg == list_structPeriod.at(posArg).getIdxIni())) {
 				a_period--;
 				return;
 			}
@@ -1313,10 +1329,12 @@ public:
 		try {
 			if (size() == 0)
 				return false;
-			
-			std::vector<int> pos_idx = getPosIdxStructIfAny(a_iter);
-			if (pos_idx.size() > 0) {
-				if (pos_idx.at(1) > -1)
+
+			int posArg = -2;
+			int idxArg = -2;
+			getPosIdxStructIfAny(a_iter, posArg, idxArg);
+			if ((posArg > -2) && (idxArg > -2)) {
+				if (idxArg > -1)
 					return true;
 			}
 			
@@ -1602,14 +1620,16 @@ public:
 			//Identifica a structPeriod a qual pertence o periodo
 			//////////////////////////////////////////////////
 
-			std::vector<int> pos_idx = getPosIdxStruct(a_iter);
+			int posArg = -2;
+			int idxArg = -2;
+			getPosIdxStruct(a_iter, posArg, idxArg);
 
-			if (pos_idx.at(1) < -1)
+			if (idxArg < -1)
 				throw std::invalid_argument("Period mismatch.");
-			else if (pos_idx.at(1) == -1)
+			else if (idxArg == -1)
 				throw std::invalid_argument("Period in empty structure.");
-			else if (pos_idx.at(1) > -1)
-				vlr.at(pos_idx.at(1)) = a_vlr;
+			else if (idxArg > -1)
+				vlr.at(idxArg) = a_vlr;
 
 		} // try{
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::setElemento_rIt(" + getString(a_iter) + "," + getString(a_vlr) + "): \n" + std::string(erro.what())); }
@@ -1662,14 +1682,16 @@ public:
 	TipoValor& at(Periodo a_iter) {
 		try { 
 			
-			std::vector<int> pos_idx = getPosIdxStruct(a_iter);
+			int posArg = -2;
+			int idxArg = -2;
+			getPosIdxStruct(a_iter, posArg, idxArg);
 
-			if (pos_idx.at(1) < -1)
+			if (idxArg < -1)
 				throw std::invalid_argument("Period mismatch.");
-			else if (pos_idx.at(1) == -1)
+			else if (idxArg == -1)
 				throw std::invalid_argument("Period in empty structure.");
 			else
-				return vlr.at(pos_idx.at(1));
+				return vlr.at(idxArg);
 		
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::at(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
@@ -1678,14 +1700,16 @@ public:
 	TipoValor& at_rIt(Periodo &a_iter) {
 		try {
 
-			std::vector<int> pos_idx = getPosIdxStruct(a_iter);
+			int posArg = -2;
+			int idxArg = -2;
+			getPosIdxStruct(a_iter, posArg, idxArg);
 
-			if (pos_idx.at(1) < -1)
+			if (idxArg < -1)
 				throw std::invalid_argument("Period mismatch.");
-			else if (pos_idx.at(1) == -1)
+			else if (idxArg == -1)
 				throw std::invalid_argument("Period in empty structure.");
 			else
-				return vlr.at(pos_idx.at(1));
+				return vlr.at(idxArg);
 
 		} // try{
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::at_rIt(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
@@ -1694,14 +1718,16 @@ public:
 	TipoValor at(Periodo a_iter) const {
 		try { 
 			
-			std::vector<int> pos_idx = getPosIdxStruct(a_iter);
+			int posArg = -2;
+			int idxArg = -2;
+			getPosIdxStruct(a_iter, posArg, idxArg);
 
-			if (pos_idx.at(1) < -1)
+			if (idxArg < -1)
 				throw std::invalid_argument("Period mismatch.");
-			else if (pos_idx.at(1) == -1)
+			else if (idxArg == -1)
 				throw std::invalid_argument("Period in empty structure.");
 			else
-				return vlr.at(pos_idx.at(1));
+				return vlr.at(idxArg);
 		
 		} // try{
 		catch (const std::exception & erro) { throw std::invalid_argument("SmartEnupla::at(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
@@ -1710,14 +1736,16 @@ public:
 	TipoValor at_rIt(Periodo &a_iter) const {
 		try {
 
-			std::vector<int> pos_idx = getPosIdxStruct(a_iter);
+			int posArg = -2;
+			int idxArg = -2;
+			getPosIdxStruct(a_iter, posArg, idxArg);
 
-			if (pos_idx.at(1) < -1)
+			if (idxArg < -1)
 				throw std::invalid_argument("Period mismatch.");
-			else if (pos_idx.at(1) == -1)
+			else if (idxArg == -1)
 				throw std::invalid_argument("Period in empty structure.");
 			else
-				return vlr.at(pos_idx.at(1));
+				return vlr.at(idxArg);
 
 		} // try{
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::at_rIt(" + getString(a_iter) + "): \n" + std::string(erro.what())); }
@@ -1734,8 +1762,11 @@ public:
 	SmartEnupla<Periodo, TipoValor> getElementos(Periodo &a_perIni, Periodo &a_perEnd) const {
 		try {
 
-			std::vector<int> pos_idx1 = getPosIdxStruct(a_perIni);
-			std::vector<int> pos_idx2 = getPosIdxStruct(a_perEnd);
+			int posArg = -2;
+			int idxArg = -2;
+
+			getPosIdxStruct(a_perIni, posArg, idxArg);
+			getPosIdxStruct(a_perEnd, posArg, idxArg);
 
 			SmartEnupla<Periodo, TipoValor> enupla_return(a_perEnd - a_perIni + 1);
 			for (Periodo period = a_perIni; period <= a_perEnd; incrementarIterador(period))
@@ -1759,7 +1790,9 @@ public:
 			if (a_num_elem <= 0)
 				throw std::invalid_argument("Numero de elementos invalido.");
 
-			std::vector<int> pos_idx1 = getPosIdxStruct(a_perIni);
+			int posArg = -2;
+			int idxArg = -2;
+			getPosIdxStruct(a_perIni, posArg, idxArg);
 
 			SmartEnupla<Periodo, TipoValor> enupla_return(a_num_elem);
 			int cont = 0;

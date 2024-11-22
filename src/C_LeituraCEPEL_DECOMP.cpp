@@ -15536,6 +15536,9 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 			try {
 
+				// Periodo de referencia sem incidencia taxa desconto
+				a_dados.setAtributo(AttComumDados_periodo_referencia, horizonte_estudo_DECK.getIteradorInicial());
+
 				std::cout << "Carregando arquivo de preConfiguracao: SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
 
 				const IdSubmercado idSubmercadoIni_PD = dados_PD.getMenorId(IdSubmercado());
@@ -17100,6 +17103,13 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 							//AttComum
 							a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_util_inicial, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_volume_util_inicial, double()));
 							a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_percentual_volume_util_inicial, 0.0);
+
+							if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_coef_linear_evaporacao_0) > 0)//
+								a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor_forced(AttVetorReservatorio_coef_linear_evaporacao_0, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getVetor(AttVetorReservatorio_coef_linear_evaporacao_0, Periodo(), double()));
+
+							if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_coef_linear_evaporacao_1) > 0)//
+								a_dados.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).setVetor_forced(AttVetorReservatorio_coef_linear_evaporacao_1, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).vetorReservatorio.at(IdReservatorio_1).getVetor(AttVetorReservatorio_coef_linear_evaporacao_1, Periodo(), double()));
+
 						}//if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).isInstanciado(IdReservatorio_1)) {
 
 						//defluencia
