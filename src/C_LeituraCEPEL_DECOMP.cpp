@@ -17178,9 +17178,13 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_defluente_minima) > 0)
 										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_vazao_defluente_minima, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_defluente_minima, periodo_PD, double()));
+									else if(dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_defluente_minima) == 0 && a_dados.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_defluente_minima) > 0)
+										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_vazao_defluente_minima, periodo, 0.0);
 
 									if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_defluente_maxima) > 0)
 										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_vazao_defluente_maxima, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_defluente_maxima, periodo_PD, double()));
+									else if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_defluente_maxima) == 0 && a_dados.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_defluente_maxima) > 0)
+										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_vazao_defluente_maxima, periodo, getdoubleFromChar("max"));
 
 									if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getSizeVetor(AttVetorHidreletrica_vazao_desviada_minima) > 0)
 										a_dados.vetorHidreletrica.at(idHidreletrica_CP).setElemento(AttVetorHidreletrica_vazao_desviada_minima, periodo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getElementoVetor(AttVetorHidreletrica_vazao_desviada_minima, periodo_PD, double()));
