@@ -4396,11 +4396,15 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_desviada_minima) = sim_operacional;
 					vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_desviada_minima, SmartEnupla<Periodo, double>(vetor_zero, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_desviada_minima, double())));
 				}
+				else
+					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_desviada_minima) = nao_operacional_informado;
 
 				if (getSizeVetor(idHidreletrica, AttVetorHidreletrica_vazao_desviada_maxima) == 0) {
 					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_desviada_maxima) = sim_operacional;
 					vetorHidreletrica.at(idHidreletrica).setVetor_forced(AttVetorHidreletrica_vazao_desviada_maxima, SmartEnupla<Periodo, double>(vetor_zero, getAtributo(idHidreletrica, AttComumHidreletrica_vazao_desviada_maxima, double())));
 				}
+				else
+					preencher_AttVetorHidreletrica.at(idHidreletrica).at(AttVetorHidreletrica_vazao_desviada_maxima) = nao_operacional_informado;
 
 			} // if (getAtributo(idHidreletrica, AttComumHidreletrica_jusante_desvio, IdHidreletrica()) != IdHidreletrica_Nenhum) {
 
