@@ -651,9 +651,19 @@ void ModeloOtimizacao::criarProcessoEstocasticoHidrologico(const TipoSubproblema
 					// varRP
 					const int varRP = addVarDecisao_RP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria, -infinito, infinito, 0.0);
 
-					vetorEstagio.at(a_idEstagio).addVariavelRealizacao(a_TSS, getNomeSolverVarDecisao_RP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria), varRP, idProcEstocastico, idVariavelAleatoria, periodSP, 1.0);
+					if (getSize2Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodSP) > 1) {
 
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varRP);
+						vetorEstagio.at(a_idEstagio).addVariavelRealizacao(a_TSS, getNomeSolverVarDecisao_RP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria), varRP, idProcEstocastico, idVariavelAleatoria, periodSP, 1.0);
+
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varRP);
+
+					}
+					else {
+						const double residuo = getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodSP, IdRealizacao_1, double());
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varRP, residuo);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varRP, residuo);
+					}
+
 
 					// varYP
 					const int varYP = addVarDecisao_YP(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria, -infinito, infinito, 0.0);
@@ -6481,6 +6491,9 @@ void ModeloOtimizacao::criarReservaPotencia(const TipoSubproblemaSolver a_TSS, D
 
 		const IdReservaPotencia idPRESIni = a_dados.getMenorId(IdReservaPotencia());
 		const IdReservaPotencia idPRESOut = a_dados.getIdOut(IdReservaPotencia());
+
+		if (idPRESIni > IdReservaPotencia_Nenhum)
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->atualizar();
 
 		for (IdReservaPotencia idPRES = idPRESIni; idPRES < idPRESOut; a_dados.incr(idPRES)) {
 
