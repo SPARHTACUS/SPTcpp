@@ -4199,9 +4199,9 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 									const std::vector<std::string> nome = vetorEstagio.at(idEstagio).getNomeVariavelEstado(idVariavelEstado);
 
-									if ((nome.at(0) != "YP") && (nome.at(0) != "VI") && (nome.at(0) != "QDEF") && (nome.at(0) != "RH") && (nome.at(0) != "RE")) {
-										throw std::invalid_argument(getFullString(idVariavelEstado) + " " + getAtributo(idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, std::string()) + " presente no modelo, nao consta no corte em " + getFullString(idEstagio));
-									}
+									//if ((nome.at(0) != "YP") && (nome.at(0) != "VI") && (nome.at(0) != "QDEF") && (nome.at(0) != "RH") && (nome.at(0) != "RE") && (nome.at(0) != "HQ")) {
+									//	throw std::invalid_argument(getFullString(idVariavelEstado) + " " + getAtributo(idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, std::string()) + " presente no modelo, nao consta no corte em " + getFullString(idEstagio));
+									//}
 
 									vetorEstagio.at(idEstagio).anyCorteExterno = true;
 
