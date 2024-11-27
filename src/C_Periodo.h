@@ -87,13 +87,21 @@
 	m(TipoPeriodo, 11horas)   \
 	m(TipoPeriodo, 10horas)   \
 	m(TipoPeriodo, 9horas)   \
+	m(TipoPeriodo, 510m)   \
 	m(TipoPeriodo, 8horas)   \
+	m(TipoPeriodo, 450m)     \
 	m(TipoPeriodo, 7horas)   \
+	m(TipoPeriodo, 390m)     \
 	m(TipoPeriodo, 6horas)   \
+	m(TipoPeriodo, 330m)     \
 	m(TipoPeriodo, 5horas)   \
+	m(TipoPeriodo, 270m)     \
 	m(TipoPeriodo, 4horas)   \
+	m(TipoPeriodo, 210m)     \
 	m(TipoPeriodo, 3horas)   \
+	m(TipoPeriodo, 150m)     \
 	m(TipoPeriodo, 2horas)   \
+	m(TipoPeriodo, 90m)      \
 	m(TipoPeriodo, horario)   \
 	m(TipoPeriodo, meia_hora) \
 	m(TipoPeriodo, minuto) 
