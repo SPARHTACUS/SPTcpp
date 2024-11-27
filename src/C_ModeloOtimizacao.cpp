@@ -4197,7 +4197,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 								if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) == IdVariavelEstado_Nenhum) {
 
-									const std::vector<std::string> nome = vetorEstagio.at(idEstagio).getNomeVariavelEstado(idVariavelEstado);
+									//const std::vector<std::string> nome = vetorEstagio.at(idEstagio).getNomeVariavelEstado(idVariavelEstado);
 
 									//if ((nome.at(0) != "YP") && (nome.at(0) != "VI") && (nome.at(0) != "QDEF") && (nome.at(0) != "RH") && (nome.at(0) != "RE") && (nome.at(0) != "HQ")) {
 									//	throw std::invalid_argument(getFullString(idVariavelEstado) + " " + getAtributo(idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, std::string()) + " presente no modelo, nao consta no corte em " + getFullString(idEstagio));
@@ -4267,10 +4267,9 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 									const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
 
-									const double vol_min = getdoubleFromChar(nome.at(4).c_str());
-									const double vol_util_max = getdoubleFromChar(nome.at(5).c_str());
+									const double vol_util_max = getdoubleFromChar(nome.at(4).c_str());
 
-									if ((vol_min < 0.0) || (vol_util_max < 0.0))
+									if (vol_util_max < 0.0)
 										throw std::invalid_argument("Limites de vol invalidos em VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
 
 									else if (Periodo(TipoPeriodo_minuto, periodo) != Periodo(TipoPeriodo_minuto, vetorEstagio.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
