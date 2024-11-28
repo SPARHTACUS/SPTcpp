@@ -918,7 +918,30 @@ int Periodo::getHoras() const {
 
 int Periodo::getMinutos() const {
 
-	if (tipoPeriodo <= TipoPeriodo_horario)
+	if (tipoPeriodo == TipoPeriodo_90m)
+		return 90;
+	else if (tipoPeriodo == TipoPeriodo_150m)
+		return 150;
+	else if (tipoPeriodo == TipoPeriodo_210m)
+		return 210;
+	else if (tipoPeriodo == TipoPeriodo_270m)
+		return 270;
+	else if (tipoPeriodo == TipoPeriodo_330m)
+		return 330;
+	else if (tipoPeriodo == TipoPeriodo_390m)
+		return 390;
+	else if (tipoPeriodo == TipoPeriodo_450m)
+		return 450;
+	else if (tipoPeriodo == TipoPeriodo_510m)
+		return 510;
+	else if (tipoPeriodo == TipoPeriodo_570m)
+		return 570;
+	else if (tipoPeriodo == TipoPeriodo_630m)
+		return 630;
+	else if (tipoPeriodo == TipoPeriodo_690m)
+		return 690;
+
+	else if (tipoPeriodo <= TipoPeriodo_horario)
 		return getHoras() * 60;
 	else if (tipoPeriodo == TipoPeriodo_meia_hora)
 		return 30;
