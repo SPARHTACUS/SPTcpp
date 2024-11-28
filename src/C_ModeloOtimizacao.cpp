@@ -4424,6 +4424,27 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 										} // else if (nome.at(0) == "PTDISPCOM") {
 
+
+										else if (nome.at(0) == "RH") {
+
+											Periodo periodo = Periodo(nome.at(2));
+											const IdRestricaoOperativaUHE idRH = getIdRestricaoOperativaUHEFromChar(nome.at(3).c_str());
+
+											int varRH = getVarDecisao_RHseExistir(a_TSS, idEstagio, periodo, idRH);
+											if (varRH == -1) 
+												varRH = addVarDecisao_RH(a_TSS, idEstagio, periodo, idRH, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+
+											int varRH_past = getVarDecisao_RHseExistir(a_TSS, IdEstagio(idEstagio - 1), periodo, idRH);
+
+											if (varRH_past == -1)
+												throw std::invalid_argument("Nao foi possivel localizar variavel RH de " + getFullString(idVariavelEstado_corte) + " do " + getFullString(idEstagio) + " em " + getFullString(IdEstagio(idEstagio - 1)));
+
+											const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varRH, varRH_past, true);
+
+											variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+
+										} // else if (nome.at(0) == "RH") {
+
 										else
 											throw std::invalid_argument(getFullString(idVariavelEstado_corte) + " " + vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()) + " presente no corte, nao consta no modelo em " + getFullString(idEstagio));
 
