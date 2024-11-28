@@ -5187,6 +5187,35 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 				} // else if (nome.at(0) == "QDEF") {
 
+
+				else if (nome.at(0) == "RH") {
+
+					Periodo periodo = Periodo(nome.at(2));
+					const IdRestricaoOperativaUHE idRH = getIdRestricaoOperativaUHEFromChar(nome.at(3).c_str());
+
+					int varRH_past = getVarDecisao_RHseExistir(a_TSS, IdEstagio(idEstagio - 1), periodo, idRH);
+
+					if (varRH_past == -1)
+						throw std::invalid_argument("Nao foi possivel localizar variavel RH de " + getFullString(idVariavelEstado) + " do " + getFullString(idEstagio) + " em " + getFullString(IdEstagio(idEstagio - 1)));
+
+					estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varRH_past);
+
+				} // else if (nome.at(0) == "RH") {
+
+				else if (nome.at(0) == "HQ") {
+
+					Periodo periodo = Periodo(nome.at(2));
+					const IdControleCotaVazao idHQ = getIdControleCotaVazaoFromChar(nome.at(3).c_str());
+
+					int varHQ_past = getVarDecisao_HQseExistir(a_TSS, IdEstagio(idEstagio - 1), periodo, idHQ);
+
+					if (varHQ_past == -1)
+						throw std::invalid_argument("Nao foi possivel localizar variavel HQ de " + getFullString(idVariavelEstado) + " do " + getFullString(idEstagio) + " em " + getFullString(IdEstagio(idEstagio - 1)));
+
+					estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varHQ_past);
+
+				} // else if (nome.at(0) == "HQ") {
+
 				else if (nome.at(0) == "PTDISPCOM") {
 
 					Periodo periodo_comando = Periodo(nome.at(2));
