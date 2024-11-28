@@ -4089,384 +4089,412 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 		const IdCorteBenders maximoIdCorteBenders = getAtributo(AttComumModeloOtimizacao_maior_corte_importado, IdCorteBenders());
 
 		a_entradaSaidaDados.setDiretorioEntrada(diretorio_importacao_cortes);
-		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
-			if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio)) {
-				if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
-					vetorEstagio.at(idEstagio).vetorCorteBenders.alocar(int(maximoIdCorteBenders));
-					Estagio estagio_aux;
-					estagio_aux.setAtributo(AttComumEstagio_idEstagio, idEstagio);
-					vetorEstagio_aux.add(estagio_aux);
-					a_entradaSaidaDados.carregarArquivoCSV_AttComum(getFullString(idEstagio) + "_estagio.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_direto);
-					a_entradaSaidaDados.carregarArquivoCSV_AttVetor(getFullString(idEstagio) + "_corteBenders_rhs.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
-					if (getAtributo(idEstagio, AttComumEstagio_selecao_cortes_nivel_dominancia, int()) > 0)
-						a_entradaSaidaDados.carregarArquivoCSV_AttVetor(getFullString(idEstagio) + "_corteBenders_estado.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
-					a_entradaSaidaDados.carregarArquivoCSV_AttMatriz(getFullString(idEstagio) + "_corteBenders_coeficientes.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
-					a_entradaSaidaDados.carregarArquivoCSV_AttComum(getFullString(idEstagio) + "_estado.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
-				} // if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
+		for (IdEstagio idStage_glob = IdEstagio(1); idStage_glob < IdEstagio_Excedente; idStage_glob++) {
+
+			Estagio estagio_aux;
+			if (a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(getFullString(idStage_glob) + "_estagio.csv", estagio_aux, TipoAcessoInstancia_direto)) {
+
+				Periodo perStage_aux = Periodo(TipoPeriodo_minuto, estagio_aux.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo()));
+
+				for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
+
+					if (vetorEstagio.isInstanciado(idEstagio)) {
+
+						Periodo perStage = getAtributo(idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
+
+						if (perStage_aux == Periodo(TipoPeriodo_minuto, perStage)) {
+
+							if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio)) {
+								if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
+									vetorEstagio.at(idEstagio).vetorCorteBenders.alocar(int(maximoIdCorteBenders));
+									Estagio estagio_aux;
+									estagio_aux.setAtributo(AttComumEstagio_idEstagio, idEstagio);
+									vetorEstagio_aux.add(estagio_aux);
+									a_entradaSaidaDados.carregarArquivoCSV_AttComum(getFullString(idEstagio) + "_estagio.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_direto);
+									a_entradaSaidaDados.carregarArquivoCSV_AttVetor(getFullString(idEstagio) + "_corteBenders_rhs.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
+									if (getAtributo(idEstagio, AttComumEstagio_selecao_cortes_nivel_dominancia, int()) > 0)
+										a_entradaSaidaDados.carregarArquivoCSV_AttVetor(getFullString(idEstagio) + "_corteBenders_estado.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
+									a_entradaSaidaDados.carregarArquivoCSV_AttMatriz(getFullString(idEstagio) + "_corteBenders_coeficientes.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
+									a_entradaSaidaDados.carregarArquivoCSV_AttComum(getFullString(idEstagio) + "_estado.csv", vetorEstagio_aux.at(idEstagio), TipoAcessoInstancia_m1);
+									break;
+								} // if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
+							}
+						}
+					}
+				}
 			}
-		} // for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
+		} // for (IdEstagio idStage_glob = IdEstagio(1); idStage_glob < IdEstagio_Excedente; idStage_glob++) {
 
 		const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> horizon = a_dados.getMatriz(AttMatrizDados_percentual_duracao_patamar_carga, Periodo(), IdPatamarCarga(), double());
 
 		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 			if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio)) {
-				SmartEnupla<IdVariavelAleatoria, std::vector<IdHidreletrica>> isIdHidreletricaNosEstadosYP(IdVariavelAleatoria_1, std::vector<std::vector<IdHidreletrica>>(IdVariavelAleatoria(IdVariavelAleatoria_Excedente - 1), std::vector<IdHidreletrica>()));
 
-				if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
+				if (vetorEstagio.at(idEstagio).vetorCorteBenders.getMaiorId() > IdCorteBenders_Nenhum) {
 
-					if (getAtributo(idEstagio, AttComumEstagio_periodo_otimizacao, Periodo()).sobreposicao(vetorEstagio_aux.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())) == 0.0)
-						throw std::invalid_argument("Periodo " + getString(vetorEstagio_aux.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())) + " importado nao compativel com periodo do estagio " + getFullString(idEstagio));
+					SmartEnupla<IdVariavelAleatoria, std::vector<IdHidreletrica>> isIdHidreletricaNosEstadosYP(IdVariavelAleatoria_1, std::vector<std::vector<IdHidreletrica>>(IdVariavelAleatoria(IdVariavelAleatoria_Excedente - 1), std::vector<IdHidreletrica>()));
 
-					const IdCorteBenders maiorIdCorteBenders = vetorEstagio_aux.at(idEstagio).getMaiorId(IdCorteBenders());
+					if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
 
-					const IdVariavelEstado maiorIdVarivelEstado = getMaiorId(idEstagio, IdVariavelEstado());
+						if (getAtributo(idEstagio, AttComumEstagio_periodo_otimizacao, Periodo()).sobreposicao(vetorEstagio_aux.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())) == 0.0)
+							throw std::invalid_argument("Periodo " + getString(vetorEstagio_aux.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())) + " importado nao compativel com periodo do estagio " + getFullString(idEstagio));
 
-					IdRealizacao maiorIdRealizacao_corte = IdRealizacao_Nenhum;
+						const IdCorteBenders maiorIdCorteBenders = vetorEstagio_aux.at(idEstagio).getMaiorId(IdCorteBenders());
 
-					IdVariavelEstado maiorIdVarivelEstado_corte = IdVariavelEstado_Nenhum;
-					for (IdCorteBenders idCorteBenders = IdCorteBenders_1; idCorteBenders <= maiorIdCorteBenders; idCorteBenders++) {
-						if (vetorEstagio_aux.at(idEstagio).vetorCorteBenders.isInstanciado(idCorteBenders)) {
-							const IdRealizacao idRealizacao = vetorEstagio_aux.at(idEstagio).getIterador1Final(idCorteBenders, AttMatrizCorteBenders_coeficiente, IdRealizacao());
-							if (idRealizacao > maiorIdRealizacao_corte)
-								maiorIdRealizacao_corte = idRealizacao;
-							if (maiorIdVarivelEstado_corte == IdVariavelEstado_Nenhum)
-								maiorIdVarivelEstado_corte = vetorEstagio_aux.at(idEstagio).getIterador2Final(idCorteBenders, AttMatrizCorteBenders_coeficiente, idRealizacao, IdVariavelEstado());
-						}
-					} // for (IdCorteBenders idCorteBenders = IdCorteBenders_1; idCorteBenders <= maiorIdCorteBenders; idCorteBenders++) {
+						const IdVariavelEstado maiorIdVarivelEstado = getMaiorId(idEstagio, IdVariavelEstado());
 
-					if (maiorIdVarivelEstado_corte == IdVariavelEstado_Nenhum)
-						throw std::invalid_argument("Nenhum corte foi importado em " + getFullString(idEstagio));
+						IdRealizacao maiorIdRealizacao_corte = IdRealizacao_Nenhum;
 
-					const int cortes_multiplos_modelo = getAtributo(idEstagio, AttComumEstagio_cortes_multiplos, int());
+						IdVariavelEstado maiorIdVarivelEstado_corte = IdVariavelEstado_Nenhum;
+						for (IdCorteBenders idCorteBenders = IdCorteBenders_1; idCorteBenders <= maiorIdCorteBenders; idCorteBenders++) {
+							if (vetorEstagio_aux.at(idEstagio).vetorCorteBenders.isInstanciado(idCorteBenders)) {
+								const IdRealizacao idRealizacao = vetorEstagio_aux.at(idEstagio).getIterador1Final(idCorteBenders, AttMatrizCorteBenders_coeficiente, IdRealizacao());
+								if (idRealizacao > maiorIdRealizacao_corte)
+									maiorIdRealizacao_corte = idRealizacao;
+								if (maiorIdVarivelEstado_corte == IdVariavelEstado_Nenhum)
+									maiorIdVarivelEstado_corte = vetorEstagio_aux.at(idEstagio).getIterador2Final(idCorteBenders, AttMatrizCorteBenders_coeficiente, idRealizacao, IdVariavelEstado());
+							}
+						} // for (IdCorteBenders idCorteBenders = IdCorteBenders_1; idCorteBenders <= maiorIdCorteBenders; idCorteBenders++) {
 
-					if ((cortes_multiplos_modelo == 0) && (maiorIdRealizacao_corte != IdRealizacao_1))
-						throw std::invalid_argument("A multiplicidade dos cortes importados nao eh compativel com a multiplicidade do modelo em " + getFullString(idEstagio));
+						if (maiorIdVarivelEstado_corte == IdVariavelEstado_Nenhum)
+							throw std::invalid_argument("Nenhum corte foi importado em " + getFullString(idEstagio));
 
-					else if ((cortes_multiplos_modelo > 0) && (maiorIdRealizacao_corte != getAtributo(idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao())))
-						throw std::invalid_argument("A multiplicidade dos cortes importados nao eh compativel com o numero de aberturas do modelo em " + getFullString(idEstagio));
+						const int cortes_multiplos_modelo = getAtributo(idEstagio, AttComumEstagio_cortes_multiplos, int());
 
-					int numero_variaveis_estado_modelo_encontradas = 0;
-					int numero_variaveis_estado_cortes_encontradas = 0;
-					SmartEnupla<IdVariavelEstado, IdVariavelEstado> variaveis_estado_modelo_encontradas(IdVariavelEstado_1, std::vector<IdVariavelEstado>(maiorIdVarivelEstado, IdVariavelEstado_Nenhum));
-					SmartEnupla<IdVariavelEstado, IdVariavelEstado> variaveis_estado_cortes_encontradas(IdVariavelEstado_1, std::vector<IdVariavelEstado>(maiorIdVarivelEstado_corte, IdVariavelEstado_Nenhum));
+						if ((cortes_multiplos_modelo == 0) && (maiorIdRealizacao_corte != IdRealizacao_1))
+							throw std::invalid_argument("A multiplicidade dos cortes importados nao eh compativel com a multiplicidade do modelo em " + getFullString(idEstagio));
 
-					bool modelo_e_cortes_estados_identicos = true;
+						else if ((cortes_multiplos_modelo > 0) && (maiorIdRealizacao_corte != getAtributo(idEstagio, AttComumEstagio_maiorIdRealizacao, IdRealizacao())))
+							throw std::invalid_argument("A multiplicidade dos cortes importados nao eh compativel com o numero de aberturas do modelo em " + getFullString(idEstagio));
 
-					if (maiorIdVarivelEstado != maiorIdVarivelEstado)
-						modelo_e_cortes_estados_identicos = false;
+						int numero_variaveis_estado_modelo_encontradas = 0;
+						int numero_variaveis_estado_cortes_encontradas = 0;
+						SmartEnupla<IdVariavelEstado, IdVariavelEstado> variaveis_estado_modelo_encontradas(IdVariavelEstado_1, std::vector<IdVariavelEstado>(maiorIdVarivelEstado, IdVariavelEstado_Nenhum));
+						SmartEnupla<IdVariavelEstado, IdVariavelEstado> variaveis_estado_cortes_encontradas(IdVariavelEstado_1, std::vector<IdVariavelEstado>(maiorIdVarivelEstado_corte, IdVariavelEstado_Nenhum));
 
-					for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVarivelEstado; idVariavelEstado++) {
+						bool modelo_e_cortes_estados_identicos = true;
 
-						if (vetorEstagio.at(idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
-
-							const std::string nome_estado = vetorEstagio.at(idEstagio).getAtributo(idVariavelEstado, AttComumVariavelEstado_nome, std::string());
-
-							for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
-
-								if (variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) == IdVariavelEstado_Nenhum) {
-
-									if (vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado_corte)) {
-
-										if (nome_estado == vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.at(idVariavelEstado_corte).getAtributo(AttComumVariavelEstado_nome, std::string())) {
-											variaveis_estado_modelo_encontradas.at(idVariavelEstado) = idVariavelEstado_corte;
-											variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) = idVariavelEstado;
-											numero_variaveis_estado_modelo_encontradas++;
-											numero_variaveis_estado_cortes_encontradas++;
-											break;
-										} // if (nome_estados.size() == nome_estados_aux.size()) {
-									}
-								}
-
-							} // for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
-
-							if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) == IdVariavelEstado_Nenhum)
-								modelo_e_cortes_estados_identicos = false;
-
-						}
-					} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVarivelEstado; idVariavelEstado++) {
-
-					//
-					// Tratamento de variáveis do modelo que não foram encontradas no corte.
-					// 
-
-					if (numero_variaveis_estado_modelo_encontradas != int(maiorIdVarivelEstado)) {
+						if (maiorIdVarivelEstado != maiorIdVarivelEstado)
+							modelo_e_cortes_estados_identicos = false;
 
 						for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVarivelEstado; idVariavelEstado++) {
 
 							if (vetorEstagio.at(idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
-								if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) == IdVariavelEstado_Nenhum) {
+								const std::string nome_estado = vetorEstagio.at(idEstagio).getAtributo(idVariavelEstado, AttComumVariavelEstado_nome, std::string());
 
-									//const std::vector<std::string> nome = vetorEstagio.at(idEstagio).getNomeVariavelEstado(idVariavelEstado);
+								for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
 
-									//if ((nome.at(0) != "YP") && (nome.at(0) != "VI") && (nome.at(0) != "QDEF") && (nome.at(0) != "RH") && (nome.at(0) != "RE") && (nome.at(0) != "HQ")) {
-									//	throw std::invalid_argument(getFullString(idVariavelEstado) + " " + getAtributo(idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, std::string()) + " presente no modelo, nao consta no corte em " + getFullString(idEstagio));
-									//}
+									if (variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) == IdVariavelEstado_Nenhum) {
 
-									vetorEstagio.at(idEstagio).anyCorteExterno = true;
+										if (vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado_corte)) {
 
-								} // if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) == IdVariavelEstado_Nenhum) {
+											if (nome_estado == vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.at(idVariavelEstado_corte).getAtributo(AttComumVariavelEstado_nome, std::string())) {
+												variaveis_estado_modelo_encontradas.at(idVariavelEstado) = idVariavelEstado_corte;
+												variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) = idVariavelEstado;
+												numero_variaveis_estado_modelo_encontradas++;
+												numero_variaveis_estado_cortes_encontradas++;
+												break;
+											} // if (nome_estados.size() == nome_estados_aux.size()) {
+										}
+									}
 
-							} // if (vetorEstagio.at(idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
+								} // for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
 
+								if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) == IdVariavelEstado_Nenhum)
+									modelo_e_cortes_estados_identicos = false;
+
+							}
 						} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVarivelEstado; idVariavelEstado++) {
 
-					} // if (numero_variaveis_estado_modelo_encontradas != int(maiorIdVarivelEstado)) {
+						//
+						// Tratamento de variáveis do modelo que não foram encontradas no corte.
+						// 
 
+						if (numero_variaveis_estado_modelo_encontradas != int(maiorIdVarivelEstado)) {
 
-					//
-					// Tratamento de variáveis do corte que não foram encontradas no modelo.
-					// 
+							for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVarivelEstado; idVariavelEstado++) {
 
-					if (numero_variaveis_estado_cortes_encontradas != int(maiorIdVarivelEstado_corte)) {
-
-						modelo_e_cortes_estados_identicos = false;
-
-						for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
-
-							if (variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) == IdVariavelEstado_Nenhum) {
-
-								const std::vector<std::string> nome = vetorEstagio_aux.at(idEstagio).getNomeVariavelEstado(idVariavelEstado_corte);
-
-								vetorEstagio.at(idEstagio).anyCorteExterno = true;
-								vetorEstagio.at(idEstagio).anyVarEstadoExterna = true;
-
-								//
-								// Defluencia viajante
-								//
-
-								if (nome.at(0) == "QDEF") {
-
-									Periodo periodo_lag = Periodo(nome.at(2));
-									const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
-
-									int varQDEF = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, idEstagio, idHidreletrica, periodo_lag, horizon, true);
-
-									const int varQDEF_ADD = getVarDecisao_QDEF_ADDseExistir(a_TSS, idEstagio, periodo_lag, idHidreletrica);
-									if (varQDEF_ADD > -1)
-										varQDEF = varQDEF_ADD;
-
-									if (varQDEF == -1)
-										throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDEF de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
-
-									int varQDEF_prev = -1;
-									
-									if (idEstagio > IdEstagio_1)
-										varQDEF_prev = getVarDecisao_QDEF(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idHidreletrica);
-
-									const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varQDEF, varQDEF_prev, true);
-
-									variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
-
-	
-								} // else if (nome.at(0) == "QDEF") {
-
-								else if (nome.at(0) == "VI") {
-
-									const Periodo periodo(nome.at(2));
-
-									const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
-
-									const double vol_util_max = getdoubleFromChar(nome.at(4).c_str());
-
-									if (vol_util_max < 0.0)
-										throw std::invalid_argument("Limites de vol invalidos em VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
-
-									else if (Periodo(TipoPeriodo_minuto, periodo) != Periodo(TipoPeriodo_minuto, vetorEstagio.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
-										throw std::invalid_argument("Periodo " + getFullString(periodo) + " nao compativel com VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
-
-									else if (idEstagio == IdEstagio_1)
-										throw std::invalid_argument("VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " nao compativel com " + getFullString(idEstagio));
-
-									Periodo periodIni = a_dados.getIterador2Inicial(AttMatrizDados_percentual_duracao_horizonte_estudo, idEstagio, Periodo());
-									Periodo periodPrev = periodIni;
-									horizon.decrementarIterador(periodPrev);
-
-									const IdEstagio idEstagioPrev = IdEstagio(idEstagio - 1);
-
-									int varVI = getVarDecisao_VIseExistir(a_TSS, idEstagio, periodIni, idHidreletrica);
-									int varVF = getVarDecisao_VFseExistir(a_TSS, idEstagioPrev, periodPrev, idHidreletrica);
-									if (varVI == -1) {
-										if (getEquLinear_BH_VOLseExistir(a_TSS, idEstagio, periodIni, idHidreletrica) > -1)
-											vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(addVarDecisao_VI(a_TSS, idEstagio, periodIni, idHidreletrica, 0.0, vol_util_max, 0.0), getEquLinear_BH_VOL(a_TSS, idEstagio, periodIni, idHidreletrica), -1.0);
-										else {
-											for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= horizon.at_rIt(periodIni).getIteradorFinal(); idPat++) {
-												if (getEquLinear_BH_VAZseExistir(a_TSS, idEstagio, periodIni, idPat, idHidreletrica) > -1) {
-													if (varVI == -1)
-														varVI = addVarDecisao_VI(a_TSS, idEstagio, periodIni, idHidreletrica, 0.0, vol_util_max, 0.0);
-													vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varVI, getEquLinear_BH_VAZ(a_TSS, idEstagio, periodIni, idPat, idHidreletrica), -(1.0 / a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodIni, idPat, double())));
-												}
-												else
-													throw std::invalid_argument("Nao ha balanco hidraulico para VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " e " + getFullString(idEstagio));
-											}
-										}
-									}
-									if (varVF == -1) {
-										if (getEquLinear_BH_VOLseExistir(a_TSS, idEstagioPrev, periodPrev, idHidreletrica) > -1)
-											vetorEstagio.at(idEstagioPrev).getSolver(a_TSS)->setCofRestricao(addVarDecisao_VF(a_TSS, idEstagioPrev, periodPrev, idHidreletrica, 0.0, vol_util_max, 0.0), getEquLinear_BH_VOL(a_TSS, idEstagioPrev, periodPrev, idHidreletrica), 1.0);
-										else {
-											for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= horizon.at_rIt(periodPrev).getIteradorFinal(); idPat++) {
-												if (getEquLinear_BH_VAZseExistir(a_TSS, idEstagioPrev, periodPrev, idPat, idHidreletrica) > -1) {
-													if (varVF == -1)
-														varVF = addVarDecisao_VF(a_TSS, idEstagioPrev, periodPrev, idHidreletrica, 0.0, vol_util_max, 0.0);
-													vetorEstagio.at(idEstagioPrev).getSolver(a_TSS)->setCofRestricao(varVF, getEquLinear_BH_VAZ(a_TSS, idEstagioPrev, periodPrev, idPat, idHidreletrica), (1.0 / a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodPrev, idPat, double())));
-												}
-												else
-													throw std::invalid_argument("Nao ha balanco hidraulico para VF de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " e " + getFullString(idEstagioPrev));
-											}
-										}
-									}
-
-									const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varVI, varVF, true);
-
-									variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
-
-								} // if (nome.at(0) == "VI") {
-
-								else if (nome.at(0) == "YP") {
-
-									const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(2).c_str());
-
-									if (idProcessoEstocastico != getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()))
-										throw std::invalid_argument(getFullString(idProcessoEstocastico) + " do acoplamento incompativel com " + getFullString(a_dados.processoEstocastico_hidrologico.getAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico())) + " do modelo");
-
-									const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(3).c_str());
-
-									Periodo periodo_lag = Periodo(nome.at(4));
-
-									const double grau_liberdade = getdoubleFromChar(nome.at(5).c_str());
-
-									if (nome.size() < 7)
-										throw std::invalid_argument(getFullString(idVariavelEstado_corte) + " com termos ausentes de VarDecisaoYP.");
-
-									std::vector<IdHidreletrica> listaHidreletrica;
-									std::vector<IdHidreletrica> listaHidreletricaNaoInstanciadaNoModelo;
-									for (int i = 6; i < nome.size(); i++) {
-										const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(i).c_str());
-										if (idHidreletrica == IdHidreletrica_Nenhum)
-											throw std::invalid_argument("Nao encontrado IdHidreletrica escrito como " + nome.at(i) + " em " + getFullString(idVariavelEstado_corte));
-										else if (!a_dados.vetorHidreletrica.isInstanciado(idHidreletrica))
-											listaHidreletricaNaoInstanciadaNoModelo.push_back(idHidreletrica);
-										listaHidreletrica.push_back(idHidreletrica);
-									}
-
-									if (isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria).size() == 0)
-										isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria) = listaHidreletrica;
-									else {
-										if (!vectorCompara(isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria), listaHidreletrica))
-											throw std::invalid_argument("Variavel aleatoria com lista IdHidreletrica diferente de lista ja instanciada em " + getFullString(idVariavelEstado_corte));
-									}
-
-									if (listaHidreletricaNaoInstanciadaNoModelo.size() > 0)
-										throw std::invalid_argument(getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) + " em " + getFullString(idVariavelEstado_corte) + " nao foi instanciado no modelo.");
-
-									else if (listaHidreletricaNaoInstanciadaNoModelo.size() == 0) {
-										const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica, true);
-										if (varYP == -1)
-											throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
-
-										int varYP_past = getVarDecisao_YP(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
-
-										const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varYP, varYP_past, true);
-
-										variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
-									}
-
-								} // else if (nome.at(0) == "YP") {
-
-								else if (nome.at(0) == "PTDISPCOM") {
-
-									Periodo periodo_comando = Periodo(nome.at(2));
-									const IdTermeletrica idTermeletrica = getIdTermeletricaFromChar(nome.at(3).c_str());
-
-									const double potencia_minima_disponivel = getdoubleFromChar(nome.at(4).c_str());
-									const double potencia_maxima_disponivel = getdoubleFromChar(nome.at(5).c_str());
-
-
-									const int varPTDISPCOM = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, idEstagio, periodo_comando, idTermeletrica, potencia_minima_disponivel, potencia_maxima_disponivel, true);
-									if (varPTDISPCOM == -1)
-										throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes PTDISPCOM de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
-									
-									int varPTDISPCOM_past = getVarDecisao_PTDISPCOM(a_TSS, IdEstagio(idEstagio - 1), periodo_comando, idTermeletrica);
-
-									const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varPTDISPCOM, varPTDISPCOM_past, true);
-
-									variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
-
-								} // else if (nome.at(0) == "PTDISPCOM") {
-
-								else
-									throw std::invalid_argument(getFullString(idVariavelEstado_corte) + " " + vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()) + " presente no corte, nao consta no modelo em " + getFullString(idEstagio));
-
-							} // if (variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) == IdVariavelEstado_Nenhum) {
-
-						} // for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
-
-					} // if (numero_variaveis_estado_cortes_encontradas != int(maiorIdVarivelEstado_corte)) {
-
-
-					IdCorteBenders idCorteBenders_sequencial = IdCorteBenders_Nenhum;
-					for (IdCorteBenders idCorteBenders = IdCorteBenders_1; idCorteBenders <= maiorIdCorteBenders; idCorteBenders++) {
-						if (vetorEstagio_aux.at(idEstagio).vetorCorteBenders.isInstanciado(idCorteBenders) && (idCorteBenders <= maximoIdCorteBenders)) {
-							if (idCorteBenders_sequencial == IdCorteBenders_Nenhum)
-								idCorteBenders_sequencial = IdCorteBenders_1;
-							else
-								idCorteBenders_sequencial++;
-
-							if (modelo_e_cortes_estados_identicos) {
-								CorteBenders corteBenders(vetorEstagio_aux.at(idEstagio).vetorCorteBenders.at(idCorteBenders));
-								corteBenders.setAtributo(AttComumCorteBenders_idCorteBenders, idCorteBenders_sequencial);
-								vetorEstagio.at(idEstagio).vetorCorteBenders.add(corteBenders);
-							} // if (modelo_e_cortes_estados_identicos) {
-
-							else if (!modelo_e_cortes_estados_identicos) {
-
-								CorteBenders corteBenders;
-								corteBenders.setAtributo(AttComumCorteBenders_idCorteBenders, idCorteBenders_sequencial);
-
-								const IdRealizacao idRealizacao_inicial = vetorEstagio_aux.at(idEstagio).getIterador1Inicial(idCorteBenders, AttMatrizCorteBenders_coeficiente, IdRealizacao());
-								const IdRealizacao idRealizacao_final = vetorEstagio_aux.at(idEstagio).getIterador1Final(idCorteBenders, AttMatrizCorteBenders_coeficiente, IdRealizacao());
-
-								for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= variaveis_estado_modelo_encontradas.getIteradorFinal(); idVariavelEstado++) {
+								if (vetorEstagio.at(idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
 									if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) == IdVariavelEstado_Nenhum) {
-										if (vetorEstagio_aux.at(idEstagio).getSizeVetor(idCorteBenders, AttVetorCorteBenders_estado) > 0)
-											corteBenders.addElemento(AttVetorCorteBenders_estado, idVariavelEstado, 0.0);
 
-										for (IdRealizacao idRealizacao = idRealizacao_inicial; idRealizacao <= idRealizacao_final; idRealizacao++)
-											corteBenders.addElemento(AttMatrizCorteBenders_coeficiente, idRealizacao, idVariavelEstado, 0.0);
+										//const std::vector<std::string> nome = vetorEstagio.at(idEstagio).getNomeVariavelEstado(idVariavelEstado);
 
-									}
+										//if ((nome.at(0) != "YP") && (nome.at(0) != "VI") && (nome.at(0) != "QDEF") && (nome.at(0) != "RH") && (nome.at(0) != "RE") && (nome.at(0) != "HQ")) {
+										//	throw std::invalid_argument(getFullString(idVariavelEstado) + " " + getAtributo(idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, std::string()) + " presente no modelo, nao consta no corte em " + getFullString(idEstagio));
+										//}
 
-									else if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) != IdVariavelEstado_Nenhum) {
-										if (vetorEstagio_aux.at(idEstagio).getSizeVetor(idCorteBenders, AttVetorCorteBenders_estado) > 0)
-											corteBenders.addElemento(AttVetorCorteBenders_estado, idVariavelEstado, vetorEstagio_aux.at(idEstagio).getElementoVetor(idCorteBenders, AttVetorCorteBenders_estado, variaveis_estado_modelo_encontradas.at(idVariavelEstado), double()));
+										vetorEstagio.at(idEstagio).anyCorteExterno = true;
 
-										for (IdRealizacao idRealizacao = idRealizacao_inicial; idRealizacao <= idRealizacao_final; idRealizacao++)
-											corteBenders.addElemento(AttMatrizCorteBenders_coeficiente, idRealizacao, idVariavelEstado, vetorEstagio_aux.at(idEstagio).getElementoMatriz(idCorteBenders, AttMatrizCorteBenders_coeficiente, idRealizacao, variaveis_estado_modelo_encontradas.at(idVariavelEstado), double()));
+									} // if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) == IdVariavelEstado_Nenhum) {
 
-									} // if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) != IdVariavelEstado_Nenhum) {
+								} // if (vetorEstagio.at(idEstagio).vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
 
-								} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= variaveis_estado_modelo_encontradas.getIteradorFinal(); idVariavelEstado++) {
+							} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= maiorIdVarivelEstado; idVariavelEstado++) {
 
-								for (IdRealizacao idRealizacao = idRealizacao_inicial; idRealizacao <= idRealizacao_final; idRealizacao++)
-									corteBenders.addElemento(AttVetorCorteBenders_rhs, idRealizacao, vetorEstagio_aux.at(idEstagio).getElementoVetor(idCorteBenders, AttVetorCorteBenders_rhs, idRealizacao, double()));
+						} // if (numero_variaveis_estado_modelo_encontradas != int(maiorIdVarivelEstado)) {
 
-								if (vetorEstagio.at(idEstagio).anyCorteExterno)
-									corteBenders.setAtributo(AttComumCorteBenders_is_externo, true);
 
-								vetorEstagio.at(idEstagio).vetorCorteBenders.add(corteBenders);
+						//
+						// Tratamento de variáveis do corte que não foram encontradas no modelo.
+						// 
 
-							} // else if (!modelo_e_cortes_estados_identicos) {
-						}
-					} // for (IdCorteBenders idCorteBenders = IdCorteBenders_1; idCorteBenders <= maiorIdCorteBenders; idCorteBenders++) {
+						if (numero_variaveis_estado_cortes_encontradas != int(maiorIdVarivelEstado_corte)) {
 
-					requestCorteBenders(a_idProcesso, idEstagio, a_diretorio_impressao_selecao_cortes, a_entradaSaidaDados);
+							modelo_e_cortes_estados_identicos = false;
 
-					if (a_dados.getAtributo(AttComumDados_tipo_estudo, TipoEstudo()) == TipoEstudo_simulacao)
-						removerCorteBenders(idEstagio);
+							for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
 
-				} // if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
+								if (variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) == IdVariavelEstado_Nenhum) {
+
+									const std::vector<std::string> nome = vetorEstagio_aux.at(idEstagio).getNomeVariavelEstado(idVariavelEstado_corte);
+
+									vetorEstagio.at(idEstagio).anyCorteExterno = true;
+									vetorEstagio.at(idEstagio).anyVarEstadoExterna = true;
+
+									//
+									// Defluencia viajante
+									//
+
+									if (nome.at(0) == "QDEF") {
+
+										Periodo periodo_lag = Periodo(nome.at(2));
+										const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
+
+										int varQDEF = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, idEstagio, idHidreletrica, periodo_lag, horizon, true);
+
+										const int varQDEF_ADD = getVarDecisao_QDEF_ADDseExistir(a_TSS, idEstagio, periodo_lag, idHidreletrica);
+										if (varQDEF_ADD > -1)
+											varQDEF = varQDEF_ADD;
+
+										if (varQDEF == -1)
+											throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDEF de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
+
+										int varQDEF_prev = -1;
+
+										if (idEstagio > IdEstagio_1)
+											varQDEF_prev = getVarDecisao_QDEF(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idHidreletrica);
+
+										const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varQDEF, varQDEF_prev, true);
+
+										variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+
+
+									} // else if (nome.at(0) == "QDEF") {
+
+									else if (nome.at(0) == "VI") {
+
+										const Periodo periodo(nome.at(2));
+
+										const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
+
+										const double vol_util_max = getdoubleFromChar(nome.at(4).c_str());
+
+										if (vol_util_max < 0.0)
+											throw std::invalid_argument("Limites de vol invalidos em VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
+
+										else if (Periodo(TipoPeriodo_minuto, periodo) != Periodo(TipoPeriodo_minuto, vetorEstagio.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
+											throw std::invalid_argument("Periodo " + getFullString(periodo) + " nao compativel com VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
+
+										else if (idEstagio == IdEstagio_1)
+											throw std::invalid_argument("VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " nao compativel com " + getFullString(idEstagio));
+
+										Periodo periodIni = a_dados.getIterador2Inicial(AttMatrizDados_percentual_duracao_horizonte_estudo, idEstagio, Periodo());
+										Periodo periodPrev = periodIni;
+										horizon.decrementarIterador(periodPrev);
+
+										const IdEstagio idEstagioPrev = IdEstagio(idEstagio - 1);
+
+										int varVI = getVarDecisao_VIseExistir(a_TSS, idEstagio, periodIni, idHidreletrica);
+										int varVF = getVarDecisao_VFseExistir(a_TSS, idEstagioPrev, periodPrev, idHidreletrica);
+										if (varVI == -1) {
+											if (getEquLinear_BH_VOLseExistir(a_TSS, idEstagio, periodIni, idHidreletrica) > -1)
+												vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(addVarDecisao_VI(a_TSS, idEstagio, periodIni, idHidreletrica, 0.0, vol_util_max, 0.0), getEquLinear_BH_VOL(a_TSS, idEstagio, periodIni, idHidreletrica), -1.0);
+											else {
+												for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= horizon.at_rIt(periodIni).getIteradorFinal(); idPat++) {
+													if (getEquLinear_BH_VAZseExistir(a_TSS, idEstagio, periodIni, idPat, idHidreletrica) > -1) {
+														if (varVI == -1)
+															varVI = addVarDecisao_VI(a_TSS, idEstagio, periodIni, idHidreletrica, 0.0, vol_util_max, 0.0);
+														vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varVI, getEquLinear_BH_VAZ(a_TSS, idEstagio, periodIni, idPat, idHidreletrica), -(1.0 / a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodIni, idPat, double())));
+													}
+													else
+														throw std::invalid_argument("Nao ha balanco hidraulico para VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " e " + getFullString(idEstagio));
+												}
+											}
+										}
+										if (varVF == -1) {
+											if (getEquLinear_BH_VOLseExistir(a_TSS, idEstagioPrev, periodPrev, idHidreletrica) > -1)
+												vetorEstagio.at(idEstagioPrev).getSolver(a_TSS)->setCofRestricao(addVarDecisao_VF(a_TSS, idEstagioPrev, periodPrev, idHidreletrica, 0.0, vol_util_max, 0.0), getEquLinear_BH_VOL(a_TSS, idEstagioPrev, periodPrev, idHidreletrica), 1.0);
+											else {
+												for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= horizon.at_rIt(periodPrev).getIteradorFinal(); idPat++) {
+													if (getEquLinear_BH_VAZseExistir(a_TSS, idEstagioPrev, periodPrev, idPat, idHidreletrica) > -1) {
+														if (varVF == -1)
+															varVF = addVarDecisao_VF(a_TSS, idEstagioPrev, periodPrev, idHidreletrica, 0.0, vol_util_max, 0.0);
+														vetorEstagio.at(idEstagioPrev).getSolver(a_TSS)->setCofRestricao(varVF, getEquLinear_BH_VAZ(a_TSS, idEstagioPrev, periodPrev, idPat, idHidreletrica), (1.0 / a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodPrev, idPat, double())));
+													}
+													else
+														throw std::invalid_argument("Nao ha balanco hidraulico para VF de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " e " + getFullString(idEstagioPrev));
+												}
+											}
+										}
+
+										const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varVI, varVF, true);
+
+										variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+
+									} // if (nome.at(0) == "VI") {
+
+									else if (nome.at(0) == "YP") {
+
+										const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(2).c_str());
+
+										if (idProcessoEstocastico != getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()))
+											throw std::invalid_argument(getFullString(idProcessoEstocastico) + " do acoplamento incompativel com " + getFullString(a_dados.processoEstocastico_hidrologico.getAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico())) + " do modelo");
+
+										const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(3).c_str());
+
+										Periodo periodo_lag = Periodo(nome.at(4));
+
+										const double grau_liberdade = getdoubleFromChar(nome.at(5).c_str());
+
+										if (nome.size() < 7)
+											throw std::invalid_argument(getFullString(idVariavelEstado_corte) + " com termos ausentes de VarDecisaoYP.");
+
+										std::vector<IdHidreletrica> listaHidreletrica;
+										std::vector<IdHidreletrica> listaHidreletricaNaoInstanciadaNoModelo;
+										for (int i = 6; i < nome.size(); i++) {
+											const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(i).c_str());
+											if (idHidreletrica == IdHidreletrica_Nenhum)
+												throw std::invalid_argument("Nao encontrado IdHidreletrica escrito como " + nome.at(i) + " em " + getFullString(idVariavelEstado_corte));
+											else if (!a_dados.vetorHidreletrica.isInstanciado(idHidreletrica))
+												listaHidreletricaNaoInstanciadaNoModelo.push_back(idHidreletrica);
+											listaHidreletrica.push_back(idHidreletrica);
+										}
+
+										if (isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria).size() == 0)
+											isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria) = listaHidreletrica;
+										else {
+											if (!vectorCompara(isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria), listaHidreletrica))
+												throw std::invalid_argument("Variavel aleatoria com lista IdHidreletrica diferente de lista ja instanciada em " + getFullString(idVariavelEstado_corte));
+										}
+
+										if (listaHidreletricaNaoInstanciadaNoModelo.size() > 0)
+											throw std::invalid_argument(getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) + " em " + getFullString(idVariavelEstado_corte) + " nao foi instanciado no modelo.");
+
+										else if (listaHidreletricaNaoInstanciadaNoModelo.size() == 0) {
+											const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica, true);
+											if (varYP == -1)
+												throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
+
+											int varYP_past = getVarDecisao_YP(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
+
+											const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varYP, varYP_past, true);
+
+											variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+										}
+
+									} // else if (nome.at(0) == "YP") {
+
+									else if (nome.at(0) == "PTDISPCOM") {
+
+										Periodo periodo_comando = Periodo(nome.at(2));
+										const IdTermeletrica idTermeletrica = getIdTermeletricaFromChar(nome.at(3).c_str());
+
+										const double potencia_minima_disponivel = getdoubleFromChar(nome.at(4).c_str());
+										const double potencia_maxima_disponivel = getdoubleFromChar(nome.at(5).c_str());
+
+
+										const int varPTDISPCOM = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, idEstagio, periodo_comando, idTermeletrica, potencia_minima_disponivel, potencia_maxima_disponivel, true);
+										if (varPTDISPCOM == -1)
+											throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes PTDISPCOM de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
+
+										int varPTDISPCOM_past = getVarDecisao_PTDISPCOM(a_TSS, IdEstagio(idEstagio - 1), periodo_comando, idTermeletrica);
+
+										const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varPTDISPCOM, varPTDISPCOM_past, true);
+
+										variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+
+									} // else if (nome.at(0) == "PTDISPCOM") {
+
+									else
+										throw std::invalid_argument(getFullString(idVariavelEstado_corte) + " " + vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()) + " presente no corte, nao consta no modelo em " + getFullString(idEstagio));
+
+								} // if (variaveis_estado_cortes_encontradas.at(idVariavelEstado_corte) == IdVariavelEstado_Nenhum) {
+
+							} // for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
+
+						} // if (numero_variaveis_estado_cortes_encontradas != int(maiorIdVarivelEstado_corte)) {
+
+
+						IdCorteBenders idCorteBenders_sequencial = IdCorteBenders_Nenhum;
+						for (IdCorteBenders idCorteBenders = IdCorteBenders_1; idCorteBenders <= maiorIdCorteBenders; idCorteBenders++) {
+							if (vetorEstagio_aux.at(idEstagio).vetorCorteBenders.isInstanciado(idCorteBenders) && (idCorteBenders <= maximoIdCorteBenders)) {
+								if (idCorteBenders_sequencial == IdCorteBenders_Nenhum)
+									idCorteBenders_sequencial = IdCorteBenders_1;
+								else
+									idCorteBenders_sequencial++;
+
+								if (modelo_e_cortes_estados_identicos) {
+									CorteBenders corteBenders(vetorEstagio_aux.at(idEstagio).vetorCorteBenders.at(idCorteBenders));
+									corteBenders.setAtributo(AttComumCorteBenders_idCorteBenders, idCorteBenders_sequencial);
+									vetorEstagio.at(idEstagio).vetorCorteBenders.add(corteBenders);
+								} // if (modelo_e_cortes_estados_identicos) {
+
+								else if (!modelo_e_cortes_estados_identicos) {
+
+									CorteBenders corteBenders;
+									corteBenders.setAtributo(AttComumCorteBenders_idCorteBenders, idCorteBenders_sequencial);
+
+									const IdRealizacao idRealizacao_inicial = vetorEstagio_aux.at(idEstagio).getIterador1Inicial(idCorteBenders, AttMatrizCorteBenders_coeficiente, IdRealizacao());
+									const IdRealizacao idRealizacao_final = vetorEstagio_aux.at(idEstagio).getIterador1Final(idCorteBenders, AttMatrizCorteBenders_coeficiente, IdRealizacao());
+
+									for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= variaveis_estado_modelo_encontradas.getIteradorFinal(); idVariavelEstado++) {
+
+										if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) == IdVariavelEstado_Nenhum) {
+											if (vetorEstagio_aux.at(idEstagio).getSizeVetor(idCorteBenders, AttVetorCorteBenders_estado) > 0)
+												corteBenders.addElemento(AttVetorCorteBenders_estado, idVariavelEstado, 0.0);
+
+											for (IdRealizacao idRealizacao = idRealizacao_inicial; idRealizacao <= idRealizacao_final; idRealizacao++)
+												corteBenders.addElemento(AttMatrizCorteBenders_coeficiente, idRealizacao, idVariavelEstado, 0.0);
+
+										}
+
+										else if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) != IdVariavelEstado_Nenhum) {
+											if (vetorEstagio_aux.at(idEstagio).getSizeVetor(idCorteBenders, AttVetorCorteBenders_estado) > 0)
+												corteBenders.addElemento(AttVetorCorteBenders_estado, idVariavelEstado, vetorEstagio_aux.at(idEstagio).getElementoVetor(idCorteBenders, AttVetorCorteBenders_estado, variaveis_estado_modelo_encontradas.at(idVariavelEstado), double()));
+
+											for (IdRealizacao idRealizacao = idRealizacao_inicial; idRealizacao <= idRealizacao_final; idRealizacao++)
+												corteBenders.addElemento(AttMatrizCorteBenders_coeficiente, idRealizacao, idVariavelEstado, vetorEstagio_aux.at(idEstagio).getElementoMatriz(idCorteBenders, AttMatrizCorteBenders_coeficiente, idRealizacao, variaveis_estado_modelo_encontradas.at(idVariavelEstado), double()));
+
+										} // if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) != IdVariavelEstado_Nenhum) {
+
+									} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= variaveis_estado_modelo_encontradas.getIteradorFinal(); idVariavelEstado++) {
+
+									for (IdRealizacao idRealizacao = idRealizacao_inicial; idRealizacao <= idRealizacao_final; idRealizacao++)
+										corteBenders.addElemento(AttVetorCorteBenders_rhs, idRealizacao, vetorEstagio_aux.at(idEstagio).getElementoVetor(idCorteBenders, AttVetorCorteBenders_rhs, idRealizacao, double()));
+
+									if (vetorEstagio.at(idEstagio).anyCorteExterno)
+										corteBenders.setAtributo(AttComumCorteBenders_is_externo, true);
+
+									vetorEstagio.at(idEstagio).vetorCorteBenders.add(corteBenders);
+
+								} // else if (!modelo_e_cortes_estados_identicos) {
+							}
+						} // for (IdCorteBenders idCorteBenders = IdCorteBenders_1; idCorteBenders <= maiorIdCorteBenders; idCorteBenders++) {
+
+						requestCorteBenders(a_idProcesso, idEstagio, a_diretorio_impressao_selecao_cortes, a_entradaSaidaDados);
+
+						if (a_dados.getAtributo(AttComumDados_tipo_estudo, TipoEstudo()) == TipoEstudo_simulacao)
+							removerCorteBenders(idEstagio);
+
+					} // 
+
+				} // if (vetorEstagio.at(idEstagio).vetorCorteBenders.getMaiorId() > IdCorteBenders_Nenhum){
+
+				else 
+					std::cout << "Cortes de Benders nao detectados para : " << getFullString(idEstagio) << std::endl;
+
 			}
 		} // for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= estagio_final; idEstagio++) {
 

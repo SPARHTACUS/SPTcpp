@@ -84,8 +84,11 @@
 	m(TipoPeriodo, 14horas)   \
 	m(TipoPeriodo, 13horas)   \
 	m(TipoPeriodo, 12horas)   \
+	m(TipoPeriodo, 690m)   \
 	m(TipoPeriodo, 11horas)   \
+	m(TipoPeriodo, 630m)   \
 	m(TipoPeriodo, 10horas)   \
+	m(TipoPeriodo, 570m)   \
 	m(TipoPeriodo, 9horas)   \
 	m(TipoPeriodo, 510m)   \
 	m(TipoPeriodo, 8horas)   \

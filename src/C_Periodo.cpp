@@ -876,9 +876,15 @@ int Periodo::getHoras() const {
 		return 8;
 	else if (tipoPeriodo == TipoPeriodo_9horas)
 		return 9;
+	else if (tipoPeriodo == TipoPeriodo_570m)
+		return 9;
 	else if (tipoPeriodo == TipoPeriodo_10horas)
 		return 10;
+	else if (tipoPeriodo == TipoPeriodo_630m)
+		return 10;
 	else if (tipoPeriodo == TipoPeriodo_11horas)
+		return 11;
+	else if (tipoPeriodo == TipoPeriodo_690m)
 		return 11;
 	else if (tipoPeriodo == TipoPeriodo_12horas)
 		return 12;
@@ -1278,6 +1284,12 @@ Periodo operator+(const Periodo& a_periodo, const int a_iterador) {
 			Periodo::iteraMinuto(a_periodo, a_iterador * 450, anoIter, mesIter, diaIter, horIter, minIter);
 		else if (tipoPeriodoArg == TipoPeriodo_510m)
 			Periodo::iteraMinuto(a_periodo, a_iterador * 510, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_570m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 570, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_630m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 630, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_690m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 690, anoIter, mesIter, diaIter, horIter, minIter);
 
 		else if (tipoPeriodoArg == TipoPeriodo_minuto)
 			Periodo::iteraMinuto(a_periodo, a_iterador, anoIter, mesIter, diaIter, horIter, minIter);
