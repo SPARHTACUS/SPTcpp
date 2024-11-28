@@ -18,7 +18,13 @@
 	  m(UnidadeUTE,  AttComum,              geracao_inicial,               double,           0,       10000,             0,      nao) \
       m(UnidadeUTE,  AttComum,            custo_de_operacao,               double,           0,        2000,             0,     nao) \
       m(UnidadeUTE,  AttComum,           horas_neste_status,                  int,           0,      100000,             0,      nao) \
-      m(UnidadeUTE,  AttComum,             min_neste_status,                  int,           0,          30,             0,      nao) 
+      m(UnidadeUTE,  AttComum,             min_neste_status,                  int,           0,          30,             0,      nao) \
+      m(UnidadeUTE,  AttComum,                      ramp_up,               double,           0,         max,           max,     nao) \
+      m(UnidadeUTE,  AttComum,                    ramp_down,               double,           0,         max,           max,     nao) \
+      m(UnidadeUTE,  AttComum,                  min_time_up,               double,           0,       10000,             0,     nao) \
+      m(UnidadeUTE,  AttComum,                min_time_down,               double,           0,       10000,             0,     nao) \
+      m(UnidadeUTE,  AttComum,                     time_ini,               double,         min,         max,           min,     nao) \
+      m(UnidadeUTE,  AttComum,                    power_ini,               double,           0,       10000,             0,     nao)
 //     c_classe,    smrtAtt,                   nomeAtributo,           tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
 
@@ -26,7 +32,10 @@
 	  m(UnidadeUTE,  AttVetor,     disponibilidade,            double,          0,            1,       0,      Periodo) \
 	  m(UnidadeUTE,  AttVetor,      unidades_reais,  IdUnidadeRealUTE,        min,          max,     min,          int) \
 	  m(UnidadeUTE,  AttVetor,   rampa_acionamento,            double,          0,          max,       0,          int) \
-	  m(UnidadeUTE,  AttVetor,  rampa_desligamento,            double,          0,          max,       0,          int) 
+	  m(UnidadeUTE,  AttVetor,  rampa_desligamento,            double,          0,          max,       0,          int) \
+      m(UnidadeUTE,  AttVetor,       ramp_shutdown,            double,          0,          max,       0,          int) \
+      m(UnidadeUTE,  AttVetor,         ramp_turnon,            double,          0,          max,       0,          int) \
+      m(UnidadeUTE,  AttVetor,  representacao_discreta_producao,  int,          0,            1,       0,      Periodo)
 
 #define ATT_MATRIZ_UNIDADE_UTE(m)  \
 	  m(UnidadeUTE,  AttMatriz,          custo_de_operacao,   double,         0,          max,             0,  Periodo, IdPatamarCarga) \

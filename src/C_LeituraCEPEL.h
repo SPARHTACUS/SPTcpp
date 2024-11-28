@@ -166,19 +166,11 @@ private:
 	void atualiza_volume_util_maximo_com_percentual_volume_util_maximo(Dados& a_dados);
 
 	// Info adicional da saida do DC   
-	void leitura_volumes_meta_from_relatos_DC(Dados& a_dados, std::string a_nomeArquivo_1, std::string a_nomeArquivo_2);
-	void leitura_volumes_meta_from_dec_oper_usih_DC(Dados& a_dados, std::string a_nomeArquivo, const bool a_somente_volume_meta_no_ultimo_estagio);
 	bool leitura_turbinamento_maximo_from_relato_e_avl_turb_max_DC(Dados& a_dados, std::string a_nomeArquivo_1, std::string a_nomeArquivo_2);
 	bool leitura_turbinamento_maximo_from_avl_turb_max_DC(Dados& a_dados, std::string a_nomeArquivo_1);
 	void leitura_coeficientes_evaporacao_from_dec_cortes_evap_DC(Dados& a_dados, std::string a_nomeArquivo);
 	void leitura_fph_from_avl_cortesfpha_dec_DC(Dados& a_dados, std::string a_nomeArquivo);
-	void leitura_range_volume_from_eco_fpha_DC(Dados& a_dados, std::string a_nomeArquivo);
-	void leitura_vazao_evaporada_meta_from_dec_oper_usih_DC(Dados& a_dados, std::string a_nomeArquivo);
-	void set_hidreletrica_vazao_turbinada_disponivel_meta(Dados& a_dados);
-	void set_hidreletrica_potencia_disponivel_meta_from_dec_oper_usih_DC(Dados& a_dados, std::string a_nomeArquivo);
-	void set_termeletrica_potencia_disponivel_meta(Dados& a_dados);
-	void leitura_potencia_comandada_from_relgnl(Dados& a_dados, const std::string a_nomeArquivo_pastaRaiz_relgnl, const std::string a_nomeArquivo_pastaAdicionais_relgnl, const std::vector<int> a_codigo_gnl, const std::vector<std::string> a_nome_gnl, SmartEnupla<IdTermeletrica, SmartEnupla<Periodo, double>>& a_lista_termeletrica_potencia_pre_comandada);
-	
+
 	void leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, const std::string a_nomeArquivo_cortes, const bool a_must_read_nwlistcf, const std::string a_diretorio_att_premissas, const int a_maior_ONS_REE, const SmartEnupla<Periodo, bool> a_horizonte_processo_estocastico, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> a_percentual_duracao_patamar_carga_original);
 	void leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo, SmartEnupla<IdReservatorioEquivalente, bool>& a_coeficientes_EAR, SmartEnupla<IdReservatorioEquivalente, SmartEnupla<int, bool>>& a_coeficiente_ENA, std::string a_nomeArquivo, const bool a_is_arquivo_fcfnwn, const int a_periodo_acoplamento, const int a_maior_ONS_REE);
 
@@ -226,7 +218,6 @@ private:
 
 	//Define mapeamento_espaco_amostral
 	SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> define_mapeamento_espaco_amostral_arvore_simetrica_CP(Dados& a_dados, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final);
-	void define_realizacao_transformada_espaco_amostral_arvore_completa_CP(Dados& a_dados);
 	void define_variavel_aleatoria_interna_CP(Dados& a_dados);
 	void define_numero_cenarios_CP(Dados& a_dados);
 	void define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados);
@@ -368,7 +359,7 @@ private:
 
 	SmartEnupla<IdContrato, int> lista_codigo_ONS_contrato = SmartEnupla<IdContrato, int>(IdContrato_1, std::vector<int>(IdContrato(int(IdContrato_Excedente) - 1), -1));
 
-	SmartEnupla<IdUsinaEolica, int> lista_codigo_ONS_usina_eolica = SmartEnupla<IdUsinaEolica, int>(IdUsinaEolica_1, std::vector<int>(IdUsinaEolica(int(IdUsinaEolica_Excedente) - 1), -1));
+	SmartEnupla<IdRenovavel, int> lista_codigo_ONS_usina_eolica = SmartEnupla<IdRenovavel, int>(IdRenovavel_1, std::vector<int>(IdRenovavel(int(IdRenovavel_Excedente) - 1), -1));
 
 	SmartEnupla<IdRestricaoEletrica, int> lista_codigo_ONS_restricao_eletrica = SmartEnupla<IdRestricaoEletrica, int>(IdRestricaoEletrica_1, std::vector<int>(IdRestricaoEletrica(int(IdRestricaoEletrica_Excedente) - 1), -1));
 
@@ -778,10 +769,6 @@ private:
 	bool aplicarModificacaoVERTJU(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const ModificacaoUHE& a_modificacaoUHE);
 	
 	bool aplicarModificacaoJUSENA(Dados& a_dados, const IdHidreletrica a_idHidreletrica, const ModificacaoUHE& a_modificacaoUHE);
-
-	//Cria os intercâmbios hidráulicos correspondentes à jusante desvio 
-
-	void adicionaIntercambiosHidraulicosApartirJusanteDesvio(Dados& a_dados);
 
 	void adicionaLimitesDesvioApartirJusanteDesvio(Dados& a_dados);
 

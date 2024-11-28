@@ -9,22 +9,24 @@
 	  m(RestricaoEletrica,  AttComum,                nome,              string,         min,          max,        Nenhum,      sim) \
 	  m(RestricaoEletrica,  AttComum,             lim_inf,              double,           0,          max,             0,      nao) \
 	  m(RestricaoEletrica,  AttComum,             lim_sup,              double,           0,          max,             0,      nao) \
-	  m(RestricaoEletrica,  AttComum, penalidade_restricao_eletrica,    double,           0,          max,          5000,      sim) 
+	  m(RestricaoEletrica,  AttComum,             vlr_ini,              double,         min,          max,           max,      nao) \
+	  m(RestricaoEletrica,  AttComum,          penalidade,              double,           0,          max,         10000,      sim) 
 //               c_classe,   smrtAtt,        nomeAtributo,                tipo,  lowerBound,   upperBound,  initialValue, mustRead?
 
 
 #define ATT_VETOR_RESTRICAO_ELETRICA(m)  \
 	  m(RestricaoEletrica,  AttVetor,  lim_inf,             double,        min,          max,             0,      Periodo) \
-	  m(RestricaoEletrica,  AttVetor,  lim_sup,             double,          0,          max,           max,      Periodo) \
-	  m(RestricaoEletrica,  AttVetor,  lim_inf_media,       double,          0,          max,           max,      Periodo) \
-	  m(RestricaoEletrica,  AttVetor,  lim_sup_media,       double,          0,          max,           max,      Periodo) 
+	  m(RestricaoEletrica,  AttVetor,  lim_sup,             double,          0,          max,           max,      Periodo) 
 //               c_classe,   smrtAtt,     nomeAtributo,               Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 
 #define ATT_MATRIZ_RESTRICAO_ELETRICA(m)  \
-	  m(RestricaoEletrica,  AttMatriz, percentual_variacao_patamar_carga,     double,          0,           10,             0,  Periodo, IdPatamarCarga) \
-	  m(RestricaoEletrica,  AttMatriz,                           lim_inf,     double,        min,          max,             0,  Periodo, IdPatamarCarga) \
-      m(RestricaoEletrica,  AttMatriz,                           lim_sup,     double,          0,          max,             0,  Periodo, IdPatamarCarga) \
+	  m(RestricaoEletrica,  AttMatriz,    var_abs_inf,     double,          min,          max,             max,  Periodo, IdPatamarCarga) \
+	  m(RestricaoEletrica,  AttMatriz,    var_abs_sup,     double,          min,          max,             max,  Periodo, IdPatamarCarga) \
+	  m(RestricaoEletrica,  AttMatriz,    var_rel_inf,     double,          0.0,          max,             max,  Periodo, IdPatamarCarga) \
+	  m(RestricaoEletrica,  AttMatriz,    var_rel_sup,     double,          0.0,          max,             max,  Periodo, IdPatamarCarga) \
+	  m(RestricaoEletrica,  AttMatriz,        lim_inf,     double,          min,          max,             max,  Periodo, IdPatamarCarga) \
+      m(RestricaoEletrica,  AttMatriz,        lim_sup,     double,          min,          max,             max,  Periodo, IdPatamarCarga) 
 //               c_classe,    smrtAtt,                      nomeAtributo,       Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define MEMBRO_RESTRICAO_ELETRICA(m)          \

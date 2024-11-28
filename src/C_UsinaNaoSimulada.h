@@ -7,8 +7,8 @@
 	  m(UsinaNaoSimulada,  AttComum,   idUsinaNaoSimulada,  IdUsinaNaoSimulada,         min,          max,           min,      sim) \
       m(UsinaNaoSimulada,  AttComum,                 nome,              string,         min,          max,           min,      nao) \
 	  m(UsinaNaoSimulada,  AttComum,      potencia_minima,              double,           0,      1000000,             0,      nao) \
-	  m(UsinaNaoSimulada,  AttComum,      potencia_maxima,              double,           0,      1000000,             0,      nao) 
-
+	  m(UsinaNaoSimulada,  AttComum,      potencia_maxima,              double,           0,      1000000,             0,      nao) \
+      m(UsinaNaoSimulada,  AttComum,      constrained_off,                bool,       false,         true,         false,      nao)
 //              c_classe,   smrtAtt,        nomeAtributo,                tipo,  lowerBound,   upperBound,  initialValue, mustRead?
 
 

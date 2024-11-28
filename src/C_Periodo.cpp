@@ -844,25 +844,47 @@ int Periodo::getHoras() const {
 		return getDias() * 24;
 	else if (tipoPeriodo == TipoPeriodo_horario)
 		return 1;
+	else if (tipoPeriodo == TipoPeriodo_90m)
+		return 1;
 	else if (tipoPeriodo == TipoPeriodo_2horas)
+		return 2;
+	else if (tipoPeriodo == TipoPeriodo_150m)
 		return 2;
 	else if (tipoPeriodo == TipoPeriodo_3horas)
 		return 3;
+	else if (tipoPeriodo == TipoPeriodo_210m)
+		return 3;
 	else if (tipoPeriodo == TipoPeriodo_4horas)
+		return 4;
+	else if (tipoPeriodo == TipoPeriodo_270m)
 		return 4;
 	else if (tipoPeriodo == TipoPeriodo_5horas)
 		return 5;
+	else if (tipoPeriodo == TipoPeriodo_330m)
+		return 5;
 	else if (tipoPeriodo == TipoPeriodo_6horas)
+		return 6;
+	else if (tipoPeriodo == TipoPeriodo_390m)
 		return 6;
 	else if (tipoPeriodo == TipoPeriodo_7horas)
 		return 7;
+	else if (tipoPeriodo == TipoPeriodo_450m)
+		return 7;
 	else if (tipoPeriodo == TipoPeriodo_8horas)
+		return 8;
+	else if (tipoPeriodo == TipoPeriodo_510m)
 		return 8;
 	else if (tipoPeriodo == TipoPeriodo_9horas)
 		return 9;
+	else if (tipoPeriodo == TipoPeriodo_570m)
+		return 9;
 	else if (tipoPeriodo == TipoPeriodo_10horas)
 		return 10;
+	else if (tipoPeriodo == TipoPeriodo_630m)
+		return 10;
 	else if (tipoPeriodo == TipoPeriodo_11horas)
+		return 11;
+	else if (tipoPeriodo == TipoPeriodo_690m)
 		return 11;
 	else if (tipoPeriodo == TipoPeriodo_12horas)
 		return 12;
@@ -896,7 +918,30 @@ int Periodo::getHoras() const {
 
 int Periodo::getMinutos() const {
 
-	if (tipoPeriodo <= TipoPeriodo_horario)
+	if (tipoPeriodo == TipoPeriodo_90m)
+		return 90;
+	else if (tipoPeriodo == TipoPeriodo_150m)
+		return 150;
+	else if (tipoPeriodo == TipoPeriodo_210m)
+		return 210;
+	else if (tipoPeriodo == TipoPeriodo_270m)
+		return 270;
+	else if (tipoPeriodo == TipoPeriodo_330m)
+		return 330;
+	else if (tipoPeriodo == TipoPeriodo_390m)
+		return 390;
+	else if (tipoPeriodo == TipoPeriodo_450m)
+		return 450;
+	else if (tipoPeriodo == TipoPeriodo_510m)
+		return 510;
+	else if (tipoPeriodo == TipoPeriodo_570m)
+		return 570;
+	else if (tipoPeriodo == TipoPeriodo_630m)
+		return 630;
+	else if (tipoPeriodo == TipoPeriodo_690m)
+		return 690;
+
+	else if (tipoPeriodo <= TipoPeriodo_horario)
 		return getHoras() * 60;
 	else if (tipoPeriodo == TipoPeriodo_meia_hora)
 		return 30;
@@ -1245,6 +1290,29 @@ Periodo operator+(const Periodo& a_periodo, const int a_iterador) {
 
 		else if (tipoPeriodoArg == TipoPeriodo_meia_hora)
 			Periodo::iteraMinuto(a_periodo, a_iterador * 30, anoIter, mesIter, diaIter, horIter, minIter);
+
+		else if (tipoPeriodoArg == TipoPeriodo_90m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 90, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_150m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 150, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_210m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 210, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_270m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 270, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_330m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 330, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_390m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 390, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_450m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 450, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_510m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 510, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_570m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 570, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_630m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 630, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (tipoPeriodoArg == TipoPeriodo_690m)
+			Periodo::iteraMinuto(a_periodo, a_iterador * 690, anoIter, mesIter, diaIter, horIter, minIter);
 
 		else if (tipoPeriodoArg == TipoPeriodo_minuto)
 			Periodo::iteraMinuto(a_periodo, a_iterador, anoIter, mesIter, diaIter, horIter, minIter);

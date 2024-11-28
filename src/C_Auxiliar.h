@@ -346,6 +346,35 @@ static void strNormalizada(std::string &a_string){
 		a_string.erase(a_string.size() - 1);
 } // string EntradaSaidaDados::strNormalizada(){
 
+static std::string remEspacosEntreStr(const std::string& a_string) {
+
+	if (a_string.empty())
+		return a_string;
+
+	if ((a_string.at(0) != ' ') && (a_string.at(a_string.size() - 1) != ' '))
+		return a_string;
+
+	size_t pos_ini = 0;
+	if (a_string.at(pos_ini) == ' ') {
+		for (pos_ini = 0; pos_ini < a_string.size(); pos_ini++) {
+			if (a_string.at(pos_ini) != ' ')
+				break;
+		}
+		if (pos_ini == a_string.size())
+			return std::string();
+
+	}
+	size_t pos_end = a_string.size() - 1;
+	if (a_string.at(pos_end) == ' ') {
+		for (pos_end = a_string.size() - 1; pos_end > 0; pos_end--) {
+			if (a_string.at(pos_end) != ' ')
+				break;
+		}
+	}
+	
+	return a_string.substr(pos_ini, pos_end - pos_ini + 1);
+
+} // string EntradaSaidaDados::strNormalizada(){
 
 static bool lerRegistro(std::string a_registro, std::string a_registroArquivo, std::string a_registroLer) {
 	
