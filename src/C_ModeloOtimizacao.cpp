@@ -4129,6 +4129,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 			}
 		} // for (IdEstagio idStage_glob = IdEstagio(1); idStage_glob < IdEstagio_Excedente; idStage_glob++) {
 
+
 		const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> horizon = a_dados.getMatriz(AttMatrizDados_percentual_duracao_patamar_carga, Periodo(), IdPatamarCarga(), double());
 
 		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
@@ -4436,8 +4437,32 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 											int varRH_past = getVarDecisao_RHseExistir(a_TSS, IdEstagio(idEstagio - 1), periodo, idRH);
 
-											if (varRH_past == -1)
-												throw std::invalid_argument("Nao foi possivel localizar variavel RH de " + getFullString(idVariavelEstado_corte) + " do " + getFullString(idEstagio) + " em " + getFullString(IdEstagio(idEstagio - 1)));
+											if (varRH_past == -1) {
+												const Periodo perIniStage = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_estudo, IdEstagio(idEstagio - 1), Periodo());
+												const Periodo perEndStage = getIterador2Final(AttMatrizModeloOtimizacao_horizonte_estudo, IdEstagio(idEstagio - 1), Periodo());
+
+												int equRH_past = -1;
+												double sobrep_acum = 0.0;
+												for (Periodo periodIn = perIniStage; periodIn <= perEndStage; horizon.incrementarIterador(periodIn)) {
+
+													const double sobrep = periodo.sobreposicao(periodIn);
+
+													if (sobrep > 0.0) {
+														if (varRH_past == -1) {
+															varRH_past = addVarDecisao_RH(a_TSS, IdEstagio(idEstagio - 1), periodo, idRH, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+															equRH_past = addEquLinear_RH(a_TSS, IdEstagio(idEstagio - 1), periodo, idRH);
+															vetorEstagio.at(IdEstagio(idEstagio - 1)).getSolver(a_TSS)->setCofRestricao(varRH_past, equRH_past, 1.0);
+														}
+														vetorEstagio.at(IdEstagio(idEstagio - 1)).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RH(a_TSS, IdEstagio(idEstagio - 1), periodIn, idRH), equRH_past, -sobrep);
+														sobrep_acum += sobrep;
+													}
+													if (sobrep_acum == 1.0)
+														break;
+												}
+
+												if (sobrep_acum < 1.0)
+													throw std::invalid_argument("Nao foi possivel localizar variavel RH de " + getFullString(idVariavelEstado_corte) + " do " + getFullString(idEstagio) + " em " + getFullString(IdEstagio(idEstagio - 1)));
+											} // if (varRH_past == -1) {
 
 											const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varRH, varRH_past, true);
 
@@ -4456,8 +4481,32 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 											int varHQ_past = getVarDecisao_HQseExistir(a_TSS, IdEstagio(idEstagio - 1), periodo, idHQ);
 
-											if (varHQ_past == -1)
-												throw std::invalid_argument("Nao foi possivel localizar variavel HQ de " + getFullString(idVariavelEstado_corte) + " do " + getFullString(idEstagio) + " em " + getFullString(IdEstagio(idEstagio - 1)));
+											if (varHQ_past == -1) {
+												const Periodo perIniStage = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_estudo, IdEstagio(idEstagio - 1), Periodo());
+												const Periodo perEndStage = getIterador2Final(AttMatrizModeloOtimizacao_horizonte_estudo, IdEstagio(idEstagio - 1), Periodo());
+
+												int equHQ_past = -1;
+												double sobrep_acum = 0.0;
+												for (Periodo periodIn = perIniStage; periodIn <= perEndStage; horizon.incrementarIterador(periodIn)) {
+
+													const double sobrep = periodo.sobreposicao(periodIn);
+
+													if (sobrep > 0.0) {
+														if (varHQ_past == -1) {
+															varHQ_past = addVarDecisao_HQ(a_TSS, IdEstagio(idEstagio - 1), periodo, idHQ, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+															equHQ_past = addEquLinear_HQ(a_TSS, IdEstagio(idEstagio - 1), periodo, idHQ);
+															vetorEstagio.at(IdEstagio(idEstagio - 1)).getSolver(a_TSS)->setCofRestricao(varHQ_past, equHQ_past, 1.0);
+														}
+														vetorEstagio.at(IdEstagio(idEstagio - 1)).getSolver(a_TSS)->setCofRestricao(getVarDecisao_HQ(a_TSS, IdEstagio(idEstagio - 1), periodIn, idHQ), equHQ_past, -sobrep);
+														sobrep_acum += sobrep;
+													}
+													if (sobrep_acum == 1.0)
+														break;
+												}
+
+												if (sobrep_acum < 1.0)
+													throw std::invalid_argument("Nao foi possivel localizar variavel HQ de " + getFullString(idVariavelEstado_corte) + " do " + getFullString(idEstagio) + " em " + getFullString(IdEstagio(idEstagio - 1)));
+											} // if (varHQ_past == -1) {
 
 											const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varHQ, varHQ_past, true);
 
@@ -4927,8 +4976,6 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 		a_entradaSaidaDados.setDiretorioEntrada(diretorio_importacao_pos_estudo);
 
-		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
-
 		// Instanciar estagio adicional a conter os cortes e estados do acoplamento.
 
 		bool estagio_carregado_sem_iterador = false;
@@ -5009,6 +5056,8 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 			const Periodo periodo_estudo_inicial = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_estudo, idEstagio, Periodo());
 			const Periodo periodo_estudo_final = getIterador2Final(AttMatrizModeloOtimizacao_horizonte_estudo, idEstagio, Periodo());
+
+			const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
 			const Periodo periodo_horizonte_estudo_inicial = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_estudo, getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()), Periodo(), double()).getIteradorInicial();
 
@@ -5193,10 +5242,34 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					Periodo periodo = Periodo(nome.at(2));
 					const IdRestricaoOperativaUHE idRH = getIdRestricaoOperativaUHEFromChar(nome.at(3).c_str());
 
-					int varRH_past = getVarDecisao_RHseExistir(a_TSS, IdEstagio(idEstagio - 1), periodo, idRH);
+					int varRH_past = getVarDecisao_RHseExistir(a_TSS, idEstagio, periodo, idRH);
 
-					if (varRH_past == -1)
-						throw std::invalid_argument("Nao foi possivel localizar variavel RH de " + getFullString(idVariavelEstado) + " do " + getFullString(idEstagio) + " em " + getFullString(IdEstagio(idEstagio - 1)));
+					if (varRH_past == -1) {
+						const Periodo perIniStage = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_estudo, idEstagio, Periodo());
+						const Periodo perEndStage = getIterador2Final(AttMatrizModeloOtimizacao_horizonte_estudo, idEstagio, Periodo());
+
+						int equRH_past = -1;
+						double sobrep_acum = 0.0;
+						for (Periodo periodIn = perIniStage; periodIn <= perEndStage; horizon.incrementarIterador(periodIn)) {
+
+							const double sobrep = periodo.sobreposicao(periodIn);
+
+							if (sobrep > 0.0) {
+								if (varRH_past == -1) {
+									varRH_past = addVarDecisao_RH(a_TSS, idEstagio, periodo, idRH, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+									equRH_past = addEquLinear_RH(a_TSS, idEstagio, periodo, idRH);
+									vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varRH_past, equRH_past, 1.0);
+								}
+								vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_RH(a_TSS, idEstagio, periodIn, idRH), equRH_past, -sobrep);
+								sobrep_acum += sobrep;
+							}
+							if (sobrep_acum == 1.0)
+								break;
+						}
+
+						if (sobrep_acum < 1.0)
+							throw std::invalid_argument("Nao foi possivel localizar variavel RH de " + getFullString(idVariavelEstado) + " do " + getFullString(idEstagio) + " em " + getFullString(idEstagio));
+					} // if (varRH_past == -1) {
 
 					estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varRH_past);
 
@@ -5207,10 +5280,34 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					Periodo periodo = Periodo(nome.at(2));
 					const IdControleCotaVazao idHQ = getIdControleCotaVazaoFromChar(nome.at(3).c_str());
 
-					int varHQ_past = getVarDecisao_HQseExistir(a_TSS, IdEstagio(idEstagio - 1), periodo, idHQ);
+					int varHQ_past = getVarDecisao_HQseExistir(a_TSS, idEstagio, periodo, idHQ);
 
-					if (varHQ_past == -1)
-						throw std::invalid_argument("Nao foi possivel localizar variavel HQ de " + getFullString(idVariavelEstado) + " do " + getFullString(idEstagio) + " em " + getFullString(IdEstagio(idEstagio - 1)));
+					if (varHQ_past == -1) {
+						const Periodo perIniStage = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_estudo, idEstagio, Periodo());
+						const Periodo perEndStage = getIterador2Final(AttMatrizModeloOtimizacao_horizonte_estudo, idEstagio, Periodo());
+
+						int equHQ_past = -1;
+						double sobrep_acum = 0.0;
+						for (Periodo periodIn = perIniStage; periodIn <= perEndStage; horizon.incrementarIterador(periodIn)) {
+
+							const double sobrep = periodo.sobreposicao(periodIn);
+
+							if (sobrep > 0.0) {
+								if (varHQ_past == -1) {
+									varHQ_past = addVarDecisao_HQ(a_TSS, idEstagio, periodo, idHQ, -vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), vetorEstagio.at(idEstagio).getSolver(a_TSS)->getInfinito(), 0.0);
+									equHQ_past = addEquLinear_HQ(a_TSS, idEstagio, periodo, idHQ);
+									vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varHQ_past, equHQ_past, 1.0);
+								}
+								vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_HQ(a_TSS, idEstagio, periodIn, idHQ), equHQ_past, -sobrep);
+								sobrep_acum += sobrep;
+							}
+							if (sobrep_acum == 1.0)
+								break;
+						}
+
+						if (sobrep_acum < 1.0)
+							throw std::invalid_argument("Nao foi possivel localizar variavel HQ de " + getFullString(idVariavelEstado) + " do " + getFullString(idEstagio) + " em " + getFullString(idEstagio));
+					} // if (varHQ_past == -1) {
 
 					estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varHQ_past);
 
