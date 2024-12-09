@@ -6244,6 +6244,7 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 
 		bool calcular_atributos_operacionais_submercado = false;
 		bool calcular_atributos_operacionais_patamar_deficit = false;
+		bool calcular_atributos_operacionais_usinaNaoSimulada = false;
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
@@ -6342,9 +6343,67 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 
 			validaUsinaNaoSimuladaEmSubmercado(idSubmercado);
 
+			const IdUsinaNaoSimulada menorIdUsinaNaoSimulada = getMenorId(idSubmercado, IdUsinaNaoSimulada());
+			const IdUsinaNaoSimulada idOutUNS = getIdOut(idSubmercado, IdUsinaNaoSimulada());
+
+			for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada < idOutUNS; vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+
+				if (vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)) {
+
+					if ((getSize1Matriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_minima) == 0) || (getSize1Matriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_maxima) == 0)) {
+
+						calcular_atributos_operacionais_usinaNaoSimulada = true;
+
+						bool preencher_percentual_variacao_patamar_carga = false;
+						if (getSize1Matriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga) == 0)
+							preencher_percentual_variacao_patamar_carga = true;
+
+						bool preencher_potencia_minima = false;
+						if (getSize1Matriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_minima) == 0) {
+							preencher_potencia_minima = true;
+							if (getSizeVetor(idSubmercado, idUsinaNaoSimulada, AttVetorUsinaNaoSimulada_potencia_minima) == 0)
+								vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).setVetor(AttVetorUsinaNaoSimulada_potencia_minima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idSubmercado, idUsinaNaoSimulada, AttComumUsinaNaoSimulada_potencia_minima, double())));
+						}
+
+						bool preencher_potencia_maxima = false;
+						if (getSize1Matriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_maxima) == 0) {
+							preencher_potencia_maxima = true;
+							if (getSizeVetor(idSubmercado, idUsinaNaoSimulada, AttVetorUsinaNaoSimulada_potencia_maxima) == 0)
+								vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).setVetor(AttVetorUsinaNaoSimulada_potencia_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, getAtributo(idSubmercado, idUsinaNaoSimulada, AttComumUsinaNaoSimulada_potencia_maxima, double())));
+						}
+
+						for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
+
+							const IdPatamarCarga maiorIdPatamarCarga = getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga());
+							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+								const double percentual_variacao_patamar_carga = getElementoMatriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga, periodo, idPatamarCarga, double());
+
+								if (preencher_potencia_minima)
+									vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).addElemento(AttMatrizUsinaNaoSimulada_potencia_minima, periodo, idPatamarCarga, getElementoVetor(idSubmercado, idUsinaNaoSimulada, AttVetorUsinaNaoSimulada_potencia_minima, periodo, double()) * percentual_variacao_patamar_carga);
+
+								if (preencher_potencia_maxima)
+									vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).addElemento(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, idPatamarCarga, getElementoVetor(idSubmercado, idUsinaNaoSimulada, AttVetorUsinaNaoSimulada_potencia_maxima, periodo, double()) * percentual_variacao_patamar_carga);
+
+								const double potencia_minima = getElementoMatriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_minima, periodo, idPatamarCarga, double());
+								const double potencia_maxima = getElementoMatriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_maxima, periodo, idPatamarCarga, double());
+
+								if (potencia_minima > potencia_maxima)
+									throw std::invalid_argument("Potencia Minima maior que Potencia Maxima em " + getString(periodo) + " em " + getFullString(idPatamarCarga) + " em " + getFullString(idSubmercado) + " em " + getFullString(idUsinaNaoSimulada));
+
+							} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+						} // for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_final_estudo; horizonte_estudo.incrementarIterador(periodo)) {
+
+					} // if ((getSize1Matriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_minima) == 0) || (getSize1Matriz(idSubmercado, idUsinaNaoSimulada, AttMatrizUsinaNaoSimulada_potencia_maxima) == 0)) {
+
+				} // if (vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)){
+
+			} // for (IdUsinaNaoSimulada idUsinaNaoSimulada = menorIdUsinaNaoSimulada; idUsinaNaoSimulada < idOutUNS; vetorSubmercado.at(a_idSubmercado).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada)) {
+
 		} // for (IdSubmercado idSubmercado = getMenorId(IdSubmercado()); idSubmercado <= maiorIdSubmercado; vetorSubmercado.incr(idSubmercado)) {
 
-		if ((calcular_atributos_operacionais_submercado) || (calcular_atributos_operacionais_patamar_deficit) || (a_imprimir_atributos_sem_recarregar)) {
+		if ((calcular_atributos_operacionais_submercado) || (calcular_atributos_operacionais_patamar_deficit) || (calcular_atributos_operacionais_usinaNaoSimulada) || (a_imprimir_atributos_sem_recarregar)) {
 
 			if (idProcesso == IdProcesso_mestre) {
 
@@ -6376,6 +6435,23 @@ void Dados::validacao_operacional_Submercado(EntradaSaidaDados a_entradaSaidaDad
 					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("SUBMERCADO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", IdSubmercado_Nenhum, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizSubmercado_percentual_variacao_patamar_carga);
 
 				} // if (calcular_atributos_operacionais_submercado) {
+
+				if (calcular_atributos_operacionais_usinaNaoSimulada) {
+
+					//
+					// Imprime Atributos Premissas
+					//
+					a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
+
+					a_entradaSaidaDados.setAppendArquivo(false);
+					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("SUBMERCADO_USINA_NAO_SIMULADA_AttVetorPremissa_PorPeriodo.csv", IdSubmercado_Nenhum, IdUsinaNaoSimulada_Nenhum, *this, periodo_estudo_inicial, periodo_final_estudo, AttVetorUsinaNaoSimulada_potencia_minima);
+					a_entradaSaidaDados.setAppendArquivo(true);
+					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("SUBMERCADO_USINA_NAO_SIMULADA_AttVetorPremissa_PorPeriodo.csv", IdSubmercado_Nenhum, IdUsinaNaoSimulada_Nenhum, *this, periodo_estudo_inicial, periodo_final_estudo, AttVetorUsinaNaoSimulada_potencia_maxima);
+
+					a_entradaSaidaDados.setAppendArquivo(false);
+					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga.csv", IdSubmercado_Nenhum, IdUsinaNaoSimulada_Nenhum, *this, periodo_estudo_inicial, periodo_final_estudo, IdPatamarCarga_1, maiorIdPatamarCarga_horizonte, AttMatrizUsinaNaoSimulada_percentual_variacao_patamar_carga);
+
+				} // if (calcular_atributos_operacionais_usinaNaoSimulada) {
 
 				//
 				// Imprime Atributos Operacionais
