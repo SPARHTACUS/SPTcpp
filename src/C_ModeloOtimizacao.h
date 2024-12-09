@@ -230,6 +230,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
     m(  VarDecisao,   RE_VASUP_FSUP,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
     m(  VarDecisao,   RE_VRSUP_FSUP,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
     m(  VarDecisao,   RH,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
+    m(  VarDecisao,   RH_ADD,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
     m(  VarDecisao,   RH_LINF_FINF,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
     m(  VarDecisao,   RH_LSUP_FSUP,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
     m(  VarDecisao,   RH_VAINF_FINF,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAOOPERATIVAUHE)  \
@@ -348,6 +349,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,    PH_FPH_FINF,          4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
 	m(  VarDecisao,    PH_FINF,              4, 1,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
 	m(  VarDecisao,    PH,                   4, 2,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTO)  \
+	m(  VarDecisao,    QTURDISP,               4, 2,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTO)  \
 	m(  VarDecisao,    PHDISP,               4, 1,    ITERADORES_4_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTO)  \
 	m(  VarDecisao,    PHDISP,               4, 2,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA)  \
 	m(  VarDecisao,    PHDISP,               4, 3,    ITERADORES_4_ESTAGIO_PERIODO_PATAMARCARGA_SUBMERCADO)  \
@@ -498,6 +500,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,    PH_REL,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
 	m(  VarDecisao,    PH_FINF,     5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
 	m(  VarDecisao,    PH,      5, 2,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADE)  \
+	m(  VarDecisao,    QTURDISP,      5, 2,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADE)  \
 	m(  VarDecisao,    PHDISP,      5, 1,     ITERADORES_5_ESTAGIO_PERIODO_HIDRELETRICA_CONJUNTOHIDRAULICO_UNIDADE)  \
 	m(  VarDecisao,    PHDISP,      5, 2,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
 	m(  VarDecisao,    PHDISP_REL,  5, 1,     ITERADORES_5_ESTAGIO_PERIODO_PATAMARCARGA_HIDRELETRICA_CONJUNTOHIDRAULICO)  \
@@ -800,6 +803,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, Periodo &a_periodo_lag, const double a_grau_liberdade, std::vector<IdHidreletrica> a_idHidreletrica = std::vector<IdHidreletrica>(), bool a_isVarEstadoExterna = false);
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdTermeletrica a_idTermeletrica, const double a_potencia_disponivel_minima, const double a_potencia_disponivel_maxima, bool a_isVarEstadoExterna = false);
 
+		int criarVariaveisDecisao_VariaveisEstado_Restricoes_RH(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period_lag, const IdRestricaoOperativaUHE a_idRH, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizon, bool a_isVarEstadoExterna = false);
+
 		void criarModeloOtimizacao(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados);
 
 		void criarTermeletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat);
@@ -842,8 +847,13 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		void formularModeloOtimizacao(const SmartEnupla<IdEstagio, std::vector<TipoSubproblemaSolver>>& a_listaTSS, Dados& a_dados, const IdEstagio a_idEstagioIni, const IdEstagio a_idEstagioEnd, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizonte_estudo);
 
+		std::string criarRestricoesHidraulicas_nomeVarEstado(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period_prev, Periodo& a_period, const IdRestricaoOperativaUHE a_idRH, const bool a_fp_local = false);
+
 		void criarRestricoesHidraulicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_periodIni_stage, Periodo& a_periodPrev, Periodo & a_period, Periodo& a_periodNext, const IdPatamarCarga a_idPat);
 		int criarRestricoesHidraulicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo & a_period, Periodo& a_periodNext, const IdPatamarCarga a_idPatamarCarga, const IdRestricaoOperativaUHE a_idRH);
+		int criarRestricoesHidraulicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, IdRestricaoOperativaUHE &a_idHQ, const std::vector<std::string>& a_stateVar, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizon);
+
+		std::string criarRestricoesEletricas_nomeVarEstado(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period_prev, Periodo& a_period, const IdRestricaoEletrica a_idRE);
 
 		void criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_periodIni_stage, Periodo& a_periodPrev, Periodo& a_period, Periodo& a_periodNext, const IdPatamarCarga a_idPat);
 		int criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, Periodo& a_periodNext, const IdPatamarCarga a_idPatamarCarga, const IdRestricaoEletrica a_idRE);
