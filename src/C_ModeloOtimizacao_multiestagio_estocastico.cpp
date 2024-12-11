@@ -5191,41 +5191,43 @@ int ModeloOtimizacao::criarRestricoesHidraulicas(const TipoSubproblemaSolver a_T
 					for (IdElementoSistema idElem = IdElementoSistema_1; idElem <= a_dados.getMaiorId(idRH, IdElementoSistema()); idElem++) {
 						bool idElemFound = false;
 						for (int e = 0; e < int(elemsRH.size()); e++) {
-							if (a_dados.getElementoMatriz(idRH, idElem, AttMatrizElementoSistema_fator_participacao, periodo, IdPatamarCarga_1, double()) == getdoubleFromChar(elemsRH.at(e).at(1).c_str())) {
-								if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()) == getTipoVariavelRestricaoOperativaFromChar(elemsRH.at(e).at(2).c_str())) {
-									if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_hidreletrica, IdHidreletrica()) == getIdHidreletricaFromChar(elemsRH.at(e).at(3).c_str())) {
-										if (elemsRH.at(e).size() > 4) {
-											if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_conjuntohidraulico, IdConjuntoHidraulico()) == getIdConjuntoHidraulicoFromChar(elemsRH.at(e).at(4).c_str())) {
-												if (elemsRH.at(e).size() > 5) {
-													if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_unidadehidraulica, IdUnidadeUHE()) == getIdUnidadeUHEFromChar(elemsRH.at(e).at(5).c_str())) {
-														if (elemsRH.at(e).size() > 6)
-															throw std::invalid_argument("Error Elem de RH do " + getFullString(a_idStage));
-														else {
-															idElemFound = true;
-															break;
+							if (a_dados.getSize1Matriz(idRH, idElem, AttMatrizElementoSistema_fator_participacao) > 0) {
+								if (a_dados.getElementoMatriz(idRH, idElem, AttMatrizElementoSistema_fator_participacao, periodo, IdPatamarCarga_1, double()) == getdoubleFromChar(elemsRH.at(e).at(1).c_str())) {
+									if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()) == getTipoVariavelRestricaoOperativaFromChar(elemsRH.at(e).at(2).c_str())) {
+										if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_hidreletrica, IdHidreletrica()) == getIdHidreletricaFromChar(elemsRH.at(e).at(3).c_str())) {
+											if (elemsRH.at(e).size() > 4) {
+												if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_conjuntohidraulico, IdConjuntoHidraulico()) == getIdConjuntoHidraulicoFromChar(elemsRH.at(e).at(4).c_str())) {
+													if (elemsRH.at(e).size() > 5) {
+														if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_unidadehidraulica, IdUnidadeUHE()) == getIdUnidadeUHEFromChar(elemsRH.at(e).at(5).c_str())) {
+															if (elemsRH.at(e).size() > 6)
+																throw std::invalid_argument("Error Elem de RH do " + getFullString(a_idStage));
+															else {
+																idElemFound = true;
+																break;
+															}
 														}
 													}
-												}
-												else {
-													idElemFound = true;
-													break;
+													else {
+														idElemFound = true;
+														break;
+													}
 												}
 											}
-										}
-										else {
-											idElemFound = true;
-											break;
+											else {
+												idElemFound = true;
+												break;
+											}
 										}
 									}
 								}
 							}
 						} // for (int e = 0; e < int(elemsRH.size()); e++) {
 						if (!idElemFound) {
-							a_idHQ == IdRestricaoOperativaUHE_Nenhum;
+							a_idHQ = IdRestricaoOperativaUHE_Nenhum;
 							break;
 						}
 						else
-							a_idHQ == idRH;
+							a_idHQ = idRH;
 					}
 				}
 			}

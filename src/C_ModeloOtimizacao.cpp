@@ -4088,6 +4088,8 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 		const IdCorteBenders maximoIdCorteBenders = getAtributo(AttComumModeloOtimizacao_maior_corte_importado, IdCorteBenders());
 
+		bool dif_stages = false;
+
 		a_entradaSaidaDados.setDiretorioEntrada(diretorio_importacao_cortes);
 		for (IdEstagio idStage_glob = IdEstagio(1); idStage_glob < IdEstagio_Excedente; idStage_glob++) {
 
@@ -4106,6 +4108,10 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 							if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio)) {
 								if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
+
+									if (idEstagio != estagio_aux.getAtributo(AttComumEstagio_idEstagio, IdEstagio()))
+										dif_stages = true;
+
 									vetorEstagio.at(idEstagio).vetorCorteBenders.alocar(int(maximoIdCorteBenders));
 									Estagio estagio_load;
 									a_entradaSaidaDados.carregarArquivoCSV_AttComum(getFullString(idStage_glob) + "_estagio.csv", estagio_load, TipoAcessoInstancia_direto);
@@ -4166,6 +4172,16 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 							if (maiorIdVarivelEstado_corte == IdVariavelEstado_Nenhum)
 								throw std::invalid_argument("Nenhum corte foi importado em " + getFullString(idEstagio));
+
+							if (dif_stages) {
+								for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
+									std::string nome_varCorte = vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.at(idVariavelEstado_corte).getAtributo(AttComumVariavelEstado_nome, std::string());
+									const size_t pos_1 = nome_varCorte.find_first_of(",");
+									const size_t pos_2 = nome_varCorte.find_first_of(",", pos_1 + 1);
+									nome_varCorte.replace(pos_1 + 1, pos_2 - pos_1 - 1, getString(idEstagio));
+									vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.at(idVariavelEstado_corte).setAtributo(AttComumVariavelEstado_nome, nome_varCorte);
+								}
+							}
 
 							const int cortes_multiplos_modelo = getAtributo(idEstagio, AttComumEstagio_cortes_multiplos, int());
 
@@ -4266,199 +4282,220 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 										//
 
 										if (nome.at(0) == "QDEF") {
+											try {
+												Periodo periodo_lag = Periodo(nome.at(2));
+												const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
 
-											Periodo periodo_lag = Periodo(nome.at(2));
-											const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
+												int varQDEF = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, idEstagio, idHidreletrica, periodo_lag, horizon, true);
 
-											int varQDEF = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, idEstagio, idHidreletrica, periodo_lag, horizon, true);
+												const int varQDEF_ADD = getVarDecisao_QDEF_ADDseExistir(a_TSS, idEstagio, periodo_lag, idHidreletrica);
+												if (varQDEF_ADD > -1)
+													varQDEF = varQDEF_ADD;
 
-											const int varQDEF_ADD = getVarDecisao_QDEF_ADDseExistir(a_TSS, idEstagio, periodo_lag, idHidreletrica);
-											if (varQDEF_ADD > -1)
-												varQDEF = varQDEF_ADD;
+												if (varQDEF == -1)
+													throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDEF de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
 
-											if (varQDEF == -1)
-												throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes QDEF de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
+												int varQDEF_prev = -1;
 
-											int varQDEF_prev = -1;
+												if (idEstagio > IdEstagio_1)
+													varQDEF_prev = getVarDecisao_QDEF(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idHidreletrica);
 
-											if (idEstagio > IdEstagio_1)
-												varQDEF_prev = getVarDecisao_QDEF(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idHidreletrica);
+												const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varQDEF, varQDEF_prev, true);
 
-											const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varQDEF, varQDEF_prev, true);
-
-											variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
-
+												variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+											} // try
+											catch (const std::exception& erro) { throw std::invalid_argument("QDEF: \n" + std::string(erro.what())); }
 
 										} // else if (nome.at(0) == "QDEF") {
 
 										else if (nome.at(0) == "VI") {
+											try {
+												const Periodo periodo(nome.at(2));
 
-											const Periodo periodo(nome.at(2));
+												const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
 
-											const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
+												const double vol_util_max = getdoubleFromChar(nome.at(4).c_str());
 
-											const double vol_util_max = getdoubleFromChar(nome.at(4).c_str());
+												if (vol_util_max < 0.0)
+													throw std::invalid_argument("Limites de vol invalidos em VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
 
-											if (vol_util_max < 0.0)
-												throw std::invalid_argument("Limites de vol invalidos em VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
+												else if (Periodo(TipoPeriodo_minuto, periodo) != Periodo(TipoPeriodo_minuto, vetorEstagio.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
+													throw std::invalid_argument("Periodo " + getFullString(periodo) + " nao compativel com VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
 
-											else if (Periodo(TipoPeriodo_minuto, periodo) != Periodo(TipoPeriodo_minuto, vetorEstagio.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
-												throw std::invalid_argument("Periodo " + getFullString(periodo) + " nao compativel com VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
+												else if (idEstagio == IdEstagio_1)
+													throw std::invalid_argument("VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " nao compativel com " + getFullString(idEstagio));
 
-											else if (idEstagio == IdEstagio_1)
-												throw std::invalid_argument("VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " nao compativel com " + getFullString(idEstagio));
+												Periodo periodIni = a_dados.getIterador2Inicial(AttMatrizDados_percentual_duracao_horizonte_estudo, idEstagio, Periodo());
+												Periodo periodPrev = periodIni;
+												horizon.decrementarIterador(periodPrev);
 
-											Periodo periodIni = a_dados.getIterador2Inicial(AttMatrizDados_percentual_duracao_horizonte_estudo, idEstagio, Periodo());
-											Periodo periodPrev = periodIni;
-											horizon.decrementarIterador(periodPrev);
+												const IdEstagio idEstagioPrev = IdEstagio(idEstagio - 1);
 
-											const IdEstagio idEstagioPrev = IdEstagio(idEstagio - 1);
-
-											int varVI = getVarDecisao_VIseExistir(a_TSS, idEstagio, periodIni, idHidreletrica);
-											int varVF = getVarDecisao_VFseExistir(a_TSS, idEstagioPrev, periodPrev, idHidreletrica);
-											if (varVI == -1) {
-												if (getEquLinear_BH_VOLseExistir(a_TSS, idEstagio, periodIni, idHidreletrica) > -1)
-													vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(addVarDecisao_VI(a_TSS, idEstagio, periodIni, idHidreletrica, 0.0, vol_util_max, 0.0), getEquLinear_BH_VOL(a_TSS, idEstagio, periodIni, idHidreletrica), -1.0);
-												else {
-													for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= horizon.at_rIt(periodIni).getIteradorFinal(); idPat++) {
-														if (getEquLinear_BH_VAZseExistir(a_TSS, idEstagio, periodIni, idPat, idHidreletrica) > -1) {
-															if (varVI == -1)
-																varVI = addVarDecisao_VI(a_TSS, idEstagio, periodIni, idHidreletrica, 0.0, vol_util_max, 0.0);
-															vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varVI, getEquLinear_BH_VAZ(a_TSS, idEstagio, periodIni, idPat, idHidreletrica), -(1.0 / a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodIni, idPat, double())));
+												int varVI = getVarDecisao_VIseExistir(a_TSS, idEstagio, periodIni, idHidreletrica);
+												int varVF = getVarDecisao_VFseExistir(a_TSS, idEstagioPrev, periodPrev, idHidreletrica);
+												if (varVI == -1) {
+													if (getEquLinear_BH_VOLseExistir(a_TSS, idEstagio, periodIni, idHidreletrica) > -1)
+														vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(addVarDecisao_VI(a_TSS, idEstagio, periodIni, idHidreletrica, 0.0, vol_util_max, 0.0), getEquLinear_BH_VOL(a_TSS, idEstagio, periodIni, idHidreletrica), -1.0);
+													else {
+														for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= horizon.at_rIt(periodIni).getIteradorFinal(); idPat++) {
+															if (getEquLinear_BH_VAZseExistir(a_TSS, idEstagio, periodIni, idPat, idHidreletrica) > -1) {
+																if (varVI == -1)
+																	varVI = addVarDecisao_VI(a_TSS, idEstagio, periodIni, idHidreletrica, 0.0, vol_util_max, 0.0);
+																vetorEstagio.at(idEstagio).getSolver(a_TSS)->setCofRestricao(varVI, getEquLinear_BH_VAZ(a_TSS, idEstagio, periodIni, idPat, idHidreletrica), -(1.0 / a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodIni, idPat, double())));
+															}
+															else
+																throw std::invalid_argument("Nao ha balanco hidraulico para VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " e " + getFullString(idEstagio));
 														}
-														else
-															throw std::invalid_argument("Nao ha balanco hidraulico para VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " e " + getFullString(idEstagio));
 													}
 												}
-											}
-											if (varVF == -1) {
-												if (getEquLinear_BH_VOLseExistir(a_TSS, idEstagioPrev, periodPrev, idHidreletrica) > -1)
-													vetorEstagio.at(idEstagioPrev).getSolver(a_TSS)->setCofRestricao(addVarDecisao_VF(a_TSS, idEstagioPrev, periodPrev, idHidreletrica, 0.0, vol_util_max, 0.0), getEquLinear_BH_VOL(a_TSS, idEstagioPrev, periodPrev, idHidreletrica), 1.0);
-												else {
-													for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= horizon.at_rIt(periodPrev).getIteradorFinal(); idPat++) {
-														if (getEquLinear_BH_VAZseExistir(a_TSS, idEstagioPrev, periodPrev, idPat, idHidreletrica) > -1) {
-															if (varVF == -1)
-																varVF = addVarDecisao_VF(a_TSS, idEstagioPrev, periodPrev, idHidreletrica, 0.0, vol_util_max, 0.0);
-															vetorEstagio.at(idEstagioPrev).getSolver(a_TSS)->setCofRestricao(varVF, getEquLinear_BH_VAZ(a_TSS, idEstagioPrev, periodPrev, idPat, idHidreletrica), (1.0 / a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodPrev, idPat, double())));
+												if (varVF == -1) {
+													if (getEquLinear_BH_VOLseExistir(a_TSS, idEstagioPrev, periodPrev, idHidreletrica) > -1)
+														vetorEstagio.at(idEstagioPrev).getSolver(a_TSS)->setCofRestricao(addVarDecisao_VF(a_TSS, idEstagioPrev, periodPrev, idHidreletrica, 0.0, vol_util_max, 0.0), getEquLinear_BH_VOL(a_TSS, idEstagioPrev, periodPrev, idHidreletrica), 1.0);
+													else {
+														for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= horizon.at_rIt(periodPrev).getIteradorFinal(); idPat++) {
+															if (getEquLinear_BH_VAZseExistir(a_TSS, idEstagioPrev, periodPrev, idPat, idHidreletrica) > -1) {
+																if (varVF == -1)
+																	varVF = addVarDecisao_VF(a_TSS, idEstagioPrev, periodPrev, idHidreletrica, 0.0, vol_util_max, 0.0);
+																vetorEstagio.at(idEstagioPrev).getSolver(a_TSS)->setCofRestricao(varVF, getEquLinear_BH_VAZ(a_TSS, idEstagioPrev, periodPrev, idPat, idHidreletrica), (1.0 / a_dados.getElementoMatriz(AttMatrizDados_conversor_vazao_volume, periodPrev, idPat, double())));
+															}
+															else
+																throw std::invalid_argument("Nao ha balanco hidraulico para VF de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " e " + getFullString(idEstagioPrev));
 														}
-														else
-															throw std::invalid_argument("Nao ha balanco hidraulico para VF de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " e " + getFullString(idEstagioPrev));
 													}
 												}
-											}
 
-											const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varVI, varVF, true);
+												const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varVI, varVF, true);
 
-											variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
-
+												variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+											} // try
+											catch (const std::exception& erro) { throw std::invalid_argument("VI: \n" + std::string(erro.what())); }
 										} // if (nome.at(0) == "VI") {
 
 										else if (nome.at(0) == "YP") {
+											try {
+												const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(2).c_str());
 
-											const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(2).c_str());
+												if (idProcessoEstocastico != getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()))
+													throw std::invalid_argument(getFullString(idProcessoEstocastico) + " do acoplamento incompativel com " + getFullString(a_dados.processoEstocastico_hidrologico.getAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico())) + " do modelo");
 
-											if (idProcessoEstocastico != getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()))
-												throw std::invalid_argument(getFullString(idProcessoEstocastico) + " do acoplamento incompativel com " + getFullString(a_dados.processoEstocastico_hidrologico.getAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico())) + " do modelo");
+												const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(3).c_str());
 
-											const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(3).c_str());
+												Periodo periodo_lag = Periodo(nome.at(4));
 
-											Periodo periodo_lag = Periodo(nome.at(4));
+												const double grau_liberdade = getdoubleFromChar(nome.at(5).c_str());
 
-											const double grau_liberdade = getdoubleFromChar(nome.at(5).c_str());
+												if (nome.size() < 7)
+													throw std::invalid_argument(getFullString(idVariavelEstado_corte) + " com termos ausentes de VarDecisaoYP.");
 
-											if (nome.size() < 7)
-												throw std::invalid_argument(getFullString(idVariavelEstado_corte) + " com termos ausentes de VarDecisaoYP.");
+												std::vector<IdHidreletrica> listaHidreletrica;
+												std::vector<IdHidreletrica> listaHidreletricaNaoInstanciadaNoModelo;
+												for (int i = 6; i < nome.size(); i++) {
+													const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(i).c_str());
+													if (idHidreletrica == IdHidreletrica_Nenhum)
+														throw std::invalid_argument("Nao encontrado IdHidreletrica escrito como " + nome.at(i) + " em " + getFullString(idVariavelEstado_corte));
+													else if (!a_dados.vetorHidreletrica.isInstanciado(idHidreletrica))
+														listaHidreletricaNaoInstanciadaNoModelo.push_back(idHidreletrica);
+													listaHidreletrica.push_back(idHidreletrica);
+												}
 
-											std::vector<IdHidreletrica> listaHidreletrica;
-											std::vector<IdHidreletrica> listaHidreletricaNaoInstanciadaNoModelo;
-											for (int i = 6; i < nome.size(); i++) {
-												const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(i).c_str());
-												if (idHidreletrica == IdHidreletrica_Nenhum)
-													throw std::invalid_argument("Nao encontrado IdHidreletrica escrito como " + nome.at(i) + " em " + getFullString(idVariavelEstado_corte));
-												else if (!a_dados.vetorHidreletrica.isInstanciado(idHidreletrica))
-													listaHidreletricaNaoInstanciadaNoModelo.push_back(idHidreletrica);
-												listaHidreletrica.push_back(idHidreletrica);
-											}
+												if (isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria).size() == 0)
+													isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria) = listaHidreletrica;
+												else {
+													if (!vectorCompara(isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria), listaHidreletrica))
+														throw std::invalid_argument("Variavel aleatoria com lista IdHidreletrica diferente de lista ja instanciada em " + getFullString(idVariavelEstado_corte));
+												}
 
-											if (isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria).size() == 0)
-												isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria) = listaHidreletrica;
-											else {
-												if (!vectorCompara(isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria), listaHidreletrica))
-													throw std::invalid_argument("Variavel aleatoria com lista IdHidreletrica diferente de lista ja instanciada em " + getFullString(idVariavelEstado_corte));
-											}
+												if (listaHidreletricaNaoInstanciadaNoModelo.size() > 0)
+													throw std::invalid_argument(getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) + " em " + getFullString(idVariavelEstado_corte) + " nao foi instanciado no modelo.");
 
-											if (listaHidreletricaNaoInstanciadaNoModelo.size() > 0)
-												throw std::invalid_argument(getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) + " em " + getFullString(idVariavelEstado_corte) + " nao foi instanciado no modelo.");
+												else if (listaHidreletricaNaoInstanciadaNoModelo.size() == 0) {
+													const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica, true);
+													if (varYP == -1)
+														throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
 
-											else if (listaHidreletricaNaoInstanciadaNoModelo.size() == 0) {
-												const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica, true);
-												if (varYP == -1)
-													throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
+													int varYP_past = getVarDecisao_YP(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
 
-												int varYP_past = getVarDecisao_YP(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
+													const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varYP, varYP_past, true);
 
-												const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varYP, varYP_past, true);
+													variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+												}
 
-												variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
-											}
+											} // try
+											catch (const std::exception& erro) { throw std::invalid_argument("YP: \n" + std::string(erro.what())); }
 
 										} // else if (nome.at(0) == "YP") {
 
 										else if (nome.at(0) == "PTDISPCOM") {
+											try {
 
-											Periodo periodo_comando = Periodo(nome.at(2));
-											const IdTermeletrica idTermeletrica = getIdTermeletricaFromChar(nome.at(3).c_str());
+												Periodo periodo_comando = Periodo(nome.at(2));
+												const IdTermeletrica idTermeletrica = getIdTermeletricaFromChar(nome.at(3).c_str());
 
-											const double potencia_minima_disponivel = getdoubleFromChar(nome.at(4).c_str());
-											const double potencia_maxima_disponivel = getdoubleFromChar(nome.at(5).c_str());
+												const double potencia_minima_disponivel = getdoubleFromChar(nome.at(4).c_str());
+												const double potencia_maxima_disponivel = getdoubleFromChar(nome.at(5).c_str());
 
 
-											const int varPTDISPCOM = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, idEstagio, periodo_comando, idTermeletrica, potencia_minima_disponivel, potencia_maxima_disponivel, true);
-											if (varPTDISPCOM == -1)
-												throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes PTDISPCOM de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
+												const int varPTDISPCOM = criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(a_TSS, a_dados, idEstagio, periodo_comando, idTermeletrica, potencia_minima_disponivel, potencia_maxima_disponivel, true);
+												if (varPTDISPCOM == -1)
+													throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes PTDISPCOM de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
 
-											int varPTDISPCOM_past = getVarDecisao_PTDISPCOM(a_TSS, IdEstagio(idEstagio - 1), periodo_comando, idTermeletrica);
+												int varPTDISPCOM_past = getVarDecisao_PTDISPCOM(a_TSS, IdEstagio(idEstagio - 1), periodo_comando, idTermeletrica);
 
-											const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varPTDISPCOM, varPTDISPCOM_past, true);
+												const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varPTDISPCOM, varPTDISPCOM_past, true);
 
-											variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+												variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+
+											} // try
+											catch (const std::exception& erro) { throw std::invalid_argument("PTDISPCOM: \n" + std::string(erro.what())); }
 
 										} // else if (nome.at(0) == "PTDISPCOM") {
 
 
 										else if (nome.at(0) == "RH") {
 
-											Periodo periodo = Periodo(nome.at(2));
-											IdRestricaoOperativaUHE idHQ;
+											try {
 
-											const int varRH = criarRestricoesHidraulicas(a_TSS, a_dados, idEstagio, idHQ, nome, horizon);
-											const int varRH_past = getVarDecisao_RH(a_TSS, IdEstagio(idEstagio - 1), periodo, idHQ);
+												Periodo periodo = Periodo(nome.at(2));
+												IdRestricaoOperativaUHE idHQ;
 
-											Periodo periodAux = periodo;
-											const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, criarRestricoesHidraulicas_nomeVarEstado(a_TSS, a_dados, idEstagio, periodo, periodAux, idHQ, true), varRH, varRH_past, true);
+												const int varRH = criarRestricoesHidraulicas(a_TSS, a_dados, idEstagio, idHQ, nome, horizon);
+												const int varRH_past = getVarDecisao_RH(a_TSS, IdEstagio(idEstagio - 1), periodo, idHQ);
 
-											variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+												Periodo periodAux = periodo;
+												const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, criarRestricoesHidraulicas_nomeVarEstado(a_TSS, a_dados, idEstagio, periodo, periodAux, idHQ, true), varRH, varRH_past, true);
+
+												variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+
+											} // try
+											catch (const std::exception& erro) { throw std::invalid_argument("RH: \n" + std::string(erro.what())); }
 
 										} // else if (nome.at(0) == "RH") {
 
 										else if (nome.at(0) == "HQ") {
 
-											Periodo periodo = Periodo(nome.at(2));
-											IdControleCotaVazao idHQ = IdControleCotaVazao_Nenhum;
-											for (IdControleCotaVazao idHQ_ = a_dados.getMenorId(IdControleCotaVazao()); idHQ_ < a_dados.getIdOut(IdControleCotaVazao()); a_dados.incr(idHQ_)) {
-												if (a_dados.getAtributo(idHQ_, AttComumControleCotaVazao_nome, std::string()) == nome.at(4)) {
-													idHQ = idHQ_;
-													break;
+											try {
+												Periodo periodo = Periodo(nome.at(2));
+												IdControleCotaVazao idHQ = IdControleCotaVazao_Nenhum;
+												for (IdControleCotaVazao idHQ_ = a_dados.getMenorId(IdControleCotaVazao()); idHQ_ < a_dados.getIdOut(IdControleCotaVazao()); a_dados.incr(idHQ_)) {
+													if (a_dados.getAtributo(idHQ_, AttComumControleCotaVazao_nome, std::string()) == nome.at(4)) {
+														idHQ = idHQ_;
+														break;
+													}
 												}
-											}
 
-											const int varHQ = criarVariaveisDecisao_VariaveisEstado_Restricoes_HQ(a_TSS, a_dados, idEstagio, periodo, idHQ, horizon, true);
+												const int varHQ = criarVariaveisDecisao_VariaveisEstado_Restricoes_HQ(a_TSS, a_dados, idEstagio, periodo, idHQ, horizon, true);
 
-											const int varHQ_past = getVarDecisao_HQ(a_TSS, IdEstagio(idEstagio - 1), periodo, idHQ);
+												const int varHQ_past = getVarDecisao_HQ(a_TSS, IdEstagio(idEstagio - 1), periodo, idHQ);
 
-											const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_HQ(a_TSS, idEstagio, periodo, idHQ) + "," + nome.at(4)), varHQ, varHQ_past, true);
+												const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_HQ(a_TSS, idEstagio, periodo, idHQ) + "," + nome.at(4)), varHQ, varHQ_past, true);
 
-											variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+												//if (idVarEstadoNew <= variaveis_estado_modelo_encontradas.getIteradorFinal())
+													//variaveis_estado_modelo_encontradas.setElemento(idVarEstadoNew, idVariavelEstado_corte);
+												//else
+													variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+
+											} // try
+											catch (const std::exception& erro) { throw std::invalid_argument("HQ: \n" + std::string(erro.what())); }
 
 										} // else if (nome.at(0) == "HQ") {
 
