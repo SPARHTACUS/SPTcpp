@@ -3444,7 +3444,7 @@ bool Dados::isRestricaoEletrica_simples(const IdRestricaoEletrica a_idRestricaoE
 		const IdElementoSistema maiorIdElementoSistema = getMaiorId(a_idRestricaoEletrica, IdElementoSistema());
 
 		if (maiorIdElementoSistema == IdElementoSistema_Nenhum)
-			throw std::invalid_argument("A restricao deve possuir ao menos um membro.");
+			throw std::invalid_argument("A restricao " + getAtributo(a_idRestricaoEletrica, AttComumRestricaoEletrica_nome, std::string()) + " deve possuir ao menos um membro.");
 
 		if (maiorIdElementoSistema > IdElementoSistema_1)
 			return false;
