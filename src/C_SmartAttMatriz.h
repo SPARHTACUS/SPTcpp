@@ -532,8 +532,11 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 					const TIter2 iterador2Final   = a_matriz.at_rIt(iter1).getIteradorFinal(); \
 					for (TIter2 iter2 = iterador2Inicial; iter2 <= iterador2Final; a_matriz.at_rIt(iter1).incrementarIterador(iter2)){ \
 						TVlr valor = a_matriz.at_rIt(iter1).at_rIt(iter2); \
-						if (valor < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
-						else if (valor > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
+						if ((valor >= Atributo##Classe##PreData.nomeAtributo##_LB) && (valor <= Atributo##Classe##PreData.nomeAtributo##_UB)){}\
+						else{\
+							if (valor < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor " + getFullString(valor) + " inferior ao valor minimo " + getFullString(Atributo##Classe##PreData.nomeAtributo##_LB) + " do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + " em " + getFullString(iter1) + " e " + getFullString(iter2)); }\
+							else if (valor > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor " + getFullString(valor) + " superior ao valor maximo " + getFullString(Atributo##Classe##PreData.nomeAtributo##_UB) + " do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + " em " + getFullString(iter1) + " e " + getFullString(iter2)); }\
+						} \
 					} \
 				} \
 			} \

@@ -205,24 +205,46 @@ static std::string getStringTipo(int a_int) { return "int"; }
 static std::string getFullString(int a_int) { return getStringTipo(a_int) + "_" + getString(a_int); }
 
 static double getdoubleFromChar(const char * a_char) {
-	if (strCompara(std::string(a_char), std::string("max")))
+	std::string vlr_str = std::string(a_char);
+	if (vlr_str.size() == 0)
+		throw std::invalid_argument("Error getting double from char");
+
+	double vlr = std::atof(vlr_str.c_str());
+	if ((vlr != 0.0) && (vlr > DOUBLE_MIN) && (vlr < DOUBLE_MAX))
+		return vlr;
+
+	bool any_non_zero_char = false;
+	for (int i = 0; i < vlr_str.size(); i++) {
+		char vlr_chr = vlr_str.at(i);
+		if ((vlr_chr != '0') && (vlr_chr != '.') && (vlr_chr != ',') && (vlr_chr != '-') && (vlr_chr != '+')) {
+			any_non_zero_char = true;
+			break;
+		}
+	}
+
+	if (!any_non_zero_char)
+		return vlr;
+
+	if (strCompara(vlr_str, std::string("max")))
 		return DOUBLE_MAX; 
-	else if (strCompara(std::string(a_char), std::string("min")))
+	else if (strCompara(vlr_str, std::string("min")))
 		return DOUBLE_MIN;
-	else if (strCompara(std::string(a_char), std::string("inf")))
+	else if (strCompara(vlr_str, std::string("inf")))
 		return DOUBLE_MAX;
-	else if (strCompara(std::string(a_char), std::string("-inf")))
+	else if (strCompara(vlr_str, std::string("-inf")))
 		return DOUBLE_MIN;
-	else
-		return std::atof(a_char);
+
+	throw std::invalid_argument("Error getting double from char");
+
+	return NAN;
 }; // static double getdoubleFromChar(const char * a_char) {
 
 static double getFromChar(const double a_double, const char * a_char) { return getdoubleFromChar(a_char); };
 
 static std::string getString(const double a_double) {
-	if (a_double >= DOUBLE_MAX * 0.99)
+	if (a_double >= DOUBLE_MAX)
 		return "inf";
-	else if (a_double <= DOUBLE_MIN * 0.99)
+	else if (a_double <= DOUBLE_MIN)
 		return "-inf";
 	std::ostringstream out;
 	double intpart;

@@ -3601,31 +3601,31 @@ public:
                 throw std::invalid_argument("Solver invalido (NULO).");
             }
 
-            int level = 4;
+            int level = 5;
             while (level > 0) {
-                try {
-                    if (level == 4) {
-                        const double toleranciaAntiga = getToleranciaViabilidade();
-                        double novaTolerancia;
-
-                        if (toleranciaAntiga >= 1e-8 || toleranciaAntiga <= 1e-10) {
-                            novaTolerancia = 1e-9;
-                        }
-                        else {
-                            novaTolerancia = 1e-6;
-                        }
-
+				try {
+                    if (level == 5) {
+                        assert(level == 1);
                         resetar();
-                        setToleranciaOtimalidade(novaTolerancia);
-                        setToleranciaViabilidade(novaTolerancia);
                         otimizar();
-                        setToleranciaOtimalidade(toleranciaAntiga);
-                        setToleranciaViabilidade(toleranciaAntiga);
 
                         if (statusOtimizacao == TipoStatusSolver_otimalidade) {
                             return level;
                         }
                     }
+					else if (level == 4) {
+						const TipoMetodoSolver metodoAntigo = tipoMetodoSolver;
+						TipoMetodoSolver metodoNovo = (metodoAntigo == TipoMetodoSolver_dual_simplex) ? TipoMetodoSolver_primal_simplex : TipoMetodoSolver_dual_simplex;
+
+						resetar();
+						tipoMetodoSolver = metodoNovo;
+						otimizar();
+						tipoMetodoSolver = metodoAntigo;
+
+						if (statusOtimizacao == TipoStatusSolver_otimalidade) {
+							return level;
+						}
+					}
                     else if (level == 3) {
                         const int scalingAntigo = escalonamento;
                         const int novoScaling = (scalingAntigo > 0) ? 0 : 1;
@@ -3639,26 +3639,41 @@ public:
                             return level;
                         }
                     }
-                    else if (level == 2) {
-                        const TipoMetodoSolver metodoAntigo = tipoMetodoSolver;
-                        TipoMetodoSolver metodoNovo = (metodoAntigo == TipoMetodoSolver_dual_simplex) ? TipoMetodoSolver_primal_simplex : TipoMetodoSolver_dual_simplex;
+					else if (level == 2) {
+						const double toleranciaAntiga = getToleranciaViabilidade();
+						double novaTolerancia;
 
-                        resetar();
-                        tipoMetodoSolver = metodoNovo;
-                        otimizar();
-                        tipoMetodoSolver = metodoAntigo;
+						if (toleranciaAntiga >= 1e-8 || toleranciaAntiga <= 1e-10) {
+							novaTolerancia = 1e-9;
+						}
+						else {
+							novaTolerancia = 1e-6;
+						}
 
-                        if (statusOtimizacao == TipoStatusSolver_otimalidade) {
-                            return level;
-                        }
-                    }
+						resetar();
+						setToleranciaOtimalidade(novaTolerancia);
+						setToleranciaViabilidade(novaTolerancia);
+						otimizar();
+						setToleranciaOtimalidade(toleranciaAntiga);
+						setToleranciaViabilidade(toleranciaAntiga);
+
+						if (statusOtimizacao == TipoStatusSolver_otimalidade) {
+							return level;
+						}
+					}
                     else {
-                        assert(level == 1);
-                        resetar();
-                        otimizar();
+                        const TipoMetodoSolver metodoAntigo = tipoMetodoSolver;
+                        if (metodoAntigo != TipoMetodoSolver_barrier) {
+                            TipoMetodoSolver metodoNovo = TipoMetodoSolver_barrier;
 
-                        if (statusOtimizacao == TipoStatusSolver_otimalidade) {
-                            return level;
+                            resetar();
+                            tipoMetodoSolver = metodoNovo;
+                            otimizar();
+                            tipoMetodoSolver = metodoAntigo;
+
+                            if (statusOtimizacao == TipoStatusSolver_otimalidade) {
+                                return level;
+                            }
                         }
                     }
                 }
