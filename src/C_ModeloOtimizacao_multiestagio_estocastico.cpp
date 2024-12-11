@@ -5221,11 +5221,11 @@ int ModeloOtimizacao::criarRestricoesHidraulicas(const TipoSubproblemaSolver a_T
 							}
 						} // for (int e = 0; e < int(elemsRH.size()); e++) {
 						if (!idElemFound) {
-							a_idHQ == IdRestricaoOperativaUHE_Nenhum;
+							a_idHQ = IdRestricaoOperativaUHE_Nenhum;
 							break;
 						}
 						else
-							a_idHQ == idRH;
+							a_idHQ = idRH;
 					}
 				}
 			}
