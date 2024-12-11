@@ -2012,6 +2012,7 @@ void LeituraCEPEL::leitura_CONFHD_201908_NW25(Dados &a_dados, std::string nomeAr
 						a_dados.vetorHidreletrica.at(idHidreletrica_expansao).setAtributo(AttComumHidreletrica_nome, nome);
 						a_dados.vetorHidreletrica.at(idHidreletrica_expansao).setAtributo(AttComumHidreletrica_codigo_usina, codigo_usina);
 						a_dados.vetorHidreletrica.at(idHidreletrica_expansao).setAtributo(AttComumHidreletrica_codigo_posto, codigo_posto_CEPEL);
+						a_dados.vetorHidreletrica.at(idHidreletrica_expansao).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, codigo_posto_CEPEL);
 						a_dados.vetorHidreletrica.at(idHidreletrica_expansao).setAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica_por_usina);
 
 						lista_IdSubmercado_hidreletrica.setElemento(idHidreletrica_expansao, IdSubmercado_Nenhum);
@@ -7859,7 +7860,15 @@ void LeituraCEPEL::leitura_RE_201908_NW25(Dados& a_dados, std::string nomeArquiv
 
 						if (line_size >= 7 + 4 * conteio) {
 
-							const int size_registro = line_size - (6 + 4 * conteio); //O NW pode ter registros somente na primeira coluna e o tamanho ser só 1 caracter
+							//const int size_registro = line_size - (6 + 4 * conteio); //O NW pode ter registros somente na primeira coluna e o tamanho ser só 1 caracter
+							//atributo = line.substr(6 + 4 * conteio, size_registro);
+
+							int size_registro = 3;
+
+							const int line_size_teste = 6 + 4 * conteio + size_registro;
+
+							if(line_size_teste > line_size)//O NW pode ter registros somente na primeira coluna e o tamanho ser só 1 caracter
+								size_registro = line_size - (6 + 4 * conteio); //O NW pode ter registros somente na primeira coluna e o tamanho ser só 1 caracter
 
 							atributo = line.substr(6 + 4 * conteio, size_registro);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
@@ -7933,9 +7942,17 @@ void LeituraCEPEL::leitura_RE_201908_NW25(Dados& a_dados, std::string nomeArquiv
 							elementoSistema.setAtributo(AttComumElementoSistema_idElementoSistema, idElementoSistema);
 							elementoSistema.setAtributo(AttComumElementoSistema_hidreletrica, idHidreletrica_inicializado);
 							elementoSistema.setAtributo(AttComumElementoSistema_tipo_elemento, TipoElementoSistema_hidreletrica);
-							elementoSistema.setAtributo(AttComumElementoSistema_fator_participacao, 1.0);
+							elementoSistema.setAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa_potencia_disponivel);
 
 							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).vetorElementoSistema.add(elementoSistema);
+
+							//Cria MatrizElementoSistema_fator_participacao
+							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
+									a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).vetorElementoSistema.at(idElementoSistema).addElemento(AttMatrizElementoSistema_fator_participacao, periodo, idPatamarCarga, 1.0);
+								} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+							} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); periodo++) {
+
 
 						}
 
@@ -8282,11 +8299,11 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados, const std::string a_diretorio)
 
 		a_dados.validacao_operacional_Intercambio(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
-		a_dados.validacao_operacional_Termeletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, false);//Precisa recarregar a info para realizar a conversão dos cortes_NW
+		a_dados.validacao_operacional_Termeletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		aplicarModificacoesUHE(a_dados);
 
-		a_dados.validacao_operacional_Hidreletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, false);//Precisa recarregar a info para realizar a conversão dos cortes_NW
+		a_dados.validacao_operacional_Hidreletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		a_dados.validacao_operacional_BaciaHidrografica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 

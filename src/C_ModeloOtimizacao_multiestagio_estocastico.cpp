@@ -2020,11 +2020,33 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 			if (a_idPat == IdPatamarCarga_1) {
 
 				const double volume_minimo = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_minimo, a_period, double());
-				const double volume_util_minimo = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_minimo, a_period, double());
-				const double volume_util_maximo = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_period, double());
+
+				const int regularizacao_period = a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_regularizacao, a_period, int());
+
+				double volume_util_minimo = 0.0;
+				double volume_util_maximo = 0.0;			
+				if ((regularizacao_period > 0) && ((a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica) || (a_idEstagio != idStageEnd))) {
+					volume_util_minimo = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_minimo, a_period, double());
+					volume_util_maximo = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_period, double());
+				}
 
 				const double volume_util_inicial = a_dados.getAtributo(idUHE, IdReservatorio_1, AttComumReservatorio_volume_util_inicial, double());
-				const int regularizacao_period = a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_regularizacao, a_period, int());
+
+				int regularizacao_periodPrev = 0;
+
+				double volume_util_minimo_prev = volume_util_inicial;
+				double volume_util_maximo_prev = volume_util_inicial;
+				if ((a_idEstagio > idStageIni) || (a_periodIni_stage < a_period)) {
+					regularizacao_periodPrev = a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_regularizacao, a_periodPrev, int());
+					if ((a_period == a_periodIni_stage) && (regularizacao_periodPrev == 0)) {
+						volume_util_minimo_prev = 0.0;
+						volume_util_maximo_prev = 0.0;
+					}
+					else {
+						volume_util_minimo_prev = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_minimo, a_periodPrev, double());
+						volume_util_maximo_prev = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_periodPrev, double());
+					}
+				}
 
 				//ENCHENDO VOLUME MORTO
 				if (a_dados.getSizeVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_enchendo_volume_morto) > 0) {
@@ -2035,47 +2057,31 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 					}
 				}
 
-				int regularizacao_periodPrev = 0;
-				if ((a_idEstagio > idStageIni) || (a_periodIni_stage < a_period))
-					regularizacao_periodPrev = a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_regularizacao, a_periodPrev, int());
-
 				//
 				// VI: Volume Inicial no periodo
 				// 
 				int varVI = getVarDecisao_VIseExistir(a_TSS, a_idEstagio, a_period, idUHE);
 				if (varVI == -1)
-					varVI = addVarDecisao_VI(a_TSS, a_idEstagio, a_period, idUHE, volume_util_minimo, volume_util_maximo, 0.0);
-				if ((a_idEstagio == IdEstagio_1) && (a_period == a_periodIni_stage)) {
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varVI, volume_util_inicial);
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varVI, volume_util_inicial);
-				} // if ((a_idEstagio == idStageIni) && (a_period == a_periodIni_stage)) {
-				else if ((a_period == a_periodIni_stage) && !regularizacao_periodPrev) {
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(varVI, 0.0);
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(varVI, 0.0);
-				}
+					varVI = addVarDecisao_VI(a_TSS, a_idEstagio, a_period, idUHE, volume_util_minimo_prev, volume_util_maximo_prev, 0.0);
 
 				//
 				// VF: Volume Final no periodo
 				//
 				int varVF = -1;
 				if (a_period < a_periodEnd_stage)
-					varVF = addVarDecisao_VI(a_TSS, a_idEstagio, a_periodNext, idUHE, a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_minimo, a_periodNext, double()), a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_periodNext, double()), 0.0);
-				else if ((a_period == a_periodEnd_stage) && (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica))
-					varVF = addVarDecisao_VF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, 0.0, 0.0);
-				else if ((a_period == a_periodEnd_stage) && (a_idEstagio == idStageEnd))
-					varVF = addVarDecisao_VF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, volume_util_maximo, 0.0);
+					varVF = addVarDecisao_VI(a_TSS, a_idEstagio, a_periodNext, idUHE, volume_util_minimo, volume_util_maximo, 0.0);
 				else if (a_period == a_periodEnd_stage)
-					varVF = addVarDecisao_VF(a_TSS, a_idEstagio, a_period, idUHE, a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_minimo, a_periodNext, double()), a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_util_maximo, a_periodNext, double()), 0.0);
+					varVF = addVarDecisao_VF(a_TSS, a_idEstagio, a_period, idUHE, volume_util_minimo, volume_util_maximo, 0.0);
 
 				//
 				// VF_prev: VI incorpora Volume Final do periodo anterior via variavel de estado
 				// 
-				if ((a_period == a_periodIni_stage) && (volume_util_maximo > 0.0) && (regularizacao_periodPrev || ((a_idEstagio == idStageIni) && (idStageIni > IdEstagio_1)))) {
+				if ((a_period == a_periodIni_stage) && (volume_util_maximo_prev > 0.0) && (regularizacao_periodPrev || ((a_idEstagio == idStageIni) && (idStageIni > IdEstagio_1)))) {
 					if ((a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica) || (getVarDecisao_VFseExistir(a_TSS, IdEstagio(a_idEstagio - 1), a_periodPrev, idUHE) == -1))
-						vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_VI(a_TSS, a_idEstagio, a_period, idUHE) + "," + getString(volume_util_maximo)), varVI, -1);
+						vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_VI(a_TSS, a_idEstagio, a_period, idUHE) + "," + getString(volume_util_maximo_prev)), varVI, -1);
 					else
-						vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_VI(a_TSS, a_idEstagio, a_period, idUHE) + "," + getString(volume_util_maximo)), varVI, getVarDecisao_VF(a_TSS, IdEstagio(a_idEstagio - 1), a_periodPrev, idUHE));
-				} // else if ((a_period == a_periodIni_stage) && regularizacao_periodPrev && (volume_util_maximo > 0.0)) {
+						vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_VI(a_TSS, a_idEstagio, a_period, idUHE) + "," + getString(volume_util_maximo_prev)), varVI, getVarDecisao_VF(a_TSS, IdEstagio(a_idEstagio - 1), a_periodPrev, idUHE));
+				} // if ((a_period == a_periodIni_stage) && (volume_util_maximo_prev > 0.0) && (regularizacao_periodPrev || ((a_idEstagio == idStageIni) && (idStageIni > IdEstagio_1)))) {
 
 				//
 				// VMED: Volume medio no periodo
@@ -2089,41 +2095,37 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 				//
 				// VH_FINF: Folga para volume minimo
 				//
+
 				if (volume_util_minimo > 0.0) {
-					Periodo periodVH;
-					IdEstagio idStage_VH = IdEstagio_Nenhum;
-					int varVH = -1;
 
-					if ((a_idEstagio > idStageIni) && (a_periodIni_stage == a_period)) {
-						idStage_VH = IdEstagio(a_idEstagio - 1);
-						periodVH = a_periodPrev;
-						varVH = getVarDecisao_VF(a_TSS, idStage_VH, periodVH, idUHE);
-					}
-					else if (a_periodIni_stage > a_period) {
-						idStage_VH = a_idEstagio;
-						periodVH = a_period;
-						varVH = getVarDecisao_VI(a_TSS, idStage_VH, periodVH, idUHE);
-					}
+					int ineVH_FINF = getIneLinear_VH_LINFseExistir(a_TSS, a_idEstagio, a_period, idUHE);
 
-					const int ineVH_FINF = addIneLinear_VH_LINF(a_TSS, idStage_VH, periodVH, idUHE);
-					const int varVH_FINF = addVarDecisao_VH_FINF(a_TSS, idStage_VH, periodVH, idUHE, 0.0, volume_util_minimo, 0.0);
-					vetorEstagio.at(idStage_VH).getSolver(a_TSS)->setRHSRestricao(ineVH_FINF, volume_util_minimo);
-					vetorEstagio.at(idStage_VH).getSolver(a_TSS)->setCofRestricao(varVH_FINF, ineVH_FINF, 1.0);
-					vetorEstagio.at(idStage_VH).getSolver(a_TSS)->setCofRestricao(varVH, ineVH_FINF, 1.0);
+					if (ineVH_FINF == -1) {
 
-					if (a_dados.getAtributo(AttComumDados_mes_penalizacao_volume_util_minimo, IdMes()) != IdMes_Nenhum) {
-						Periodo periodo_penalizacao;
-						criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VH_LINF(a_TSS, a_dados, idStage_VH, periodo_penalizacao);
-					}
-					else {
-						const int equZP0_VH_LINF = addEquLinear_ZP0_VH_LINF(a_TSS, idStage_VH, periodVH);
-						const int varZP0_VH_LINF = addVarDecisao_ZP0_VH_LINF(a_TSS, idStage_VH, periodVH, 0.0, infinito, 0.0);
-						const double valor_penalidade = a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_volume_util_minimo, double()) * a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, idStage_VH, periodVH, double());
-						vetorEstagio.at(idStage_VH).getSolver(a_TSS)->setCofRestricao(varZP0_VH_LINF, equZP0_VH_LINF, 1.0);
-						vetorEstagio.at(idStage_VH).getSolver(a_TSS)->setCofRestricao(varVH_FINF, equZP0_VH_LINF, -valor_penalidade);
-						vetorEstagio.at(idStage_VH).getSolver(a_TSS)->setCofRestricao(varZP0_VH_LINF, getEquLinear_ZP0(a_TSS, idStage_VH), -1.0);
-					} // else {
-				} // if (volume_util_minimo > 0.0) {
+						ineVH_FINF = addIneLinear_VH_LINF(a_TSS, a_idEstagio, a_period, idUHE);
+						int varVH_FINF = getVarDecisao_VH_FINFseExistir(a_TSS, a_idEstagio, a_period, idUHE);
+						if (varVH_FINF == -1)
+							varVH_FINF = addVarDecisao_VH_FINF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, volume_util_minimo, 0.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineVH_FINF, volume_util_minimo);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVH_FINF, ineVH_FINF, 1.0);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVF, ineVH_FINF, 1.0);
+
+						if (a_dados.getAtributo(AttComumDados_mes_penalizacao_volume_util_minimo, IdMes()) != IdMes_Nenhum) {
+							Periodo periodo_penalizacao;
+							criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VH_LINF(a_TSS, a_dados, a_idEstagio, periodo_penalizacao);
+						}
+						else {
+							const int equZP0_VH_LINF = addEquLinear_ZP0_VH_LINF(a_TSS, a_idEstagio, a_period);
+							const int varZP0_VH_LINF = addVarDecisao_ZP0_VH_LINF(a_TSS, a_idEstagio, a_period, 0.0, infinito, 0.0);
+							const double valor_penalidade = a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_volume_util_minimo, double()) * a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, a_period, double());
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VH_LINF, equZP0_VH_LINF, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVH_FINF, equZP0_VH_LINF, -valor_penalidade);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VH_LINF, getEquLinear_ZP0(a_TSS, a_idEstagio), -1.0);
+						} // else {
+
+					}//if (ineVH_FINF == -1) {
+				} // if (idStage_VH != IdEstagio_Nenhum) {
+
 
 				//
 				// QEVAP: Vazao Evaporada Reservatorio
@@ -5191,30 +5193,32 @@ int ModeloOtimizacao::criarRestricoesHidraulicas(const TipoSubproblemaSolver a_T
 					for (IdElementoSistema idElem = IdElementoSistema_1; idElem <= a_dados.getMaiorId(idRH, IdElementoSistema()); idElem++) {
 						bool idElemFound = false;
 						for (int e = 0; e < int(elemsRH.size()); e++) {
-							if (a_dados.getElementoMatriz(idRH, idElem, AttMatrizElementoSistema_fator_participacao, periodo, IdPatamarCarga_1, double()) == getdoubleFromChar(elemsRH.at(e).at(1).c_str())) {
-								if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()) == getTipoVariavelRestricaoOperativaFromChar(elemsRH.at(e).at(2).c_str())) {
-									if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_hidreletrica, IdHidreletrica()) == getIdHidreletricaFromChar(elemsRH.at(e).at(3).c_str())) {
-										if (elemsRH.at(e).size() > 4) {
-											if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_conjuntohidraulico, IdConjuntoHidraulico()) == getIdConjuntoHidraulicoFromChar(elemsRH.at(e).at(4).c_str())) {
-												if (elemsRH.at(e).size() > 5) {
-													if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_unidadehidraulica, IdUnidadeUHE()) == getIdUnidadeUHEFromChar(elemsRH.at(e).at(5).c_str())) {
-														if (elemsRH.at(e).size() > 6)
-															throw std::invalid_argument("Error Elem de RH do " + getFullString(a_idStage));
-														else {
-															idElemFound = true;
-															break;
+							if (a_dados.getSize1Matriz(idRH, idElem, AttMatrizElementoSistema_fator_participacao) > 0) {
+								if (a_dados.getElementoMatriz(idRH, idElem, AttMatrizElementoSistema_fator_participacao, periodo, IdPatamarCarga_1, double()) == getdoubleFromChar(elemsRH.at(e).at(1).c_str())) {
+									if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()) == getTipoVariavelRestricaoOperativaFromChar(elemsRH.at(e).at(2).c_str())) {
+										if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_hidreletrica, IdHidreletrica()) == getIdHidreletricaFromChar(elemsRH.at(e).at(3).c_str())) {
+											if (elemsRH.at(e).size() > 4) {
+												if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_conjuntohidraulico, IdConjuntoHidraulico()) == getIdConjuntoHidraulicoFromChar(elemsRH.at(e).at(4).c_str())) {
+													if (elemsRH.at(e).size() > 5) {
+														if (a_dados.getAtributo(idRH, idElem, AttComumElementoSistema_unidadehidraulica, IdUnidadeUHE()) == getIdUnidadeUHEFromChar(elemsRH.at(e).at(5).c_str())) {
+															if (elemsRH.at(e).size() > 6)
+																throw std::invalid_argument("Error Elem de RH do " + getFullString(a_idStage));
+															else {
+																idElemFound = true;
+																break;
+															}
 														}
 													}
-												}
-												else {
-													idElemFound = true;
-													break;
+													else {
+														idElemFound = true;
+														break;
+													}
 												}
 											}
-										}
-										else {
-											idElemFound = true;
-											break;
+											else {
+												idElemFound = true;
+												break;
+											}
 										}
 									}
 								}
