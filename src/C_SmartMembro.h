@@ -164,7 +164,7 @@ friend class LeituraCEPEL;\
 				menorId = Id##Membro##_Nenhum;\
 			}\
 			else if (a_idObjeto == menorId) { \
-				for (Id##Membro id = menorId; id <= maiorId; id++) {\
+				for (Id##Membro id = Id##Membro(menorId + 1); id <= maiorId; id++) {\
 					if (isInstanciado(id)){ \
 						menorId = id; \
 						break; \
@@ -172,7 +172,7 @@ friend class LeituraCEPEL;\
 				} \
             } \
 			else if (a_idObjeto == maiorId) { \
-				for (Id##Membro id = maiorId; id >= menorId; id--) {\
+				for (Id##Membro id = Id##Membro(maiorId - 1); id >= menorId; id--) {\
 					if (isInstanciado(id)){ \
 						maiorId = id; \
 						break; \
