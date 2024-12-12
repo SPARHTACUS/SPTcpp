@@ -289,7 +289,7 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		if (!strCompara(diretorio_importacao_pre_estudo, "nenhum"))
 			a_entradaSaidaDados.setDiretorioEntrada(diretorio_importacao_pre_estudo);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_AFLUENCIA_AttMatrizPremissa_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_m2);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AFLUENCIA_AttMatrizPremissa_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
 		a_entradaSaidaDados.setDiretorioEntrada(getAtributo(AttComumDados_diretorio_entrada_dados, std::string()));
 
