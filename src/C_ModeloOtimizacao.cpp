@@ -890,11 +890,16 @@ double ModeloOtimizacao::atualizar_ENA_acoplamento(Dados& a_dados, const IdReser
 								const IdHidreletrica idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).getIteradorInicial();
 								const double         coeficiente_idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE_ENA);
 
-								if (periodoPE < periodo_amostra_ini) //Valores da tendência
-									afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.at(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodoPE, double());
-								else//Valores dentro da árvore
-									afluencia_natural += coeficiente_idUHE_ENA * get_afluencia_incremental_from_idVariavelAleatoria(mapIdVar.at(idUHE_ENA), a_idCenario, a_idRealizacao, periodoPE); //Depende se estiver na etapa do forward/backward
-
+								if (periodoPE < periodo_amostra_ini) {//Valores da tendência
+									const double aflu_incr = vetorProcessoEstocastico.at(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodoPE, double());
+									if (aflu_incr > 0.0)
+										afluencia_natural += coeficiente_idUHE_ENA * aflu_incr;
+								}
+								else {//Valores dentro da árvore
+									const double aflu_incr = getRealizacaoInterna(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), a_idCenario, a_idRealizacao, periodoPE); //Depende se estiver na etapa do forward/backward
+									if (aflu_incr > 0.0)
+										afluencia_natural += coeficiente_idUHE_ENA * aflu_incr;
+								}
 							}//for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
 
 							if (afluencia_natural < 0.0)
@@ -3114,7 +3119,7 @@ void ModeloOtimizacao::retorna_equacionamento_afluencia_natural_x_posto(Dados& a
 
 }
 
-double ModeloOtimizacao::get_afluencia_incremental_from_idVariavelAleatoria(const IdVariavelAleatoria a_idVariavelAleatoria, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodoPE) {
+double ModeloOtimizacao::getRealizacaoInterna(const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodoPE) {
 
 	try {
 
@@ -3139,10 +3144,13 @@ double ModeloOtimizacao::get_afluencia_incremental_from_idVariavelAleatoria(cons
 			throw std::invalid_argument("Nao encontrada condicao para atualizar afluencia_incremental");
 
 
+		afluencia_incremental = vetorProcessoEstocastico.at(idProcessoEstocastico).calcularRealizacaoInterna(a_idVariavelAleatoria, a_idVariavelAleatoriaInterna, a_periodoPE, afluencia_incremental);
+
+
 		return afluencia_incremental;
 
 	}//	try {
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao::get_afluencia_incremental_from_idVariavelAleatoria: \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao::getRealizacaoInterna: \n" + std::string(erro.what())); }
 
 }
 
@@ -3169,11 +3177,16 @@ double ModeloOtimizacao::get_afluencia_natural_posto(Dados& a_dados, const Perio
 
 			const IdHidreletrica idHidreletrica_aux = idHidreletricas_x_usina_calculo_ENA.at(idHidreletrica).at(pos);
 
-			if (a_periodoPE < vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) //Valores da tendência
-				afluencia_natural_posto += vetorProcessoEstocastico.at(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idHidreletrica_aux), mapIdVarInterna.at(idHidreletrica_aux), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
-			else//Valores dentro da árvore
-				afluencia_natural_posto += get_afluencia_incremental_from_idVariavelAleatoria(mapIdVar.at(idHidreletrica_aux), a_idCenario, a_idRealizacao, a_periodoPE);
-
+			if (a_periodoPE < vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) { //Valores da tendência
+				const double afluencia_incr = vetorProcessoEstocastico.at(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idHidreletrica_aux), mapIdVarInterna.at(idHidreletrica_aux), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
+				if (afluencia_incr > 0.0)
+					afluencia_natural_posto += afluencia_incr;
+			}
+			else {//Valores dentro da árvore
+				const double afluencia_incr = getRealizacaoInterna(mapIdVar.at(idHidreletrica_aux), mapIdVarInterna.at(idHidreletrica_aux), a_idCenario, a_idRealizacao, a_periodoPE);
+				if (afluencia_incr > 0.0)
+					afluencia_natural_posto += afluencia_incr;
+			}
 			
 		}//for (pos = iterador_inicial; pos <= iterador_final; pos++) {
 
