@@ -10045,7 +10045,7 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 								if (((tipo_processamento == TipoProcessamentoParalelo_por_abertura) && (cortes_multiplos != 1)) || (idProcesso_aux == idProcesso)) {
 
-									std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstadoFromCenarios(idProcesso_aux, idIteracao, idEstagio);
+									std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstadoFromCenarios_(idProcesso_aux, idIteracao, idEstagio);
 
 									if (lista_cenario_estado.size() > 0) {
 

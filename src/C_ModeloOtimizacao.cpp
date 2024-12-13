@@ -569,10 +569,7 @@ void ModeloOtimizacao::gerarRealizacoes(const IdEstagio a_estagioIni, const IdEs
 
 				for (IdProcesso idPro = IdProcesso_mestre; idPro <= arranjoResolucao.getMaiorId(IdProcesso()); idPro++) {
 
-					std::vector<IdCenario> cenarios_estados = arranjoResolucao.getIdsCenarioEstadoFromAberturas(idPro, a_idIteracao, idEstagio);
-
-					if (cenarios_estados.size() == 0)
-						cenarios_estados = arranjoResolucao.getIdsCenarioEstadoFromCenarios(idPro, a_idIteracao, idEstagio);
+					std::vector<IdCenario> cenarios_estados = arranjoResolucao.getIdsCenarioEstado(idPro, a_idIteracao, idEstagio);
 
 					if ((cenarios_estados.size() > 0) && (menor_cenario == IdCenario_Nenhum)) {
 						menor_cenario = cenarios_estados.at(0);
@@ -3748,19 +3745,10 @@ void ModeloOtimizacao::alocarVariaveisEstado(const IdIteracao a_idIteracao, cons
 		IdCenario maior_cenario_estado = IdCenario_Nenhum;
 
 		const IdProcesso idProcesso_local = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
-		if (arranjoResolucao.getSize1Matriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_abertura_por_cenario_estado) > 0) {
-			const std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso_local, a_idIteracao, a_idEstagio);
-			if (lista_cenario_estado.size() > 0) {
-				menor_cenario_estado = lista_cenario_estado.at(0);
-				maior_cenario_estado = lista_cenario_estado.at(lista_cenario_estado.size() - 1);
-			}
-		}
-		if (menor_cenario_estado == IdCenario_Nenhum) {
-			const std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstadoFromCenarios(idProcesso_local, a_idIteracao, a_idEstagio);
-			if (lista_cenario_estado.size() > 0) {
-				menor_cenario_estado = lista_cenario_estado.at(0);
-				maior_cenario_estado = lista_cenario_estado.at(lista_cenario_estado.size() - 1);
-			}
+		const std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstado(idProcesso_local, a_idIteracao, a_idEstagio);
+		if (lista_cenario_estado.size() > 0) {
+			menor_cenario_estado = lista_cenario_estado.at(0);
+			maior_cenario_estado = lista_cenario_estado.at(lista_cenario_estado.size() - 1);
 		}
 
 		if (menor_cenario_estado == IdCenario_Nenhum)

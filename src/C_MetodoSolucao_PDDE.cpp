@@ -391,7 +391,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 		int cont_numero_otimizacao = 0;
 		for (IdEstagio idEstagio = a_estagio_final; idEstagio >= estagio_inicial; idEstagio--) {
 
-			const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(a_idProcesso, a_idIteracao, idEstagio);
+			const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas_(a_idProcesso, a_idIteracao, idEstagio);
 			const int numero_cenarios_estados = int(cenarios_estados.size());
 
 			const int numero_aberturas = a_modeloOtimizacao.arranjoResolucao.getNumeroAberturas(a_idProcesso, a_idIteracao, idEstagio);
@@ -895,7 +895,7 @@ void MetodoSolucao::executarPDDE_atualizarCustoSuperior_BW(const IdIteracao a_id
 			if (a_custo_superior.size() > 0) {
 				if (a_custo_superior.at(idEstagio).size() > 0) {
 
-					const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso_local, a_idIteracao, idEstagio);
+					const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas_(idProcesso_local, a_idIteracao, idEstagio);
 
 					int c = 0;
 					for (int i = 0; i < int(cenarios_estados.size()); i++) {
@@ -938,7 +938,7 @@ void MetodoSolucao::executarPDDE_atualizarCustoSuperior_BW(const IdIteracao a_id
 
 					MPI_Recv(&custo_superior_outro[0], numero_cenarios_outro, MPI_DOUBLE, getRank(idProcesso), 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-					const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso, a_idIteracao, idEstagio);
+					const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas_(idProcesso, a_idIteracao, idEstagio);
 					int c = 0;
 
 					for (int i = 0; i < int(cenarios_estados.size()); i++) {
@@ -1331,7 +1331,7 @@ void MetodoSolucao::executarPDDE_sincronizarResultadosParaCorteBenders(const Tip
 
 			const int rank = getRank(idProcesso);
 
-			const int numero_cenarios_estados = int(a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso, a_idIteracao, a_idEstagio).size());
+			const int numero_cenarios_estados = int(a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas_(idProcesso, a_idIteracao, a_idEstagio).size());
 
 			const int numero_aberturas = a_modeloOtimizacao.arranjoResolucao.getNumeroAberturas(idProcesso, a_idIteracao, a_idEstagio);
 
@@ -1415,7 +1415,7 @@ void MetodoSolucao::executarPDDE_calcularCorteBendersSingleCut(const IdIteracao 
 
 				const IdProcesso idProcesso = IdProcesso(r + 1);
 
-				const std::vector<IdCenario> cenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso, a_idIteracao, a_idEstagio);
+				const std::vector<IdCenario> cenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas_(idProcesso, a_idIteracao, a_idEstagio);
 
 				for (int c = 0; c < nc; c++) {
 
