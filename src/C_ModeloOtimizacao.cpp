@@ -4151,6 +4151,11 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 				if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio)) {
 
+					if (a_dados.getAtributo(AttComumDados_iteracao_maxima_cortes_externos, IdIteracao()) != IdIteracao_Nenhum) {
+						vetorEstagio.at(idEstagio).anyCorteExterno = true;
+						vetorEstagio.at(idEstagio).anyVarEstadoExterna = true;
+					}
+
 					if (vetorEstagio_aux.at(idEstagio).vetorCorteBenders.getMaiorId() > IdCorteBenders_Nenhum) {
 
 						SmartEnupla<IdVariavelAleatoria, std::vector<IdHidreletrica>> isIdHidreletricaNosEstadosYP(IdVariavelAleatoria_1, std::vector<std::vector<IdHidreletrica>>(IdVariavelAleatoria(IdVariavelAleatoria_Excedente - 1), std::vector<IdHidreletrica>()));
