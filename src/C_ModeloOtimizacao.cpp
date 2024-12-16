@@ -558,13 +558,15 @@ void ModeloOtimizacao::gerarRealizacoes(const IdEstagio a_estagioIni, const IdEs
 					return;
 			} // if (arranjoResolucao.getMenorId(IdIteracao()) < a_idIteracao) {
 
+			IdCenario menor_cenario = menor_cenario_iteracao;
+			IdCenario maior_cenario = maior_cenario_iteracao;
+
+			/*
 			IdCenario menor_cenario = IdCenario_Nenhum;
 			IdCenario maior_cenario = IdCenario_Nenhum;
 
 			IdEstagio idStageEnd = a_estagioEnd;
-			if ((!is_variavelEstado_ENA) && (!imprimir_cenarios))
-				idStageEnd--;
-				 
+
 			for (IdEstagio idEstagio = a_estagioIni; idEstagio <= idStageEnd; idEstagio++) {
 
 				for (IdProcesso idPro = IdProcesso_mestre; idPro <= arranjoResolucao.getMaiorId(IdProcesso()); idPro++) {
@@ -585,7 +587,7 @@ void ModeloOtimizacao::gerarRealizacoes(const IdEstagio a_estagioIni, const IdEs
 				}
 
 			} // for (IdEstagio idEstagio = a_estagioIni; idEstagio <= idStageEnd; idEstagio++) {
-
+			*/
 
 			int semente_geracao_cenario_hidrologico = -1;
 
