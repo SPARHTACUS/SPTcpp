@@ -39,7 +39,10 @@ private:
 
 	void instancia_dados_preConfig(Dados& a_dados, const std::string a_diretorio);
 	
-	void instancia_dados_matriz_preConfig(Dados& a_dados, const std::string a_diretorio);
+	bool instancia_dados_matriz_preConfig(Dados& a_dados, const std::string a_diretorio);
+	bool instancia_submercado_matriz_percentual_variacao_patamar_carga_preConfig(Dados& a_dados, const std::string a_diretorio);
+	bool instancia_intercambio_matriz_percentual_variacao_patamar_carga_preConfig(Dados& a_dados, const std::string a_diretorio);
+	bool instancia_usinaNaoSimulada_matriz_percentual_variacao_patamar_carga_preConfig(Dados& a_dados, const std::string a_diretorio);
 
 	void sequenciarRestricoesEletricas(Dados& a_dados);
 	void sequenciarRestricoesHidraulicas(Dados& a_dados);
@@ -508,19 +511,19 @@ private:
 			for (int i = 0; i < a_menemonico.size(); i++)
 				menemonico_baixo.at(i) = tolower(menemonico_baixo.at(i));
 
-			if ((menemonico_baixo.find("sud") != std::string::npos) || strCompara(menemonico_baixo, "se") || strCompara(menemonico_baixo, "se/co"))
+			if ((menemonico_baixo.find("sud") != std::string::npos) || strCompara(menemonico_baixo, "se") || strCompara(menemonico_baixo, "se/co") || strCompara(menemonico_baixo, "sudeste"))
 				return IdSubmercado_SUDESTE;
 
-			else if ((menemonico_baixo.find("sul") != std::string::npos) || strCompara(menemonico_baixo, "s"))
+			else if ((menemonico_baixo.find("sul") != std::string::npos) || strCompara(menemonico_baixo, "s") || strCompara(menemonico_baixo, "sul"))
 				return IdSubmercado_SUL;
 
-			else if ((menemonico_baixo.find("nord") != std::string::npos) || strCompara(menemonico_baixo, "ne"))
+			else if ((menemonico_baixo.find("nord") != std::string::npos) || strCompara(menemonico_baixo, "ne") || strCompara(menemonico_baixo, "nordeste"))
 				return IdSubmercado_NORDESTE;
 
-			else if ((menemonico_baixo.find("nort") != std::string::npos) || strCompara(menemonico_baixo, "n"))
+			else if ((menemonico_baixo.find("nort") != std::string::npos) || strCompara(menemonico_baixo, "n") || strCompara(menemonico_baixo, "norte"))
 				return IdSubmercado_NORTE;
 
-			else if ((menemonico_baixo.find("fc") != std::string::npos) || (menemonico_baixo.find("imp") != std::string::npos) || (menemonico_baixo.find("fic") != std::string::npos) || strCompara(menemonico_baixo, "f"))
+			else if ((menemonico_baixo.find("fc") != std::string::npos) || (menemonico_baixo.find("imp") != std::string::npos) || (menemonico_baixo.find("fic") != std::string::npos) || strCompara(menemonico_baixo, "f") || strCompara(menemonico_baixo, "nofict1"))
 				return IdSubmercado_IMPERATRIZ;
 
 			else if ((menemonico_baixo.find("an") != std::string::npos))
