@@ -29,13 +29,11 @@ ModeloOtimizacao::ModeloOtimizacao(const IdModeloOtimizacao a_idModeloOtimizacao
 
 		criarModeloOtimizacao(a_dados, a_entradaSaidaDados);
 
-		a_dados.esvaziar();
-
-
 		///////////////////////////////
 		//Se existirem idVariavelEstado associados às ENAs de acoplamento
 		//Carrega os AttComumHIDRELETRICA e HIDRELETRICA_REE_AttVetorPremissa_produtibilidade_ENA
 
+		Dados dados_temp;
 		if (anyVarEstadoENA()) {
 
 			const IdProcessoEstocastico maiorIdProcessoEstocastico = vetorProcessoEstocastico.getMaiorId();
@@ -45,16 +43,32 @@ ModeloOtimizacao::ModeloOtimizacao(const IdModeloOtimizacao a_idModeloOtimizacao
 				throw std::invalid_argument("Deve ser instanciado somente um processo estocastico");
 
 			std::string diretorio_att_premissas = "";
-			diretorio_att_premissas = a_entradaSaidaDados.getDiretorioEntrada() + "//Otimizacao//AtributosPremissasSPT";
-
-			a_entradaSaidaDados.carregarArquivoCSV_AttComum("HIDRELETRICA_AttComumOperacional.csv", a_dados, TipoAcessoInstancia_m1);
-			a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_REE_AttVetorPremissa_produtibilidade_ENA.csv", a_dados, TipoAcessoInstancia_m2);
+			diretorio_att_premissas = a_entradaSaidaDados.getDiretorioEntrada();
 
 			a_dados.validaProdutibilidadeENA(a_entradaSaidaDados, diretorio_att_premissas, vetorProcessoEstocastico.at(maiorIdProcessoEstocastico));
-
+			/*
+			for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE < a_dados.getIdOut(IdHidreletrica()); a_dados.incr(idUHE)) {
+				Hidreletrica uhe;
+				uhe.setAtributo(AttComumHidreletrica_idHidreletrica, idUHE);
+				dados_temp.vetorHidreletrica.add(uhe);
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_codigo_posto, a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_posto, int()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_posto_acoplamento_ENA, int()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_codigo_REE, a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_REE, int()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_codigo_usina, a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_usina, int()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_jusante_JUSENA, a_dados.getAtributo(idUHE, AttComumHidreletrica_jusante_JUSENA, IdHidreletrica()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_jusante_desvio, a_dados.getAtributo(idUHE, AttComumHidreletrica_jusante_desvio, IdHidreletrica()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_bacia, a_dados.getAtributo(idUHE, AttComumHidreletrica_bacia, IdBaciaHidrografica()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_submercado, a_dados.getAtributo(idUHE, AttComumHidreletrica_submercado, IdSubmercado()));
+				dados_temp.vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente = a_dados.vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente;
+			}*/
+			dados_temp.vetorHidreletrica = a_dados.vetorHidreletrica;
 		}//if (anyVarEstadoENA()) {
 
 		///////////////////////////////
+
+		a_dados.esvaziar();
+
+		a_dados.vetorHidreletrica = dados_temp.vetorHidreletrica;
 
 	}
 	catch (const std::exception&erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::ModeloOtimizacao(" + getString(a_idModeloOtimizacao) + ",a_dados,a_entradaSaidaDados): \n" + std::string(erro.what())); }

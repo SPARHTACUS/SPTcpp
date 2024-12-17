@@ -783,56 +783,52 @@ void MetodoSolucao::executarPDDE_atualizarCustoSuperior_FW(const IdIteracao a_id
 
 			} // for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
 
-			
+
 			const IdProcessoEstocastico idPE_hidro = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
+			const IdEstagio estagio_inicial = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
+			const IdEstagio estagio_final = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
+
+			SmartEnupla<IdCenario, double> prob_cen(menor_cenario_iteracao, std::vector<double>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, 1.0));
+			double prob_cenarios = 0.0;
 
 			for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
 
-				double custo_superior = 0.0;
-
-				bool is_todos_nan = true;
-				for (IdEstagio idEstagio = maior_estagio; idEstagio >= menor_estagio; idEstagio--) {
-
-					double prob = 1.0;
+				for (IdEstagio idEstagio_prob = estagio_final; idEstagio_prob >= estagio_inicial; idEstagio_prob--) {
 
 					if (a_modeloOtimizacao.getSize1Matriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
 						const Periodo perIni = a_modeloOtimizacao.getIterador1Inicial(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, Periodo());
 						const Periodo perEnd = a_modeloOtimizacao.getIterador1Final(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, Periodo());
 
-						const Periodo period = a_modeloOtimizacao.getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo());
+						const Periodo period = a_modeloOtimizacao.getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio_prob, Periodo());
 
 						if ((perIni <= period) && (period <= perEnd)) {
 							const IdRealizacao idReal = a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, period, IdRealizacao());
-							prob = a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, idReal, double());
+							prob_cen.at(idCenario) *= a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, idReal, double());
 						} // if ((perIni <= period) && (period <= perEnd)) {
 
 					} // if (a_modeloOtimizacao.getSize1Matriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
 
-					if (prob == 1.0) {
-						prob /= (double(maior_cenario_iteracao - menor_cenario_iteracao) + 1.0);
-
-						custo_superior += compilacao_custo_superior.at(idEstagio).at(idCenario) * prob;
-
-					}
-					else {
-						custo_superior += compilacao_custo_superior.at(idEstagio).at(idCenario);
-						custo_superior *= prob;
-					}
-
-					if (!isnan(compilacao_custo_superior.at(idEstagio).at(idCenario)))
-						is_todos_nan = false;
-				} // for (IdEstagio idEstagio = maior_estagio; idEstagio >= menor_estagio; idEstagio--) {
-
-				if (!isnan(custo_superior)) {
-					double custo_superior_prev = getElementoMatriz(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, double());
-					setElemento(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, custo_superior + custo_superior_prev);
 				}
-				else if (!is_todos_nan)
-					throw std::invalid_argument("Erro na compilacao do custo superior do cenario.");
 
+				if (prob_cen.at(idCenario) == 1.0)
+					prob_cen.at(idCenario) = 1.0 / double(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1);
+
+				prob_cenarios += prob_cen.at(idCenario);
 			}
 
-			const double custo_superior_medio = getSoma_noNAN(getElementosMatriz(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, IdCenario(), double()));
+			double custo_superior_medio = 0.0;
+			for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
+
+				double custo_superior = 0.0;
+
+				for (IdEstagio idEstagio = maior_estagio; idEstagio >= menor_estagio; idEstagio--)
+					custo_superior += compilacao_custo_superior.at(idEstagio).at(idCenario);
+
+				setElemento(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, custo_superior);
+
+				custo_superior_medio += custo_superior * prob_cen.at(idCenario);
+
+			}
 
 			if (getSizeVetor(AttVetorMetodoSolucao_custo_superior) > 0) {
 				const IdIteracao idIter_eval = IdIteracao(getIteradorFinal(AttVetorMetodoSolucao_custo_superior, IdIteracao()) + 1);
@@ -1005,25 +1001,16 @@ void MetodoSolucao::executarPDDE_atualizarCustoSuperior_BW(const IdIteracao a_id
 				prob_cenarios += prob_cen.at(idCenario);
 			}
 
-			bool is_todos_nan = true;
+			double custo_superior_medio = 0.0;
 			for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
 
-				double custo_superior = compilacao_custo_superior.at(maior_estagio).at(idCenario) * (prob_cen.at(idCenario) / prob_cenarios);
+				double custo_superior_prev = getElementoMatriz(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, double());
+				const double custo_superior = compilacao_custo_superior.at(maior_estagio).at(idCenario) + custo_superior_prev;
+				setElemento(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, custo_superior);
 
-				if (!isnan(compilacao_custo_superior.at(maior_estagio).at(idCenario)))
-					is_todos_nan = false;
-
-				if (!isnan(custo_superior)) {
-					double custo_superior_prev = getElementoMatriz(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, double());
-					if (!isnan(custo_superior_prev))
-						setElemento(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, custo_superior + custo_superior_prev);
-				}
-				else if (!is_todos_nan)
-					throw std::invalid_argument("Erro na compilacao do custo superior do cenario.");
-
+				custo_superior_medio += custo_superior * prob_cen.at(idCenario);
 			}
 
-			const double custo_superior_medio = getSoma_noNAN(getElementosMatriz(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, IdCenario(), double()));
 			setElemento(AttVetorMetodoSolucao_custo_superior, a_idIteracao, custo_superior_medio);
 
 		} // if (a_idProcesso == IdProcesso_mestre) {
