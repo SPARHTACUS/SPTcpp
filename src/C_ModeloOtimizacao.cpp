@@ -140,6 +140,9 @@ void ModeloOtimizacao::ativarCortesExternos(const IdEstagio a_idEstagio) {
 
 		const IdEstagio idEstagio_posterior = IdEstagio(a_idEstagio + 1);
 
+		if (!vetorEstagio.isInstanciado(idEstagio_posterior))
+			return;
+
 		if (!vetorEstagio.at(idEstagio_posterior).anyCorteExterno)
 			return;
 
