@@ -977,11 +977,10 @@ void MetodoSolucao::executarPDDE_atualizarCustoSuperior_BW(const IdIteracao a_id
 			const IdEstagio estagio_inicial = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
 			const IdEstagio estagio_final = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
 
+			SmartEnupla<IdCenario, double> prob_cen(menor_cenario_iteracao, std::vector<double>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, 1.0));
+			double prob_cenarios = 0.0;
+
 			for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
-
-				bool is_todos_nan = true;
-
-				double prob = 1.0;
 
 				for (IdEstagio idEstagio_prob = estagio_final; idEstagio_prob >= estagio_inicial; idEstagio_prob--) {
 
@@ -993,17 +992,23 @@ void MetodoSolucao::executarPDDE_atualizarCustoSuperior_BW(const IdIteracao a_id
 
 						if ((perIni <= period) && (period <= perEnd)) {
 							const IdRealizacao idReal = a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, period, IdRealizacao());
-							prob *= a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, idReal, double());
+							prob_cen.at(idCenario) *= a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, idReal, double());
 						} // if ((perIni <= period) && (period <= perEnd)) {
 
 					} // if (a_modeloOtimizacao.getSize1Matriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
 
 				}
 
-				if (prob == 1.0)
-					prob = 1.0 / double(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1);
+				if (prob_cen.at(idCenario) == 1.0)
+					prob_cen.at(idCenario) = 1.0 / double(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1);
 
-				double custo_superior = compilacao_custo_superior.at(maior_estagio).at(idCenario) * prob;
+				prob_cenarios += prob_cen.at(idCenario);
+			}
+
+			bool is_todos_nan = true;
+			for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
+
+				double custo_superior = compilacao_custo_superior.at(maior_estagio).at(idCenario) * (prob_cen.at(idCenario) / prob_cenarios);
 
 				if (!isnan(compilacao_custo_superior.at(maior_estagio).at(idCenario)))
 					is_todos_nan = false;

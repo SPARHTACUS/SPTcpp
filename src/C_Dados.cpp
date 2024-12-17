@@ -546,9 +546,7 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 		validacao_mapeamento_cenarios_aberturas(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar, mapeamento_cenarios_aberturas);
 
-		//
-		// Esvazia Atributos Processo Estocástico Hidrológico
-		//
+		a_entradaSaidaDados.setDiretorioEntrada(diretorio_entrada);
 
 		processoEstocastico_hidrologico = ProcessoEstocastico();
 
@@ -8110,6 +8108,11 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 				}//if (processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) > 0) {
 
 			}//for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= maiorIdProcesso; idProcesso_aux++) {
+
+			processoEstocastico_hidrologico.setMatriz_forced(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>>());
+
+			a_entradaSaidaDados.setDiretorioEntrada(a_entradaSaidaDados.getDiretorioSaida());
+			a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_direto);
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////
 
