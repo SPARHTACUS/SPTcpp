@@ -5360,42 +5360,54 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_RH(const 
 
 							else if (tipo == TipoVariavelRestricaoOperativa_vazao_turbinada) {
 								if ((idConj != IdConjuntoHidraulico_Nenhum) && (idUnd != IdUnidadeUHE_Nenhum)) {
-									if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idStage, periodo, idUHE, idConj, idUnd) > -1)
-										vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idStage, periodo, idUHE, idConj, idUnd), equRH_per, -fp);
-									else
-										vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idStage, periodo, IdPatamarCarga_1, idUHE, idConj, idUnd), equRH_per, -fp);
+									if (a_dados.getElementoVetor(idUHE, idConj, idUnd, AttVetorUnidadeUHE_disponibilidade, periodo, double()) > 0.0) {
+										if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idStage, periodo, idUHE, idConj, idUnd) > -1)
+											vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idStage, periodo, idUHE, idConj, idUnd), equRH_per, -fp);
+										else
+											vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idStage, periodo, IdPatamarCarga_1, idUHE, idConj, idUnd), equRH_per, -fp);
+									}
 								}
 								else if (idConj != IdConjuntoHidraulico_Nenhum) {
-									if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idStage, periodo, idUHE, idConj) > -1)
-										vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idStage, periodo, idUHE, idConj), equRH_per, -fp);
-									else
-										vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idStage, periodo, IdPatamarCarga_1, idUHE, idConj), equRH_per, -fp);
+									if (a_dados.getElementoVetor(idUHE, idConj, AttVetorConjuntoHidraulico_disponibilidade, periodo, double()) > 0.0) {
+										if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idStage, periodo, idUHE, idConj) > -1)
+											vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idStage, periodo, idUHE, idConj), equRH_per, -fp);
+										else
+											vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idStage, periodo, IdPatamarCarga_1, idUHE, idConj), equRH_per, -fp);
+									}
 								}
 								else {
-									if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idStage, periodo, idUHE) > -1)
-										vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idStage, periodo, idUHE), equRH_per, -fp);
-									else
-										vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idStage, periodo, IdPatamarCarga_1, idUHE), equRH_per, -fp);
+									if (a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_disponibilidade, periodo, double()) > 0.0) {
+										if (getVarDecisao_QTURDISPseExistir(a_TSS, a_idStage, periodo, idUHE) > -1)
+											vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idStage, periodo, idUHE), equRH_per, -fp);
+										else
+											vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_QTURDISP(a_TSS, a_idStage, periodo, IdPatamarCarga_1, idUHE), equRH_per, -fp);
+									}
 								}
 							}
 							else if (tipo == TipoVariavelRestricaoOperativa_potencia_disponivel) {
 								if ((idConj != IdConjuntoHidraulico_Nenhum) && (idUnd != IdUnidadeUHE_Nenhum)) {
-									if (getVarDecisao_PHDISPseExistir(a_TSS, a_idStage, periodo, idUHE, idConj, idUnd) > -1)
-										vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idStage, periodo, idUHE, idConj, idUnd), equRH_per, -fp);
-									else
-										vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idStage, periodo, IdPatamarCarga_1, idUHE, idConj, idUnd), equRH_per, -fp);
+									if (a_dados.getElementoVetor(idUHE, idConj, idUnd, AttVetorUnidadeUHE_disponibilidade, periodo, double()) > 0.0) {
+										if (getVarDecisao_PHDISPseExistir(a_TSS, a_idStage, periodo, idUHE, idConj, idUnd) > -1)
+											vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idStage, periodo, idUHE, idConj, idUnd), equRH_per, -fp);
+										else
+											vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idStage, periodo, IdPatamarCarga_1, idUHE, idConj, idUnd), equRH_per, -fp);
+									}
 								}
 								else if (idConj != IdConjuntoHidraulico_Nenhum) {
-									if (getVarDecisao_PHDISPseExistir(a_TSS, a_idStage, periodo, idUHE, idConj) > -1)
-										vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idStage, periodo, idUHE, idConj), equRH_per, -fp);
-									else
-										vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idStage, periodo, IdPatamarCarga_1, idUHE, idConj), equRH_per, -fp);
+									if (a_dados.getElementoVetor(idUHE, idConj, AttVetorConjuntoHidraulico_disponibilidade, periodo, double()) > 0.0) {
+										if (getVarDecisao_PHDISPseExistir(a_TSS, a_idStage, periodo, idUHE, idConj) > -1)
+											vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idStage, periodo, idUHE, idConj), equRH_per, -fp);
+										else
+											vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idStage, periodo, IdPatamarCarga_1, idUHE, idConj), equRH_per, -fp);
+									}
 								}
 								else {
-									if (getVarDecisao_PHDISPseExistir(a_TSS, a_idStage, periodo, idUHE) > -1)
-										vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idStage, periodo, idUHE), equRH_per, -fp);
-									else
-										vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idStage, periodo, IdPatamarCarga_1, idUHE), equRH_per, -fp);
+									if (a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_disponibilidade, periodo, double()) > 0.0) {
+										if (getVarDecisao_PHDISPseExistir(a_TSS, a_idStage, periodo, idUHE) > -1)
+											vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idStage, periodo, idUHE), equRH_per, -fp);
+										else
+											vetorEstagio.at(a_idStage).getSolver(a_TSS)->setCofRestricao(getVarDecisao_PHDISP(a_TSS, a_idStage, periodo, IdPatamarCarga_1, idUHE), equRH_per, -fp);
+									}
 								}
 							}
 							else
