@@ -330,9 +330,9 @@ void armazenarValorDual##Elem##_##Nome##_##Nro##_##Seq(const TipoSubproblemaSolv
 						if (vlrP - vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->getToleranciaViabilidade() <= vlrI)\
 							lInf = "|";\
 						std::string name_var = vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->getNomeVariavel(idx_var);\
-						const std::string coef_var = getString(vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->getCofRestricao(idx_var, indx_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).at(a_IdEstagio_1).at(pos), vlrCV_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).at(a_IdEstagio_1).at(pos).at(i).at(1))); \
-						vlrC_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).at(a_IdEstagio_1).at(idx_name) += coef_var + ";" + lInf + name_var + lSup + ";"; \
-						vlrC_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).at(a_IdEstagio_1).at(idx_valr) += coef_var + ";" + getString(vlrP) + ";"; \
+						const double coef_var = vetorEstagio.at(a_IdEstagio_1).getSolver(a_TSS)->getCofRestricao(idx_var, indx_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).at(a_IdEstagio_1).at(pos), vlrCV_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).at(a_IdEstagio_1).at(pos).at(i).at(1)); \
+						vlrC_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).at(a_IdEstagio_1).at(idx_name) += getString(coef_var * vlrP) + ";" + lInf + name_var + lSup + ";"; \
+						vlrC_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).at(a_IdEstagio_1).at(idx_valr) += getString(coef_var) + ";" + getString(vlrP) + ";"; \
 					}\
 				}\
 			}\

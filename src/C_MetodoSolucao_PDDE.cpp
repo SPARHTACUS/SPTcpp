@@ -391,7 +391,7 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 		int cont_numero_otimizacao = 0;
 		for (IdEstagio idEstagio = a_estagio_final; idEstagio >= estagio_inicial; idEstagio--) {
 
-			const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(a_idProcesso, a_idIteracao, idEstagio);
+			const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas_(a_idProcesso, a_idIteracao, idEstagio);
 			const int numero_cenarios_estados = int(cenarios_estados.size());
 
 			const int numero_aberturas = a_modeloOtimizacao.arranjoResolucao.getNumeroAberturas(a_idProcesso, a_idIteracao, idEstagio);
@@ -783,56 +783,61 @@ void MetodoSolucao::executarPDDE_atualizarCustoSuperior_FW(const IdIteracao a_id
 
 			} // for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
 
-			
-			const IdProcessoEstocastico idPE_hidro = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
 
+			const IdProcessoEstocastico idPE_hidro = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
+			const IdEstagio estagio_inicial = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
+			const IdEstagio estagio_final = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
+
+			SmartEnupla<IdCenario, double> prob_cen(menor_cenario_iteracao, std::vector<double>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, 1.0));
+			double prob_cenarios = 0.0;
+
+			for (IdEstagio idEstagio_prob = estagio_final; idEstagio_prob >= estagio_inicial; idEstagio_prob--) {
+
+				if (a_modeloOtimizacao.getSize1Matriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
+
+					const Periodo perIni = a_modeloOtimizacao.getIterador1Inicial(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, Periodo());
+					const Periodo perEnd = a_modeloOtimizacao.getIterador1Final(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, Periodo());
+					const Periodo period = a_modeloOtimizacao.getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio_prob, Periodo());
+					if ((perIni <= period) && (period <= perEnd)) {
+						const double prob_1 = a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, IdRealizacao_1, double());
+						const IdRealizacao idRealEnd = a_modeloOtimizacao.getIterador2Final(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, IdRealizacao());
+						bool is_equ = true;
+						for (IdRealizacao idReal = IdRealizacao_2; idReal <= idRealEnd; idReal++) {
+							if (prob_1 != a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, idReal, double())) {
+								is_equ = false;
+								break;
+							}
+						}
+						if (!is_equ) {
+							for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
+								const IdRealizacao idReal = a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, period, IdRealizacao());
+								prob_cen.at(idCenario) *= a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, idReal, double());
+							} // for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
+						}
+					} // if ((perIni <= period) && (period <= perEnd)) {
+				} // if (a_modeloOtimizacao.getSize1Matriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
+			} // for (IdEstagio idEstagio_prob = estagio_final; idEstagio_prob >= estagio_inicial; idEstagio_prob--) {
+
+			for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
+				if (prob_cen.at(idCenario) == 1.0)
+					prob_cen.at(idCenario) = 1.0 / double(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1);
+
+				prob_cenarios += prob_cen.at(idCenario);
+			}
+
+			double custo_superior_medio = 0.0;
 			for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
 
 				double custo_superior = 0.0;
 
-				bool is_todos_nan = true;
-				for (IdEstagio idEstagio = maior_estagio; idEstagio >= menor_estagio; idEstagio--) {
+				for (IdEstagio idEstagio = maior_estagio; idEstagio >= menor_estagio; idEstagio--)
+					custo_superior += compilacao_custo_superior.at(idEstagio).at(idCenario);
 
-					double prob = 1.0;
+				setElemento(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, custo_superior);
 
-					if (a_modeloOtimizacao.getSize1Matriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
-						const Periodo perIni = a_modeloOtimizacao.getIterador1Inicial(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, Periodo());
-						const Periodo perEnd = a_modeloOtimizacao.getIterador1Final(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, Periodo());
-
-						const Periodo period = a_modeloOtimizacao.getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo());
-
-						if ((perIni <= period) && (period <= perEnd)) {
-							const IdRealizacao idReal = a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, period, IdRealizacao());
-							prob = a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, idReal, double());
-						} // if ((perIni <= period) && (period <= perEnd)) {
-
-					} // if (a_modeloOtimizacao.getSize1Matriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
-
-					if (prob == 1.0) {
-						prob /= (double(maior_cenario_iteracao - menor_cenario_iteracao) + 1.0);
-
-						custo_superior += compilacao_custo_superior.at(idEstagio).at(idCenario) * prob;
-
-					}
-					else {
-						custo_superior += compilacao_custo_superior.at(idEstagio).at(idCenario);
-						custo_superior *= prob;
-					}
-
-					if (!isnan(compilacao_custo_superior.at(idEstagio).at(idCenario)))
-						is_todos_nan = false;
-				} // for (IdEstagio idEstagio = maior_estagio; idEstagio >= menor_estagio; idEstagio--) {
-
-				if (!isnan(custo_superior)) {
-					double custo_superior_prev = getElementoMatriz(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, double());
-					setElemento(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, custo_superior + custo_superior_prev);
-				}
-				else if (!is_todos_nan)
-					throw std::invalid_argument("Erro na compilacao do custo superior do cenario.");
+				custo_superior_medio += custo_superior * prob_cen.at(idCenario);
 
 			}
-
-			const double custo_superior_medio = getSoma_noNAN(getElementosMatriz(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, IdCenario(), double()));
 
 			if (getSizeVetor(AttVetorMetodoSolucao_custo_superior) > 0) {
 				const IdIteracao idIter_eval = IdIteracao(getIteradorFinal(AttVetorMetodoSolucao_custo_superior, IdIteracao()) + 1);
@@ -886,154 +891,144 @@ void MetodoSolucao::executarPDDE_atualizarCustoSuperior_BW(const IdIteracao a_id
 			const IdCenario maior_cenario_iteracao = a_modeloOtimizacao.arranjoResolucao.getAtributo(a_idIteracao, AttComumIteracao_maior_cenario, IdCenario());
 			SmartEnupla<IdEstagio, SmartEnupla<IdCenario, double>> compilacao_custo_superior(menor_estagio, std::vector<SmartEnupla<IdCenario, double>>(int(maior_estagio - menor_estagio) + 1, SmartEnupla<IdCenario, double>()));
 
-			for (IdEstagio idEstagio = menor_estagio; idEstagio <= maior_estagio; idEstagio++) {
+			const IdEstagio idEstagio = menor_estagio;
 
-				const Periodo period = a_modeloOtimizacao.getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo());
+			const Periodo period = a_modeloOtimizacao.getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo());
 
-				compilacao_custo_superior.at(idEstagio) = SmartEnupla<IdCenario, double>(menor_cenario_iteracao, std::vector<double>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, NAN));
+			compilacao_custo_superior.at(idEstagio) = SmartEnupla<IdCenario, double>(menor_cenario_iteracao, std::vector<double>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, NAN));
 
-				if (a_custo_superior.size() > 0) {
-					if (a_custo_superior.at(idEstagio).size() > 0) {
+			if (a_custo_superior.size() > 0) {
+				if (a_custo_superior.at(idEstagio).size() > 0) {
 
-						const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso_local, a_idIteracao, idEstagio);
+					const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas_(idProcesso_local, a_idIteracao, idEstagio);
 
-						int c = 0;
-						for (int i = 0; i < int(cenarios_estados.size()); i++) {
+					int c = 0;
+					for (int i = 0; i < int(cenarios_estados.size()); i++) {
 
-							const IdCenario cenario_estado = cenarios_estados.at(i);
-							const IdAbertura menor_abertura_em_cenario_estado = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_abertura_por_cenario_estado, cenario_estado, idEstagio, IdAbertura());
-							const IdAbertura maior_abertura_em_cenario_estado = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_maior_abertura_por_cenario_estado, cenario_estado, idEstagio, IdAbertura());
-							const int na = int(maior_abertura_em_cenario_estado - menor_abertura_em_cenario_estado) + 1;
+						const IdCenario cenario_estado = cenarios_estados.at(i);
+						const IdAbertura menor_abertura_em_cenario_estado = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_abertura_por_cenario_estado, cenario_estado, idEstagio, IdAbertura());
+						const IdAbertura maior_abertura_em_cenario_estado = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_maior_abertura_por_cenario_estado, cenario_estado, idEstagio, IdAbertura());
+						const int na = int(maior_abertura_em_cenario_estado - menor_abertura_em_cenario_estado) + 1;
 
-							for (IdProcesso idPro = IdProcesso_mestre; idPro <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idPro++) {
-								const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getIterador1Inicial(a_idIteracao, idPro, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
-								const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getIterador1Final(a_idIteracao, idPro, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
+						for (IdProcesso idPro = IdProcesso_mestre; idPro <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idPro++) {
+							const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getIterador1Inicial(a_idIteracao, idPro, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
+							const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getIterador1Final(a_idIteracao, idPro, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
 
-								for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
-									if (cenario_estado == a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idPro, AttMatrizProcesso_cenario_estado_por_cenario, idCenario, idEstagio, IdCenario())) {
-										const IdAbertura idAbertura = IdAbertura(a_modeloOtimizacao.getElementoMatriz(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()), AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, period, IdRealizacao()));
-										if ((menor_abertura_em_cenario_estado <= idAbertura) && (idAbertura <= maior_abertura_em_cenario_estado)) {
-											const int a = int(idAbertura - menor_abertura_em_cenario_estado);
-											compilacao_custo_superior.at(idEstagio).at(idCenario) = a_custo_superior.at(idEstagio).at(c + a);
-										}
+							for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
+								if (cenario_estado == a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idPro, AttMatrizProcesso_cenario_estado_por_cenario, idCenario, idEstagio, IdCenario())) {
+									const IdAbertura idAbertura = IdAbertura(a_modeloOtimizacao.getElementoMatriz(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()), AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, period, IdRealizacao()));
+									if ((menor_abertura_em_cenario_estado <= idAbertura) && (idAbertura <= maior_abertura_em_cenario_estado)) {
+										const int a = int(idAbertura - menor_abertura_em_cenario_estado);
+										compilacao_custo_superior.at(idEstagio).at(idCenario) = a_custo_superior.at(idEstagio).at(c + a);
 									}
-								}// for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
-							}
-							c += na;
-						} // for (int i = 0; i < int(cenarios_estados.size()); i++) {
+								}
+							}// for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
+						}
+						c += na;
+					} // for (int i = 0; i < int(cenarios_estados.size()); i++) {
 
-						if (c != int(a_custo_superior.at(idEstagio).size()))
-							throw std::invalid_argument("Erro em " + getFullString(idProcesso_local) + " " + getString(c) + " " + getString(int(a_custo_superior.at(idEstagio).size())));
+					if (c != int(a_custo_superior.at(idEstagio).size()))
+						throw std::invalid_argument("Erro em " + getFullString(idProcesso_local) + " " + getString(c) + " " + getString(int(a_custo_superior.at(idEstagio).size())));
 
-					}
-				} // if (a_custo_superior.size() > 0) {
+				}
+			} // if (a_custo_superior.size() > 0) {
 
-				for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
+			for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
 
-					int numero_cenarios_outro = 0;
-					MPI_Recv(&numero_cenarios_outro, 1, MPI_INT, getRank(idProcesso), 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				int numero_cenarios_outro = 0;
+				MPI_Recv(&numero_cenarios_outro, 1, MPI_INT, getRank(idProcesso), 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-					if (numero_cenarios_outro > 0) {
-						std::vector<double> custo_superior_outro(numero_cenarios_outro, NAN);
+				if (numero_cenarios_outro > 0) {
+					std::vector<double> custo_superior_outro(numero_cenarios_outro, NAN);
 
-						MPI_Recv(&custo_superior_outro[0], numero_cenarios_outro, MPI_DOUBLE, getRank(idProcesso), 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					MPI_Recv(&custo_superior_outro[0], numero_cenarios_outro, MPI_DOUBLE, getRank(idProcesso), 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-						const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso, a_idIteracao, idEstagio);
-						int c = 0;
+					const std::vector<IdCenario> cenarios_estados = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas_(idProcesso, a_idIteracao, idEstagio);
+					int c = 0;
 
-						for (int i = 0; i < int(cenarios_estados.size()); i++) {
+					for (int i = 0; i < int(cenarios_estados.size()); i++) {
 
-							const IdCenario cenario_estado = cenarios_estados.at(i);
-							const IdAbertura menor_abertura_em_cenario_estado = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_menor_abertura_por_cenario_estado, cenario_estado, idEstagio, IdAbertura());
-							const IdAbertura maior_abertura_em_cenario_estado = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_maior_abertura_por_cenario_estado, cenario_estado, idEstagio, IdAbertura());
-							const int na = int(maior_abertura_em_cenario_estado - menor_abertura_em_cenario_estado) + 1;
+						const IdCenario cenario_estado = cenarios_estados.at(i);
+						const IdAbertura menor_abertura_em_cenario_estado = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_menor_abertura_por_cenario_estado, cenario_estado, idEstagio, IdAbertura());
+						const IdAbertura maior_abertura_em_cenario_estado = a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idProcesso, AttMatrizProcesso_maior_abertura_por_cenario_estado, cenario_estado, idEstagio, IdAbertura());
+						const int na = int(maior_abertura_em_cenario_estado - menor_abertura_em_cenario_estado) + 1;
 
-							for (IdProcesso idPro = IdProcesso_mestre; idPro <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idPro++) {
-								const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getIterador1Inicial(a_idIteracao, idPro, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
-								const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getIterador1Final(a_idIteracao, idPro, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
+						for (IdProcesso idPro = IdProcesso_mestre; idPro <= a_modeloOtimizacao.arranjoResolucao.getMaiorId(IdProcesso()); idPro++) {
+							const IdCenario menor_cenario = a_modeloOtimizacao.arranjoResolucao.getIterador1Inicial(a_idIteracao, idPro, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
+							const IdCenario maior_cenario = a_modeloOtimizacao.arranjoResolucao.getIterador1Final(a_idIteracao, idPro, AttMatrizProcesso_cenario_estado_por_cenario, IdCenario());
 
-								for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
-									if (cenario_estado == a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idPro, AttMatrizProcesso_cenario_estado_por_cenario, idCenario, idEstagio, IdCenario())) {
-										const IdAbertura idAbertura = IdAbertura(a_modeloOtimizacao.getElementoMatriz(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()), AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, period, IdRealizacao()));
-										if ((menor_abertura_em_cenario_estado <= idAbertura) && (idAbertura <= maior_abertura_em_cenario_estado)) {
-											const int a = int(idAbertura - menor_abertura_em_cenario_estado);
-											compilacao_custo_superior.at(idEstagio).at(idCenario) = custo_superior_outro.at(c + a);
-										}
+							for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
+								if (cenario_estado == a_modeloOtimizacao.arranjoResolucao.getElementoMatriz(a_idIteracao, idPro, AttMatrizProcesso_cenario_estado_por_cenario, idCenario, idEstagio, IdCenario())) {
+									const IdAbertura idAbertura = IdAbertura(a_modeloOtimizacao.getElementoMatriz(a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()), AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, period, IdRealizacao()));
+									if ((menor_abertura_em_cenario_estado <= idAbertura) && (idAbertura <= maior_abertura_em_cenario_estado)) {
+										const int a = int(idAbertura - menor_abertura_em_cenario_estado);
+										compilacao_custo_superior.at(idEstagio).at(idCenario) = custo_superior_outro.at(c + a);
 									}
-								}// for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
-							}
-							c += na;
-						} // for (int i = 0; i < int(cenarios_estados.size()); i++) {
+								}
+							}// for (IdCenario idCenario = menor_cenario; idCenario <= maior_cenario; idCenario++) {
+						}
+						c += na;
+					} // for (int i = 0; i < int(cenarios_estados.size()); i++) {
 
-						if (c != numero_cenarios_outro)
-							throw std::invalid_argument("Erro em " + getFullString(idProcesso) + " " + getString(c) + " " + getString(numero_cenarios_outro));
+					if (c != numero_cenarios_outro)
+						throw std::invalid_argument("Erro em " + getFullString(idProcesso) + " " + getString(c) + " " + getString(numero_cenarios_outro));
 
-					}
-				} // for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_maiorIdProcesso; idProcesso++) {
-
-			} // for (IdEstagio idEstagio = menor_estagio; idEstagio <= maior_estagio; idEstagio++) {
+				}
+			} // for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= a_maiorIdProcesso; idProcesso++) {
 
 			const IdProcessoEstocastico idPE_hidro = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
 
-			const IdEstagio idEstagio_prev = IdEstagio(menor_estagio - 1);
+
+			const IdEstagio estagio_inicial = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
+			const IdEstagio estagio_final = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
+
+			SmartEnupla<IdCenario, double> prob_cen(menor_cenario_iteracao, std::vector<double>(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1, 1.0));
+			double prob_cenarios = 0.0;
+
+			for (IdEstagio idEstagio_prob = estagio_final; idEstagio_prob >= estagio_inicial; idEstagio_prob--) {
+
+				if (a_modeloOtimizacao.getSize1Matriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
+
+					const Periodo perIni = a_modeloOtimizacao.getIterador1Inicial(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, Periodo());
+					const Periodo perEnd = a_modeloOtimizacao.getIterador1Final(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, Periodo());
+					const Periodo period = a_modeloOtimizacao.getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio_prob, Periodo());
+					if ((perIni <= period) && (period <= perEnd)) {				
+						const double prob_1 = a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, IdRealizacao_1, double());
+						const IdRealizacao idRealEnd = a_modeloOtimizacao.getIterador2Final(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, IdRealizacao());
+						bool is_equ = true;
+						for (IdRealizacao idReal = IdRealizacao_2; idReal <= idRealEnd; idReal++) {
+							if (prob_1 != a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, idReal, double())) {
+								is_equ = false;
+								break;
+							}
+						}
+						if (!is_equ) {
+							for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
+								const IdRealizacao idReal = a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, period, IdRealizacao());
+								prob_cen.at(idCenario) *= a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, idReal, double());
+							} // for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
+						}
+					} // if ((perIni <= period) && (period <= perEnd)) {
+				} // if (a_modeloOtimizacao.getSize1Matriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
+			} // for (IdEstagio idEstagio_prob = estagio_final; idEstagio_prob >= estagio_inicial; idEstagio_prob--) {
 
 			for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
+				if (prob_cen.at(idCenario) == 1.0)
+					prob_cen.at(idCenario) = 1.0 / double(int(maior_cenario_iteracao - menor_cenario_iteracao) + 1);
 
-				double custo_superior = 0.0;
-
-				bool is_todos_nan = true;
-
-				for (IdEstagio idEstagio = maior_estagio; idEstagio >= idEstagio_prev; idEstagio--) {
-
-					double prob = 1.0;
-
-					if (a_modeloOtimizacao.getSize1Matriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
-						const Periodo perIni = a_modeloOtimizacao.getIterador1Inicial(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, Periodo());
-						const Periodo perEnd = a_modeloOtimizacao.getIterador1Final(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, Periodo());
-
-						const Periodo period = a_modeloOtimizacao.getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, idEstagio, Periodo());
-
-						if ((perIni <= period) && (period <= perEnd)) {
-							const IdRealizacao idReal = a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, period, IdRealizacao());
-							prob = a_modeloOtimizacao.getElementoMatriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao, period, idReal, double());
-						} // if ((perIni <= period) && (period <= perEnd)) {
-
-					} // if (a_modeloOtimizacao.getSize1Matriz(idPE_hidro, AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0) {
-
-					if (prob == 1.0) {
-						prob /= (double(maior_cenario_iteracao - menor_cenario_iteracao) + 1.0);
-
-						if (idEstagio > idEstagio_prev)
-							custo_superior += compilacao_custo_superior.at(idEstagio).at(idCenario) * prob;
-					}
-					else {
-
-						if (idEstagio > idEstagio_prev)
-							custo_superior += compilacao_custo_superior.at(idEstagio).at(idCenario);
-
-						custo_superior *= prob;
-
-					}
-
-					if (idEstagio > idEstagio_prev) {
-						if (!isnan(compilacao_custo_superior.at(idEstagio).at(idCenario)))
-							is_todos_nan = false;
-					}
-
-				} // for (IdEstagio idEstagio = maior_estagio; idEstagio >= idEstagio_prev; idEstagio--) {
-
-
-				if (!isnan(custo_superior)) {
-					double custo_superior_prev = getElementoMatriz(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, double());
-					if (!isnan(custo_superior_prev))
-						setElemento(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, custo_superior + custo_superior_prev);
-				}
-				else if (!is_todos_nan)
-					throw std::invalid_argument("Erro na compilacao do custo superior do cenario.");
-
+				prob_cenarios += prob_cen.at(idCenario);
 			}
 
-			const double custo_superior_medio = getSoma_noNAN(getElementosMatriz(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, IdCenario(), double()));
+			double custo_superior_medio = 0.0;
+			for (IdCenario idCenario = menor_cenario_iteracao; idCenario <= maior_cenario_iteracao; idCenario++) {
+
+				double custo_superior_prev = getElementoMatriz(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, double());
+				const double custo_superior = compilacao_custo_superior.at(maior_estagio).at(idCenario) + custo_superior_prev;
+				setElemento(AttMatrizMetodoSolucao_custo_superior, a_idIteracao, idCenario, custo_superior);
+
+				custo_superior_medio += custo_superior * prob_cen.at(idCenario);
+			}
+
 			setElemento(AttVetorMetodoSolucao_custo_superior, a_idIteracao, custo_superior_medio);
 
 		} // if (a_idProcesso == IdProcesso_mestre) {
@@ -1346,7 +1341,7 @@ void MetodoSolucao::executarPDDE_sincronizarResultadosParaCorteBenders(const Tip
 
 			const int rank = getRank(idProcesso);
 
-			const int numero_cenarios_estados = int(a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso, a_idIteracao, a_idEstagio).size());
+			const int numero_cenarios_estados = int(a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas_(idProcesso, a_idIteracao, a_idEstagio).size());
 
 			const int numero_aberturas = a_modeloOtimizacao.arranjoResolucao.getNumeroAberturas(idProcesso, a_idIteracao, a_idEstagio);
 
@@ -1430,7 +1425,7 @@ void MetodoSolucao::executarPDDE_calcularCorteBendersSingleCut(const IdIteracao 
 
 				const IdProcesso idProcesso = IdProcesso(r + 1);
 
-				const std::vector<IdCenario> cenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso, a_idIteracao, a_idEstagio);
+				const std::vector<IdCenario> cenarios_estado = a_modeloOtimizacao.arranjoResolucao.getIdsCenarioEstadoFromAberturas_(idProcesso, a_idIteracao, a_idEstagio);
 
 				for (int c = 0; c < nc; c++) {
 

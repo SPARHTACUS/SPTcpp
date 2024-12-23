@@ -29,13 +29,11 @@ ModeloOtimizacao::ModeloOtimizacao(const IdModeloOtimizacao a_idModeloOtimizacao
 
 		criarModeloOtimizacao(a_dados, a_entradaSaidaDados);
 
-		a_dados.esvaziar();
-
-
 		///////////////////////////////
 		//Se existirem idVariavelEstado associados às ENAs de acoplamento
 		//Carrega os AttComumHIDRELETRICA e HIDRELETRICA_REE_AttVetorPremissa_produtibilidade_ENA
 
+		Dados dados_temp;
 		if (anyVarEstadoENA()) {
 
 			const IdProcessoEstocastico maiorIdProcessoEstocastico = vetorProcessoEstocastico.getMaiorId();
@@ -45,16 +43,32 @@ ModeloOtimizacao::ModeloOtimizacao(const IdModeloOtimizacao a_idModeloOtimizacao
 				throw std::invalid_argument("Deve ser instanciado somente um processo estocastico");
 
 			std::string diretorio_att_premissas = "";
-			diretorio_att_premissas = a_entradaSaidaDados.getDiretorioEntrada() + "//Otimizacao//AtributosPremissasSPT";
-
-			a_entradaSaidaDados.carregarArquivoCSV_AttComum("HIDRELETRICA_AttComumOperacional.csv", a_dados, TipoAcessoInstancia_m1);
-			a_entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_REE_AttVetorPremissa_produtibilidade_ENA.csv", a_dados, TipoAcessoInstancia_m2);
+			diretorio_att_premissas = a_entradaSaidaDados.getDiretorioEntrada();
 
 			a_dados.validaProdutibilidadeENA(a_entradaSaidaDados, diretorio_att_premissas, vetorProcessoEstocastico.at(maiorIdProcessoEstocastico));
-
+			/*
+			for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE < a_dados.getIdOut(IdHidreletrica()); a_dados.incr(idUHE)) {
+				Hidreletrica uhe;
+				uhe.setAtributo(AttComumHidreletrica_idHidreletrica, idUHE);
+				dados_temp.vetorHidreletrica.add(uhe);
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_codigo_posto, a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_posto, int()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_posto_acoplamento_ENA, int()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_codigo_REE, a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_REE, int()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_codigo_usina, a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_usina, int()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_jusante_JUSENA, a_dados.getAtributo(idUHE, AttComumHidreletrica_jusante_JUSENA, IdHidreletrica()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_jusante_desvio, a_dados.getAtributo(idUHE, AttComumHidreletrica_jusante_desvio, IdHidreletrica()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_bacia, a_dados.getAtributo(idUHE, AttComumHidreletrica_bacia, IdBaciaHidrografica()));
+				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_submercado, a_dados.getAtributo(idUHE, AttComumHidreletrica_submercado, IdSubmercado()));
+				dados_temp.vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente = a_dados.vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente;
+			}*/
+			dados_temp.vetorHidreletrica = a_dados.vetorHidreletrica;
 		}//if (anyVarEstadoENA()) {
 
 		///////////////////////////////
+
+		a_dados.esvaziar();
+
+		a_dados.vetorHidreletrica = dados_temp.vetorHidreletrica;
 
 	}
 	catch (const std::exception&erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::ModeloOtimizacao(" + getString(a_idModeloOtimizacao) + ",a_dados,a_entradaSaidaDados): \n" + std::string(erro.what())); }
@@ -139,6 +153,9 @@ void ModeloOtimizacao::ativarCortesExternos(const IdEstagio a_idEstagio) {
 	try {
 
 		const IdEstagio idEstagio_posterior = IdEstagio(a_idEstagio + 1);
+
+		if (!vetorEstagio.isInstanciado(idEstagio_posterior))
+			return;
 
 		if (!vetorEstagio.at(idEstagio_posterior).anyCorteExterno)
 			return;
@@ -558,17 +575,20 @@ void ModeloOtimizacao::gerarRealizacoes(const IdEstagio a_estagioIni, const IdEs
 					return;
 			} // if (arranjoResolucao.getMenorId(IdIteracao()) < a_idIteracao) {
 
+			IdCenario menor_cenario = menor_cenario_iteracao;
+			IdCenario maior_cenario = maior_cenario_iteracao;
+
+			/*
 			IdCenario menor_cenario = IdCenario_Nenhum;
 			IdCenario maior_cenario = IdCenario_Nenhum;
 
-			for (IdEstagio idEstagio = a_estagioIni; idEstagio < a_estagioEnd; idEstagio++) {
+			IdEstagio idStageEnd = a_estagioEnd;
+
+			for (IdEstagio idEstagio = a_estagioIni; idEstagio <= idStageEnd; idEstagio++) {
 
 				for (IdProcesso idPro = IdProcesso_mestre; idPro <= arranjoResolucao.getMaiorId(IdProcesso()); idPro++) {
 
-					std::vector<IdCenario> cenarios_estados = arranjoResolucao.getIdsCenarioEstadoFromAberturas(idPro, a_idIteracao, idEstagio);
-
-					if (cenarios_estados.size() == 0)
-						cenarios_estados = arranjoResolucao.getIdsCenarioEstadoFromCenarios(idPro, a_idIteracao, idEstagio);
+					std::vector<IdCenario> cenarios_estados = arranjoResolucao.getIdsCenarioEstado(idPro, a_idIteracao, idEstagio);
 
 					if ((cenarios_estados.size() > 0) && (menor_cenario == IdCenario_Nenhum)) {
 						menor_cenario = cenarios_estados.at(0);
@@ -583,8 +603,8 @@ void ModeloOtimizacao::gerarRealizacoes(const IdEstagio a_estagioIni, const IdEs
 					}
 				}
 
-			} // for (IdEstagio idEstagio = a_estagioIni; idEstagio < a_estagioEnd; idEstagio++) {
-
+			} // for (IdEstagio idEstagio = a_estagioIni; idEstagio <= idStageEnd; idEstagio++) {
+			*/
 
 			int semente_geracao_cenario_hidrologico = -1;
 
@@ -886,11 +906,16 @@ double ModeloOtimizacao::atualizar_ENA_acoplamento(Dados& a_dados, const IdReser
 								const IdHidreletrica idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).getIteradorInicial();
 								const double         coeficiente_idUHE_ENA = coeficiente_idHidreletricas_calculo_ENA.at(pos).at(idUHE_ENA);
 
-								if (periodoPE < periodo_amostra_ini) //Valores da tendência
-									afluencia_natural += coeficiente_idUHE_ENA * vetorProcessoEstocastico.at(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodoPE, double());
-								else//Valores dentro da árvore
-									afluencia_natural += coeficiente_idUHE_ENA * get_afluencia_incremental_from_idVariavelAleatoria(mapIdVar.at(idUHE_ENA), a_idCenario, a_idRealizacao, periodoPE); //Depende se estiver na etapa do forward/backward
-
+								if (periodoPE < periodo_amostra_ini) {//Valores da tendência
+									const double aflu_incr = vetorProcessoEstocastico.at(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodoPE, double());
+									if (aflu_incr > 0.0)
+										afluencia_natural += coeficiente_idUHE_ENA * aflu_incr;
+								}
+								else {//Valores dentro da árvore
+									const double aflu_incr = getRealizacaoInterna(mapIdVar.at(idUHE_ENA), mapIdVarInterna.at(idUHE_ENA), a_idCenario, a_idRealizacao, periodoPE); //Depende se estiver na etapa do forward/backward
+									if (aflu_incr > 0.0)
+										afluencia_natural += coeficiente_idUHE_ENA * aflu_incr;
+								}
 							}//for (int pos = 0; pos < int(coeficiente_idHidreletricas_calculo_ENA.size()); pos++) {
 
 							if (afluencia_natural < 0.0)
@@ -3110,7 +3135,7 @@ void ModeloOtimizacao::retorna_equacionamento_afluencia_natural_x_posto(Dados& a
 
 }
 
-double ModeloOtimizacao::get_afluencia_incremental_from_idVariavelAleatoria(const IdVariavelAleatoria a_idVariavelAleatoria, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodoPE) {
+double ModeloOtimizacao::getRealizacaoInterna(const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const IdCenario a_idCenario, const IdRealizacao a_idRealizacao, const Periodo a_periodoPE) {
 
 	try {
 
@@ -3135,10 +3160,13 @@ double ModeloOtimizacao::get_afluencia_incremental_from_idVariavelAleatoria(cons
 			throw std::invalid_argument("Nao encontrada condicao para atualizar afluencia_incremental");
 
 
+		afluencia_incremental = vetorProcessoEstocastico.at(idProcessoEstocastico).calcularRealizacaoInterna(a_idVariavelAleatoria, a_idVariavelAleatoriaInterna, a_periodoPE, afluencia_incremental);
+
+
 		return afluencia_incremental;
 
 	}//	try {
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao::get_afluencia_incremental_from_idVariavelAleatoria: \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao::getRealizacaoInterna: \n" + std::string(erro.what())); }
 
 }
 
@@ -3165,11 +3193,16 @@ double ModeloOtimizacao::get_afluencia_natural_posto(Dados& a_dados, const Perio
 
 			const IdHidreletrica idHidreletrica_aux = idHidreletricas_x_usina_calculo_ENA.at(idHidreletrica).at(pos);
 
-			if (a_periodoPE < vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) //Valores da tendência
-				afluencia_natural_posto += vetorProcessoEstocastico.at(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idHidreletrica_aux), mapIdVarInterna.at(idHidreletrica_aux), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
-			else//Valores dentro da árvore
-				afluencia_natural_posto += get_afluencia_incremental_from_idVariavelAleatoria(mapIdVar.at(idHidreletrica_aux), a_idCenario, a_idRealizacao, a_periodoPE);
-
+			if (a_periodoPE < vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())) { //Valores da tendência
+				const double afluencia_incr = vetorProcessoEstocastico.at(idProcessoEstocastico).getElementoVetor(mapIdVar.at(idHidreletrica_aux), mapIdVarInterna.at(idHidreletrica_aux), AttVetorVariavelAleatoriaInterna_tendencia_temporal, a_periodoPE, double());
+				if (afluencia_incr > 0.0)
+					afluencia_natural_posto += afluencia_incr;
+			}
+			else {//Valores dentro da árvore
+				const double afluencia_incr = getRealizacaoInterna(mapIdVar.at(idHidreletrica_aux), mapIdVarInterna.at(idHidreletrica_aux), a_idCenario, a_idRealizacao, a_periodoPE);
+				if (afluencia_incr > 0.0)
+					afluencia_natural_posto += afluencia_incr;
+			}
 			
 		}//for (pos = iterador_inicial; pos <= iterador_final; pos++) {
 
@@ -3731,19 +3764,10 @@ void ModeloOtimizacao::alocarVariaveisEstado(const IdIteracao a_idIteracao, cons
 		IdCenario maior_cenario_estado = IdCenario_Nenhum;
 
 		const IdProcesso idProcesso_local = arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
-		if (arranjoResolucao.getSize1Matriz(a_idIteracao, idProcesso_local, AttMatrizProcesso_menor_abertura_por_cenario_estado) > 0) {
-			const std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstadoFromAberturas(idProcesso_local, a_idIteracao, a_idEstagio);
-			if (lista_cenario_estado.size() > 0) {
-				menor_cenario_estado = lista_cenario_estado.at(0);
-				maior_cenario_estado = lista_cenario_estado.at(lista_cenario_estado.size() - 1);
-			}
-		}
-		if (menor_cenario_estado == IdCenario_Nenhum) {
-			const std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstadoFromCenarios(idProcesso_local, a_idIteracao, a_idEstagio);
-			if (lista_cenario_estado.size() > 0) {
-				menor_cenario_estado = lista_cenario_estado.at(0);
-				maior_cenario_estado = lista_cenario_estado.at(lista_cenario_estado.size() - 1);
-			}
+		const std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstado(idProcesso_local, a_idIteracao, a_idEstagio);
+		if (lista_cenario_estado.size() > 0) {
+			menor_cenario_estado = lista_cenario_estado.at(0);
+			maior_cenario_estado = lista_cenario_estado.at(lista_cenario_estado.size() - 1);
 		}
 
 		if (menor_cenario_estado == IdCenario_Nenhum)
@@ -4143,6 +4167,11 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 			if (vetorEstagio_aux.isInstanciado(idEstagio)) {
 
 				if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio)) {
+
+					if (a_dados.getAtributo(AttComumDados_iteracao_maxima_cortes_externos, IdIteracao()) != IdIteracao_Nenhum) {
+						vetorEstagio.at(idEstagio).anyCorteExterno = true;
+						vetorEstagio.at(idEstagio).anyVarEstadoExterna = true;
+					}
 
 					if (vetorEstagio_aux.at(idEstagio).vetorCorteBenders.getMaiorId() > IdCorteBenders_Nenhum) {
 

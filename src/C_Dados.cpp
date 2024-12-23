@@ -289,7 +289,7 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 		if (!strCompara(diretorio_importacao_pre_estudo, "nenhum"))
 			a_entradaSaidaDados.setDiretorioEntrada(diretorio_importacao_pre_estudo);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_AFLUENCIA_AttMatrizPremissa_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_m2);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AFLUENCIA_AttMatrizPremissa_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
 		a_entradaSaidaDados.setDiretorioEntrada(getAtributo(AttComumDados_diretorio_entrada_dados, std::string()));
 
@@ -546,9 +546,7 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 		validacao_mapeamento_cenarios_aberturas(a_entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar, mapeamento_cenarios_aberturas);
 
-		//
-		// Esvazia Atributos Processo Estocástico Hidrológico
-		//
+		//a_entradaSaidaDados.setDiretorioEntrada(diretorio_entrada);
 
 		processoEstocastico_hidrologico = ProcessoEstocastico();
 
@@ -7997,9 +7995,9 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 			int semente_espaco_amostral_hidrologico = getAtributo(AttComumDados_semente_espaco_amostral_geracao_cenario_hidrologico, int());
 
 			if (realizar_reducao_espaco_amostral)
-				processoEstocastico_hidrologico.gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, imprimir_espaco_amostral_hidrologico, TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao, getHorizonteEspacoAmostralHidrologico(estagio_inicial, estagio_final, IdRealizacao(getAtributo(AttComumDados_numero_aberturas, int())), true), getAtributo(AttComumDados_tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico, TipoSorteio()), semente_espaco_amostral_hidrologico);
+				processoEstocastico_hidrologico.gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, imprimir_espaco_amostral_hidrologico, TipoRelaxacaoVariavelAleatoria_penalizacao, getHorizonteEspacoAmostralHidrologico(estagio_inicial, estagio_final, IdRealizacao(getAtributo(AttComumDados_numero_aberturas, int())), true), getAtributo(AttComumDados_tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico, TipoSorteio()), semente_espaco_amostral_hidrologico);
 			else
-				processoEstocastico_hidrologico.gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, imprimir_espaco_amostral_hidrologico, TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao, getHorizonteEspacoAmostralHidrologico(estagio_inicial, estagio_final), getAtributo(AttComumDados_tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico, TipoSorteio()), semente_espaco_amostral_hidrologico);
+				processoEstocastico_hidrologico.gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, imprimir_espaco_amostral_hidrologico, TipoRelaxacaoVariavelAleatoria_penalizacao, getHorizonteEspacoAmostralHidrologico(estagio_inicial, estagio_final), getAtributo(AttComumDados_tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico, TipoSorteio()), semente_espaco_amostral_hidrologico);
 
 
 
@@ -8110,6 +8108,11 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 				}//if (processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) > 0) {
 
 			}//for (IdProcesso idProcesso_aux = IdProcesso_mestre; idProcesso_aux <= maiorIdProcesso; idProcesso_aux++) {
+
+			processoEstocastico_hidrologico.setMatriz_forced(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>>());
+
+			a_entradaSaidaDados.setDiretorioEntrada(a_entradaSaidaDados.getDiretorioSaida());
+			a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) + ".csv", processoEstocastico_hidrologico, TipoAcessoInstancia_direto);
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -10045,7 +10048,7 @@ void Dados::mapearCenariosAberturasPorIteracaoEmArranjoResolucao() {
 
 								if (((tipo_processamento == TipoProcessamentoParalelo_por_abertura) && (cortes_multiplos != 1)) || (idProcesso_aux == idProcesso)) {
 
-									std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstadoFromCenarios(idProcesso_aux, idIteracao, idEstagio);
+									std::vector<IdCenario> lista_cenario_estado = arranjoResolucao.getIdsCenarioEstadoFromCenarios_(idProcesso_aux, idIteracao, idEstagio);
 
 									if (lista_cenario_estado.size() > 0) {
 
