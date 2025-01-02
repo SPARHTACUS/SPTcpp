@@ -221,8 +221,10 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 
 					if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
 
-						if (!doubleCompara(1e-6, soma_sobreposicao, 1.0))
-							throw std::invalid_argument("Periodo do processo estocastico nao subsituido por uma decomposicao equivalente");
+						if (periodo_DC != horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorInicial())) {
+							if (!doubleCompara(1e-6, soma_sobreposicao, 1.0))
+								throw std::invalid_argument("Periodo do processo estocastico nao subsituido por uma decomposicao equivalente");
+						}
 
 						break;
 
@@ -12688,9 +12690,10 @@ void LeituraCEPEL::define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados)
 
 				if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
 
-					if (!doubleCompara(1e-6, soma_sobreposicao, 1.0))
-						throw std::invalid_argument("Periodo do processo estocastico nao subsituido por uma decomposicao equivalente");
-
+					if (periodo_DC != horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorInicial())) {
+						if (!doubleCompara(1e-6, soma_sobreposicao, 1.0))
+							throw std::invalid_argument("Periodo do processo estocastico nao subsituido por uma decomposicao equivalente");
+					}
 					break;
 
 				}//if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
