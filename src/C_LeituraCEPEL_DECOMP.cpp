@@ -15450,7 +15450,13 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		//****************************************
 		//Arquivo Intercambio
 		//****************************************
+		bool is_carregar_PD_intercambio = false;
 		bool dadosPreConfig_intercambio_attComum_operacional = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("INTERCAMBIO_AttComumOperacional.csv", dados_PD, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_intercambio_attMatriz_operacional = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m1);
+		if (dadosPreConfig_intercambio_attComum_operacional && dadosPreConfig_intercambio_attMatriz_operacional)
+			is_carregar_PD_intercambio = true;
+		else if (dadosPreConfig_intercambio_attComum_operacional || dadosPreConfig_intercambio_attMatriz_operacional)
+			throw std::invalid_argument("Tentativa de incluir intercambios em dadosPreConfig_PD, ambos os arquivos AttComum e AttMatriz sao necessarios");
 
 		//****************************************
 		//Arquivos Restrições Elétricas
@@ -15830,6 +15836,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 			catch (const std::exception& erro) { throw std::invalid_argument("Erro dadosPreConfig_usina_nao_simulada_operacional: \n" + std::string(erro.what())); }
 
 		}//if (dadosPreConfig_usina_nao_simulada_operacional) {
+
 
 		//////////////////////////////////////////////////////////////
 		//SUBMERCADO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga
@@ -16236,6 +16243,106 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 			catch (const std::exception& erro) { throw std::invalid_argument("Erro is_carregar_PD_submercado_patamar_deficit: \n" + std::string(erro.what())); }
 
 		}//is_carregar_PD_submercado_patamar_deficit
+
+
+		if (is_carregar_PD_intercambio) {
+
+			try {
+
+				std::cout << "Carregando arquivo de preConfiguracao: INTERCAMBIO_AttComumOperacional.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
+
+				//*******************************************************************
+				//  1. Mapeia intercambio PD no CP
+				//   Testa se o intercambio existe no CP. Caso contrário, lanca excecao
+				//   Depois atualiza estes valores com a sobreposição dos periodos_CP e periodos_PD
+				//*******************************************************************
+
+				Periodo periodo_REF = horizonte_estudo.getIteradorInicial(); //Período a partir do qual vão ser consideradas as restrições originais (atualiza-se a partir do periodo_final_PD)
+
+				const IdIntercambio idIntercambioIni_CP = a_dados.getMenorId(IdIntercambio());
+				const IdIntercambio idIntercambioOut_CP = a_dados.getIdOut(IdIntercambio());
+
+				const IdIntercambio idIntercambioIni_PD = dados_PD.getMenorId(IdIntercambio());
+				const IdIntercambio idIntercambioOut_PD = dados_PD.getIdOut(IdIntercambio());
+
+				for (IdIntercambio idIntercambio_PD_ = idIntercambioIni_PD; idIntercambio_PD_ < idIntercambioOut_PD; dados_PD.vetorIntercambio.incr(idIntercambio_PD_)) {
+
+					if (dados_PD.getSize1Matriz(idIntercambio_PD_, AttMatrizIntercambio_potencia_minima) == 0)
+						throw std::invalid_argument("Intercambio PD " + getFullString(idIntercambio_PD_) + " sem " + getFullString(AttMatrizIntercambio_potencia_minima) + ".");
+
+					//Validação do horizonte_informacao_PD_pre_config
+					std::vector<Periodo> periodos_PD = dados_PD.vetorIntercambio.at(idIntercambio_PD_).getMatriz(AttMatrizIntercambio_potencia_minima, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+
+					const Periodo periodo_inicial_PD = periodos_PD.at(0);
+					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
+
+					validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
+
+					const IdSubmercado submercado_origem  = dados_PD.vetorIntercambio.at(idIntercambio_PD_).getAtributo(AttComumIntercambio_submercado_origem, IdSubmercado());
+					const IdSubmercado submercado_destino = dados_PD.vetorIntercambio.at(idIntercambio_PD_).getAtributo(AttComumIntercambio_submercado_destino, IdSubmercado());
+
+					IdIntercambio idIntercambio_CP_ = IdIntercambio_Nenhum;
+					for (IdIntercambio idIntercambio_CP = idIntercambioIni_CP; idIntercambio_CP < idIntercambioOut_CP; a_dados.vetorIntercambio.incr(idIntercambio_CP)) {
+						if ((a_dados.getAtributo(idIntercambio_CP, AttComumIntercambio_submercado_origem, IdSubmercado()) == submercado_origem) && (a_dados.getAtributo(idIntercambio_CP, AttComumIntercambio_submercado_destino, IdSubmercado()) == submercado_destino)) {
+							idIntercambio_CP_ = idIntercambio_CP;
+							break;
+						}
+					}
+
+					if (idIntercambio_CP_ == IdIntercambio_Nenhum)
+						throw std::invalid_argument("Intercambio PD " + getFullString(idIntercambio_PD_) + " nao encontrado no CP.");
+
+
+					a_dados.vetorIntercambio.at(idIntercambio_CP_).setAtributo(AttComumIntercambio_penalidade_intercambio, dados_PD.vetorIntercambio.at(idIntercambio_PD_).getAtributo(AttComumIntercambio_penalidade_intercambio, double()));
+					a_dados.vetorIntercambio.at(idIntercambio_CP_).setAtributo(AttComumIntercambio_penalidade_intercambio_minimo, dados_PD.vetorIntercambio.at(idIntercambio_PD_).getAtributo(AttComumIntercambio_penalidade_intercambio_minimo, double()));
+
+					/////////////////////////////////////////////////////////////////////////////////////
+					//Atualiza valores
+					/////////////////////////////////////////////////////////////////////////////////////
+
+					SmartEnupla<Periodo, bool> horizonte_info_PD;
+
+					for (int pos = 0; pos < int(periodos_PD.size()); pos++)
+						horizonte_info_PD.addElemento(periodos_PD.at(pos), true);
+
+					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+						for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+							const double sobreposicao = periodo.sobreposicao(periodo_PD);
+
+							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+								if (periodo > periodo_REF)//Atualiza o periodo_REF para depois atualizar os limites do conjunto de restrições originais
+									periodo_REF = periodo;
+
+								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorIntercambio.at(idIntercambio_PD_).getIterador2Final(AttMatrizIntercambio_potencia_minima, periodo_PD, IdPatamarCarga());
+
+								if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
+									throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
+
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+									//AttMatriz
+									a_dados.vetorIntercambio.at(idIntercambio_CP_).setElemento(AttMatrizIntercambio_potencia_maxima, periodo, idPatamarCarga, dados_PD.vetorIntercambio.at(idIntercambio_PD_).getElementoMatriz(AttMatrizIntercambio_potencia_maxima, periodo_PD, idPatamarCarga, double()));
+									a_dados.vetorIntercambio.at(idIntercambio_CP_).setElemento(AttMatrizIntercambio_potencia_minima, periodo, idPatamarCarga, dados_PD.vetorIntercambio.at(idIntercambio_PD_).getElementoMatriz(AttMatrizIntercambio_potencia_minima, periodo_PD, idPatamarCarga, double()));
+								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+
+						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+					}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+				}//for (IdIntercambio idIntercambio_PD = idIntercambioIni_PD; idIntercambio_PD < idIntercambioOut_PD; dados_PD.vetorIntercambio.incr(idIntercambio_PD)) {
+
+			}//try {
+			catch (const std::exception& erro) { throw std::invalid_argument("Erro is_carregar_PD_intercambio: \n" + std::string(erro.what())); }
+
+		}//is_carregar_PD_intercambio
+
+
 
 		//////////////////////////////////////////////////////////////////////////////
 		//RENOVAVEL_AttComumOperacional
@@ -17085,6 +17192,22 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_tempo_viagem_agua, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tempo_viagem_agua, int()));
 						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_jusante, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_jusante, IdHidreletrica()));
 						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_jusante_desvio, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_jusante_desvio, IdHidreletrica()));
+
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_turbinamento, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_turbinamento, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_vertimento, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_vertimento, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_desvio_agua, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_desvio_agua, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_turbinamento_minimo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_vazao_defluente_minima, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_vazao_defluente_minima, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_vazao_defluente_maxima, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_vazao_defluente_maxima, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_vazao_desviada_minima, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_vazao_desviada_minima, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_afluencia_incremental, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_afluencia_incremental, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_vazao_retirada, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_vazao_retirada, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_volume_minimo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_volume_minimo, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_volume_util_minimo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_volume_util_minimo, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_evaporacao, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_evaporacao, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_potencia_minima, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_potencia_minima, double()));
+
+
 
 						//AttVetor					
 						if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_por_usina) {
@@ -17950,7 +18073,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 								&& idContrato_PD == IdContrato_Nenhum && idRenovavel_PD == IdRenovavel_Nenhum && idUsinaElevatoria_PD == IdUsinaElevatoria_Nenhum && idIntercambio_PD == IdIntercambio_Nenhum) {
 
 								is_all_elementos_restricao_in_CP = false;
-								std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) + " | todos os ids_Nenhum"  << std::endl;
+								//throw std::invalid_argument("Nao considerada idRestricaoEletrica_PD: " + getString(idRestricaoEletrica_PD) + " | nao encontrado " + getFullString(idElementoSistema) + " | todos os ids_Nenhum");
 								break;
 
 							}
@@ -19374,6 +19497,12 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		//////////////////////////////////////////////////////////////
 
 		leitura_coeficientes_evaporacao_from_dec_cortes_evap_DC(a_dados, a_diretorio + "//DadosAdicionais" + "//dec_cortes_evap.csv");
+
+		a_dados.setMatriz_forced(AttMatrizDados_percentual_duracao_horizonte_estudo, SmartEnupla<IdEstagio, SmartEnupla<Periodo, double>>());
+		a_dados.setMatriz_forced(AttMatrizDados_desagio_acumulado_horizonte_estudo, SmartEnupla<IdEstagio, SmartEnupla<Periodo, double>>());
+		a_dados.setMatriz_forced(AttMatrizDados_conversor_vazao_volume, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>());
+		a_dados.setVetor_forced(AttVetorDados_conversor_vazao_volume, SmartEnupla<Periodo, double>());
+		a_dados.validacao_operacional_Dados(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		a_dados.validacao_operacional_Submercado(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 

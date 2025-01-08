@@ -1068,9 +1068,9 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 			SmartEnupla<IdEstagio, SmartEnupla<Periodo, double>> percentual_duracao_horizonte_estudo = getMatriz(AttMatrizDados_percentual_duracao_horizonte_estudo, IdEstagio(), Periodo(), double());
 
 			for (IdEstagio idEstagio = percentual_duracao_horizonte_estudo.getIteradorInicial(); idEstagio <= percentual_duracao_horizonte_estudo.getIteradorFinal(); idEstagio++) {
-				if (percentual_duracao_horizonte_estudo.at(idEstagio).getIteradorInicial() != getIteradorInicial(AttMatrizDados_desagio_acumulado_horizonte_estudo, idEstagio, Periodo()))
+				if (percentual_duracao_horizonte_estudo.at(idEstagio).getIteradorInicial() != getIterador2Inicial(AttMatrizDados_desagio_acumulado_horizonte_estudo, idEstagio, Periodo()))
 					throw std::invalid_argument("Periodo inicial em " + getFullString(idEstagio) + " deve ser " + getFullString(percentual_duracao_horizonte_estudo.at(idEstagio).getIteradorInicial()) + " em " + getFullString(AttMatrizDados_desagio_acumulado_horizonte_estudo));
-				if (percentual_duracao_horizonte_estudo.at(idEstagio).getIteradorFinal() != getIteradorFinal(AttMatrizDados_desagio_acumulado_horizonte_estudo, idEstagio, Periodo()))
+				if (percentual_duracao_horizonte_estudo.at(idEstagio).getIteradorFinal() != getIterador2Final(AttMatrizDados_desagio_acumulado_horizonte_estudo, idEstagio, Periodo()))
 					throw std::invalid_argument("Periodo final em " + getFullString(idEstagio) + " deve ser " + getFullString(percentual_duracao_horizonte_estudo.at(idEstagio).getIteradorFinal()) + " em " + getFullString(AttMatrizDados_desagio_acumulado_horizonte_estudo));
 			}
 
