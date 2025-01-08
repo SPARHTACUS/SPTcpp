@@ -18073,7 +18073,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 								&& idContrato_PD == IdContrato_Nenhum && idRenovavel_PD == IdRenovavel_Nenhum && idUsinaElevatoria_PD == IdUsinaElevatoria_Nenhum && idIntercambio_PD == IdIntercambio_Nenhum) {
 
 								is_all_elementos_restricao_in_CP = false;
-								//throw std::invalid_argument("Nao considerada idRestricaoEletrica_PD: " + getString(idRestricaoEletrica_PD) + " | nao encontrado " + getFullString(idElementoSistema) + " | todos os ids_Nenhum");
+								throw std::invalid_argument("Nao considerada idRestricaoEletrica_PD: " + getString(idRestricaoEletrica_PD) + " | nao encontrado " + getFullString(idElementoSistema) + " | todos os ids_Nenhum");
 								break;
 
 							}
