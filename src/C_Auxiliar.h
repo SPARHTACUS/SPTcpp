@@ -189,6 +189,22 @@ static std::vector<int> getFromString(const std::vector<int> a_valor, const std:
 };
 
 
+static bool isCharNonZeroNumber(const char a_chr) {
+	if ((a_chr == '1') || (a_chr == '2') || (a_chr == '3') || (a_chr == '4') || (a_chr == '5') || (a_chr == '6') || (a_chr == '7') || (a_chr == '8') || (a_chr == '9'))
+		return true;
+	return false;
+}
+
+static bool isCharNumber(const char a_chr) {
+	if (isCharNonZeroNumber(a_chr))
+		return true;
+	if (a_chr == '0')
+		return true;
+	return false;
+}
+
+
+
 static int getFromChar(const int a_int, const char * a_char) { return getintFromChar(a_char); };
 
 static std::string getString(int a_int) { 

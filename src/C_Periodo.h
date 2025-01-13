@@ -111,6 +111,10 @@
 DEFINE_SMART_ENUM(TipoPeriodo, TIPO_PERIODO)
 
 
+
+
+
+
 class Periodo {
 
 private:
@@ -123,8 +127,9 @@ private:
 	IdHor hora;
 	IdMin minuto;
 
-	void inicializaAtributos();
+	std::pair<unsigned int, char> duration;
 
+	void inicializaAtributos();
 
 	void validaAno   (const IdAno a_ano);
 	void validaMes   (const IdMes a_mes);
@@ -202,6 +207,8 @@ public:
 	int getMinutos() const;
 	int getSegundos() const;
 
+	std::pair<unsigned int, char> getDuration()const;
+
 	int posStructPeriod = -1;
 	int idxStructPeriod = -1;
 	std::string codStructPeriod;
@@ -251,6 +258,8 @@ public:
 
 	static Periodo getPeriodoFinal();
 	static Periodo getPeriodoFinal(TipoPeriodo a_tipoPeriodo);
+
+	static std::pair<unsigned int, char> getDurationFromStr(std::string a_str);
 
 	IdEstacao getEstacao() const;
 

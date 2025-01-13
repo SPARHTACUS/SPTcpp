@@ -19,6 +19,9 @@ static const int numeroElementosArraySeparador = 3;
 static const int ano_inicial = 1900;
 static const int ano_final = 2200;
 
+static const char* mhdqMa = "mhdqMa"; // [m]inuto, [h]ora, [d]ia, [q]uinzena, [M]es, [a]no
+static const unsigned short int mhdqMa_size = 6U; // [m]inuto, [h]ora, [d]ia, [q]uinzena, [M]es, [a]no
+
 void Periodo::inicializaAtributos() {
 
 	tipoPeriodo = TipoPeriodo_Nenhum;
@@ -27,6 +30,9 @@ void Periodo::inicializaAtributos() {
 	dia = IdDia_Nenhum;
 	hora = IdHor_Nenhum;
 	minuto = IdMin_Nenhum;
+
+	duration.first = 0;
+	duration.second = '0';
 
 } // void Periodo::inicializaAtributos(){
 
@@ -957,6 +963,12 @@ int Periodo::getSegundos() const {
 	return getMinutos() * 60;
 } // int Periodo::getSegundos() const{
 
+std::pair<unsigned int, char> Periodo::getDuration() const{
+
+	return duration;
+}
+
+
 TipoPeriodo Periodo::getTipoPeriodo() const { return tipoPeriodo; }
 
 std::string normStringMes(const IdMes a_idMes) {
@@ -1882,6 +1894,75 @@ Periodo Periodo::getPeriodoFinal(TipoPeriodo a_tipoPeriodo) {
 	return Periodo(a_tipoPeriodo, 31, 12, ano_final, 23, 59);
 
 } // Periodo Periodo::getPeriodoFinal(TipoPeriodo a_tipoPeriodo){
+
+
+std::pair<unsigned int, char> Periodo::getDurationFromStr(std::string a_str){
+
+	std::pair<unsigned int, char> duration_(0, '0');
+
+	if (a_str.size() == 0)
+		return duration_;
+
+	bool is_durT_valid = false;
+	const char durT = a_str.at(a_str.size() - 1);
+
+	for (unsigned int i = 0; i < mhdqMa_size; i++) {
+		if (durT == mhdqMa[i]) {
+			is_durT_valid = true;
+			break;
+		}
+	}
+
+	if (!is_durT_valid)
+		return duration_;
+
+	bool allZero = true;
+	const std::string durV = a_str.substr(0, a_str.size() - 1);
+	for (size_t i = 0; i < durV.size(); i++) {
+		if (!isCharNonZeroNumber(durV[i])) {
+			if (durV[i] != '0')
+				return duration_;
+		}
+		else
+			allZero = false;
+	}
+
+	if (allZero)
+		return duration_;
+
+	duration_.first = std::atoi(durV.c_str());
+	duration_.second = durT;
+
+	if ((durT == 'q') || (durT == 'M') || (durT == 'a'))
+		return duration_;
+
+	if ((durT == 'm') && (duration_.first >= 60U)) {
+		if (duration_.first >= 1440U) {
+			if (duration_.first % 1440U == 0) {
+				duration_.first /= 1440U;
+				duration_.second = 'd';
+				return duration_;
+			}
+		}
+
+		if (duration_.first % 60U == 0) {
+			duration_.first /= 60U;
+			duration_.second = 'h';
+			return duration_;
+		}	
+	} // if ((durT == 'm') && (duration_.first >= 60U)) {
+
+	if ((durT == 'h') && (duration_.first >= 24U)) {
+		if (duration_.first % 24U == 0) {
+			duration_.first /= 24U;
+			duration_.second = 'h';
+			return duration_;
+		}
+	}
+
+	return duration_;
+
+}
 
 
 IdEstacao Periodo::getEstacao() const {
