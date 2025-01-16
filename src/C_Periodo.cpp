@@ -19,8 +19,6 @@ static const int numeroElementosArraySeparador = 3;
 static const int ano_inicial = 1900;
 static const int ano_final = 2200;
 
-static const char* mhdqMa = "mhdqMa"; // [m]inuto, [h]ora, [d]ia, [q]uinzena, [M]es, [a]no
-static const unsigned short int mhdqMa_size = 6U; // [m]inuto, [h]ora, [d]ia, [q]uinzena, [M]es, [a]no
 
 void Periodo::inicializaAtributos() {
 
@@ -153,184 +151,164 @@ void Periodo::validaMinuto(const IdMin a_minuto) {
 
 
 
-void Periodo::setPeriodo(const TipoPeriodo a_tipoPeriodo, const std::string a_periodo) {
+void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const std::string a_perStr) {
 	try {
-
-		std::string periodoStr = a_periodo;
 
 		std::vector<size_t> posSeparador;
 		std::vector<char>   queSeparador;
 
-		for (std::string::size_type pos = 0; pos < periodoStr.size(); ++pos) {
+		for (std::string::size_type pos = 0; pos < a_perStr.size(); ++pos) {
 			for (int i = 0; i < numeroElementosArraySeparador; i++) {
-				if (periodoStr.at(pos) == arraySeparador[i]) {
+				if (a_perStr.at(pos) == arraySeparador[i]) {
 					posSeparador.push_back(pos);
 					queSeparador.push_back(arraySeparador[i]);
 					break;
-				} // if (periodoStr.at(pos) == arraySeparador[i]) {
+				} // if (a_perStr.at(pos) == arraySeparador[i]) {
 			} // for (int i = 0; i < numeroElementosArraySeparador; i++) {
-		} // for (std::string::size_type pos = 0; pos < periodoStr.size(); ++pos) {
+		} // for (std::string::size_type pos = 0; pos < a_perStr.size(); ++pos) {
 
-		TipoPeriodo tipoPeriodoLido = TipoPeriodo_Nenhum;
+		std::pair<unsigned int, char> duration_ = a_dur;
 
-		if (posSeparador.size() == 0)
-			tipoPeriodoLido = TipoPeriodo_anual;
+		const bool isDurValid = isValidDuration(a_dur);
+
+		IdHor horLido = IdHor_0;
+		IdMin minLido = IdMin_0;
+		IdDia diaLido = IdDia_1;
+		IdMes mesLido = IdMes_1;
+		IdAno anoLido = IdAno_Nenhum;
+
+		if (posSeparador.size() == 0) {
+			if (!isDurValid)
+				duration_ = getDurationFromStr("a");
+			anoLido = getIdAnoFromChar(a_perStr.c_str());
+		}
 
 		else if (posSeparador.size() == 1) {
-			if (queSeparador.at(0) == '/')
-				tipoPeriodoLido = TipoPeriodo_mensal;
+			if (queSeparador.at(0) == '/') {
+				if (!isDurValid)
+					duration_ = getDurationFromStr("M");
+				anoLido = getIdAnoFromChar(std::string(a_perStr.substr(posSeparador.at(0) + 1, std::string::npos)).c_str());
+				mesLido = getIdMesFromChar(a_perStr.substr(0, posSeparador.at(0)).c_str());
+			}
 			else
 				throw std::invalid_argument("String com formato invalido de Periodo. Formato padrao completo " + std::string(formatoPadrao));
 		} // if (posSeparador.size() == 1) {
 
 		else if (posSeparador.size() == 2) {
-			if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '/'))
-				tipoPeriodoLido = TipoPeriodo_diario;
+			if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '/')) {
+				if (!isDurValid)
+					duration_ = getDurationFromStr("d");
+				diaLido = getIdDiaFromChar(a_perStr.substr(0, posSeparador.at(0)).c_str());
+				mesLido = getIdMesFromChar(a_perStr.substr(posSeparador.at(0) + 1, posSeparador.at(1) - posSeparador.at(0) - 1).c_str());
+				anoLido = getIdAnoFromChar(std::string(a_perStr.substr(posSeparador.at(1) + 1, std::string::npos)).c_str());
+			}
 			else
 				throw std::invalid_argument("String com formato invalido de Periodo. Formato padrao completo " + std::string(formatoPadrao));
 		} // else if (posSeparador.size() == 2) {
 
 		else if (posSeparador.size() == 3) {
-			if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '/') && (queSeparador.at(2) == '-'))
-				tipoPeriodoLido = TipoPeriodo_Excedente;
+			if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '/') && (queSeparador.at(2) == '-')) {}
 			else
 				throw std::invalid_argument("String com formato invalido de Periodo. Formato padrao completo " + std::string(formatoPadrao));
 		} // else if (posSeparador.size() == 3) {
 
 		else if (posSeparador.size() == 4) {
-			if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '/') && (queSeparador.at(2) == '-') && (queSeparador.at(3) == ':'))
-				tipoPeriodoLido = TipoPeriodo_minuto;
+			if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '/') && (queSeparador.at(2) == '-') && (queSeparador.at(3) == ':')) {
+				if (!isDurValid)
+					duration_ = getDurationFromStr("m");
+			}
 			else
 				throw std::invalid_argument("String com formato invalido de Periodo. Formato padrao completo " + std::string(formatoPadrao));
 		} // else if (posSeparador.size() == 4) {
 
 		else if (posSeparador.size() == 5) {
-			if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '/') && (queSeparador.at(2) == '-') && (queSeparador.at(3) == ':') && (queSeparador.at(4) == ':'))
-				tipoPeriodoLido = TipoPeriodo_minuto;
-			else if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '/') && (queSeparador.at(2) == '-') && (queSeparador.at(3) == ':') && (queSeparador.at(4) == '-'))
-				tipoPeriodoLido = TipoPeriodo_Excedente;
+			if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '/') && (queSeparador.at(2) == '-') && (queSeparador.at(3) == ':') && (queSeparador.at(4) == ':')) {
+				if (!isDurValid)
+					duration_ = getDurationFromStr("m");
+			}
+			else if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '/') && (queSeparador.at(2) == '-') && (queSeparador.at(3) == ':') && (queSeparador.at(4) == '-')) {}
 			else
 				throw std::invalid_argument("String com formato invalido de Periodo. Formato padrao completo " + std::string(formatoPadrao));
 		} // else if (posSeparador.size() == 5) {
 
 		else if (posSeparador.size() == 6) {
-			if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '/') && (queSeparador.at(2) == '-') && (queSeparador.at(3) == ':') && (queSeparador.at(4) == ':') && (queSeparador.at(5) == '-'))
-				tipoPeriodoLido = TipoPeriodo_Excedente;
+			if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '/') && (queSeparador.at(2) == '-') && (queSeparador.at(3) == ':') && (queSeparador.at(4) == ':') && (queSeparador.at(5) == '-')) {}
 			else
 				throw std::invalid_argument("String com formato invalido de Periodo. Formato padrao completo " + std::string(formatoPadrao));
 		} // else if (posSeparador.size() == 6) {
 		else
 			throw std::invalid_argument("String com formato invalido de Periodo. Formato padrao completo " + std::string(formatoPadrao));
 
-		TipoPeriodo tipoPeriodoAtribuido = tipoPeriodoLido;
-		if ((a_tipoPeriodo < tipoPeriodoAtribuido) && (a_tipoPeriodo > TipoPeriodo_Nenhum))
-			tipoPeriodoAtribuido = a_tipoPeriodo;
-		else if (a_tipoPeriodo > tipoPeriodoAtribuido)
-			throw std::invalid_argument("Tipo de Periodo nao compativel com o Periodo lido na String.");
+		if (anoLido == IdAno_Nenhum) {
 
-		if (tipoPeriodoLido == TipoPeriodo_anual)
-			setPeriodo(tipoPeriodoAtribuido, IdDia_1, IdMes_1, getIdAnoFromChar(periodoStr.c_str()), IdHor_0, IdMin_0);
+			diaLido = getIdDiaFromChar(a_perStr.substr(0, posSeparador.at(0)).c_str());
+			mesLido = getIdMesFromChar(a_perStr.substr(posSeparador.at(0) + 1, posSeparador.at(1) - posSeparador.at(0) - 1).c_str());
+			anoLido = getIdAnoFromChar(a_perStr.substr(posSeparador.at(1) + 1, posSeparador.at(2) - posSeparador.at(1) - 1).c_str());
 
-		else if (tipoPeriodoLido == TipoPeriodo_mensal) 
-			setPeriodo(tipoPeriodoAtribuido, IdDia_1, getIdMesFromChar(periodoStr.substr(0, posSeparador.at(0)).c_str()), getIdAnoFromChar(std::string(periodoStr.substr(posSeparador.at(0) + 1, std::string::npos)).c_str()), IdHor_0, IdMin_0);
-
-		else if (tipoPeriodoLido == TipoPeriodo_diario) {
-			const IdDia diaLido = getIdDiaFromChar(periodoStr.substr(0, posSeparador.at(0)).c_str());
-			const IdMes mesLido = getIdMesFromChar(periodoStr.substr(posSeparador.at(0) + 1, posSeparador.at(1) - posSeparador.at(0) - 1).c_str());
-			const IdAno anoLido = getIdAnoFromChar(std::string(periodoStr.substr(posSeparador.at(1) + 1, std::string::npos)).c_str());
-			setPeriodo(tipoPeriodoAtribuido, diaLido, mesLido, anoLido, IdHor_0, IdMin_0);
-		} // if (tipoPeriodoLido == TipoPeriodo_diario) {
-
-		else if (tipoPeriodoLido == TipoPeriodo_horario) {
-			const IdDia diaLido = getIdDiaFromChar(periodoStr.substr(0, posSeparador.at(0)).c_str());
-			const IdMes mesLido = getIdMesFromChar(periodoStr.substr(posSeparador.at(0) + 1, posSeparador.at(1) - posSeparador.at(0) - 1).c_str());
-			const IdAno anoLido = getIdAnoFromChar(periodoStr.substr(posSeparador.at(1) + 1, posSeparador.at(2) - posSeparador.at(1) - 1).c_str());
-			const IdHor horLido = getIdHorFromChar(periodoStr.substr(posSeparador.at(2) + 1, std::string::npos).c_str());
-			setPeriodo(tipoPeriodoAtribuido, diaLido, mesLido, anoLido, horLido, IdMin_0);
-		} // else if (tipoPeriodoLido == TipoPeriodo_horario) {
-
-		else if (tipoPeriodoLido == TipoPeriodo_minuto) {
-			const IdDia diaLido = getIdDiaFromChar(periodoStr.substr(0, posSeparador.at(0)).c_str());
-			const IdMes mesLido = getIdMesFromChar(periodoStr.substr(posSeparador.at(0) + 1, posSeparador.at(1) - posSeparador.at(0) - 1).c_str());
-			const IdAno anoLido = getIdAnoFromChar(periodoStr.substr(posSeparador.at(1) + 1, posSeparador.at(2) - posSeparador.at(1) - 1).c_str());
-			const IdHor horLido = getIdHorFromChar(periodoStr.substr(posSeparador.at(2) + 1, posSeparador.at(3) - posSeparador.at(2) - 1).c_str());
-			IdMin minLido = IdMin_Nenhum;
-			if (posSeparador.size() == 4)
-				minLido = getIdMinFromChar(periodoStr.substr(posSeparador.at(3) + 1, std::string::npos).c_str());
-			else
-				minLido = getIdMinFromChar(periodoStr.substr(posSeparador.at(3) + 1, posSeparador.at(4) - posSeparador.at(3) - 1).c_str());
-			setPeriodo(tipoPeriodoAtribuido, diaLido, mesLido, anoLido, horLido, minLido);
-		} // else if (tipoPeriodoLido == TipoPeriodo_minuto) {
-
-		else if (tipoPeriodoLido == TipoPeriodo_Excedente) {
-
-			const IdDia diaLido = getIdDiaFromChar(periodoStr.substr(0, posSeparador.at(0)).c_str());
-			const IdMes mesLido = getIdMesFromChar(periodoStr.substr(posSeparador.at(0) + 1, posSeparador.at(1) - posSeparador.at(0) - 1).c_str());
-			const IdAno anoLido = getIdAnoFromChar(periodoStr.substr(posSeparador.at(1) + 1, posSeparador.at(2) - posSeparador.at(1) - 1).c_str());
-
-			IdHor horLido = IdHor_0;
-			IdMin minLido = IdMin_0;
+			horLido = IdHor_0;
+			minLido = IdMin_0;
 
 			if (posSeparador.size() > 3) {
-				horLido = getIdHorFromChar(periodoStr.substr(posSeparador.at(2) + 1, posSeparador.at(3) - posSeparador.at(2) - 1).c_str());
-				minLido = getIdMinFromChar(periodoStr.substr(posSeparador.at(3) + 1, posSeparador.at(4) - posSeparador.at(3) - 1).c_str());
+				horLido = getIdHorFromChar(a_perStr.substr(posSeparador.at(2) + 1, posSeparador.at(3) - posSeparador.at(2) - 1).c_str());
+				minLido = getIdMinFromChar(a_perStr.substr(posSeparador.at(3) + 1, posSeparador.at(4) - posSeparador.at(3) - 1).c_str());
 			} // if (posSeparador.size() > 3) {
 
 			if (posSeparador.size() == 3)
-				tipoPeriodoAtribuido = getTipoPeriodoFromChar(periodoStr.substr(posSeparador.at(2) + 1, std::string::npos).c_str());
+				duration_ = getDurationFromStr(a_perStr.substr(posSeparador.at(2) + 1, std::string::npos));
 			else if (posSeparador.size() == 5)
-				tipoPeriodoAtribuido = getTipoPeriodoFromChar(periodoStr.substr(posSeparador.at(4) + 1, std::string::npos).c_str());
+				duration_ = getDurationFromStr(a_perStr.substr(posSeparador.at(4) + 1, std::string::npos));
 			else
-				tipoPeriodoAtribuido = getTipoPeriodoFromChar(periodoStr.substr(posSeparador.at(5) + 1, std::string::npos).c_str());
-
-			setPeriodo(tipoPeriodoAtribuido, diaLido, mesLido, anoLido, horLido, minLido);
+				duration_ = getDurationFromStr(a_perStr.substr(posSeparador.at(5) + 1, std::string::npos));
 
 		} // else if (tipoPeriodoLido == TipoPeriodo_Excedente) {
 
+		setPeriodo(duration_, diaLido, mesLido, anoLido, horLido, minLido);
+
 	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + a_periodo + "): \n" + std::string(erro.what())); }
-} // void Periodo::setPeriodo(const TipoPeriodo a_tipoPeriodo, const std::string a_periodo){
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + getFullString(a_dur) + "," + a_perStr + "): \n" + std::string(erro.what())); }
+} // void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const std::string a_periodo){
 
 
 
 
 
-void Periodo::setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdAno a_ano) {
-	try { setPeriodo(a_tipoPeriodo, IdDia_1, IdMes_1, a_ano, IdHor_0, IdMin_0); } // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + getString(a_tipoPeriodo) + "," + getString(a_ano) + "): \n" + std::string(erro.what())); }
-} // void Periodo::setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdAno a_ano) {
+void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdAno a_ano) {
+	try { setPeriodo(a_dur, IdDia_1, IdMes_1, a_ano, IdHor_0, IdMin_0); } // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + getString(a_dur) + "," + getString(a_ano) + "): \n" + std::string(erro.what())); }
+} // void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdAno a_ano) {
 
 
-void Periodo::setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdMes a_mes, const IdAno a_ano) {
-	try { setPeriodo(a_tipoPeriodo, IdDia_1, a_mes, a_ano, IdHor_0, IdMin_0); } // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + getString(a_tipoPeriodo) + "," + getString(a_mes) + "," + getString(a_ano) + "): \n" + std::string(erro.what())); }
-} // void Periodo::setPeriodo(const TipoPeriodo a_tipoPeriodo, const int IdMes, const IdAno a_ano){
+void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdMes a_mes, const IdAno a_ano) {
+	try { setPeriodo(a_dur, IdDia_1, a_mes, a_ano, IdHor_0, IdMin_0); } // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + getString(a_dur) + "," + getString(a_mes) + "," + getString(a_ano) + "): \n" + std::string(erro.what())); }
+} // void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const int IdMes, const IdAno a_ano){
 
 
-void Periodo::setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano) {
-	try { setPeriodo(a_tipoPeriodo, a_dia, a_mes, a_ano, IdHor_0, IdMin_0); } // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + getString(a_tipoPeriodo) + "," + getString(a_dia) + "," + getString(a_mes) + "," + getString(a_ano) + "): \n" + std::string(erro.what())); }
-} // void Periodo::setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano){
+void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano) {
+	try { setPeriodo(a_dur, a_dia, a_mes, a_ano, IdHor_0, IdMin_0); } // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + getString(a_dur) + "," + getString(a_dia) + "," + getString(a_mes) + "," + getString(a_ano) + "): \n" + std::string(erro.what())); }
+} // void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano){
 
 
-void Periodo::setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora) {
-	try { setPeriodo(a_tipoPeriodo, a_dia, a_mes, a_ano, a_hora, IdMin_0); } // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + getString(a_tipoPeriodo) + "," + getString(a_dia) + "," + getString(a_mes) + "," + getString(a_ano) + "," + getString(a_hora) + "): \n" + std::string(erro.what())); }
-} // void Periodo::setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora){
+void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora) {
+	try { setPeriodo(a_dur, a_dia, a_mes, a_ano, a_hora, IdMin_0); } // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + getString(a_dur) + "," + getString(a_dia) + "," + getString(a_mes) + "," + getString(a_ano) + "," + getString(a_hora) + "): \n" + std::string(erro.what())); }
+} // void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora){
 
 
-void Periodo::setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto) {
+void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto) {
 	try {
-		if ((a_tipoPeriodo <= TipoPeriodo_Nenhum) || (a_tipoPeriodo > TipoPeriodo_minuto)) { throw std::invalid_argument("Tipo de Periodo Invalido."); }
+		if (!isValidDuration(a_dur)) { throw std::invalid_argument("Invalid a_dur."); }
 		validaAno(a_ano);
 		validaMes(a_mes);
 		validaDia(a_dia);
 		validaHora(a_hora);
 		validaMinuto(a_minuto);
-		tipoPeriodo = a_tipoPeriodo;
+		duration = a_dur;
+		tipoPeriodo = getTipoPeriodoFromDuration(a_dur);
 	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + getString(a_tipoPeriodo) + "," + getString(a_dia) + "," + getString(a_mes) + "," + getString(a_ano) + "," + getString(a_hora) + "," + getString(a_minuto) + "): \n" + std::string(erro.what())); }
-} // void Periodo::setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto){
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + getString(a_dur) + "," + getString(a_dia) + "," + getString(a_mes) + "," + getString(a_ano) + "," + getString(a_hora) + "," + getString(a_minuto) + "): \n" + std::string(erro.what())); }
+} // void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto){
 
 
 Periodo::Periodo() { inicializaAtributos(); }
@@ -340,14 +318,14 @@ Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const Periodo& a_periodo) {
 		if (!a_periodo.isValido())
 			throw std::invalid_argument("Periodo Invalido.");
 		inicializaAtributos();
-		setPeriodo(a_tipoPeriodo, a_periodo.getDia(), a_periodo.getMes(), a_periodo.getAno(), a_periodo.getHora(), a_periodo.getMinuto());
+		setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_periodo.getDia(), a_periodo.getMes(), a_periodo.getAno(), a_periodo.getHora(), a_periodo.getMinuto());
 	} // try {
 	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::Periodo(" + getFullString(a_tipoPeriodo) + "," + a_periodo.str() + ") \n" + std::string(erro.what())); }
 }
 
 Periodo::Periodo(const std::string a_periodo) {
 	inicializaAtributos();
-	setPeriodo(TipoPeriodo_Nenhum, a_periodo);
+	setPeriodo(getDurationFromStr(""), a_periodo);
 }
 
 Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const std::string a_periodo) {
@@ -355,7 +333,7 @@ Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const std::string a_periodo) {
 		throw std::invalid_argument("Periodo::Periodo(" + getString(a_tipoPeriodo) + "," + a_periodo + "): \nTipo de Periodo Invalido.");
 
 	inicializaAtributos();
-	setPeriodo(a_tipoPeriodo, a_periodo);
+	setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_periodo);
 } // Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const std::string a_periodo) {
 
 
@@ -363,39 +341,39 @@ Periodo::Periodo(const int   a_ano) {
 	std::stringstream anoStr;
 	anoStr << a_ano;
 	inicializaAtributos();
-	setPeriodo(TipoPeriodo_anual, getIdAnoFromChar(anoStr.str().c_str()));
+	setPeriodo(getDurationFromStr("1a"), getIdAnoFromChar(anoStr.str().c_str()));
 } // Periodo::Periodo(const int   a_ano) {
 
-Periodo::Periodo(const IdAno a_ano) { inicializaAtributos(); setPeriodo(TipoPeriodo_anual, a_ano); }
+Periodo::Periodo(const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromStr("1a"), a_ano); }
 
 Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int a_ano) {
 	std::stringstream anoStr;
 	anoStr << a_ano;
 	inicializaAtributos();
-	setPeriodo(a_tipoPeriodo, getIdAnoFromChar(anoStr.str().c_str()));
+	setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), getIdAnoFromChar(anoStr.str().c_str()));
 } // Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_ano) {
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdAno a_ano) { inicializaAtributos(); setPeriodo(a_tipoPeriodo, a_ano); }
+Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_ano); }
 
 Periodo::Periodo(const int a_mes, const int a_ano) {
 	std::stringstream anoStr, mesStr;
 	anoStr << a_ano;
 	mesStr << a_mes;
 	inicializaAtributos();
-	setPeriodo(TipoPeriodo_mensal, getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()));
+	setPeriodo(getDurationFromStr("1M"), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()));
 } // Periodo::Periodo(const int   a_mes, const int   a_ano) {
 
-Periodo::Periodo(const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(TipoPeriodo_mensal, a_mes, a_ano); }
+Periodo::Periodo(const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromStr("1M"), a_mes, a_ano); }
 
 Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_mes, const int   a_ano) {
 	std::stringstream anoStr, mesStr;
 	anoStr << a_ano;
 	mesStr << a_mes;
 	inicializaAtributos();
-	setPeriodo(a_tipoPeriodo, getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()));
+	setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()));
 } // Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_mes, const int   a_ano) {
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(a_tipoPeriodo, a_mes, a_ano); }
+Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_mes, a_ano); }
 
 Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano) {
 	std::stringstream anoStr, mesStr, diaStr;
@@ -403,10 +381,10 @@ Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano) {
 	mesStr << a_mes;
 	diaStr << a_dia;
 	inicializaAtributos();
-	setPeriodo(TipoPeriodo_diario, getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()));
+	setPeriodo(getDurationFromStr("1d"), getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()));
 } // Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano) { 
 
-Periodo::Periodo(const IdDia a_dia, const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(TipoPeriodo_diario, a_dia, a_mes, a_ano); }
+Periodo::Periodo(const IdDia a_dia, const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromStr("1d"), a_dia, a_mes, a_ano); }
 
 Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int   a_mes, const int   a_ano) {
 	std::stringstream anoStr, mesStr, diaStr;
@@ -414,10 +392,10 @@ Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int  
 	mesStr << a_mes;
 	diaStr << a_dia;
 	inicializaAtributos();
-	setPeriodo(a_tipoPeriodo, getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()));
+	setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()));
 } // Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int   a_mes, const int   a_ano) {
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(a_tipoPeriodo, a_dia, a_mes, a_ano); }
+Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_dia, a_mes, a_ano); }
 
 Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora) {
 	std::stringstream anoStr, mesStr, diaStr, horStr;
@@ -426,10 +404,10 @@ Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano, const 
 	diaStr << a_dia;
 	horStr << a_hora;
 	inicializaAtributos();
-	setPeriodo(TipoPeriodo_horario, getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()), getIdHorFromChar(horStr.str().c_str()));
+	setPeriodo(getDurationFromStr("1h"), getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()), getIdHorFromChar(horStr.str().c_str()));
 } // Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora) {
 
-Periodo::Periodo(const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora) { inicializaAtributos(); setPeriodo(TipoPeriodo_horario, a_dia, a_mes, a_ano, a_hora); }
+Periodo::Periodo(const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora) { inicializaAtributos(); setPeriodo(getDurationFromStr("1h"), a_dia, a_mes, a_ano, a_hora); }
 
 Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora) {
 	std::stringstream anoStr, mesStr, diaStr, horStr;
@@ -438,10 +416,10 @@ Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int  
 	diaStr << a_dia;
 	horStr << a_hora;
 	inicializaAtributos();
-	setPeriodo(a_tipoPeriodo, getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()), getIdHorFromChar(horStr.str().c_str()));
+	setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()), getIdHorFromChar(horStr.str().c_str()));
 } // Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora) {
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora) { inicializaAtributos(); setPeriodo(a_tipoPeriodo, a_dia, a_mes, a_ano, a_hora); }
+Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora) { inicializaAtributos(); setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_dia, a_mes, a_ano, a_hora); }
 
 Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano, const int a_hora, const int a_minuto) {
 	std::stringstream anoStr, mesStr, diaStr, horStr, minStr;
@@ -451,10 +429,10 @@ Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano, const 
 	horStr << a_hora;
 	minStr << a_minuto;
 	inicializaAtributos();
-	setPeriodo(TipoPeriodo_minuto, getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()), getIdHorFromChar(horStr.str().c_str()), getIdMinFromChar(minStr.str().c_str()));
+	setPeriodo(getDurationFromStr("1m"), getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()), getIdHorFromChar(horStr.str().c_str()), getIdMinFromChar(minStr.str().c_str()));
 } // Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora, const int   a_minuto) {
 
-Periodo::Periodo(const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto) { inicializaAtributos(); setPeriodo(TipoPeriodo_minuto, a_dia, a_mes, a_ano, a_hora, a_minuto); }
+Periodo::Periodo(const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto) { inicializaAtributos(); setPeriodo(getDurationFromStr("1m"), a_dia, a_mes, a_ano, a_hora, a_minuto); }
 
 Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora, const int   a_minuto) {
 	std::stringstream anoStr, mesStr, diaStr, horStr, minStr;
@@ -464,10 +442,10 @@ Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int  
 	horStr << a_hora;
 	minStr << a_minuto;
 	inicializaAtributos();
-	setPeriodo(a_tipoPeriodo, getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()), getIdHorFromChar(horStr.str().c_str()), getIdMinFromChar(minStr.str().c_str()));
+	setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()), getIdHorFromChar(horStr.str().c_str()), getIdMinFromChar(minStr.str().c_str()));
 } // Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora, const int   a_minuto) {
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto) { inicializaAtributos(); setPeriodo(a_tipoPeriodo, a_dia, a_mes, a_ano, a_hora, a_minuto); }
+Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto) { inicializaAtributos(); setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_dia, a_mes, a_ano, a_hora, a_minuto); }
 
 
 double Periodo::sobreposicao(const Periodo a_periodo_overlap)const {
@@ -1027,7 +1005,16 @@ std::string Periodo::str() const {
 } // std::string Periodo::str() const{
 
 
-bool Periodo::isValido() const { if (tipoPeriodo == TipoPeriodo_Nenhum) { return false; } else { return true; } }
+bool Periodo::isValido() const { 
+	
+	if (tipoPeriodo == TipoPeriodo_Nenhum) 
+		return false;
+
+	if (isValidDuration(getDuration()))
+		return true;
+
+	return false;
+}
 
 
 Periodo operator+(const Periodo& a_periodo, const int a_iterador) {
@@ -1896,71 +1883,223 @@ Periodo Periodo::getPeriodoFinal(TipoPeriodo a_tipoPeriodo) {
 } // Periodo Periodo::getPeriodoFinal(TipoPeriodo a_tipoPeriodo){
 
 
-std::pair<unsigned int, char> Periodo::getDurationFromStr(std::string a_str){
+std::pair<unsigned int, char> Periodo::getDurationFromStr(const std::string &a_str){
 
 	std::pair<unsigned int, char> duration_(0, '0');
 
 	if (a_str.size() == 0)
 		return duration_;
 
-	bool is_durT_valid = false;
 	const char durT = a_str.at(a_str.size() - 1);
 
-	for (unsigned int i = 0; i < mhdqMa_size; i++) {
-		if (durT == mhdqMa[i]) {
-			is_durT_valid = true;
-			break;
+	if (isValidDurationT(durT)) {
+
+		if (a_str.size() == 1) {
+			duration_.first = 1U;
+			duration_.second = durT;
+			return duration_;
 		}
-	}
 
-	if (!is_durT_valid)
-		return duration_;
+		// Teste para retrocompatibilizacao com antigos periodos
+		if (a_str.at(a_str.size() - 2) != 'r') {
 
-	bool allZero = true;
-	const std::string durV = a_str.substr(0, a_str.size() - 1);
-	for (size_t i = 0; i < durV.size(); i++) {
-		if (!isCharNonZeroNumber(durV[i])) {
-			if (durV[i] != '0')
-				return duration_;
-		}
-		else
-			allZero = false;
-	}
-
-	if (allZero)
-		return duration_;
-
-	duration_.first = std::atoi(durV.c_str());
-	duration_.second = durT;
-
-	if ((durT == 'q') || (durT == 'M') || (durT == 'a'))
-		return duration_;
-
-	if ((durT == 'm') && (duration_.first >= 60U)) {
-		if (duration_.first >= 1440U) {
-			if (duration_.first % 1440U == 0) {
-				duration_.first /= 1440U;
-				duration_.second = 'd';
-				return duration_;
+			bool allZero = true;
+			const std::string durV = a_str.substr(0, a_str.size() - 1);
+			for (size_t i = 0; i < durV.size(); i++) {
+				if (!isCharNonZeroNumber(durV[i])) {
+					if (durV[i] != '0')
+						return duration_;
+				}
+				else
+					allZero = false;
 			}
-		}
 
-		if (duration_.first % 60U == 0) {
-			duration_.first /= 60U;
-			duration_.second = 'h';
-			return duration_;
-		}	
-	} // if ((durT == 'm') && (duration_.first >= 60U)) {
+			if (allZero)
+				return duration_;
 
-	if ((durT == 'h') && (duration_.first >= 24U)) {
-		if (duration_.first % 24U == 0) {
-			duration_.first /= 24U;
-			duration_.second = 'h';
+			duration_.first = std::atoi(durV.c_str());
+			duration_.second = durT;
+
+			if ((durT == 'q') || (durT == 'M') || (durT == 'a'))
+				return duration_;
+
+			if ((durT == 'm') && (duration_.first >= 60U)) {
+				if (duration_.first >= 1440U) {
+					if (duration_.first % 1440U == 0) {
+						duration_.first /= 1440U;
+						duration_.second = 'd';
+						return duration_;
+					}
+				}
+
+				if (duration_.first % 60U == 0) {
+					duration_.first /= 60U;
+					duration_.second = 'h';
+					return duration_;
+				}
+			} // if ((durT == 'm') && (duration_.first >= 60U)) {
+
+			if ((durT == 'h') && (duration_.first >= 24U)) {
+				if (duration_.first % 24U == 0) {
+					duration_.first /= 24U;
+					duration_.second = 'h';
+					return duration_;
+				}
+			}
+
 			return duration_;
 		}
 	}
+
+	size_t pos = a_str.find("minuto");
+	if (pos != std::string::npos)
+		return getDurationFromStr("m");
+
+	if (a_str.at(a_str.size() - 1) == 'm')
+		return getDurationFromStr(a_str);
+
+	pos = a_str.find("meia_hora");
+	if (pos != std::string::npos)
+		return getDurationFromStr("30m");
+
+	pos = a_str.find("horario");
+	if (pos != std::string::npos)
+		return getDurationFromStr("h");
+
+	pos = a_str.find("horas");
+	if (pos != std::string::npos)
+		return getDurationFromStr(std::string(a_str.substr(0, pos) + "h"));
+
+	pos = a_str.find("diario");
+	if (pos != std::string::npos)
+		return getDurationFromStr("d");
+
+	pos = a_str.find("dias");
+	if (pos != std::string::npos)
+		return getDurationFromStr(std::string(a_str.substr(0, pos) + "d"));
+
+	pos = a_str.find("semanal");
+	if (pos != std::string::npos)
+		return getDurationFromStr("7d");
+
+	pos = a_str.find("mensal");
+	if (pos != std::string::npos)
+		return getDurationFromStr("M");
+
+	pos = a_str.find("anual");
+	if (pos != std::string::npos)
+		return getDurationFromStr("a");
 
 	return duration_;
+
+}
+
+std::pair<unsigned int, char> Periodo::getDurationFromTipoPeriodo(const TipoPeriodo a_perT) {
+
+	try {
+
+		return getDurationFromStr(getString(a_perT));
+
+
+	} // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getDurationFromTipoPeriodo(" + getFullString(a_perT) + ") : \n" + std::string(erro.what())); }
+
+}
+
+TipoPeriodo Periodo::getTipoPeriodoFromDuration(const std::pair<unsigned int, char>& a_dur) {
+
+	try {
+
+		if (!isValidDuration(a_dur))
+			throw std::invalid_argument("Invalid dur.");
+
+		if (a_dur.second == 'm') {
+			if (a_dur.first == 1U)
+				return TipoPeriodo_minuto;
+			else if (a_dur.first == 30U)
+				return TipoPeriodo_meia_hora;
+			return getTipoPeriodoFromChar(getString(a_dur).c_str());
+		}
+
+		if (a_dur.second == 'h') {
+			if (a_dur.first == 1U)
+				return TipoPeriodo_horario;
+			return getTipoPeriodoFromChar(std::string(getString(a_dur.first) + "horas").c_str());
+		}
+
+		if (a_dur.second == 'd') {
+			if (a_dur.first == 1U)
+				return TipoPeriodo_diario;
+			if (a_dur.first == 7U)
+				return TipoPeriodo_semanal;
+			return getTipoPeriodoFromChar(std::string(getString(a_dur.first) + "dias").c_str());
+		}
+
+		if (a_dur.second == 'M') {
+			if (a_dur.first == 1U)
+				return TipoPeriodo_mensal;
+			return TipoPeriodo_Nenhum;
+		}
+
+		if (a_dur.second == 'a') {
+			if (a_dur.first == 1U)
+				return TipoPeriodo_anual;
+			return TipoPeriodo_Nenhum;
+		}
+
+		return TipoPeriodo_Nenhum;
+	} // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getTipoPeriodoFromDuration(" + getFullString(a_dur) + ") : \n" + std::string(erro.what())); }
+
+}
+
+bool Periodo::isValidDuration(const std::pair<unsigned int, char>& a_dur1){
+
+	if (a_dur1.first == 0U)
+		return false;
+
+	if (!isValidDurationT(a_dur1.second))
+		return false;
+
+	return true;
+
+}
+
+bool Periodo::isValidDurationT(const char a_durT){
+
+	if ((a_durT == 'm') || (a_durT == 'h') || (a_durT == 'd') || (a_durT == 'q') || (a_durT == 'M') || (a_durT == 'a'))
+		return true;
+
+	return false;
+}
+
+bool Periodo::isSameDuration(const Periodo& a_per1, const Periodo& a_per2){
+
+	try {
+
+		if (!a_per1.isValido())
+			throw std::invalid_argument("Invalid a_per1");
+
+		if (!a_per2.isValido())
+			throw std::invalid_argument("Invalid a_per2");
+
+		const std::pair<unsigned int, char> dur1 = a_per1.getDuration();
+		const std::pair<unsigned int, char> dur2 = a_per2.getDuration();
+
+		if (dur1.second == dur2.second) {
+			if (dur1.first == dur2.first)
+				return true;
+			else
+				return false;
+		}
+
+		if (a_per1.getMinutos() == a_per2.getMinutos())
+			return true;
+
+		return false;
+
+	} // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::isSameDuration(" + getFullString(a_per1) + "," + getFullString(a_per2) + "): \n" + std::string(erro.what())); }
 
 }
 

@@ -217,6 +217,22 @@ static std::string getString(int a_int) {
 	return std::to_string(a_int);
 }
 
+static std::string getString(unsigned int a_int) {
+
+	if (a_int == INT_MAX)
+		return "inf";
+
+	return std::to_string(a_int);
+}
+
+static std::string getString(std::pair<unsigned int, char> a_pair) {
+	return getString(a_pair.first) + a_pair.second;
+}
+
+static std::string getFullString(std::pair<unsigned int, char> a_pair) {
+	return "pair_" + getString(a_pair.first) + a_pair.second;
+}
+
 static std::string getStringTipo(int a_int) { return "int"; }
 static std::string getFullString(int a_int) { return getStringTipo(a_int) + "_" + getString(a_int); }
 

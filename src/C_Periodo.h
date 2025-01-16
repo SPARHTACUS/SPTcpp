@@ -137,12 +137,12 @@ private:
 	void validaHora  (const IdHor a_hora);
 	void validaMinuto(const IdMin a_minuto);
 
-	void setPeriodo(const TipoPeriodo a_tipoPeriodo, const std::string a_periodo);
-	void setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdAno a_ano);
-	void setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdMes a_mes, const IdAno a_ano);
-	void setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_hor, const IdMes a_mes, const IdAno a_ano);
-	void setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_hor, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora);
-	void setPeriodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_hor, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto);
+	void setPeriodo(const std::pair<unsigned int, char>& a_dur, const std::string a_periodo);
+	void setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdAno a_ano);
+	void setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdMes a_mes, const IdAno a_ano);
+	void setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdDia a_hor, const IdMes a_mes, const IdAno a_ano);
+	void setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdDia a_hor, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora);
+	void setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdDia a_hor, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto);
 
 public:
 
@@ -259,7 +259,16 @@ public:
 	static Periodo getPeriodoFinal();
 	static Periodo getPeriodoFinal(TipoPeriodo a_tipoPeriodo);
 
-	static std::pair<unsigned int, char> getDurationFromStr(std::string a_str);
+	static std::pair<unsigned int, char> getDurationFromStr(const std::string &a_str);
+
+	static std::pair<unsigned int, char> getDurationFromTipoPeriodo(const TipoPeriodo a_perT);
+	static TipoPeriodo getTipoPeriodoFromDuration(const std::pair<unsigned int, char> &a_dur);
+
+	static bool isValidDuration(const std::pair<unsigned int, char>& a_dur1);
+	static bool isValidDurationT(const char a_durT);
+
+	static bool isSameDuration(const Periodo &a_per1, const Periodo& a_per2);
+
 
 	IdEstacao getEstacao() const;
 
