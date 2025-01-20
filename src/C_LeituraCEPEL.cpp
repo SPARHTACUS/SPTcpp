@@ -1002,7 +1002,7 @@ void LeituraCEPEL::instancia_dados_preConfig(Dados& a_dados, const std::string a
 
 			const Periodo periodo_referencia = a_dados.getAtributo(AttComumDados_periodo_referencia, Periodo());
 
-			if (periodo_referencia != Periodo(periodo_referencia.getTipoPeriodo(), a_dados.getIteradorInicial(AttVetorDados_horizonte_estudo, Periodo())))
+			if (periodo_referencia != Periodo(getString(periodo_referencia.getDuration()), a_dados.getIteradorInicial(AttVetorDados_horizonte_estudo, Periodo())))
 				throw std::invalid_argument("Atributo " + getFullString(AttComumDados_periodo_referencia) + " nao compativel com " + getFullString(AttVetorDados_horizonte_estudo));
 
 		} // if ((a_dados.getSizeVetor(AttVetorDados_horizonte_estudo) > 0) && (dadosPreConfig_instanciados)) {
@@ -2735,7 +2735,7 @@ bool LeituraCEPEL::aplicarModificacaoNOVAMAQ(Dados& a_dados, const IdHidreletric
 
 			double sobreposicao = periodo.sobreposicao(a_modificacaoUHE.periodo);
 
-			if ((periodo == horizonte_estudo.getIteradorInicial()) && (Periodo(horizonte_estudo_DECK.getIteradorInicial().getTipoPeriodo(), a_modificacaoUHE.periodo) == horizonte_estudo_DECK.getIteradorInicial()))
+			if ((periodo == horizonte_estudo.getIteradorInicial()) && (Periodo(getString(horizonte_estudo_DECK.getIteradorInicial().getDuration()), a_modificacaoUHE.periodo) == horizonte_estudo_DECK.getIteradorInicial()))
 				sobreposicao += sobreposicao_atraso_periodo_inicial;
 
 			if ((periodo >= a_modificacaoUHE.periodo) || (sobreposicao > 0.0)) {
@@ -4233,8 +4233,8 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 		SmartEnupla<Periodo, bool> horizonte_tendencia_mais_processo_estocastico_MENSAL;
 
-		const Periodo periodo_inicial_MENSAL = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_processo_estocastico.getIteradorInicial().getMes(), horizonte_tendencia_mais_processo_estocastico.getIteradorInicial().getAno());
-		const Periodo periodo_final_MENSAL = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_processo_estocastico.getIteradorFinal().getMes(), horizonte_tendencia_mais_processo_estocastico.getIteradorFinal().getAno());
+		const Periodo periodo_inicial_MENSAL = Periodo("M", horizonte_tendencia_mais_processo_estocastico.getIteradorInicial().getMes(), horizonte_tendencia_mais_processo_estocastico.getIteradorInicial().getAno());
+		const Periodo periodo_final_MENSAL = Periodo("M", horizonte_tendencia_mais_processo_estocastico.getIteradorFinal().getMes(), horizonte_tendencia_mais_processo_estocastico.getIteradorFinal().getAno());
 
 		for (Periodo periodo_aux = periodo_inicial_MENSAL; periodo_aux <= periodo_final_MENSAL; periodo_aux++)
 			horizonte_tendencia_mais_processo_estocastico_MENSAL.addElemento(periodo_aux, true);
@@ -4304,13 +4304,13 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				/////////////////////////////////////////
 				//Determina o mês/ano operativo do periodo_inicial do horizonte_estudo com base na semana operativa (p.ex: o período 26/08/2023-semanal tem como mês operativo = Setembro/2023)
 
-				Periodo periodo_inicial_semanal = Periodo(TipoPeriodo_semanal, a_horizonte_estudo.getIteradorInicial());
+				Periodo periodo_inicial_semanal = Periodo("7d", a_horizonte_estudo.getIteradorInicial());
 				periodo_inicial_semanal++;
 				
 				Periodo periodo_final_mensal = horizonte_tendencia_mais_processo_estocastico_MENSAL.getIteradorFinal();
 
 				//////////////////////
-				Periodo periodo_inicial_aux = Periodo(TipoPeriodo_mensal, IdMes_1, periodo_inicial_semanal.getAno()); //A impressão dos cortes no arquivo nwlistcf.rel é desde o mês 1 até o mês 12 (mesmo que o estudo comece p.ex. no mês 6)
+				Periodo periodo_inicial_aux = Periodo("M", IdMes_1, periodo_inicial_semanal.getAno()); //A impressão dos cortes no arquivo nwlistcf.rel é desde o mês 1 até o mês 12 (mesmo que o estudo comece p.ex. no mês 6)
 
 				for (Periodo periodo = periodo_inicial_aux; periodo <= periodo_final_mensal; periodo++)//Todos os períodos são em base mensal
 					periodo_acoplamento++;
@@ -4349,7 +4349,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			estagio_pos_estudo.setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, 0);
 			estagio_pos_estudo.setAtributo(AttComumEstagio_cortes_multiplos, 0);
 
-			const Periodo periodo_pos_estudo = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_processo_estocastico_MENSAL.getIteradorFinal() + 1);
+			const Periodo periodo_pos_estudo = Periodo("M", horizonte_tendencia_mais_processo_estocastico_MENSAL.getIteradorFinal() + 1);
 			estagio_pos_estudo.setAtributo(AttComumEstagio_periodo_otimizacao, periodo_pos_estudo);
 
 			estagio_pos_estudo.alocarCorteBenders(8000);
@@ -4568,9 +4568,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 			// Estados VMINOP
 			const IdMes mes_referencia_penalizacao_VMINOP = IdMes_11;
-			Periodo periodo_penalizacao_VMINOP = Periodo(TipoPeriodo_minuto, Periodo(mes_referencia_penalizacao_VMINOP, periodo_pos_estudo.getAno()) + 1) - 1;
+			Periodo periodo_penalizacao_VMINOP = Periodo("m", Periodo(mes_referencia_penalizacao_VMINOP, periodo_pos_estudo.getAno()) + 1) - 1;
 			if (periodo_pos_estudo.getMes() > mes_referencia_penalizacao_VMINOP)
-				periodo_penalizacao_VMINOP = Periodo(TipoPeriodo_minuto, Periodo(mes_referencia_penalizacao_VMINOP, IdAno(int(periodo_pos_estudo.getAno()) + 1)) + 1) - 1;
+				periodo_penalizacao_VMINOP = Periodo("m", Periodo(mes_referencia_penalizacao_VMINOP, IdAno(int(periodo_pos_estudo.getAno()) + 1)) + 1) - 1;
 			const std::string strVarDecisaoZP0_VH_LINFIdEstagio = std::string("ZP0_VH_LINF," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_penalizacao_VMINOP));
 			estados.addElemento(estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, strVarDecisaoZP0_VH_LINFIdEstagio, -1, -1), 0.0);
 

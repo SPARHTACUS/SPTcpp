@@ -196,7 +196,7 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 								soma_sobreposicao += sobreposicao;
 
 							//////////////
-							const Periodo periodo_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo_DC);
+							const Periodo periodo_teste = Periodo(getString(periodo_otimizacao.getDuration()), periodo_DC);
 
 							if (periodo_teste == periodo_otimizacao)
 								is_first_sobreposicao = true;
@@ -239,7 +239,7 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 			//2.Periodos que pertencem ao horizonte COM extensão
 			////////////////////////////////////////////////////
 
-			const Periodo periodo_extensao = Periodo(TipoPeriodo_mensal, horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal())+1);
+			const Periodo periodo_extensao = Periodo("M", horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal())+1);
 
 			for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
 
@@ -1273,7 +1273,7 @@ void LeituraCEPEL::ler_afluencia_passada_from_VAZOES_201906_DC29(Dados& a_dados,
 
 							const Periodo periodo_diario(idDia, idMes, idAno);
 
-							Periodo periodo_semanal(TipoPeriodo_semanal, periodo_diario);
+							Periodo periodo_semanal("7d", periodo_diario);
 
 							const Periodo periodo_diario_limite(1, mesInicial_PMO, anoInicial_PMO); //Corresponde ao primeiro dia do mês do PMO
 
@@ -5117,7 +5117,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							Periodo data_reportada_DADGER(dia, mes, ano);
 
-							//if (data_reportada_DADGER != Periodo(TipoPeriodo_diario, horizonte_estudo.getIteradorInicial()))
+							//if (data_reportada_DADGER != Periodo("d", horizonte_estudo.getIteradorInicial()))
 								//throw std::invalid_argument("Registro DT - Data nao coincidente com os estagios gerados a partir do arquivo VAZOES.RVX");
 
 						}//try {
@@ -6952,7 +6952,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							if (!a_dados.vetorHidreletrica.at(idHidreletrica).vetorDefluencia.isInstanciado(IdDefluencia_passada)) {//As defluências podem ser inicializadas desde a pre-configuração
 
 								//Nota: A defluencia passada vai considerar periodos_diarios de 15 dias anteriores ao horizonte de estudo (15 dias máximo tempo de viagem d'água registrado)
-								const SmartEnupla<Periodo, bool> horizonte_defluencia_passada(Periodo(TipoPeriodo_diario, horizonte_estudo.getIteradorInicial()) - 15, std::vector<bool>(15, true));
+								const SmartEnupla<Periodo, bool> horizonte_defluencia_passada(Periodo("d", horizonte_estudo.getIteradorInicial()) - 15, std::vector<bool>(15, true));
 
 								Defluencia defluencia;
 								defluencia.setAtributo(AttComumDefluencia_idDefluencia, IdDefluencia_passada);
@@ -10137,7 +10137,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 							///////////////////////////////////////		
 	
 
-							Periodo periodo_comandado(TipoPeriodo_semanal, std::stoi(line.substr(20 + 15 * numero_patamares, 2)), std::stoi(line.substr(22 + 15 * numero_patamares, 2)), \
+							Periodo periodo_comandado("7d", std::stoi(line.substr(20 + 15 * numero_patamares, 2)), std::stoi(line.substr(22 + 15 * numero_patamares, 2)), \
 								std::stoi(line.substr(24 + 15 * numero_patamares, 4)));
 
 
@@ -12048,7 +12048,7 @@ void LeituraCEPEL::define_horizonte_otimizacao_CP(Dados& a_dados) {
 
 			const Periodo periodo_inicial = data_execucao + 1;
 
-			Periodo periodo_1(TipoPeriodo_semanal, periodo_inicial);
+			Periodo periodo_1("7d", periodo_inicial);
 			horizonte_otimizacao.addElemento(periodo_1);
 
 			//*****************************************
@@ -12113,7 +12113,7 @@ void LeituraCEPEL::define_horizonte_otimizacao_CP(Dados& a_dados) {
 
 			const Periodo periodo_inicial = data_execucao + 1;
 
-			Periodo periodo_1(TipoPeriodo_semanal, periodo_inicial);
+			Periodo periodo_1("7d", periodo_inicial);
 			horizonte_otimizacao.addElemento(periodo_1);
 
 			//*****************************************
@@ -12263,14 +12263,14 @@ void LeituraCEPEL::define_horizonte_estudo_CP(Dados& a_dados) {
 
 									int conteioDias = 1;
 
-									Periodo periodo_diario_inicial = Periodo(TipoPeriodo_diario, periodo_final_DC);
+									Periodo periodo_diario_inicial = Periodo("d", periodo_final_DC);
 									Periodo periodo_diario = periodo_diario_inicial;
 
 									while (true) {
 
 										if (conteioDias > 7) {
 
-											Periodo periodo_semanal(TipoPeriodo_semanal, periodo_diario_inicial);
+											Periodo periodo_semanal("7d", periodo_diario_inicial);
 											horizonte_estudo.addElemento(periodo_semanal, idEstagio);
 
 											conteioDias = 1;
@@ -12352,14 +12352,14 @@ void LeituraCEPEL::define_horizonte_estudo_CP(Dados& a_dados) {
 
 							int conteioDias = 1;
 
-							Periodo periodo_diario_inicial = Periodo(TipoPeriodo_diario, periodo_final_DC);
+							Periodo periodo_diario_inicial = Periodo("d", periodo_final_DC);
 							Periodo periodo_diario = periodo_diario_inicial;
 
 							while (true) {
 
 								if (conteioDias > 7) {
 
-									Periodo periodo_semanal(TipoPeriodo_semanal, periodo_diario_inicial);
+									Periodo periodo_semanal("7d", periodo_diario_inicial);
 									horizonte_estudo.addElemento(periodo_semanal, idEstagio);
 
 									conteioDias = 1;
@@ -12652,7 +12652,7 @@ void LeituraCEPEL::define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados)
 							soma_sobreposicao += sobreposicao;
 
 						//////////////
-						const Periodo periodo_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo_DC);
+						const Periodo periodo_teste = Periodo(getString(periodo_otimizacao.getDuration()), periodo_DC);
 
 						if (periodo_teste == periodo_otimizacao)
 							is_first_sobreposicao = true;
@@ -12875,7 +12875,7 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 							if (horizonte_otimizacao_DC.at(idEstagio_DC).getTipoPeriodo() <= periodo.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
 
-								const Periodo periodo_teste = Periodo(periodo.getTipoPeriodo(), horizonte_otimizacao_DC.at(idEstagio_DC));
+								const Periodo periodo_teste = Periodo(getString(periodo.getDuration()), horizonte_otimizacao_DC.at(idEstagio_DC));
 
 								if (periodo_teste == periodo)
 									is_first_sobreposicao = true;
@@ -12975,9 +12975,9 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 			const SmartEnupla<Periodo, double> horizonte_tendencia(a_dados.processoEstocastico_hidrologico.getVetor(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double()), NAN);
 
-			const Periodo periodNextMinTrend = Periodo(TipoPeriodo_minuto, horizonte_tendencia.getIteradorFinal() + 1);
+			const Periodo periodNextMinTrend = Periodo("m", horizonte_tendencia.getIteradorFinal() + 1);
 			const Periodo periodIni = a_dados.processoEstocastico_hidrologico.getIterador1Inicial(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo());
-			const Periodo periodIniMin = Periodo(TipoPeriodo_minuto, periodIni);
+			const Periodo periodIniMin = Periodo("m", periodIni);
 
 			if (periodNextMinTrend > periodIniMin)
 				throw std::invalid_argument("Trend period must not surpass the begining of the SP.");
@@ -12986,14 +12986,14 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 				Periodo peridGap = horizonte_tendencia.getIteradorFinal() + 1;
 
-				while (Periodo(TipoPeriodo_minuto, peridGap + 1) - 1 != periodIniMin - 1) {
+				while (Periodo("m", peridGap + 1) - 1 != periodIniMin - 1) {
 
 					TipoPeriodo typePeriodGap = peridGap.getTipoPeriodo();
 
 					for (TipoPeriodo typePer = typePeriodGap; typePer < TipoPeriodo_minuto; typePer++) {
 
-						peridGap = Periodo(typePer, peridGap);
-						Periodo peridNextMinGap = Periodo(TipoPeriodo_minuto, peridGap + 1);
+						peridGap = Periodo(getString(Periodo::getDurationFromTipoPeriodo(typePer)), peridGap);
+						Periodo peridNextMinGap = Periodo("m", peridGap + 1);
 
 						if (peridNextMinGap <= periodIniMin) {
 
@@ -13620,7 +13620,7 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 										is_periodo_um_periodo_final_deck = true;
 									else {
 
-										Periodo periodo_teste = Periodo(periodo.getTipoPeriodo(), periodo + 1);
+										Periodo periodo_teste = Periodo(getString(periodo.getDuration()), periodo + 1);
 
 										if(periodo_teste > periodo_ultimo_sobreposicao)
 											is_periodo_um_periodo_final_deck = true;
@@ -13629,7 +13629,7 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 											for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
 
 												const TipoPeriodo tipo_periodo = tipo_periodos_horizonte_DECK.at(pos);
-												const Periodo periodo_seguinte = Periodo(tipo_periodo, periodo + 1);
+												const Periodo periodo_seguinte = Periodo(getString(Periodo::getDurationFromTipoPeriodo(tipo_periodo)), periodo + 1);
 
 												for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
 
@@ -13657,8 +13657,8 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 										if (sobreposicao > 0.0) {
 
-											Periodo periodo_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo + 1);
-											Periodo periodo_otimizacao_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo_otimizacao + 1);
+											Periodo periodo_teste = Periodo(getString(periodo_otimizacao.getDuration()), periodo + 1);
+											Periodo periodo_otimizacao_teste = Periodo(getString(periodo_otimizacao.getDuration()), periodo_otimizacao + 1);
 
 											if(periodo_teste == periodo_otimizacao_teste) //Garante que o período onde a restrição RHE é ativada é no último período pertencente ao período de otimização
 												is_periodo_um_periodo_final_deck = true;
@@ -18810,17 +18810,17 @@ void LeituraCEPEL::validar_horizonte_informacao_PD_pre_config(Dados &a_dados, co
 		bool is_periodo_inicial_PD_valido = false;
 		bool is_periodo_final_PD_valido = false;
 
-		const Periodo periodo_inicial_PD_TESTE = Periodo(TipoPeriodo_minuto, a_periodo_inicial_PD);
-		const Periodo periodo_final_PD_TESTE = Periodo(TipoPeriodo_minuto, a_periodo_final_PD + 1);
+		const Periodo periodo_inicial_PD_TESTE = Periodo("m", a_periodo_inicial_PD);
+		const Periodo periodo_final_PD_TESTE = Periodo("m", a_periodo_final_PD + 1);
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
 		for (Periodo periodo_deck = horizonte_estudo.getIteradorInicial(); periodo_deck <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_deck)) {
 
-			if (Periodo(TipoPeriodo_minuto, periodo_deck) == periodo_inicial_PD_TESTE)
+			if (Periodo("m", periodo_deck) == periodo_inicial_PD_TESTE)
 				is_periodo_inicial_PD_valido = true;
 
-			if (Periodo(TipoPeriodo_minuto, periodo_deck + 1) == periodo_final_PD_TESTE)
+			if (Periodo("m", periodo_deck + 1) == periodo_final_PD_TESTE)
 				is_periodo_final_PD_valido = true;
 
 			if (is_periodo_inicial_PD_valido && is_periodo_final_PD_valido)

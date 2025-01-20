@@ -22,7 +22,6 @@ static const int ano_final = 2200;
 
 void Periodo::inicializaAtributos() {
 
-	tipoPeriodo = TipoPeriodo_Nenhum;
 	ano = IdAno_Nenhum;
 	mes = IdMes_Nenhum;
 	dia = IdDia_Nenhum;
@@ -84,7 +83,7 @@ IdDia Periodo::getMaiorDiaDoMes() const {
 
 IdDiaSemana Periodo::getDiaSemana()const {
 	try {
-		if ((tipoPeriodo <= TipoPeriodo_Nenhum) || (tipoPeriodo >= TipoPeriodo_Excedente)) { throw std::invalid_argument("Periodo Invalido."); }
+		if (!isValido()) { throw std::invalid_argument("Periodo Invalido."); }
 
 		const int anoInt = int(ano) - 1 + ano_inicial;
 
@@ -260,7 +259,7 @@ void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const std::
 			else
 				duration_ = getDurationFromStr(a_perStr.substr(posSeparador.at(5) + 1, std::string::npos));
 
-		} // else if (tipoPeriodoLido == TipoPeriodo_Excedente) {
+		} // if (anoLido == IdAno_Nenhum) {
 
 		setPeriodo(duration_, diaLido, mesLido, anoLido, horLido, minLido);
 
@@ -305,7 +304,6 @@ void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdDia
 		validaHora(a_hora);
 		validaMinuto(a_minuto);
 		duration = a_dur;
-		tipoPeriodo = getTipoPeriodoFromDuration(a_dur);
 	} // try {
 	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::setPeriodo(" + getString(a_dur) + "," + getString(a_dia) + "," + getString(a_mes) + "," + getString(a_ano) + "," + getString(a_hora) + "," + getString(a_minuto) + "): \n" + std::string(erro.what())); }
 } // void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto){
@@ -313,14 +311,14 @@ void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const IdDia
 
 Periodo::Periodo() { inicializaAtributos(); }
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const Periodo& a_periodo) {
+Periodo::Periodo(const std::string a_duration, const Periodo& a_periodo) {
 	try {
 		if (!a_periodo.isValido())
 			throw std::invalid_argument("Periodo Invalido.");
 		inicializaAtributos();
-		setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_periodo.getDia(), a_periodo.getMes(), a_periodo.getAno(), a_periodo.getHora(), a_periodo.getMinuto());
+		setPeriodo(getDurationFromStr(a_duration), a_periodo.getDia(), a_periodo.getMes(), a_periodo.getAno(), a_periodo.getHora(), a_periodo.getMinuto());
 	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::Periodo(" + getFullString(a_tipoPeriodo) + "," + a_periodo.str() + ") \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::Periodo(" + getFullString(a_duration) + "," + a_periodo.str() + ") \n" + std::string(erro.what())); }
 }
 
 Periodo::Periodo(const std::string a_periodo) {
@@ -328,13 +326,11 @@ Periodo::Periodo(const std::string a_periodo) {
 	setPeriodo(getDurationFromStr(""), a_periodo);
 }
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const std::string a_periodo) {
-	if ((a_tipoPeriodo <= TipoPeriodo_Nenhum) || (a_tipoPeriodo >= TipoPeriodo_Excedente))
-		throw std::invalid_argument("Periodo::Periodo(" + getString(a_tipoPeriodo) + "," + a_periodo + "): \nTipo de Periodo Invalido.");
+Periodo::Periodo(const std::string a_duration, const std::string a_periodo) {
 
 	inicializaAtributos();
-	setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_periodo);
-} // Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const std::string a_periodo) {
+	setPeriodo(getDurationFromStr(a_duration), a_periodo);
+} // Periodo::Periodo(const std::string a_duration, const std::string a_periodo) {
 
 
 Periodo::Periodo(const int   a_ano) {
@@ -346,14 +342,14 @@ Periodo::Periodo(const int   a_ano) {
 
 Periodo::Periodo(const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromStr("1a"), a_ano); }
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int a_ano) {
+Periodo::Periodo(const std::string a_duration, const int a_ano) {
 	std::stringstream anoStr;
 	anoStr << a_ano;
 	inicializaAtributos();
-	setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), getIdAnoFromChar(anoStr.str().c_str()));
-} // Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_ano) {
+	setPeriodo(getDurationFromStr(a_duration), getIdAnoFromChar(anoStr.str().c_str()));
+} // Periodo::Periodo(const std::string a_duration, const int   a_ano) {
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_ano); }
+Periodo::Periodo(const std::string a_duration, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromStr(a_duration), a_ano); }
 
 Periodo::Periodo(const int a_mes, const int a_ano) {
 	std::stringstream anoStr, mesStr;
@@ -365,15 +361,15 @@ Periodo::Periodo(const int a_mes, const int a_ano) {
 
 Periodo::Periodo(const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromStr("1M"), a_mes, a_ano); }
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_mes, const int   a_ano) {
+Periodo::Periodo(const std::string a_duration, const int   a_mes, const int   a_ano) {
 	std::stringstream anoStr, mesStr;
 	anoStr << a_ano;
 	mesStr << a_mes;
 	inicializaAtributos();
-	setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()));
-} // Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_mes, const int   a_ano) {
+	setPeriodo(getDurationFromStr(a_duration), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()));
+} // Periodo::Periodo(const std::string a_duration, const int   a_mes, const int   a_ano) {
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_mes, a_ano); }
+Periodo::Periodo(const std::string a_duration, const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromStr(a_duration), a_mes, a_ano); }
 
 Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano) {
 	std::stringstream anoStr, mesStr, diaStr;
@@ -386,16 +382,16 @@ Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano) {
 
 Periodo::Periodo(const IdDia a_dia, const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromStr("1d"), a_dia, a_mes, a_ano); }
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int   a_mes, const int   a_ano) {
+Periodo::Periodo(const std::string a_duration, const int   a_dia, const int   a_mes, const int   a_ano) {
 	std::stringstream anoStr, mesStr, diaStr;
 	anoStr << a_ano;
 	mesStr << a_mes;
 	diaStr << a_dia;
 	inicializaAtributos();
-	setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()));
-} // Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int   a_mes, const int   a_ano) {
+	setPeriodo(getDurationFromStr(a_duration), getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()));
+} // Periodo::Periodo(const std::string a_duration, const int   a_dia, const int   a_mes, const int   a_ano) {
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_dia, a_mes, a_ano); }
+Periodo::Periodo(const std::string a_duration, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano) { inicializaAtributos(); setPeriodo(getDurationFromStr(a_duration), a_dia, a_mes, a_ano); }
 
 Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora) {
 	std::stringstream anoStr, mesStr, diaStr, horStr;
@@ -409,17 +405,17 @@ Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano, const 
 
 Periodo::Periodo(const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora) { inicializaAtributos(); setPeriodo(getDurationFromStr("1h"), a_dia, a_mes, a_ano, a_hora); }
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora) {
+Periodo::Periodo(const std::string a_duration, const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora) {
 	std::stringstream anoStr, mesStr, diaStr, horStr;
 	anoStr << a_ano;
 	mesStr << a_mes;
 	diaStr << a_dia;
 	horStr << a_hora;
 	inicializaAtributos();
-	setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()), getIdHorFromChar(horStr.str().c_str()));
-} // Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora) {
+	setPeriodo(getDurationFromStr(a_duration), getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()), getIdHorFromChar(horStr.str().c_str()));
+} // Periodo::Periodo(const std::string a_duration, const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora) {
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora) { inicializaAtributos(); setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_dia, a_mes, a_ano, a_hora); }
+Periodo::Periodo(const std::string a_duration, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora) { inicializaAtributos(); setPeriodo(getDurationFromStr(a_duration), a_dia, a_mes, a_ano, a_hora); }
 
 Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano, const int a_hora, const int a_minuto) {
 	std::stringstream anoStr, mesStr, diaStr, horStr, minStr;
@@ -434,7 +430,7 @@ Periodo::Periodo(const int   a_dia, const int   a_mes, const int   a_ano, const 
 
 Periodo::Periodo(const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto) { inicializaAtributos(); setPeriodo(getDurationFromStr("1m"), a_dia, a_mes, a_ano, a_hora, a_minuto); }
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora, const int   a_minuto) {
+Periodo::Periodo(const std::string a_duration, const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora, const int   a_minuto) {
 	std::stringstream anoStr, mesStr, diaStr, horStr, minStr;
 	anoStr << a_ano;
 	mesStr << a_mes;
@@ -442,10 +438,10 @@ Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int  
 	horStr << a_hora;
 	minStr << a_minuto;
 	inicializaAtributos();
-	setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()), getIdHorFromChar(horStr.str().c_str()), getIdMinFromChar(minStr.str().c_str()));
-} // Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora, const int   a_minuto) {
+	setPeriodo(getDurationFromStr(a_duration), getIdDiaFromChar(diaStr.str().c_str()), getIdMesFromChar(mesStr.str().c_str()), getIdAnoFromChar(anoStr.str().c_str()), getIdHorFromChar(horStr.str().c_str()), getIdMinFromChar(minStr.str().c_str()));
+} // Periodo::Periodo(const std::string a_duration, const int   a_dia, const int   a_mes, const int   a_ano, const int   a_hora, const int   a_minuto) {
 
-Periodo::Periodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto) { inicializaAtributos(); setPeriodo(getDurationFromTipoPeriodo(a_tipoPeriodo), a_dia, a_mes, a_ano, a_hora, a_minuto); }
+Periodo::Periodo(const std::string a_duration, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto) { inicializaAtributos(); setPeriodo(getDurationFromStr(a_duration), a_dia, a_mes, a_ano, a_hora, a_minuto); }
 
 
 double Periodo::sobreposicao(const Periodo a_periodo_overlap)const {
@@ -480,15 +476,15 @@ double Periodo::sobreposicao(const Periodo a_periodo_overlap)const {
 
 			if ((periodo_base >= a_periodo_overlap) && (periodo_base_seguinte >= periodo_overlap_seguinte)) {
 
-				periodo_ini = Periodo(TipoPeriodo(TipoPeriodo_Excedente - 1), periodo_base);
-				periodo_fim = Periodo(TipoPeriodo(TipoPeriodo_Excedente - 1), periodo_overlap_seguinte);
+				periodo_ini = Periodo("m", periodo_base);
+				periodo_fim = Periodo("m", periodo_overlap_seguinte);
 
 			} // if ((periodo_base > a_periodo_overlap) && (periodo_base_seguinte > a_periodo_overlap)) {	 
 
 			else if ((periodo_base <= a_periodo_overlap) && (periodo_base_seguinte <= periodo_overlap_seguinte)) {
 
-				periodo_ini = Periodo(TipoPeriodo(TipoPeriodo_Excedente - 1), a_periodo_overlap);
-				periodo_fim = Periodo(TipoPeriodo(TipoPeriodo_Excedente - 1), periodo_base_seguinte);
+				periodo_ini = Periodo("m", a_periodo_overlap);
+				periodo_fim = Periodo("m", periodo_base_seguinte);
 
 			} // else if ((periodo_base < a_periodo_overlap) && (periodo_base_seguinte < a_periodo_overlap)) {
 
@@ -536,14 +532,14 @@ double Periodo::sobreposicao(const Periodo a_periodo_overlap_1, const Periodo a_
 
 			if (a_periodo_overlap_1 >= a_periodo_overlap_2) {
 
-				periodo_ini = Periodo(TipoPeriodo(TipoPeriodo_Excedente - 1), a_periodo_overlap_1);
-				periodo_fim = Periodo(TipoPeriodo(TipoPeriodo_Excedente - 1), a_periodo_overlap_2 + 1);
+				periodo_ini = Periodo("m", a_periodo_overlap_1);
+				periodo_fim = Periodo("m", a_periodo_overlap_2 + 1);
 
 			}//if (a_periodo_overlap_1 >= a_periodo_overlap_2) {
 			else {
 
-				periodo_ini = Periodo(TipoPeriodo(TipoPeriodo_Excedente - 1), a_periodo_overlap_2);
-				periodo_fim = Periodo(TipoPeriodo(TipoPeriodo_Excedente - 1), a_periodo_overlap_1 + 1);
+				periodo_ini = Periodo("m", a_periodo_overlap_2);
+				periodo_fim = Periodo("m", a_periodo_overlap_1 + 1);
 
 			}//else {
 
@@ -573,8 +569,8 @@ double Periodo::atraso(const Periodo a_periodo) const {
 		if (periodo_base >= a_periodo)
 			return 0.0;
 
-		const Periodo periodo_ini = Periodo(TipoPeriodo(TipoPeriodo_Excedente - 1), periodo_base);
-		const Periodo periodo_fim = Periodo(TipoPeriodo(TipoPeriodo_Excedente - 1), a_periodo);
+		const Periodo periodo_ini = Periodo("m", periodo_base);
+		const Periodo periodo_fim = Periodo("m", a_periodo);
 
 		int minutos_atraso = 0;
 
@@ -615,330 +611,150 @@ bool Periodo::sobreposicaoExcedente(const Periodo a_periodo_overlap)const {
 
 
 
-int Periodo::getMeses() const {
-	if (tipoPeriodo == TipoPeriodo_anual)
-		return 12;
-	else if (tipoPeriodo == TipoPeriodo_mensal)
-		return 1;
-	else
-		return 0;
-} // int Periodo::getMeses() const{
+unsigned int Periodo::getMeses() const {
+	try{
 
+		if (!isValido())
+			throw std::invalid_argument("Invalid Period.");
 
-int Periodo::getDias() const {
+		if (duration.second == 'a')
+			return 12U * duration.first;
+		else if (duration.second == 'M')
+			return duration.first;
 
-	if (tipoPeriodo == TipoPeriodo_anual) {
-		if (anoBissexto() && mes <= IdMes_2)
-			return 366;
-		else
-			return 365;
-	} // if (tipoPeriodo == TipoPeriodo_anual) {
+		const Periodo periodIni("M", *this);
+		const Periodo periodEnd = *this + 1;
 
-	else if (tipoPeriodo == TipoPeriodo_mensal)
-		return int(getMaiorDiaDoMes());
+		unsigned int numMes = 0;
+		for (Periodo period = periodIni; period + 1 <= periodEnd; period++)
+			numMes++;
 
-	else if (tipoPeriodo == TipoPeriodo_semanal)
-		return 7;
+		return numMes;
 
-	else if (tipoPeriodo == TipoPeriodo_60dias)
-		return 60;
+	} // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getMeses() \n" + std::string(erro.what())); }
 
-	else if (tipoPeriodo == TipoPeriodo_59dias)
-		return 59;
+} // unsigned int Periodo::getMeses() const{
 
-	else if (tipoPeriodo == TipoPeriodo_58dias)
-		return 58;
 
-	else if (tipoPeriodo == TipoPeriodo_57dias)
-		return 57;
+unsigned int Periodo::getDias() const {
 
-	else if (tipoPeriodo == TipoPeriodo_56dias)
-		return 56;
+	try {
 
-	else if (tipoPeriodo == TipoPeriodo_55dias)
-		return 55;
+		if (!isValido())
+			throw std::invalid_argument("Invalid Period.");
 
-	else if (tipoPeriodo == TipoPeriodo_54dias)
-		return 54;
+		if (duration.second == 'd')
+			return duration.first;
 
-	else if (tipoPeriodo == TipoPeriodo_53dias)
-		return 53;
+		if (duration.second == 'h')
+			return unsigned int(duration.first / 24U);
 
-	else if (tipoPeriodo == TipoPeriodo_52dias)
-		return 52;
+		if (duration.second == 'm')
+			return unsigned int(duration.first / 1440U);
 
-	else if (tipoPeriodo == TipoPeriodo_51dias)
-		return 51;
+		if (duration.first == 1U) {
+			if ((dia == IdDia_1) && (hora == IdHor_1) && (minuto == IdMin_1)) {
+				if (duration.second == 'a') {
+					if (mes <= IdMes_2) {
+						if (anoBissexto())
+							return 366U;
+					}
+					return 365U;
+				}
+				else if (duration.second == 'M') {
+					if (mes == IdMes_1) return 31U;
+					else if (mes == IdMes_2) {
+						if (anoBissexto())
+							return 29U;
+						return 28U;
+					}
+					else if (mes == IdMes_3) return 31U;
+					else if (mes == IdMes_4) return 30U;
+					else if (mes == IdMes_5) return 31U;
+					else if (mes == IdMes_6) return 30U;
+					else if (mes == IdMes_7) return 31U;
+					else if (mes == IdMes_8) return 31U;
+					else if (mes == IdMes_9) return 30U;
+					else if (mes == IdMes_10) return 31U;
+					else if (mes == IdMes_11) return 30U;
+					else if (mes == IdMes_12) return 31U;
+				}
+			}
+		}
 
-	else if (tipoPeriodo == TipoPeriodo_50dias)
-		return 50;
+		const Periodo periodIni("d", *this);
+		const Periodo periodEnd = *this + 1;
 
-	else if (tipoPeriodo == TipoPeriodo_49dias)
-		return 49;
+		unsigned int numDia = 0;
+		for (Periodo period = periodIni; period + 1 <= periodEnd; period++)
+			numDia++;
 
-	else if (tipoPeriodo == TipoPeriodo_48dias)
-		return 48;
+		return numDia;
 
-	else if (tipoPeriodo == TipoPeriodo_47dias)
-		return 47;
+	} // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getDias() \n" + std::string(erro.what())); }
 
-	else if (tipoPeriodo == TipoPeriodo_46dias)
-		return 46;
+} // unsigned int Periodo::getDias() const{
 
-	else if (tipoPeriodo == TipoPeriodo_45dias)
-		return 45;
 
-	else if (tipoPeriodo == TipoPeriodo_44dias)
-		return 44;
+unsigned int Periodo::getHoras() const {
 
-	else if (tipoPeriodo == TipoPeriodo_43dias)
-		return 43;
+	try {
 
-	else if (tipoPeriodo == TipoPeriodo_42dias)
-		return 42;
+		if (!isValido())
+			throw std::invalid_argument("Invalid Period.");
 
-	else if (tipoPeriodo == TipoPeriodo_41dias)
-		return 41;
+		if (duration.second == 'd')
+			return  unsigned int(duration.first * 24U);
 
-	else if (tipoPeriodo == TipoPeriodo_40dias)
-		return 40;
+		if (duration.second == 'h')
+			return duration.first;
 
-	else if (tipoPeriodo == TipoPeriodo_39dias)
-		return 39;
+		if (duration.second == 'm')
+			return unsigned int(duration.first / 60U);
 
-	else if (tipoPeriodo == TipoPeriodo_38dias)
-		return 38;
+		return getDias() * 24U;
 
-	else if (tipoPeriodo == TipoPeriodo_37dias)
-		return 37;
-
-	else if (tipoPeriodo == TipoPeriodo_36dias)
-		return 36;
-
-	else if (tipoPeriodo == TipoPeriodo_35dias)
-		return 35;
-
-	else if (tipoPeriodo == TipoPeriodo_34dias)
-		return 34;
-
-	else if (tipoPeriodo == TipoPeriodo_33dias)
-		return 33;
-
-	else if (tipoPeriodo == TipoPeriodo_32dias)
-		return 32;
-
-	else if (tipoPeriodo == TipoPeriodo_31dias)
-		return 31;
-
-	else if (tipoPeriodo == TipoPeriodo_30dias)
-		return 30;
-
-	else if (tipoPeriodo == TipoPeriodo_29dias)
-		return 29;
-
-	else if (tipoPeriodo == TipoPeriodo_28dias)
-		return 28;
-
-	else if (tipoPeriodo == TipoPeriodo_27dias)
-		return 27;
-
-	else if (tipoPeriodo == TipoPeriodo_26dias)
-		return 26;
-
-	else if (tipoPeriodo == TipoPeriodo_25dias)
-		return 25;
-
-	else if (tipoPeriodo == TipoPeriodo_24dias)
-		return 24;
-
-	else if (tipoPeriodo == TipoPeriodo_23dias)
-		return 23;
-
-	else if (tipoPeriodo == TipoPeriodo_22dias)
-		return 22;
-
-	else if (tipoPeriodo == TipoPeriodo_21dias)
-		return 21;
-
-	else if (tipoPeriodo == TipoPeriodo_20dias)
-		return 20;
-
-	else if (tipoPeriodo == TipoPeriodo_19dias)
-		return 19;
-
-	else if (tipoPeriodo == TipoPeriodo_18dias)
-		return 18;
-
-	else if (tipoPeriodo == TipoPeriodo_17dias)
-		return 17;
-
-	else if (tipoPeriodo == TipoPeriodo_16dias)
-		return 16;
-
-	else if (tipoPeriodo == TipoPeriodo_15dias)
-		return 15;
-
-	else if (tipoPeriodo == TipoPeriodo_14dias)
-		return 14;
-
-	else if (tipoPeriodo == TipoPeriodo_13dias)
-		return 13;
-
-	else if (tipoPeriodo == TipoPeriodo_12dias)
-		return 12;
-
-	else if (tipoPeriodo == TipoPeriodo_11dias)
-		return 11;
-
-	else if (tipoPeriodo == TipoPeriodo_10dias)
-		return 10;
-
-	else if (tipoPeriodo == TipoPeriodo_9dias)
-		return 9;
-
-	else if (tipoPeriodo == TipoPeriodo_8dias)
-		return 8;
-
-	else if (tipoPeriodo == TipoPeriodo_6dias)
-		return 6;
-
-	else if (tipoPeriodo == TipoPeriodo_5dias)
-		return 5;
-
-	else if (tipoPeriodo == TipoPeriodo_4dias)
-		return 4;
-
-	else if (tipoPeriodo == TipoPeriodo_3dias)
-		return 3;
-
-	else if (tipoPeriodo == TipoPeriodo_2dias)
-		return 2;
-
-	else if (tipoPeriodo == TipoPeriodo_diario)
-		return 1;
-	else
-		return 0;
-
-} // int Periodo::getDias() const{
-
-
-int Periodo::getHoras() const {
-
-	if (tipoPeriodo <= TipoPeriodo_diario)
-		return getDias() * 24;
-	else if (tipoPeriodo == TipoPeriodo_horario)
-		return 1;
-	else if (tipoPeriodo == TipoPeriodo_90m)
-		return 1;
-	else if (tipoPeriodo == TipoPeriodo_2horas)
-		return 2;
-	else if (tipoPeriodo == TipoPeriodo_150m)
-		return 2;
-	else if (tipoPeriodo == TipoPeriodo_3horas)
-		return 3;
-	else if (tipoPeriodo == TipoPeriodo_210m)
-		return 3;
-	else if (tipoPeriodo == TipoPeriodo_4horas)
-		return 4;
-	else if (tipoPeriodo == TipoPeriodo_270m)
-		return 4;
-	else if (tipoPeriodo == TipoPeriodo_5horas)
-		return 5;
-	else if (tipoPeriodo == TipoPeriodo_330m)
-		return 5;
-	else if (tipoPeriodo == TipoPeriodo_6horas)
-		return 6;
-	else if (tipoPeriodo == TipoPeriodo_390m)
-		return 6;
-	else if (tipoPeriodo == TipoPeriodo_7horas)
-		return 7;
-	else if (tipoPeriodo == TipoPeriodo_450m)
-		return 7;
-	else if (tipoPeriodo == TipoPeriodo_8horas)
-		return 8;
-	else if (tipoPeriodo == TipoPeriodo_510m)
-		return 8;
-	else if (tipoPeriodo == TipoPeriodo_9horas)
-		return 9;
-	else if (tipoPeriodo == TipoPeriodo_570m)
-		return 9;
-	else if (tipoPeriodo == TipoPeriodo_10horas)
-		return 10;
-	else if (tipoPeriodo == TipoPeriodo_630m)
-		return 10;
-	else if (tipoPeriodo == TipoPeriodo_11horas)
-		return 11;
-	else if (tipoPeriodo == TipoPeriodo_690m)
-		return 11;
-	else if (tipoPeriodo == TipoPeriodo_12horas)
-		return 12;
-	else if (tipoPeriodo == TipoPeriodo_13horas)
-		return 13;
-	else if (tipoPeriodo == TipoPeriodo_14horas)
-		return 14;
-	else if (tipoPeriodo == TipoPeriodo_15horas)
-		return 15;
-	else if (tipoPeriodo == TipoPeriodo_16horas)
-		return 16;
-	else if (tipoPeriodo == TipoPeriodo_17horas)
-		return 17;
-	else if (tipoPeriodo == TipoPeriodo_18horas)
-		return 18;
-	else if (tipoPeriodo == TipoPeriodo_19horas)
-		return 19;
-	else if (tipoPeriodo == TipoPeriodo_20horas)
-		return 20;
-	else if (tipoPeriodo == TipoPeriodo_21horas)
-		return 21;
-	else if (tipoPeriodo == TipoPeriodo_22horas)
-		return 22;
-	else if (tipoPeriodo == TipoPeriodo_23horas)
-		return 23;
-	else
-		return 0;
+	} // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getHoras() \n" + std::string(erro.what())); }
 
 } // int Periodo::getHoras() const{
 
 
-int Periodo::getMinutos() const {
+unsigned int Periodo::getMinutos() const {
 
-	if (tipoPeriodo == TipoPeriodo_90m)
-		return 90;
-	else if (tipoPeriodo == TipoPeriodo_150m)
-		return 150;
-	else if (tipoPeriodo == TipoPeriodo_210m)
-		return 210;
-	else if (tipoPeriodo == TipoPeriodo_270m)
-		return 270;
-	else if (tipoPeriodo == TipoPeriodo_330m)
-		return 330;
-	else if (tipoPeriodo == TipoPeriodo_390m)
-		return 390;
-	else if (tipoPeriodo == TipoPeriodo_450m)
-		return 450;
-	else if (tipoPeriodo == TipoPeriodo_510m)
-		return 510;
-	else if (tipoPeriodo == TipoPeriodo_570m)
-		return 570;
-	else if (tipoPeriodo == TipoPeriodo_630m)
-		return 630;
-	else if (tipoPeriodo == TipoPeriodo_690m)
-		return 690;
+	try {
 
-	else if (tipoPeriodo <= TipoPeriodo_horario)
-		return getHoras() * 60;
-	else if (tipoPeriodo == TipoPeriodo_meia_hora)
-		return 30;
-	else if (tipoPeriodo == TipoPeriodo_minuto)
-		return 1;
-	else
-		return 0;
+		if (!isValido())
+			throw std::invalid_argument("Invalid Period.");
+
+		if (duration.second == 'd')
+			return  unsigned int(duration.first * 1440U);
+
+		if (duration.second == 'h')
+			return unsigned int(duration.first * 60U);
+
+		if (duration.second == 'm')
+			return duration.first;
+
+		return getDias() * 1440U;
+
+	} // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getMinutos() \n" + std::string(erro.what())); }
 
 } // int Periodo::getMinutos() const{
 
 
-int Periodo::getSegundos() const {
-	return getMinutos() * 60;
+unsigned int Periodo::getSegundos() const {
+
+	try {
+
+		return getMinutos() * 60U;
+
+	} // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getSegundos() \n" + std::string(erro.what())); }
+
 } // int Periodo::getSegundos() const{
 
 std::pair<unsigned int, char> Periodo::getDuration() const{
@@ -947,7 +763,7 @@ std::pair<unsigned int, char> Periodo::getDuration() const{
 }
 
 
-TipoPeriodo Periodo::getTipoPeriodo() const { return tipoPeriodo; }
+TipoPeriodo Periodo::getTipoPeriodo() const { return getTipoPeriodoFromDuration(duration); }
 
 std::string normStringMes(const IdMes a_idMes) {
 	if (a_idMes <= IdMes_9)
@@ -979,37 +795,31 @@ std::string normStringMin(const IdMin a_idMin) {
 
 std::string Periodo::str() const {
 
-	if ((tipoPeriodo == TipoPeriodo_minuto) || (tipoPeriodo == TipoPeriodo_meia_hora))
-		return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + "-" + getString(tipoPeriodo));
+	if (duration.second == 'm')
+		return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + "-" + getString(duration));
 
 	else if ((hora == IdHor_0) && (minuto == IdMin_0)) {
 
-		if (tipoPeriodo == TipoPeriodo_diario)
-			return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano));
+		if (duration.second == 'd')
+			return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + getString(duration));
 
-		else if (((tipoPeriodo < TipoPeriodo_diario) && (tipoPeriodo > TipoPeriodo_mensal)) || ((tipoPeriodo == TipoPeriodo_mensal) && (dia != IdDia_1)))
-			return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + getString(tipoPeriodo));
+		else if ((duration.second == 'M') && (dia == IdDia_1))
+			return std::string(normStringMes(mes) + "/" + getString(ano) + "-" + getString(duration));
 
-		else if ((tipoPeriodo == TipoPeriodo_mensal) && (dia == IdDia_1))
-			return std::string(normStringMes(mes) + "/" + getString(ano));
+		else if ((duration.second == 'a') && (mes == IdMes_1) && (dia == IdDia_1))
+			return std::string(getString(ano) + "-" + getString(duration));
 
-		else if ((tipoPeriodo == TipoPeriodo_anual) && (mes == IdMes_1) && (dia == IdDia_1))
-			return std::string(getString(ano));
-		else if (tipoPeriodo == TipoPeriodo_anual)
-			return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + getString(tipoPeriodo));
+		return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + getString(duration));
 
 	} // else if ((hora == IdHor_0) && (minuto == IdMin_0)) {
 
-	return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + ":-" + getString(tipoPeriodo));
+	return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + ":-" + getString(duration));
 
 } // std::string Periodo::str() const{
 
 
 bool Periodo::isValido() const { 
 	
-	if (tipoPeriodo == TipoPeriodo_Nenhum) 
-		return false;
-
 	if (isValidDuration(getDuration()))
 		return true;
 
@@ -1024,7 +834,7 @@ Periodo operator+(const Periodo& a_periodo, const int a_iterador) {
 		if (!a_periodo.isValido())
 			throw std::invalid_argument("Periodo invalido.");
 
-		const TipoPeriodo tipoPeriodoArg = a_periodo.getTipoPeriodo();
+		const std::pair<unsigned int, char> duration_ = a_periodo.getDuration();
 
 		IdAno anoIter;
 		IdMes mesIter;
@@ -1032,293 +842,25 @@ Periodo operator+(const Periodo& a_periodo, const int a_iterador) {
 		IdHor horIter;
 		IdMin minIter;
 
-		if (tipoPeriodoArg == TipoPeriodo_anual)
-			Periodo::iteraAno(a_periodo, a_iterador, anoIter, mesIter, diaIter, horIter, minIter);
+		if (duration_.second == 'a')
+			Periodo::iteraAno(a_periodo, a_iterador * duration_.first, anoIter, mesIter, diaIter, horIter, minIter);
 
-		else if (tipoPeriodoArg == TipoPeriodo_mensal)
-			Periodo::iteraMes(a_periodo, a_iterador, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (duration_.second == 'M')
+			Periodo::iteraMes(a_periodo, a_iterador * duration_.first, anoIter, mesIter, diaIter, horIter, minIter);
 
-		else if (tipoPeriodoArg == TipoPeriodo_60dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 60, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (duration_.second == 'd')
+			Periodo::iteraDia(a_periodo, a_iterador * duration_.first, anoIter, mesIter, diaIter, horIter, minIter);
 
-		else if (tipoPeriodoArg == TipoPeriodo_59dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 59, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (duration_.second == 'h')
+			Periodo::iteraHora(a_periodo, a_iterador * duration_.first, anoIter, mesIter, diaIter, horIter, minIter);
 
-		else if (tipoPeriodoArg == TipoPeriodo_58dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 58, anoIter, mesIter, diaIter, horIter, minIter);
+		else if (duration_.second == 'm')
+			Periodo::iteraMinuto(a_periodo, a_iterador * duration_.first, anoIter, mesIter, diaIter, horIter, minIter);
 
-		else if (tipoPeriodoArg == TipoPeriodo_57dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 57, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_56dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 56, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_55dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 55, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_54dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 54, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_53dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 53, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_52dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 52, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_51dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 51, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_50dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 50, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_49dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 49, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_48dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 48, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_47dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 47, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_46dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 46, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_45dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 45, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_44dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 44, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_43dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 43, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_42dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 42, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_41dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 41, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_40dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 40, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_39dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 39, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_38dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 38, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_37dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 37, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_36dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 36, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_35dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 35, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_34dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 34, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_33dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 33, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_32dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 32, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_31dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 31, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_30dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 30, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_29dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 29, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_28dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 28, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_27dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 27, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_26dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 26, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_25dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 25, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_24dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 24, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_23dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 23, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_22dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 22, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_21dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 21, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_20dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 20, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_19dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 19, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_18dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 18, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_17dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 17, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_16dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 16, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_15dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 15, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_14dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 14, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_13dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 13, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_12dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 12, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_11dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 11, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_10dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 10, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_9dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 9, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_8dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 8, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_semanal)
-			Periodo::iteraDia(a_periodo, a_iterador * 7, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_6dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 6, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_5dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 5, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_4dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 4, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_3dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 3, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_2dias)
-			Periodo::iteraDia(a_periodo, a_iterador * 2, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_diario)
-			Periodo::iteraDia(a_periodo, a_iterador, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_23horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 23, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_22horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 22, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_21horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 21, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_20horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 20, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_19horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 19, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_18horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 18, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_17horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 17, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_16horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 16, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_15horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 15, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_14horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 14, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_13horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 13, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_12horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 12, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_11horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 11, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_10horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 10, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_9horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 9, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_8horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 8, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_7horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 7, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_6horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 6, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_5horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 5, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_4horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 4, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_3horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 3, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_2horas)
-			Periodo::iteraHora(a_periodo, a_iterador * 2, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_horario)
-			Periodo::iteraHora(a_periodo, a_iterador, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_meia_hora)
-			Periodo::iteraMinuto(a_periodo, a_iterador * 30, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_90m)
-			Periodo::iteraMinuto(a_periodo, a_iterador * 90, anoIter, mesIter, diaIter, horIter, minIter);
-		else if (tipoPeriodoArg == TipoPeriodo_150m)
-			Periodo::iteraMinuto(a_periodo, a_iterador * 150, anoIter, mesIter, diaIter, horIter, minIter);
-		else if (tipoPeriodoArg == TipoPeriodo_210m)
-			Periodo::iteraMinuto(a_periodo, a_iterador * 210, anoIter, mesIter, diaIter, horIter, minIter);
-		else if (tipoPeriodoArg == TipoPeriodo_270m)
-			Periodo::iteraMinuto(a_periodo, a_iterador * 270, anoIter, mesIter, diaIter, horIter, minIter);
-		else if (tipoPeriodoArg == TipoPeriodo_330m)
-			Periodo::iteraMinuto(a_periodo, a_iterador * 330, anoIter, mesIter, diaIter, horIter, minIter);
-		else if (tipoPeriodoArg == TipoPeriodo_390m)
-			Periodo::iteraMinuto(a_periodo, a_iterador * 390, anoIter, mesIter, diaIter, horIter, minIter);
-		else if (tipoPeriodoArg == TipoPeriodo_450m)
-			Periodo::iteraMinuto(a_periodo, a_iterador * 450, anoIter, mesIter, diaIter, horIter, minIter);
-		else if (tipoPeriodoArg == TipoPeriodo_510m)
-			Periodo::iteraMinuto(a_periodo, a_iterador * 510, anoIter, mesIter, diaIter, horIter, minIter);
-		else if (tipoPeriodoArg == TipoPeriodo_570m)
-			Periodo::iteraMinuto(a_periodo, a_iterador * 570, anoIter, mesIter, diaIter, horIter, minIter);
-		else if (tipoPeriodoArg == TipoPeriodo_630m)
-			Periodo::iteraMinuto(a_periodo, a_iterador * 630, anoIter, mesIter, diaIter, horIter, minIter);
-		else if (tipoPeriodoArg == TipoPeriodo_690m)
-			Periodo::iteraMinuto(a_periodo, a_iterador * 690, anoIter, mesIter, diaIter, horIter, minIter);
-
-		else if (tipoPeriodoArg == TipoPeriodo_minuto)
-			Periodo::iteraMinuto(a_periodo, a_iterador, anoIter, mesIter, diaIter, horIter, minIter);
 		else
 			throw std::invalid_argument("Tipo de Periodo invalido.");
 
-		return Periodo(tipoPeriodoArg, diaIter, mesIter, anoIter, horIter, minIter);
+		return Periodo(getString(duration_), diaIter, mesIter, anoIter, horIter, minIter);
 
 	} // try {
 	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::+(" + a_periodo.str() + "," + std::to_string(a_iterador) + "): \n" + std::string(erro.what())); }
@@ -1329,7 +871,7 @@ Periodo operator+(const Periodo& a_periodo, const int a_iterador) {
 Periodo operator-(const Periodo& a_periodo, const int a_iterador) { return operator+(a_periodo, -a_iterador); }
 
 
-int operator-(const Periodo& a_periodo1, const Periodo& a_periodo2) {
+unsigned int operator-(const Periodo& a_periodo1, const Periodo& a_periodo2) {
 
 	try {
 
@@ -1339,94 +881,98 @@ int operator-(const Periodo& a_periodo1, const Periodo& a_periodo2) {
 		else if (!a_periodo2.isValido())
 			throw std::invalid_argument("Argumento 2 com Periodo invalido.");
 
-		const TipoPeriodo tipoPeriodoArg1 = a_periodo1.getTipoPeriodo();
-		const TipoPeriodo tipoPeriodoArg2 = a_periodo2.getTipoPeriodo();
-
-		if (tipoPeriodoArg1 != tipoPeriodoArg2)
+		if (!Periodo::isSameDuration(a_periodo1, a_periodo2))
 			throw std::invalid_argument("Tipos de Periodo diferentes inviabilizam a operacao.");
 
-		if (tipoPeriodoArg1 == TipoPeriodo_anual)
-			return a_periodo1.getAno() - a_periodo2.getAno();
+		const std::pair<unsigned int, char> dur1 = a_periodo1.getDuration();
+		const std::pair<unsigned int, char> dur2 = a_periodo2.getDuration();
 
-		else if (tipoPeriodoArg1 == TipoPeriodo_mensal)
-			return (a_periodo1.getAno() - a_periodo2.getAno()) * 12 + a_periodo1.getMes() - a_periodo2.getMes();
+		if (dur1.first == 1U) {
 
-		else if (tipoPeriodoArg1 > TipoPeriodo_mensal && tipoPeriodoArg1 <= TipoPeriodo_diario) {
+			if (dur1.second == 'a')
+				return a_periodo1.getAno() - a_periodo2.getAno();
 
-			int contador = 0;
+			else if (dur1.second == 'M')
+				return (a_periodo1.getAno() - a_periodo2.getAno()) * 12 + a_periodo1.getMes() - a_periodo2.getMes();
 
-			if (a_periodo1 >= a_periodo2) {
+			else if (dur1.second == 'd') {
 
-				Periodo periodo_teste = a_periodo2;
+				int contador = 0;
 
-				while (true) {
+				if (a_periodo1 >= a_periodo2) {
 
-					periodo_teste = periodo_teste + 1;
+					Periodo periodo_teste = a_periodo2;
 
-					if (periodo_teste <= a_periodo1)
-						contador++;
+					while (true) {
 
-					if (periodo_teste >= a_periodo1)
-						break;
+						periodo_teste = periodo_teste + 1;
 
-				}//while (true) {
+						if (periodo_teste <= a_periodo1)
+							contador++;
 
-			}//if (a_periodo1 >= a_periodo2) {
-			else if (a_periodo1 < a_periodo2) {
+						if (periodo_teste >= a_periodo1)
+							break;
 
-				Periodo periodo_teste = a_periodo1;
+					}//while (true) {
 
-				while (true) {
-
-					periodo_teste = periodo_teste + 1;
-
-					if (periodo_teste <= a_periodo2)
-						contador--;
-
-					if (periodo_teste >= a_periodo2)
-						break;
-
-				}//while (true) {
-
-
-			}//else if (a_periodo1 < a_periodo2) {
-
-			return contador;
-
-		}//else if (tipoPeriodoArg1 > TipoPeriodo_mensal && tipoPeriodoArg1 <= TipoPeriodo_diario) {
-
-		else if (tipoPeriodoArg1 >= TipoPeriodo_diario) {
-
-			int iterador;
-			if (a_periodo1 > a_periodo2)
-				iterador = 1;
-			else if (a_periodo1 < a_periodo2)
-				iterador = -1;
-			else
-				return 0;
-
-			int contador = 0;
-			Periodo periodo = a_periodo1;
-			while (true) {
-				periodo = periodo - iterador;
-				contador++;
-				if (a_periodo1 > a_periodo2) {
-					if (periodo < a_periodo2) { contador--; break; }
-					else if (periodo == a_periodo2) { break; }
-				}
-
+				}//if (a_periodo1 >= a_periodo2) {
 				else if (a_periodo1 < a_periodo2) {
-					if (periodo > a_periodo2) { contador--; break; }
-					else if (periodo == a_periodo2) { break; }
-				}
-			} // while (true) {
 
-			return 	contador * iterador;
+					Periodo periodo_teste = a_periodo1;
 
-		} // else if (tipoPeriodoArg1 >= TipoPeriodo_diario) {
+					while (true) {
 
-		else
-			throw std::invalid_argument("Tipo de Periodo invalido.");
+						periodo_teste = periodo_teste + 1;
+
+						if (periodo_teste <= a_periodo2)
+							contador--;
+
+						if (periodo_teste >= a_periodo2)
+							break;
+
+					}//while (true) {
+
+
+				}//else if (a_periodo1 < a_periodo2) {
+
+				return contador;
+
+			}// else if (dur1.second == 'd') {
+
+			else if ((dur1.second == 'h') || (dur1.second == 'm')) {
+
+				int iterador;
+				if (a_periodo1 > a_periodo2)
+					iterador = 1;
+				else if (a_periodo1 < a_periodo2)
+					iterador = -1;
+				else
+					return 0;
+
+				int contador = 0;
+				Periodo periodo = a_periodo1;
+				while (true) {
+					periodo = periodo - iterador;
+					contador++;
+					if (a_periodo1 > a_periodo2) {
+						if (periodo < a_periodo2) { contador--; break; }
+						else if (periodo == a_periodo2) { break; }
+					}
+
+					else if (a_periodo1 < a_periodo2) {
+						if (periodo > a_periodo2) { contador--; break; }
+						else if (periodo == a_periodo2) { break; }
+					}
+				} // while (true) {
+
+				return 	contador * iterador;
+
+			} // else if ((dur1.second == 'h') || (dur1.second == 'm')) {
+
+			else
+				throw std::invalid_argument("Tipo de Periodo invalido.");
+
+		}
 
 		return 0;
 
@@ -1469,10 +1015,7 @@ bool operator==(const Periodo& a_periodo1, const Periodo& a_periodo2) {
 		else if (!a_periodo2.isValido())
 			throw std::invalid_argument("Argumento 2 com Periodo invalido.");
 
-		const TipoPeriodo tipoPeriodoArg1 = a_periodo1.getTipoPeriodo();
-		const TipoPeriodo tipoPeriodoArg2 = a_periodo2.getTipoPeriodo();
-
-		if (tipoPeriodoArg1 != tipoPeriodoArg2)
+		if (!Periodo::isSameDuration(a_periodo1, a_periodo2))
 			return false;
 
 		else if (a_periodo1.getAno() != a_periodo2.getAno())
@@ -1786,7 +1329,7 @@ void Periodo::iteraHora(const Periodo& a_periodo, const int a_iterador, IdAno& a
 	a_horaIter = IdHor(horaIter + 1);
 
 	if (iteradorDia != 0)
-		Periodo::iteraDia(Periodo(a_periodo.getTipoPeriodo(), a_diaIter, a_mesIter, a_anoIter, a_horaIter, a_minutoIter), iteradorDia, a_anoIter, a_mesIter, a_diaIter, a_horaIter, a_minutoIter);
+		Periodo::iteraDia(Periodo(getString(a_periodo.getDuration()), a_diaIter, a_mesIter, a_anoIter, a_horaIter, a_minutoIter), iteradorDia, a_anoIter, a_mesIter, a_diaIter, a_horaIter, a_minutoIter);
 
 } // void Periodo::iteraHora(const Periodo & a_periodo, const int a_iterador, IdAno & a_anoIter, IdMes & a_mesIter, IdDia & a_diaIter, IdHor & a_horaIter, IdMin & a_minutoIter){
 
@@ -1825,7 +1368,7 @@ void Periodo::iteraMinuto(const Periodo& a_periodo, const int a_iterador, IdAno&
 	a_minutoIter = IdMin(minutoIter + 1);
 
 	if (iteradorHora != 0)
-		Periodo::iteraHora(Periodo(a_periodo.getTipoPeriodo(), a_diaIter, a_mesIter, a_anoIter, a_horaIter, a_minutoIter), iteradorHora, a_anoIter, a_mesIter, a_diaIter, a_horaIter, a_minutoIter);
+		Periodo::iteraHora(Periodo(getString(a_periodo.getDuration()), a_diaIter, a_mesIter, a_anoIter, a_horaIter, a_minutoIter), iteradorHora, a_anoIter, a_mesIter, a_diaIter, a_horaIter, a_minutoIter);
 
 } // void Periodo::iteraMinuto(const Periodo & a_periodo, const int a_iterador, IdAno & a_anoIter, IdMes & a_mesIter, IdDia & a_diaIter, IdHor & a_horaIter, IdMin & a_minutoIter){
 
@@ -1862,25 +1405,12 @@ Periodo Periodo::getPeriodoInicial() {
 
 } // Periodo Periodo::getPeriodoInicial(){
 
-Periodo Periodo::getPeriodoInicial(TipoPeriodo a_tipoPeriodo) {
-
-	return Periodo(a_tipoPeriodo, 1, 1, ano_inicial, 0, 0);
-
-} // Periodo Periodo::getPeriodoInicial(TipoPeriodo a_tipoPeriodo){
-
 
 Periodo Periodo::getPeriodoFinal() {
 
 	return Periodo(31, 12, ano_final, 23, 59);
 
 } // Periodo Periodo::getPeriodoFinal(){
-
-
-Periodo Periodo::getPeriodoFinal(TipoPeriodo a_tipoPeriodo) {
-
-	return Periodo(a_tipoPeriodo, 31, 12, ano_final, 23, 59);
-
-} // Periodo Periodo::getPeriodoFinal(TipoPeriodo a_tipoPeriodo){
 
 
 std::pair<unsigned int, char> Periodo::getDurationFromStr(const std::string &a_str){
@@ -1920,7 +1450,7 @@ std::pair<unsigned int, char> Periodo::getDurationFromStr(const std::string &a_s
 			duration_.first = std::atoi(durV.c_str());
 			duration_.second = durT;
 
-			if ((durT == 'q') || (durT == 'M') || (durT == 'a'))
+			if ((durT == 'M') || (durT == 'a'))
 				return duration_;
 
 			if ((durT == 'm') && (duration_.first >= 60U)) {
@@ -2067,7 +1597,7 @@ bool Periodo::isValidDuration(const std::pair<unsigned int, char>& a_dur1){
 
 bool Periodo::isValidDurationT(const char a_durT){
 
-	if ((a_durT == 'm') || (a_durT == 'h') || (a_durT == 'd') || (a_durT == 'q') || (a_durT == 'M') || (a_durT == 'a'))
+	if ((a_durT == 'm') || (a_durT == 'h') || (a_durT == 'd') || (a_durT == 'M') || (a_durT == 'a'))
 		return true;
 
 	return false;
@@ -2103,15 +1633,17 @@ bool Periodo::isSameDuration(const Periodo& a_per1, const Periodo& a_per2){
 
 }
 
+std::vector<std::string> Periodo::getDurT(){
+
+	return std::vector<std::string>{"m", "h", "d", "M", "a"};
+}
+
 
 IdEstacao Periodo::getEstacao() const {
 
 	try {
 
-		if ((tipoPeriodo <= TipoPeriodo_Nenhum) || (tipoPeriodo >= TipoPeriodo_Excedente))
-			throw std::invalid_argument("Tipo de periodo invalido.");
-
-		if (tipoPeriodo == TipoPeriodo_mensal)
+		if (duration.second == 'M')
 			return IdEstacao(getMes());
 
 		else
@@ -2161,50 +1693,10 @@ Periodo Periodo::deslocarPeriodo(const Periodo& a_periodo, int a_numero_de_horas
 
 		Periodo::iteraHora(a_periodo, a_numero_de_horas, anoIter, mesIter, diaIter, horIter, minIter);
 
-		TipoPeriodo tipoPeriodo = a_periodo.getTipoPeriodo();
-
-		if (tipoPeriodo == TipoPeriodo_mensal) {
-
-			const int numeroDias = a_periodo.getDias();
-
-			if (numeroDias == 28)
-				tipoPeriodo = TipoPeriodo_28dias;
-			else if (numeroDias == 29)
-				tipoPeriodo = TipoPeriodo_29dias;
-			else if (numeroDias == 30)
-				tipoPeriodo = TipoPeriodo_30dias;
-			else if (numeroDias == 31)
-				tipoPeriodo = TipoPeriodo_31dias;
-			else
-				throw std::invalid_argument("Tipo de periodo mensal invalido.");
-
-		}//if (tipoPeriodo == TipoPeriodo_mensal) {
-
-		return Periodo(tipoPeriodo, diaIter, mesIter, anoIter, horIter, minIter);
+		return Periodo(getString(a_periodo.getDuration()), diaIter, mesIter, anoIter, horIter, minIter);
 
 	} // try {
 	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::deslocarPeriodo(" + getString(a_periodo) + getString(a_numero_de_horas) + "): \n" + std::string(erro.what())); }
-
-}
-
-Periodo Periodo::getPeriodoDiario_do_diaFinal(const Periodo& a_periodo)
-{
-	try {
-
-		IdAno anoIter;
-		IdMes mesIter;
-		IdDia diaIter;
-		IdHor horIter;
-		IdMin minIter;
-
-		const int numero_de_dias = a_periodo.getDias();
-
-		Periodo::iteraDia(a_periodo, numero_de_dias, anoIter, mesIter, diaIter, horIter, minIter);
-
-		return Periodo(TipoPeriodo_diario, diaIter, mesIter, anoIter, horIter, minIter);;
-
-	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getPeriodoDiario_do_diaFinal(" + getString(a_periodo) + "): \n" + std::string(erro.what())); }
 
 }
 

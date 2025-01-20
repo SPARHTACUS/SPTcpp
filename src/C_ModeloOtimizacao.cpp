@@ -2310,7 +2310,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				const double afluencia_117 = get_afluencia_natural_posto(a_dados, a_periodoPE, 117, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 				const double afluencia_301 = get_afluencia_natural_posto(a_dados, a_periodoPE, 301, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
-				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo(TipoPeriodo_semanal, vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
+				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo("7d", vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
 
 				//*************************************************************************
 				// VAZ(318) = VAZ(116)+0.1*(VAZ(161)-VAZ(117)-VAZ(301))+VAZ(117)+VAZ(301)
@@ -2615,7 +2615,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 
 				///////
 
-				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo(TipoPeriodo_semanal, vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
+				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo("7d", vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
 
 
 				if (idMes_alvo == IdMes_1) {
@@ -2791,7 +2791,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				//////////
 				//-VAZ(292)
 				//////////
-				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo(TipoPeriodo_semanal, vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
+				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo("7d", vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
 
 				if (idMes_alvo == IdMes_1) {
 
@@ -3220,7 +3220,7 @@ IdMes ModeloOtimizacao::get_IdMes_operativo(const Periodo a_periodoPE, const Per
 		Periodo periodo_teste = a_periodoPE;
 
 		if (a_periodoPE.sobreposicao(a_periodo_inicial_semanal) > 0) {//Para garantir que a primeira semana operativa corresponda ao mês operativo			
-			periodo_teste = Periodo(TipoPeriodo_semanal, periodo_teste) + 1;		
+			periodo_teste = Periodo("7d", periodo_teste) + 1;		
 		}
 
 		return periodo_teste.getMes();
@@ -4120,7 +4120,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 			Estagio estagio_aux;
 			if (a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(getFullString(idStage_glob) + "_estagio.csv", estagio_aux, TipoAcessoInstancia_direto)) {
 
-				Periodo perStage_aux = Periodo(TipoPeriodo_minuto, estagio_aux.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo()));
+				Periodo perStage_aux = Periodo("m", estagio_aux.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo()));
 
 				for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
@@ -4128,7 +4128,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 						Periodo perStage = getAtributo(idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
 
-						if (perStage_aux == Periodo(TipoPeriodo_minuto, perStage)) {
+						if (perStage_aux == Periodo("m", perStage)) {
 
 							if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio)) {
 								if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
@@ -4348,7 +4348,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 												if (vol_util_max < 0.0)
 													throw std::invalid_argument("Limites de vol invalidos em VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
 
-												else if (Periodo(TipoPeriodo_minuto, periodo) != Periodo(TipoPeriodo_minuto, vetorEstagio.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
+												else if (Periodo("m", periodo) != Periodo("m", vetorEstagio.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
 													throw std::invalid_argument("Periodo " + getFullString(periodo) + " nao compativel com VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
 
 												else if (idEstagio == IdEstagio_1)
@@ -4628,7 +4628,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 		const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
 
 		const Periodo perStageEnd = getAtributo(estagio_final, AttComumEstagio_periodo_otimizacao, Periodo());
-		const Periodo perStageNextMin = Periodo(TipoPeriodo_minuto, perStageEnd + 1);
+		const Periodo perStageNextMin = Periodo("m", perStageEnd + 1);
 
 		a_entradaSaidaDados.setDiretorioEntrada(diretorio_importacao_pos_estudo);
 
@@ -4663,7 +4663,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 					if (!estagio_carregado) {
 						estagio_carregado = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(prefixo + "estagio_" + getFullString(a_idIteracao) + ".csv", estagio_auxiliar, TipoAcessoInstancia_direto);
 						if (estagio_carregado) {
-							if (perStageNextMin != Periodo(TipoPeriodo_minuto, estagio_auxiliar.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
+							if (perStageNextMin != Periodo("m", estagio_auxiliar.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
 								estagio_carregado = false;
 						}
 					}
@@ -4692,7 +4692,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 						estagio_carregado_sem_iterador = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(prefixo + "estagio.csv", estagio_auxiliar, TipoAcessoInstancia_direto);
 
 						if (estagio_carregado_sem_iterador) {
-							if (perStageNextMin != Periodo(TipoPeriodo_minuto, estagio_auxiliar.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
+							if (perStageNextMin != Periodo("m", estagio_auxiliar.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
 								estagio_carregado_sem_iterador = false;
 						}
 
@@ -5003,7 +5003,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 		const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
 
 		const Periodo perStageEnd = getAtributo(estagio_final, AttComumEstagio_periodo_otimizacao, Periodo());
-		const Periodo perStageNextMin = Periodo(TipoPeriodo_minuto, perStageEnd + 1);
+		const Periodo perStageNextMin = Periodo("m", perStageEnd + 1);
 
 		a_entradaSaidaDados.setDiretorioEntrada(diretorio_importacao_pos_estudo);
 
@@ -5035,14 +5035,14 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					estagio_carregado_sem_iterador = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(prefixo + "estagio.csv", estagio, TipoAcessoInstancia_direto);
 
 					if (estagio_carregado_sem_iterador) {
-						if (perStageNextMin != Periodo(TipoPeriodo_minuto, estagio.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
+						if (perStageNextMin != Periodo("m", estagio.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
 							estagio_carregado_sem_iterador = false;
 					}
 
 					if (!estagio_carregado_sem_iterador) {
 						estagio_carregado = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(prefixo + "estagio_" + getFullString(arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao())) + ".csv", estagio, TipoAcessoInstancia_direto);
 						if (estagio_carregado) {
-							if (perStageNextMin != Periodo(TipoPeriodo_minuto, estagio.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
+							if (perStageNextMin != Periodo("m", estagio.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
 								estagio_carregado = false;
 						}
 					}
@@ -5079,7 +5079,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 				const Periodo periodo_otimizacao = getAtributo(estagio_final, AttComumEstagio_periodo_otimizacao, Periodo());
 				const Periodo periodo_otimizacao_lido = estagio.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
 
-				if (Periodo(periodo_otimizacao_lido.getTipoPeriodo(), periodo_otimizacao + 1) != periodo_otimizacao_lido)
+				if (Periodo(getString(periodo_otimizacao_lido.getDuration()), periodo_otimizacao + 1) != periodo_otimizacao_lido)
 					throw std::invalid_argument("Periodo " + getString(periodo_otimizacao_lido) + " importado nao compativel com final do horizonte de otimizacao.");
 
 			} // if (true) {
@@ -5150,7 +5150,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 					const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
 
-					if (Periodo(periodo.getTipoPeriodo(), periodo_estudo_final + 1) != periodo)
+					if (Periodo(getString(periodo.getDuration()), periodo_estudo_final + 1) != periodo)
 						throw std::invalid_argument("Periodo estudo invalido " + getFullString(periodo_estudo_final) + " para o acoplamento de varVI de " + getFullString(idVariavelEstado) + " em " + getFullString(periodo));
 
 					estagio.setVariavelDecisaoEmVariavelEstado(idVariavelEstado, a_TSS, -1);

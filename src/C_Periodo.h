@@ -119,8 +119,6 @@ class Periodo {
 
 private:
 
-	TipoPeriodo tipoPeriodo;
-
 	IdAno ano;
 	IdMes mes;
 	IdDia dia;
@@ -148,40 +146,40 @@ public:
 
 	Periodo();
 
-	Periodo(const TipoPeriodo a_tipoPeriodo, const Periodo &a_periodo);
+	Periodo(const std::string a_duration, const Periodo &a_periodo);
 
 	Periodo(const std::string a_periodo);
-	Periodo(const TipoPeriodo a_tipoPeriodo, const std::string a_periodo);
+	Periodo(const std::string a_duration, const std::string a_periodo);
 
 	Periodo(const int a_ano);
-	Periodo(const TipoPeriodo a_tipoPeriodo, const int a_ano);
+	Periodo(const std::string a_duration, const int a_ano);
 
 	Periodo(const IdAno a_ano);
-	Periodo(const TipoPeriodo a_tipoPeriodo, const IdAno a_ano);
+	Periodo(const std::string a_duration, const IdAno a_ano);
 
 	Periodo(const int a_mes, const int a_ano);
-	Periodo(const TipoPeriodo a_tipoPeriodo, const int a_mes, const int a_ano);
+	Periodo(const std::string a_duration, const int a_mes, const int a_ano);
 
 	Periodo(const IdMes a_mes, const IdAno a_ano);
-	Periodo(const TipoPeriodo a_tipoPeriodo, const IdMes a_mes, const IdAno a_ano);
+	Periodo(const std::string a_duration, const IdMes a_mes, const IdAno a_ano);
 
 	Periodo(const int a_dia, const int a_mes, const int a_ano);
-	Periodo(const TipoPeriodo a_tipoPeriodo, const int a_dia, const int a_mes, const int a_ano);
+	Periodo(const std::string a_duration, const int a_dia, const int a_mes, const int a_ano);
 
 	Periodo(const IdDia a_dia, const IdMes a_mes, const IdAno a_ano);
-	Periodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano);
+	Periodo(const std::string a_duration, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano);
 
 	Periodo(const int a_dia, const int a_mes, const int a_ano, const int a_hora);
-	Periodo(const TipoPeriodo a_tipoPeriodo, const int a_dia, const int a_mes, const int a_ano, const int a_hora);
+	Periodo(const std::string a_duration, const int a_dia, const int a_mes, const int a_ano, const int a_hora);
 	
 	Periodo(const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora);
-	Periodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora);
+	Periodo(const std::string a_duration, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora);
 
 	Periodo(const int a_dia, const int a_mes, const int a_ano, const int a_hora, const int a_minuto);
-	Periodo(const TipoPeriodo a_tipoPeriodo, const int a_dia, const int a_mes, const int a_ano, const int a_hora, const int a_minuto);
+	Periodo(const std::string a_duration, const int a_dia, const int a_mes, const int a_ano, const int a_hora, const int a_minuto);
 
 	Periodo(const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto);
-	Periodo(const TipoPeriodo a_tipoPeriodo, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto);
+	Periodo(const std::string a_duration, const IdDia a_dia, const IdMes a_mes, const IdAno a_ano, const IdHor a_hora, const IdMin a_minuto);
 
 	double sobreposicao(const Periodo a_periodo_overlap)const;
 	
@@ -201,11 +199,11 @@ public:
 	IdDia getMaiorDiaDoMes() const;
 	IdDia getMaiorDiaDoMes(IdMes a_idMes) const;
 
-	int getMeses()   const;
-	int getDias()    const;
-	int getHoras()   const;
-	int getMinutos() const;
-	int getSegundos() const;
+	unsigned int getMeses()   const;
+	unsigned int getDias()    const;
+	unsigned int getHoras()   const;
+	unsigned int getMinutos() const;
+	unsigned int getSegundos() const;
 
 	std::pair<unsigned int, char> getDuration()const;
 
@@ -227,7 +225,7 @@ public:
 
 	friend Periodo operator-(const Periodo &a_periodo, const int a_iterador);
 
-	friend int operator-(const Periodo &a_periodo1, const Periodo &a_periodo2);
+	friend unsigned int operator-(const Periodo &a_periodo1, const Periodo &a_periodo2);
 
 	friend void operator++(Periodo &a_periodo, int);
 	friend void operator--(Periodo &a_periodo, int);
@@ -254,10 +252,8 @@ public:
 	static void iteraMinuto(const Periodo &a_periodo, const int a_iterador, IdAno &a_anoIter, IdMes &a_mesIter, IdDia &a_diaIter, IdHor &a_horaIter, IdMin &a_minutoIter);
 	
 	static Periodo getPeriodoInicial();
-	static Periodo getPeriodoInicial(TipoPeriodo a_tipoPeriodo);
 
 	static Periodo getPeriodoFinal();
-	static Periodo getPeriodoFinal(TipoPeriodo a_tipoPeriodo);
 
 	static std::pair<unsigned int, char> getDurationFromStr(const std::string &a_str);
 
@@ -269,13 +265,13 @@ public:
 
 	static bool isSameDuration(const Periodo &a_per1, const Periodo& a_per2);
 
+	static std::vector<std::string> getDurT();
 
 	IdEstacao getEstacao() const;
 
 	static IdEstacao getMaiorEstacao(TipoPeriodo a_tipoPeriodo);
 
 	Periodo deslocarPeriodo(const Periodo& a_periodo, int a_numero_de_horas);
-	Periodo getPeriodoDiario_do_diaFinal(const Periodo& a_periodo);
 
 	~Periodo();
 

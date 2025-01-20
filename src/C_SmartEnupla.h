@@ -626,8 +626,8 @@ public:
 			else if (a_num_per < 1)
 				throw std::invalid_argument("Invalid num per.");
 			else if (a_empty_struct) {
-				if (a_period.getTipoPeriodo() != TipoPeriodo_minuto)
-					throw std::invalid_argument("Only " + getFullString(TipoPeriodo_minuto) + " must be accepted for empty structure.");
+				if (a_period.getDuration().second != 'm')
+					throw std::invalid_argument("Only periods with durT = m must be accepted for empty structure.");
 			}
 			per_ini = a_period;
 			idx_prev = a_idx_prev;
@@ -654,9 +654,9 @@ public:
 			return getIdxEnd();
 		}
 
-		const Periodo per_next = Periodo(a_period.getTipoPeriodo(), getPeriodEnd() + 1);
+		const Periodo per_next = Periodo(getString(a_period.getDuration()), getPeriodEnd() + 1);
 		if (per_next == a_period) {
-			if ((empty_struct) || getType() != a_period.getTipoPeriodo())
+			if ((empty_struct) || (!Periodo::isSameDuration(per_ini, a_period)))
 				return -1;
 			else {
 				num_per++;
@@ -691,9 +691,9 @@ public:
 		if (empty_struct)
 			return -20;
 
-		const Periodo per_prev = Periodo(a_period.getTipoPeriodo(), getPeriodIni()) - 1;
+		const Periodo per_prev = Periodo(getString(a_period.getDuration()), getPeriodIni()) - 1;
 		if (per_prev == a_period) {
-			if ((empty_struct) || getType() != a_period.getTipoPeriodo())
+			if ((empty_struct) || (!Periodo::isSameDuration(per_ini, a_period)))
 				return -1;
 			else {
 				num_per++;
@@ -710,7 +710,7 @@ public:
 
 	bool isEmpty()const { return empty_struct; };
 
-	TipoPeriodo getType()const { return per_ini.getTipoPeriodo(); };
+	std::pair<unsigned int, char> getType()const { return per_ini.getDuration(); };
 	
 	void setIdxPrev(const int a_idx_prev) {
 		if (a_idx_prev < -1)
@@ -728,13 +728,13 @@ public:
 	int getIdxIni()const { if (empty_struct) return idx_prev; else return idx_prev + 1; };
 	int getIdxEnd()const { if (empty_struct) return idx_prev; else return idx_prev + num_per; };
 
-	int getIdx(Periodo &a_periodo)const {
-		if (!a_periodo.isValido()) { throw std::invalid_argument("invalid period"); }
+	int getIdx(Periodo &a_period)const {
+		if (!a_period.isValido()) { throw std::invalid_argument("invalid period"); }
 		else if (empty_struct) return -1;
-		else if (getType() != a_periodo.getTipoPeriodo()) return -2;
-		else if (a_periodo > getPeriodEnd()) return -2;
+		else if (!Periodo::isSameDuration(per_ini, a_period)) return -2;
+		else if (a_period > getPeriodEnd()) return -2;
 		for (int num = 1; num <= num_per; num++) {
-			if (a_periodo == (getPeriodIni() + num - 1))
+			if (a_period == (getPeriodIni() + num - 1))
 				return idx_prev + num;
 		}
 		return -2;
@@ -750,7 +750,7 @@ public:
 	int getNumPer()const { return num_per; };
 
 	Periodo getPeriodIni()const { return per_ini; };
-	Periodo getPeriodEnd()const { return per_ini + num_per - 1; };
+	Periodo getPeriodEnd()const { return per_ini + (num_per - 1); };
 
 	Periodo getPeriod(const int a_idx)const {
 		if (a_idx < 0) { throw std::invalid_argument("invalid index"); }
@@ -796,7 +796,7 @@ private:
 			if (pos == 0) {
 				new_code = getString(periodo_ini.getAno()) + getString(periodo_ini.getMes()) + getString(periodo_ini.getDia()) + getString(periodo_ini.getHora()) + getString(periodo_ini.getMinuto());
 			}
-			new_code.append(getString(int(periodo_ini.getTipoPeriodo())) + getString(list_structPeriod.at(pos).getNumPer()));
+			new_code.append(getString(periodo_ini.getDuration()) + getString(list_structPeriod.at(pos).getNumPer()));
 		}
 
 		code = new_code;
@@ -1318,7 +1318,7 @@ public:
 
 	bool isProximoIterador(const Periodo a_iter) const {
 		try {
-			if (Periodo(a_iter.getTipoPeriodo(), getIteradorFinal() + 1) == a_iter)
+			if (Periodo(getString(a_iter.getDuration()), getIteradorFinal() + 1) == a_iter)
 				return true;
 			return false;
 		} // try{
@@ -1360,7 +1360,7 @@ public:
 				return;
 			}
 
-			if (Periodo(TipoPeriodo_minuto, getIteradorFinal() + 1) != Periodo(TipoPeriodo_minuto, a_vlr.getIteradorInicial()))
+			if (Periodo("m", getIteradorFinal() + 1) != Periodo("m", a_vlr.getIteradorInicial()))
 				throw std::invalid_argument("Argument not sequential");
 
 			while (true) {
@@ -1408,6 +1408,9 @@ public:
 
 		try {
 
+			if (!a_itr.isValido())
+				throw std::invalid_argument("Invalid period");
+
 			if (list_structPeriod.size() == 0) {
 				list_structPeriod.push_back(StructPeriod(a_itr, 1, -1));
 				vlr.push_back(a_vlr);
@@ -1435,8 +1438,8 @@ public:
 					else if ((idx == -1) || (idx == -2)) {
 						// adding new empty structure after the end
 						if (idx == -2) {
-							const Periodo perIni_empty(TipoPeriodo_minuto, perEnd + 1);
-							const Periodo perEnd_empty = Periodo(TipoPeriodo_minuto, a_itr) - 1;
+							const Periodo perIni_empty(std::string("m"), perEnd + 1);
+							const Periodo perEnd_empty = Periodo(std::string("m"), a_itr) - 1;
 							list_structPeriod.push_back(StructPeriod(perIni_empty, perEnd_empty - perIni_empty + 1, list_structPeriod.at(pos).getIdxEnd(), true));
 							any_empty_struct = true;
 						}
@@ -1473,8 +1476,8 @@ public:
 					else if ((idx == -1) || (idx == -2)) {
 						// adding new empty structure in the begining
 						if (idx == -2) {
-							const Periodo perIni_empty(TipoPeriodo_minuto, a_itr + 1);
-							const Periodo perEnd_empty = Periodo(TipoPeriodo_minuto, perIni) - 1;
+							const Periodo perIni_empty("m", a_itr + 1);
+							const Periodo perEnd_empty = Periodo("m", perIni) - 1;
 							list_structPeriod.insert(list_structPeriod.begin(), StructPeriod(perIni_empty, perEnd_empty - perIni_empty + 1, -1, true));
 							any_empty_struct = true;
 						}
@@ -1495,7 +1498,7 @@ public:
 			// period in some empty structure
 			//
 			try {
-				const Periodo itr_next_minute = Periodo(TipoPeriodo_minuto, a_itr + 1);
+				const Periodo itr_next_minute = Periodo("m", a_itr + 1);
 				const int pos_end = int(list_structPeriod.size() - 1);
 				for (int pos = 0; pos <= pos_end; pos++) {
 					if (list_structPeriod.at(pos).isEmpty()) {
@@ -1559,7 +1562,7 @@ public:
 							std::vector<StructPeriod> new_structs;
 							new_structs.reserve(3);
 							const int num_per = a_itr.getMinutos();
-							if (list_structPeriod.at(pos).getPeriodIni() == Periodo(TipoPeriodo_minuto, a_itr)) {
+							if (list_structPeriod.at(pos).getPeriodIni() == Periodo("m", a_itr)) {
 								if (pos == 0)
 									new_structs.push_back(StructPeriod(a_itr, 1, -1));
 								else
@@ -1578,7 +1581,7 @@ public:
 								vlr.insert(vlr.begin() + new_structs.at(new_structs.size() - 1).getIdxEnd(), a_vlr);
 							}
 							else {
-								new_structs.push_back(StructPeriod(list_structPeriod.at(pos).getPeriodIni(), Periodo(TipoPeriodo_minuto, a_itr) - list_structPeriod.at(pos).getPeriodIni(), list_structPeriod.at(pos).getIdxIni(), true));
+								new_structs.push_back(StructPeriod(list_structPeriod.at(pos).getPeriodIni(), Periodo("m", a_itr) - list_structPeriod.at(pos).getPeriodIni(), list_structPeriod.at(pos).getIdxIni(), true));
 								if (pos == 0)
 									new_structs.push_back(StructPeriod(a_itr, 1, -1));
 								else

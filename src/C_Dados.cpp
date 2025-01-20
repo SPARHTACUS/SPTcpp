@@ -955,9 +955,9 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 
 			const Periodo periodo_horizonte_otimizacao = getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
 
-			const TipoPeriodo tipo_periodo_horizonte_otimizacao = periodo_horizonte_otimizacao.getTipoPeriodo();
+			const std::pair<unsigned int, char> tipo_periodo_horizonte_otimizacao = periodo_horizonte_otimizacao.getDuration();
 
-			if (Periodo(tipo_periodo_horizonte_otimizacao, periodo_horizonte_estudo) != periodo_horizonte_otimizacao)
+			if (Periodo(getString(tipo_periodo_horizonte_otimizacao), periodo_horizonte_estudo) != periodo_horizonte_otimizacao)
 				throw std::invalid_argument("Data inicial do horizonte de estudo incompativel com horizonte de otimizacao no " + getFullString(idEstagio));
 
 			const double segundos_periodo_horizonte_otimizacao = double(periodo_horizonte_otimizacao.getSegundos());
@@ -984,7 +984,7 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 			if (getSizeMatriz(AttMatrizDados_percentual_duracao_horizonte_estudo, idEstagio) == 0)
 				throw std::invalid_argument("Nao foram encontrados periodos de estudo no horizonte de otimizacao em " + getFullString(idEstagio));
 
-			if (Periodo(tipo_periodo_horizonte_otimizacao, periodo_horizonte_estudo) != periodo_horizonte_otimizacao + 1)
+			if (Periodo(getString(tipo_periodo_horizonte_otimizacao), periodo_horizonte_estudo) != (periodo_horizonte_otimizacao + 1))
 				throw std::invalid_argument("Data final do horizonte de estudo incompativel com horizonte de otimizacao no " + getFullString(idEstagio));
 
 		} // for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= estagio_final; idEstagio++) {
@@ -1019,7 +1019,7 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 
 
 		//Nota: A defluencia passada vai considerar periodos_diarios de 15 dias anteriores ao horizonte de estudo (15 dias m�ximo tempo de viagem d'�gua registrado)
-		SmartEnupla<Periodo, bool> horizonte_defluencia_passada_mais_estudo(Periodo(TipoPeriodo_diario, horizonte_estudo.getIteradorInicial()) - 15, std::vector<bool>(15, true));
+		SmartEnupla<Periodo, bool> horizonte_defluencia_passada_mais_estudo(Periodo("d", horizonte_estudo.getIteradorInicial()) - 15, std::vector<bool>(15, true));
 
 		//Adiciona periodos do horizonte_estudo
 		for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo))
@@ -3117,7 +3117,7 @@ void Dados::validaHidreletrica(const IdHidreletrica a_menorIdHidreletrica, const
 
 				if (vetorHidreletrica.at(idUHE).vetorDefluencia.isInstanciado(IdDefluencia_passada)) {
 
-					Periodo periodo_teste(periodo_estudo_inicial.getTipoPeriodo(), getIteradorFinal(idUHE, IdDefluencia_passada, AttVetorDefluencia_vazao_defluencia, Periodo()) + 1);
+					Periodo periodo_teste(getString(periodo_estudo_inicial.getDuration()), getIteradorFinal(idUHE, IdDefluencia_passada, AttVetorDefluencia_vazao_defluencia, Periodo()) + 1);
 
 					if (periodo_teste != periodo_estudo_inicial)
 						throw std::invalid_argument("Ultimo periodo da defluencia deve ser sequencial com o primeiro periodo do horizonte de estudo");
@@ -7583,10 +7583,10 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 
 			if (periodos_em_estagio.at(idEstagio).size() > 0) {
 
-				if (Periodo(TipoPeriodo_minuto, periodo_decomposicao) != Periodo(TipoPeriodo_minuto, periodos_em_estagio.at(idEstagio).at(0)))
+				if (Periodo("m", periodo_decomposicao) != Periodo("m", periodos_em_estagio.at(idEstagio).at(0)))
 					return 81;
 
-				if (Periodo(TipoPeriodo_minuto, periodo_decomposicao + 1) != Periodo(TipoPeriodo_minuto, periodos_em_estagio.at(idEstagio).at(periodos_em_estagio.at(idEstagio).size() - 1) + 1))
+				if (Periodo("m", periodo_decomposicao + 1) != Periodo("m", periodos_em_estagio.at(idEstagio).at(periodos_em_estagio.at(idEstagio).size() - 1) + 1))
 					return 82;
 
 				for (IdCenario idCenario = IdCenario_1; idCenario <= mapeamento_espaco_amostral.getIteradorFinal(); idCenario++) {
@@ -7637,7 +7637,7 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 		if (periodo_final_espaco_amostral < periodo_final_otimizacao)
 			isHorizontePEmenor = true;
 
-		Periodo periodo_final_tendencia_minuto_ref = Periodo(TipoPeriodo_minuto, periodo_inicial_espaco_amostral) - 1;
+		Periodo periodo_final_tendencia_minuto_ref = Periodo("m", periodo_inicial_espaco_amostral) - 1;
 
 		for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= a_processo_estocastico.vetorVariavelAleatoria.getMaiorId(); idVariavelAleatoria++) {
 
@@ -7764,7 +7764,7 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 					if (tendencia_temporal.size() == 0)
 						return 16;
 
-					if (periodo_final_tendencia_minuto_ref != Periodo(TipoPeriodo_minuto, tendencia_temporal.getIteradorFinal() + 1) - 1)
+					if (periodo_final_tendencia_minuto_ref != Periodo("m", tendencia_temporal.getIteradorFinal() + 1) - 1)
 						return 17;
 
 					int lag = 0;
@@ -9377,7 +9377,7 @@ bool Dados::valida_tendencia_AfluenciaEmHidreletrica(const AttVetorAfluencia a_a
 
 		const Periodo periodo_otimizacao_estagio_inicial = getElementoVetor(AttVetorDados_horizonte_otimizacao, estagio_inicial, Periodo());
 
-		const Periodo periodo_tendencia_seguinte = Periodo(periodo_otimizacao_estagio_inicial.getTipoPeriodo(), periodo_final_tendencia + 1);
+		const Periodo periodo_tendencia_seguinte = Periodo(getString(periodo_otimizacao_estagio_inicial.getDuration()), periodo_final_tendencia + 1);
 
 
 		if (periodo_otimizacao_estagio_inicial != periodo_tendencia_seguinte)

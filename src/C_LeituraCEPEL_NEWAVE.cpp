@@ -226,7 +226,7 @@ void LeituraCEPEL::leitura_CURVA_202001_NW27(Dados& a_dados, std::string a_nomeA
 
 								for (int mes = 1; mes <= 12; mes++) {
 
-									const Periodo periodo_dado = Periodo(TipoPeriodo_mensal, IdMes(mes), getIdAnoFromChar(line.substr(0, 4).c_str()));
+									const Periodo periodo_dado = Periodo("M", IdMes(mes), getIdAnoFromChar(line.substr(0, 4).c_str()));
 									double percentual_energia = std::stod(line.substr(mes * 6, 5)) * 0.01;
 
 									const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
@@ -1152,9 +1152,9 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 
 					horizonte_estudo.addElemento(periodo, idEstagio);
 
-					if (periodo.getTipoPeriodo() != TipoPeriodo_mensal) {
+					if (periodo.getDuration().second != 'M') {
 
-						periodo = Periodo(TipoPeriodo_mensal, periodo + 1);
+						periodo = Periodo("M", periodo + 1);
 
 						if ((periodo.getDia() != IdDia_1) || (periodo.getHora() != IdHor_0) || (periodo.getMinuto() != IdMin_0))
 							throw std::invalid_argument("A data inicial do segundo periodo de estudo deve corresponder ao inicio de um mes.");
@@ -6063,9 +6063,9 @@ void LeituraCEPEL::leitura_MANUTT_201908_NW25(Dados& a_dados, std::string nomeAr
 
 					if (duracao_manutencao_em_dias_restantes > 0) {
 						if (periodos_em_manutencao.size() == 0)
-							periodos_em_manutencao.push_back(Periodo(TipoPeriodo(63 - duracao_manutencao_em_dias_restantes), dia_inicial, mes_inicial, ano_inicial));
+							periodos_em_manutencao.push_back(Periodo(getString(duracao_manutencao_em_dias_restantes) + "d", dia_inicial, mes_inicial, ano_inicial));
 						else
-							periodos_em_manutencao.push_back(Periodo(TipoPeriodo(63 - duracao_manutencao_em_dias_restantes), periodos_em_manutencao.at(periodos_em_manutencao.size() - 1) + 1));
+							periodos_em_manutencao.push_back(Periodo(getString(duracao_manutencao_em_dias_restantes) + "d", periodos_em_manutencao.at(periodos_em_manutencao.size() - 1) + 1));
 					} // if (duracao_manutencao_em_dias_restantes > 0) {
 
 				} // if (true) {
@@ -6088,7 +6088,7 @@ void LeituraCEPEL::leitura_MANUTT_201908_NW25(Dados& a_dados, std::string nomeAr
 
 						double sobreposicao_inicial = periodo.sobreposicao(periodo_manutencao_inicial);
 						
-						if ((periodo == horizonte_estudo.getIteradorInicial()) && (Periodo(horizonte_estudo_DECK.getIteradorInicial().getTipoPeriodo(), periodo_manutencao_inicial) == horizonte_estudo_DECK.getIteradorInicial()))
+						if ((periodo == horizonte_estudo.getIteradorInicial()) && (Periodo(getString(horizonte_estudo_DECK.getIteradorInicial().getDuration()), periodo_manutencao_inicial) == horizonte_estudo_DECK.getIteradorInicial()))
 							sobreposicao_inicial += sobreposicao_atraso_periodo_inicial;
 
 						const double sobreposicao_final = periodo.sobreposicao(periodo_manutencao_final);
