@@ -1047,46 +1047,6 @@ DEFINE_SMART_ENUM(IdRestricaoCenario, ID_RESTRICAO_CENARIO)
 #endif
 DEFINE_SMART_ENUM(IdVariavelRealizacaoInterna, ID_VARIAVEL_REALIZACAO_INTERNA)
 
-#define ID_ESTACAO(m)\
-	m(IdEstacao,    1) m(IdEstacao,    2) m(IdEstacao,    3) m(IdEstacao,    4) m(IdEstacao,    5) m(IdEstacao,    6) m(IdEstacao,    7) m(IdEstacao,    8) m(IdEstacao,    9) m(IdEstacao,   10)\
-	m(IdEstacao,   11) m(IdEstacao,   12) m(IdEstacao,   13) m(IdEstacao,   14) m(IdEstacao,   15) m(IdEstacao,   16) m(IdEstacao,   17) m(IdEstacao,   18) m(IdEstacao,   19) m(IdEstacao,   20)\
-	m(IdEstacao,   21) m(IdEstacao,   22) m(IdEstacao,   23) m(IdEstacao,   24) m(IdEstacao,   25) m(IdEstacao,   26) m(IdEstacao,   27) m(IdEstacao,   28) m(IdEstacao,   29) m(IdEstacao,   30)\
-	m(IdEstacao,   31) m(IdEstacao,   32) m(IdEstacao,   33) m(IdEstacao,   34) m(IdEstacao,   35) m(IdEstacao,   36) m(IdEstacao,   37) m(IdEstacao,   38) m(IdEstacao,   39) m(IdEstacao,   40)\
-	m(IdEstacao,   41) m(IdEstacao,   42) m(IdEstacao,   43) m(IdEstacao,   44) m(IdEstacao,   45) m(IdEstacao,   46) m(IdEstacao,   47) m(IdEstacao,   48) m(IdEstacao,   49) m(IdEstacao,   50)\
-	m(IdEstacao,   51) m(IdEstacao,   52) m(IdEstacao,   53) m(IdEstacao,   54) m(IdEstacao,   55) m(IdEstacao,   56) m(IdEstacao,   57) m(IdEstacao,   58) m(IdEstacao,   59) m(IdEstacao,   60)\
-	m(IdEstacao,   61) m(IdEstacao,   62) m(IdEstacao,   63) m(IdEstacao,   64) m(IdEstacao,   65) m(IdEstacao,   66) m(IdEstacao,   67) m(IdEstacao,   68) m(IdEstacao,   69) m(IdEstacao,   70)\
-	m(IdEstacao,   71) m(IdEstacao,   72) m(IdEstacao,   73) m(IdEstacao,   74) m(IdEstacao,   75) m(IdEstacao,   76) m(IdEstacao,   77) m(IdEstacao,   78) m(IdEstacao,   79) m(IdEstacao,   80)\
-	m(IdEstacao,   81) m(IdEstacao,   82) m(IdEstacao,   83) m(IdEstacao,   84) m(IdEstacao,   85) m(IdEstacao,   86) m(IdEstacao,   87) m(IdEstacao,   88) m(IdEstacao,   89) m(IdEstacao,   90)\
-	m(IdEstacao,   91) m(IdEstacao,   92) m(IdEstacao,   93) m(IdEstacao,   94) m(IdEstacao,   95) m(IdEstacao,   96) m(IdEstacao,   97) m(IdEstacao,   98) m(IdEstacao,   99) m(IdEstacao,  100)\
-	m(IdEstacao,  101) m(IdEstacao,  102) m(IdEstacao,  103) m(IdEstacao,  104) m(IdEstacao,  105) m(IdEstacao,  106) m(IdEstacao,  107) m(IdEstacao,  108) m(IdEstacao,  109) m(IdEstacao,  110)\
-	m(IdEstacao,  111) m(IdEstacao,  112) m(IdEstacao,  113) m(IdEstacao,  114) m(IdEstacao,  115) m(IdEstacao,  116) m(IdEstacao,  117) m(IdEstacao,  118) m(IdEstacao,  119) m(IdEstacao,  120)\
-	m(IdEstacao,  121) m(IdEstacao,  122) m(IdEstacao,  123) m(IdEstacao,  124) m(IdEstacao,  125) m(IdEstacao,  126) m(IdEstacao,  127) m(IdEstacao,  128) m(IdEstacao,  129) m(IdEstacao,  130)\
-	m(IdEstacao,  131) m(IdEstacao,  132) m(IdEstacao,  133) m(IdEstacao,  134) m(IdEstacao,  135) m(IdEstacao,  136) m(IdEstacao,  137) m(IdEstacao,  138) m(IdEstacao,  139) m(IdEstacao,  140)\
-	m(IdEstacao,  141) m(IdEstacao,  142) m(IdEstacao,  143) m(IdEstacao,  144) m(IdEstacao,  145) m(IdEstacao,  146) m(IdEstacao,  147) m(IdEstacao,  148) m(IdEstacao,  149) m(IdEstacao,  150)\
-	m(IdEstacao,  151) m(IdEstacao,  152) m(IdEstacao,  153) m(IdEstacao,  154) m(IdEstacao,  155) m(IdEstacao,  156) m(IdEstacao,  157) m(IdEstacao,  158) m(IdEstacao,  159) m(IdEstacao,  160)\
-	m(IdEstacao,  161) m(IdEstacao,  162) m(IdEstacao,  163) m(IdEstacao,  164) m(IdEstacao,  165) m(IdEstacao,  166) m(IdEstacao,  167) m(IdEstacao,  168) m(IdEstacao,  169) m(IdEstacao,  170)\
-	m(IdEstacao,  171) m(IdEstacao,  172) m(IdEstacao,  173) m(IdEstacao,  174) m(IdEstacao,  175) m(IdEstacao,  176) m(IdEstacao,  177) m(IdEstacao,  178) m(IdEstacao,  179) m(IdEstacao,  180)\
-	m(IdEstacao,  181) m(IdEstacao,  182) m(IdEstacao,  183) m(IdEstacao,  184) m(IdEstacao,  185) m(IdEstacao,  186) m(IdEstacao,  187) m(IdEstacao,  188) m(IdEstacao,  189) m(IdEstacao,  190)\
-	m(IdEstacao,  191) m(IdEstacao,  192) m(IdEstacao,  193) m(IdEstacao,  194) m(IdEstacao,  195) m(IdEstacao,  196) m(IdEstacao,  197) m(IdEstacao,  198) m(IdEstacao,  199) m(IdEstacao,  200)\
-	m(IdEstacao,  201) m(IdEstacao,  202) m(IdEstacao,  203) m(IdEstacao,  204) m(IdEstacao,  205) m(IdEstacao,  206) m(IdEstacao,  207) m(IdEstacao,  208) m(IdEstacao,  209) m(IdEstacao,  210)\
-	m(IdEstacao,  211) m(IdEstacao,  212) m(IdEstacao,  213) m(IdEstacao,  214) m(IdEstacao,  215) m(IdEstacao,  216) m(IdEstacao,  217) m(IdEstacao,  218) m(IdEstacao,  219) m(IdEstacao,  220)\
-	m(IdEstacao,  221) m(IdEstacao,  222) m(IdEstacao,  223) m(IdEstacao,  224) m(IdEstacao,  225) m(IdEstacao,  226) m(IdEstacao,  227) m(IdEstacao,  228) m(IdEstacao,  229) m(IdEstacao,  230)\
-	m(IdEstacao,  231) m(IdEstacao,  232) m(IdEstacao,  233) m(IdEstacao,  234) m(IdEstacao,  235) m(IdEstacao,  236) m(IdEstacao,  237) m(IdEstacao,  238) m(IdEstacao,  239) m(IdEstacao,  240)\
-	m(IdEstacao,  241) m(IdEstacao,  242) m(IdEstacao,  243) m(IdEstacao,  244) m(IdEstacao,  245) m(IdEstacao,  246) m(IdEstacao,  247) m(IdEstacao,  248) m(IdEstacao,  249) m(IdEstacao,  250)\
-	m(IdEstacao,  251) m(IdEstacao,  252) m(IdEstacao,  253) m(IdEstacao,  254) m(IdEstacao,  255) m(IdEstacao,  256) m(IdEstacao,  257) m(IdEstacao,  258) m(IdEstacao,  259) m(IdEstacao,  260)\
-	m(IdEstacao,  261) m(IdEstacao,  262) m(IdEstacao,  263) m(IdEstacao,  264) m(IdEstacao,  265) m(IdEstacao,  266) m(IdEstacao,  267) m(IdEstacao,  268) m(IdEstacao,  269) m(IdEstacao,  270)\
-	m(IdEstacao,  271) m(IdEstacao,  272) m(IdEstacao,  273) m(IdEstacao,  274) m(IdEstacao,  275) m(IdEstacao,  276) m(IdEstacao,  277) m(IdEstacao,  278) m(IdEstacao,  279) m(IdEstacao,  280)\
-	m(IdEstacao,  281) m(IdEstacao,  282) m(IdEstacao,  283) m(IdEstacao,  284) m(IdEstacao,  285) m(IdEstacao,  286) m(IdEstacao,  287) m(IdEstacao,  288) m(IdEstacao,  289) m(IdEstacao,  290)\
-	m(IdEstacao,  291) m(IdEstacao,  292) m(IdEstacao,  293) m(IdEstacao,  294) m(IdEstacao,  295) m(IdEstacao,  296) m(IdEstacao,  297) m(IdEstacao,  298) m(IdEstacao,  299) m(IdEstacao,  300)\
-	m(IdEstacao,  301) m(IdEstacao,  302) m(IdEstacao,  303) m(IdEstacao,  304) m(IdEstacao,  305) m(IdEstacao,  306) m(IdEstacao,  307) m(IdEstacao,  308) m(IdEstacao,  309) m(IdEstacao,  310)\
-	m(IdEstacao,  311) m(IdEstacao,  312) m(IdEstacao,  313) m(IdEstacao,  314) m(IdEstacao,  315) m(IdEstacao,  316) m(IdEstacao,  317) m(IdEstacao,  318) m(IdEstacao,  319) m(IdEstacao,  320)\
-	m(IdEstacao,  321) m(IdEstacao,  322) m(IdEstacao,  323) m(IdEstacao,  324) m(IdEstacao,  325) m(IdEstacao,  326) m(IdEstacao,  327) m(IdEstacao,  328) m(IdEstacao,  329) m(IdEstacao,  330)\
-	m(IdEstacao,  331) m(IdEstacao,  332) m(IdEstacao,  333) m(IdEstacao,  334) m(IdEstacao,  335) m(IdEstacao,  336) m(IdEstacao,  337) m(IdEstacao,  338) m(IdEstacao,  339) m(IdEstacao,  340)\
-	m(IdEstacao,  341) m(IdEstacao,  342) m(IdEstacao,  343) m(IdEstacao,  344) m(IdEstacao,  345) m(IdEstacao,  346) m(IdEstacao,  347) m(IdEstacao,  348) m(IdEstacao,  349) m(IdEstacao,  350)\
-	m(IdEstacao,  351) m(IdEstacao,  352) m(IdEstacao,  353) m(IdEstacao,  354) m(IdEstacao,  355) m(IdEstacao,  356) m(IdEstacao,  357) m(IdEstacao,  358) m(IdEstacao,  359) m(IdEstacao,  360)\
-	m(IdEstacao,  361) m(IdEstacao,  362) m(IdEstacao,  363) m(IdEstacao,  364) m(IdEstacao,  365)
-DEFINE_SMART_ENUM(IdEstacao, ID_ESTACAO)
-
 #define ID_PROCESSO_ESTOCASTICO(m)\
 	m(IdProcessoEstocastico, hidrologico_hidreletrica)\
 	m(IdProcessoEstocastico, hidrologico_hidreletrica_sintetico)\
@@ -1159,7 +1119,6 @@ m(IdDefluencia)                 \
 m(IdDia)                        \
 m(IdDiaSemana)                  \
 m(IdElementoSistema)            \
-m(IdEstacao)                    \
 m(IdEstagio)                    \
 m(IdFuncaoProducaoHidreletrica) \
 m(IdGeracaoEletrica)            \

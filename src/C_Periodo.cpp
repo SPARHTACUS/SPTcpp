@@ -1639,47 +1639,6 @@ std::vector<std::string> Periodo::getDurT(){
 }
 
 
-IdEstacao Periodo::getEstacao() const {
-
-	try {
-
-		if (duration.second == 'M')
-			return IdEstacao(getMes());
-
-		else
-			return IdEstacao_1;
-
-	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getEstacao(): \n" + std::string(erro.what())); }
-
-}  // IdEstacao Periodo::getEstacao() const{
-
-
-IdEstacao Periodo::getMaiorEstacao(TipoPeriodo a_tipoPeriodo) {
-
-	try {
-
-		if ((a_tipoPeriodo <= TipoPeriodo_Nenhum) || (a_tipoPeriodo >= TipoPeriodo_Excedente))
-			throw std::invalid_argument("Tipo de periodo invalido.");
-
-		if (a_tipoPeriodo == TipoPeriodo_anual)
-			return IdEstacao_1;
-
-		else if (a_tipoPeriodo == TipoPeriodo_mensal)
-			return IdEstacao_12;
-
-		else if (a_tipoPeriodo == TipoPeriodo_semanal)
-			return IdEstacao_52;
-
-		else if (a_tipoPeriodo == TipoPeriodo_diario)
-			return IdEstacao_365;
-
-		return IdEstacao_12;
-
-	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getMaiorEstacao(" + getString(a_tipoPeriodo) + "): \n" + std::string(erro.what())); }
-
-} // IdEstacao Periodo::getEstacao(TipoPeriodo a_tipoPeriodo){
 
 Periodo Periodo::deslocarPeriodo(const Periodo& a_periodo, int a_numero_de_horas)
 {

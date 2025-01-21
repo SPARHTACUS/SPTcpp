@@ -9271,7 +9271,7 @@ bool Dados::valida_historico_AfluenciaEmHidreletrica(const AttVetorAfluencia a_a
 		if (!historico_afluencia_carregado)
 			return false;
 
-		const int ordem_maxima_historico = int(Periodo::getMaiorEstacao(periodo_inicial_historico.getTipoPeriodo())) - 1;
+		const int ordem_maxima_historico = int(IdMes_12) - 1;
 
 		if (getAtributo(AttComumDados_ordem_maxima_auto_correlacao_geracao_cenario_hidrologico, int()) > ordem_maxima_historico)
 			throw std::invalid_argument("O valor do atributo " + getFullString(AttComumDados_ordem_maxima_auto_correlacao_geracao_cenario_hidrologico) + " nao pode ser maior que a ordem maxima: " + getString(ordem_maxima_historico));
@@ -9522,15 +9522,15 @@ void Dados::adicionarTendenciaHidrologicaHistorica() {
 			int lag_inicial = 0;
 			if (getElementoVetor(AttVetorDados_numero_aberturas, estagio_inicial_horizonte_otimizacao, int()) > 1) {
 				lag_inicial = 1;
-				if (periodo_tendencia_hidrologica_historica.getEstacao() != (periodoInicialHorizonte - 1).getEstacao())
+				if (periodo_tendencia_hidrologica_historica.getMes() != (periodoInicialHorizonte - 1).getMes())
 					throw std::invalid_argument("A estacao do periodo de tendencia hidrologica historica deve igual a estacao do periodo " + getString(periodoInicialHorizonte - 1));
 			}
 			else if (getElementoVetor(AttVetorDados_numero_aberturas, estagio_inicial_horizonte_otimizacao, int()) == 1) {
-				if (periodo_tendencia_hidrologica_historica.getEstacao() != periodoInicialHorizonte.getEstacao())
+				if (periodo_tendencia_hidrologica_historica.getMes() != periodoInicialHorizonte.getMes())
 					throw std::invalid_argument("A estacao do periodo de tendencia hidrologica historica deve igual a estacao do periodo " + getString(periodoInicialHorizonte));
 			}
 
-			const int numero_estacoes = Periodo::getMaiorEstacao(periodoInicialHorizonte.getTipoPeriodo());
+			const int numero_estacoes = IdMes_12;
 
 			for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 				SmartEnupla<Periodo, double> incremental_tendencia;
@@ -9588,7 +9588,7 @@ void Dados::adicionarTendenciaHidrologicaHistorica() {
 
 						SmartEnupla<Periodo, double> periodos_composicao;
 
-						for (Periodo periodo_historico = historico_hidrologico.getIteradorFinal() - Periodo::getMaiorEstacao(maior_periodo_historico.getTipoPeriodo()); periodo_historico <= tendencia_hidrologica.getIteradorFinal(); periodo_historico++) {
+						for (Periodo periodo_historico = historico_hidrologico.getIteradorFinal() - int(IdMes_12); periodo_historico <= tendencia_hidrologica.getIteradorFinal(); periodo_historico++) {
 
 							const double sobreposicao = periodo_tendencia.sobreposicao(periodo_historico);
 
@@ -9602,7 +9602,7 @@ void Dados::adicionarTendenciaHidrologicaHistorica() {
 							if (periodo <= maior_periodo_historico)
 								tendencia_hidrologica.at(periodo_tendencia) += periodos_composicao.at_rIt(periodo) * historico_hidrologico.at_rIt(periodo);
 							else
-								tendencia_hidrologica.at(periodo_tendencia) += periodos_composicao.at_rIt(periodo) * getMedia(historico_hidrologico.getElementos(periodo.getEstacao()).at(periodo.getTipoPeriodo()));
+								tendencia_hidrologica.at(periodo_tendencia) += periodos_composicao.at_rIt(periodo) * getMedia(historico_hidrologico.getElementos(periodo.getMes()));
 
 						} // for (Periodo periodo = periodos_composicao.getIteradorInicial(); periodo <= periodos_composicao.getIteradorFinal(); periodo++) {
 

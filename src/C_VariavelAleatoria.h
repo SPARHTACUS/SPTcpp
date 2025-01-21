@@ -25,23 +25,23 @@
 	  m(VariavelAleatoria,  AttVetor,                            tendencia_temporal,   double,          1,          max,             1,  Periodo)   \
 	  m(VariavelAleatoria,  AttVetor,               tendencia_temporal_transformada,   double,          1,          max,             1,  Periodo)   \
 	  m(VariavelAleatoria,  AttVetor,                                tipo_relaxacao,   TipoRelaxacaoVariavelAleatoria,        min,          max, sem_relaxacao,  Periodo) \
-	  m(VariavelAleatoria,  AttVetor,                          media_serie_temporal,   double,        min,          max,             1,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                      media_serie_transformada,   double,          1,          max,             1,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                          media_residuo_normal,   double,          0,          max,             1,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                       media_residuo_lognormal,   double,          1,          max,             1,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                         desvio_serie_temporal,   double,          0,          max,             1,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                     desvio_serie_transformada,   double,          0,          max,             1,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                         desvio_residuo_normal,   double,          0,          max,             1,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                      desvio_residuo_lognormal,   double,          0,          max,             1,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                     assimetria_serie_temporal,   double,          0,          max,             0,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                 assimetria_serie_transformada,   double,          0,          max,             0,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                  assimetria_residuo_lognormal,   double,          0,          max,             0,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                         ordem_auto_correlacao,      int,          0,          365,             0,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                            ic_auto_correlacao,   double,          0,          max,             0,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                          sigma_residuo_normal,   double,          0,          max,             0,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                             mi_residuo_normal,   double,        min,          max,             0,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                          delta_residuo_normal,   double,        min,          max,             0,  IdEstacao) \
-	  m(VariavelAleatoria,  AttVetor,                         phi_residuo_lognormal,   double,        min,          max,             0,  IdEstacao) \
+	  m(VariavelAleatoria,  AttVetor,                          media_serie_temporal,   double,        min,          max,             1,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                      media_serie_transformada,   double,          1,          max,             1,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                          media_residuo_normal,   double,          0,          max,             1,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                       media_residuo_lognormal,   double,          1,          max,             1,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                         desvio_serie_temporal,   double,          0,          max,             1,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                     desvio_serie_transformada,   double,          0,          max,             1,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                         desvio_residuo_normal,   double,          0,          max,             1,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                      desvio_residuo_lognormal,   double,          0,          max,             1,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                     assimetria_serie_temporal,   double,          0,          max,             0,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                 assimetria_serie_transformada,   double,          0,          max,             0,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                  assimetria_residuo_lognormal,   double,          0,          max,             0,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                         ordem_auto_correlacao,      int,          0,          365,             0,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                            ic_auto_correlacao,   double,          0,          max,             0,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                          sigma_residuo_normal,   double,          0,          max,             0,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                             mi_residuo_normal,   double,        min,          max,             0,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                          delta_residuo_normal,   double,        min,          max,             0,  IdMes) \
+	  m(VariavelAleatoria,  AttVetor,                         phi_residuo_lognormal,   double,        min,          max,             0,  IdMes) \
 	  m(VariavelAleatoria,  AttVetor,                              auto_covariancia,   double,        min,          max,             0,  int) \
 	  m(VariavelAleatoria,  AttVetor,                               auto_correlacao,   double,        min,          max,             0,  int) \
 	  m(VariavelAleatoria,  AttVetor,                       auto_correlacao_residuo,   double,        min,          max,             0,  int) \
@@ -57,17 +57,17 @@
 	  m(VariavelAleatoria,  AttMatriz,             ruido_correlacionado_espaco_amostral,       double,          min,          max,             0,    Periodo, IdRealizacao)   \
 	  m(VariavelAleatoria,  AttMatriz,                          residuo_espaco_amostral,       double,          min,          max,             0,    Periodo, IdRealizacao)   \
 	  m(VariavelAleatoria,  AttMatriz,               coeficiente_linear_auto_correlacao,       double,          min,          max,             0,    Periodo, int)       \
-	  m(VariavelAleatoria,  AttMatriz,                         auto_covariancia_sazonal,       double,          min,          max,             0,  IdEstacao, int)       \
-	  m(VariavelAleatoria,  AttMatriz,                                  auto_correlacao,       double,          min,          max,             0,  IdEstacao, int)       \
-	  m(VariavelAleatoria,  AttMatriz,                          auto_correlacao_residuo,       double,          min,          max,             0,  IdEstacao, int)       \
-	  m(VariavelAleatoria,  AttMatriz,                   auto_correlacao_residuo_normal,       double,          min,          max,             0,  IdEstacao, int)       \
-	  m(VariavelAleatoria,  AttMatriz,                auto_correlacao_residuo_lognormal,       double,          min,          max,             0,  IdEstacao, int)       \
-	  m(VariavelAleatoria,  AttMatriz,                          auto_correlacao_parcial,       double,          min,          max,             0,  IdEstacao, int)       \
-	  m(VariavelAleatoria,  AttMatriz,                      coeficiente_auto_correlacao,       double,          -10,           10,             0,  IdEstacao, int)       \
-	  m(VariavelAleatoria,  AttMatriz,       coeficiente_linear_auto_correlacao_sazonal,       double,          -10,           10,             0,  IdEstacao, int)       \
-	  m(VariavelAleatoria,  AttMatriz,                                       correlacao,       double,          min,          max,             0,  IdVariavelAleatoria, IdEstacao) \
-	  m(VariavelAleatoria,  AttMatriz,                     correlacao_residuo_lognormal,       double,          min,          max,             0,  IdVariavelAleatoria, IdEstacao) \
-	  m(VariavelAleatoria,  AttMatriz,                   matriz_carga_residuo_lognormal,       double,          min,          max,             0,  IdEstacao, IdVariavelAleatoria)
+	  m(VariavelAleatoria,  AttMatriz,                         auto_covariancia_sazonal,       double,          min,          max,             0,  IdMes, int)       \
+	  m(VariavelAleatoria,  AttMatriz,                                  auto_correlacao,       double,          min,          max,             0,  IdMes, int)       \
+	  m(VariavelAleatoria,  AttMatriz,                          auto_correlacao_residuo,       double,          min,          max,             0,  IdMes, int)       \
+	  m(VariavelAleatoria,  AttMatriz,                   auto_correlacao_residuo_normal,       double,          min,          max,             0,  IdMes, int)       \
+	  m(VariavelAleatoria,  AttMatriz,                auto_correlacao_residuo_lognormal,       double,          min,          max,             0,  IdMes, int)       \
+	  m(VariavelAleatoria,  AttMatriz,                          auto_correlacao_parcial,       double,          min,          max,             0,  IdMes, int)       \
+	  m(VariavelAleatoria,  AttMatriz,                      coeficiente_auto_correlacao,       double,          -10,           10,             0,  IdMes, int)       \
+	  m(VariavelAleatoria,  AttMatriz,       coeficiente_linear_auto_correlacao_sazonal,       double,          -10,           10,             0,  IdMes, int)       \
+	  m(VariavelAleatoria,  AttMatriz,                                       correlacao,       double,          min,          max,             0,  IdVariavelAleatoria, IdMes) \
+	  m(VariavelAleatoria,  AttMatriz,                     correlacao_residuo_lognormal,       double,          min,          max,             0,  IdVariavelAleatoria, IdMes) \
+	  m(VariavelAleatoria,  AttMatriz,                   matriz_carga_residuo_lognormal,       double,          min,          max,             0,  IdMes, IdVariavelAleatoria)
 //               c_classe,    smrtAtt,                                     nomeAtributo,         Tipo,   lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define MEMBRO_VARIAVEL_ALEATORIA(m)\
@@ -138,7 +138,7 @@ public:
 
 	void calcularSigmaMiDeltaResiduoNormal();
 
-	double calcularRuidoCorrelacionado(const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao_variaveis_aleatorias, const IdEstacao a_idEstacao, const SmartEnupla<IdVariavelAleatoria, double>& a_ruido_branco);
+	double calcularRuidoCorrelacionado(const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao_variaveis_aleatorias, const IdMes a_idEstacao, const SmartEnupla<IdVariavelAleatoria, double>& a_ruido_branco);
 
 	void gerarRuidoBrancoEspacoAmostral(const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> &a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, int &a_semente);
 	void gerarRuidoBrancoEspacoAmostral(const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> &a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, const int a_numero_maximo_periodos, int &a_semente);

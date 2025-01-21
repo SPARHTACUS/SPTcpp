@@ -1812,15 +1812,16 @@ public:
 	};
 
 
-	std::vector<std::vector<TipoValor>> getElementos(const IdEstacao a_estacao) const {
+	std::vector<TipoValor> getElementos(const IdMes a_estacao) const {
 		try {
-			if ((a_estacao <= IdEstacao_Nenhum) || (a_estacao >= IdEstacao_Excedente))
+			if ((a_estacao <= IdMes_Nenhum) || (a_estacao >= IdMes_Excedente))
 				throw std::invalid_argument("Estacao Invalida.");
 
-			std::vector<std::vector<TipoValor>> vetor_retorno(TipoPeriodo_Excedente, std::vector<TipoValor>());
+			std::vector<TipoValor> vetor_retorno;
+			vetor_retorno.reserve(100);
 			for (Periodo period = getIteradorInicial(); period <= getIteradorFinal(); incrementarIterador(period)) {
-				if (period.getEstacao() == a_estacao)
-					vetor_retorno.at(period.getTipoPeriodo()).push_back(getElemento(period));
+				if (period.getMes() == a_estacao)
+					vetor_retorno.push_back(getElemento(period));
 			}
 			return vetor_retorno;
 		} // try{

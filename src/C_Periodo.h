@@ -267,10 +267,6 @@ public:
 
 	static std::vector<std::string> getDurT();
 
-	IdEstacao getEstacao() const;
-
-	static IdEstacao getMaiorEstacao(TipoPeriodo a_tipoPeriodo);
-
 	Periodo deslocarPeriodo(const Periodo& a_periodo, int a_numero_de_horas);
 
 	~Periodo();
