@@ -988,8 +988,6 @@ SmartEnupla<IdMes, Valor> getCorrelacaoSazonal(const SmartEnupla<Periodo, Valor>
 		else if (periodo_final_serie2 < periodo_final_serie1)
 			periodo_final = periodo_final_serie2;
 
-		const TipoPeriodo tipoPeriodo = periodo_inicial.getTipoPeriodo();
-
 		const IdMes maiorEstacao = IdMes_12;
 
 		SmartEnupla<IdMes, Valor> media_serie1(IdMes_1, std::vector<Valor>(int(maiorEstacao), Valor(0)));

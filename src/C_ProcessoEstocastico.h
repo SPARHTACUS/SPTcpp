@@ -203,8 +203,6 @@ public:
 
 private:
 
-	std::vector<TipoPeriodo> tipo_periodo_espaco_amostral;
-
 	void mapearCenariosEspacoAmostralPorSorteio(const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int& a_semente);
 
 	bool mapearCenariosEspacoAmostralCompleto    (const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);

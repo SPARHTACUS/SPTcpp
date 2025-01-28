@@ -9241,7 +9241,7 @@ bool Dados::valida_historico_AfluenciaEmHidreletrica(const AttVetorAfluencia a_a
 			historico_afluencia_carregado = true;
 			periodo_inicial_historico = getIteradorInicial(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, a_attVetorAfluencia, Periodo());
 			periodo_final_historico = getIteradorFinal(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, a_attVetorAfluencia, Periodo());
-			if (periodo_inicial_historico.getTipoPeriodo() != periodo_final_historico.getTipoPeriodo())
+			if (!Periodo::isSameDuration(periodo_inicial_historico, periodo_final_historico))
 				throw std::invalid_argument("Os periodos inicial e final do atributo " + getFullString(a_attVetorAfluencia) + " devem ser do mesmo tipo.");
 		}
 
@@ -9510,11 +9510,11 @@ void Dados::adicionarTendenciaHidrologicaHistorica() {
 
 			const Periodo periodo_final_historico_afluencia_incremental = getIteradorFinal(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico, Periodo());
 
-			if (periodo_tendencia_hidrologica_historica.getTipoPeriodo() != periodoInicialHorizonte.getTipoPeriodo())
-				throw std::invalid_argument("O TipoPeriodo de " + getFullString(AttComumDados_periodo_tendencia_hidrologica_historica) + " devem ser o mesmo do inicio do horizonte: " + getString(periodoInicialHorizonte.getTipoPeriodo()) + " .");
+			if (!Periodo::isSameDuration(periodo_tendencia_hidrologica_historica, periodoInicialHorizonte))
+				throw std::invalid_argument("O TipoPeriodo de " + getFullString(AttComumDados_periodo_tendencia_hidrologica_historica) + " devem ser o mesmo do inicio do horizonte: " + getString(periodoInicialHorizonte.getDuration()) + " .");
 
-			else if (periodo_tendencia_hidrologica_historica.getTipoPeriodo() != periodo_final_historico_afluencia_incremental.getTipoPeriodo())
-				throw std::invalid_argument("O TipoPeriodo de " + getFullString(AttComumDados_periodo_tendencia_hidrologica_historica) + " devem ser o mesmo do historico: " + getString(periodo_final_historico_afluencia_incremental.getTipoPeriodo()) + " .");
+			else if (!Periodo::isSameDuration(periodo_tendencia_hidrologica_historica, periodo_final_historico_afluencia_incremental))
+				throw std::invalid_argument("O TipoPeriodo de " + getFullString(AttComumDados_periodo_tendencia_hidrologica_historica) + " devem ser o mesmo do historico: " + getString(periodo_final_historico_afluencia_incremental.getDuration()) + " .");
 
 			else if (periodo_tendencia_hidrologica_historica > periodo_final_historico_afluencia_incremental)
 				throw std::invalid_argument("Periodo historico de afluencia inicial maior que o periodo final do historico.");

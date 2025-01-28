@@ -1,117 +1,10 @@
 #ifndef C_PERIODO_H
 #define C_PERIODO_H
 
-//#define _GLIBCXX_USE_CXX11_ABI 0
-
 #include <vector>
 #include <string>
 
 #include "C_SmartEnum.h"
-
-
-#define TIPO_PERIODO(m)       \
-	m(TipoPeriodo, anual)     \
-	m(TipoPeriodo, mensal)    \
-    m(TipoPeriodo, 60dias)    \
-    m(TipoPeriodo, 59dias)    \
-    m(TipoPeriodo, 58dias)    \
-    m(TipoPeriodo, 57dias)    \
-    m(TipoPeriodo, 56dias)    \
-    m(TipoPeriodo, 55dias)    \
-    m(TipoPeriodo, 54dias)    \
-    m(TipoPeriodo, 53dias)    \
-    m(TipoPeriodo, 52dias)    \
-    m(TipoPeriodo, 51dias)    \
-    m(TipoPeriodo, 50dias)    \
-    m(TipoPeriodo, 49dias)    \
-    m(TipoPeriodo, 48dias)    \
-    m(TipoPeriodo, 47dias)    \
-    m(TipoPeriodo, 46dias)    \
-    m(TipoPeriodo, 45dias)    \
-    m(TipoPeriodo, 44dias)    \
-    m(TipoPeriodo, 43dias)    \
-    m(TipoPeriodo, 42dias)    \
-    m(TipoPeriodo, 41dias)    \
-    m(TipoPeriodo, 40dias)    \
-    m(TipoPeriodo, 39dias)    \
-    m(TipoPeriodo, 38dias)    \
-    m(TipoPeriodo, 37dias)    \
-    m(TipoPeriodo, 36dias)    \
-    m(TipoPeriodo, 35dias)    \
-    m(TipoPeriodo, 34dias)    \
-    m(TipoPeriodo, 33dias)    \
-    m(TipoPeriodo, 32dias)    \
-    m(TipoPeriodo, 31dias)    \
-    m(TipoPeriodo, 30dias)    \
-    m(TipoPeriodo, 29dias)    \
-    m(TipoPeriodo, 28dias)    \
-    m(TipoPeriodo, 27dias)    \
-    m(TipoPeriodo, 26dias)    \
-    m(TipoPeriodo, 25dias)    \
-    m(TipoPeriodo, 24dias)    \
-    m(TipoPeriodo, 23dias)    \
-    m(TipoPeriodo, 22dias)    \
-    m(TipoPeriodo, 21dias)    \
-    m(TipoPeriodo, 20dias)    \
-    m(TipoPeriodo, 19dias)    \
-    m(TipoPeriodo, 18dias)    \
-    m(TipoPeriodo, 17dias)    \
-    m(TipoPeriodo, 16dias)    \
-    m(TipoPeriodo, 15dias)    \
-    m(TipoPeriodo, 14dias)    \
-    m(TipoPeriodo, 13dias)    \
-    m(TipoPeriodo, 12dias)    \
-    m(TipoPeriodo, 11dias)    \
-    m(TipoPeriodo, 10dias)    \
-    m(TipoPeriodo, 9dias)     \
-    m(TipoPeriodo, 8dias)     \
-	m(TipoPeriodo, semanal)   \
-	m(TipoPeriodo, 6dias)     \
-	m(TipoPeriodo, 5dias)     \
-	m(TipoPeriodo, 4dias)     \
-	m(TipoPeriodo, 3dias)     \
-	m(TipoPeriodo, 2dias)     \
-	m(TipoPeriodo, diario)    \
-	m(TipoPeriodo, 23horas)   \
-	m(TipoPeriodo, 22horas)   \
-	m(TipoPeriodo, 21horas)   \
-	m(TipoPeriodo, 20horas)   \
-	m(TipoPeriodo, 19horas)   \
-	m(TipoPeriodo, 18horas)   \
-	m(TipoPeriodo, 17horas)   \
-	m(TipoPeriodo, 16horas)   \
-	m(TipoPeriodo, 15horas)   \
-	m(TipoPeriodo, 14horas)   \
-	m(TipoPeriodo, 13horas)   \
-	m(TipoPeriodo, 12horas)   \
-	m(TipoPeriodo, 690m)   \
-	m(TipoPeriodo, 11horas)   \
-	m(TipoPeriodo, 630m)   \
-	m(TipoPeriodo, 10horas)   \
-	m(TipoPeriodo, 570m)   \
-	m(TipoPeriodo, 9horas)   \
-	m(TipoPeriodo, 510m)   \
-	m(TipoPeriodo, 8horas)   \
-	m(TipoPeriodo, 450m)     \
-	m(TipoPeriodo, 7horas)   \
-	m(TipoPeriodo, 390m)     \
-	m(TipoPeriodo, 6horas)   \
-	m(TipoPeriodo, 330m)     \
-	m(TipoPeriodo, 5horas)   \
-	m(TipoPeriodo, 270m)     \
-	m(TipoPeriodo, 4horas)   \
-	m(TipoPeriodo, 210m)     \
-	m(TipoPeriodo, 3horas)   \
-	m(TipoPeriodo, 150m)     \
-	m(TipoPeriodo, 2horas)   \
-	m(TipoPeriodo, 90m)      \
-	m(TipoPeriodo, horario)   \
-	m(TipoPeriodo, meia_hora) \
-	m(TipoPeriodo, minuto) 
-DEFINE_SMART_ENUM(TipoPeriodo, TIPO_PERIODO)
-
-
-
 
 
 
@@ -183,11 +76,7 @@ public:
 
 	double sobreposicao(const Periodo a_periodo_overlap)const;
 	
-	double sobreposicao(const Periodo a_periodo_overlap_1, const Periodo a_periodo_overlap_2)const;
-
 	double atraso(const Periodo a_periodo)const;
-
-	bool sobreposicaoExcedente(const Periodo a_periodo_overlap) const;
 
 	IdAno getAno()    const { return ano;    };
 	IdMes getMes()    const { return mes;    };
@@ -210,8 +99,6 @@ public:
 	int posStructPeriod = -1;
 	int idxStructPeriod = -1;
 	std::string codStructPeriod;
-
-	TipoPeriodo getTipoPeriodo() const;
 
 	bool anoBissexto() const;
 
@@ -257,17 +144,14 @@ public:
 
 	static std::pair<unsigned int, char> getDurationFromStr(const std::string &a_str);
 
-	static std::pair<unsigned int, char> getDurationFromTipoPeriodo(const TipoPeriodo a_perT);
-	static TipoPeriodo getTipoPeriodoFromDuration(const std::pair<unsigned int, char> &a_dur);
-
 	static bool isValidDuration(const std::pair<unsigned int, char>& a_dur1);
 	static bool isValidDurationT(const char a_durT);
 
 	static bool isSameDuration(const Periodo &a_per1, const Periodo& a_per2);
 
-	static std::vector<std::string> getDurT();
+	static Periodo getPeriodBtwn(const Periodo& a_per1, const Periodo& a_per2);
 
-	Periodo deslocarPeriodo(const Periodo& a_periodo, int a_numero_de_horas);
+	static std::vector<std::string> getDurT();
 
 	~Periodo();
 

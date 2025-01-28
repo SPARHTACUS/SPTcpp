@@ -456,7 +456,7 @@ void LeituraCEPEL::leitura_VAZOES_201904_DES16(Dados& a_dados, const std::string
 								horizonte_estudo.addElemento(periodo, IdEstagio_1);
 
 							if (numeroDias > 1) {
-								Periodo periodoRestante = Periodo(TipoPeriodo_horario, IdDia(periodo_estudo_inicial.getDia()), periodo_estudo_inicial.getMes(), periodo_estudo_inicial.getAno()) + 24;
+								Periodo periodoRestante = Periodo("h", IdDia(periodo_estudo_inicial.getDia()), periodo_estudo_inicial.getMes(), periodo_estudo_inicial.getAno()) + 24;
 								for (Periodo periodo = periodoRestante; periodo <= periodo_final_estudo - 1; periodo++)
 									horizonte_estudo.addElemento(periodo, IdEstagio_1);
 							}
@@ -1581,9 +1581,9 @@ void LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16(Dados& a_dados, const 
 							a_dados.vetorHidreletrica.at(idHidreletrica).setVetor(AttVetorHidreletrica_regularizacao, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
 
 						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
-							if ((tipo_regularizacao == "D") && (periodo.getTipoPeriodo() >= TipoPeriodo_diario)) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
-							else if ((tipo_regularizacao == "S") && (periodo.getTipoPeriodo() >= TipoPeriodo_semanal)) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
-							else if ((tipo_regularizacao == "M") && (periodo.getTipoPeriodo() >= TipoPeriodo_mensal)) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
+							if ((tipo_regularizacao == "D") && (periodo.getMinutos() <= Periodo("1d", periodo).getMinutos())) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
+							else if ((tipo_regularizacao == "S") && (periodo.getMinutos() <= Periodo("7d", periodo).getMinutos())) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
+							else if ((tipo_regularizacao == "M") && (periodo.getMinutos() <= Periodo("1M", periodo).getMinutos())) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
 							else { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 0); }
 						}
 

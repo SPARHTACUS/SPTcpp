@@ -6056,7 +6056,7 @@ void LeituraCEPEL::leitura_MANUTT_201908_NW25(Dados& a_dados, std::string nomeAr
 
 					for (int p = 0; p < numero_periodos_60dias_cheios_manutencao; p++) {
 						if (p == 0)
-							periodos_em_manutencao.push_back(Periodo(TipoPeriodo_60dias, dia_inicial, mes_inicial, ano_inicial));
+							periodos_em_manutencao.push_back(Periodo("60d", dia_inicial, mes_inicial, ano_inicial));
 						else
 							periodos_em_manutencao.push_back(periodos_em_manutencao.at(p - 1) + 1);
 					} // for (int p = 0; p < numero_periodos_60dias_cheios_manutencao; p++) {

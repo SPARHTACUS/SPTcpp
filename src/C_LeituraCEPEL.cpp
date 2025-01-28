@@ -8775,7 +8775,7 @@ IdMes LeituraCEPEL::get_IdMes_operativo(const Periodo a_periodo, const bool is_p
 {
 	try {
 
-		if (a_periodo.getTipoPeriodo() > TipoPeriodo_semanal)
+		if (a_periodo.getMinutos() < Periodo("7d", a_periodo).getMinutos())
 			throw std::invalid_argument("Nao implementada regra para periodos com duracao menor a TipoPeriodo_semanal \n");
 
 		Periodo periodo_teste = a_periodo;

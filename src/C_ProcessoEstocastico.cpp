@@ -126,7 +126,7 @@ void ProcessoEstocastico::avaliarModeloViaSerieSintetica(const EntradaSaidaDados
 
 		for (int i = 0; i < a_horizonte_espaco_amostral.size(); i++) {
 
-			if (periodo_inicial_serie.getTipoPeriodo() == getIteradorFinal(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_serie_temporal, Periodo()).getTipoPeriodo())
+			if (Periodo::isSameDuration(periodo_inicial_serie, getIteradorFinal(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_serie_temporal, Periodo())))
 				break;
 
 			a_horizonte_espaco_amostral.incrementarIterador(periodo_inicial_serie);

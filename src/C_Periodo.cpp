@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-static const char* formatoPadrao = "DD/MM/AAAA-hh:mm:ss-TipoPeriodo";
+static const char* formatoPadrao = "DD/MM/AAAA-hh:mm:ss-Duration";
 //Formas simplificadas de ingressar o Periodo:
 //AAAA
 //MM/AAAA
@@ -200,6 +200,12 @@ void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const std::
 				diaLido = getIdDiaFromChar(a_perStr.substr(0, posSeparador.at(0)).c_str());
 				mesLido = getIdMesFromChar(a_perStr.substr(posSeparador.at(0) + 1, posSeparador.at(1) - posSeparador.at(0) - 1).c_str());
 				anoLido = getIdAnoFromChar(std::string(a_perStr.substr(posSeparador.at(1) + 1, std::string::npos)).c_str());
+			}
+			else if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '-')) {
+				if (!isDurValid)
+					duration_ = getDurationFromStr("M");
+				anoLido = getIdAnoFromChar(std::string(a_perStr.substr(posSeparador.at(0) + 1, posSeparador.at(1) - posSeparador.at(0) - 1)).c_str());
+				mesLido = getIdMesFromChar(a_perStr.substr(0, posSeparador.at(0)).c_str());
 			}
 			else
 				throw std::invalid_argument("String com formato invalido de Periodo. Formato padrao completo " + std::string(formatoPadrao));
@@ -506,59 +512,6 @@ double Periodo::sobreposicao(const Periodo a_periodo_overlap)const {
 
 } // double Periodo::sobreposicao(const Periodo a_periodo_overlap){
 
-double Periodo::sobreposicao(const Periodo a_periodo_overlap_1, const Periodo a_periodo_overlap_2)const {
-
-	try {
-
-		const Periodo periodo_overlap_seguinte_1 = a_periodo_overlap_1 + 1;
-		const Periodo periodo_overlap_seguinte_2 = a_periodo_overlap_2 + 1;
-
-		const Periodo periodo_base = *this;
-
-		const Periodo periodo_base_seguinte = periodo_base + 1;
-
-		if ((periodo_overlap_seguinte_1 <= periodo_base) || (a_periodo_overlap_1 >= periodo_base_seguinte) || (periodo_overlap_seguinte_2 <= periodo_base) || (a_periodo_overlap_2 >= periodo_base_seguinte))
-			return 0.0;
-
-		else if (periodo_base == a_periodo_overlap_1 && periodo_base == a_periodo_overlap_2)
-			return 1.0;
-
-		else {
-
-			//Determina o periodo_ini e periodo_fim dependendo da superposição do a_periodo_overlap_1 e a_periodo_overlap_2
-
-			Periodo periodo_ini;
-			Periodo periodo_fim;
-
-			if (a_periodo_overlap_1 >= a_periodo_overlap_2) {
-
-				periodo_ini = Periodo("m", a_periodo_overlap_1);
-				periodo_fim = Periodo("m", a_periodo_overlap_2 + 1);
-
-			}//if (a_periodo_overlap_1 >= a_periodo_overlap_2) {
-			else {
-
-				periodo_ini = Periodo("m", a_periodo_overlap_2);
-				periodo_fim = Periodo("m", a_periodo_overlap_1 + 1);
-
-			}//else {
-
-			int minutos_sobreposicao = 0;
-
-			for (Periodo periodo = periodo_ini; periodo < periodo_fim; periodo++) {
-				if ((periodo >= periodo_base) && (periodo < periodo_base_seguinte))
-					minutos_sobreposicao += periodo.getMinutos();
-			} // for (Periodo periodo = periodo_ini; periodo < periodo_fim; periodo++) {
-
-			return double(minutos_sobreposicao) / double(periodo_base.getMinutos());
-
-		} // else {	 
-
-	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::sobreposicao(" + a_periodo_overlap_1.str() + a_periodo_overlap_2.str() + ") \n" + std::string(erro.what())); }
-
-} // double Periodo::sobreposicao(const Periodo a_periodo_overlap){
-
 
 double Periodo::atraso(const Periodo a_periodo) const {
 
@@ -583,32 +536,6 @@ double Periodo::atraso(const Periodo a_periodo) const {
 	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::sobreposicao(" + getString(a_periodo) + ") \n" + std::string(erro.what())); }
 
 } // double Periodo::atraso(const Periodo a_periodo_atraso) const {
-
-
-
-bool Periodo::sobreposicaoExcedente(const Periodo a_periodo_overlap)const {
-
-	try {
-
-		const Periodo periodo_overlap_seguinte = a_periodo_overlap + 1;
-
-		const Periodo periodo_base = *this;
-
-		const Periodo periodo_base_seguinte = periodo_base + 1;
-
-		if ((a_periodo_overlap < periodo_base) && (periodo_overlap_seguinte >= periodo_base_seguinte))
-			return true;
-
-		if ((a_periodo_overlap <= periodo_base) && (periodo_overlap_seguinte > periodo_base_seguinte))
-			return true;
-
-		return false;
-
-	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::sobreposicao(" + a_periodo_overlap.str() + ") \n" + std::string(erro.what())); }
-
-} // bool Periodo::sobreposicaoExcedente(const Periodo a_periodo_overlap){
-
 
 
 unsigned int Periodo::getMeses() const {
@@ -763,8 +690,6 @@ std::pair<unsigned int, char> Periodo::getDuration() const{
 }
 
 
-TipoPeriodo Periodo::getTipoPeriodo() const { return getTipoPeriodoFromDuration(duration); }
-
 std::string normStringMes(const IdMes a_idMes) {
 	if (a_idMes <= IdMes_9)
 		return "0" + getString(a_idMes);
@@ -795,25 +720,29 @@ std::string normStringMin(const IdMin a_idMin) {
 
 std::string Periodo::str() const {
 
+	std::string durStr = getString(duration);
+	if (duration.first == 1U)
+		durStr = duration.second;
+
 	if (duration.second == 'm')
-		return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + "-" + getString(duration));
+		return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + "-" + durStr);
 
 	else if ((hora == IdHor_0) && (minuto == IdMin_0)) {
 
 		if (duration.second == 'd')
-			return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + getString(duration));
+			return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + durStr);
 
 		else if ((duration.second == 'M') && (dia == IdDia_1))
-			return std::string(normStringMes(mes) + "/" + getString(ano) + "-" + getString(duration));
+			return std::string(normStringMes(mes) + "/" + getString(ano) + "-" + durStr);
 
 		else if ((duration.second == 'a') && (mes == IdMes_1) && (dia == IdDia_1))
-			return std::string(getString(ano) + "-" + getString(duration));
+			return std::string(getString(ano) + "-" + durStr);
 
-		return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + getString(duration));
+		return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + durStr);
 
 	} // else if ((hora == IdHor_0) && (minuto == IdMin_0)) {
 
-	return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + ":-" + getString(duration));
+	return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + ":-" + durStr);
 
 } // std::string Periodo::str() const{
 
@@ -1524,64 +1453,6 @@ std::pair<unsigned int, char> Periodo::getDurationFromStr(const std::string &a_s
 
 }
 
-std::pair<unsigned int, char> Periodo::getDurationFromTipoPeriodo(const TipoPeriodo a_perT) {
-
-	try {
-
-		return getDurationFromStr(getString(a_perT));
-
-
-	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getDurationFromTipoPeriodo(" + getFullString(a_perT) + ") : \n" + std::string(erro.what())); }
-
-}
-
-TipoPeriodo Periodo::getTipoPeriodoFromDuration(const std::pair<unsigned int, char>& a_dur) {
-
-	try {
-
-		if (!isValidDuration(a_dur))
-			throw std::invalid_argument("Invalid dur.");
-
-		if (a_dur.second == 'm') {
-			if (a_dur.first == 1U)
-				return TipoPeriodo_minuto;
-			else if (a_dur.first == 30U)
-				return TipoPeriodo_meia_hora;
-			return getTipoPeriodoFromChar(getString(a_dur).c_str());
-		}
-
-		if (a_dur.second == 'h') {
-			if (a_dur.first == 1U)
-				return TipoPeriodo_horario;
-			return getTipoPeriodoFromChar(std::string(getString(a_dur.first) + "horas").c_str());
-		}
-
-		if (a_dur.second == 'd') {
-			if (a_dur.first == 1U)
-				return TipoPeriodo_diario;
-			if (a_dur.first == 7U)
-				return TipoPeriodo_semanal;
-			return getTipoPeriodoFromChar(std::string(getString(a_dur.first) + "dias").c_str());
-		}
-
-		if (a_dur.second == 'M') {
-			if (a_dur.first == 1U)
-				return TipoPeriodo_mensal;
-			return TipoPeriodo_Nenhum;
-		}
-
-		if (a_dur.second == 'a') {
-			if (a_dur.first == 1U)
-				return TipoPeriodo_anual;
-			return TipoPeriodo_Nenhum;
-		}
-
-		return TipoPeriodo_Nenhum;
-	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getTipoPeriodoFromDuration(" + getFullString(a_dur) + ") : \n" + std::string(erro.what())); }
-
-}
 
 bool Periodo::isValidDuration(const std::pair<unsigned int, char>& a_dur1){
 
@@ -1633,31 +1504,40 @@ bool Periodo::isSameDuration(const Periodo& a_per1, const Periodo& a_per2){
 
 }
 
+Periodo Periodo::getPeriodBtwn(const Periodo& a_per1, const Periodo& a_per2){
+
+	try{
+
+		Periodo perMaior = a_per2;
+		Periodo perMenor = a_per1;
+
+		if (a_per1 > a_per2) {
+			perMaior = a_per1;
+			perMenor = a_per2;
+		}
+
+		const Periodo perMenorNxt_min = Periodo("m", perMenor + 1);
+
+		if (perMenorNxt_min >= perMaior)
+			throw std::invalid_argument("There is no gap between periods.");
+
+		const Periodo perMaiorPrv_min = Periodo("m", perMaior) - 1;
+
+		const unsigned int numMin = perMaiorPrv_min - perMenorNxt_min + 1;
+
+		return Periodo(getString(numMin) + "m", perMenorNxt_min);
+
+	} // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getPeriodBtwn(" + getFullString(a_per1) + "," + getFullString(a_per2) + "): \n" + std::string(erro.what())); }
+
+}
+
 std::vector<std::string> Periodo::getDurT(){
 
 	return std::vector<std::string>{"m", "h", "d", "M", "a"};
 }
 
 
-
-Periodo Periodo::deslocarPeriodo(const Periodo& a_periodo, int a_numero_de_horas)
-{
-	try {
-
-		IdAno anoIter;
-		IdMes mesIter;
-		IdDia diaIter;
-		IdHor horIter;
-		IdMin minIter;
-
-		Periodo::iteraHora(a_periodo, a_numero_de_horas, anoIter, mesIter, diaIter, horIter, minIter);
-
-		return Periodo(getString(a_periodo.getDuration()), diaIter, mesIter, anoIter, horIter, minIter);
-
-	} // try {
-	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::deslocarPeriodo(" + getString(a_periodo) + getString(a_numero_de_horas) + "): \n" + std::string(erro.what())); }
-
-}
 
 Periodo::~Periodo() {}
 

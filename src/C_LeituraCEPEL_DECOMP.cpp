@@ -185,9 +185,9 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 						Periodo periodo_processo_estocastico = periodo_DC;
 						bool is_first_sobreposicao = false;
 
-						if (periodo_DC.getTipoPeriodo() <= periodo_otimizacao.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
+						if (periodo_DC.getMinutos() >= periodo_otimizacao.getMinutos()) { //Granularidade do periodo_otimizacao <= periodo_DC
 
-							if (periodo_DC.getTipoPeriodo() < periodo_otimizacao.getTipoPeriodo())
+							if (periodo_DC.getMinutos() > periodo_otimizacao.getMinutos())
 								a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_tipo_lag_autocorrelacao, TipoLagAutocorrelacao_semanal_sab);
 
 							periodo_processo_estocastico = periodo_otimizacao;
@@ -1031,7 +1031,7 @@ void LeituraCEPEL::ler_vazao_probabilidade_estrutura_arvore_cenarios_from_VAZOES
 
 								Periodo periodo_processo_estocastico = periodo_DC;
 
-								if (periodo_DC.getTipoPeriodo() <= periodo_otimizacao.getTipoPeriodo()) //Granularidade do periodo_otimizacao <= periodo_DC
+								if (periodo_DC.getMinutos() >= periodo_otimizacao.getMinutos()) //Granularidade do periodo_otimizacao <= periodo_DC
 									periodo_processo_estocastico = periodo_otimizacao;
 
 								matriz_probabilidade_abertura.addElemento(periodo_processo_estocastico, probabilidade_abertura);
@@ -12645,7 +12645,7 @@ void LeituraCEPEL::define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados)
 					Periodo periodo_processo_estocastico = periodo_DC;
 					bool is_first_sobreposicao = false;
 
-					if (periodo_DC.getTipoPeriodo() <= periodo_otimizacao.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
+					if (periodo_DC.getMinutos() >= periodo_otimizacao.getMinutos()) { //Granularidade do periodo_otimizacao <= periodo_DC
 						periodo_processo_estocastico = periodo_otimizacao;
 
 						if(periodo_otimizacao.sobreposicao(periodo_DC) == 1.0)//Garante que o periodo_otimizacao esteja "dentro" do periodo_DC
@@ -12873,7 +12873,7 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 							bool is_first_sobreposicao = false;
 
-							if (horizonte_otimizacao_DC.at(idEstagio_DC).getTipoPeriodo() <= periodo.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
+							if (horizonte_otimizacao_DC.at(idEstagio_DC).getMinutos() >= periodo.getMinutos()) { //Granularidade do periodo_otimizacao <= periodo_DC
 
 								const Periodo periodo_teste = Periodo(getString(periodo.getDuration()), horizonte_otimizacao_DC.at(idEstagio_DC));
 
@@ -12975,50 +12975,21 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 			const SmartEnupla<Periodo, double> horizonte_tendencia(a_dados.processoEstocastico_hidrologico.getVetor(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double()), NAN);
 
-			const Periodo periodNextMinTrend = Periodo("m", horizonte_tendencia.getIteradorFinal() + 1);
-			const Periodo periodIni = a_dados.processoEstocastico_hidrologico.getIterador1Inicial(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo());
-			const Periodo periodIniMin = Periodo("m", periodIni);
+			const Periodo periodEndTrend = horizonte_tendencia.getIteradorFinal();
+			const Periodo periodIniSP = a_dados.processoEstocastico_hidrologico.getIterador1Inicial(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo());
 
-			if (periodNextMinTrend > periodIniMin)
-				throw std::invalid_argument("Trend period must not surpass the begining of the SP.");
+			const Periodo periodGap = Periodo::getPeriodBtwn(periodEndTrend, periodIniSP);
 
-			if (periodNextMinTrend < periodIniMin) {
+			for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= a_dados.processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria()); idVar++) {
 
-				Periodo peridGap = horizonte_tendencia.getIteradorFinal() + 1;
+				const double realiz = a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVar, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodIniSP, IdRealizacao_1, double());
 
-				while (Periodo("m", peridGap + 1) - 1 != periodIniMin - 1) {
-
-					TipoPeriodo typePeriodGap = peridGap.getTipoPeriodo();
-
-					for (TipoPeriodo typePer = typePeriodGap; typePer < TipoPeriodo_minuto; typePer++) {
-
-						peridGap = Periodo(getString(Periodo::getDurationFromTipoPeriodo(typePer)), peridGap);
-						Periodo peridNextMinGap = Periodo("m", peridGap + 1);
-
-						if (peridNextMinGap <= periodIniMin) {
-
-							for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= a_dados.processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria()); idVar++) {
-
-								const double realiz = a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVar, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodIni, IdRealizacao_1, double());
-
-								a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVar).vetorVariavelAleatoriaInterna.at(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_tendencia_temporal, peridGap, realiz);
-								a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVar).vetorVariavelAleatoriaInterna.at(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, peridGap, realiz);
-							}
-
-							if (peridNextMinGap < periodIniMin)
-								peridGap++;
-
-							break;
-						}
-
-					}
-				}
+				a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVar).vetorVariavelAleatoriaInterna.at(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodGap, realiz);
+				a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVar).vetorVariavelAleatoriaInterna.at(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, periodGap, realiz);
 			}
 
-
-
 		}//if (!processoEstocasticoHidrologicoPreConfig_instanciado) {
-	
+
 		else {
 			/*
 			const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
@@ -13571,13 +13542,13 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 					////////////////////////////
 					//Determina os tipos de períodos do hosrizonte_estudo_DECK
 
-					std::vector<TipoPeriodo> tipo_periodos_horizonte_DECK;
+					std::vector<std::pair<unsigned int, char>> tipo_periodos_horizonte_DECK;
 
 					for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
 
 						bool is_tipo_periodo_encontrado = false;
 
-						const TipoPeriodo tipo_periodo = periodo_deck.getTipoPeriodo();
+						const std::pair<unsigned int, char> tipo_periodo = periodo_deck.getDuration();
 
 						for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
 
@@ -13628,8 +13599,8 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 											for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
 
-												const TipoPeriodo tipo_periodo = tipo_periodos_horizonte_DECK.at(pos);
-												const Periodo periodo_seguinte = Periodo(getString(Periodo::getDurationFromTipoPeriodo(tipo_periodo)), periodo + 1);
+												const std::pair<unsigned int, char> tipo_periodo = tipo_periodos_horizonte_DECK.at(pos);
+												const Periodo periodo_seguinte = Periodo(getString(tipo_periodo), periodo + 1);
 
 												for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
 
@@ -15394,7 +15365,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		//Informação Operacional pre-Config PD (valores absolutos) -> entra direito no Att do problema CP
 		//Informação Premissa pre-Config PD (valores p.u) -> Aplica modulação PD na previsão CP
 		// 
-		// Condição: periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo() (e.g. um periodo_PD horário não sobreescreve informação a um periodo semanal)
+		// Condição: (periodo.getMinutos() <= periodo_PD.getMinutos()) (e.g. um periodo_PD horário não sobreescreve informação a um periodo semanal)
 		// 
 		// *********************************
 		// Restrições elétricas/hidráulicas
@@ -15641,7 +15612,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-						if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
@@ -15657,7 +15628,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							}//for (IdSubmercado idSubmercado_PD = idSubmercadoIni_PD; idSubmercado_PD < idSubmercadoOut_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-						}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 					}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -15721,7 +15692,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-						if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
@@ -15826,7 +15797,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							}//for (IdSubmercado idSubmercado_PD = idSubmercadoIni_PD; idSubmercado_PD < idSubmercadoOut_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-						}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 					}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -15882,7 +15853,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-						if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
@@ -15919,7 +15890,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							}//for (IdSubmercado idSubmercado_PD = idSubmercadoIni_PD; idSubmercado_PD < idSubmercadoOut_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-						}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 					}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -15981,7 +15952,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-						if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
@@ -16083,7 +16054,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							}//for (IdSubmercado idSubmercado_PD = idSubmercadoIni_PD; idSubmercado_PD < idSubmercadoOut_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-						}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 					}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -16214,7 +16185,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-								if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 									const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 									const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.at(idPatamarDeficit_PD).getIterador2Final(AttMatrizPatamarDeficit_custo, periodo_PD, IdPatamarCarga());
@@ -16229,7 +16200,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -16312,7 +16283,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								if (periodo > periodo_REF)//Atualiza o periodo_REF para depois atualizar os limites do conjunto de restrições originais
 									periodo_REF = periodo;
@@ -16329,7 +16300,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									a_dados.vetorIntercambio.at(idIntercambio_CP_).setElemento(AttMatrizIntercambio_potencia_minima, periodo, idPatamarCarga, dados_PD.vetorIntercambio.at(idIntercambio_PD_).getElementoMatriz(AttMatrizIntercambio_potencia_minima, periodo_PD, idPatamarCarga, double()));
 								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -16430,7 +16401,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								if (periodo > periodo_REF)//Atualiza o periodo_REF para depois atualizar os limites do conjunto de restrições originais
 									periodo_REF = periodo;
@@ -16449,7 +16420,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									a_dados.vetorRenovavel.at(idRenovavel_PD).setElemento(AttMatrizRenovavel_geracao, periodo, idPatamarCarga, dados_PD.vetorRenovavel.at(idRenovavel_PD).getElementoMatriz(AttMatrizRenovavel_geracao, periodo_PD, idPatamarCarga, double()));
 								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -16649,7 +16620,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-									if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+									if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 										const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
@@ -16672,7 +16643,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 										a_dados.vetorTermeletrica.at(idTermeletrica_CP).vetorUnidadeUTE.at(idUnidadeUTEIni_CP).setElemento(AttVetorUnidadeUTE_disponibilidade, periodo, 0.0);
 										a_dados.vetorTermeletrica.at(idTermeletrica_CP).vetorUnidadeUTE.at(idUnidadeUTEIni_CP).setElemento(AttVetorUnidadeUTE_representacao_discreta_producao, periodo, 0);
 
-									}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+									}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -16932,7 +16903,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-								if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 									const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 									const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidadeUTEIni_PD).getIterador2Final(AttMatrizUnidadeUTE_custo_de_operacao, periodo_PD, IdPatamarCarga());
@@ -16965,7 +16936,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									if (dados_PD.vetorTermeletrica.at(idTermeletrica_PD).getSizeMatriz(AttMatrizTermeletrica_potencia_disponivel_maxima) > 0)
 										a_dados.vetorTermeletrica.at(idTermeletrica_PD).setElemento(AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, IdPatamarCarga_1, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).getElementoMatriz(AttMatrizTermeletrica_potencia_disponivel_maxima, periodo_PD, IdPatamarCarga_1, double()));
 
-								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -17326,7 +17297,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-								if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 									const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 									IdPatamarCarga maiorIdPatamarCarga_PD = IdPatamarCarga_Nenhum;
@@ -17514,7 +17485,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									}//if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).isInstanciado(IdReservatorio_1)) {
 
-								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -17640,7 +17611,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorContrato.at(idContrato_PD).getIterador2Final(AttMatrizContrato_lim_inf, periodo_PD, IdPatamarCarga());
@@ -17656,7 +17627,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -17745,7 +17716,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorDemandaEspecial.at(idDemandaEspecial_PD).getIterador2Final(AttMatrizDemandaEspecial_demanda, periodo_PD, IdPatamarCarga());
@@ -17759,7 +17730,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -17873,7 +17844,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).getIterador2Final(AttMatrizReservaPotencia_reserva_minima, periodo_PD, IdPatamarCarga());
@@ -17892,7 +17863,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									a_dados.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.at(idElementoSistema).setElemento(AttMatrizElementoSistema_fator_participacao, periodo, IdPatamarCarga_1, dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.at(idElementoSistema).getElementoMatriz(AttMatrizElementoSistema_fator_participacao, periodo_PD, IdPatamarCarga_1, double()));
 								}//for (IdElementoSistema idElementoSistema = idElementoSistemaIni; idElementoSistema < idElementoSistemaOut; dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.incr(idElementoSistema)) {
 
-							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -17992,7 +17963,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								//AttMatriz
 								const int int_size = dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getIterador2Final(AttMatrizControleCotaVazao_num_horas_lag, periodo_PD, int());
@@ -18007,7 +17978,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 								a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setElemento(AttVetorControleCotaVazao_coef_linear_cota_vazao_0, periodo, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getElementoVetor(AttVetorControleCotaVazao_coef_linear_cota_vazao_0, periodo_PD, double()));
 								a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setElemento(AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getElementoVetor(AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo_PD, double()));
 
-							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -18345,7 +18316,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-								if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 									if (periodo > periodo_REF)//Atualiza o periodo_REF para depois atualizar os limites do conjunto de restrições originais
 										periodo_REF = periodo;
@@ -18400,7 +18371,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									//}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -18642,7 +18613,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-								if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 									if (periodo > periodo_REF)//Atualiza o periodo_REF para depois atualizar os limites do conjunto de restrições originais
 										periodo_REF = periodo;
@@ -18702,7 +18673,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									//}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
