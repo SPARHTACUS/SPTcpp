@@ -11988,7 +11988,6 @@ void LeituraCEPEL::defineHorizontes_CP(Dados& a_dados)
 		if (!dadosPreConfig_instanciados) {
 			a_dados.setAtributo(AttComumDados_periodo_referencia, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial());
 			a_dados.setAtributo(AttComumDados_estagio_final, a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal());
-			a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, estagio_acoplamento_pre_estudo);
 		}//if (!dadosPreConfig_instanciados) {
 		else {
 
@@ -11997,9 +11996,6 @@ void LeituraCEPEL::defineHorizontes_CP(Dados& a_dados)
 
 			if (a_dados.getAtributo(AttComumDados_estagio_final, IdEstagio()) != a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal())
 				throw std::invalid_argument("Pre-config deve ter estagio_final igual a: " + getString(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()));
-
-			if (a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio()) != estagio_acoplamento_pre_estudo)
-				throw std::invalid_argument("Pre-config deve ter estagio_acoplamento_pre_estudo igual a: " + getString(estagio_acoplamento_pre_estudo));
 
 		}//	else {
 

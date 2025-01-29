@@ -333,11 +333,6 @@ void MetodoSolucao::executarPDDE_forward(EntradaSaidaDados a_entradaSaidaDados, 
 						a_entradaSaidaDados.setDiretorioSaida(diretorio);
 						a_modeloOtimizacao.exportarVersaoAlternativaCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
 
-						if (idEstagio == a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_acoplamento_pre_estudo, IdEstagio())) {
-							a_entradaSaidaDados.setAppendArquivo(false);
-							a_entradaSaidaDados.setDiretorioSaida(diretorio);
-							a_modeloOtimizacao.exportarCorteBenders_AcoplamentoPreEstudo(a_idIteracao, a_entradaSaidaDados);
-						}
 					} // if (a_idProcesso == IdProcesso_mestre) {
 
 				} // for (IdEstagio idEstagio = a_estagio_final; idEstagio >= a_estagio_inicial; idEstagio--) {
@@ -630,11 +625,6 @@ void MetodoSolucao::executarPDDE_backward_new(EntradaSaidaDados a_entradaSaidaDa
 					a_entradaSaidaDados.setAppendArquivo(false);
 					a_entradaSaidaDados.setDiretorioSaida(diretorio);
 					a_modeloOtimizacao.exportarVersaoAlternativaCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
-				}
-				if (idEstagio == a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_acoplamento_pre_estudo, IdEstagio())) {
-					a_entradaSaidaDados.setAppendArquivo(false);
-					a_entradaSaidaDados.setDiretorioSaida(diretorio);
-					a_modeloOtimizacao.exportarCorteBenders_AcoplamentoPreEstudo(a_idIteracao, a_entradaSaidaDados);
 				}
 
 			} // if (a_idProcesso == IdProcesso_mestre) {

@@ -14,8 +14,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 	try {
 		
-		const IdEstagio idEstagio_acoplamento = a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio());
-
 		const IdEstagio estagio_inicial = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
 		const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
 
@@ -61,10 +59,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 				vetorEstagio.at(idEstagio).selecaoSolucaoProxy(a_dados.getElementoVetor(AttVetorDados_numero_aberturas_solucao_proxy, idEstagio, int()));
 
-				if (idEstagio == idEstagio_acoplamento)
-					vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, 0);
-				else
-					vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, getAtributo(AttComumModeloOtimizacao_selecao_cortes_nivel_dominancia, int()));
+				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, getAtributo(AttComumModeloOtimizacao_selecao_cortes_nivel_dominancia, int()));
 				
 				if ((idEstagio > estagio_inicial) || (estagio_inicial != IdEstagio_1)) {
 					if (strCompara(getAtributo(AttComumModeloOtimizacao_diretorio_importacao_cortes, std::string()), "nenhum")) {
@@ -89,23 +84,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 		} // if (true) {
 
-
-		Periodo periodo_acoplamento;
-		if (idEstagio_acoplamento > estagio_final) {
-			const SmartEnupla<Periodo, double> horizon_stage = a_dados.getElementosMatriz(AttMatrizDados_percentual_duracao_horizonte_estudo, estagio_final, Periodo(), double());
-			periodo_acoplamento = horizon_stage.getIteradorFinal() + 1;
-		}
-		else
-			periodo_acoplamento = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio_acoplamento, Periodo());
-
-		Periodo menor_periodo_estagio_acoplamento_pre_estudo = periodo_acoplamento;
-
-		for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
-			if (horizonte_estudo.getElemento(periodo) == a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio())) {
-				menor_periodo_estagio_acoplamento_pre_estudo = periodo;
-				break;
-			}//if (horizonte_estudo_vetor.getElemento(periodo) == a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio())) {
-		}//for (Periodo periodo = horizonte_estudo_vetor.getIteradorInicial(); periodo <= horizonte_estudo_vetor.getIteradorFinal(); horizonte_estudo_vetor.incrementarIterador(periodo)) {
+		const Periodo menor_periodo_estagio_acoplamento_pre_estudo = horizonte_estudo.getIteradorInicial();
 
 		const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> horizon = a_dados.getMatriz(AttMatrizDados_percentual_duracao_patamar_carga, Periodo(), IdPatamarCarga(), double());
 
@@ -220,9 +199,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 		importarVariaveisEstado_AcoplamentoPosEstudo(TipoSubproblemaSolver_geral, a_dados, idProcesso, a_entradaSaidaDados);
 
 		importarCorteBenders(TipoSubproblemaSolver_geral, a_dados, idProcesso, std::string(a_entradaSaidaDados.getDiretorioSaida() + "//" + getFullString(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao())) + "//Selecao_Cortes_Importacao"), a_entradaSaidaDados);
-
-		if (idProcesso == IdProcesso_mestre)
-			exportarVariaveisEstado_AcoplamentoPreEstudo(a_entradaSaidaDados);
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::formularModeloOtimizacao(): \n" + std::string(erro.what())); }

@@ -719,14 +719,8 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 				a_dados.volume_inicial_carregado_from_operacional = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv", a_dados, TipoAcessoInstancia_m2);
 				a_dados.volume_inicial_carregado_from_premissa    = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumPremissa.csv", a_dados, TipoAcessoInstancia_m2);
 
-				if (a_dados.getAtributo(AttComumDados_estagio_inicial, IdEstagio()) == IdEstagio_1) {
-					if (a_dados.volume_inicial_carregado_from_operacional && a_dados.volume_inicial_carregado_from_premissa)
-						throw std::invalid_argument("Apenas um dos arquivos HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv, HIDRELETRICA_RESERVATORIO_AttComumPremissa.csv deve ser carregado.");
-				}
-				else {
-					if (a_dados.volume_inicial_carregado_from_operacional || a_dados.volume_inicial_carregado_from_premissa)
-						throw std::invalid_argument("Nenhum dos arquivos HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv, HIDRELETRICA_RESERVATORIO_AttComumPremissa.csv deve ser carregado quando " + getFullString(AttComumDados_estagio_inicial) + " for maior que " + getFullString(IdEstagio_1));
-				}
+				if (a_dados.volume_inicial_carregado_from_operacional && a_dados.volume_inicial_carregado_from_premissa)
+					throw std::invalid_argument("Apenas um dos arquivos HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv, HIDRELETRICA_RESERVATORIO_AttComumPremissa.csv deve ser carregado.");
 
 			} // if (true) {
 
@@ -738,11 +732,7 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 
 			entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AttVetorOperacional_PorPeriodo.csv", a_dados, TipoAcessoInstancia_m1);
 
-			if (true) {
-				const bool leitura_att_vetor_defluencia = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv", a_dados, TipoAcessoInstancia_m2);
-				if ((a_dados.getAtributo(AttComumDados_estagio_inicial, IdEstagio()) > IdEstagio_1) && (leitura_att_vetor_defluencia))
-					throw std::invalid_argument("O arquivo HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv nao deve ser lido caso " + getFullString(AttComumDados_estagio_inicial) + " seja maior que " + getFullString(IdEstagio_1) + ".");
-			} // if (true) {
+			const bool leitura_att_vetor_defluencia = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv", a_dados, TipoAcessoInstancia_m2);
 
 			bool tipo_detalhamento_producao_por_usina = false;
 			bool tipo_detalhamento_producao_por_conjunto = false;
@@ -861,8 +851,6 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 							break;
 						}
 					}
-
-					a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, estagio_acoplamento_pre_estudo);
 
 				} // else if (tendencia_natural || tendencia_incremental){
 
