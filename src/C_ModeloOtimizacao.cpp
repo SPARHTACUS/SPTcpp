@@ -5176,25 +5176,25 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 				else if (nome.at(0) == "YP") {
 
-					Periodo periodo = Periodo(nome.at(2));
+					//Periodo periodo = Periodo(nome.at(2));
 
-					Periodo periodo_lag = Periodo(nome.at(3));
+					Periodo periodo_lag = Periodo(nome.at(2));
 
-					const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(4).c_str());
+					const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(3).c_str());
 
 					if (idProcessoEstocastico != getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()))
 						throw std::invalid_argument(getFullString(idProcessoEstocastico) + " do acoplamento incompativel com " + getFullString(a_dados.processoEstocastico_hidrologico.getAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico())) + " do modelo");
 
-					const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(5).c_str());
+					const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(4).c_str());
 
-					const double grau_liberdade = getdoubleFromChar(nome.at(6).c_str());
+					const double grau_liberdade = getdoubleFromChar(nome.at(5).c_str());
 
-					if (nome.size() < 8)
+					if (nome.size() < 7)
 						throw std::invalid_argument(getFullString(idVariavelEstado) + " com termos ausentes de YP.");
 
 					std::vector<IdHidreletrica> listaHidreletrica;
 					std::vector<IdHidreletrica> listaHidreletricaNaoInstanciadaNoModelo;
-					for (int i = 7; i < nome.size(); i++) {
+					for (int i = 6; i < nome.size(); i++) {
 						const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(i).c_str());
 						if (idHidreletrica == IdHidreletrica_Nenhum)
 							throw std::invalid_argument("Nao encontrado IdHidreletrica escrito como " + nome.at(i) + " em " + getFullString(idVariavelEstado));
