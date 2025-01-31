@@ -32,7 +32,6 @@
 	  m(Dados,  AttComum,                                   estagio_final,                         IdEstagio,           1,         max,             1,      sim) \
 	  m(Dados,  AttComum,                     diretorio_importacao_cortes,                            string,         min,         max,        Nenhum,      sim) \
 	  m(Dados,  AttComum,                 diretorio_importacao_pos_estudo,                            string,         min,         max,        Nenhum,      sim) \
-	  m(Dados,  AttComum,                 diretorio_importacao_pre_estudo,                            string,         min,         max,        Nenhum,      sim) \
 	  m(Dados,  AttComum,                                iteracao_inicial,                        IdIteracao,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                         numero_maximo_iteracoes,                               int,           0,         max,             0,      sim) \
 	  m(Dados,  AttComum,                                numero_aberturas,                               int,           1,         max,             1,      nao) \
