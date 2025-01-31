@@ -322,6 +322,12 @@ private:
 
 	void inicializa_Submercados_Intercambios_Nao_Registrados(Dados& a_dados, const SmartEnupla<Periodo, IdEstagio> a_horizonte_estudo);
 
+	bool folderExists(const std::string& path) {
+		struct stat info;
+		return (stat(path.c_str(), &info) == 0 && (info.st_mode & S_IFDIR));
+	}
+
+
 	////////////////////////////////////////////////////////////////
 	//PreConfig Hidrelétricas
 
