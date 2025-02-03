@@ -4,6 +4,7 @@
 #include <fstream>
 
 Dados dados_CP_ref; //dados de um CP referência para popular info de um novo estudo CP
+bool is_read_dados_CP_ref = false; // identifica se existe CP referência para popular info de um novo estudo CP
 IdEstagio idEstagioMaximo = IdEstagio_3; //Decomposição adoptada para o CP
 
 const IdEstagio estagio_acoplamento_pre_estudo = IdEstagio_2; //Acoplamento com o PD
@@ -1785,6 +1786,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 			const std::string dadosEntradaCP_preConfig = a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG" + "//DadosEntradaCP_PRECONFIG";
 
 			if (folderExists(dadosEntradaCP_preConfig)) {
+				is_read_dados_CP_ref = true;
 
 				EntradaSaidaDados entradaSaidaDados;
 
@@ -2728,7 +2730,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							// e.x de aplicação: patamares não sequenciais extras
 							///////////////////////////////////////////////////////////////////////////							
 
-							if (dados_CP_ref.vetorTermeletrica.isInstanciado(IdTermeletrica(codigo_usina))) {
+							if (is_read_dados_CP_ref) {
 
 								/////////////
 								//Atualiza 
@@ -2746,7 +2748,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 									custo_operacao.push_back(dados_CP_ref.vetorTermeletrica.at(IdTermeletrica(codigo_usina)).getElementoMatriz(AttMatrizTermeletrica_custo_de_operacao, periodo_DC, idPatamarCarga_CP_ref, double()));
 								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-							}//if (dados_CP_ref.vetorTermeletrica.isInstanciado(IdTermeletrica(codigo_usina))) {
+							}//if (is_read_dados_CP_ref) {
 
 
 							/////////////////////////////////////////
@@ -3298,7 +3300,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							// e.x de aplicação: patamares não sequenciais extras
 							///////////////////////////////////////////////////////////////////////////
 
-							if (dados_CP_ref.getSize1Matriz(idSubmercado, AttMatrizSubmercado_demanda) > 0) {
+							if (is_read_dados_CP_ref) {
 
 								double horasTotais = 0; //horas totais do periodo_DC do deck original
 
@@ -3319,7 +3321,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 									duracao_horas_patamar.push_back(dados_CP_ref.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, idPatamarCarga_CP_ref, double()) * horasTotais);
 								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 									
-							}//if (dados_CP_ref.getSize1Matriz(idSubmercado, AttMatrizSubmercado_demanda) > 0) {
+							}//if (is_read_dados_CP_ref) {
 
 							///////////////////////////////////////////////////////////////////////////
 
@@ -3654,7 +3656,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							// e.x de aplicação: patamares não sequenciais extras
 							///////////////////////////////////////////////////////////////////////////							
 
-							if (dados_CP_ref.vetorSubmercado.at(idSubmercado).vetorPatamarDeficit.isInstanciado(idPatamarDeficit)) {
+							if (is_read_dados_CP_ref) {
 
 								/////////////
 								//Atualiza 
@@ -3677,7 +3679,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-							}//if (dados_CP_ref.vetorSubmercado.at(idSubmercado).vetorPatamarDeficit.isInstanciado(idPatamarDeficit)) {
+							}//if (is_read_dados_CP_ref) {
 
 							////////////////////////////////////////////////////////////////////////////////
 
@@ -4010,7 +4012,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							// e.x de aplicação: patamares não sequenciais extras
 							///////////////////////////////////////////////////////////////////////////							
 
-							if (dados_CP_ref.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(idUsinaNaoSimulada)) {
+							if (is_read_dados_CP_ref) {
 
 								/////////////
 								//Atualiza 
@@ -4024,7 +4026,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 									usinaNaoSimulada_potencia_gerada.push_back(dados_CP_ref.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).getElementoMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo_DC, idPatamarCarga_CP_ref, double()));
 								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-							}//if (dados_CP_ref.vetorTermeletrica.isInstanciado(IdTermeletrica(codigo_usina))) {
+							}//if (is_read_dados_CP_ref) {
 
 							///////////////////////////////////////////////////////////////////////////		
 
@@ -4322,7 +4324,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								// e.x de aplicação: patamares não sequenciais extras
 								///////////////////////////////////////////////////////////////////////////							
 
-								if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio_itaipu_iv)) {
+								if (is_read_dados_CP_ref) {
 
 									/////////////
 									//Atualiza 
@@ -4338,41 +4340,25 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 										potencia_maxima_itaipu_iv.push_back(dados_CP_ref.vetorIntercambio.at(idIntercambio_itaipu_iv).getElementoMatriz(AttMatrizIntercambio_potencia_maxima, periodo_DC, idPatamarCarga_CP_ref, double()));
 									}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-								}//if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio_itaipu_iv)) {
-
-								if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio_itaipu_ande)) {
-
 									/////////////
 									//Atualiza 
 									potencia_minima_itaipu_ande.clear();
 									potencia_maxima_itaipu_ande.clear();
-
-									const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_inicial);
-
-									const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
 
 									for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 										potencia_minima_itaipu_ande.push_back(dados_CP_ref.vetorIntercambio.at(idIntercambio_itaipu_ande).getElementoMatriz(AttMatrizIntercambio_potencia_minima, periodo_DC, idPatamarCarga_CP_ref, double()));
 										potencia_maxima_itaipu_ande.push_back(dados_CP_ref.vetorIntercambio.at(idIntercambio_itaipu_ande).getElementoMatriz(AttMatrizIntercambio_potencia_maxima, periodo_DC, idPatamarCarga_CP_ref, double()));
 									}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-								}//if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio_itaipu_ande)) {
-
-								if (dados_CP_ref.vetorSubmercado.isInstanciado(idSubmercado_ande)) {
-
 									/////////////
 									//Atualiza 
 									demanda_ande.clear();
-
-									const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_inicial);
-
-									const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
 
 									for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 										demanda_ande.push_back(dados_CP_ref.vetorSubmercado.at(idSubmercado_ande).getElementoMatriz(AttMatrizSubmercado_demanda, periodo_DC, idPatamarCarga_CP_ref, double()));
 									}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-								}//if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio_itaipu_ande)) {
+								}//if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio_itaipu_iv)) {
 
 								///////////////////////////////////////////
 
@@ -4596,7 +4582,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								throw std::invalid_argument("Registro IT - Intercambio nao encontrado");
 
 
-							if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio_itaipu_ande)) {
+							if (is_read_dados_CP_ref) {
 
 								/////////////
 								//Atualiza 
@@ -4610,23 +4596,15 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 									itaipu_50Hz_potencia.push_back(dados_CP_ref.vetorIntercambio.at(idIntercambio_itaipu_ande).getElementoMatriz(AttMatrizIntercambio_potencia_maxima, periodo_DC, idPatamarCarga_CP_ref, double()));
 								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-							}//if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio_itaipu_ande)) {
-
-							if (dados_CP_ref.vetorSubmercado.isInstanciado(idSubmercado_ande)) {
-
 								/////////////
 								//Atualiza 
 								itaipu_carga_ANDE.clear();
-
-								const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_Itaipu);
-
-								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
 
 								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 									itaipu_carga_ANDE.push_back(dados_CP_ref.vetorSubmercado.at(idSubmercado_ande).getElementoMatriz(AttMatrizSubmercado_demanda, periodo_DC, idPatamarCarga_CP_ref, double()));
 								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-							}//if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio_itaipu_ande)) {
+							}//if (is_read_dados_CP_ref) {
 
 							///////////////////////////////////////////
 
@@ -5169,7 +5147,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							// e.x de aplicação: patamares não sequenciais extras
 							///////////////////////////////////////////////////////////////////////////							
 
-							if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio)) {
+							if (is_read_dados_CP_ref) {
 
 								/////////////
 								//Atualiza 
@@ -5183,7 +5161,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 									intercambio_capacidade_maxima_submercado_origem.push_back(dados_CP_ref.vetorIntercambio.at(idIntercambio).getElementoMatriz(AttMatrizIntercambio_potencia_maxima, periodo_DC, idPatamarCarga_CP_ref, double()));
 								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-							}//if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio)) {
+							}//if (is_read_dados_CP_ref) {
 
 							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -6312,7 +6290,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							// e.x de aplicação: patamares não sequenciais extras
 							///////////////////////////////////////////////////////////////////////////							
 
-							if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
+							if (is_read_dados_CP_ref) {
 
 								//Procura uma restrição com o mesmo número de elementos e fatores de participação na restrição do deck atual
 
@@ -6348,7 +6326,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 									lim_sup.push_back(dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_CP_ref).getElementoMatriz(AttMatrizRestricaoEletrica_lim_sup, periodo_DC, idPatamarCarga_CP_ref, double()));
 								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-							}//if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
+							}//if (is_read_dados_CP_ref) {
 
 							/////////////////////////////
 
@@ -7883,7 +7861,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							// e.x de aplicação: patamares não sequenciais extras
 							///////////////////////////////////////////////////////////////////////////							
 
-							if (dados_CP_ref.vetorContrato.numObjetos() > 0) {
+							if (is_read_dados_CP_ref) {
 
 								//Procura uma restrição com o mesmo número de elementos e fatores de participação na restrição do deck atual
 
@@ -7923,7 +7901,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 									custo.push_back(dados_CP_ref.vetorContrato.at(idContrato_CP_ref).getElementoMatriz(AttMatrizContrato_custo, periodo_DC, idPatamarCarga_CP_ref, double()));
 								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-							}//if (dados_CP_ref.vetorContrato.numObjetos() > 0) {
+							}//if (is_read_dados_CP_ref) {
 
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9395,7 +9373,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							// e.x de aplicação: patamares não sequenciais extras
 							///////////////////////////////////////////////////////////////////////////							
 
-							if (dados_CP_ref.vetorRestricaoOperativaUHE.numObjetos() > 0) {
+							if (is_read_dados_CP_ref) {
 
 								//Procura uma restrição com o mesmo número de elementos e fatores de participação na restrição do deck atual
 
@@ -9432,7 +9410,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 									lim_sup.push_back(dados_CP_ref.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_CP_ref).getElementoMatriz(AttMatrizRestricaoOperativaUHE_lim_sup, periodo_DC, idPatamarCarga_CP_ref, double()));
 								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-							}//if (dados_CP_ref.vetorRestricaoOperativaUHE.numObjetos() > 0) {
+							}//if (is_read_dados_CP_ref) {
 
 							/////////////////////////
 
@@ -10795,7 +10773,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 							// e.x de aplicação: patamares não sequenciais extras
 							///////////////////////////////////////////////////////////////////////////							
 
-							if (dados_CP_ref.vetorTermeletrica.isInstanciado(idTermeletrica)) {
+							if (is_read_dados_CP_ref) {
 
 								/////////////
 								//Atualiza 
@@ -10807,7 +10785,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 									potencia.push_back(dados_CP_ref.vetorTermeletrica.at(idTermeletrica).getElementoMatriz(AttMatrizTermeletrica_potencia_disponivel_comandada, periodo_comandado, idPatamarCarga_CP_ref, double()));
 								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-							}//if (dados_CP_ref.vetorTermeletrica.isInstanciado(idTermeletrica)) {
+							}//if (is_read_dados_CP_ref) {
 
 							/////////////////////////////
 
@@ -11102,7 +11080,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_B(Dados& a_dados, const std::strin
 							// e.x de aplicação: patamares não sequenciais extras
 							///////////////////////////////////////////////////////////////////////////							
 
-							if (dados_CP_ref.vetorTermeletrica.isInstanciado(idTermeletrica)) {
+							if (is_read_dados_CP_ref) {
 
 								/////////////
 								//Atualiza 
@@ -11120,7 +11098,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_B(Dados& a_dados, const std::strin
 									custo_operacao.push_back(dados_CP_ref.vetorTermeletrica.at(idTermeletrica).getElementoMatriz(AttMatrizTermeletrica_custo_de_operacao, periodo_DC, idPatamarCarga_CP_ref, double()));
 								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
 
-							}//if (dados_CP_ref.vetorTermeletrica.isInstanciado(idTermeletrica)) {
+							}//if (is_read_dados_CP_ref) {
 
 
 							//***********************************************************************************************************************
