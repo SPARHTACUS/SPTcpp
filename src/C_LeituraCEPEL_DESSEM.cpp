@@ -156,7 +156,7 @@ Periodo LeituraCEPEL::getPeriodoInicial(Dados& a_dados, std::string diaInicial, 
 
 				if (meiaHoraInicial == "1") { idMinInicial = IdMin_30; }
 
-				periodo_inicial_restricao = Periodo(TipoPeriodo_meia_hora, idDiaInicial, periodo_inicial.getMes(), periodo_inicial.getAno(), idHoraInicial, idMinInicial);
+				periodo_inicial_restricao = Periodo("30m", idDiaInicial, periodo_inicial.getMes(), periodo_inicial.getAno(), idHoraInicial, idMinInicial);
 
 			}// if (getIdDiaFromChar(diaInicial.c_str()) >= idDiaInicioEstudo) {
 
@@ -204,7 +204,7 @@ Periodo LeituraCEPEL::getPeriodoFinal(Dados& a_dados, std::string diaFinal, std:
 
 				if (meiaHoraFinal == "1") { idMinFinal = IdMin_30; }
 
-				periodo_final_restricao = Periodo(TipoPeriodo_meia_hora, idDiaFinal, periodo_final_estudo.getMes(), periodo_final_estudo.getAno(), idHoraFinal, idMinFinal);
+				periodo_final_restricao = Periodo("30m", idDiaFinal, periodo_final_estudo.getMes(), periodo_final_estudo.getAno(), idHoraFinal, idMinFinal);
 
 			}// if (getIdDiaFromChar(diaFinal.c_str()) <= idDiaFinalEstudo) {
 
@@ -218,7 +218,7 @@ Periodo LeituraCEPEL::getPeriodoFinal(Dados& a_dados, std::string diaFinal, std:
 				if (meiaHoraFinal == "1") { idMinFinal = IdMin_30; }
 
 
-				periodo_final_restricao = Periodo(TipoPeriodo_meia_hora, idDiaFinal, idMesInicio, periodo_inicial.getAno(), idHoraFinal, idMinFinal);
+				periodo_final_restricao = Periodo("30m", idDiaFinal, idMesInicio, periodo_inicial.getAno(), idHoraFinal, idMinFinal);
 
 			}// if (getIdDiaFromChar(diaFinal.c_str()) <= idDiaFinalEstudo) {
 
@@ -334,7 +334,6 @@ void LeituraCEPEL::InstanciaProcessoEstocastico(Dados& a_dados, SmartEnupla<Peri
 		//a_dados.setAtributo(AttComumDados_metodo_solver, TipoMetodoSolver_barrier);
 		a_dados.setAtributo(AttComumDados_tipo_solver, TipoSolver_gurobi);
 		//a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("DadosSaidaCP//Otimizacao//AcoplamentoPreEstudo") );
-		a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio_2);
 		a_dados.setAtributo(AttComumDados_tipo_metodo_solucao, IdMetodoSolucao_MILP);
 		a_dados.setAtributo(AttComumDados_tipo_espaco_amostral_geracao_cenario_hidrologico, TipoEspacoAmostral_arvore_cenarios);
 		a_dados.setAtributo(AttComumDados_tipo_estudo, TipoEstudo_otimizacao);
@@ -438,7 +437,7 @@ void LeituraCEPEL::leitura_VAZOES_201904_DES16(Dados& a_dados, const std::string
 
 						// PERIODO INICIAL DO ESTUDO 
 						if (numeroLinha == 10) {
-							a_dados.setAtributo(AttComumDados_periodo_referencia, Periodo(TipoPeriodo_meia_hora, getIdDiaFromChar(line.substr(4, 2).c_str()), \
+							a_dados.setAtributo(AttComumDados_periodo_referencia, Periodo("30m", getIdDiaFromChar(line.substr(4, 2).c_str()), \
 								getIdMesFromChar(line.substr(8, 2).c_str()), getIdAnoFromChar(line.substr(12, 4).c_str()), getIdHorFromChar(line.substr(0, 2).c_str()), IdMin_0));
 						}//if (cont == 10) {
 
@@ -456,19 +455,19 @@ void LeituraCEPEL::leitura_VAZOES_201904_DES16(Dados& a_dados, const std::string
 								horizonte_estudo.addElemento(periodo, IdEstagio_1);
 
 							if (numeroDias > 1) {
-								Periodo periodoRestante = Periodo(TipoPeriodo_horario, IdDia(periodo_estudo_inicial.getDia()), periodo_estudo_inicial.getMes(), periodo_estudo_inicial.getAno()) + 24;
+								Periodo periodoRestante = Periodo("h", IdDia(periodo_estudo_inicial.getDia()), periodo_estudo_inicial.getMes(), periodo_estudo_inicial.getAno()) + 24;
 								for (Periodo periodo = periodoRestante; periodo <= periodo_final_estudo - 1; periodo++)
 									horizonte_estudo.addElemento(periodo, IdEstagio_1);
 							}
 
 							switch (numeroDias) {
-							case 1: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo(TipoPeriodo_diario, periodo_estudo_inicial));  break;
-							case 2: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo(TipoPeriodo_2dias, periodo_estudo_inicial));  break;
-							case 3: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo(TipoPeriodo_3dias, periodo_estudo_inicial));  break;
-							case 4: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo(TipoPeriodo_4dias, periodo_estudo_inicial));  break;
-							case 5: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo(TipoPeriodo_5dias, periodo_estudo_inicial));  break;
-							case 6: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo(TipoPeriodo_6dias, periodo_estudo_inicial));  break;
-							case 7: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo(TipoPeriodo_semanal, periodo_estudo_inicial));  break;
+							case 1: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo("d", periodo_estudo_inicial));  break;
+							case 2: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo("2d", periodo_estudo_inicial));  break;
+							case 3: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo("3d", periodo_estudo_inicial));  break;
+							case 4: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo("4d", periodo_estudo_inicial));  break;
+							case 5: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo("5d", periodo_estudo_inicial));  break;
+							case 6: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo("6d", periodo_estudo_inicial));  break;
+							case 7: horizonte_otimizacao.addElemento(IdEstagio_1, Periodo("7d", periodo_estudo_inicial));  break;
 							} //switch (numeroDias) {
 
 							a_dados.setVetor(AttVetorDados_horizonte_otimizacao, horizonte_otimizacao);
@@ -560,7 +559,7 @@ void LeituraCEPEL::leitura_VAZOES_201904_DES16(Dados& a_dados, const std::string
 								defluencia.setAtributo(AttComumDefluencia_idDefluencia, IdDefluencia_passada);
 								a_dados.vetorHidreletrica.at(idHidreletricaInstanciada).vetorDefluencia.add(defluencia);
 
-								const SmartEnupla<Periodo, IdEstagio> horizonte_defluencia(Periodo(TipoPeriodo_diario, horizonte_estudo.getIteradorInicial()) - 15, std::vector<IdEstagio>(15, IdEstagio_1));
+								const SmartEnupla<Periodo, IdEstagio> horizonte_defluencia(Periodo("d", horizonte_estudo.getIteradorInicial()) - 15, std::vector<IdEstagio>(15, IdEstagio_1));
 
 								// PRÉ CARREGA VETOR DEFLUÊNCIA PASSADAS COM 0.0
 								a_dados.vetorHidreletrica.at(idHidreletricaInstanciada).vetorDefluencia.at(IdDefluencia_passada).setVetor(AttVetorDefluencia_vazao_defluencia, SmartEnupla<Periodo, double>(horizonte_defluencia, 0.0));
@@ -1581,9 +1580,9 @@ void LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16(Dados& a_dados, const 
 							a_dados.vetorHidreletrica.at(idHidreletrica).setVetor(AttVetorHidreletrica_regularizacao, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
 
 						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
-							if ((tipo_regularizacao == "D") && (periodo.getTipoPeriodo() >= TipoPeriodo_diario)) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
-							else if ((tipo_regularizacao == "S") && (periodo.getTipoPeriodo() >= TipoPeriodo_semanal)) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
-							else if ((tipo_regularizacao == "M") && (periodo.getTipoPeriodo() >= TipoPeriodo_mensal)) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
+							if ((tipo_regularizacao == "D") && (periodo.getMinutos() <= Periodo("1d", periodo).getMinutos())) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
+							else if ((tipo_regularizacao == "S") && (periodo.getMinutos() <= Periodo("7d", periodo).getMinutos())) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
+							else if ((tipo_regularizacao == "M") && (periodo.getMinutos() <= Periodo("1M", periodo).getMinutos())) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
 							else { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 0); }
 						}
 
@@ -1804,7 +1803,7 @@ void LeituraCEPEL::leitura_DEFLANT_201904_DES16(Dados& a_dados, const std::strin
 						else idMesInicial--;
 					}
 
-					Periodo periodo_inicial_defluencia = Periodo(TipoPeriodo_diario, idDiaInicial, idMesInicial, idAnoInicial);
+					Periodo periodo_inicial_defluencia = Periodo("d", idDiaInicial, idMesInicial, idAnoInicial);
 					Periodo periodo_final_defluencia = a_dados.getAtributo(AttComumDados_periodo_referencia, Periodo());
 
 					if (diaFinal != "F") {
@@ -1818,7 +1817,7 @@ void LeituraCEPEL::leitura_DEFLANT_201904_DES16(Dados& a_dados, const std::strin
 							if (idMesInicial == IdMes_1) { idAnoInicial--; idMesInicial = IdMes_12; }
 							else idMesInicial--;
 						}
-						periodo_final_defluencia = Periodo(TipoPeriodo_meia_hora, idDiaFinal, idMesFinal, idAnoFinal);
+						periodo_final_defluencia = Periodo("30m", idDiaFinal, idMesFinal, idAnoFinal);
 					}
 
 					const IdHidreletrica idHidreletrica = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, std::stoi(line.substr(9, 3)));
@@ -1900,7 +1899,7 @@ void LeituraCEPEL::leitura_COTASR11_201904_DES16(Dados& a_dados, const std::stri
 
 					}
 
-					Periodo periodo = Periodo(TipoPeriodo_meia_hora, idDiaInicial, idMesInicial, idAnoInicial, idHoraInicial, idMinInicial);
+					Periodo periodo = Periodo("30m", idDiaInicial, idMesInicial, idAnoInicial, idHoraInicial, idMinInicial);
 
 					IdControleCotaVazao idControleCotaVazao = a_dados.vetorControleCotaVazao.getMaiorId();
 
@@ -2290,8 +2289,8 @@ void LeituraCEPEL::leitura_EOLICA_201904_DES16(Dados& a_dados, const std::string
 		const Periodo periodo_inicial_estudo = horizonte_estudo.getIteradorInicial();
 		const Periodo periodo_final_estudo = horizonte_estudo.getIteradorFinal();
 
-		const Periodo periodo_inicial_estudo_meia = Periodo(TipoPeriodo_meia_hora, periodo_inicial_estudo);
-		const Periodo periodo_final_estudo_meia = Periodo(TipoPeriodo_meia_hora, periodo_final_estudo + 1) - 1;
+		const Periodo periodo_inicial_estudo_meia = Periodo("30m", periodo_inicial_estudo);
+		const Periodo periodo_final_estudo_meia = Periodo("30m", periodo_final_estudo + 1) - 1;
 
 		std::ifstream myfile(a_nomeArquivo);
 		std::string line;
@@ -2394,9 +2393,9 @@ void LeituraCEPEL::leitura_EOLICA_201904_DES16(Dados& a_dados, const std::string
 							}
 
 							if (dado.at(4) == "1")
-								periodo_inicial_geracao = Periodo(TipoPeriodo_meia_hora, idDiaInicial, idMesInicial, idAnoInicial, idHorInicial, IdMin_30);
+								periodo_inicial_geracao = Periodo("30m", idDiaInicial, idMesInicial, idAnoInicial, idHorInicial, IdMin_30);
 							else
-								periodo_inicial_geracao = Periodo(TipoPeriodo_meia_hora, idDiaInicial, idMesInicial, idAnoInicial, idHorInicial, IdMin_0);
+								periodo_inicial_geracao = Periodo("30m", idDiaInicial, idMesInicial, idAnoInicial, idHorInicial, IdMin_0);
 						}
 
 						Periodo periodo_final_geracao;
@@ -2419,9 +2418,9 @@ void LeituraCEPEL::leitura_EOLICA_201904_DES16(Dados& a_dados, const std::string
 							}
 
 							if (dado.at(7) == "1")
-								periodo_final_geracao = Periodo(TipoPeriodo_meia_hora, idDiaFinal, idMesFinal, idAnoFinal, idHorFinal, IdMin_30);
+								periodo_final_geracao = Periodo("30m", idDiaFinal, idMesFinal, idAnoFinal, idHorFinal, IdMin_30);
 							else
-								periodo_final_geracao = Periodo(TipoPeriodo_meia_hora, idDiaFinal, idMesFinal, idAnoFinal, idHorFinal, IdMin_0);
+								periodo_final_geracao = Periodo("30m", idDiaFinal, idMesFinal, idAnoFinal, idHorFinal, IdMin_0);
 						}
 
 						const IdRenovavel idRenovavel_inicializado = getIdFromCodigoONS(lista_codigo_ONS_usina_eolica, std::stoi(dado.at(1)));
@@ -2477,8 +2476,8 @@ void LeituraCEPEL::validarGeracaoMediaRenovaveis(Dados& a_dados){
 		const Periodo periodo_inicial_estudo = horizonte_estudo.getIteradorInicial();
 		const Periodo periodo_final_estudo = horizonte_estudo.getIteradorFinal();
 
-		const Periodo periodo_inicial_estudo_meia = Periodo(TipoPeriodo_meia_hora, periodo_inicial_estudo);
-		const Periodo periodo_final_estudo_meia   = Periodo(TipoPeriodo_meia_hora, periodo_final_estudo + 1) - 1;
+		const Periodo periodo_inicial_estudo_meia = Periodo("30m", periodo_inicial_estudo);
+		const Periodo periodo_final_estudo_meia   = Periodo("30m", periodo_final_estudo + 1) - 1;
 
 		const IdRenovavel  maiorIdRenovavel = a_dados.getMaiorId(IdRenovavel());
 
@@ -2499,8 +2498,8 @@ void LeituraCEPEL::validarGeracaoMediaRenovaveis(Dados& a_dados){
 
 				for (Periodo periodo_estudo = horizonte_estudo.getIteradorInicial(); periodo_estudo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_estudo)) {
 
-					const Periodo periodo_estudo_inicial_meia = Periodo(TipoPeriodo_meia_hora, periodo_estudo);
-					const Periodo periodo_estudo_final_meia = Periodo(TipoPeriodo_meia_hora, periodo_estudo + 1) - 1;
+					const Periodo periodo_estudo_inicial_meia = Periodo("30m", periodo_estudo);
+					const Periodo periodo_estudo_final_meia = Periodo("30m", periodo_estudo + 1) - 1;
 
 					double valor = 0.0;
 

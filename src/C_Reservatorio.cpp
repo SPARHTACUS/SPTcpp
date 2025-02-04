@@ -67,8 +67,8 @@ void Reservatorio::calculaAproximacaoLinearEvaporacao(const double a_volumeMinim
 		if (a_regra_esp) {
 			if (getSizeVetor(AttVetorReservatorio_poli_cota_area_0) > 0) {			
 				if (a_periodo == getIteradorInicial(AttVetorReservatorio_poli_cota_area_0, Periodo())) {
-					const Periodo period_min_end = Periodo(TipoPeriodo_minuto, a_periodo + 1) - 1;
-					const Periodo period_month_end = Periodo(TipoPeriodo_mensal, period_min_end.getMes(), period_min_end.getAno());
+					const Periodo period_min_end = Periodo("m", a_periodo + 1) - 1;
+					const Periodo period_month_end = Periodo("M", period_min_end.getMes(), period_min_end.getAno());
 					coefEvaporacao = (getElementoVetor(AttVetorReservatorio_evaporacao, period_month_end.getMes(), double()) / (3.6 * 730));
 				}
 				else {
@@ -79,11 +79,11 @@ void Reservatorio::calculaAproximacaoLinearEvaporacao(const double a_volumeMinim
 				a_regra_esp = false;
 		}
 		if (!a_regra_esp) {
-			const Periodo period_min_end = Periodo(TipoPeriodo_minuto, a_periodo + 1) - 1;
-			const Periodo period_month_end = Periodo(TipoPeriodo_mensal, period_min_end.getMes(), period_min_end.getAno());
+			const Periodo period_min_end = Periodo("m", a_periodo + 1) - 1;
+			const Periodo period_month_end = Periodo("M", period_min_end.getMes(), period_min_end.getAno());
 			SmartEnupla<Periodo, double> periods_month;
 
-			Periodo period_month = Periodo(TipoPeriodo_mensal, a_periodo.getMes(), a_periodo.getAno());
+			Periodo period_month = Periodo("M", a_periodo.getMes(), a_periodo.getAno());
 			periods_month.addElemento(period_month, a_periodo.sobreposicao(period_month));
 
 			if (period_month < period_month_end) {

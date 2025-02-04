@@ -29,14 +29,14 @@ void VariavelAleatoriaInterna::gerarTendenciaTemporalMedia(const Periodo a_perio
 
 	try {
 
-		const Periodo periodo_inicial = a_periodo_final - int(Periodo::getMaiorEstacao(a_periodo_final.getTipoPeriodo())) + 1;
+		const Periodo periodo_inicial = a_periodo_final - int(IdMes_12) + 1;
 
 		SmartEnupla<IdCenario, SmartEnupla<Periodo, double>> tendencia_media;
 
 		tendencia_media.addElemento(IdCenario_1, SmartEnupla<Periodo, double>(periodo_inicial, std::vector<double>(a_periodo_final - periodo_inicial + 1, 0.0)));
 
 		for (Periodo periodo = periodo_inicial; periodo <= a_periodo_final; periodo++) {
-			const IdEstacao idEstacao = periodo.getEstacao();
+			const IdMes idEstacao = periodo.getMes();
 			const double media = getElementoVetor(AttVetorVariavelAleatoriaInterna_media_serie_temporal, idEstacao, double());
 			tendencia_media.at(IdCenario_1).setElemento(periodo, media);
 		} // for (Periodo periodo = a_periodo_inicial; periodo <= a_periodo_final; periodo++) {
@@ -149,17 +149,15 @@ void VariavelAleatoriaInterna::calcularEstatisticaSerieTemporal(){
 
 	try {
 
-		const TipoPeriodo tipoPeriodo = getIteradorInicial(AttVetorVariavelAleatoriaInterna_serie_temporal, Periodo()).getTipoPeriodo();
+		const IdMes maiorEstacao = IdMes_12;
 
-		const IdEstacao maiorEstacao = Periodo::getMaiorEstacao(tipoPeriodo);
+		SmartEnupla<IdMes, double> media;
+		SmartEnupla<IdMes, double> desvio;
+		SmartEnupla<IdMes, double> assimetria;
 
-		SmartEnupla<IdEstacao, double> media;
-		SmartEnupla<IdEstacao, double> desvio;
-		SmartEnupla<IdEstacao, double> assimetria;
+		for (IdMes idEstacao = IdMes_1; idEstacao <= maiorEstacao; idEstacao++) {
 
-		for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
-
-			const std::vector<double> dados = getVetor(AttVetorVariavelAleatoriaInterna_serie_temporal, Periodo(), double()).getElementos(idEstacao).at(tipoPeriodo);
+			const std::vector<double> dados = getVetor(AttVetorVariavelAleatoriaInterna_serie_temporal, Periodo(), double()).getElementos(idEstacao);
 
 			media.addElemento(idEstacao, getMedia(dados));
 
@@ -167,7 +165,7 @@ void VariavelAleatoriaInterna::calcularEstatisticaSerieTemporal(){
 
             assimetria.addElemento(idEstacao, getAssimetria(media.getElemento(idEstacao), desvio.getElemento(idEstacao), dados));
 
-		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+		} // for (IdMes idEstacao = IdMes_1; idEstacao <= maiorEstacao; idEstacao++) {
 
 		setVetor(AttVetorVariavelAleatoriaInterna_media_serie_temporal, media);
 		setVetor(AttVetorVariavelAleatoriaInterna_desvio_serie_temporal, desvio);
@@ -186,17 +184,15 @@ void VariavelAleatoriaInterna::calcularEstatisticaSerieTransformada(){
 
 	try {
 
-		const TipoPeriodo tipoPeriodo = getIteradorInicial(AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, Periodo()).getTipoPeriodo();
+		const IdMes maiorEstacao = IdMes_12;
 
-		const IdEstacao maiorEstacao = Periodo::getMaiorEstacao(tipoPeriodo);
+		SmartEnupla<IdMes, double> media;
+		SmartEnupla<IdMes, double> desvio;
+		SmartEnupla<IdMes, double> assimetria;
 
-		SmartEnupla<IdEstacao, double> media;
-		SmartEnupla<IdEstacao, double> desvio;
-		SmartEnupla<IdEstacao, double> assimetria;
+		for (IdMes idEstacao = IdMes_1; idEstacao <= maiorEstacao; idEstacao++) {
 
-		for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
-
-			const std::vector<double> dados = getVetor(AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, Periodo(), double()).getElementos(idEstacao).at(tipoPeriodo);
+			const std::vector<double> dados = getVetor(AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, Periodo(), double()).getElementos(idEstacao);
 
 			media.addElemento(idEstacao, getMedia(dados));
 
@@ -204,7 +200,7 @@ void VariavelAleatoriaInterna::calcularEstatisticaSerieTransformada(){
 
 			assimetria.addElemento(idEstacao, getAssimetria(media.getElemento(idEstacao), desvio.getElemento(idEstacao), dados));
 
-		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+		} // for (IdMes idEstacao = IdMes_1; idEstacao <= maiorEstacao; idEstacao++) {
 
 		setVetor(AttVetorVariavelAleatoriaInterna_media_serie_transformada, media);
 		setVetor(AttVetorVariavelAleatoriaInterna_desvio_serie_transformada, desvio);
@@ -261,7 +257,7 @@ void VariavelAleatoriaInterna::calcularAutoCorrelacaoSerieTransformada() {
 		if (getSizeMatriz(AttMatrizVariavelAleatoriaInterna_auto_correlacao) > 0)
 			return;
 
-		setMatriz(AttMatrizVariavelAleatoriaInterna_auto_correlacao, getAutoCorrelacaoSazonal(getMatriz(AttMatrizVariavelAleatoriaInterna_auto_covariancia, IdEstacao(), int(), double())));
+		setMatriz(AttMatrizVariavelAleatoriaInterna_auto_correlacao, getAutoCorrelacaoSazonal(getMatriz(AttMatrizVariavelAleatoriaInterna_auto_covariancia, IdMes(), int(), double())));
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("VariavelAleatoriaInterna(" + getString(getIdObjeto()) + ")::calcularAutoCorrelacaoSerieTransformada(): \n" + std::string(erro.what())); }

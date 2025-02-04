@@ -511,7 +511,7 @@ void ModeloOtimizacao::requestCorteBenders(const IdProcesso a_idProcesso, const 
 
 		} // if (getSize1Matriz(a_idEstagio, AttMatrizEstagio_cortes_selecionados) > 0) {
 
-		if ((getAtributo(AttComumModeloOtimizacao_remover_cortes_dominados, bool())) && (a_idEstagio != getAtributo(AttComumModeloOtimizacao_estagio_acoplamento_pre_estudo, IdEstagio())))
+		if ((getAtributo(AttComumModeloOtimizacao_remover_cortes_dominados, bool())))
 			removerCortesBendersDominados(a_idEstagio, a_idProcesso, a_entradaSaidaDados);
 
 	} // try {
@@ -2310,7 +2310,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				const double afluencia_117 = get_afluencia_natural_posto(a_dados, a_periodoPE, 117, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 				const double afluencia_301 = get_afluencia_natural_posto(a_dados, a_periodoPE, 301, a_idCenario, a_idRealizacao, a_idProcessoEstocastico);
 
-				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo(TipoPeriodo_semanal, vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
+				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo("7d", vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
 
 				//*************************************************************************
 				// VAZ(318) = VAZ(116)+0.1*(VAZ(161)-VAZ(117)-VAZ(301))+VAZ(117)+VAZ(301)
@@ -2615,7 +2615,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 
 				///////
 
-				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo(TipoPeriodo_semanal, vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
+				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo("7d", vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
 
 
 				if (idMes_alvo == IdMes_1) {
@@ -2791,7 +2791,7 @@ void ModeloOtimizacao::retorna_equacionamento_regras_afluencia_natural_x_idHidre
 				//////////
 				//-VAZ(292)
 				//////////
-				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo(TipoPeriodo_semanal, vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
+				const IdMes idMes_alvo = get_IdMes_operativo(a_periodoPE, Periodo("7d", vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIterador2Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario_1, Periodo())));
 
 				if (idMes_alvo == IdMes_1) {
 
@@ -3220,7 +3220,7 @@ IdMes ModeloOtimizacao::get_IdMes_operativo(const Periodo a_periodoPE, const Per
 		Periodo periodo_teste = a_periodoPE;
 
 		if (a_periodoPE.sobreposicao(a_periodo_inicial_semanal) > 0) {//Para garantir que a primeira semana operativa corresponda ao mês operativo			
-			periodo_teste = Periodo(TipoPeriodo_semanal, periodo_teste) + 1;		
+			periodo_teste = Periodo("7d", periodo_teste) + 1;		
 		}
 
 		return periodo_teste.getMes();
@@ -4046,53 +4046,6 @@ void ModeloOtimizacao::removerCorteBenders(const IdEstagio a_estagio){
 } // void ModeloOtimizacao::removerCorteBenders(const IdEstagio a_estagio){
 
 
-void ModeloOtimizacao::exportarCorteBenders_AcoplamentoPreEstudo(const IdIteracao a_idIteracao, EntradaSaidaDados a_entradaSaidaDados) {
-
-	try {
-
-		const string diretorio_importacao_pre_estudo = getAtributo(AttComumModeloOtimizacao_diretorio_importacao_pre_estudo, std::string());
-
-		if (strCompara(diretorio_importacao_pre_estudo, "nenhum"))
-			return;
-
-		a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//AcoplamentoPreEstudo");
-
-		const IdEstagio estagio_acoplamento_pre_estudo = getAtributo(AttComumModeloOtimizacao_estagio_acoplamento_pre_estudo, IdEstagio());
-
-		if (estagio_acoplamento_pre_estudo <= getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio())){
-
-			if (vetorEstagio.at(estagio_acoplamento_pre_estudo).vetorCorteBenders.getMaiorId() != IdCorteBenders_Nenhum) {
-
-				for (IdCorteBenders idCorteBenders = IdCorteBenders(maiorIdCorteExportadoPreEstudo + 1); idCorteBenders <= getMaiorId(estagio_acoplamento_pre_estudo, IdCorteBenders()); idCorteBenders++) {
-					if (vetorEstagio.at(estagio_acoplamento_pre_estudo).vetorCorteBenders.isInstanciado(idCorteBenders)) {
-						if (idCorteBenders == IdCorteBenders(maiorIdCorteExportadoPreEstudo + 1))
-							a_entradaSaidaDados.setAppendArquivo(false);
-						else
-							a_entradaSaidaDados.setAppendArquivo(true);
-						a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("corteBenders_rhs_" + getFullString(a_idIteracao) + ".csv", idCorteBenders, vetorEstagio.at(estagio_acoplamento_pre_estudo), AttVetorCorteBenders_rhs);
-						a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("corteBenders_estado_" + getFullString(a_idIteracao) + ".csv", idCorteBenders, vetorEstagio.at(estagio_acoplamento_pre_estudo), AttVetorCorteBenders_estado);
-						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("corteBenders_coeficientes_" + getFullString(a_idIteracao) + ".csv", idCorteBenders, vetorEstagio.at(estagio_acoplamento_pre_estudo), AttMatrizCorteBenders_coeficiente);
-					}
-				}
-
-				a_entradaSaidaDados.setAppendArquivo(false);
-				a_entradaSaidaDados.imprimirArquivoCSV_AttComum("estagio_" + getFullString(a_idIteracao) + ".csv", vetorEstagio.at(estagio_acoplamento_pre_estudo), std::vector<AttComumEstagio>{AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao});
-
-				maiorIdCorteExportadoPreEstudo = getMaiorId(estagio_acoplamento_pre_estudo, IdCorteBenders());
-
-				if (a_idIteracao == arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_final, IdIteracao()))
-					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("eop.txt", vetorEstagio.at(estagio_acoplamento_pre_estudo), std::vector<AttComumEstagio>{AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao});
-
-			} // if (vetorEstagio.at(estagio_acoplamento_pre_estudo).vetorCorteBenders.getMaiorId() != IdCorteBenders_Nenhum) {
-
-		} // if (estagio_acoplamento_pre_estudo <= getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio())){
-
-	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::imprimirCorteBendersAcoplamento(a_entradaSaidaDados): \n" + std::string(erro.what())); }
-
-} // void ModeloOtimizacao::imprimirCorteBendersAcoplamento(EntradaSaidaDados a_entradaSaidaDados, const bool a_imprimir_estagio_e_estados){
-
-
 void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdProcesso a_idProcesso, const std::string a_diretorio_impressao_selecao_cortes, EntradaSaidaDados a_entradaSaidaDados) {
 
 	try {
@@ -4120,7 +4073,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 			Estagio estagio_aux;
 			if (a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(getFullString(idStage_glob) + "_estagio.csv", estagio_aux, TipoAcessoInstancia_direto)) {
 
-				Periodo perStage_aux = Periodo(TipoPeriodo_minuto, estagio_aux.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo()));
+				Periodo perStage_aux = Periodo("m", estagio_aux.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo()));
 
 				for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
@@ -4128,7 +4081,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 						Periodo perStage = getAtributo(idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
 
-						if (perStage_aux == Periodo(TipoPeriodo_minuto, perStage)) {
+						if (perStage_aux == Periodo("m", perStage)) {
 
 							if (arranjoResolucao.isAnyCenarioEstado(idEstagio) || arranjoResolucao.isAnyAberturas(idEstagio)) {
 								if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
@@ -4348,7 +4301,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 												if (vol_util_max < 0.0)
 													throw std::invalid_argument("Limites de vol invalidos em VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
 
-												else if (Periodo(TipoPeriodo_minuto, periodo) != Periodo(TipoPeriodo_minuto, vetorEstagio.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
+												else if (Periodo("m", periodo) != Periodo("m", vetorEstagio.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
 													throw std::invalid_argument("Periodo " + getFullString(periodo) + " nao compativel com VI de " + getFullString(idHidreletrica) + " em " + getFullString(idVariavelEstado_corte) + " no corte em " + getFullString(idEstagio));
 
 												else if (idEstagio == IdEstagio_1)
@@ -4628,7 +4581,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 		const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
 
 		const Periodo perStageEnd = getAtributo(estagio_final, AttComumEstagio_periodo_otimizacao, Periodo());
-		const Periodo perStageNextMin = Periodo(TipoPeriodo_minuto, perStageEnd + 1);
+		const Periodo perStageNextMin = Periodo("m", perStageEnd + 1);
 
 		a_entradaSaidaDados.setDiretorioEntrada(diretorio_importacao_pos_estudo);
 
@@ -4663,7 +4616,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 					if (!estagio_carregado) {
 						estagio_carregado = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(prefixo + "estagio_" + getFullString(a_idIteracao) + ".csv", estagio_auxiliar, TipoAcessoInstancia_direto);
 						if (estagio_carregado) {
-							if (perStageNextMin != Periodo(TipoPeriodo_minuto, estagio_auxiliar.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
+							if (perStageNextMin != Periodo("m", estagio_auxiliar.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
 								estagio_carregado = false;
 						}
 					}
@@ -4692,7 +4645,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 						estagio_carregado_sem_iterador = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(prefixo + "estagio.csv", estagio_auxiliar, TipoAcessoInstancia_direto);
 
 						if (estagio_carregado_sem_iterador) {
-							if (perStageNextMin != Periodo(TipoPeriodo_minuto, estagio_auxiliar.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
+							if (perStageNextMin != Periodo("m", estagio_auxiliar.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
 								estagio_carregado_sem_iterador = false;
 						}
 
@@ -4873,123 +4826,6 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 } // void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const std::string a_diretorio_recuperacao_cortes, EntradaSaidaDados a_entradaSaidaDados){
 
 
-void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPreEstudo(const IdProcesso a_idProcesso, const IdProcesso a_maior_processo, const IdIteracao a_idIteracao, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, EntradaSaidaDados a_entradaSaidaDados) {
-	try {
-
-		const string diretorio_importacao_pre_estudo = getAtributo(AttComumModeloOtimizacao_diretorio_importacao_pre_estudo, std::string());
-
-		if (strCompara(diretorio_importacao_pre_estudo, "nenhum"))
-			return;
-
-		const IdEstagio estagio_acoplamento_pre_estudo = getAtributo(AttComumModeloOtimizacao_estagio_acoplamento_pre_estudo, IdEstagio());
-
-		a_entradaSaidaDados.setDiretorioEntrada(diretorio_importacao_pre_estudo);
-
-		Estagio estagio;
-
-		bool impressao = false;
-		bool estado_valores_carregados = false;
-		Estagio estagio_auxiliar;
-		while (true) {
-
-			estado_valores_carregados = a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir(std::string("estado_valores_" + getFullString(a_idIteracao) + ".csv"), estagio, TipoAcessoInstancia_m1);
-
-			if (estado_valores_carregados) {
-				if (a_idProcesso == IdProcesso_mestre)
-					std::cout << "Variaveis Estado pre-estudo detectadas." << std::endl;
-				break;
-			}
-			else {
-				if (a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("eop.txt", estagio_auxiliar, TipoAcessoInstancia_direto))
-					return;
-			}
-
-
-			if ((!impressao) && (a_idProcesso == IdProcesso_mestre)) {
-				std::cout << "Aguardando variaveis de estado no diretorio: " << diretorio_importacao_pre_estudo << std::endl;
-				std::cout << "Caso NAO haja acoplamento pre-estudo, pressione Ctrl+C para sair e altere valor de " << getFullString(AttComumDados_diretorio_importacao_pre_estudo) << " para: Nenhum" << std::endl;
-				impressao = true;
-			} // if ((!impressao) && (a_idProcesso == IdProcesso_mestre)) {
-
-			aguardarTempo(5000);
-
-		} // while (true) {
-
-		const IdProcessoEstocastico tipo_processo_estocastico_hidrologico = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
-
-		for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(estagio_acoplamento_pre_estudo, IdVariavelEstado()); idVariavelEstado++) {
-
-			if (estagio.vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
-
-				if (estagio.getSizeVetor(idVariavelEstado, AttVetorVariavelEstado_valor) > 0) {
-
-					for (IdCenario idCenario = a_cenario_inicial; idCenario <= a_cenario_final; idCenario++) {
-
-						IdProcesso idProcesso_busca = IdProcesso_Nenhum;
-						/*
-						for (IdProcesso idProcesso = estagio.getIteradorInicial(IdVariavelEstado_1, AttMatrizVariavelEstado_valor, IdProcesso()); idProcesso <= estagio.getIterador1Final(IdVariavelEstado_1, AttMatrizVariavelEstado_valor, IdProcesso()); idProcesso++) {
-							if (estagio.getSize2Matriz(IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso) > 0) {
-								if ((estagio.getIterador2Inicial(IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso, IdCenario()) <= idCenario) && (idCenario <= estagio.getIterador2Final(IdVariavelEstado_1, AttMatrizVariavelEstado_valor, idProcesso, IdCenario()))) {
-									idProcesso_busca = idProcesso;
-									break;
-								}
-							}
-						}
-						*/
-						//vetorEstagio.at(estagio_acoplamento_pre_estudo).addValorVariavelEstado(idVariavelEstado, true, a_idProcesso, a_maior_processo, idCenario, estagio.getElementoMatriz(idVariavelEstado, AttMatrizVariavelEstado_valor, idProcesso_busca, idCenario, double()));
-
-					} // for (IdCenario idCenario = a_cenario_inicial; idCenario <= a_cenario_final; idCenario++) {
-
-				} // if (estagio.getSize1Matriz(idVariavelEstado, AttMatrizVariavelEstado_valor) > 0) {
-
-			} // if (estagio.vetorVariavelEstado.isInstanciado(idVariavelEstado)) {
-
-			else if ((!estagio.vetorVariavelEstado.isInstanciado(idVariavelEstado)) && (a_idIteracao == arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao())) && (a_idProcesso == IdProcesso_mestre))
-				std::cout << "Nao foi instanciado " + getFullString(idVariavelEstado) << "." << std::endl;
-
-		} // for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= getMaiorId(estagio_acoplamento_pre_estudo, IdVariavelEstado()); idVariavelEstado++) {
-
-	} // try
-	catch (const std::exception & erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::importarVariaveisEstado_AcoplamentoPreEstudo(a_entradaSaidaDados): \n" + std::string(erro.what())); }
-} // void ModeloOtimizacao::exportarEstadosAcoplamentoPreEstudo(const IdProcesso a_idProcesso, EntradaSaidaDados a_entradaSaidaDados) {
-
-
-void ModeloOtimizacao::exportarVariaveisEstado_AcoplamentoPreEstudo(EntradaSaidaDados a_entradaSaidaDados) {
-	try {
-
-		const string diretorio_importacao_pre_estudo = getAtributo(AttComumModeloOtimizacao_diretorio_importacao_pre_estudo, std::string());
-
-		if (strCompara(diretorio_importacao_pre_estudo, "nenhum"))
-			return;
-
-		a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//AcoplamentoPreEstudo");
-
-		const IdEstagio estagio_acoplamento_pre_estudo = getAtributo(AttComumModeloOtimizacao_estagio_acoplamento_pre_estudo, IdEstagio());
-
-		if ((estagio_acoplamento_pre_estudo >= getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio())) && (estagio_acoplamento_pre_estudo <= getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio()))) {
-
-			if (vetorEstagio.at(estagio_acoplamento_pre_estudo).vetorVariavelEstado.getMaiorId() != IdVariavelEstado_Nenhum) {
-
-				if (getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()) == IdEstagio_1) {
-
-					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("estagio.csv", vetorEstagio.at(estagio_acoplamento_pre_estudo), std::vector<AttComumEstagio>{ AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao, AttComumEstagio_selecao_cortes_nivel_dominancia, AttComumEstagio_cortes_multiplos, AttComumEstagio_alpha_CVAR, AttComumEstagio_lambda_CVAR});
-					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("estado.csv", IdVariavelEstado_Nenhum, vetorEstagio.at(estagio_acoplamento_pre_estudo));
-
-				}
-				else {
-					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("estagio_" + getFullString(arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao())) + ".csv", vetorEstagio.at(estagio_acoplamento_pre_estudo), std::vector<AttComumEstagio>{ AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao, AttComumEstagio_selecao_cortes_nivel_dominancia, AttComumEstagio_cortes_multiplos, AttComumEstagio_alpha_CVAR, AttComumEstagio_lambda_CVAR});
-					a_entradaSaidaDados.imprimirArquivoCSV_AttComum("estado_" + getFullString(arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao())) + ".csv", IdVariavelEstado_Nenhum, vetorEstagio.at(estagio_acoplamento_pre_estudo));
-				}
-
-			} // if (vetorEstagio.at(estagio_acoplamento_pre_estudo).vetorVariavelEstado.getMaiorId() != IdVariavelEstado_Nenhum) {
-
-		} // if (estagio_acoplamento_pre_estudo <= getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio())) {
-
-	} // try
-	catch (const std::exception & erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::exportarVariaveisEstado_AcoplamentoPreEstudo(a_entradaSaidaDados): \n" + std::string(erro.what())); }
-} // void ModeloOtimizacao::exportarEstadosAcoplamentoPreEstudo(const IdProcesso a_idProcesso, EntradaSaidaDados a_entradaSaidaDados) {
-
-
 void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdProcesso a_idProcesso, EntradaSaidaDados a_entradaSaidaDados) {
 
 	try {
@@ -5003,7 +4839,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 		const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
 
 		const Periodo perStageEnd = getAtributo(estagio_final, AttComumEstagio_periodo_otimizacao, Periodo());
-		const Periodo perStageNextMin = Periodo(TipoPeriodo_minuto, perStageEnd + 1);
+		const Periodo perStageNextMin = Periodo("m", perStageEnd + 1);
 
 		a_entradaSaidaDados.setDiretorioEntrada(diretorio_importacao_pos_estudo);
 
@@ -5035,14 +4871,14 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 					estagio_carregado_sem_iterador = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(prefixo + "estagio.csv", estagio, TipoAcessoInstancia_direto);
 
 					if (estagio_carregado_sem_iterador) {
-						if (perStageNextMin != Periodo(TipoPeriodo_minuto, estagio.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
+						if (perStageNextMin != Periodo("m", estagio.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
 							estagio_carregado_sem_iterador = false;
 					}
 
 					if (!estagio_carregado_sem_iterador) {
 						estagio_carregado = a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir(prefixo + "estagio_" + getFullString(arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao())) + ".csv", estagio, TipoAcessoInstancia_direto);
 						if (estagio_carregado) {
-							if (perStageNextMin != Periodo(TipoPeriodo_minuto, estagio.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
+							if (perStageNextMin != Periodo("m", estagio.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())))
 								estagio_carregado = false;
 						}
 					}
@@ -5079,7 +4915,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 				const Periodo periodo_otimizacao = getAtributo(estagio_final, AttComumEstagio_periodo_otimizacao, Periodo());
 				const Periodo periodo_otimizacao_lido = estagio.getAtributo(AttComumEstagio_periodo_otimizacao, Periodo());
 
-				if (Periodo(periodo_otimizacao_lido.getTipoPeriodo(), periodo_otimizacao + 1) != periodo_otimizacao_lido)
+				if (Periodo(getString(periodo_otimizacao_lido.getDuration()), periodo_otimizacao + 1) != periodo_otimizacao_lido)
 					throw std::invalid_argument("Periodo " + getString(periodo_otimizacao_lido) + " importado nao compativel com final do horizonte de otimizacao.");
 
 			} // if (true) {
@@ -5150,7 +4986,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 					const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
 
-					if (Periodo(periodo.getTipoPeriodo(), periodo_estudo_final + 1) != periodo)
+					if (Periodo(getString(periodo.getDuration()), periodo_estudo_final + 1) != periodo)
 						throw std::invalid_argument("Periodo estudo invalido " + getFullString(periodo_estudo_final) + " para o acoplamento de varVI de " + getFullString(idVariavelEstado) + " em " + getFullString(periodo));
 
 					estagio.setVariavelDecisaoEmVariavelEstado(idVariavelEstado, a_TSS, -1);
@@ -6442,7 +6278,7 @@ void ModeloOtimizacao::criarModeloOtimizacao(Dados &a_dados, EntradaSaidaDados a
 
 		if ((idModeloOtimizacao == IdModeloOtimizacao_multiestagio_estocastico_otimizacao) || (idModeloOtimizacao == IdModeloOtimizacao_multiestagio_estocastico_simulacao)) {
 
-			const IdEstagio estagio_inicial = a_dados.getAtributo(AttComumDados_estagio_inicial, IdEstagio());
+			const IdEstagio estagio_inicial = IdEstagio_1;
 
 			setAtributo(AttComumModeloOtimizacao_estagio_inicial, estagio_inicial);
 
@@ -6456,7 +6292,6 @@ void ModeloOtimizacao::criarModeloOtimizacao(Dados &a_dados, EntradaSaidaDados a
 			setAtributo(AttComumModeloOtimizacao_periodo_estudo_inicial, a_dados.getElementosMatriz(AttMatrizDados_percentual_duracao_horizonte_estudo, estagio_inicial, Periodo(), double()).getIteradorInicial());
 			setAtributo(AttComumModeloOtimizacao_periodo_estudo_final, a_dados.getElementosMatriz(AttMatrizDados_percentual_duracao_horizonte_estudo, estagio_final, Periodo(), double()).getIteradorFinal());
 
-			setAtributo(AttComumModeloOtimizacao_estagio_acoplamento_pre_estudo, a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio()));
 			setAtributo(AttComumModeloOtimizacao_maior_estagio_impressao_versao_alternativa_cortes, a_dados.getAtributo(AttComumDados_maior_estagio_impressao_versao_alternativa_cortes, IdEstagio()));
 
 			setAtributo(AttComumModeloOtimizacao_foco_numerico, a_dados.getAtributo(AttComumDados_foco_numerico, int()));
@@ -6487,7 +6322,6 @@ void ModeloOtimizacao::criarModeloOtimizacao(Dados &a_dados, EntradaSaidaDados a
 
 			setAtributo(AttComumModeloOtimizacao_diretorio_importacao_cortes,              a_dados.getAtributo(AttComumDados_diretorio_importacao_cortes, std::string()));
 
-			setAtributo(AttComumModeloOtimizacao_diretorio_importacao_pre_estudo, a_dados.getAtributo(AttComumDados_diretorio_importacao_pre_estudo, std::string()));
 			setAtributo(AttComumModeloOtimizacao_diretorio_importacao_pos_estudo, a_dados.getAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string()));
 
 			setAtributo(AttComumModeloOtimizacao_calcular_custo_primal_via_subproblema_mestre, a_dados.getAtributo(AttComumDados_calcular_custo_primal_via_subproblema_mestre, bool()));

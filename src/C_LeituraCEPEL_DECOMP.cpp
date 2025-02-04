@@ -186,9 +186,9 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 						Periodo periodo_processo_estocastico = periodo_DC;
 						bool is_first_sobreposicao = false;
 
-						if (periodo_DC.getTipoPeriodo() <= periodo_otimizacao.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
+						if (periodo_DC.getMinutos() >= periodo_otimizacao.getMinutos()) { //Granularidade do periodo_otimizacao <= periodo_DC
 
-							if (periodo_DC.getTipoPeriodo() < periodo_otimizacao.getTipoPeriodo())
+							if (periodo_DC.getMinutos() > periodo_otimizacao.getMinutos())
 								a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_tipo_lag_autocorrelacao, TipoLagAutocorrelacao_semanal_sab);
 
 							periodo_processo_estocastico = periodo_otimizacao;
@@ -197,7 +197,7 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 								soma_sobreposicao += sobreposicao;
 
 							//////////////
-							const Periodo periodo_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo_DC);
+							const Periodo periodo_teste = Periodo(getString(periodo_otimizacao.getDuration()), periodo_DC);
 
 							if (periodo_teste == periodo_otimizacao)
 								is_first_sobreposicao = true;
@@ -222,8 +222,10 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 
 					if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
 
-						if (!doubleCompara(1e-6, soma_sobreposicao, 1.0))
-							throw std::invalid_argument("Periodo do processo estocastico nao subsituido por uma decomposicao equivalente");
+						if (periodo_DC != horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorInicial())) {
+							if (!doubleCompara(1e-6, soma_sobreposicao, 1.0))
+								throw std::invalid_argument("Periodo do processo estocastico nao subsituido por uma decomposicao equivalente");
+						}
 
 						break;
 
@@ -238,7 +240,7 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 			//2.Periodos que pertencem ao horizonte COM extensão
 			////////////////////////////////////////////////////
 
-			const Periodo periodo_extensao = Periodo(TipoPeriodo_mensal, horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal())+1);
+			const Periodo periodo_extensao = Periodo("M", horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorFinal())+1);
 
 			for (IdEstagio idEstagio_otimizacao = horizonte_otimizacao.getIteradorInicial(); idEstagio_otimizacao <= horizonte_otimizacao.getIteradorFinal(); idEstagio_otimizacao++) {
 
@@ -1030,7 +1032,7 @@ void LeituraCEPEL::ler_vazao_probabilidade_estrutura_arvore_cenarios_from_VAZOES
 
 								Periodo periodo_processo_estocastico = periodo_DC;
 
-								if (periodo_DC.getTipoPeriodo() <= periodo_otimizacao.getTipoPeriodo()) //Granularidade do periodo_otimizacao <= periodo_DC
+								if (periodo_DC.getMinutos() >= periodo_otimizacao.getMinutos()) //Granularidade do periodo_otimizacao <= periodo_DC
 									periodo_processo_estocastico = periodo_otimizacao;
 
 								matriz_probabilidade_abertura.addElemento(periodo_processo_estocastico, probabilidade_abertura);
@@ -1272,7 +1274,7 @@ void LeituraCEPEL::ler_afluencia_passada_from_VAZOES_201906_DC29(Dados& a_dados,
 
 							const Periodo periodo_diario(idDia, idMes, idAno);
 
-							Periodo periodo_semanal(TipoPeriodo_semanal, periodo_diario);
+							Periodo periodo_semanal("7d", periodo_diario);
 
 							const Periodo periodo_diario_limite(1, mesInicial_PMO, anoInicial_PMO); //Corresponde ao primeiro dia do mês do PMO
 
@@ -5457,7 +5459,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							Periodo data_reportada_DADGER(dia, mes, ano);
 
-							//if (data_reportada_DADGER != Periodo(TipoPeriodo_diario, horizonte_estudo.getIteradorInicial()))
+							//if (data_reportada_DADGER != Periodo("d", horizonte_estudo.getIteradorInicial()))
 								//throw std::invalid_argument("Registro DT - Data nao coincidente com os estagios gerados a partir do arquivo VAZOES.RVX");
 
 						}//try {
@@ -7342,7 +7344,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							if (!a_dados.vetorHidreletrica.at(idHidreletrica).vetorDefluencia.isInstanciado(IdDefluencia_passada)) {//As defluências podem ser inicializadas desde a pre-configuração
 
 								//Nota: A defluencia passada vai considerar periodos_diarios de 15 dias anteriores ao horizonte de estudo (15 dias máximo tempo de viagem d'água registrado)
-								const SmartEnupla<Periodo, bool> horizonte_defluencia_passada(Periodo(TipoPeriodo_diario, horizonte_estudo.getIteradorInicial()) - 15, std::vector<bool>(15, true));
+								const SmartEnupla<Periodo, bool> horizonte_defluencia_passada(Periodo("d", horizonte_estudo.getIteradorInicial()) - 15, std::vector<bool>(15, true));
 
 								Defluencia defluencia;
 								defluencia.setAtributo(AttComumDefluencia_idDefluencia, IdDefluencia_passada);
@@ -10665,8 +10667,9 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 							///////////////////////////////////////		
 	
 
-							Periodo periodo_comandado(TipoPeriodo_semanal, std::stoi(line.substr(20 + 15 * num_patamar_carga, 2)), std::stoi(line.substr(22 + 15 * num_patamar_carga, 2)), \
+							Periodo periodo_comandado("7d", std::stoi(line.substr(20 + 15 * num_patamar_carga, 2)), std::stoi(line.substr(22 + 15 * num_patamar_carga, 2)), \
 								std::stoi(line.substr(24 + 15 * num_patamar_carga, 4)));
+
 
 
 							bool is_periodo_comandado_in_horizonte_estudo = false;
@@ -12692,7 +12695,6 @@ void LeituraCEPEL::defineHorizontes_CP(Dados& a_dados)
 		if (!dadosPreConfig_instanciados) {
 			a_dados.setAtributo(AttComumDados_periodo_referencia, a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio()).getIteradorInicial());
 			a_dados.setAtributo(AttComumDados_estagio_final, a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal());
-			a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, estagio_acoplamento_pre_estudo);
 		}//if (!dadosPreConfig_instanciados) {
 		else {
 
@@ -12701,9 +12703,6 @@ void LeituraCEPEL::defineHorizontes_CP(Dados& a_dados)
 
 			if (a_dados.getAtributo(AttComumDados_estagio_final, IdEstagio()) != a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal())
 				throw std::invalid_argument("Pre-config deve ter estagio_final igual a: " + getString(a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo()).getIteradorFinal()));
-
-			if (a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio()) != estagio_acoplamento_pre_estudo)
-				throw std::invalid_argument("Pre-config deve ter estagio_acoplamento_pre_estudo igual a: " + getString(estagio_acoplamento_pre_estudo));
 
 		}//	else {
 
@@ -12752,7 +12751,7 @@ void LeituraCEPEL::define_horizonte_otimizacao_CP(Dados& a_dados) {
 
 			const Periodo periodo_inicial = data_execucao + 1;
 
-			Periodo periodo_1(TipoPeriodo_semanal, periodo_inicial);
+			Periodo periodo_1("7d", periodo_inicial);
 			horizonte_otimizacao.addElemento(periodo_1);
 
 			//*****************************************
@@ -12817,7 +12816,7 @@ void LeituraCEPEL::define_horizonte_otimizacao_CP(Dados& a_dados) {
 
 			const Periodo periodo_inicial = data_execucao + 1;
 
-			Periodo periodo_1(TipoPeriodo_semanal, periodo_inicial);
+			Periodo periodo_1("7d", periodo_inicial);
 			horizonte_otimizacao.addElemento(periodo_1);
 
 			//*****************************************
@@ -12967,14 +12966,14 @@ void LeituraCEPEL::define_horizonte_estudo_CP(Dados& a_dados) {
 
 									int conteioDias = 1;
 
-									Periodo periodo_diario_inicial = Periodo(TipoPeriodo_diario, periodo_final_DC);
+									Periodo periodo_diario_inicial = Periodo("d", periodo_final_DC);
 									Periodo periodo_diario = periodo_diario_inicial;
 
 									while (true) {
 
 										if (conteioDias > 7) {
 
-											Periodo periodo_semanal(TipoPeriodo_semanal, periodo_diario_inicial);
+											Periodo periodo_semanal("7d", periodo_diario_inicial);
 											horizonte_estudo.addElemento(periodo_semanal, idEstagio);
 
 											conteioDias = 1;
@@ -13056,14 +13055,14 @@ void LeituraCEPEL::define_horizonte_estudo_CP(Dados& a_dados) {
 
 							int conteioDias = 1;
 
-							Periodo periodo_diario_inicial = Periodo(TipoPeriodo_diario, periodo_final_DC);
+							Periodo periodo_diario_inicial = Periodo("d", periodo_final_DC);
 							Periodo periodo_diario = periodo_diario_inicial;
 
 							while (true) {
 
 								if (conteioDias > 7) {
 
-									Periodo periodo_semanal(TipoPeriodo_semanal, periodo_diario_inicial);
+									Periodo periodo_semanal("7d", periodo_diario_inicial);
 									horizonte_estudo.addElemento(periodo_semanal, idEstagio);
 
 									conteioDias = 1;
@@ -13349,14 +13348,14 @@ void LeituraCEPEL::define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados)
 					Periodo periodo_processo_estocastico = periodo_DC;
 					bool is_first_sobreposicao = false;
 
-					if (periodo_DC.getTipoPeriodo() <= periodo_otimizacao.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
+					if (periodo_DC.getMinutos() >= periodo_otimizacao.getMinutos()) { //Granularidade do periodo_otimizacao <= periodo_DC
 						periodo_processo_estocastico = periodo_otimizacao;
 
 						if(periodo_otimizacao.sobreposicao(periodo_DC) == 1.0)//Garante que o periodo_otimizacao esteja "dentro" do periodo_DC
 							soma_sobreposicao += sobreposicao;
 
 						//////////////
-						const Periodo periodo_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo_DC);
+						const Periodo periodo_teste = Periodo(getString(periodo_otimizacao.getDuration()), periodo_DC);
 
 						if (periodo_teste == periodo_otimizacao)
 							is_first_sobreposicao = true;
@@ -13394,9 +13393,10 @@ void LeituraCEPEL::define_afluencia_arvore_de_cenarios_postos_CP(Dados& a_dados)
 
 				if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
 
-					if (!doubleCompara(1e-6, soma_sobreposicao, 1.0))
-						throw std::invalid_argument("Periodo do processo estocastico nao subsituido por uma decomposicao equivalente");
-
+					if (periodo_DC != horizonte_otimizacao_DC.at(horizonte_otimizacao_DC.getIteradorInicial())) {
+						if (!doubleCompara(1e-6, soma_sobreposicao, 1.0))
+							throw std::invalid_argument("Periodo do processo estocastico nao subsituido por uma decomposicao equivalente");
+					}
 					break;
 
 				}//if (is_encontrada_sobreposicao && sobreposicao == 0.0) {
@@ -13576,9 +13576,9 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 							bool is_first_sobreposicao = false;
 
-							if (horizonte_otimizacao_DC.at(idEstagio_DC).getTipoPeriodo() <= periodo.getTipoPeriodo()) { //Granularidade do periodo_otimizacao <= periodo_DC
+							if (horizonte_otimizacao_DC.at(idEstagio_DC).getMinutos() >= periodo.getMinutos()) { //Granularidade do periodo_otimizacao <= periodo_DC
 
-								const Periodo periodo_teste = Periodo(periodo.getTipoPeriodo(), horizonte_otimizacao_DC.at(idEstagio_DC));
+								const Periodo periodo_teste = Periodo(getString(periodo.getDuration()), horizonte_otimizacao_DC.at(idEstagio_DC));
 
 								if (periodo_teste == periodo)
 									is_first_sobreposicao = true;
@@ -13675,14 +13675,39 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 			}//for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
-		}//if (!processoEstocasticoHidrologicoPreConfig_instanciado) {
-		/*
-		else {
 
+			const SmartEnupla<Periodo, double> horizonte_tendencia(a_dados.processoEstocastico_hidrologico.getVetor(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double()), NAN);
+
+			const Periodo periodEndTrend = horizonte_tendencia.getIteradorFinal();
+			const Periodo periodIniSP = a_dados.processoEstocastico_hidrologico.getIterador1Inicial(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo());
+
+			const Periodo periodGap = Periodo::getPeriodBtwn(periodEndTrend, periodIniSP);
+
+			for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= a_dados.processoEstocastico_hidrologico.getMaiorId(IdVariavelAleatoria()); idVar++) {
+
+				const double realiz = a_dados.processoEstocastico_hidrologico.getElementoMatriz(idVar, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodIniSP, IdRealizacao_1, double());
+
+				a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVar).vetorVariavelAleatoriaInterna.at(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodGap, realiz);
+				a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVar).vetorVariavelAleatoriaInterna.at(IdVariavelAleatoriaInterna_1).addElemento(AttVetorVariavelAleatoriaInterna_tendencia_temporal_transformada, periodGap, realiz);
+			}
+
+		}//if (!processoEstocasticoHidrologicoPreConfig_instanciado) {
+
+		else {
+			/*
 			const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
 			const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
 
 			const SmartEnupla<Periodo, double> horizonte_tendencia(a_dados.processoEstocastico_hidrologico.getVetor(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo(), double()), NAN);
+
+			for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+				IdVariavelAleatoria idVar = IdVariavelAleatoria_Nenhum;
+				IdVariavelAleatoriaInterna idVarInt = IdVariavelAleatoriaInterna_Nenhum;
+
+				a_dados.processoEstocastico_hidrologico.getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(idVar, idVarInt, idHidreletrica);
+
+			}
 
 			valor_afluencia_passadas_GEVAZP = SmartEnupla<int, SmartEnupla<Periodo, double>>(0, std::vector<SmartEnupla<Periodo, double>>(320, horizonte_tendencia));
 
@@ -13722,9 +13747,10 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 				valor_afluencia_passadas_GEVAZP.at(178 - 1).at(periodo) = valor_afluencia_passadas_GEVAZP.at(169 - 1).at(periodo);
 
 			}//for (Periodo periodo = periodo_inicial_historico; periodo <= periodo_final_historico; valor_afluencia_passadas.at(0).incrementarIterador(periodo)) {
-
+			*/
 		}
-		*/
+		
+
 	}//try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados): \n" + std::string(erro.what())); }
 
@@ -14219,13 +14245,13 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 					////////////////////////////
 					//Determina os tipos de períodos do hosrizonte_estudo_DECK
 
-					std::vector<TipoPeriodo> tipo_periodos_horizonte_DECK;
+					std::vector<std::pair<unsigned int, char>> tipo_periodos_horizonte_DECK;
 
 					for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
 
 						bool is_tipo_periodo_encontrado = false;
 
-						const TipoPeriodo tipo_periodo = periodo_deck.getTipoPeriodo();
+						const std::pair<unsigned int, char> tipo_periodo = periodo_deck.getDuration();
 
 						for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
 
@@ -14268,7 +14294,7 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 										is_periodo_um_periodo_final_deck = true;
 									else {
 
-										Periodo periodo_teste = Periodo(periodo.getTipoPeriodo(), periodo + 1);
+										Periodo periodo_teste = Periodo(getString(periodo.getDuration()), periodo + 1);
 
 										if(periodo_teste > periodo_ultimo_sobreposicao)
 											is_periodo_um_periodo_final_deck = true;
@@ -14276,8 +14302,8 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 											for (int pos = 0; pos < int(tipo_periodos_horizonte_DECK.size()); pos++) {
 
-												const TipoPeriodo tipo_periodo = tipo_periodos_horizonte_DECK.at(pos);
-												const Periodo periodo_seguinte = Periodo(tipo_periodo, periodo + 1);
+												const std::pair<unsigned int, char> tipo_periodo = tipo_periodos_horizonte_DECK.at(pos);
+												const Periodo periodo_seguinte = Periodo(getString(tipo_periodo), periodo + 1);
 
 												for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
 
@@ -14305,8 +14331,8 @@ void LeituraCEPEL::atualiza_restricao_operativa_UHE_tipoRestricaoHidraulica_ener
 
 										if (sobreposicao > 0.0) {
 
-											Periodo periodo_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo + 1);
-											Periodo periodo_otimizacao_teste = Periodo(periodo_otimizacao.getTipoPeriodo(), periodo_otimizacao + 1);
+											Periodo periodo_teste = Periodo(getString(periodo_otimizacao.getDuration()), periodo + 1);
+											Periodo periodo_otimizacao_teste = Periodo(getString(periodo_otimizacao.getDuration()), periodo_otimizacao + 1);
 
 											if(periodo_teste == periodo_otimizacao_teste) //Garante que o período onde a restrição RHE é ativada é no último período pertencente ao período de otimização
 												is_periodo_um_periodo_final_deck = true;
@@ -16042,7 +16068,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		//Informação Operacional pre-Config PD (valores absolutos) -> entra direito no Att do problema CP
 		//Informação Premissa pre-Config PD (valores p.u) -> Aplica modulação PD na previsão CP
 		// 
-		// Condição: periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo() (e.g. um periodo_PD horário não sobreescreve informação a um periodo semanal)
+		// Condição: (periodo.getMinutos() <= periodo_PD.getMinutos()) (e.g. um periodo_PD horário não sobreescreve informação a um periodo semanal)
 		// 
 		// *********************************
 		// Restrições elétricas/hidráulicas
@@ -16098,7 +16124,13 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 		//****************************************
 		//Arquivo Intercambio
 		//****************************************
+		bool is_carregar_PD_intercambio = false;
 		bool dadosPreConfig_intercambio_attComum_operacional = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("INTERCAMBIO_AttComumOperacional.csv", dados_PD, TipoAcessoInstancia_m1);
+		bool dadosPreConfig_intercambio_attMatriz_operacional = entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_PD, TipoAcessoInstancia_m1);
+		if (dadosPreConfig_intercambio_attComum_operacional && dadosPreConfig_intercambio_attMatriz_operacional)
+			is_carregar_PD_intercambio = true;
+		else if (dadosPreConfig_intercambio_attComum_operacional || dadosPreConfig_intercambio_attMatriz_operacional)
+			throw std::invalid_argument("Tentativa de incluir intercambios em dadosPreConfig_PD, ambos os arquivos AttComum e AttMatriz sao necessarios");
 
 		//****************************************
 		//Arquivos Restrições Elétricas
@@ -16260,7 +16292,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 					const Periodo periodo_inicial_PD = periodos_PD.at(0);
 					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-					validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+					validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 				}//for (IdSubmercado idSubmercado_PD = idSubmercadoIni_PD; idSubmercado_PD < idSubmercadoOut_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
@@ -16283,7 +16315,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-						if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
@@ -16299,7 +16331,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							}//for (IdSubmercado idSubmercado_PD = idSubmercadoIni_PD; idSubmercado_PD < idSubmercadoOut_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-						}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 					}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -16337,7 +16369,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						const Periodo periodo_inicial_PD = periodos_PD.at(0);
 						const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-						validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+						validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 					}//for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = idUsinaNaoSimuladaIni_PD; idUsinaNaoSimulada_PD < idUsinaNaoSimuladaOut_PD; dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
 
@@ -16363,7 +16395,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-						if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
@@ -16468,7 +16500,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							}//for (IdSubmercado idSubmercado_PD = idSubmercadoIni_PD; idSubmercado_PD < idSubmercadoOut_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-						}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 					}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -16478,6 +16510,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 			catch (const std::exception& erro) { throw std::invalid_argument("Erro dadosPreConfig_usina_nao_simulada_operacional: \n" + std::string(erro.what())); }
 
 		}//if (dadosPreConfig_usina_nao_simulada_operacional) {
+
 
 		//////////////////////////////////////////////////////////////
 		//SUBMERCADO_AttMatrizPremissa_PorPeriodoPorIdPatamarCarga
@@ -16501,7 +16534,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 					const Periodo periodo_inicial_PD = periodos_PD.at(0);
 					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-					validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+					validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 				}//for (IdSubmercado idSubmercado_PD = idSubmercadoIni_PD; idSubmercado_PD < idSubmercadoOut_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
@@ -16523,7 +16556,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-						if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
@@ -16560,7 +16593,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							}//for (IdSubmercado idSubmercado_PD = idSubmercadoIni_PD; idSubmercado_PD < idSubmercadoOut_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-						}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 					}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -16598,7 +16631,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						const Periodo periodo_inicial_PD = periodos_PD.at(0);
 						const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-						validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+						validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 					}//for (IdUsinaNaoSimulada idUsinaNaoSimulada_PD = idUsinaNaoSimuladaIni_PD; idUsinaNaoSimulada_PD < idUsinaNaoSimuladaOut_PD; dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorUsinaNaoSimulada.incr(idUsinaNaoSimulada_PD)) {
 
@@ -16622,7 +16655,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 						const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-						if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
@@ -16724,7 +16757,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							}//for (IdSubmercado idSubmercado_PD = idSubmercadoIni_PD; idSubmercado_PD < idSubmercadoOut_PD; dados_PD.vetorSubmercado.incr(idSubmercado_PD)) {
 
-						}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+						}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 					}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -16808,7 +16841,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						const Periodo periodo_inicial_PD = periodos_PD.at(0);
 						const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-						validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+						validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 						////////////////////////////////////////
 						//Instancia novos PatamarDeficit PD no CP
@@ -16855,7 +16888,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-								if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 									const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 									const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorSubmercado.at(idSubmercado_PD).vetorPatamarDeficit.at(idPatamarDeficit_PD).getIterador2Final(AttMatrizPatamarDeficit_custo, periodo_PD, IdPatamarCarga());
@@ -16870,7 +16903,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -16884,6 +16917,106 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 			catch (const std::exception& erro) { throw std::invalid_argument("Erro is_carregar_PD_submercado_patamar_deficit: \n" + std::string(erro.what())); }
 
 		}//is_carregar_PD_submercado_patamar_deficit
+
+
+		if (is_carregar_PD_intercambio) {
+
+			try {
+
+				std::cout << "Carregando arquivo de preConfiguracao: INTERCAMBIO_AttComumOperacional.csv..." << std::endl;
+				std::cout << "Carregando arquivo de preConfiguracao: INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv..." << std::endl;
+
+				//*******************************************************************
+				//  1. Mapeia intercambio PD no CP
+				//   Testa se o intercambio existe no CP. Caso contrário, lanca excecao
+				//   Depois atualiza estes valores com a sobreposição dos periodos_CP e periodos_PD
+				//*******************************************************************
+
+				Periodo periodo_REF = horizonte_estudo.getIteradorInicial(); //Período a partir do qual vão ser consideradas as restrições originais (atualiza-se a partir do periodo_final_PD)
+
+				const IdIntercambio idIntercambioIni_CP = a_dados.getMenorId(IdIntercambio());
+				const IdIntercambio idIntercambioOut_CP = a_dados.getIdOut(IdIntercambio());
+
+				const IdIntercambio idIntercambioIni_PD = dados_PD.getMenorId(IdIntercambio());
+				const IdIntercambio idIntercambioOut_PD = dados_PD.getIdOut(IdIntercambio());
+
+				for (IdIntercambio idIntercambio_PD_ = idIntercambioIni_PD; idIntercambio_PD_ < idIntercambioOut_PD; dados_PD.vetorIntercambio.incr(idIntercambio_PD_)) {
+
+					if (dados_PD.getSize1Matriz(idIntercambio_PD_, AttMatrizIntercambio_potencia_minima) == 0)
+						throw std::invalid_argument("Intercambio PD " + getFullString(idIntercambio_PD_) + " sem " + getFullString(AttMatrizIntercambio_potencia_minima) + ".");
+
+					//Validação do horizonte_informacao_PD_pre_config
+					std::vector<Periodo> periodos_PD = dados_PD.vetorIntercambio.at(idIntercambio_PD_).getMatriz(AttMatrizIntercambio_potencia_minima, Periodo(), IdPatamarCarga(), double()).getIteradores(horizonte_estudo.getIteradorInicial(), horizonte_estudo.getIteradorFinal());
+
+					const Periodo periodo_inicial_PD = periodos_PD.at(0);
+					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
+
+					validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
+
+					const IdSubmercado submercado_origem  = dados_PD.vetorIntercambio.at(idIntercambio_PD_).getAtributo(AttComumIntercambio_submercado_origem, IdSubmercado());
+					const IdSubmercado submercado_destino = dados_PD.vetorIntercambio.at(idIntercambio_PD_).getAtributo(AttComumIntercambio_submercado_destino, IdSubmercado());
+
+					IdIntercambio idIntercambio_CP_ = IdIntercambio_Nenhum;
+					for (IdIntercambio idIntercambio_CP = idIntercambioIni_CP; idIntercambio_CP < idIntercambioOut_CP; a_dados.vetorIntercambio.incr(idIntercambio_CP)) {
+						if ((a_dados.getAtributo(idIntercambio_CP, AttComumIntercambio_submercado_origem, IdSubmercado()) == submercado_origem) && (a_dados.getAtributo(idIntercambio_CP, AttComumIntercambio_submercado_destino, IdSubmercado()) == submercado_destino)) {
+							idIntercambio_CP_ = idIntercambio_CP;
+							break;
+						}
+					}
+
+					if (idIntercambio_CP_ == IdIntercambio_Nenhum)
+						throw std::invalid_argument("Intercambio PD " + getFullString(idIntercambio_PD_) + " nao encontrado no CP.");
+
+
+					a_dados.vetorIntercambio.at(idIntercambio_CP_).setAtributo(AttComumIntercambio_penalidade_intercambio, dados_PD.vetorIntercambio.at(idIntercambio_PD_).getAtributo(AttComumIntercambio_penalidade_intercambio, double()));
+					a_dados.vetorIntercambio.at(idIntercambio_CP_).setAtributo(AttComumIntercambio_penalidade_intercambio_minimo, dados_PD.vetorIntercambio.at(idIntercambio_PD_).getAtributo(AttComumIntercambio_penalidade_intercambio_minimo, double()));
+
+					/////////////////////////////////////////////////////////////////////////////////////
+					//Atualiza valores
+					/////////////////////////////////////////////////////////////////////////////////////
+
+					SmartEnupla<Periodo, bool> horizonte_info_PD;
+
+					for (int pos = 0; pos < int(periodos_PD.size()); pos++)
+						horizonte_info_PD.addElemento(periodos_PD.at(pos), true);
+
+					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+						for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+							const double sobreposicao = periodo.sobreposicao(periodo_PD);
+
+							if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
+
+								if (periodo > periodo_REF)//Atualiza o periodo_REF para depois atualizar os limites do conjunto de restrições originais
+									periodo_REF = periodo;
+
+								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorIntercambio.at(idIntercambio_PD_).getIterador2Final(AttMatrizIntercambio_potencia_minima, periodo_PD, IdPatamarCarga());
+
+								if (maiorIdPatamarCarga != maiorIdPatamarCarga_PD || maiorIdPatamarCarga != IdPatamarCarga_1)
+									throw std::invalid_argument("Nao compativel o maiorIdPatamarCarga entre o estudo CP e os dadosPreConfig_PD");
+
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+									//AttMatriz
+									a_dados.vetorIntercambio.at(idIntercambio_CP_).setElemento(AttMatrizIntercambio_potencia_maxima, periodo, idPatamarCarga, dados_PD.vetorIntercambio.at(idIntercambio_PD_).getElementoMatriz(AttMatrizIntercambio_potencia_maxima, periodo_PD, idPatamarCarga, double()));
+									a_dados.vetorIntercambio.at(idIntercambio_CP_).setElemento(AttMatrizIntercambio_potencia_minima, periodo, idPatamarCarga, dados_PD.vetorIntercambio.at(idIntercambio_PD_).getElementoMatriz(AttMatrizIntercambio_potencia_minima, periodo_PD, idPatamarCarga, double()));
+								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+							}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
+
+						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
+
+					}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+				}//for (IdIntercambio idIntercambio_PD = idIntercambioIni_PD; idIntercambio_PD < idIntercambioOut_PD; dados_PD.vetorIntercambio.incr(idIntercambio_PD)) {
+
+			}//try {
+			catch (const std::exception& erro) { throw std::invalid_argument("Erro is_carregar_PD_intercambio: \n" + std::string(erro.what())); }
+
+		}//is_carregar_PD_intercambio
+
+
 
 		//////////////////////////////////////////////////////////////////////////////
 		//RENOVAVEL_AttComumOperacional
@@ -16920,7 +17053,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 					const Periodo periodo_inicial_PD = periodos_PD.at(0);
 					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-					validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+					validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 					////////////////////////////////////////
 					//Instancia novas renovaveis PD no CP
@@ -16971,7 +17104,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								if (periodo > periodo_REF)//Atualiza o periodo_REF para depois atualizar os limites do conjunto de restrições originais
 									periodo_REF = periodo;
@@ -16990,7 +17123,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									a_dados.vetorRenovavel.at(idRenovavel_PD).setElemento(AttMatrizRenovavel_geracao, periodo, idPatamarCarga, dados_PD.vetorRenovavel.at(idRenovavel_PD).getElementoMatriz(AttMatrizRenovavel_geracao, periodo_PD, idPatamarCarga, double()));
 								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -17087,7 +17220,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 					const Periodo periodo_inicial_PD = periodos_PD.at(0);
 					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-					validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+					validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 					SmartEnupla<Periodo, bool> horizonte_info_PD;
 
@@ -17190,7 +17323,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-									if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+									if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 										const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 
@@ -17213,7 +17346,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 										a_dados.vetorTermeletrica.at(idTermeletrica_CP).vetorUnidadeUTE.at(idUnidadeUTEIni_CP).setElemento(AttVetorUnidadeUTE_disponibilidade, periodo, 0.0);
 										a_dados.vetorTermeletrica.at(idTermeletrica_CP).vetorUnidadeUTE.at(idUnidadeUTEIni_CP).setElemento(AttVetorUnidadeUTE_representacao_discreta_producao, periodo, 0);
 
-									}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+									}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -17268,7 +17401,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						const Periodo periodo_inicial_PD = periodos_PD.at(0);
 						const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-						validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+						validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 						////////////////////////////////////////
 						//Instancia novas termelétricas PD no CP
@@ -17473,7 +17606,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-								if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 									const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 									const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorTermeletrica.at(idTermeletrica_PD).vetorUnidadeUTE.at(idUnidadeUTEIni_PD).getIterador2Final(AttMatrizUnidadeUTE_custo_de_operacao, periodo_PD, IdPatamarCarga());
@@ -17506,7 +17639,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									if (dados_PD.vetorTermeletrica.at(idTermeletrica_PD).getSizeMatriz(AttMatrizTermeletrica_potencia_disponivel_maxima) > 0)
 										a_dados.vetorTermeletrica.at(idTermeletrica_PD).setElemento(AttMatrizTermeletrica_potencia_disponivel_maxima, periodo, IdPatamarCarga_1, dados_PD.vetorTermeletrica.at(idTermeletrica_PD).getElementoMatriz(AttMatrizTermeletrica_potencia_disponivel_maxima, periodo_PD, IdPatamarCarga_1, double()));
 
-								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -17724,7 +17857,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						const Periodo periodo_inicial_PD = periodos_PD.at(0);
 						const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-						validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+						validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 						//////////////////////////////////
 						//hidrelétrica
@@ -17733,6 +17866,22 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_tempo_viagem_agua, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tempo_viagem_agua, int()));
 						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_jusante, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_jusante, IdHidreletrica()));
 						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_jusante_desvio, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_jusante_desvio, IdHidreletrica()));
+
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_turbinamento, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_turbinamento, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_vertimento, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_vertimento, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_desvio_agua, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_desvio_agua, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_turbinamento_minimo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_turbinamento_minimo, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_vazao_defluente_minima, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_vazao_defluente_minima, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_vazao_defluente_maxima, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_vazao_defluente_maxima, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_vazao_desviada_minima, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_vazao_desviada_minima, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_afluencia_incremental, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_afluencia_incremental, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_vazao_retirada, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_vazao_retirada, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_volume_minimo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_volume_minimo, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_volume_util_minimo, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_volume_util_minimo, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_evaporacao, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_evaporacao, double()));
+						a_dados.vetorHidreletrica.at(idHidreletrica_CP).setAtributo(AttComumHidreletrica_penalidade_potencia_minima, dados_PD.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_penalidade_potencia_minima, double()));
+
+
 
 						//AttVetor					
 						if (a_dados.vetorHidreletrica.at(idHidreletrica_CP).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_por_usina) {
@@ -17851,7 +18000,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-								if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 									const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 									IdPatamarCarga maiorIdPatamarCarga_PD = IdPatamarCarga_Nenhum;
@@ -18039,7 +18188,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									}//if (dados_PD.vetorHidreletrica.at(idHidreletrica_CP).isInstanciado(IdReservatorio_1)) {
 
-								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -18113,7 +18262,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 					const Periodo periodo_inicial_PD = periodos_PD.at(0);
 					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-					validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+					validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 					////////////////////////////////////////
 					//Instancia novos contratos PD no CP
@@ -18165,7 +18314,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorContrato.at(idContrato_PD).getIterador2Final(AttMatrizContrato_lim_inf, periodo_PD, IdPatamarCarga());
@@ -18181,7 +18330,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -18223,7 +18372,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 					const Periodo periodo_inicial_PD = periodos_PD.at(0);
 					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-					validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+					validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 					////////////////////////////////////////
 					//Instancia novas demanda_especial PD no CP
@@ -18270,7 +18419,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorDemandaEspecial.at(idDemandaEspecial_PD).getIterador2Final(AttMatrizDemandaEspecial_demanda, periodo_PD, IdPatamarCarga());
@@ -18284,7 +18433,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -18330,7 +18479,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 					const Periodo periodo_inicial_PD = periodos_PD.at(0);
 					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-					validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+					validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 					////////////////////////////////////////
 					//Instancia novas reserva_potencia PD no CP
@@ -18398,7 +18547,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
 								const IdPatamarCarga maiorIdPatamarCarga_PD = dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).getIterador2Final(AttMatrizReservaPotencia_reserva_minima, periodo_PD, IdPatamarCarga());
@@ -18417,7 +18566,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 									a_dados.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.at(idElementoSistema).setElemento(AttMatrizElementoSistema_fator_participacao, periodo, IdPatamarCarga_1, dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.at(idElementoSistema).getElementoMatriz(AttMatrizElementoSistema_fator_participacao, periodo_PD, IdPatamarCarga_1, double()));
 								}//for (IdElementoSistema idElementoSistema = idElementoSistemaIni; idElementoSistema < idElementoSistemaOut; dados_PD.vetorReservaPotencia.at(idReservaPotencia_PD).vetorElementoSistema.incr(idElementoSistema)) {
 
-							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -18464,7 +18613,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 					const Periodo periodo_inicial_PD = periodos_PD.at(0);
 					const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-					validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+					validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 					////////////////////////////////////////
 					//Instancia novas reserva_potencia PD no CP
@@ -18517,7 +18666,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 							const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-							if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 								//AttMatriz
 								const int int_size = dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getIterador2Final(AttMatrizControleCotaVazao_num_horas_lag, periodo_PD, int());
@@ -18532,7 +18681,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 								a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setElemento(AttVetorControleCotaVazao_coef_linear_cota_vazao_0, periodo, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getElementoVetor(AttVetorControleCotaVazao_coef_linear_cota_vazao_0, periodo_PD, double()));
 								a_dados.vetorControleCotaVazao.at(idControleCotaVazao_PD).setElemento(AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo, dados_PD.vetorControleCotaVazao.at(idControleCotaVazao_PD).getElementoVetor(AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo_PD, double()));
 
-							}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+							}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 						}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -18598,7 +18747,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 								&& idContrato_PD == IdContrato_Nenhum && idRenovavel_PD == IdRenovavel_Nenhum && idUsinaElevatoria_PD == IdUsinaElevatoria_Nenhum && idIntercambio_PD == IdIntercambio_Nenhum) {
 
 								is_all_elementos_restricao_in_CP = false;
-								std::cout << "Nao considerada idRestricaoEletrica_PD: " << getString(idRestricaoEletrica_PD) + " | nao encontrado idElementoSistema: " << getString(idElementoSistema) + " | todos os ids_Nenhum"  << std::endl;
+								throw std::invalid_argument("Nao considerada idRestricaoEletrica_PD: " + getString(idRestricaoEletrica_PD) + " | nao encontrado " + getFullString(idElementoSistema) + " | todos os ids_Nenhum");
 								break;
 
 							}
@@ -18724,7 +18873,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						const Periodo periodo_inicial_PD = periodos_PD.at(0);
 						const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-						validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+						validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 						////////////////////////////////////////
 						//Instancia as novas restrições PD no CP
@@ -18870,7 +19019,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-								if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 									if (periodo > periodo_REF)//Atualiza o periodo_REF para depois atualizar os limites do conjunto de restrições originais
 										periodo_REF = periodo;
@@ -18925,7 +19074,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									//}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -19066,7 +19215,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 						const Periodo periodo_inicial_PD = periodos_PD.at(0);
 						const Periodo periodo_final_PD = periodos_PD.at(int(periodos_PD.size()) - 1);
 
-						validar_horizonte_informacao_PD_pre_config(periodo_inicial_PD, periodo_final_PD);
+						validar_horizonte_informacao_PD_pre_config(a_dados, periodo_inicial_PD, periodo_final_PD);
 
 						////////////////////////////////////////
 						//Instancia as novas restrições PD no CP
@@ -19167,7 +19316,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 								const double sobreposicao = periodo.sobreposicao(periodo_PD);
 
-								if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 									if (periodo > periodo_REF)//Atualiza o periodo_REF para depois atualizar os limites do conjunto de restrições originais
 										periodo_REF = periodo;
@@ -19227,7 +19376,7 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 									//}//for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-								}//if (sobreposicao == 1.0 && periodo.getTipoPeriodo() >= periodo_PD.getTipoPeriodo()) {
+								}//if (sobreposicao == 1.0 && (periodo.getMinutos() <= periodo_PD.getMinutos())) {
 
 							}//for (Periodo periodo_PD = periodo_inicial_PD; periodo_PD <= periodo_final_PD; horizonte_info_PD.incrementarIterador(periodo_PD)) {
 
@@ -19322,34 +19471,36 @@ void LeituraCEPEL::atualizar_valores_com_DadosEntradaPD_PRECONFIG(Dados& a_dados
 
 }
 
-void LeituraCEPEL::validar_horizonte_informacao_PD_pre_config(const Periodo a_periodo_inicial_PD, const Periodo a_periodo_final_PD) {
+void LeituraCEPEL::validar_horizonte_informacao_PD_pre_config(Dados &a_dados, const Periodo a_periodo_inicial_PD, const Periodo a_periodo_final_PD) {
 
 	try {
 
 		//*********************************************************************************************************
 		//Validação do período da info da PD (Não é aceita informação do PD sem ser uma semana operativa completa):
-		//(i)  o período inicial da info PD deve coincidir com a algum período inicial deck
-		//(ii) o período final da info PD deve coincidir com a algum período final deck
+		//(i)  o período inicial da info PD deve coincidir com a algum período inicial
+		//(ii) o período final da info PD deve coincidir com a algum período final
 		//*********************************************************************************************************
 
 		bool is_periodo_inicial_PD_valido = false;
 		bool is_periodo_final_PD_valido = false;
 
-		const Periodo periodo_inicial_PD_TESTE = Periodo(TipoPeriodo_minuto, a_periodo_inicial_PD);
-		const Periodo periodo_final_PD_TESTE = Periodo(TipoPeriodo_minuto, a_periodo_final_PD + 1);
+		const Periodo periodo_inicial_PD_TESTE = Periodo("m", a_periodo_inicial_PD);
+		const Periodo periodo_final_PD_TESTE = Periodo("m", a_periodo_final_PD + 1);
 
-		for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
-			if (Periodo(TipoPeriodo_minuto, periodo_deck) == periodo_inicial_PD_TESTE)
+		for (Periodo periodo_deck = horizonte_estudo.getIteradorInicial(); periodo_deck <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_deck)) {
+
+			if (Periodo("m", periodo_deck) == periodo_inicial_PD_TESTE)
 				is_periodo_inicial_PD_valido = true;
 
-			if (Periodo(TipoPeriodo_minuto, periodo_deck + 1) == periodo_final_PD_TESTE)
+			if (Periodo("m", periodo_deck + 1) == periodo_final_PD_TESTE)
 				is_periodo_final_PD_valido = true;
 
 			if (is_periodo_inicial_PD_valido && is_periodo_final_PD_valido)
 				break;
 
-		}//for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
+		}//for (Periodo periodo_deck = horizonte_estudo.getIteradorInicial(); periodo_deck <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo_deck)) {
 
 		if (!is_periodo_inicial_PD_valido)
 			throw std::invalid_argument("Periodo inicial dos dados dadosPreConfig_PD deve coincidir com o inicio de uma semana operativa");
@@ -20020,6 +20171,12 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		//////////////////////////////////////////////////////////////
 
 		leitura_coeficientes_evaporacao_from_dec_cortes_evap_DC(a_dados, a_diretorio + "//DadosAdicionais" + "//dec_cortes_evap.csv");
+
+		a_dados.setMatriz_forced(AttMatrizDados_percentual_duracao_horizonte_estudo, SmartEnupla<IdEstagio, SmartEnupla<Periodo, double>>());
+		a_dados.setMatriz_forced(AttMatrizDados_desagio_acumulado_horizonte_estudo, SmartEnupla<IdEstagio, SmartEnupla<Periodo, double>>());
+		a_dados.setMatriz_forced(AttMatrizDados_conversor_vazao_volume, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>());
+		a_dados.setVetor_forced(AttVetorDados_conversor_vazao_volume, SmartEnupla<Periodo, double>());
+		a_dados.validacao_operacional_Dados(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		a_dados.validacao_operacional_Submercado(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 

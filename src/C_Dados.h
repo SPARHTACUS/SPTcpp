@@ -29,12 +29,9 @@
 	  m(Dados,  AttComum,                                     tipo_estudo,                        TipoEstudo,         min,         max,           min,      sim) \
 	  m(Dados,  AttComum,                             taxa_desconto_anual,                            double,           0,           1,             0,      sim) \
 	  m(Dados,  AttComum,                              periodo_referencia,                           Periodo,         min,         max,           min,      sim) \
-	  m(Dados,  AttComum,                                 estagio_inicial,                         IdEstagio,           1,         max,             1,      sim) \
 	  m(Dados,  AttComum,                                   estagio_final,                         IdEstagio,           1,         max,             1,      sim) \
-	  m(Dados,  AttComum,                  estagio_acoplamento_pre_estudo,                         IdEstagio,         min,         max,             1,      sim) \
 	  m(Dados,  AttComum,                     diretorio_importacao_cortes,                            string,         min,         max,        Nenhum,      sim) \
 	  m(Dados,  AttComum,                 diretorio_importacao_pos_estudo,                            string,         min,         max,        Nenhum,      sim) \
-	  m(Dados,  AttComum,                 diretorio_importacao_pre_estudo,                            string,         min,         max,        Nenhum,      sim) \
 	  m(Dados,  AttComum,                                iteracao_inicial,                        IdIteracao,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                         numero_maximo_iteracoes,                               int,           0,         max,             0,      sim) \
 	  m(Dados,  AttComum,                                numero_aberturas,                               int,           1,         max,             1,      nao) \
@@ -191,9 +188,6 @@ public:
 public:
 
 	bool isDadosAttComumValidados()const;
-
-	Periodo   getMenorPeriodoHorizonteEstudo() const;
-	Periodo   getMaiorPeriodoHorizonteEstudo() const;
 
 	enum PreencherAtributo {
 		nao_sem_utilizacao,

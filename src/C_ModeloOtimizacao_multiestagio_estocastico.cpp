@@ -14,8 +14,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 	try {
 		
-		const IdEstagio idEstagio_acoplamento = a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio());
-
 		const IdEstagio estagio_inicial = getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio());
 		const IdEstagio estagio_final = getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
 
@@ -61,10 +59,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 				vetorEstagio.at(idEstagio).selecaoSolucaoProxy(a_dados.getElementoVetor(AttVetorDados_numero_aberturas_solucao_proxy, idEstagio, int()));
 
-				if (idEstagio == idEstagio_acoplamento)
-					vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, 0);
-				else
-					vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, getAtributo(AttComumModeloOtimizacao_selecao_cortes_nivel_dominancia, int()));
+				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, getAtributo(AttComumModeloOtimizacao_selecao_cortes_nivel_dominancia, int()));
 				
 				if ((idEstagio > estagio_inicial) || (estagio_inicial != IdEstagio_1)) {
 					if (strCompara(getAtributo(AttComumModeloOtimizacao_diretorio_importacao_cortes, std::string()), "nenhum")) {
@@ -89,23 +84,7 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 
 		} // if (true) {
 
-
-		Periodo periodo_acoplamento;
-		if (idEstagio_acoplamento > estagio_final) {
-			const SmartEnupla<Periodo, double> horizon_stage = a_dados.getElementosMatriz(AttMatrizDados_percentual_duracao_horizonte_estudo, estagio_final, Periodo(), double());
-			periodo_acoplamento = horizon_stage.getIteradorFinal() + 1;
-		}
-		else
-			periodo_acoplamento = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio_acoplamento, Periodo());
-
-		Periodo menor_periodo_estagio_acoplamento_pre_estudo = periodo_acoplamento;
-
-		for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
-			if (horizonte_estudo.getElemento(periodo) == a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio())) {
-				menor_periodo_estagio_acoplamento_pre_estudo = periodo;
-				break;
-			}//if (horizonte_estudo_vetor.getElemento(periodo) == a_dados.getAtributo(AttComumDados_estagio_acoplamento_pre_estudo, IdEstagio())) {
-		}//for (Periodo periodo = horizonte_estudo_vetor.getIteradorInicial(); periodo <= horizonte_estudo_vetor.getIteradorFinal(); horizonte_estudo_vetor.incrementarIterador(periodo)) {
+		const Periodo menor_periodo_estagio_acoplamento_pre_estudo = horizonte_estudo.getIteradorInicial();
 
 		const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> horizon = a_dados.getMatriz(AttMatrizDados_percentual_duracao_patamar_carga, Periodo(), IdPatamarCarga(), double());
 
@@ -220,9 +199,6 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 		importarVariaveisEstado_AcoplamentoPosEstudo(TipoSubproblemaSolver_geral, a_dados, idProcesso, a_entradaSaidaDados);
 
 		importarCorteBenders(TipoSubproblemaSolver_geral, a_dados, idProcesso, std::string(a_entradaSaidaDados.getDiretorioSaida() + "//" + getFullString(a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao())) + "//Selecao_Cortes_Importacao"), a_entradaSaidaDados);
-
-		if (idProcesso == IdProcesso_mestre)
-			exportarVariaveisEstado_AcoplamentoPreEstudo(a_entradaSaidaDados);
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("ModeloOtimizacao(" + getString(getIdObjeto()) + ")::formularModeloOtimizacao(): \n" + std::string(erro.what())); }
@@ -690,7 +666,7 @@ void ModeloOtimizacao::criarProcessoEstocasticoHidrologico(const TipoSubproblema
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(var_YP_LAG, posEquYP, -getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodSP, lag, double()));
 
 							} // if (getElementoMatriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodSP, lag, double()) > 0.0){
-						} // for (int lag = 1; lag <= getSize2Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, periodSP.getEstacao()); lag++) {
+						} // for (int lag = 1; lag <= getSize2Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, periodSP.getMes()); lag++) {
 					} // if (getSize1Matriz(idProcEstocastico, idVariavelAleatoria, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) > 0) {
 
 				} // for (Periodo periodSP = periodo_processo_estocastico_inicial; periodSP <= periodo_processo_estocastico_final; a_horizonte_processo_estocastico_estagio.incrementarIterador(periodSP)) {
@@ -853,7 +829,7 @@ void ModeloOtimizacao::criarBalancoHidraulicoPorVazao(const TipoSubproblemaSolve
 				if (tempo_viagem_agua > 0) {
 					const Periodo periodo_ref = a_dados.getElementoVetor(idHidreletrica_montante, AttVetorHidreletrica_horizonte_defluencia_viajante, a_period, Periodo());
 					if (periodo_ref != Periodo(IdAno_1900)) {
-						Periodo periodo_lag = Periodo(periodo_ref.getTipoPeriodo(), Periodo(TipoPeriodo_horario, periodo_ref) - tempo_viagem_agua);
+						Periodo periodo_lag = Periodo(getString(periodo_ref.getDuration()), Periodo("h", periodo_ref) - tempo_viagem_agua);
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, a_idEstagio, idHidreletrica_montante, periodo_lag, a_horizon), posEquQMON, -1.0);
 					}
 					else
@@ -994,7 +970,7 @@ void ModeloOtimizacao::criarBalancoHidraulicoPorVolume(const TipoSubproblemaSolv
 				if (tempo_viagem_agua > 0) {
 					const Periodo periodo_ref = a_dados.getElementoVetor(idHidreletrica_montante, AttVetorHidreletrica_horizonte_defluencia_viajante, a_period, Periodo());
 					if (periodo_ref != Periodo(IdAno_1900)) {
-						Periodo periodo_lag = Periodo(periodo_ref.getTipoPeriodo(), Periodo(TipoPeriodo_horario, periodo_ref) - tempo_viagem_agua);
+						Periodo periodo_lag = Periodo(getString(periodo_ref.getDuration()), Periodo("h", periodo_ref) - tempo_viagem_agua);
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, a_idEstagio, idHidreletrica_montante, periodo_lag, a_horizon), posEquQMON, -1.0);
 					}
 					else
@@ -3540,7 +3516,7 @@ void ModeloOtimizacao::criarComandoTermeletricas(const TipoSubproblemaSolver a_T
 		if (a_dados.getSize1Matriz(a_idUTE, AttMatrizTermeletrica_potencia_disponivel_comandada) > 0) {
 
 			const Periodo periodEnd_precom = a_dados.getIterador1Final(a_idUTE, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo());
-			const Periodo periodNext_precom = Periodo(TipoPeriodo_minuto, periodEnd_precom + 1);
+			const Periodo periodNext_precom = Periodo("m", periodEnd_precom + 1);
 			const Periodo periodNext = a_period + 1;
 
 			if ((periodNext_precom >= periodNext) || (periodNext_precom > a_period)) {
@@ -3598,11 +3574,11 @@ void ModeloOtimizacao::criarComandoTermeletricas(const TipoSubproblemaSolver a_T
 
 		// Períodos mensais com Potencia a comandar recursivamente
 
-		const Periodo period_min_end = Periodo(TipoPeriodo_minuto, a_period + 1) - 1;
-		const Periodo period_month_end = Periodo(TipoPeriodo_mensal, period_min_end.getMes(), period_min_end.getAno());
+		const Periodo period_min_end = Periodo("m", a_period + 1) - 1;
+		const Periodo period_month_end = Periodo("M", period_min_end.getMes(), period_min_end.getAno());
 		SmartEnupla<Periodo, double> periods_month;
 
-		Periodo period_month = Periodo(TipoPeriodo_mensal, periodIni_com_regr.getMes(), periodIni_com_regr.getAno());
+		Periodo period_month = Periodo("M", periodIni_com_regr.getMes(), periodIni_com_regr.getAno());
 		periods_month.addElemento(period_month, a_period.sobreposicao(period_month));
 
 		if (period_month < period_month_end) {
@@ -3762,9 +3738,9 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM
 		if (lag_mensal_potencia_comandada == 0)
 			throw std::invalid_argument(getFullString(a_idUTE) + " com atributo " + getFullString(AttComumTermeletrica_lag_mensal_potencia_disponivel_comandada) + " igual a zero.");
 
-		const Periodo periodo_comando_minuto = Periodo(TipoPeriodo_minuto, a_periodMonth - lag_mensal_potencia_comandada);
+		const Periodo periodo_comando_minuto = Periodo("m", a_periodMonth - lag_mensal_potencia_comandada);
 		const Periodo periodo_otimizacao = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
-		const Periodo periodo_otimizacao_next = Periodo(TipoPeriodo_minuto, periodo_otimizacao + 1);
+		const Periodo periodo_otimizacao_next = Periodo("m", periodo_otimizacao + 1);
 
 		if (periodo_comando_minuto >= periodo_otimizacao_next)
 			return -1;
@@ -3813,15 +3789,15 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VH_LI
 
 			const IdMes mes_penalizacao_volume_util_minimo = a_dados.getAtributo(AttComumDados_mes_penalizacao_volume_util_minimo, IdMes());
 
-			const Periodo periodo_minuto_otimizacao_final = Periodo(TipoPeriodo_minuto, periodo_otimizacao + 1) - 1;
-			const Periodo periodo_minuto_otimizacao_inicial = Periodo(TipoPeriodo_minuto, periodo_otimizacao);
+			const Periodo periodo_minuto_otimizacao_final = Periodo("m", periodo_otimizacao + 1) - 1;
+			const Periodo periodo_minuto_otimizacao_inicial = Periodo("m", periodo_otimizacao);
 
 			const IdMes idMes_inicio = periodo_minuto_otimizacao_inicial.getMes();
 			const IdAno idAno_inicio = periodo_minuto_otimizacao_inicial.getAno();
 
-			Periodo periodo_penalizacao = Periodo(TipoPeriodo_minuto, Periodo(mes_penalizacao_volume_util_minimo, idAno_inicio) + 1) -1;
+			Periodo periodo_penalizacao = Periodo("m", Periodo(mes_penalizacao_volume_util_minimo, idAno_inicio) + 1) -1;
 			if (idMes_inicio > mes_penalizacao_volume_util_minimo)
-				periodo_penalizacao = Periodo(TipoPeriodo_minuto, Periodo(mes_penalizacao_volume_util_minimo, IdAno(int(idAno_inicio) + 1)) + 1) - 1;
+				periodo_penalizacao = Periodo("m", Periodo(mes_penalizacao_volume_util_minimo, IdAno(int(idAno_inicio) + 1)) + 1) - 1;
 
 			if ((periodo_minuto_otimizacao_inicial > periodo_penalizacao) || (periodo_minuto_otimizacao_final < periodo_penalizacao))
 				return -1;
@@ -3838,7 +3814,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VH_LI
 					if (varZPO_VH_FINF > -1)
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZPO_VH_FINF, getEquLinear_ZP0(a_TSS, a_idEstagio), -1.0);
 
-					periodo_penalizacao = Periodo(TipoPeriodo_minuto, Periodo(TipoPeriodo_anual, periodo_penalizacao) + 1) - 1;
+					periodo_penalizacao = Periodo("m", Periodo("a", periodo_penalizacao) + 1) - 1;
 
 					if (periodo_minuto_otimizacao_final < periodo_penalizacao)
 						return -1;
@@ -3861,7 +3837,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VH_LI
 		if (periodo_inicial_horizonte_estudo > a_periodo_penalizacao)
 			throw std::invalid_argument("Inicio do horizonte de estudo " + getFullString(periodo_inicial_horizonte_estudo) + " nao pode ser maior que periodo penalizacao.");
 
-		const Periodo periodo_penalizacao_anterior = Periodo(TipoPeriodo_minuto, Periodo(TipoPeriodo_anual, a_periodo_penalizacao) - 1);
+		const Periodo periodo_penalizacao_anterior = Periodo("m", Periodo("a", a_periodo_penalizacao) - 1);
 		if ((Periodo(periodo_final_horizonte_estudo + 1) <= periodo_penalizacao_anterior))
 			return -1;
 
@@ -3876,7 +3852,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VH_LI
 
 		for (Periodo periodo = periodo_inicial_varredura_horizonte_estudo; periodo <= periodo_final_horizonte_estudo; horizonte_estudo.incrementarIterador(periodo)) {
 
-			const Periodo periodo_minuto_final = Periodo(TipoPeriodo_minuto, Periodo(periodo + 1)) - 1;
+			const Periodo periodo_minuto_final = Periodo("m", Periodo(periodo + 1)) - 1;
 
 			double percentual_inclusao_periodo = 0.0;
 
@@ -3898,7 +3874,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VH_LI
 
 			// Periodo engloba parcialmente o periodo de penalizacao
 			else if ((periodo <= a_periodo_penalizacao) && (a_periodo_penalizacao < periodo_minuto_final))
-				percentual_inclusao_periodo = double((a_periodo_penalizacao - Periodo(TipoPeriodo_minuto, periodo)) + 1.0) / double(periodo.getMinutos());
+				percentual_inclusao_periodo = double((a_periodo_penalizacao - Periodo("m", periodo)) + 1.0) / double(periodo.getMinutos());
 
 			else if (periodo > a_periodo_penalizacao)
 				return varZP0_VH_LINF;
@@ -4181,7 +4157,7 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_HQ(const 
 						if (tempo_viagem_agua > 0) {
 							const Periodo periodo_ref = a_dados.getElementoVetor(idUHE, AttVetorHidreletrica_horizonte_defluencia_viajante, periodo, Periodo());
 							if (periodo_ref != Periodo(IdAno_1900)) {
-								Periodo periodo_lag = Periodo(periodo_ref.getTipoPeriodo(), Periodo(TipoPeriodo_horario, periodo_ref) - tempo_viagem_agua);
+								Periodo periodo_lag = Periodo(getString(periodo_ref.getDuration()), Periodo("h", periodo_ref) - tempo_viagem_agua);
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, a_idEstagio, idUHE, periodo_lag, a_horizon), equHQ_per, -a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_fator_participacao, h, double()) * a_dados.getElementoVetor(a_idConHQ, AttVetorControleCotaVazao_coef_linear_cota_vazao_1, periodo, double()));
 								tva_considerado = true;
 							}
@@ -7031,7 +7007,7 @@ void ModeloOtimizacao::criarControleCotaVazao(const TipoSubproblemaSolver a_TSS,
 					const double num_horas_lag_max = a_dados.getElementoMatriz(idConHQ, AttMatrizControleCotaVazao_num_horas_lag, a_period, i, double());
 					const int num_minutos_lag_max = int(num_horas_lag_max * 60);
 
-					Periodo period_lag_max = Periodo(a_period.getTipoPeriodo(), Periodo(TipoPeriodo_minuto, a_period) - num_minutos_lag_max);
+					Periodo period_lag_max = Periodo(getString(a_period.getDuration()), Periodo("m", a_period) - num_minutos_lag_max);
 
 					Periodo period_lag = a_period;
 					if (num_minutos_lag_max > 0)

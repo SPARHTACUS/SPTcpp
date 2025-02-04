@@ -719,14 +719,8 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 				a_dados.volume_inicial_carregado_from_operacional = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv", a_dados, TipoAcessoInstancia_m2);
 				a_dados.volume_inicial_carregado_from_premissa    = entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_RESERVATORIO_AttComumPremissa.csv", a_dados, TipoAcessoInstancia_m2);
 
-				if (a_dados.getAtributo(AttComumDados_estagio_inicial, IdEstagio()) == IdEstagio_1) {
-					if (a_dados.volume_inicial_carregado_from_operacional && a_dados.volume_inicial_carregado_from_premissa)
-						throw std::invalid_argument("Apenas um dos arquivos HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv, HIDRELETRICA_RESERVATORIO_AttComumPremissa.csv deve ser carregado.");
-				}
-				else {
-					if (a_dados.volume_inicial_carregado_from_operacional || a_dados.volume_inicial_carregado_from_premissa)
-						throw std::invalid_argument("Nenhum dos arquivos HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv, HIDRELETRICA_RESERVATORIO_AttComumPremissa.csv deve ser carregado quando " + getFullString(AttComumDados_estagio_inicial) + " for maior que " + getFullString(IdEstagio_1));
-				}
+				if (a_dados.volume_inicial_carregado_from_operacional && a_dados.volume_inicial_carregado_from_premissa)
+					throw std::invalid_argument("Apenas um dos arquivos HIDRELETRICA_RESERVATORIO_AttComumOperacional.csv, HIDRELETRICA_RESERVATORIO_AttComumPremissa.csv deve ser carregado.");
 
 			} // if (true) {
 
@@ -738,11 +732,7 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 
 			entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AttVetorOperacional_PorPeriodo.csv", a_dados, TipoAcessoInstancia_m1);
 
-			if (true) {
-				const bool leitura_att_vetor_defluencia = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv", a_dados, TipoAcessoInstancia_m2);
-				if ((a_dados.getAtributo(AttComumDados_estagio_inicial, IdEstagio()) > IdEstagio_1) && (leitura_att_vetor_defluencia))
-					throw std::invalid_argument("O arquivo HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv nao deve ser lido caso " + getFullString(AttComumDados_estagio_inicial) + " seja maior que " + getFullString(IdEstagio_1) + ".");
-			} // if (true) {
+			const bool leitura_att_vetor_defluencia = entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_DEFLUENCIA_AttVetorOperacional_PorPeriodo.csv", a_dados, TipoAcessoInstancia_m2);
 
 			bool tipo_detalhamento_producao_por_usina = false;
 			bool tipo_detalhamento_producao_por_conjunto = false;
@@ -795,17 +785,8 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 			if ((a_dados.getAtributo(AttComumDados_tipo_geracao_cenario_hidrologico, TipoGeracaoCenario()) == TipoGeracaoCenario_sintetica_in_sample) ||
 				(a_dados.getAtributo(AttComumDados_tipo_geracao_cenario_hidrologico, TipoGeracaoCenario()) == TipoGeracaoCenario_sintetica_out_of_sample)) {
 
-				if (strCompara(a_dados.getAtributo(AttComumDados_diretorio_importacao_pre_estudo, std::string()), "nenhum")) {
-					entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetor_natural_historico.csv", a_dados, TipoAcessoInstancia_m2);
-					entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetor_natural_tendencia.csv", a_dados, TipoAcessoInstancia_m2);
-				}
-				else {
-					const std::string diretorio_entrada = entradaSaidaDados.getDiretorioEntrada();
-					entradaSaidaDados.setDiretorioEntrada(a_dados.getAtributo(AttComumDados_diretorio_importacao_pre_estudo, std::string()));
-					entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetor_natural_historico.csv", a_dados, TipoAcessoInstancia_m2);
-					entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetor_natural_tendencia.csv", a_dados, TipoAcessoInstancia_m2);
-					entradaSaidaDados.setDiretorioEntrada(diretorio_entrada);
-				}
+				entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetor_natural_historico.csv", a_dados, TipoAcessoInstancia_m2);
+				entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetor_natural_tendencia.csv", a_dados, TipoAcessoInstancia_m2);
 
 				a_dados.setAtributo(AttComumDados_tipo_tendencia_hidrologica, TipoTendenciaEstocastica_serie_informada);
 
@@ -861,8 +842,6 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 							break;
 						}
 					}
-
-					a_dados.setAtributo(AttComumDados_estagio_acoplamento_pre_estudo, estagio_acoplamento_pre_estudo);
 
 				} // else if (tendencia_natural || tendencia_incremental){
 
@@ -1002,7 +981,7 @@ void LeituraCEPEL::instancia_dados_preConfig(Dados& a_dados, const std::string a
 
 			const Periodo periodo_referencia = a_dados.getAtributo(AttComumDados_periodo_referencia, Periodo());
 
-			if (periodo_referencia != Periodo(periodo_referencia.getTipoPeriodo(), a_dados.getIteradorInicial(AttVetorDados_horizonte_estudo, Periodo())))
+			if (periodo_referencia != Periodo(getString(periodo_referencia.getDuration()), a_dados.getIteradorInicial(AttVetorDados_horizonte_estudo, Periodo())))
 				throw std::invalid_argument("Atributo " + getFullString(AttComumDados_periodo_referencia) + " nao compativel com " + getFullString(AttVetorDados_horizonte_estudo));
 
 		} // if ((a_dados.getSizeVetor(AttVetorDados_horizonte_estudo) > 0) && (dadosPreConfig_instanciados)) {
@@ -2735,7 +2714,7 @@ bool LeituraCEPEL::aplicarModificacaoNOVAMAQ(Dados& a_dados, const IdHidreletric
 
 			double sobreposicao = periodo.sobreposicao(a_modificacaoUHE.periodo);
 
-			if ((periodo == horizonte_estudo.getIteradorInicial()) && (Periodo(horizonte_estudo_DECK.getIteradorInicial().getTipoPeriodo(), a_modificacaoUHE.periodo) == horizonte_estudo_DECK.getIteradorInicial()))
+			if ((periodo == horizonte_estudo.getIteradorInicial()) && (Periodo(getString(horizonte_estudo_DECK.getIteradorInicial().getDuration()), a_modificacaoUHE.periodo) == horizonte_estudo_DECK.getIteradorInicial()))
 				sobreposicao += sobreposicao_atraso_periodo_inicial;
 
 			if ((periodo >= a_modificacaoUHE.periodo) || (sobreposicao > 0.0)) {
@@ -4233,8 +4212,8 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 		SmartEnupla<Periodo, bool> horizonte_tendencia_mais_processo_estocastico_MENSAL;
 
-		const Periodo periodo_inicial_MENSAL = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_processo_estocastico.getIteradorInicial().getMes(), horizonte_tendencia_mais_processo_estocastico.getIteradorInicial().getAno());
-		const Periodo periodo_final_MENSAL = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_processo_estocastico.getIteradorFinal().getMes(), horizonte_tendencia_mais_processo_estocastico.getIteradorFinal().getAno());
+		const Periodo periodo_inicial_MENSAL = Periodo("M", horizonte_tendencia_mais_processo_estocastico.getIteradorInicial().getMes(), horizonte_tendencia_mais_processo_estocastico.getIteradorInicial().getAno());
+		const Periodo periodo_final_MENSAL = Periodo("M", horizonte_tendencia_mais_processo_estocastico.getIteradorFinal().getMes(), horizonte_tendencia_mais_processo_estocastico.getIteradorFinal().getAno());
 
 		for (Periodo periodo_aux = periodo_inicial_MENSAL; periodo_aux <= periodo_final_MENSAL; periodo_aux++)
 			horizonte_tendencia_mais_processo_estocastico_MENSAL.addElemento(periodo_aux, true);
@@ -4304,13 +4283,13 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				/////////////////////////////////////////
 				//Determina o mês/ano operativo do periodo_inicial do horizonte_estudo com base na semana operativa (p.ex: o período 26/08/2023-semanal tem como mês operativo = Setembro/2023)
 
-				Periodo periodo_inicial_semanal = Periodo(TipoPeriodo_semanal, a_horizonte_estudo.getIteradorInicial());
+				Periodo periodo_inicial_semanal = Periodo("7d", a_horizonte_estudo.getIteradorInicial());
 				periodo_inicial_semanal++;
 				
 				Periodo periodo_final_mensal = horizonte_tendencia_mais_processo_estocastico_MENSAL.getIteradorFinal();
 
 				//////////////////////
-				Periodo periodo_inicial_aux = Periodo(TipoPeriodo_mensal, IdMes_1, periodo_inicial_semanal.getAno()); //A impressão dos cortes no arquivo nwlistcf.rel é desde o mês 1 até o mês 12 (mesmo que o estudo comece p.ex. no mês 6)
+				Periodo periodo_inicial_aux = Periodo("M", IdMes_1, periodo_inicial_semanal.getAno()); //A impressão dos cortes no arquivo nwlistcf.rel é desde o mês 1 até o mês 12 (mesmo que o estudo comece p.ex. no mês 6)
 
 				for (Periodo periodo = periodo_inicial_aux; periodo <= periodo_final_mensal; periodo++)//Todos os períodos são em base mensal
 					periodo_acoplamento++;
@@ -4349,7 +4328,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			estagio_pos_estudo.setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, 0);
 			estagio_pos_estudo.setAtributo(AttComumEstagio_cortes_multiplos, 0);
 
-			const Periodo periodo_pos_estudo = Periodo(TipoPeriodo_mensal, horizonte_tendencia_mais_processo_estocastico_MENSAL.getIteradorFinal() + 1);
+			const Periodo periodo_pos_estudo = Periodo("M", horizonte_tendencia_mais_processo_estocastico_MENSAL.getIteradorFinal() + 1);
 			estagio_pos_estudo.setAtributo(AttComumEstagio_periodo_otimizacao, periodo_pos_estudo);
 
 			estagio_pos_estudo.alocarCorteBenders(8000);
@@ -4568,9 +4547,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 			// Estados VMINOP
 			const IdMes mes_referencia_penalizacao_VMINOP = IdMes_11;
-			Periodo periodo_penalizacao_VMINOP = Periodo(TipoPeriodo_minuto, Periodo(mes_referencia_penalizacao_VMINOP, periodo_pos_estudo.getAno()) + 1) - 1;
+			Periodo periodo_penalizacao_VMINOP = Periodo("m", Periodo(mes_referencia_penalizacao_VMINOP, periodo_pos_estudo.getAno()) + 1) - 1;
 			if (periodo_pos_estudo.getMes() > mes_referencia_penalizacao_VMINOP)
-				periodo_penalizacao_VMINOP = Periodo(TipoPeriodo_minuto, Periodo(mes_referencia_penalizacao_VMINOP, IdAno(int(periodo_pos_estudo.getAno()) + 1)) + 1) - 1;
+				periodo_penalizacao_VMINOP = Periodo("m", Periodo(mes_referencia_penalizacao_VMINOP, IdAno(int(periodo_pos_estudo.getAno()) + 1)) + 1) - 1;
 			const std::string strVarDecisaoZP0_VH_LINFIdEstagio = std::string("ZP0_VH_LINF," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_penalizacao_VMINOP));
 			estados.addElemento(estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, strVarDecisaoZP0_VH_LINFIdEstagio, -1, -1), 0.0);
 
@@ -8775,7 +8754,7 @@ IdMes LeituraCEPEL::get_IdMes_operativo(const Periodo a_periodo, const bool is_p
 {
 	try {
 
-		if (a_periodo.getTipoPeriodo() > TipoPeriodo_semanal)
+		if (a_periodo.getMinutos() < Periodo("7d", a_periodo).getMinutos())
 			throw std::invalid_argument("Nao implementada regra para periodos com duracao menor a TipoPeriodo_semanal \n");
 
 		Periodo periodo_teste = a_periodo;
