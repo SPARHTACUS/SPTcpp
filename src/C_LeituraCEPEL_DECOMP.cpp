@@ -3,7 +3,8 @@
 #include <iostream>
 #include <fstream>
 
-
+Dados dados_CP_ref; //dados de um CP referência para popular info de um novo estudo CP
+bool is_read_dados_CP_ref = false; // identifica se existe CP referência para popular info de um novo estudo CP
 IdEstagio idEstagioMaximo = IdEstagio_3; //Decomposição adoptada para o CP
 
 const IdEstagio estagio_acoplamento_pre_estudo = IdEstagio_2; //Acoplamento com o PD
@@ -1777,6 +1778,61 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 		if (leituraArquivo.is_open()) {
 
+			///////////////////////////////////////////////////////////////////////////////////
+			//Carrega informação pre-config de um estudo de CP 
+			// para popular informação de um novo CP 
+			// (p.ex patamar extra não sequencial para construir um estudo patamar sequencial)
+
+			const std::string dadosEntradaCP_preConfig = a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG" + "//DadosEntradaCP_PRECONFIG";
+
+			if (folderExists(dadosEntradaCP_preConfig)) {
+				is_read_dados_CP_ref = true;
+
+				EntradaSaidaDados entradaSaidaDados;
+
+				entradaSaidaDados.setDiretorioEntrada(dadosEntradaCP_preConfig);
+
+				//Dados
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("DADOS_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_direto);
+
+				//Submercado
+				entradaSaidaDados.carregarArquivoCSV_AttComum("SUBMERCADO_AttComumOperacional.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("SUBMERCADO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("SUBMERCADO_PATAMAR_DEFICIT_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_m2);
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("SUBMERCADO_USINA_NAO_SIMULADA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_m2);
+
+				//Intercambio
+				entradaSaidaDados.carregarArquivoCSV_AttComum("INTERCAMBIO_AttComumOperacional.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("INTERCAMBIO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+
+				//Restrição Elétrica
+				entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_ELETRICA_AttComumOperacional.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+				entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttComumOperacional.csv", dados_CP_ref, TipoAcessoInstancia_m2);
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_ELETRICA_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_m2);
+
+				//Restrição Operativa UHE
+				entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_OPERATIVA_UHE_AttComumOperacional.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+				entradaSaidaDados.carregarArquivoCSV_AttComum("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttComumOperacional.csv", dados_CP_ref, TipoAcessoInstancia_m2);
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("RESTRICAO_OPERATIVA_UHE_ELEMENTO_SISTEMA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_m2);
+
+				//Termelétrica
+				entradaSaidaDados.carregarArquivoCSV_AttComum("TERMELETRICA_AttComumOperacional.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("TERMELETRICA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("TERMELETRICA_COMANDO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+
+				//Usina Elevatória
+				entradaSaidaDados.carregarArquivoCSV_AttComum("USINA_ELEVATORIA_AttComumOperacional.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("USINA_ELEVATORIA_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+
+				//Contrato
+				entradaSaidaDados.carregarArquivoCSV_AttComum("CONTRATO_AttComumOperacional.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+				entradaSaidaDados.carregarArquivoCSV_AttMatriz("CONTRATO_AttMatrizOperacional_PorPeriodoPorIdPatamarCarga.csv", dados_CP_ref, TipoAcessoInstancia_m1);
+
+			}//if (true) {
+
+
 			/////////////////////////////////////////////////
 			//1.Instancia percentual_duracao_patamar_carga
 			/////////////////////////////////////////////////
@@ -2668,6 +2724,33 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 							}//if (line_size >= 129) {
 
+
+							///////////////////////////////////////////////////////////////////////////
+							//Subtitui leitura por info carregada na pre-Config (se existir)
+							// e.x de aplicação: patamares não sequenciais extras
+							///////////////////////////////////////////////////////////////////////////							
+
+							if (is_read_dados_CP_ref) {
+
+								/////////////
+								//Atualiza 
+								potencia_minima.clear();
+								potencia_maxima.clear();
+								custo_operacao.clear();
+
+								const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_termeletrica);
+
+								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									potencia_minima.push_back(dados_CP_ref.vetorTermeletrica.at(IdTermeletrica(codigo_usina)).getElementoMatriz(AttMatrizTermeletrica_potencia_minima, periodo_DC, idPatamarCarga_CP_ref, double()));
+									potencia_maxima.push_back(dados_CP_ref.vetorTermeletrica.at(IdTermeletrica(codigo_usina)).getElementoMatriz(AttMatrizTermeletrica_potencia_minima, periodo_DC, idPatamarCarga_CP_ref, double()) + dados_CP_ref.vetorTermeletrica.at(IdTermeletrica(codigo_usina)).getElementoMatriz(AttMatrizTermeletrica_potencia_util, periodo_DC, idPatamarCarga_CP_ref, double()));
+									custo_operacao.push_back(dados_CP_ref.vetorTermeletrica.at(IdTermeletrica(codigo_usina)).getElementoMatriz(AttMatrizTermeletrica_custo_de_operacao, periodo_DC, idPatamarCarga_CP_ref, double()));
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+							}//if (is_read_dados_CP_ref) {
+
+
 							/////////////////////////////////////////
 							//Guarda a informação nos SmartElementos
 							/////////////////////////////////////////
@@ -3212,6 +3295,36 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							}//if (line_size >= 119) {
 
 
+							///////////////////////////////////////////////////////////////////////////
+							//Subtitui leitura por info carregada na pre-Config (se existir)
+							// e.x de aplicação: patamares não sequenciais extras
+							///////////////////////////////////////////////////////////////////////////
+
+							if (is_read_dados_CP_ref) {
+
+								double horasTotais = 0; //horas totais do periodo_DC do deck original
+
+								for (int pos = 0; pos < int(duracao_horas_patamar.size()); pos++)
+									horasTotais += duracao_horas_patamar.at(pos);
+
+								/////////////
+								//Atualiza 
+								demanda_patamar.clear();
+								duracao_horas_patamar.clear();
+
+								const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_demanda);
+
+								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									demanda_patamar.push_back(dados_CP_ref.vetorSubmercado.at(idSubmercado).getElementoMatriz(AttMatrizSubmercado_demanda, periodo_DC, idPatamarCarga_CP_ref, double()));
+									duracao_horas_patamar.push_back(dados_CP_ref.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, idPatamarCarga_CP_ref, double()) * horasTotais);
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									
+							}//if (is_read_dados_CP_ref) {
+
+							///////////////////////////////////////////////////////////////////////////
+
 							if (true) {
 								//Necessário para a conversão com a modulação da demanda informada na preConfig PD
 
@@ -3473,6 +3586,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 							}//if (line_size >= 104) {
 
+
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Filosofia, sobreescreve a informação para t >= idEstagio
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3536,6 +3650,39 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								throw std::invalid_argument("Nao inicializada idContrato com codigo_usina_" + getString(codigo_usina));
 
 							const IdPatamarDeficit  idPatamarDeficit = idPatamarDeficit_inicializado;
+
+							///////////////////////////////////////////////////////////////////////////
+							//Subtitui leitura por info carregada na pre-Config (se existir)
+							// e.x de aplicação: patamares não sequenciais extras
+							///////////////////////////////////////////////////////////////////////////							
+
+							if (is_read_dados_CP_ref) {
+
+								/////////////
+								//Atualiza 
+								patamarDeficit_percentual_da_demanda.clear();
+								patamarDeficit_custo.clear();
+
+								const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_patamar_deficit);
+
+								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+									const double percentual_da_demanda = dados_CP_ref.vetorSubmercado.at(idSubmercado).vetorPatamarDeficit.at(idPatamarDeficit).getElementoMatriz(AttMatrizPatamarDeficit_potencia_maxima, periodo_DC, idPatamarCarga_CP_ref, double()) / dados_CP_ref.vetorSubmercado.at(idSubmercado).getElementoMatriz(AttMatrizSubmercado_demanda, periodo_DC, idPatamarCarga_CP_ref, double());
+
+									if(percentual_da_demanda > 1.0)
+										throw std::invalid_argument("percentual_da_demanda invalido");
+
+									patamarDeficit_percentual_da_demanda.push_back(percentual_da_demanda);
+									patamarDeficit_custo.push_back(dados_CP_ref.vetorSubmercado.at(idSubmercado).vetorPatamarDeficit.at(idPatamarDeficit).getElementoMatriz(AttMatrizPatamarDeficit_custo, periodo_DC, idPatamarCarga_CP_ref, double()));
+
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+							}//if (is_read_dados_CP_ref) {
+
+							////////////////////////////////////////////////////////////////////////////////
+
 
 							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -3664,6 +3811,15 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							}//if (line_size >= 29 + 5 * numero_patamares) {
 							else
 								fator_de_perdas = 1; //Default: nos Decks não especificam este valor
+
+							/////////////////////////////////////////////////
+
+							if (dados_CP_ref.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.isInstanciado(dados_CP_ref.getMenorId(idSubmercado, IdUsinaNaoSimulada()))) {
+								throw std::invalid_argument("Nao implementada a condição de ter preConfig CP e geracao de usina nao simulada do registro BE");
+
+							}
+							/////////////////////////////////////////////////
+
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Filosofia, sobreescreve a informação para t >= idEstagio e soma todas as bacias especias guardando um valor total
@@ -3851,6 +4007,30 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 							const IdUsinaNaoSimulada idUsinaNaoSimulada = getIdUsinaNaoSimulada_from_nome_or_bloco(nome, "");
 
+							///////////////////////////////////////////////////////////////////////////
+							//Subtitui leitura por info carregada na pre-Config (se existir)
+							// e.x de aplicação: patamares não sequenciais extras
+							///////////////////////////////////////////////////////////////////////////							
+
+							if (is_read_dados_CP_ref) {
+
+								/////////////
+								//Atualiza 
+								usinaNaoSimulada_potencia_gerada.clear();
+
+								const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_registro);
+
+								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									usinaNaoSimulada_potencia_gerada.push_back(dados_CP_ref.vetorSubmercado.at(idSubmercado).vetorUsinaNaoSimulada.at(idUsinaNaoSimulada).getElementoMatriz(AttMatrizUsinaNaoSimulada_potencia_maxima, periodo_DC, idPatamarCarga_CP_ref, double()));
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+							}//if (is_read_dados_CP_ref) {
+
+							///////////////////////////////////////////////////////////////////////////		
+
+
 							if (true) {
 								//Necessário para a conversão com a modulação da demanda informada na preConfig PD 								
 								for (Periodo periodo_deck = horizonte_estudo_DECK.getIteradorInicial(); periodo_deck <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo_deck)) {
@@ -3987,6 +4167,10 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 							if (a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica()) == TipoDetalhamentoProducaoHidreletrica_por_conjunto) {
 
+								if (dados_CP_ref.vetorHidreletrica.isInstanciado(dados_CP_ref.getMenorId(IdHidreletrica())))
+									throw std::invalid_argument("Registro RI - nao implementado detalhamento pro conjunto e preConfig CP");
+
+
 								const IdSubmercado idSubmercado_ande = getIdFromCodigoONS(lista_codigo_ONS_submercado, codigo_ANDE);
 
 								// VERIFICA SE O CONJUNTO HIDRAULICO JÁ FOI INSTANCIADO
@@ -4113,6 +4297,71 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								if (a_dados.getSize1Matriz(idSubmercado_ande, AttMatrizSubmercado_demanda) == 0)
 									a_dados.vetorSubmercado.at(idSubmercado_ande).setMatriz(AttMatrizSubmercado_demanda, matriz_zero);
 
+								std::vector<double> potencia_minima_itaipu_iv;
+								std::vector<double> potencia_maxima_itaipu_iv;
+
+								std::vector<double> potencia_minima_itaipu_ande;
+								std::vector<double> potencia_maxima_itaipu_ande;
+								
+								std::vector<double> demanda_ande;
+
+								for (int pos = 0; pos < num_patamar_carga; pos++) {
+
+									const int passo = pos * 35;
+
+									potencia_minima_itaipu_iv.push_back(std::stod(line.substr(passo + 16, 7)));
+									potencia_maxima_itaipu_iv.push_back(std::stod(line.substr(passo + 24, 7)));
+
+									potencia_minima_itaipu_ande.push_back(std::stod(line.substr(passo + 30, 7)));
+									potencia_maxima_itaipu_ande.push_back(std::stod(line.substr(passo + 37, 7)));
+
+									demanda_ande.push_back(std::stod(line.substr(passo + 44, 7)));
+
+								}//for (int pos = 0; pos < num_patamar_carga; pos++) {
+
+								///////////////////////////////////////////////////////////////////////////
+								//Subtitui leitura por info carregada na pre-Config (se existir)
+								// e.x de aplicação: patamares não sequenciais extras
+								///////////////////////////////////////////////////////////////////////////							
+
+								if (is_read_dados_CP_ref) {
+
+									/////////////
+									//Atualiza 
+									potencia_minima_itaipu_iv.clear();
+									potencia_maxima_itaipu_iv.clear();
+									
+									const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_inicial);
+
+									const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
+
+									for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+										potencia_minima_itaipu_iv.push_back(dados_CP_ref.vetorIntercambio.at(idIntercambio_itaipu_iv).getElementoMatriz(AttMatrizIntercambio_potencia_minima, periodo_DC, idPatamarCarga_CP_ref, double()));
+										potencia_maxima_itaipu_iv.push_back(dados_CP_ref.vetorIntercambio.at(idIntercambio_itaipu_iv).getElementoMatriz(AttMatrizIntercambio_potencia_maxima, periodo_DC, idPatamarCarga_CP_ref, double()));
+									}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+									/////////////
+									//Atualiza 
+									potencia_minima_itaipu_ande.clear();
+									potencia_maxima_itaipu_ande.clear();
+
+									for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+										potencia_minima_itaipu_ande.push_back(dados_CP_ref.vetorIntercambio.at(idIntercambio_itaipu_ande).getElementoMatriz(AttMatrizIntercambio_potencia_minima, periodo_DC, idPatamarCarga_CP_ref, double()));
+										potencia_maxima_itaipu_ande.push_back(dados_CP_ref.vetorIntercambio.at(idIntercambio_itaipu_ande).getElementoMatriz(AttMatrizIntercambio_potencia_maxima, periodo_DC, idPatamarCarga_CP_ref, double()));
+									}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+									/////////////
+									//Atualiza 
+									demanda_ande.clear();
+
+									for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+										demanda_ande.push_back(dados_CP_ref.vetorSubmercado.at(idSubmercado_ande).getElementoMatriz(AttMatrizSubmercado_demanda, periodo_DC, idPatamarCarga_CP_ref, double()));
+									}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+								}//if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio_itaipu_iv)) {
+
+								///////////////////////////////////////////
+
 								for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 									int numero_patamares_x_periodo = 0;
@@ -4126,17 +4375,16 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 											if (periodo >= horizonte_otimizacao_DC.getElemento(idEstagio_inicial)) {
 
-												int passo = (int(idPatamarCarga_DECK) - 1) * 35;
 												// GERAÇÃO ITAIPU 60 HZ
-												a_dados.vetorIntercambio.at(idIntercambio_itaipu_iv).setElemento(AttMatrizIntercambio_potencia_minima, periodo, idPatamarCarga, std::stod(line.substr(passo + 16, 7)));
-												a_dados.vetorIntercambio.at(idIntercambio_itaipu_iv).setElemento(AttMatrizIntercambio_potencia_maxima, periodo, idPatamarCarga, std::stod(line.substr(passo + 24, 7)));
+												a_dados.vetorIntercambio.at(idIntercambio_itaipu_iv).setElemento(AttMatrizIntercambio_potencia_minima, periodo, idPatamarCarga, potencia_minima_itaipu_iv.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+												a_dados.vetorIntercambio.at(idIntercambio_itaipu_iv).setElemento(AttMatrizIntercambio_potencia_maxima, periodo, idPatamarCarga, potencia_maxima_itaipu_iv.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
 
 												// GERAÇÃO ITAIPU 50 HZ
-												a_dados.vetorIntercambio.at(idIntercambio_itaipu_ande).setElemento(AttMatrizIntercambio_potencia_minima, periodo, idPatamarCarga, std::stod(line.substr(passo + 30, 7)));
-												a_dados.vetorIntercambio.at(idIntercambio_itaipu_ande).setElemento(AttMatrizIntercambio_potencia_maxima, periodo, idPatamarCarga, std::stod(line.substr(passo + 37, 7)));
+												a_dados.vetorIntercambio.at(idIntercambio_itaipu_ande).setElemento(AttMatrizIntercambio_potencia_minima, periodo, idPatamarCarga, potencia_minima_itaipu_ande.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+												a_dados.vetorIntercambio.at(idIntercambio_itaipu_ande).setElemento(AttMatrizIntercambio_potencia_maxima, periodo, idPatamarCarga, potencia_maxima_itaipu_ande.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
 
 												// CARGA ANDE
-												a_dados.vetorSubmercado.at(idSubmercado_ande).setElemento(AttMatrizSubmercado_demanda, periodo, idPatamarCarga, std::stod(line.substr(passo + 44, 7)));
+												a_dados.vetorSubmercado.at(idSubmercado_ande).setElemento(AttMatrizSubmercado_demanda, periodo, idPatamarCarga, demanda_ande.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
 												
 											}//if (periodo >= horizonte_otimizacao_DC.getElemento(idEstagio_inicial)) {
 
@@ -4304,6 +4552,62 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								itaipu_carga_ANDE.push_back(atof(atributo.c_str()));
 
 							}//if (line_size >= 69) {
+
+							///////////////////////////////////////////////////////////////////////////
+							//Subtitui leitura por info carregada na pre-Config (se existir)
+							// e.x de aplicação: patamares não sequenciais extras
+							///////////////////////////////////////////////////////////////////////////							
+
+							//Na representaçao por usina de Itaipú os limites do intercambio Itaipú->Ande e Itaipú->IV sao atualizados
+
+							const IdSubmercado idSubmercado_itaipu = getIdFromCodigoONS(lista_codigo_ONS_submercado, codigo_submercado_ITAIPU);
+							const IdSubmercado idSubmercado_ande = getIdFromCodigoONS(lista_codigo_ONS_submercado, codigo_ANDE);
+
+							std::vector<IdIntercambio> idIntercambio_inicializado = a_dados.vetorIntercambio.getIdObjetos(AttComumIntercambio_submercado_origem, idSubmercado_itaipu);
+
+							int idIntercambio_inicializado_size = int(idIntercambio_inicializado.size());
+
+							IdIntercambio idIntercambio_itaipu_ande = IdIntercambio_Nenhum;
+
+							for (int intercambio_inicializado = 0; intercambio_inicializado < idIntercambio_inicializado_size; intercambio_inicializado++) {
+
+								if (a_dados.getAtributo(idIntercambio_inicializado.at(intercambio_inicializado), AttComumIntercambio_submercado_destino, IdSubmercado()) == idSubmercado_ande) {
+									idIntercambio_itaipu_ande = idIntercambio_inicializado.at(intercambio_inicializado);
+									break;
+								}//if (a_dados.getAtributo(idIntercambio_inicializado.at(intercambio_inicializado), AttComumIntercambio_submercado_destino, IdSubmercado()) == idSubmercado_destino) {
+
+							}//for (int intercambio_inicializado = 0; intercambio_inicializado < idIntercambio_inicializado_size; intercambio_inicializado++) {
+
+							if (idIntercambio_itaipu_ande == IdIntercambio_Nenhum)
+								throw std::invalid_argument("Registro IT - Intercambio nao encontrado");
+
+
+							if (is_read_dados_CP_ref) {
+
+								/////////////
+								//Atualiza 
+								itaipu_50Hz_potencia.clear();
+
+								const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_Itaipu);
+
+								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									itaipu_50Hz_potencia.push_back(dados_CP_ref.vetorIntercambio.at(idIntercambio_itaipu_ande).getElementoMatriz(AttMatrizIntercambio_potencia_maxima, periodo_DC, idPatamarCarga_CP_ref, double()));
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+								/////////////
+								//Atualiza 
+								itaipu_carga_ANDE.clear();
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									itaipu_carga_ANDE.push_back(dados_CP_ref.vetorSubmercado.at(idSubmercado_ande).getElementoMatriz(AttMatrizSubmercado_demanda, periodo_DC, idPatamarCarga_CP_ref, double()));
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+							}//if (is_read_dados_CP_ref) {
+
+							///////////////////////////////////////////
+
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Guarda informação nos Smart Elementos
@@ -4838,6 +5142,27 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 							}//for (int intercambio_inicializado = 0; intercambio_inicializado < idIntercambio_inicializado_size; intercambio_inicializado++) {
 
+							///////////////////////////////////////////////////////////////////////////
+							//Subtitui leitura por info carregada na pre-Config (se existir)
+							// e.x de aplicação: patamares não sequenciais extras
+							///////////////////////////////////////////////////////////////////////////							
+
+							if (is_read_dados_CP_ref) {
+
+								/////////////
+								//Atualiza 
+								intercambio_capacidade_maxima_submercado_origem.clear();
+
+								const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_intercambio);
+
+								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									intercambio_capacidade_maxima_submercado_origem.push_back(dados_CP_ref.vetorIntercambio.at(idIntercambio).getElementoMatriz(AttMatrizIntercambio_potencia_maxima, periodo_DC, idPatamarCarga_CP_ref, double()));
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+							}//if (is_read_dados_CP_ref) {
+
 							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 								int numero_patamares_x_periodo = 0;
@@ -4877,6 +5202,23 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 									break;
 
 							}//for (int intercambio_inicializado = 0; intercambio_inicializado < idIntercambio_inicializado_size; intercambio_inicializado++) {
+
+							if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio)) {
+
+								/////////////
+								//Atualiza 
+								intercambio_capacidade_maxima_submercado_destino.clear();
+
+								const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_intercambio);
+
+								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									intercambio_capacidade_maxima_submercado_destino.push_back(dados_CP_ref.vetorIntercambio.at(idIntercambio).getElementoMatriz(AttMatrizIntercambio_potencia_maxima, periodo_DC, idPatamarCarga_CP_ref, double()));
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+							}//if (dados_CP_ref.vetorIntercambio.isInstanciado(idIntercambio)) {
+
 
 							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -5041,8 +5383,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 						try {
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Campo 2 -  Número de iterações.
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 2 -  Número de iterações.
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							atributo = line.substr(4, 3);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
@@ -5905,260 +6247,112 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 							const int line_size = int(line.length());
 
-							SmartEnupla<Periodo, int> numero_patamares_x_periodo(SmartEnupla<Periodo, int>(horizonte_estudo, 0));
+							//SmartEnupla<Periodo, int> numero_patamares_x_periodo(SmartEnupla<Periodo, int>(horizonte_estudo, 0));
 
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-							//Patamar 1
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							const int num_patamar_carga = int(percentual_duracao_patamar_carga_original.at(horizonte_estudo.getIteradorInicial()).size()); //No deck original DC não muda o número de patamares por período
 
-							limiteInferior = "";
-							limiteSuperior = "";
+							/*
+							if (line.size() >= 104) { num_patamar_carga = 5; }
+							else if (line.size() >= 84) { num_patamar_carga = 4; }
+							else if (line.size() >= 64) { num_patamar_carga = 3; }
+							else if (line.size() >= 44) { num_patamar_carga = 2; }
+							else if (line.size() >= 24) { num_patamar_carga = 1; }
+							*/
 
-							if (line_size >= 24) {
+							std::vector<double> lim_inf(num_patamar_carga, 0.0);
+							std::vector<double> lim_sup(num_patamar_carga, getdoubleFromChar("max"));
 
-								numero_patamar++;
+							for (int pos = 0; pos < num_patamar_carga; pos++) {
 
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								//Campo 4 - Limite inferior em MWmed para o patamar 1. 
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								limiteInferior = line.substr(14, 10);
+								int passo = 20;
+
+								limiteInferior = "";
+								limiteInferior = line.substr(pos * passo + 14, 10);
 								limiteInferior.erase(std::remove(limiteInferior.begin(), limiteInferior.end(), ' '), limiteInferior.end());
 
-							}//if (line_size >= 24) {
+								if (limiteInferior != "")
+									lim_inf.at(pos) = std::atof(limiteInferior.c_str());
 
-							if (line_size >= 34) {
+								limiteSuperior = "";
 
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								//Campo 5 - Limite superior em MWmed para o patamar 1. 
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								limiteSuperior = line.substr(24, 10);
-								limiteSuperior.erase(std::remove(limiteSuperior.begin(), limiteSuperior.end(), ' '), limiteSuperior.end());
+								if (int(line.length()) >= pos * passo + 24 + 10) { // Pode ser reportado no deck o lim_inf e não o lim_sup (nesse caso seria o valor default)
+									limiteSuperior = line.substr(pos * passo + 24, 10);
+									limiteSuperior.erase(std::remove(limiteSuperior.begin(), limiteSuperior.end(), ' '), limiteSuperior.end());
+								}//if (int(line.length()) >= pos * passo + 24 + 10) {
 
-							}//if (line_size >= 34) {
+								if (limiteSuperior != "")
+									lim_sup.at(pos) = std::atof(limiteSuperior.c_str());
 
+							}//for (int pos = 0; pos < num_patamar_carga; pos++) {
 
-							if (limiteInferior != "" || limiteSuperior != "") {
+							///////////////////////////////////////////////////////////////////////////
+							//Subtitui leitura por info carregada na pre-Config (se existir)
+							// e.x de aplicação: patamares não sequenciais extras
+							///////////////////////////////////////////////////////////////////////////							
 
-								idPatamarCarga_DECK = getIdPatamarCargaFromChar(std::to_string(numero_patamar).c_str());
+							if (is_read_dados_CP_ref) {
 
-								for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.incrementarIterador(periodo)) {
+								//Procura uma restrição com o mesmo número de elementos e fatores de participação na restrição do deck atual
+
+								const IdRestricaoEletrica idREOut = dados_CP_ref.getIdOut(IdRestricaoEletrica());
+								const IdRestricaoEletrica idREIni = dados_CP_ref.getMenorId(IdRestricaoEletrica());
+
+								IdRestricaoEletrica idRestricaoEletrica_CP_ref = IdRestricaoEletrica_Nenhum;
+
+								for (IdRestricaoEletrica idRestricaoEletrica_aux = idREIni; idRestricaoEletrica_aux < idREOut; dados_CP_ref.incr(idRestricaoEletrica_aux)) {
+
+									//1. Testa o nome da restrição que é um código dado no deck
+									//Não é possível neste ponto mapear com os elementos da restrição porque os registros dos elementos são depois do registro LU (limites)
+									if (a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()) == dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_aux).getAtributo(AttComumRestricaoEletrica_nome, std::string())) {
+										idRestricaoEletrica_CP_ref = idRestricaoEletrica_aux;
+									}//if (a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()) == dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_aux).getAtributo(AttComumRestricaoEletrica_nome, std::string())) {
+
+								}//for (IdRestricaoEletrica idRestricaoEletrica_aux = idREIni; idRestricaoEletrica_aux < idREOut; dados_CP_ref.incr(idRestricaoEletrica_aux)) {
+
+								if(idRestricaoEletrica_CP_ref == IdRestricaoEletrica_Nenhum)
+									throw std::invalid_argument("Nao encontrada restricao com nome: " + a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()));
+
+								/////////////
+								//Atualiza 
+								lim_inf.clear();
+								lim_sup.clear();
+
+								const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_inicial);
+
+								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									lim_inf.push_back(dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_CP_ref).getElementoMatriz(AttMatrizRestricaoEletrica_lim_inf, periodo_DC, idPatamarCarga_CP_ref, double()));
+									lim_sup.push_back(dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_CP_ref).getElementoMatriz(AttMatrizRestricaoEletrica_lim_sup, periodo_DC, idPatamarCarga_CP_ref, double()));
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+							}//if (is_read_dados_CP_ref) {
+
+							/////////////////////////////
+
+							for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.incrementarIterador(periodo)) {
+
+								int numero_patamares_x_periodo = 0;
+
+								for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
 
 									if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
-										
-										numero_patamares_x_periodo.at(periodo)++;
+										numero_patamares_x_periodo++;
 
-										const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo.at(periodo));
+										const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo);
 
-										if (limiteInferior != "") { a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, std::atof(limiteInferior.c_str())); }
-										if (limiteSuperior != "") { a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, std::atof(limiteSuperior.c_str())); }
+										if (periodo >= horizonte_otimizacao_DC.at(idEstagio_inicial)) {
+
+											a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, lim_inf.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+											a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, lim_sup.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+
+										}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_inicial)) {
 
 									}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
 
-								}//for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.at(periodo)) {
+								}//for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
 
-							}//if (limiteInferior != "" || limiteSuperior != "") {
-
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-							//Patamar 2
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-							limiteInferior = "";
-							limiteSuperior = "";
-
-							if (line_size >= 44) {
-
-								numero_patamar++;
-
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								//Campo 6 - Limite inferior em MWmed para o patamar 2. 
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								limiteInferior = line.substr(34, 10);
-								limiteInferior.erase(std::remove(limiteInferior.begin(), limiteInferior.end(), ' '), limiteInferior.end());
-
-							}//if (line_size >= 44) {
-
-							if (line_size >= 54) {
-
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								//Campo 7 - Limite superior em MWmed para o patamar 2. 
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								limiteSuperior = line.substr(44, 10);
-								limiteSuperior.erase(std::remove(limiteSuperior.begin(), limiteSuperior.end(), ' '), limiteSuperior.end());
-
-							}//if (line_size >= 54) {
-
-
-							if (limiteInferior != "" || limiteSuperior != "") {
-
-								idPatamarCarga_DECK = getIdPatamarCargaFromChar(std::to_string(numero_patamar).c_str());
-
-								for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.incrementarIterador(periodo)) {
-
-									if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
-
-										numero_patamares_x_periodo.at(periodo)++;
-
-										const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo.at(periodo));
-
-										if (limiteInferior != "") { a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, std::atof(limiteInferior.c_str())); }
-										if (limiteSuperior != "") { a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, std::atof(limiteSuperior.c_str())); }
-
-									}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
-
-								}//for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.at(periodo)) {
-
-							}//if (limiteInferior != "" || limiteSuperior != "") {
-
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-							//Patamar 3
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-							limiteInferior = "";
-							limiteSuperior = "";
-
-							if (line_size >= 64) {
-
-								numero_patamar++;
-
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								//Campo 8 - Limite inferior em MWmed para o patamar 3. 
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								limiteInferior = line.substr(54, 10);
-								limiteInferior.erase(std::remove(limiteInferior.begin(), limiteInferior.end(), ' '), limiteInferior.end());
-
-							}//if (line_size >= 64) {
-
-							if (line_size >= 74) {
-
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								//Campo 9 - Limite superior em MWmed para o patamar 3. 
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								limiteSuperior = line.substr(64, 10);
-								limiteSuperior.erase(std::remove(limiteSuperior.begin(), limiteSuperior.end(), ' '), limiteSuperior.end());
-
-							}//if (line_size >= 74) {
-
-
-							if (limiteInferior != "" || limiteSuperior != "") {
-
-								idPatamarCarga_DECK = getIdPatamarCargaFromChar(std::to_string(numero_patamar).c_str());
-
-								for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.incrementarIterador(periodo)) {
-
-									if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
-
-										numero_patamares_x_periodo.at(periodo)++;
-
-										const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo.at(periodo));
-
-										if (limiteInferior != "") { a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, std::atof(limiteInferior.c_str())); }
-										if (limiteSuperior != "") { a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, std::atof(limiteSuperior.c_str())); }
-
-									}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
-
-								}//for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.at(periodo)) {
-
-							}//if (limiteInferior != "" || limiteSuperior != "") {
-
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-							//Patamar 4
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-							limiteInferior = "";
-							limiteSuperior = "";
-
-							if (line_size >= 84) {
-
-								numero_patamar++;
-
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								//Campo 10 - Limite inferior em MWmed para o patamar 4. 
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								limiteInferior = line.substr(74, 10);
-								limiteInferior.erase(std::remove(limiteInferior.begin(), limiteInferior.end(), ' '), limiteInferior.end());
-
-							}//if (line_size >= 84) {
-
-							if (line_size >= 94) {
-
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								//Campo 11 - Limite superior em MWmed para o patamar 4. 
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								limiteSuperior = line.substr(84, 10);
-								limiteSuperior.erase(std::remove(limiteSuperior.begin(), limiteSuperior.end(), ' '), limiteSuperior.end());
-
-							}//if (line_size >= 94) {
-
-							if (limiteInferior != "" || limiteSuperior != "") {
-
-								idPatamarCarga_DECK = getIdPatamarCargaFromChar(std::to_string(numero_patamar).c_str());
-
-								for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.incrementarIterador(periodo)) {
-
-									if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
-
-										numero_patamares_x_periodo.at(periodo)++;
-
-										const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo.at(periodo));
-
-										if (limiteInferior != "") { a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, std::atof(limiteInferior.c_str())); }
-										if (limiteSuperior != "") { a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, std::atof(limiteSuperior.c_str())); }
-
-									}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
-
-								}//for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.at(periodo)) {
-
-							}//if (limiteInferior != "" || limiteSuperior != "") {
-
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-							//Patamar 5
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-							limiteInferior = "";
-							limiteSuperior = "";
-
-							if (line_size >= 104) {
-
-								numero_patamar++;
-
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								//Campo 12 - Limite inferior em MWmed para o patamar 5. 
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								limiteInferior = line.substr(94, 10);
-								limiteInferior.erase(std::remove(limiteInferior.begin(), limiteInferior.end(), ' '), limiteInferior.end());
-
-							}//if (line_size >= 104) {
-
-							if (line_size >= 114) {
-
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								//Campo 13 - Limite superior em MWmed para o patamar 5. 
-								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-								limiteSuperior = line.substr(104, 10);
-								limiteSuperior.erase(std::remove(limiteSuperior.begin(), limiteSuperior.end(), ' '), limiteSuperior.end());
-
-							}//if (line_size >= 114) {
-
-							if (limiteInferior != "" || limiteSuperior != "") {
-
-								idPatamarCarga_DECK = getIdPatamarCargaFromChar(std::to_string(numero_patamar).c_str());
-
-								for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.incrementarIterador(periodo)) {
-
-									if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
-
-										numero_patamares_x_periodo.at(periodo)++;
-
-										const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo.at(periodo));
-
-										if (limiteInferior != "") { a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, std::atof(limiteInferior.c_str())); }
-										if (limiteSuperior != "") { a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, std::atof(limiteSuperior.c_str())); }
-
-									}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
-
-								}//for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.at(periodo)) {
-
-							}//if (limiteInferior != "" || limiteSuperior != "") {
+							}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
 						}//try {
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro LU: \n" + std::string(erro.what())); }
@@ -6271,6 +6465,45 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 							if (idIntercambio == IdIntercambio_Nenhum) {//Significa que a restriçao elétrica é referente à idHidreletrica
 
+								//Se existe info preConfigCP verifica se existe o elemento na restrição do deck
+								if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
+
+									//Procura uma restrição com o mesmo número de elementos e fatores de participação na restrição do deck atual
+
+									const IdRestricaoEletrica idREOut = dados_CP_ref.getIdOut(IdRestricaoEletrica());
+									const IdRestricaoEletrica idREIni = dados_CP_ref.getMenorId(IdRestricaoEletrica());
+
+									IdRestricaoEletrica idRestricaoEletrica_CP_ref = IdRestricaoEletrica_Nenhum;
+
+									for (IdRestricaoEletrica idRestricaoEletrica_aux = idREIni; idRestricaoEletrica_aux < idREOut; dados_CP_ref.incr(idRestricaoEletrica_aux)) {
+
+										//1. Testa o nome da restrição que é um código dado no deck
+										//Não é possível neste ponto mapear com os elementos da restrição porque os registros dos elementos são depois do registro LU (limites)
+										if (a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()) == dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_aux).getAtributo(AttComumRestricaoEletrica_nome, std::string())) {
+											idRestricaoEletrica_CP_ref = idRestricaoEletrica_aux;
+										}//if (a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()) == dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_aux).getAtributo(AttComumRestricaoEletrica_nome, std::string())) {
+
+									}//for (IdRestricaoEletrica idRestricaoEletrica_aux = idREIni; idRestricaoEletrica_aux < idREOut; dados_CP_ref.incr(idRestricaoEletrica_aux)) {
+
+									if (idRestricaoEletrica_CP_ref == IdRestricaoEletrica_Nenhum)
+										throw std::invalid_argument("Nao encontrada restricao com nome: " + a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()));
+
+									const IdElementoSistema maiorIdElementoSistema_CP_ref = dados_CP_ref.getMaiorId(idRestricaoEletrica_CP_ref, IdElementoSistema());
+
+									bool is_found_element = false;
+
+									for (IdElementoSistema idElementoSistema_CP_ref = IdElementoSistema_1; idElementoSistema_CP_ref <= maiorIdElementoSistema_CP_ref; idElementoSistema_CP_ref++) {
+										if (dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_CP_ref).vetorElementoSistema.at(idElementoSistema_CP_ref).getAtributo(AttComumElementoSistema_hidreletrica, IdHidreletrica()) == idHidreletrica) {
+											is_found_element = true;
+											break;
+										}
+									}//for (IdElementoSistema idElementoSistema_CP_ref = IdElementoSistema_1; idElementoSistema_CP_ref <= maiorIdElementoSistema_CP_ref; idElementoSistema_CP_ref++) {
+
+									if(!is_found_element)
+										throw std::invalid_argument("Nao encontrada elemento: " + getFullString(idHidreletrica) + " com nome : " + a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()));
+
+								}//if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
+
 								//Verifica se o elemento da restrição já foi inicializado
 
 								const std::vector<IdElementoSistema> idElementoSistema_inicializada = a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).vetorElementoSistema.getIdObjetos(AttComumElementoSistema_hidreletrica, idHidreletrica);
@@ -6359,6 +6592,46 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								//As restriçoes elétricas referentes aos conjuntos 50/60 Hz Itaipu sao incluidos nos
 								//intercambios ITAIPU->ANDE e ITAIPU->IV respectivamente
+
+								//Se existe info preConfigCP verifica se existe o elemento na restrição do deck
+								if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
+
+									//Procura uma restrição com o mesmo número de elementos e fatores de participação na restrição do deck atual
+
+									const IdRestricaoEletrica idREOut = dados_CP_ref.getIdOut(IdRestricaoEletrica());
+									const IdRestricaoEletrica idREIni = dados_CP_ref.getMenorId(IdRestricaoEletrica());
+
+									IdRestricaoEletrica idRestricaoEletrica_CP_ref = IdRestricaoEletrica_Nenhum;
+
+									for (IdRestricaoEletrica idRestricaoEletrica_aux = idREIni; idRestricaoEletrica_aux < idREOut; dados_CP_ref.incr(idRestricaoEletrica_aux)) {
+
+										//1. Testa o nome da restrição que é um código dado no deck
+										//Não é possível neste ponto mapear com os elementos da restrição porque os registros dos elementos são depois do registro LU (limites)
+										if (a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()) == dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_aux).getAtributo(AttComumRestricaoEletrica_nome, std::string())) {
+											idRestricaoEletrica_CP_ref = idRestricaoEletrica_aux;
+										}//if (a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()) == dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_aux).getAtributo(AttComumRestricaoEletrica_nome, std::string())) {
+
+									}//for (IdRestricaoEletrica idRestricaoEletrica_aux = idREIni; idRestricaoEletrica_aux < idREOut; dados_CP_ref.incr(idRestricaoEletrica_aux)) {
+
+									if (idRestricaoEletrica_CP_ref == IdRestricaoEletrica_Nenhum)
+										throw std::invalid_argument("Nao encontrada restricao com nome: " + a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()));
+
+									const IdElementoSistema maiorIdElementoSistema_CP_ref = dados_CP_ref.getMaiorId(idRestricaoEletrica_CP_ref, IdElementoSistema());
+
+									bool is_found_element = false;
+
+									for (IdElementoSistema idElementoSistema_CP_ref = IdElementoSistema_1; idElementoSistema_CP_ref <= maiorIdElementoSistema_CP_ref; idElementoSistema_CP_ref++) {
+										if (dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_CP_ref).vetorElementoSistema.at(idElementoSistema_CP_ref).getAtributo(AttComumElementoSistema_intercambio, IdIntercambio()) == idIntercambio) {
+											is_found_element = true;
+											break;
+										}
+									}//for (IdElementoSistema idElementoSistema_CP_ref = IdElementoSistema_1; idElementoSistema_CP_ref <= maiorIdElementoSistema_CP_ref; idElementoSistema_CP_ref++) {
+
+									if (!is_found_element)
+										throw std::invalid_argument("Nao encontrada elemento: " + getFullString(idIntercambio) + " com nome : " + a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()));
+
+								}//if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
+
 
 								//Verifica se o elemento da restrição já foi inicializado
 
@@ -6510,6 +6783,46 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Guarda informação nos Smart Elementos
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+							//Se existe info preConfigCP verifica se existe o elemento na restrição do deck
+							if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
+
+								//Procura uma restrição com o mesmo número de elementos e fatores de participação na restrição do deck atual
+
+								const IdRestricaoEletrica idREOut = dados_CP_ref.getIdOut(IdRestricaoEletrica());
+								const IdRestricaoEletrica idREIni = dados_CP_ref.getMenorId(IdRestricaoEletrica());
+
+								IdRestricaoEletrica idRestricaoEletrica_CP_ref = IdRestricaoEletrica_Nenhum;
+
+								for (IdRestricaoEletrica idRestricaoEletrica_aux = idREIni; idRestricaoEletrica_aux < idREOut; dados_CP_ref.incr(idRestricaoEletrica_aux)) {
+
+									//1. Testa o nome da restrição que é um código dado no deck
+									//Não é possível neste ponto mapear com os elementos da restrição porque os registros dos elementos são depois do registro LU (limites)
+									if (a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()) == dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_aux).getAtributo(AttComumRestricaoEletrica_nome, std::string())) {
+										idRestricaoEletrica_CP_ref = idRestricaoEletrica_aux;
+									}//if (a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()) == dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_aux).getAtributo(AttComumRestricaoEletrica_nome, std::string())) {
+
+								}//for (IdRestricaoEletrica idRestricaoEletrica_aux = idREIni; idRestricaoEletrica_aux < idREOut; dados_CP_ref.incr(idRestricaoEletrica_aux)) {
+
+								if (idRestricaoEletrica_CP_ref == IdRestricaoEletrica_Nenhum)
+									throw std::invalid_argument("Nao encontrada restricao com nome: " + a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()));
+
+								const IdElementoSistema maiorIdElementoSistema_CP_ref = dados_CP_ref.getMaiorId(idRestricaoEletrica_CP_ref, IdElementoSistema());
+
+								bool is_found_element = false;
+
+								for (IdElementoSistema idElementoSistema_CP_ref = IdElementoSistema_1; idElementoSistema_CP_ref <= maiorIdElementoSistema_CP_ref; idElementoSistema_CP_ref++) {
+									if (dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_CP_ref).vetorElementoSistema.at(idElementoSistema_CP_ref).getAtributo(AttComumElementoSistema_termeletrica, IdTermeletrica()) == idTermeletrica) {
+										is_found_element = true;
+										break;
+									}
+								}//for (IdElementoSistema idElementoSistema_CP_ref = IdElementoSistema_1; idElementoSistema_CP_ref <= maiorIdElementoSistema_CP_ref; idElementoSistema_CP_ref++) {
+
+								if (!is_found_element)
+									throw std::invalid_argument("Nao encontrada elemento: " + getFullString(idTermeletrica) + " com nome : " + a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()));
+
+							}//if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
+
 
 							//Verifica se o elemento da restrição já foi inicializado
 
@@ -6683,6 +6996,46 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							//Guarda informação nos Smart Elementos
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+							//Se existe info preConfigCP verifica se existe o elemento na restrição do deck
+							if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
+
+								//Procura uma restrição com o mesmo número de elementos e fatores de participação na restrição do deck atual
+
+								const IdRestricaoEletrica idREOut = dados_CP_ref.getIdOut(IdRestricaoEletrica());
+								const IdRestricaoEletrica idREIni = dados_CP_ref.getMenorId(IdRestricaoEletrica());
+
+								IdRestricaoEletrica idRestricaoEletrica_CP_ref = IdRestricaoEletrica_Nenhum;
+
+								for (IdRestricaoEletrica idRestricaoEletrica_aux = idREIni; idRestricaoEletrica_aux < idREOut; dados_CP_ref.incr(idRestricaoEletrica_aux)) {
+
+									//1. Testa o nome da restrição que é um código dado no deck
+									//Não é possível neste ponto mapear com os elementos da restrição porque os registros dos elementos são depois do registro LU (limites)
+									if (a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()) == dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_aux).getAtributo(AttComumRestricaoEletrica_nome, std::string())) {
+										idRestricaoEletrica_CP_ref = idRestricaoEletrica_aux;
+									}//if (a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()) == dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_aux).getAtributo(AttComumRestricaoEletrica_nome, std::string())) {
+
+								}//for (IdRestricaoEletrica idRestricaoEletrica_aux = idREIni; idRestricaoEletrica_aux < idREOut; dados_CP_ref.incr(idRestricaoEletrica_aux)) {
+
+								if (idRestricaoEletrica_CP_ref == IdRestricaoEletrica_Nenhum)
+									throw std::invalid_argument("Nao encontrada restricao com nome: " + a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()));
+
+								const IdElementoSistema maiorIdElementoSistema_CP_ref = dados_CP_ref.getMaiorId(idRestricaoEletrica_CP_ref, IdElementoSistema());
+
+								bool is_found_element = false;
+
+								for (IdElementoSistema idElementoSistema_CP_ref = IdElementoSistema_1; idElementoSistema_CP_ref <= maiorIdElementoSistema_CP_ref; idElementoSistema_CP_ref++) {
+									if (dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_CP_ref).vetorElementoSistema.at(idElementoSistema_CP_ref).getAtributo(AttComumElementoSistema_intercambio, IdIntercambio()) == idIntercambio) {
+										is_found_element = true;
+										break;
+									}
+								}//for (IdElementoSistema idElementoSistema_CP_ref = IdElementoSistema_1; idElementoSistema_CP_ref <= maiorIdElementoSistema_CP_ref; idElementoSistema_CP_ref++) {
+
+								if (!is_found_element)
+									throw std::invalid_argument("Nao encontrada elemento: " + getFullString(idIntercambio) + " com nome : " + a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()));
+
+							}//if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
+
+
 							//Verifica se o elemento da restrição já foi inicializado
 
 							const std::vector<IdElementoSistema> idElementoSistema_inicializada = a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).vetorElementoSistema.getIdObjetos(AttComumElementoSistema_intercambio, idIntercambio);
@@ -6831,6 +7184,45 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Guarda informação nos Smart Elementos
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+							//Se existe info preConfigCP verifica se existe o elemento na restrição do deck
+							if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
+
+								//Procura uma restrição com o mesmo número de elementos e fatores de participação na restrição do deck atual
+
+								const IdRestricaoEletrica idREOut = dados_CP_ref.getIdOut(IdRestricaoEletrica());
+								const IdRestricaoEletrica idREIni = dados_CP_ref.getMenorId(IdRestricaoEletrica());
+
+								IdRestricaoEletrica idRestricaoEletrica_CP_ref = IdRestricaoEletrica_Nenhum;
+
+								for (IdRestricaoEletrica idRestricaoEletrica_aux = idREIni; idRestricaoEletrica_aux < idREOut; dados_CP_ref.incr(idRestricaoEletrica_aux)) {
+
+									//1. Testa o nome da restrição que é um código dado no deck
+									//Não é possível neste ponto mapear com os elementos da restrição porque os registros dos elementos são depois do registro LU (limites)
+									if (a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()) == dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_aux).getAtributo(AttComumRestricaoEletrica_nome, std::string())) {
+										idRestricaoEletrica_CP_ref = idRestricaoEletrica_aux;
+									}//if (a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()) == dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_aux).getAtributo(AttComumRestricaoEletrica_nome, std::string())) {
+
+								}//for (IdRestricaoEletrica idRestricaoEletrica_aux = idREIni; idRestricaoEletrica_aux < idREOut; dados_CP_ref.incr(idRestricaoEletrica_aux)) {
+
+								if (idRestricaoEletrica_CP_ref == IdRestricaoEletrica_Nenhum)
+									throw std::invalid_argument("Nao encontrada restricao com nome: " + a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()));
+
+								const IdElementoSistema maiorIdElementoSistema_CP_ref = dados_CP_ref.getMaiorId(idRestricaoEletrica_CP_ref, IdElementoSistema());
+
+								bool is_found_element = false;
+
+								for (IdElementoSistema idElementoSistema_CP_ref = IdElementoSistema_1; idElementoSistema_CP_ref <= maiorIdElementoSistema_CP_ref; idElementoSistema_CP_ref++) {
+									if (dados_CP_ref.vetorRestricaoEletrica.at(idRestricaoEletrica_CP_ref).vetorElementoSistema.at(idElementoSistema_CP_ref).getAtributo(AttComumElementoSistema_contrato, IdContrato()) == idContrato) {
+										is_found_element = true;
+										break;
+									}
+								}//for (IdElementoSistema idElementoSistema_CP_ref = IdElementoSistema_1; idElementoSistema_CP_ref <= maiorIdElementoSistema_CP_ref; idElementoSistema_CP_ref++) {
+
+								if (!is_found_element)
+									throw std::invalid_argument("Nao encontrada elemento: " + getFullString(idContrato) + " com nome : " + a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).getAtributo(AttComumRestricaoEletrica_nome, std::string()));
+
+							}//if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
 
 							//Verifica se o elemento da restrição já foi inicializado
 
@@ -7369,7 +7761,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							atributo = line.substr(4, 3);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-							const int codigo_usina = atoi(atributo.c_str());
+							const int codigo_contrato = atoi(atributo.c_str());
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Campo 3 -  Índice do subsistema ao qual pertence o contrato.  
@@ -7380,7 +7772,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							const IdSubmercado idSubmercado = getIdFromCodigoONS(lista_codigo_ONS_submercado, atoi(atributo.c_str()));
 
 							if (idSubmercado == IdSubmercado_Nenhum)
-								throw std::invalid_argument("Submercado nao instanciado com codigo_usina_" + atributo);
+								throw std::invalid_argument("Submercado nao instanciado com codigo_" + atributo);
 
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7393,6 +7785,8 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 							if (atributo != "")
 								nome = atributo;
+
+							nome = getString(codigo_contrato) + "_" + nome;
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Campo 5 -  Índice do estágio.
@@ -7461,6 +7855,55 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							else
 								fator_de_perdas = 1; //Default: nos Decks não especificam este valor
 
+
+							///////////////////////////////////////////////////////////////////////////
+							//Subtitui leitura por info carregada na pre-Config (se existir)
+							// e.x de aplicação: patamares não sequenciais extras
+							///////////////////////////////////////////////////////////////////////////							
+
+							if (is_read_dados_CP_ref) {
+
+								//Procura uma restrição com o mesmo número de elementos e fatores de participação na restrição do deck atual
+
+								const IdContrato idContratoOut = dados_CP_ref.getIdOut(IdContrato());
+								const IdContrato idContratoIni = dados_CP_ref.getMenorId(IdContrato());
+
+								IdContrato idContrato_CP_ref = IdContrato_Nenhum;
+
+								for (IdContrato idContrato_aux = idContratoIni; idContrato_aux < idContratoOut; dados_CP_ref.incr(idContrato_aux)) {
+
+									//1. Testa o nome da restrição que é um código dado no deck
+									if ((nome == dados_CP_ref.vetorContrato.at(idContrato_aux).getAtributo(AttComumContrato_nome, std::string())) \
+									&& (tipo_contrato == dados_CP_ref.vetorContrato.at(idContrato_aux).getAtributo(AttComumContrato_tipo_contrato, TipoContrato())) \
+									&& (idSubmercado == dados_CP_ref.vetorContrato.at(idContrato_aux).getAtributo(AttComumContrato_submercado, IdSubmercado()))){
+										idContrato_CP_ref = idContrato_aux;
+									}//
+
+								}//for (IdContrato idContrato_aux = idContratoIni; idContrato_aux < idContratoOut; dados_CP_ref.incr(idContrato_aux)) {
+
+								if (idContrato_CP_ref == IdContrato_Nenhum)
+									throw std::invalid_argument("Nao encontrada restricao com nome: " + nome);
+
+								/////////////
+								//Atualiza
+
+								limite_inferior.clear();
+								limite_superior.clear();
+								custo.clear();
+
+								const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_contrato);
+
+								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									limite_inferior.push_back(dados_CP_ref.vetorContrato.at(idContrato_CP_ref).getElementoMatriz(AttMatrizContrato_lim_inf, periodo_DC, idPatamarCarga_CP_ref, double()));
+									limite_superior.push_back(dados_CP_ref.vetorContrato.at(idContrato_CP_ref).getElementoMatriz(AttMatrizContrato_lim_sup, periodo_DC, idPatamarCarga_CP_ref, double()));
+									custo.push_back(dados_CP_ref.vetorContrato.at(idContrato_CP_ref).getElementoMatriz(AttMatrizContrato_custo, periodo_DC, idPatamarCarga_CP_ref, double()));
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+							}//if (is_read_dados_CP_ref) {
+
+
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Filosofia, sobreescreve a informação para t >= idEstagio e soma todas as bacias especias guardando um valor total
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7487,7 +7930,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								contrato.setAtributo(AttComumContrato_tipo_restricao, TipoRestricaoContrato_limite);
 								contrato.setAtributo(AttComumContrato_tipo_unidade, TipoUnidadeRestricaoContrato_MW);
 
-								lista_codigo_ONS_contrato.setElemento(idContrato, codigo_usina);
+								lista_codigo_ONS_contrato.setElemento(idContrato, codigo_contrato);
 
 								/////////////////////////////////////
 
@@ -7512,7 +7955,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							
 
 							//Identifica o Contrato inicializado com codigo_usina
-							const IdContrato idContrato_inicializado = getIdFromCodigoONS(lista_codigo_ONS_contrato, codigo_usina);
+							const IdContrato idContrato_inicializado = getIdFromCodigoONS(lista_codigo_ONS_contrato, codigo_contrato);
 
 							if (idContrato_inicializado == IdContrato_Nenhum)
 								throw std::invalid_argument("Nao inicializada idContrato com codigo_usina_" + atributo);
@@ -7676,6 +8119,10 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 					if (menemonico == "HA") {//Identificação das restrições RHA					
 
 						try {
+
+							if (dados_CP_ref.vetorRestricaoOperativaUHE.numObjetos() > 0)
+								throw std::invalid_argument("Nao implementado carregar restricoes RHA com preConfig CP");
+
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Campo 2 -  Número de identificação da restrição de afluência (entre 01 e 120).
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8893,64 +9340,104 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							std::string limiteInferior;
 							std::string limiteSuperior;
 
-							const int line_size = int(line.length());
+							const int num_patamar_carga = int(percentual_duracao_patamar_carga_original.at(horizonte_estudo.getIteradorInicial()).size()); //No deck original DC não muda o número de patamares por período
 
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-							//Patamar 1-5
-							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							std::vector<double> lim_inf(num_patamar_carga, getdoubleFromChar("min"));
+							std::vector<double> lim_sup(num_patamar_carga, getdoubleFromChar("max"));
 
-							SmartEnupla<Periodo, double> numero_patamares_x_periodo(horizonte_estudo, 0);
+							for (int pos = 0; pos < num_patamar_carga; pos++) {
 
-							int numero_patamar = 0;
-
-							for (int patamar = 0; patamar < 5; patamar++) {
+								int passo = 20;
 
 								limiteInferior = "";
+								limiteInferior = line.substr(pos * passo + 14, 10);
+								limiteInferior.erase(std::remove(limiteInferior.begin(), limiteInferior.end(), ' '), limiteInferior.end());
+
+								if (limiteInferior != "")
+									lim_inf.at(pos) = std::atof(limiteInferior.c_str());
+
 								limiteSuperior = "";
 
-								if (line_size >= 24 + 20 * patamar) {
-
-									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-									//Campo 4 - Limite inferior (hm3). 
-									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-									limiteInferior = line.substr(14 + 20 * patamar, 10);
-									limiteInferior.erase(std::remove(limiteInferior.begin(), limiteInferior.end(), ' '), limiteInferior.end());
-
-								}//if (line_size >= 24 + 20 * patamar) {
-
-								if (line_size >= 34 + 20 * patamar) {
-
-									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-									//Campo 5 - Limite superior (hm3).
-									/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-									limiteSuperior = line.substr(24 + 20 * patamar, 10);
+								if (int(line.length()) >= pos * passo + 24 + 10) { // Pode ser reportado no deck o lim_inf e não o lim_sup (nesse caso seria o valor default)
+									limiteSuperior = line.substr(pos * passo + 24, 10);
 									limiteSuperior.erase(std::remove(limiteSuperior.begin(), limiteSuperior.end(), ' '), limiteSuperior.end());
+								}//if (int(line.length()) >= pos * passo + 24 + 10) {
 
-								}//if (line_size >= 34 + 20 * patamar) {
+								if (limiteSuperior != "")
+									lim_sup.at(pos) = std::atof(limiteSuperior.c_str());
 
-								if (limiteInferior != "" || limiteSuperior != "") {
+							}//for (int pos = 0; pos < num_patamar_carga; pos++) {
 
-									//Filosofia: Este tipo de restrição é carregada para todos os periodos
+							///////////////////////////////////////////////////////////////////////////
+							//Subtitui leitura por info carregada na pre-Config (se existir)
+							// e.x de aplicação: patamares não sequenciais extras
+							///////////////////////////////////////////////////////////////////////////							
 
-									IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga(patamar + 1);
+							if (is_read_dados_CP_ref) {
 
-									for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.incrementarIterador(periodo)) {
+								//Procura uma restrição com o mesmo número de elementos e fatores de participação na restrição do deck atual
 
-										if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
-											numero_patamares_x_periodo.at(periodo)++;
+								const IdRestricaoOperativaUHE idREOut = dados_CP_ref.getIdOut(IdRestricaoOperativaUHE());
+								const IdRestricaoOperativaUHE idREIni = dados_CP_ref.getMenorId(IdRestricaoOperativaUHE());
 
-											const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo.at(periodo));
+								IdRestricaoOperativaUHE idRestricaoOperativaUHE_CP_ref = IdRestricaoOperativaUHE_Nenhum;
 
-											if (limiteInferior != "") { a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, std::atof(limiteInferior.c_str())); }
-											if (limiteSuperior != "") { a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, std::atof(limiteSuperior.c_str())); }
+								for (IdRestricaoOperativaUHE idRestricaoOperativaUHE_aux = idREIni; idRestricaoOperativaUHE_aux < idREOut; dados_CP_ref.incr(idRestricaoOperativaUHE_aux)) {
 
-										}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
+									//1. Testa o nome da restrição que é um código dado no deck
+									//Não é possível neste ponto mapear com os elementos da restrição porque os registros dos elementos são depois do registro LQ (limites)
+									if ((a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getAtributo(AttComumRestricaoOperativaUHE_nome, std::string()) == dados_CP_ref.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_aux).getAtributo(AttComumRestricaoOperativaUHE_nome, std::string())) \
+										&& ((dados_CP_ref.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_aux).getAtributo(AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica())) == TipoRestricaoHidraulica_vazao_defluente)) {
+										idRestricaoOperativaUHE_CP_ref = idRestricaoOperativaUHE_aux;
+									}//if 
 
-									}//for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.at(periodo)) {
+								}//for 
 
-								}//if (limiteInferior != "" || limiteSuperior != "") {
+								if (idRestricaoOperativaUHE_CP_ref == IdRestricaoOperativaUHE_Nenhum)
+									throw std::invalid_argument("Nao encontrada restricao com nome: " + a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getAtributo(AttComumRestricaoOperativaUHE_nome, std::string()));
 
-							}//for (int patamar = 0; patamar < 5; patamar++) {
+								/////////////
+								//Atualiza 
+								lim_inf.clear();
+								lim_sup.clear();
+
+								const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_inicial);
+
+								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									lim_inf.push_back(dados_CP_ref.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_CP_ref).getElementoMatriz(AttMatrizRestricaoOperativaUHE_lim_inf, periodo_DC, idPatamarCarga_CP_ref, double()));
+									lim_sup.push_back(dados_CP_ref.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_CP_ref).getElementoMatriz(AttMatrizRestricaoOperativaUHE_lim_sup, periodo_DC, idPatamarCarga_CP_ref, double()));
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+							}//if (is_read_dados_CP_ref) {
+
+							/////////////////////////
+
+							for (Periodo periodo = periodo_inicio; periodo <= periodo_final; horizonte_estudo.incrementarIterador(periodo)) {
+
+								int numero_patamares_x_periodo = 0;
+
+								for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
+
+									if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
+										numero_patamares_x_periodo++;
+
+										const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo);
+
+										if (periodo >= horizonte_otimizacao_DC.at(idEstagio_inicial)) {
+
+											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_inf, periodo, idPatamarCarga, lim_inf.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+											a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).setElemento(AttMatrizRestricaoOperativaUHE_lim_sup, periodo, idPatamarCarga, lim_sup.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+
+										}//if (periodo >= horizonte_otimizacao_DC.at(idEstagio_inicial)) {
+
+									}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
+
+								}//for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
+
+							}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
 						}//try {
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro LQ: \n" + std::string(erro.what())); }
 
@@ -9041,6 +9528,47 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 									tipoVariavelRestricaoOperativa = TipoVariavelRestricaoOperativa_vazao_turbinada;
 								else if (tipo_restricao_RHQ == "QVER")
 									tipoVariavelRestricaoOperativa = TipoVariavelRestricaoOperativa_vazao_vertida;
+
+								//Se existe info preConfigCP verifica se existe o elemento na restrição do deck
+								if (dados_CP_ref.vetorRestricaoOperativaUHE.numObjetos() > 0) {
+
+									//Procura uma restrição com o mesmo número de elementos e fatores de participação na restrição do deck atual
+									const IdRestricaoOperativaUHE idREOut = dados_CP_ref.getIdOut(IdRestricaoOperativaUHE());
+									const IdRestricaoOperativaUHE idREIni = dados_CP_ref.getMenorId(IdRestricaoOperativaUHE());
+
+									IdRestricaoOperativaUHE idRestricaoOperativaUHE_CP_ref = IdRestricaoOperativaUHE_Nenhum;
+
+									for (IdRestricaoOperativaUHE idRestricaoOperativaUHE_aux = idREIni; idRestricaoOperativaUHE_aux < idREOut; dados_CP_ref.incr(idRestricaoOperativaUHE_aux)) {
+
+										//1. Testa o nome da restrição que é um código dado no deck
+										//Não é possível neste ponto mapear com os elementos da restrição porque os registros dos elementos são depois do registro LQ (limites)
+										if ((a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getAtributo(AttComumRestricaoOperativaUHE_nome, std::string()) == dados_CP_ref.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_aux).getAtributo(AttComumRestricaoOperativaUHE_nome, std::string())) \
+											&& ((dados_CP_ref.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_aux).getAtributo(AttComumRestricaoOperativaUHE_tipoRestricaoHidraulica, TipoRestricaoHidraulica())) == TipoRestricaoHidraulica_vazao_defluente)) {
+											idRestricaoOperativaUHE_CP_ref = idRestricaoOperativaUHE_aux;
+										}//if 
+
+									}//for 
+
+									if (idRestricaoOperativaUHE_CP_ref == IdRestricaoOperativaUHE_Nenhum)
+										throw std::invalid_argument("Nao encontrada restricao com nome: " + a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getAtributo(AttComumRestricaoOperativaUHE_nome, std::string()));
+
+
+									const IdElementoSistema maiorIdElementoSistema_CP_ref = dados_CP_ref.getMaiorId(idRestricaoOperativaUHE_CP_ref, IdElementoSistema());
+
+									bool is_found_element = false;
+
+									for (IdElementoSistema idElementoSistema_CP_ref = IdElementoSistema_1; idElementoSistema_CP_ref <= maiorIdElementoSistema_CP_ref; idElementoSistema_CP_ref++) {
+										if ((dados_CP_ref.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_CP_ref).vetorElementoSistema.at(idElementoSistema_CP_ref).getAtributo(AttComumElementoSistema_hidreletrica, IdHidreletrica()) == idHidreletrica)\
+										&&(dados_CP_ref.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE_CP_ref).vetorElementoSistema.at(idElementoSistema_CP_ref).getAtributo(AttComumElementoSistema_tipoVariavelRestricaoOperativa, TipoVariavelRestricaoOperativa()) == tipoVariavelRestricaoOperativa)) {
+											is_found_element = true;
+											break;
+										}
+									}//for (IdElementoSistema idElementoSistema_CP_ref = IdElementoSistema_1; idElementoSistema_CP_ref <= maiorIdElementoSistema_CP_ref; idElementoSistema_CP_ref++) {
+
+									if (!is_found_element)
+										throw std::invalid_argument("Nao encontrada elemento: " + getFullString(idHidreletrica) + " com nome : " + a_dados.vetorRestricaoOperativaUHE.at(idRestricaoOperativaUHE).getAtributo(AttComumRestricaoOperativaUHE_nome, std::string()));
+
+								}//if (dados_CP_ref.vetorRestricaoEletrica.numObjetos() > 0) {
 
 								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 								//Guarda informação nos Smart Elementos
@@ -10128,15 +10656,17 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 
 							const IdPatamarCarga maiorIdPatamarCarga = a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, a_dados.getIterador1Inicial(AttMatrizDados_percentual_duracao_patamar_carga, Periodo()), IdPatamarCarga());
 
-							const int numero_patamares = int(maiorIdPatamarCarga);
+							//const int numero_patamares = int(maiorIdPatamarCarga);
+							//Pode ter patamares extra na preConfig CP
+							const int num_patamar_carga = int(percentual_duracao_patamar_carga_original.at(horizonte_estudo.getIteradorInicial()).size()); //No deck original DC não muda o número de patamares por período
 
 							///////////////////////////////////////
 							// Campos "dia", "mês" e "ano 
 							///////////////////////////////////////		
 	
 
-							Periodo periodo_comandado(TipoPeriodo_semanal, std::stoi(line.substr(20 + 15 * numero_patamares, 2)), std::stoi(line.substr(22 + 15 * numero_patamares, 2)), \
-								std::stoi(line.substr(24 + 15 * numero_patamares, 4)));
+							Periodo periodo_comandado(TipoPeriodo_semanal, std::stoi(line.substr(20 + 15 * num_patamar_carga, 2)), std::stoi(line.substr(22 + 15 * num_patamar_carga, 2)), \
+								std::stoi(line.substr(24 + 15 * num_patamar_carga, 4)));
 
 
 							bool is_periodo_comandado_in_horizonte_estudo = false;
@@ -10160,6 +10690,43 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 
 							if (is_periodo_comandado_in_horizonte_estudo = true) {
 
+								for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+									const double sobreposicao = periodo.sobreposicao(periodo_comandado);
+
+									if (sobreposicao > 0.0) {
+
+										/////////////////////////////////////////////////////////////////////////////////
+										//Determina o periodo da AttMatrizTermeletrica_potencia_disponivel_comandada
+										//Nota: Se o tipo do periodo_estudo é menor que o tipo do periodo_comandado então cria um elemento com o periodo_estudo
+										//      Caso contrário, cria um elemento com o periodo_comandado
+
+										Periodo periodo_aux;
+
+										if (sobreposicao == 1.0)//periodo is all in periodo_comandado
+											periodo_aux = periodo;
+										else {
+
+											if (periodo_comandado.sobreposicao(periodo) != 1.0)
+												throw std::invalid_argument("Tipo de periodos nao validos para esta logica: o periodo_comando deve estar 100% no periodo_estudo");
+											
+											periodo_aux = periodo_comandado;
+
+										}//else {
+										/////////////////////////////////////////////////////////////////////////////////
+
+										const IdPatamarCarga maiorIdPatamarCarga = get_maiorIdPatamarCarga_periodo_from_percentual_duracao_patamar_carga(a_dados, periodo);
+
+										for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= maiorIdPatamarCarga; idPatamarCarga_DECK++) {
+											a_dados.vetorTermeletrica.at(idTermeletrica).addElemento(AttMatrizTermeletrica_potencia_disponivel_comandada, periodo_aux, idPatamarCarga_DECK, 0.0);
+										}
+
+									}//if (sobreposicao > 0.0) {
+
+								}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+								//////////
+								/*
 								if (a_dados.getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada) == 0) {
 
 
@@ -10175,7 +10742,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 									a_dados.vetorTermeletrica.at(idTermeletrica).setMatriz(AttMatrizTermeletrica_potencia_disponivel_comandada, matriz_zero);
 
 								}//if (a_dados.getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada) == 0) {
-
+								*/
 
 							}//if (is_periodo_comandado_in_horizonte_estudo = true) {
 							else {
@@ -10183,13 +10750,124 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 								for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= maiorIdPatamarCarga; idPatamarCarga_DECK++) {
 									a_dados.vetorTermeletrica.at(idTermeletrica).addElemento(AttMatrizTermeletrica_potencia_disponivel_comandada, periodo_comandado, idPatamarCarga_DECK, 0.0);
 								}
-
-
 							}
 
 
+							/////////////////////////////////////////////////////////////////////////////
+							
+							std::vector<double> potencia(num_patamar_carga, 0.0);
+
+							for (int pos = 0; pos < num_patamar_carga; pos++) {
+
+								int passo = 15;
+
+								atributo = line.substr(pos * passo + 19, 10);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								potencia.at(pos) = atof(atributo.c_str());
+
+							}//for (int pos = 0; pos < num_patamar_carga; pos++) {
+
+							///////////////////////////////////////////////////////////////////////////
+							//Subtitui leitura por info carregada na pre-Config (se existir)
+							// e.x de aplicação: patamares não sequenciais extras
+							///////////////////////////////////////////////////////////////////////////							
+
+							if (is_read_dados_CP_ref) {
+
+								/////////////
+								//Atualiza 
+								potencia.clear();
+
+								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, dados_CP_ref.getIterador1Inicial(AttMatrizDados_percentual_duracao_patamar_carga, Periodo()), IdPatamarCarga());
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									potencia.push_back(dados_CP_ref.vetorTermeletrica.at(idTermeletrica).getElementoMatriz(AttMatrizTermeletrica_potencia_disponivel_comandada, periodo_comandado, idPatamarCarga_CP_ref, double()));
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+							}//if (is_read_dados_CP_ref) {
+
+							/////////////////////////////
+
+							if (is_periodo_comandado_in_horizonte_estudo) {
+								
+								for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+									const double sobreposicao = periodo.sobreposicao(periodo_comandado);
+
+									if (sobreposicao > 0.0) {
+
+										/////////////////////////////////////////////////////////////////////////////////
+										//Determina o periodo da AttMatrizTermeletrica_potencia_disponivel_comandada
+										//Nota: Se o tipo do periodo_estudo é menor que o tipo do periodo_comandado então cria um elemento com o periodo_estudo
+										//      Caso contrário, cria um elemento com o periodo_comandado
+
+										Periodo periodo_aux;
+
+										if (sobreposicao == 1.0)//periodo is all in periodo_comandado
+											periodo_aux = periodo;
+										else {
+
+											if (periodo_comandado.sobreposicao(periodo) != 1.0)
+												throw std::invalid_argument("Tipo de periodos nao validos para esta logica: o periodo_comando deve estar 100% no periodo_estudo");
+
+											periodo_aux = periodo_comandado;
+
+										}//else {
+										/////////////////////////////////////////////////////////////////////////////////
+
+										int numero_patamares_x_periodo = 0;
+
+										for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
+
+											if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
+												numero_patamares_x_periodo++;
+
+												const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo);
+												a_dados.vetorTermeletrica.at(idTermeletrica).setElemento(AttMatrizTermeletrica_potencia_disponivel_comandada, periodo_aux, idPatamarCarga, potencia.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+
+											}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
+
+										}//for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
+
+									}//if (sobreposicao > 0.0) {
+
+									//////
+									/*
+									const double sobreposicao = periodo.sobreposicao(periodo_comandado);
+
+									if (sobreposicao > 0) {
+
+										int numero_patamares_x_periodo = 0;
+
+										for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
+
+											if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
+												numero_patamares_x_periodo++;
+
+												const IdPatamarCarga idPatamarCarga = IdPatamarCarga(numero_patamares_x_periodo);
+												a_dados.vetorTermeletrica.at(idTermeletrica).setElemento(AttMatrizTermeletrica_potencia_disponivel_comandada, periodo, idPatamarCarga, potencia.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1) * sobreposicao);
+
+											}//if (a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga_DECK, double()) > 0.0) {
+
+										}//for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga_DECK++) {
+
+									}//if (sobreposicao > 0) {
+									*/
+								}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+							}//if (is_periodo_comandado_in_horizonte_estudo) {
+							else {
+
+								for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= maiorIdPatamarCarga; idPatamarCarga_DECK++) {
+									a_dados.vetorTermeletrica.at(idTermeletrica).setElemento(AttMatrizTermeletrica_potencia_disponivel_comandada, periodo_comandado, idPatamarCarga_DECK, potencia.at(getintFromChar(getString(idPatamarCarga_DECK).c_str()) - 1));
+								}//for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= maiorIdPatamarCarga; idPatamarCarga_DECK++) {
+
+							}//else {
+
 
 							/////////////////////////////////////////////////////////////////////////////
+							/*
 							SmartEnupla<Periodo, int> numero_patamares_x_periodo(horizonte_estudo, 0);
 
 							for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= maiorIdPatamarCarga; idPatamarCarga_DECK++) {
@@ -10235,7 +10913,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 
 
 							}//for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= maiorIdPatamarCarga; idPatamarCarga_DECK++) {
-
+							*/
 						}//try {
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro GL: \n" + std::string(erro.what())); }
 
@@ -10342,6 +11020,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_B(Dados& a_dados, const std::strin
 								custo_operacao.push_back(std::stod(line.substr(119, 10)));
 							}//if (line_size >= 129) {
 
+
 							/////////////////////////////////////////
 							//Guarda a informação nos SmartElementos
 							/////////////////////////////////////////
@@ -10394,6 +11073,33 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_B(Dados& a_dados, const std::strin
 								throw std::invalid_argument("Nao inicializada idTermeletrica com codigo_usina_" + getString(codigo_usina));
 
 							idTermeletrica = idTermeletrica_inicializado;
+
+
+							///////////////////////////////////////////////////////////////////////////
+							//Subtitui leitura por info carregada na pre-Config (se existir)
+							// e.x de aplicação: patamares não sequenciais extras
+							///////////////////////////////////////////////////////////////////////////							
+
+							if (is_read_dados_CP_ref) {
+
+								/////////////
+								//Atualiza 
+								potencia_minima.clear();
+								potencia_maxima.clear();
+								custo_operacao.clear();
+
+								const Periodo periodo_DC = horizonte_otimizacao_DC.at(idEstagio_termeletrica);
+
+								const IdPatamarCarga maiorIdPatamarCarga_CP_ref = dados_CP_ref.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo_DC, IdPatamarCarga());
+
+								for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+									potencia_minima.push_back(dados_CP_ref.vetorTermeletrica.at(idTermeletrica).getElementoMatriz(AttMatrizTermeletrica_potencia_minima, periodo_DC, idPatamarCarga_CP_ref, double()));
+									potencia_maxima.push_back(dados_CP_ref.vetorTermeletrica.at(idTermeletrica).getElementoMatriz(AttMatrizTermeletrica_potencia_minima, periodo_DC, idPatamarCarga_CP_ref, double()) + dados_CP_ref.vetorTermeletrica.at(idTermeletrica).getElementoMatriz(AttMatrizTermeletrica_potencia_util, periodo_DC, idPatamarCarga_CP_ref, double()));
+									custo_operacao.push_back(dados_CP_ref.vetorTermeletrica.at(idTermeletrica).getElementoMatriz(AttMatrizTermeletrica_custo_de_operacao, periodo_DC, idPatamarCarga_CP_ref, double()));
+								}//for (IdPatamarCarga idPatamarCarga_CP_ref = IdPatamarCarga_1; idPatamarCarga_CP_ref <= maiorIdPatamarCarga_CP_ref; idPatamarCarga_CP_ref++) {
+
+							}//if (is_read_dados_CP_ref) {
+
 
 							//***********************************************************************************************************************
 							//No arquivo DADGNL, estágio refere-se a o número da semana dentro do horizonte de planejamento, por tanto, a atualização 

@@ -3633,9 +3633,9 @@ void ModeloOtimizacao::criarComandoTermeletricas(const TipoSubproblemaSolver a_T
 							const double disponibilidade = horz_disponibilidade.at_rIt(period);
 							if ((disponibilidade > 0.0) && (sobreposicao > 0.0)) {
 
-								for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= idPatEnd; idPat++) {
+								for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, period, IdPatamarCarga()); idPat++) {
 
-									const double perc_dur_pat = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_period, idPat, double());
+									const double perc_dur_pat = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, period, idPat, double());
 
 									const double potencia_minima = a_dados.getElementoMatriz(a_idUTE, AttMatrizTermeletrica_potencia_minima, period, idPat, double());
 									const double potencia_maxima = a_dados.getElementoMatriz(a_idUTE, AttMatrizTermeletrica_potencia_minima, period, idPat, double()) + a_dados.getElementoMatriz(a_idUTE, AttMatrizTermeletrica_potencia_util, period, idPat, double());
@@ -3687,9 +3687,9 @@ void ModeloOtimizacao::criarComandoTermeletricas(const TipoSubproblemaSolver a_T
 									const double disponibilidade = horz_disponibilidade.at_rIt(period);
 									if ((disponibilidade > 0.0) && (sobreposicao > 0.0)) {
 
-										for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= idPatEnd; idPat++) {
+										for (IdPatamarCarga idPat = IdPatamarCarga_1; idPat <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, period, IdPatamarCarga()); idPat++) {
 
-											const double perc_dur_pat = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, a_period, idPat, double());
+											const double perc_dur_pat = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, period, idPat, double());
 
 											const double potencia_minima = a_dados.getElementoMatriz(a_idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, period, idPat, double());
 											const double potencia_maxima = a_dados.getElementoMatriz(a_idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_minima, period, idPat, double()) + a_dados.getElementoMatriz(a_idUTE, idUnidadeUTE, AttMatrizUnidadeUTE_potencia_util, period, idPat, double());
@@ -4528,15 +4528,25 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 				if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
 					varYP_anterior = -1;
 
+				std::vector<IdHidreletrica> listaIdHidreletrica = a_listaIdHidreletrica;
+				if (listaIdHidreletrica.size() == 0)
+					listaIdHidreletrica = vetorProcessoEstocastico.at(a_idProcessoEstocastico).getIdFisicoFromIdVariavelAleatoria(a_idVariavelAleatoria, IdHidreletrica());
+
 				// Variáveis de estado a repassar lag
 				if (sobreposicao_periodo_otimizacao == 0.0)
-					vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_YP(a_TSS, a_idEstagio, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria) + "," + getString(a_grau_liberdade) + "," + getStringFromLista(a_listaIdHidreletrica, ",", false)), varYP, varYP_anterior, a_isVarEstadoExterna);
+					vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_YP(a_TSS, a_idEstagio, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria) + "," + getString(a_grau_liberdade) + "," + getStringFromLista(listaIdHidreletrica, ",", false)), varYP, varYP_anterior, a_isVarEstadoExterna);
 
 				// Variáveis de estado a compor lag
 				else if (sobreposicao_periodo_otimizacao > 0.0) {
 					const int varYP_ADD = addVarDecisao_YP_ADD(a_TSS, a_idEstagio, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria, -infinito, infinito, 0.0);
+
+					if (equYP == -1) {
+						equYP = addEquLinear_YP(a_TSS, a_idEstagio, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria);
+						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP, equYP, 1.0);
+					}
+
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP_ADD, equYP, -1.0);
-					vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_YP(a_TSS, a_idEstagio, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria) + "," + getString(a_grau_liberdade) + "," + getStringFromLista(a_listaIdHidreletrica, ",", false)), varYP_ADD, varYP_anterior, a_isVarEstadoExterna);
+					vetorEstagio.at(a_idEstagio).addVariavelEstado(a_TSS, std::string(getNomeSolverVarDecisao_YP(a_TSS, a_idEstagio, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria) + "," + getString(a_grau_liberdade) + "," + getStringFromLista(listaIdHidreletrica, ",", false)), varYP_ADD, varYP_anterior, a_isVarEstadoExterna);
 				}
 
 			} // if ((varYP_anterior > -1) || ((idEstagio_anterior == menor_estagio) && (periodo_inicial_proc_estoc_hidrologico > a_idVariavelAleatoria))) {
