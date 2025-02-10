@@ -4165,6 +4165,22 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 								}
 							}
 
+							//Módulo para a retrocompatibilização do período no nome das variáveis de estado 
+							if (true) {
+								for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
+									const std::vector<std::string> nome = vetorEstagio_aux.at(idEstagio).getNomeVariavelEstado(idVariavelEstado_corte);
+									
+									string nome_varCorte = vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.at(idVariavelEstado_corte).getAtributo(AttComumVariavelEstado_nome, std::string());
+
+									const size_t pos_1 = nome_varCorte.find(nome.at(2));
+									nome_varCorte.replace(pos_1, nome.at(2).length(), getString(Periodo(nome.at(2)))); //Periodo(nome.at(2)): período com a nova padronização
+
+									vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.at(idVariavelEstado_corte).setAtributo(AttComumVariavelEstado_nome, nome_varCorte);
+
+								}//for (IdVariavelEstado idVariavelEstado_corte = IdVariavelEstado_1; idVariavelEstado_corte <= maiorIdVarivelEstado_corte; idVariavelEstado_corte++) {
+
+							}//if (true) {
+
 							const int cortes_multiplos_modelo = getAtributo(idEstagio, AttComumEstagio_cortes_multiplos, int());
 
 							if ((cortes_multiplos_modelo == 0) && (maiorIdRealizacao_corte != IdRealizacao_1))
@@ -4266,6 +4282,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 										if (nome.at(0) == "QDEF") {
 											try {
 												Periodo periodo_lag = Periodo(nome.at(2));
+
 												const IdHidreletrica idHidreletrica = getIdHidreletricaFromChar(nome.at(3).c_str());
 
 												int varQDEF = criarVariaveisDecisao_VariaveisEstado_Restricoes_QDEF(a_TSS, a_dados, idEstagio, idHidreletrica, periodo_lag, horizon, true);
@@ -4355,14 +4372,14 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 										else if (nome.at(0) == "YP") {
 											try {
-												const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(2).c_str());
+												const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(3).c_str());
 
 												if (idProcessoEstocastico != getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()))
 													throw std::invalid_argument(getFullString(idProcessoEstocastico) + " do acoplamento incompativel com " + getFullString(a_dados.processoEstocastico_hidrologico.getAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico())) + " do modelo");
 
-												const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(3).c_str());
+												const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(4).c_str());
 
-												Periodo periodo_lag = Periodo(nome.at(4));
+												Periodo periodo_lag = Periodo(nome.at(2));
 
 												const double grau_liberdade = getdoubleFromChar(nome.at(5).c_str());
 
@@ -4391,11 +4408,13 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 													throw std::invalid_argument(getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) + " em " + getFullString(idVariavelEstado_corte) + " nao foi instanciado no modelo.");
 
 												else if (listaHidreletricaNaoInstanciadaNoModelo.size() == 0) {
-													const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica, true);
-													if (varYP == -1)
-														throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(idVariavelEstado_corte) + " em " + getFullString(idEstagio));
-
-													int varYP_past = getVarDecisao_YP(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
+													criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica, true);
+													int varYP = getVarDecisao_YP_ADDseExistir(a_TSS, idEstagio, periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
+													
+													if(varYP == -1)
+														varYP = getVarDecisao_YP(a_TSS, idEstagio, periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
+													
+													const int varYP_past = getVarDecisao_YP(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
 
 													const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varYP, varYP_past, true);
 
@@ -4411,6 +4430,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 											try {
 
 												Periodo periodo_comando = Periodo(nome.at(2));
+
 												const IdTermeletrica idTermeletrica = getIdTermeletricaFromChar(nome.at(3).c_str());
 
 												const double potencia_minima_disponivel = getdoubleFromChar(nome.at(4).c_str());
@@ -4432,12 +4452,12 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 										} // else if (nome.at(0) == "PTDISPCOM") {
 
-
 										else if (nome.at(0) == "RH") {
 
 											try {
 
 												Periodo periodo = Periodo(nome.at(2));
+
 												IdRestricaoOperativaUHE idHQ;
 
 												const int varRH = criarRestricoesHidraulicas(a_TSS, a_dados, idEstagio, idHQ, nome, horizon);
@@ -4457,6 +4477,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 											try {
 												Periodo periodo = Periodo(nome.at(2));
+
 												IdControleCotaVazao idHQ = IdControleCotaVazao_Nenhum;
 												for (IdControleCotaVazao idHQ_ = a_dados.getMenorId(IdControleCotaVazao()); idHQ_ < a_dados.getIdOut(IdControleCotaVazao()); a_dados.incr(idHQ_)) {
 													if (a_dados.getAtributo(idHQ_, AttComumControleCotaVazao_nome, std::string()) == nome.at(4)) {
