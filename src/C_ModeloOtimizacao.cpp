@@ -4409,10 +4409,14 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 												else if (listaHidreletricaNaoInstanciadaNoModelo.size() == 0) {
 													criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica, true);
-													const int varYP_ADD = getVarDecisao_YP_ADD(a_TSS, idEstagio, periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
+													int varYP = getVarDecisao_YP_ADDseExistir(a_TSS, idEstagio, periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
+													
+													if(varYP == -1)
+														varYP = getVarDecisao_YP(a_TSS, idEstagio, periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
+													
 													const int varYP_past = getVarDecisao_YP(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
 
-													const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varYP_ADD, varYP_past, true);
+													const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varYP, varYP_past, true);
 
 													variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
 												}
