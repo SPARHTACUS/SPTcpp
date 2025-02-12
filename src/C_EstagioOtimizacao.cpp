@@ -65,7 +65,7 @@ IdVariavelEstado Estagio::addVariavelEstado(const TipoSubproblemaSolver a_TSS, c
 						return idVariavelEstado;
 
 					if (getElementoVetor(idVariavelEstado, AttVetorVariavelEstado_idVariavelDecisao, a_TSS, int()) != -1)
-						throw std::invalid_argument("O atributo " + getFullString(AttVetorVariavelEstado_idVariavelDecisao) + " ja foi instanciado com varDecisao " + getString(getElementoVetor(idVariavelEstado, AttVetorVariavelEstado_idVariavelDecisao, a_TSS, int())) + ".");
+						throw std::invalid_argument("O atributo " + getFullString(AttVetorVariavelEstado_idVariavelDecisao) + " ja foi instanciado com varDecisao " + getString(getElementoVetor(idVariavelEstado, AttVetorVariavelEstado_idVariavelDecisao, a_TSS, int())) + " e idVariavelDecisaoEstagioAnterior: " + getString(getAtributo(idVariavelEstado, AttComumVariavelEstado_idVariavelDecisaoEstagioAnterior, int())) + ".");
 
 					vetorVariavelEstado.at(idVariavelEstado).setElemento(AttVetorVariavelEstado_idVariavelDecisao, a_TSS, a_idVariavelDecisao);
 

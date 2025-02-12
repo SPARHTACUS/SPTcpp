@@ -4372,12 +4372,12 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 										else if (nome.at(0) == "YP") {
 											try {
-												const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(3).c_str());
+												IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(3).c_str());
 
 												if (idProcessoEstocastico != getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()))
 													throw std::invalid_argument(getFullString(idProcessoEstocastico) + " do acoplamento incompativel com " + getFullString(a_dados.processoEstocastico_hidrologico.getAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico())) + " do modelo");
 
-												const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(4).c_str());
+												IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(4).c_str());
 
 												Periodo periodo_lag = Periodo(nome.at(2));
 
@@ -4408,6 +4408,49 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 													throw std::invalid_argument(getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) + " em " + getFullString(idVariavelEstado_corte) + " nao foi instanciado no modelo.");
 
 												else if (listaHidreletricaNaoInstanciadaNoModelo.size() == 0) {
+
+													//Normaliza variavelEstado entre o processo estocástico do modelo de otimização e o processo estocástico com o qual foi construido os cortes
+													if (listaHidreletrica.size() > 0) {
+
+														std::vector<IdVariavelAleatoria> idVarEquiv;
+														std::vector<std::vector<IdVariavelAleatoriaInterna>> idVarIntEquiv;
+
+														const IdProcessoEstocastico idProcessoEstocastico_modelo = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
+
+														for (int i = 0; i < int(listaHidreletrica.size()); i++) {
+															IdVariavelAleatoria idVar; IdVariavelAleatoriaInterna idVarInt;
+															vetorProcessoEstocastico.at(idProcessoEstocastico_modelo).getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(idVar, idVarInt, listaHidreletrica.at(i));
+															if (idVarEquiv.size() == 0) {
+																idVarEquiv.push_back(idVar);
+																idVarIntEquiv.push_back(std::vector<IdVariavelAleatoriaInterna>(1, idVarInt));
+															}
+															else {
+																for (int j = 0; i < int(idVarEquiv.size()); j++) {
+																	if (idVarEquiv.at(j) == idVar) {
+																		idVarIntEquiv.at(i).push_back(idVarInt);
+																		break;
+																	}
+																	else if (i == int(idVarEquiv.size()) - 1) {
+																		idVarEquiv.push_back(idVar);
+																		idVarIntEquiv.push_back(std::vector<IdVariavelAleatoriaInterna>(1, idVarInt));
+																	}
+																}
+
+															}
+														}//for (int i = 0; i < int(listaHidreletrica.size()); i++) {
+
+														if(int(idVarEquiv.size()) > 1)
+															throw std::invalid_argument("Nao criado metodo para multiples variaveis aleatorias compondo um YP");
+
+														idVariavelAleatoria = idVarEquiv.at(0);
+
+														idProcessoEstocastico = idProcessoEstocastico_modelo;
+
+														string nome_atualizado = std::string(getNomeSolverVarDecisao_YP(a_TSS, idEstagio, periodo_lag, idProcessoEstocastico, idVariavelAleatoria) + "," + getString(grau_liberdade) + "," + getStringFromLista(listaHidreletrica, ",", false));
+														vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.at(idVariavelEstado_corte).setAtributo(AttComumVariavelEstado_nome, nome_atualizado);
+
+													}//if (listaHidreletrica.size() > 0){
+
 													criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica, true);
 													int varYP = getVarDecisao_YP_ADDseExistir(a_TSS, idEstagio, periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
 													
