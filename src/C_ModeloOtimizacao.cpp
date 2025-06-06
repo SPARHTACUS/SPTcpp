@@ -46,21 +46,7 @@ ModeloOtimizacao::ModeloOtimizacao(const IdModeloOtimizacao a_idModeloOtimizacao
 			diretorio_att_premissas = a_entradaSaidaDados.getDiretorioEntrada();
 
 			a_dados.validaProdutibilidadeENA(a_entradaSaidaDados, diretorio_att_premissas, vetorProcessoEstocastico.at(maiorIdProcessoEstocastico));
-			/*
-			for (IdHidreletrica idUHE = a_dados.getMenorId(IdHidreletrica()); idUHE < a_dados.getIdOut(IdHidreletrica()); a_dados.incr(idUHE)) {
-				Hidreletrica uhe;
-				uhe.setAtributo(AttComumHidreletrica_idHidreletrica, idUHE);
-				dados_temp.vetorHidreletrica.add(uhe);
-				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_codigo_posto, a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_posto, int()));
-				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_codigo_posto_acoplamento_ENA, a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_posto_acoplamento_ENA, int()));
-				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_codigo_REE, a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_REE, int()));
-				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_codigo_usina, a_dados.getAtributo(idUHE, AttComumHidreletrica_codigo_usina, int()));
-				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_jusante_JUSENA, a_dados.getAtributo(idUHE, AttComumHidreletrica_jusante_JUSENA, IdHidreletrica()));
-				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_jusante_desvio, a_dados.getAtributo(idUHE, AttComumHidreletrica_jusante_desvio, IdHidreletrica()));
-				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_bacia, a_dados.getAtributo(idUHE, AttComumHidreletrica_bacia, IdBaciaHidrografica()));
-				dados_temp.vetorHidreletrica.at(idUHE).setAtributo(AttComumHidreletrica_submercado, a_dados.getAtributo(idUHE, AttComumHidreletrica_submercado, IdSubmercado()));
-				dados_temp.vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente = a_dados.vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente;
-			}*/
+
 			dados_temp.vetorHidreletrica = a_dados.vetorHidreletrica;
 		}//if (anyVarEstadoENA()) {
 
@@ -577,34 +563,6 @@ void ModeloOtimizacao::gerarRealizacoes(const IdEstagio a_estagioIni, const IdEs
 
 			IdCenario menor_cenario = menor_cenario_iteracao;
 			IdCenario maior_cenario = maior_cenario_iteracao;
-
-			/*
-			IdCenario menor_cenario = IdCenario_Nenhum;
-			IdCenario maior_cenario = IdCenario_Nenhum;
-
-			IdEstagio idStageEnd = a_estagioEnd;
-
-			for (IdEstagio idEstagio = a_estagioIni; idEstagio <= idStageEnd; idEstagio++) {
-
-				for (IdProcesso idPro = IdProcesso_mestre; idPro <= arranjoResolucao.getMaiorId(IdProcesso()); idPro++) {
-
-					std::vector<IdCenario> cenarios_estados = arranjoResolucao.getIdsCenarioEstado(idPro, a_idIteracao, idEstagio);
-
-					if ((cenarios_estados.size() > 0) && (menor_cenario == IdCenario_Nenhum)) {
-						menor_cenario = cenarios_estados.at(0);
-						maior_cenario = cenarios_estados.at(0);
-					}
-
-					for (int i = 1; i < int(cenarios_estados.size()); i++) {
-						if (cenarios_estados.at(i) < menor_cenario)
-							menor_cenario = cenarios_estados.at(i);
-						else if (maior_cenario < cenarios_estados.at(i))
-							maior_cenario = cenarios_estados.at(i);
-					}
-				}
-
-			} // for (IdEstagio idEstagio = a_estagioIni; idEstagio <= idStageEnd; idEstagio++) {
-			*/
 
 			int semente_geracao_cenario_hidrologico = -1;
 
@@ -4241,12 +4199,6 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 										if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) == IdVariavelEstado_Nenhum) {
 
-											//const std::vector<std::string> nome = vetorEstagio.at(idEstagio).getNomeVariavelEstado(idVariavelEstado);
-
-											//if ((nome.at(0) != "YP") && (nome.at(0) != "VI") && (nome.at(0) != "QDEF") && (nome.at(0) != "RH") && (nome.at(0) != "RE") && (nome.at(0) != "HQ")) {
-											//	throw std::invalid_argument(getFullString(idVariavelEstado) + " " + getAtributo(idEstagio, idVariavelEstado, AttComumVariavelEstado_nome, std::string()) + " presente no modelo, nao consta no corte em " + getFullString(idEstagio));
-											//}
-
 											vetorEstagio.at(idEstagio).anyCorteExterno = true;
 
 										} // if (variaveis_estado_modelo_encontradas.at(idVariavelEstado) == IdVariavelEstado_Nenhum) {
@@ -4500,14 +4452,13 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 											try {
 
 												Periodo periodo = Periodo(nome.at(2));
+												IdRestricaoOperativaUHE idRH;
 
-												IdRestricaoOperativaUHE idHQ;
-
-												const int varRH = criarRestricoesHidraulicas(a_TSS, a_dados, idEstagio, idHQ, nome, horizon);
-												const int varRH_past = getVarDecisao_RH(a_TSS, IdEstagio(idEstagio - 1), periodo, idHQ);
+												const int varRH = criarRestricoesHidraulicas(a_TSS, a_dados, idEstagio, idRH, nome, horizon);
+												const int varRH_past = getVarDecisao_RH(a_TSS, IdEstagio(idEstagio - 1), periodo, idRH);
 
 												Periodo periodAux = periodo;
-												const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, criarRestricoesHidraulicas_nomeVarEstado(a_TSS, a_dados, idEstagio, periodo, periodAux, idHQ, true), varRH, varRH_past, true);
+												const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, criarRestricoesHidraulicas_nomeVarEstado(a_TSS, a_dados, idEstagio, periodo, periodAux, idRH, true), varRH, varRH_past, true);
 
 												variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
 
@@ -4515,6 +4466,27 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 											catch (const std::exception& erro) { throw std::invalid_argument("RH: \n" + std::string(erro.what())); }
 
 										} // else if (nome.at(0) == "RH") {
+
+										else if (nome.at(0) == "RE") {
+
+											try {
+
+												Periodo periodo = Periodo(nome.at(2));
+												IdRestricaoEletrica idRE;
+
+												const int varRE = criarRestricoesEletricas(a_TSS, a_dados, idEstagio, idRE, nome, horizon);
+												const int varRE_past = getVarDecisao_RE(a_TSS, IdEstagio(idEstagio - 1), periodo, idRE);
+
+												Periodo periodAux = periodo;
+												const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, criarRestricoesEletricas_nomeVarEstado(a_TSS, a_dados, idEstagio, periodo, periodAux, idRE, true), varRE, varRE_past, true);
+
+												variaveis_estado_modelo_encontradas.addElemento(idVarEstadoNew, idVariavelEstado_corte);
+
+											} // try
+											catch (const std::exception& erro) { throw std::invalid_argument("RE: \n" + std::string(erro.what())); }
+
+										} // else if (nome.at(0) == "RE") {
+
 
 										else if (nome.at(0) == "HQ") {
 
@@ -5076,8 +5048,6 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 				else if (nome.at(0) == "YP") {
 
-					//Periodo periodo = Periodo(nome.at(2));
-
 					Periodo periodo_lag = Periodo(nome.at(2));
 
 					const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(3).c_str());
@@ -5180,13 +5150,24 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 				else if (nome.at(0) == "RH") {
 
-					IdRestricaoOperativaUHE idHQ;
+					IdRestricaoOperativaUHE idRH;
 
-					const int varRH = criarRestricoesHidraulicas(a_TSS, a_dados, idEstagio, idHQ, nome, horizon);
+					const int varRH = criarRestricoesHidraulicas(a_TSS, a_dados, idEstagio, idRH, nome, horizon);
 
 					estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varRH);
 
 				} // else if (nome.at(0) == "RH") {
+
+
+				else if (nome.at(0) == "RE") {
+
+					IdRestricaoEletrica idRE;
+
+					const int varRE = criarRestricoesEletricas(a_TSS, a_dados, idEstagio, idRE, nome, horizon);
+
+					estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varRE);
+
+				} // else if (nome.at(0) == "RE") {
 
 				else if (nome.at(0) == "HQ") {
 

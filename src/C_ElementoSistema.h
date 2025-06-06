@@ -53,6 +53,8 @@ public:
 	void esvaziar();
 	virtual ~ElementoSistema();
 
+	void validar();
+
 	DECLARA_SMART_ELEMENTO(ElementoSistema, SMART_ELEMENTO_ELEMENTO_SISTEMA)
 
 };

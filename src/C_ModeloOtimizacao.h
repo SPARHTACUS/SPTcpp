@@ -221,6 +221,7 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 	m(  VarDecisao,   PI,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_SUBMERCADO)  \
 	m(  VarDecisao,   PR,               3, 2,         ITERADORES_3_ESTAGIO_PERIODO_RENOVAVEL)  \
     m(  VarDecisao,   RE,               3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
+    m(  VarDecisao,   RE_ADD,          3, 1,         ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
     m(  VarDecisao,   RE_LINF_FINF,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
     m(  VarDecisao,   RE_LSUP_FSUP,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
     m(  VarDecisao,   RE_VAINF_FINF,    3, 1,    ITERADORES_3_ESTAGIO_PERIODO_RESTRICAELETRICA)  \
@@ -794,8 +795,8 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_HQ(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo_lag, const IdControleCotaVazao a_idConHQ, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizon, bool a_isVarEstadoExterna = false);
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, Periodo &a_periodo_lag, const double a_grau_liberdade, std::vector<IdHidreletrica> a_idHidreletrica = std::vector<IdHidreletrica>(), bool a_isVarEstadoExterna = false);
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_PTDISPCOM(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo &a_periodo, const IdTermeletrica a_idTermeletrica, const double a_potencia_disponivel_minima, const double a_potencia_disponivel_maxima, bool a_isVarEstadoExterna = false);
-
 		int criarVariaveisDecisao_VariaveisEstado_Restricoes_RH(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period_lag, const IdRestricaoOperativaUHE a_idRH, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizon, bool a_isVarEstadoExterna = false);
+		int criarVariaveisDecisao_VariaveisEstado_Restricoes_RE(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period_lag, const IdRestricaoEletrica a_idRE, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizon, bool a_isVarEstadoExterna = false);
 
 		void criarModeloOtimizacao(Dados& a_dados, EntradaSaidaDados a_entradaSaidaDados);
 
@@ -843,12 +844,23 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		void criarRestricoesHidraulicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_periodIni_stage, Periodo& a_periodPrev, Periodo & a_period, Periodo& a_periodNext, const IdPatamarCarga a_idPat);
 		int criarRestricoesHidraulicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo & a_period, Periodo& a_periodNext, const IdPatamarCarga a_idPatamarCarga, const IdRestricaoOperativaUHE a_idRH);
-		int criarRestricoesHidraulicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, IdRestricaoOperativaUHE &a_idHQ, const std::vector<std::string>& a_stateVar, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizon);
+		int criarRestricoesHidraulicas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, IdRestricaoOperativaUHE &a_idRH, const std::vector<std::string>& a_stateVar, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizon);
 
-		std::string criarRestricoesEletricas_nomeVarEstado(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period_prev, Periodo& a_period, const IdRestricaoEletrica a_idRE);
+		std::string criarRestricoesEletricas_nomeVarEstado(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period_prev, Periodo& a_period, const IdRestricaoEletrica a_idRE, const bool a_fp_local = false);
 
 		void criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_periodIni_stage, Periodo& a_periodPrev, Periodo& a_period, Periodo& a_periodNext, const IdPatamarCarga a_idPat);
 		int criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, Periodo& a_periodNext, const IdPatamarCarga a_idPatamarCarga, const IdRestricaoEletrica a_idRE);
+
+		int criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, IdRestricaoEletrica& a_idRE, const std::vector<std::string>& a_stateVar, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizon);
+
+		bool tryIncorporarRestricaoEletricaHidreletrica(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+		bool tryIncorporarRestricaoEletricaTermeletrica(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+		bool tryIncorporarRestricaoEletricaDemanda(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+		bool tryIncorporarRestricaoEletricaRenovavel(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+		bool tryIncorporarRestricaoEletricaContrato(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+		bool tryIncorporarRestricaoEletricaIntercambio(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+		bool tryIncorporarRestricaoEletricaUsinaElevatoria(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+
 
 		void criarReservaPotencia(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat);
 		int criarReservaPotencia(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPatamarCarga, const IdReservaPotencia a_idPRES);

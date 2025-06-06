@@ -742,7 +742,7 @@ std::string Periodo::str() const {
 
 	} // else if ((hora == IdHor_0) && (minuto == IdMin_0)) {
 
-	return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + ":-" + durStr);
+	return std::string(normStringDia(dia) + "/" + normStringMes(mes) + "/" + getString(ano) + "-" + normStringHor(hora) + ":" + normStringMin(minuto) + "-" + durStr);
 
 } // std::string Periodo::str() const{
 
