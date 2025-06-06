@@ -10678,11 +10678,11 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 
 								const double sobreposicao = periodo.sobreposicao(periodo_comandado);
 
-								if (sobreposicao > 0) {
+								if (sobreposicao == 1.0) {
 									is_periodo_comandado_in_horizonte_estudo = true;
 									break;
 
-								}//if (sobreposicao > 0) {
+								}//if (sobreposicao == 1.0) {
 
 							}//for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -10691,7 +10691,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 							//Inicializa matriz potencia_disponivel_comandada
 							///////////////////////////////////////////////////
 
-							if (is_periodo_comandado_in_horizonte_estudo = true) {
+							if (is_periodo_comandado_in_horizonte_estudo) {
 
 								for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -10747,7 +10747,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 								}//if (a_dados.getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada) == 0) {
 								*/
 
-							}//if (is_periodo_comandado_in_horizonte_estudo = true) {
+							}//if (is_periodo_comandado_in_horizonte_estudo) {
 							else {
 
 								for (IdPatamarCarga idPatamarCarga_DECK = IdPatamarCarga_1; idPatamarCarga_DECK <= maiorIdPatamarCarga; idPatamarCarga_DECK++) {
