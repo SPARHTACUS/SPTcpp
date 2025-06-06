@@ -853,6 +853,14 @@ DEFINE_SMART_ELEMENTO(ModeloOtimizacao, SMART_ELEMENTO_MODELO_OTIMIZACAO)
 
 		int criarRestricoesEletricas(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, IdRestricaoEletrica& a_idRE, const std::vector<std::string>& a_stateVar, const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>& a_horizon);
 
+		bool tryIncorporarRestricaoEletricaHidreletrica(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+		bool tryIncorporarRestricaoEletricaTermeletrica(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+		bool tryIncorporarRestricaoEletricaDemanda(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+		bool tryIncorporarRestricaoEletricaRenovavel(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+		bool tryIncorporarRestricaoEletricaContrato(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+		bool tryIncorporarRestricaoEletricaIntercambio(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+		bool tryIncorporarRestricaoEletricaUsinaElevatoria(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idStage, Periodo& a_period, const IdRestricaoEletrica a_idRE, const IdElementoSistema a_idElem, const int a_equRE_per);
+
 
 		void criarReservaPotencia(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPat);
 		int criarReservaPotencia(const TipoSubproblemaSolver a_TSS, Dados& a_dados, const IdEstagio a_idEstagio, Periodo& a_period, const IdPatamarCarga a_idPatamarCarga, const IdReservaPotencia a_idPRES);
