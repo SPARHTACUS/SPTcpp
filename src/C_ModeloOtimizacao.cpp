@@ -5048,8 +5048,6 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 				else if (nome.at(0) == "YP") {
 
-					//Periodo periodo = Periodo(nome.at(2));
-
 					Periodo periodo_lag = Periodo(nome.at(2));
 
 					const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(3).c_str());
@@ -5152,13 +5150,24 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 				else if (nome.at(0) == "RH") {
 
-					IdRestricaoOperativaUHE idHQ;
+					IdRestricaoOperativaUHE idRH;
 
-					const int varRH = criarRestricoesHidraulicas(a_TSS, a_dados, idEstagio, idHQ, nome, horizon);
+					const int varRH = criarRestricoesHidraulicas(a_TSS, a_dados, idEstagio, idRH, nome, horizon);
 
 					estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varRH);
 
 				} // else if (nome.at(0) == "RH") {
+
+
+				else if (nome.at(0) == "RE") {
+
+					IdRestricaoEletrica idRE;
+
+					const int varRE = criarRestricoesEletricas(a_TSS, a_dados, idEstagio, idRE, nome, horizon);
+
+					estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varRE);
+
+				} // else if (nome.at(0) == "RE") {
 
 				else if (nome.at(0) == "HQ") {
 
