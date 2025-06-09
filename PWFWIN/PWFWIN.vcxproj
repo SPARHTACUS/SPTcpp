@@ -20,8 +20,6 @@
     <ClCompile Include="..\src\C_ControleCotaVazao.cpp" />
     <ClCompile Include="..\src\C_CorteBenders.cpp" />
     <ClCompile Include="..\src\C_Dados.cpp" />
-    <ClCompile Include="..\src\C_Dados_CP.cpp" />
-    <ClCompile Include="..\src\C_Dados_MP.cpp" />
     <ClCompile Include="..\src\C_Defluencia.cpp" />
     <ClCompile Include="..\src\C_DemandaEspecial.cpp" />
     <ClCompile Include="..\src\C_ElementoSistema.cpp" />
@@ -35,7 +33,6 @@
     <ClCompile Include="..\src\C_Iteracao.cpp" />
     <ClCompile Include="..\src\C_LeituraCEPEL.cpp" />
     <ClCompile Include="..\src\C_LeituraCEPEL_DECOMP.cpp" />
-    <ClCompile Include="..\src\C_LeituraCEPEL_DESSEM.cpp" />
     <ClCompile Include="..\src\C_LeituraCEPEL_NEWAVE.cpp" />
     <ClCompile Include="..\src\C_MetodoSolucao.cpp" />
     <ClCompile Include="..\src\C_MetodoSolucao_PDDE.cpp" />

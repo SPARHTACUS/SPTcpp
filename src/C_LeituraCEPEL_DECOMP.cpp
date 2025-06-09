@@ -6242,8 +6242,6 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							int numero_patamar = 0;
 
-							IdPatamarCarga idPatamarCarga_DECK;
-
 							std::string limiteInferior;
 							std::string limiteSuperior;
 

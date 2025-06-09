@@ -218,9 +218,9 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 
 		// Afluencia
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AFLUENCIA_NATURAL_HISTORICO_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
-		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AFLUENCIA_AttMatrizPremissa_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_m2);
+		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AFLUENCIA_NATURAL_TENDENCIA_AttVetorPremissa_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
 		a_entradaSaidaDados.setDiretorioEntrada(getAtributo(AttComumDados_diretorio_entrada_dados, std::string()));
 
@@ -7773,13 +7773,13 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 				bool impresso_historico = false;
 				if (getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) > 0) {
 					a_entradaSaidaDados.setAppendArquivo(impresso_historico);
-					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_vazao_afluente, *this, AttVetorAfluencia_natural_historico);
+					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_NATURAL_HISTORICO_AttVetorPremissa_PorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_vazao_afluente, *this, AttVetorAfluencia_natural_historico);
 					impresso_historico = true;
 				}
 				bool impresso_tendencia = false;
 				if (getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia) > 0) {
 					a_entradaSaidaDados.setAppendArquivo(impresso_tendencia);
-					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorCenarioPorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_vazao_afluente, *this, AttVetorAfluencia_natural_tendencia);
+					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_NATURAL_TENDENCIA_AttVetorPremissa_PorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_vazao_afluente, *this, AttVetorAfluencia_natural_tendencia);
 					impresso_tendencia = true;
 				}
 
@@ -8053,16 +8053,6 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 				vetorHidreletrica.at(idHidreletrica_YHF).vetorAfluencia.at(IdAfluencia_vazao_afluente).setMatriz_forced(AttMatrizAfluencia_natural, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>(horizonte_afluencia, SmartEnupla<IdCenario, double>(a_cenario_inicial, std::vector<double>(int(a_cenario_final- a_cenario_inicial)+1, 0.0))));
 
 				//Inicializa AttVetorAfluencia_incremental_tendencia / AttVetorAfluencia_natural_tendencia
-				/*
-				if (a_idProcesso == IdProcesso_mestre) {
-
-					for (Periodo periodo = horizonte_afluencia.getIteradorInicial(); periodo < horizonte_otimizacao.at(estagio_inicial); horizonte_afluencia.incrementarIterador(periodo)) {//Inclui valores SOMENTE da tendência
-						vetorHidreletrica.at(idHidreletrica_YHF).vetorAfluencia.at(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_incremental_tendencia, periodo, cenarios_realizacao_espaco_amostral.at_rIt(periodo).at(IdCenario_1));
-						vetorHidreletrica.at(idHidreletrica_YHF).vetorAfluencia.at(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_natural_tendencia, periodo, 0.0);
-					}//for (Periodo periodo = horizonte_afluencia.getIteradorInicial(); periodo <= horizonte_otimizacao.at(estagio_inicial); horizonte_afluencia.incrementarIterador(periodo)) {
-
-				}//if (a_idProcesso == IdProcesso_mestre) {
-				*/
 
 				for (Periodo periodo = horizonte_afluencia.getIteradorInicial(); periodo < horizonte_otimizacao.at(IdEstagio_1); horizonte_afluencia.incrementarIterador(periodo)) {//Inclui valores SOMENTE da tendência
 					vetorHidreletrica.at(idHidreletrica_YHF).vetorAfluencia.at(IdAfluencia_vazao_afluente).addElemento(AttVetorAfluencia_incremental_tendencia, periodo, cenarios_realizacao_espaco_amostral.at_rIt(periodo).at(a_cenario_inicial));
@@ -8191,16 +8181,17 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 		if (a_idProcesso == IdProcesso_mestre) {
 
 			if ((getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico) > 0))
-				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetor_natural_historico.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_natural_historico);
-
-			if ((getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia) > 0))
-				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetor_natural_tendencia.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_natural_tendencia);
+				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_NATURAL_HISTORICO_AttVetorPremissa_PorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_natural_historico);
 
 			if ((getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_historico) > 0))
-				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_AFLUENCIA_AttVetor_incremental_historico.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_incremental_historico);
+				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_AFLUENCIA_INCREMENTAL_HISTORICO_AttVetor_PorPeriodo.csv.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_incremental_historico);
+
+			if ((getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_tendencia) > 0))
+				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_NATURAL_TENDENCIA_AttVetorPremissa_PorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_natural_tendencia);
 
 			if ((getSizeVetor(getMenorId(IdHidreletrica()), IdAfluencia_vazao_afluente, AttVetorAfluencia_incremental_tendencia) > 0))
-				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_AFLUENCIA_AttVetor_incremental_tendencia.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_incremental_tendencia);
+				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_AFLUENCIA_INCREMENTAL_TENDENCIA_AttVetor_PorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_incremental_tendencia);
+
 
 		}//if (a_idProcesso == IdProcesso_mestre) {
 
@@ -8208,36 +8199,13 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 
 		a_entradaSaidaDados.setAppendArquivo(false);
 		if (vetorHidreletrica.at(getMenorId(IdHidreletrica())).vetorAfluencia.at(IdAfluencia_vazao_afluente).getSizeMatriz(AttMatrizAfluencia_natural) > 0)
-			a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("_info_HIDRELETRICA_AFLUENCIA_AttMatriz_natural_" + getString(a_cenario_inicial) + "_" + getString(a_cenario_final) + ".csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttMatrizAfluencia_natural);
+			a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("_info_HIDRELETRICA_AFLUENCIA_NATURAL_AttMatriz_" + getString(a_cenario_inicial) + "_" + getString(a_cenario_final) + ".csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttMatrizAfluencia_natural);
 		
 		if (vetorHidreletrica.at(getMenorId(IdHidreletrica())).vetorAfluencia.at(IdAfluencia_vazao_afluente).getSizeMatriz(AttMatrizAfluencia_incremental) > 0)
-			a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("_info_HIDRELETRICA_AFLUENCIA_AttMatriz_incremental_" + getString(a_cenario_inicial) + "_" + getString(a_cenario_final) + ".csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttMatrizAfluencia_incremental);
+			a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("_info_HIDRELETRICA_AFLUENCIA_INCREMENTAL_AttMatriz_" + getString(a_cenario_inicial) + "_" + getString(a_cenario_final) + ".csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttMatrizAfluencia_incremental);
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-		/*
-		int imprimir_HIDRELETRICA_AFLUENCIA_AttMatrizPremissa = 0;
-
-		a_entradaSaidaDados.setAppendArquivo(true);
-
-		if (a_idProcesso == IdProcesso_mestre) {
-			imprimir_HIDRELETRICA_AFLUENCIA_AttMatrizPremissa = 1;
-			a_entradaSaidaDados.setAppendArquivo(false);
-		}
-		else
-			MPI_Recv(&imprimir_HIDRELETRICA_AFLUENCIA_AttMatrizPremissa, 1, MPI_INT, getRank(IdProcesso(a_idProcesso - 1)), getRank(a_idProcesso), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-		if (imprimir_HIDRELETRICA_AFLUENCIA_AttMatrizPremissa) {
-			a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("_info_HIDRELETRICA_AFLUENCIA_AttMatriz_natural.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttMatrizAfluencia_natural);
-			a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("_info_HIDRELETRICA_AFLUENCIA_AttMatriz_incremental.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttMatrizAfluencia_incremental);
-		}
-		else
-			throw std::invalid_argument("Erro impressao de " + getFullString(AttMatrizAfluencia_natural) + " em " + getFullString(a_idProcesso));
-
-		if (arranjoResolucao.getMaiorId(IdProcesso()) != a_idProcesso)
-			MPI_Send(&imprimir_HIDRELETRICA_AFLUENCIA_AttMatrizPremissa, 1, MPI_INT, getRank(IdProcesso(a_idProcesso + 1)), getRank(IdProcesso(a_idProcesso + 1)), MPI_COMM_WORLD);
-		*/
 
 		MPI_Barrier(MPI_COMM_WORLD);
 
@@ -8459,9 +8427,9 @@ void Dados::calcularDeterminacaoEspacialFromHistoricoAfluenciaNatural(EntradaSai
 		} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 
 		if (a_imprimir) {
-			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorHidreletrica.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_r2_natural_historico);
-			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorHidreletrica2.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_r2_incremental_historico);
-			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_natural_historico);
+			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_AFLUENCIA_NATURAL_HISTORICO_AttVetor_PorHidreletrica.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_r2_natural_historico);
+			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("_info_HIDRELETRICA_AFLUENCIA_INCREMENTAL_HISTORICO_AttVetor_PorHidreletrica.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_r2_incremental_historico);
+			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_NATURAL_HISTORICO_AttVetorPremissa_PorPeriodo.csv", IdHidreletrica_Nenhum, IdAfluencia_Nenhum, *this, AttVetorAfluencia_natural_historico);
 		}
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("Dados::calcularDeterminacaoEspacialFromHistoricoAfluenciaNatural(" + getFullString(a_valor_r2) + "): \n" + std::string(erro.what())); }
