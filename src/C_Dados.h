@@ -46,7 +46,6 @@
 	  m(Dados,  AttComum,           tipo_processo_estocastico_hidrologico,             IdProcessoEstocastico,         min,         max,           min,      sim) \
 	  m(Dados,  AttComum, relaxar_afluencia_incremental_com_viabilidade_hidraulica,                     bool,         min,         max,           nao,      nao) \
 	  m(Dados,  AttComum,    calcular_custo_primal_via_subproblema_mestre,                              bool,          min,         max,           min,     nao) \
-	  m(Dados,  AttComum,            tipo_espaco_amostral_geracao_cenario_hidrologico,                TipoEspacoAmostral,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                 tipo_correlacao_geracao_cenario_hidrologico, TipoCorrelacaoVariaveisAleatorias,         min,         max,                 min,      nao) \
 	  m(Dados,  AttComum,                 correlacao_dominante_geracao_cenario_hidrologico,                double,        0.1,         1.0,         0.95,      nao) \
 	  m(Dados,  AttComum,                     tipo_modelo_geracao_cenario_hidrologico, TipoModeloGeracaoSinteticaCenario,      nenhum,         max,                 min,      nao) \

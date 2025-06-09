@@ -9,8 +9,6 @@
 
 #define ATT_COMUM_PROCESSO_ESTOCASTICO(m)  \
 	  m(ProcessoEstocastico,  AttComum,                   idProcessoEstocastico,               IdProcessoEstocastico,         min,         max,           min,      nao) \
-	  m(ProcessoEstocastico,  AttComum,                    tipo_espaco_amostral,                  TipoEspacoAmostral,         min,         max,           min,      nao) \
-	  m(ProcessoEstocastico,  AttComum,                  tipo_lag_autocorrelacao,               TipoLagAutocorrelacao,         min,         max,           min,      nao) \
 	  m(ProcessoEstocastico,  AttComum,                 correlacao_determinante,                              double,        0.1,         1.0,           0.95,      nao) \
 	  m(ProcessoEstocastico,  AttComum,    tipo_correlacao_variaveis_aleatorias,   TipoCorrelacaoVariaveisAleatorias,         min,         max,           min,      nao) 
 //                 c_classe,   smrtAtt,                            nomeAtributo,                                tipo,  lowerBound,  upperBound,  initialValue, mustRead?

@@ -5,8 +5,7 @@
 
 
 #define ATT_COMUM_DEFLUENCIA(m)  \
-	  m(Defluencia,  AttComum,               idDefluencia,         IdDefluencia,         min,         max,           min,      nao) \
-	  m(Defluencia,  AttComum,      tipo_elemento_jusante,  TipoElementoJusante,      Nenhum,         max,        Nenhum,      nao)
+	  m(Defluencia,  AttComum,               idDefluencia,         IdDefluencia,         min,         max,           min,      nao) 
 //       c_classe,   smrtAtt,                nomeAtributo,                 tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
 #define ATT_VETOR_DEFLUENCIA(m)  \

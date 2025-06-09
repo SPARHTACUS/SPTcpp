@@ -670,10 +670,6 @@ void Dados::validaTermeletrica(const IdTermeletrica a_menorIdTermeletrica, const
 
 			for (IdTermeletrica idUTE = a_menorIdTermeletrica; idUTE <= a_maiorIdTermeletrica; vetorTermeletrica.incr(idUTE)) {
 
-				const bool considerar_usina = getAtributo(idUTE, AttComumTermeletrica_considerar_usina, bool());
-
-				if (considerar_usina) {
-
 					const IdSubmercado idSubmercado = getAtributo(idUTE, AttComumTermeletrica_submercado, IdSubmercado());
 					if (idSubmercado > maiorIdSubmercado)
 						throw std::invalid_argument("O Submercado " + getString(idSubmercado) + " cadastrado na Termeletrica " + getString(idUTE) + " nao consta no cadastro do Dados.");
@@ -792,9 +788,6 @@ void Dados::validaTermeletrica(const IdTermeletrica a_menorIdTermeletrica, const
 						} // if ((getSize1Matriz(idUTE, idUnidade, AttMatrizUnidadeUTE_potencia_disponivel_minima) != 0) && (getSize1Matriz(idUTE, idUnidade, AttMatrizUnidadeUTE_potencia_disponivel_maxima) != 0)) {
 
 					} // for 
-
-
-				} // if (considerar_usina){
 
 			} // for (IdTermeletrica idUTE = getMenorId(IdTermeletrica()); idUTE <= maiorIdTermeletrica; vetorTermeletrica.incr(idUTE)) {
 
@@ -2280,11 +2273,11 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 				////TRAJETORIA DE ACIONAMENTO E DESLIGAMENTO
 
-				if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_acionamento) > 0)
-					preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_rampa_acionamento) = nao_operacional_informado;
+				if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_ramp_turnon) > 0)
+					preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_ramp_turnon) = nao_operacional_informado;
 
-				if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_rampa_desligamento) > 0)
-					preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_rampa_desligamento) = nao_operacional_informado;
+				if (getSizeVetor(idTermeletrica, idUnidadeUTE, AttVetorUnidadeUTE_ramp_shutdown) > 0)
+					preencher_AttVetorUnidadeUTE.at(idTermeletrica).at(idUnidadeUTE).at(AttVetorUnidadeUTE_ramp_shutdown) = nao_operacional_informado;
 
 
 
@@ -2660,13 +2653,13 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 								a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_premissa);
 
-								if ((attVetorUnidadeUTE == AttVetorUnidadeUTE_rampa_acionamento) || (attVetorUnidadeUTE == AttVetorUnidadeUTE_rampa_desligamento)) {
+								if ((attVetorUnidadeUTE == AttVetorUnidadeUTE_ramp_turnon) || (attVetorUnidadeUTE == AttVetorUnidadeUTE_ramp_shutdown)) {
 
 									a_entradaSaidaDados.setAppendArquivo(impresso_AttVetorUnidadeUTE_PorInteiro.at(0));
 									a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("TERMELETRICA_UNIDADE_AttVetorPremissa_PorInteiro.csv", idTermeletrica, idUnidadeUTE, *this, 0, 100, attVetorUnidadeUTE);
 									impresso_AttVetorUnidadeUTE_PorInteiro.at(0) = true;
 
-								} // if ((attVetorUnidadeUTE == AttVetorUnidadeUTE_rampa_acionamento) || (attVetorUnidadeUTE == AttVetorUnidadeUTE_rampa_desligamento)) {
+								} // if ((attVetorUnidadeUTE == AttVetorUnidadeUTE_ramp_turnon) || (attVetorUnidadeUTE == AttVetorUnidadeUTE_ramp_shutdown)) {
 
 								else {
 
@@ -2684,13 +2677,13 @@ void Dados::validacao_operacional_Termeletrica(EntradaSaidaDados a_entradaSaidaD
 
 								a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
-								if ((attVetorUnidadeUTE == AttVetorUnidadeUTE_rampa_acionamento) || (attVetorUnidadeUTE == AttVetorUnidadeUTE_rampa_desligamento)) {
+								if ((attVetorUnidadeUTE == AttVetorUnidadeUTE_ramp_turnon) || (attVetorUnidadeUTE == AttVetorUnidadeUTE_ramp_shutdown)) {
 
 									a_entradaSaidaDados.setAppendArquivo(impresso_AttVetorUnidadeUTE_PorInteiro.at(0));
 									a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("TERMELETRICA_UNIDADE_AttVetorOperacional_PorInteiro.csv", idTermeletrica, idUnidadeUTE, *this, 0, 100, attVetorUnidadeUTE);
 									impresso_AttVetorUnidadeUTE_PorInteiro.at(0) = true;
 
-								} // if ((attVetorUnidadeUTE == AttVetorUnidadeUTE_rampa_acionamento) || (attVetorUnidadeUTE == AttVetorUnidadeUTE_rampa_desligamento)) {
+								} // if ((attVetorUnidadeUTE == AttVetorUnidadeUTE_ramp_turnon) || (attVetorUnidadeUTE == AttVetorUnidadeUTE_ramp_shutdown)) {
 
 								else {
 									a_entradaSaidaDados.setAppendArquivo(impresso_AttVetorUnidadeUTE_PorPeriodo.at(1));
@@ -7662,8 +7655,6 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 		bool calcular_att_operacionais_tendencia_hidrologica = false;
 
 		const IdProcessoEstocastico tipo_processo_estocastico_hidrologico = getAtributo(AttComumDados_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
-
-		const TipoEspacoAmostral   tipo_espaco_amostral_hidrologico = getAtributo(AttComumDados_tipo_espaco_amostral_geracao_cenario_hidrologico, TipoEspacoAmostral());
 
 		const TipoModeloGeracaoSinteticaCenario tipo_modelo_geracao_sintetica = getAtributo(AttComumDados_tipo_modelo_geracao_cenario_hidrologico, TipoModeloGeracaoSinteticaCenario());
 		const TipoValor     tipo_coeficiente_auto_correlacao = getAtributo(AttComumDados_tipo_coeficiente_auto_correlacao_geracao_cenario_hidrologico, TipoValor());
