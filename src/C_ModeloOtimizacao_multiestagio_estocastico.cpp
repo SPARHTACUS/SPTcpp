@@ -603,8 +603,6 @@ void ModeloOtimizacao::criarProcessoEstocasticoHidrologico(const TipoSubproblema
 
 		const IdProcessoEstocastico idProcEstocastico = getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
 
-		const TipoLagAutocorrelacao tipo_lag_autocorrelacao = getAtributo(idProcEstocastico, AttComumProcessoEstocastico_tipo_lag_autocorrelacao, TipoLagAutocorrelacao());
-
 		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
 		for (IdVariavelAleatoria idVariavelAleatoria = IdVariavelAleatoria_1; idVariavelAleatoria <= getMaiorId(idProcEstocastico, IdVariavelAleatoria()); idVariavelAleatoria++) {
@@ -3082,8 +3080,6 @@ void ModeloOtimizacao::criarTermeletricas(const TipoSubproblemaSolver a_TSS, Dad
 		const IdTermeletrica idUTEOut = a_dados.getIdOut(IdTermeletrica());
 		for (IdTermeletrica idUTE = idUTEIni; idUTE < idUTEOut; a_dados.vetorTermeletrica.incr(idUTE)) {
 
-			if (a_dados.getAtributo(idUTE, AttComumTermeletrica_considerar_usina, bool())) {
-
 				IdUnidadeUTE idUnUTE_equiv = IdUnidadeUTE_Nenhum;
 
 				const TipoDetalhamentoProducaoTermeletrica tipo_detalhamento_producao = a_dados.getAtributo(idUTE, AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica());
@@ -3470,7 +3466,6 @@ void ModeloOtimizacao::criarTermeletricas(const TipoSubproblemaSolver a_TSS, Dad
 						criarComandoTermeletricas(a_TSS, a_dados, a_idEstagio, a_period, idUTE, idUnUTE_equiv);
 
 				} // if (disponivel) {
-			} // if (a_dados.getAtributo(idUTE, AttComumTermeletrica_considerar_usina, bool())) {
 		} // for (IdTermeletrica idUTE = a_dados.getMenorId(IdTermeletrica()); idUTE < maiorIdTermeletrica; a_dados.vetorTermeletrica.incr(idUTE)) {
 
 	} // try

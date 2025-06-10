@@ -188,9 +188,6 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 
 						if (periodo_DC.getMinutos() >= periodo_otimizacao.getMinutos()) { //Granularidade do periodo_otimizacao <= periodo_DC
 
-							if (periodo_DC.getMinutos() > periodo_otimizacao.getMinutos())
-								a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_tipo_lag_autocorrelacao, TipoLagAutocorrelacao_semanal_sab);
-
 							periodo_processo_estocastico = periodo_otimizacao;
 
 							if (periodo_otimizacao.sobreposicao(periodo_DC) == 1.0)//Garante que o periodo_otimizacao esteja "dentro" do periodo_DC
@@ -938,11 +935,8 @@ void LeituraCEPEL::ler_vazao_probabilidade_estrutura_arvore_cenarios_from_VAZOES
 								const IdRealizacao idRealizacao = IdRealizacao(conteio_realizacoes);
 								probabilidade_abertura.setElemento(idRealizacao, prob);
 
-								//a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, horizonte_otimizacao_DC.getElemento(horizonte_otimizacao_DC.getIteradorFinal()), IdNo(conteio_realizacoes + 1), prob);
-
 							}//if (pos + 1 >= int(horizonte_otimizacao_DC.size())) {
-							//else
-								//a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, horizonte_otimizacao_DC.getElemento(IdEstagio(conteio_estagio)), IdNo_1, prob);
+							
 
 						}//if (registro == 4) {
 						else {
@@ -951,8 +945,6 @@ void LeituraCEPEL::ler_vazao_probabilidade_estrutura_arvore_cenarios_from_VAZOES
 
 							const IdRealizacao idRealizacao = IdRealizacao(conteio_realizacoes);
 							probabilidade_abertura.setElemento(idRealizacao, prob);
-
-							//a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, horizonte_otimizacao_DC.getElemento(horizonte_otimizacao_DC.getIteradorFinal()), IdNo(conteio_realizacoes + 1), prob);
 
 						}//else {
 
@@ -988,9 +980,6 @@ void LeituraCEPEL::ler_vazao_probabilidade_estrutura_arvore_cenarios_from_VAZOES
 							numero_nos *= numero_realizacoes_por_periodo.getElemento(horizonte_otimizacao_DC.getElemento(idEstagio));
 
 							const double prob = 1.0 / numero_realizacoes_por_periodo.getElemento(horizonte_otimizacao_DC.getElemento(idEstagio));
-
-							//for (int no = 0; no < numero_nos; no++)
-								//a_dados.processoEstocastico_hidrologico.addElemento(AttMatrizProcessoEstocastico_no_probabilidade, horizonte_otimizacao_DC.getElemento(idEstagio), IdNo(no + 2), prob);
 
 						}//for (IdEstagio idEstagio = idEstagio_inicial; idEstagio <= idEstagio_final; idEstagio++) {
 
@@ -1741,13 +1730,8 @@ void LeituraCEPEL::instanciar_processo_estocastico_CP(Dados& a_dados) {
 
 		a_dados.processoEstocastico_hidrologico = ProcessoEstocastico();
 		a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico_hidrologico_hidreletrica);
-		a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_tipo_espaco_amostral, TipoEspacoAmostral_arvore_cenarios);
 		a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_tipo_correlacao_variaveis_aleatorias, TipoCorrelacaoVariaveisAleatorias_sem_correlacao);
 		
-		if (!dadosPreConfig_instanciados)
-			a_dados.setAtributo(AttComumDados_tipo_espaco_amostral_geracao_cenario_hidrologico, TipoEspacoAmostral_arvore_cenarios);
-
-
 
 	}//	try {
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::instanciar_processo_estocastico_CP: \n" + std::string(erro.what())); }
@@ -2777,8 +2761,6 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_submercado, idSubmercado);
 								a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_nome, nome);
-								//a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_tipo_termeletrica, TipoTermeletrica_convencional);
-								a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_considerar_usina, true);
 								a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica_por_usina);
 								a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_codigo_usina, codigo_usina);
 
@@ -6242,8 +6224,6 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							int numero_patamar = 0;
 
-							IdPatamarCarga idPatamarCarga_DECK;
-
 							std::string limiteInferior;
 							std::string limiteSuperior;
 
@@ -7348,7 +7328,6 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 								Defluencia defluencia;
 								defluencia.setAtributo(AttComumDefluencia_idDefluencia, IdDefluencia_passada);
-								defluencia.setAtributo(AttComumDefluencia_tipo_elemento_jusante, TipoElementoJusante_usina);
 
 								a_dados.vetorHidreletrica.at(idHidreletrica).vetorDefluencia.add(defluencia);
 
@@ -10538,7 +10517,6 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 
 								a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_submercado, idSubmercado);
 								a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_nome, nome);
-								a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_considerar_usina, true);
 								a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica_por_usina);
 
 								codigo_gnl.push_back(codigo_usina);

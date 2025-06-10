@@ -14,7 +14,6 @@ public:
 
 	void leitura_CEPEL(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const std::string a_deck, const std::string a_nick);
 
-	void leitura_DESSEM(Dados& a_dados, const std::string nomeArquivo, const std::string nomePasta);
 	void leitura_DECOMP(Dados& a_dados, const std::string a_diretorio);
 	void leitura_NEWAVE(Dados& a_dados, const std::string a_diretorio, const std::string nomeArquivo);
 

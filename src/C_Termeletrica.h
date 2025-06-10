@@ -13,7 +13,6 @@
 	  m(Termeletrica,  AttComum,                    tipo_combustivel,                      TipoCombustivel,     Nenhum,          max,        Nenhum,      nao) \
       m(Termeletrica,  AttComum,          tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica,        min,          max,     por_usina,      nao) \
 	  m(Termeletrica,  AttComum,                unidades_simultaneas,                                 bool,      false,         true,          true,      nao) \
-	  m(Termeletrica,  AttComum,                    considerar_usina,                                 bool,      false,         true,          true,      nao) \
 	  m(Termeletrica,  AttComum,     representacao_discreta_producao,                                 bool,      false,         true,         false,      nao) \
 	  m(Termeletrica,  AttComum,                     rampa_transicao,                               double,        min,          max,             0,      nao) \
 	  m(Termeletrica,  AttComum,                            time_ini,                               double,     -50000,        50000,             0,      nao) \

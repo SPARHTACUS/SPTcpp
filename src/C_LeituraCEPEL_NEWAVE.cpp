@@ -3612,7 +3612,6 @@ void LeituraCEPEL::leitura_CONFT_201908_NW25(Dados &a_dados, std::string nomeArq
 						termeletrica.setAtributo(AttComumTermeletrica_idTermeletrica, idTermeletrica);
 						termeletrica.setAtributo(AttComumTermeletrica_nome, nome);
 						termeletrica.setAtributo(AttComumTermeletrica_submercado, idSubmercado);
-						termeletrica.setAtributo(AttComumTermeletrica_considerar_usina, true);
 						termeletrica.setAtributo(AttComumTermeletrica_codigo_usina, codigo_usina);
 						termeletrica.setAtributo(AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica_por_usina);
 						a_dados.vetorTermeletrica.add(termeletrica);
@@ -3627,7 +3626,6 @@ void LeituraCEPEL::leitura_CONFT_201908_NW25(Dados &a_dados, std::string nomeArq
 					else if ((idTermeletrica_inicializado != IdTermeletrica_Nenhum) && (termeletricasPreConfig_instanciadas)) {
 						a_dados.vetorTermeletrica.at(idTermeletrica_inicializado).setAtributo(AttComumTermeletrica_nome, nome);
 						a_dados.vetorTermeletrica.at(idTermeletrica_inicializado).setAtributo(AttComumTermeletrica_submercado, idSubmercado);
-						a_dados.vetorTermeletrica.at(idTermeletrica_inicializado).setAtributo(AttComumTermeletrica_considerar_usina, true);
 
 						lista_classe_ONS_termeletrica.setElemento(idTermeletrica_inicializado, classe_CEPEL);
 						lista_termeletrica_com_expansao.setElemento(idTermeletrica_inicializado, usina_com_expansao);

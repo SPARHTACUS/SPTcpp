@@ -44,7 +44,6 @@
 	  m(Hidreletrica,  AttComum,                  canal_fuga_medio,                               double,          0,        10000,                 0,         nao) \
       m(Hidreletrica,  AttComum,                 tempo_viagem_agua,                                  int,          0,          360,                 0,         nao) \
  	  m(Hidreletrica,  AttComum,         vertimento_influencia_fcj,                                 bool,      false,         true,             false,         nao) \
- 	  m(Hidreletrica,  AttComum,             tipo_elemento_jusante,                  TipoElementoJusante,     Nenhum,          max,            Nenhum,         nao) \
  	  m(Hidreletrica,  AttComum,                      tipo_turbina,                          TipoTurbina,     Nenhum,          max,            Nenhum,         nao) \
 	  m(Hidreletrica,  AttComum,                 vertimento_maximo,                               double,        min,          max,               max,         nao) \
       m(Hidreletrica,  AttComum, percentual_retorno_vazao_desviada,                               double,          0,            1,                 0,         nao) \

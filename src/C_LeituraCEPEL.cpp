@@ -113,17 +113,1183 @@ LeituraCEPEL::LeituraCEPEL() {
 	////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	/*
-	lista_modificacaoUHE.reserve(500);
-	lista_modificacaoUHE.push_back(std::vector<ModificacaoUHE>());
-
-	lista_modificacaoUTE.reserve(500);
-	lista_modificacaoUTE.push_back(std::vector<ModificacaoUTE>());
-	*/
-
 } // LeituraCEPEL::LeituraCEPEL() { 
 
 LeituraCEPEL::~LeituraCEPEL() {}
+
+void LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16(Dados& a_dados, const std::string a_nomeArquivo, const bool a_hidreletricasPreConfig_instanciadas, const bool a_readPoliJusHidr_dat, const bool a_realiza_conexao_hidraulica, const bool a_is_set_jusena, const int a_codigo_usina_alvo) {
+
+	try {
+
+		const int info_size = 792;//Cada usina tem reservado este tamanho para incluir sua informação
+
+		char c_39[39];
+		char c_12[12];
+		char c_8[8];
+		char c_1[1];
+		int i_4;
+		float f_4;
+
+		int usina = 0;
+		std::ifstream leituraArquivo;
+		leituraArquivo.open(a_nomeArquivo, std::ios_base::in | std::ios::binary);
+
+		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
+
+		while (!(leituraArquivo.eof())) {
+
+			////////////////////////////////////////////////////////////////////////
+			//Nome
+			leituraArquivo.seekg(0 + info_size * usina, std::ios::beg);
+			leituraArquivo.read(reinterpret_cast<char*>(&c_12), sizeof(c_12));
+
+			std::string nome(c_12, 12);
+			nome.erase(std::find_if(nome.rbegin(), nome.rend(), std::bind1st(std::not_equal_to<char>(), ' ')).base(), nome.end());// ELIMINA OS ESPAÇOS NO FINAL DO NOME 
+			/////////////////////////////////////////////////////////////////////////
+
+			if (!nome.empty()) {
+
+				const int codigo_usina = usina + 1; //Estrutura do arquivo
+
+				if (a_codigo_usina_alvo == 0 || codigo_usina == a_codigo_usina_alvo) { //Se a_codigo_usina_alvo != 0 somente carrega informação da usina com codigo_usina == a_codigo_usina_alvo (Necessário p.ex para carregar info de IdHidreletrica_176_COMPPAFMOX)
+
+					std::vector<double> poli_cota_volume(5, 0.0);
+					std::vector<double> poli_cota_area(5, 0.0);
+					std::vector<int>    numero_maquinas_conjunto(5, 0);
+					std::vector<double> potencia_unidade_x_conjunto(5, 0.0);
+					std::vector<double> h_nominal(5, 0.0);
+					std::vector<double>    q_nominal(5, 0.0);
+					std::vector<double>    evaporacao(12, 0.0);
+
+					std::vector<std::vector<double>> coefJusante(6, std::vector<double>(5, 0.0));
+					std::vector<double> cotaJusanteRef(6, 0.0);
+
+					////////////////////////////////////////////////////////////////////////
+					//Posto
+					leituraArquivo.seekg(12 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					const int posto = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Posto BDH (não é utilizado)
+					leituraArquivo.seekg(16 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&c_8), sizeof(c_8));
+
+					std::string posto_BDH(c_8, 8);
+
+					////////////////////////////////////////////////////////////////////////
+					//Subsistema
+					leituraArquivo.seekg(24 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					const int submercado = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Empresa
+					leituraArquivo.seekg(28 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					const int empresa = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Jusante
+					leituraArquivo.seekg(32 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					const int jusante = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Desvio
+					leituraArquivo.seekg(36 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					const int desvio = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Volume Mínimo
+					leituraArquivo.seekg(40 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double volume_minimo = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Volume Máximo
+					leituraArquivo.seekg(44 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double volume_maximo = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Volume Vertedouro
+					leituraArquivo.seekg(48 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double volume_minimo_vertimento = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Volume Desvio
+					leituraArquivo.seekg(52 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double volume_minimo_desvio = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Cota Mínima
+					leituraArquivo.seekg(56 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double cota_minima = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Cota Máxima
+					leituraArquivo.seekg(60 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double cota_maxima = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol VC 0
+					leituraArquivo.seekg(64 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					poli_cota_volume.at(0) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol VC 1
+					leituraArquivo.seekg(68 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					poli_cota_volume.at(1) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol VC 2
+					leituraArquivo.seekg(72 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					poli_cota_volume.at(2) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol VC 3
+					leituraArquivo.seekg(76 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					poli_cota_volume.at(3) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol VC 4
+					leituraArquivo.seekg(80 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					poli_cota_volume.at(4) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol CA 0
+					leituraArquivo.seekg(84 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					poli_cota_area.at(0) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol CA 1
+					leituraArquivo.seekg(88 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					poli_cota_area.at(1) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol CA 2
+					leituraArquivo.seekg(92 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					poli_cota_area.at(2) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol CA 3
+					leituraArquivo.seekg(96 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					poli_cota_area.at(3) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol CA 4
+					leituraArquivo.seekg(100 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					poli_cota_area.at(4) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Evap JAN
+					leituraArquivo.seekg(104 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					evaporacao.at(0) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Evap FEV
+					leituraArquivo.seekg(108 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					evaporacao.at(1) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Evap MAR
+					leituraArquivo.seekg(112 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					evaporacao.at(2) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Evap ABR
+					leituraArquivo.seekg(116 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					evaporacao.at(3) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Evap MAI
+					leituraArquivo.seekg(120 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					evaporacao.at(4) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Evap JUN
+					leituraArquivo.seekg(124 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					evaporacao.at(5) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Evap JUL
+					leituraArquivo.seekg(128 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					evaporacao.at(6) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Evap AGO
+					leituraArquivo.seekg(132 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					evaporacao.at(7) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Evap SET
+					leituraArquivo.seekg(136 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					evaporacao.at(8) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Evap OUT
+					leituraArquivo.seekg(140 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					evaporacao.at(9) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Evap NOV
+					leituraArquivo.seekg(144 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					evaporacao.at(10) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Evap DEZ
+					leituraArquivo.seekg(148 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					evaporacao.at(11) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Num. Conj. Máquinas
+					leituraArquivo.seekg(152 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					const int numConjuntos = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Num. Máquinas Conj. 1
+					leituraArquivo.seekg(156 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					numero_maquinas_conjunto.at(0) = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Num. Máquinas Conj. 2
+					leituraArquivo.seekg(160 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					numero_maquinas_conjunto.at(1) = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Num. Máquinas Conj. 3
+					leituraArquivo.seekg(164 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					numero_maquinas_conjunto.at(2) = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Num. Máquinas Conj. 4
+					leituraArquivo.seekg(168 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					numero_maquinas_conjunto.at(3) = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Num. Máquinas Conj. 5
+					leituraArquivo.seekg(172 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					numero_maquinas_conjunto.at(4) = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Potência Conj. 1
+					leituraArquivo.seekg(176 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					potencia_unidade_x_conjunto.at(0) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Potência Conj. 2
+					leituraArquivo.seekg(180 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					potencia_unidade_x_conjunto.at(1) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Potência Conj. 3
+					leituraArquivo.seekg(184 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					potencia_unidade_x_conjunto.at(2) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Potência Conj. 4
+					leituraArquivo.seekg(188 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					potencia_unidade_x_conjunto.at(3) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Potência Conj. 5
+					leituraArquivo.seekg(192 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					potencia_unidade_x_conjunto.at(4) = double(f_4);
+
+					//Campos ignorados: LiteralField(size=300, starting_position=196)
+
+					////////////////////////////////////////////////////////////////////////
+					//H Nominal 1
+					leituraArquivo.seekg(496 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					h_nominal.at(0) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//H Nominal 2
+					leituraArquivo.seekg(500 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					h_nominal.at(1) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//H Nominal 3
+					leituraArquivo.seekg(504 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					h_nominal.at(2) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//H Nominal 4
+					leituraArquivo.seekg(508 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					h_nominal.at(3) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//H Nominal 5
+					leituraArquivo.seekg(512 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					h_nominal.at(4) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Q Nominal 1
+					leituraArquivo.seekg(516 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					q_nominal.at(0) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Q Nominal 2
+					leituraArquivo.seekg(520 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					q_nominal.at(1) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Q Nominal 3
+					leituraArquivo.seekg(524 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					q_nominal.at(2) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Q Nominal 4
+					leituraArquivo.seekg(528 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					q_nominal.at(3) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Q Nominal 5
+					leituraArquivo.seekg(532 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					q_nominal.at(4) = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Produtibilidade
+					leituraArquivo.seekg(536 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double fator_de_producao = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Perdas
+					leituraArquivo.seekg(540 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double perdas = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Núm. Pol. Jus.
+					leituraArquivo.seekg(544 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					const int numero_polinomio_jusante = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 1 - 0
+					leituraArquivo.seekg(548 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(0).at(0) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 1 - 1
+					leituraArquivo.seekg(552 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(0).at(1) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 1 - 2
+					leituraArquivo.seekg(556 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(0).at(2) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 1 - 3
+					leituraArquivo.seekg(560 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(0).at(3) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 1 - 4
+					leituraArquivo.seekg(564 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(0).at(4) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 2 - 0
+					leituraArquivo.seekg(568 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(1).at(0) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 2 - 1
+					leituraArquivo.seekg(572 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(1).at(1) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 2 - 2
+					leituraArquivo.seekg(576 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(1).at(2) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 2 - 3
+					leituraArquivo.seekg(580 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(1).at(3) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 2 - 4
+					leituraArquivo.seekg(584 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(1).at(4) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 3 - 0
+					leituraArquivo.seekg(588 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(2).at(0) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 3 - 1
+					leituraArquivo.seekg(592 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(2).at(1) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 3 - 2
+					leituraArquivo.seekg(596 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(2).at(2) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 3 - 3
+					leituraArquivo.seekg(600 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(2).at(3) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 3 - 4
+					leituraArquivo.seekg(604 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(2).at(4) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 4 - 0
+					leituraArquivo.seekg(608 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(3).at(0) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 4 - 1
+					leituraArquivo.seekg(612 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(3).at(1) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 4 - 2
+					leituraArquivo.seekg(616 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(3).at(2) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 4 - 3
+					leituraArquivo.seekg(620 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(3).at(3) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 4 - 4
+					leituraArquivo.seekg(624 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(3).at(4) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 5 - 0
+					leituraArquivo.seekg(628 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(4).at(0) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 5 - 1
+					leituraArquivo.seekg(632 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(4).at(1) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 5 - 2
+					leituraArquivo.seekg(636 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(4).at(2) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 5 - 3
+					leituraArquivo.seekg(640 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(4).at(3) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 5 - 4
+					leituraArquivo.seekg(644 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(4).at(4) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 6 - 0
+					leituraArquivo.seekg(648 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(5).at(0) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 6 - 1
+					leituraArquivo.seekg(652 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(5).at(1) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 6 - 2
+					leituraArquivo.seekg(656 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(5).at(2) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 6 - 3
+					leituraArquivo.seekg(660 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(5).at(3) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. 6 - 4
+					leituraArquivo.seekg(664 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					coefJusante.at(5).at(4) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. REF - 1
+					leituraArquivo.seekg(668 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					cotaJusanteRef.at(0) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. REF - 2
+					leituraArquivo.seekg(672 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					cotaJusanteRef.at(1) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. REF - 3
+					leituraArquivo.seekg(676 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					cotaJusanteRef.at(2) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. REF - 4
+					leituraArquivo.seekg(680 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					cotaJusanteRef.at(3) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. REF - 5
+					leituraArquivo.seekg(684 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					cotaJusanteRef.at(4) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Pol. Jus. REF - 6
+					leituraArquivo.seekg(688 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					cotaJusanteRef.at(5) = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Canal Fuga Médio
+					leituraArquivo.seekg(692 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double canal_fuga_medio = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Influência no vert
+					leituraArquivo.seekg(696 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					bool vertimento_influencia_fcj = false;
+
+					if (int(i_4) == 1)
+						vertimento_influencia_fcj = true;
+
+					////////////////////////////////////////////////////////////////////////
+					//Fator de Carga Máximo (Não é utilizado)
+					leituraArquivo.seekg(700 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double fatorCargaMax = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Fator de Carga Mínimo (Não é utilizado)
+					leituraArquivo.seekg(704 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double fatorCargaMin = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Vazão Mínima Hist.
+					leituraArquivo.seekg(708 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					const double vazao_defluente_minima_historica = double(int(i_4));
+
+					////////////////////////////////////////////////////////////////////////
+					//Núm. de Unid. Base
+					leituraArquivo.seekg(712 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					const int numero_maquinas_base = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Tipo de Turbina
+					leituraArquivo.seekg(716 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					const int tipo_turbina = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Repr. Conjunto (Não é utilizado)
+					leituraArquivo.seekg(720 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					const int represConj = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//TEIF
+					leituraArquivo.seekg(724 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double indisponibilidade_forcada = double(double(f_4) / 100);//Padrão PWF
+
+					////////////////////////////////////////////////////////////////////////
+					//IP
+					leituraArquivo.seekg(728 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double indisponibilidade_programada = double(double(f_4) / 100);//Padrão PWF
+
+					////////////////////////////////////////////////////////////////////////
+					//Tipo Perda
+					leituraArquivo.seekg(732 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&i_4), sizeof(i_4));
+
+					const int tipo_perda = int(i_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Data (Não é utilizado)
+					leituraArquivo.seekg(736 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&c_12), sizeof(c_12));
+
+					std::string data(c_12, 12);
+
+					////////////////////////////////////////////////////////////////////////
+					//Observação (Não é utilizado)
+					leituraArquivo.seekg(748 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&c_39), sizeof(c_39));
+
+					std::string observacoes(c_39, 39);
+
+					////////////////////////////////////////////////////////////////////////
+					//Volume de Referência
+					leituraArquivo.seekg(787 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
+
+					const double volume_referencia = double(f_4);
+
+					////////////////////////////////////////////////////////////////////////
+					//Tipo de Regular
+					leituraArquivo.seekg(791 + info_size * usina, std::ios::beg);
+					leituraArquivo.read(reinterpret_cast<char*>(&c_1), sizeof(c_1));
+
+					std::string tipo_regularizacao(c_1, 1);
+
+					//************************************************************
+					//GUARDA INFORMAÇÕES NAS SMART ENUPLAS
+					//************************************************************
+
+					const IdHidreletrica idHidreletrica = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina);
+
+					if (a_codigo_usina_alvo != 0 && idHidreletrica == IdHidreletrica_Nenhum)
+						throw std::invalid_argument("Nao instanciada idHidreletrica com codigo_usina_alvo: " + getString(a_codigo_usina_alvo));
+
+					//176-COMP PAF-MOX: a_realiza_conexao_hidraulica = false / a_is_set_jusena = true
+					//176-COMP PAF-MOX deve ficar isolada do sistema no BH do problema de otimização (não aponta para nenhuma outra usina, os cálculos de produtibilidade_ENA e produtibilida_EAR são realizado por meio da jusante_JUSENA)
+					if (a_codigo_usina_alvo == 176 && (!a_is_set_jusena || a_realiza_conexao_hidraulica))
+						throw std::invalid_argument("176-COMP PAF-MOX deve ter somente o codigo da usina jusena para o calculo da produtibilida_EAR");
+
+					// CARREGA OS DADOS DA USINA CASO ELA VAI SER UTILIZADO NO ESTUDO, ESTAS JA DEVEM ESTAR INSTANCIADAS! 
+					if (idHidreletrica != IdHidreletrica_Nenhum) {
+						const IdSubmercado idSubmercado = getIdFromCodigoONS(lista_codigo_ONS_submercado, submercado);
+
+						lista_IdSubmercado_hidreletrica.setElemento(idHidreletrica, idSubmercado);
+
+						// USINA JUSANTE
+						if ((deck_str == "DC") && (jusante != 0) && !a_hidreletricasPreConfig_instanciadas && a_realiza_conexao_hidraulica) {//Somente o DC não informa as usinas a jusante na configuração das hidrelétricas, então são carregadas como nenhum e logo no cadastro de modificações são atualizadas pelo Deck oficial
+							const IdHidreletrica idHidreletricaJusante = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, jusante);
+							if (idHidreletricaJusante != IdHidreletrica_Nenhum) { a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_jusante, idHidreletricaJusante); }
+						}
+						else if ((deck_str == "DC") && a_hidreletricasPreConfig_instanciadas) {//No modo carregar PreConfig, o CP precisa validar a configuração hidráulica respeito a jusantes/desvios, info do HIDR.dat + modificações NUMJUS (lidas posteriormente)  
+
+							//Guarda informação em listas que servirão para a validação da configuração hidráulica entre a PD e o CP
+							if (jusante != 0) {
+								const IdHidreletrica idHidreletricaJusante = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, jusante);
+								lista_jusante_hidreletrica.setElemento(idHidreletrica, idHidreletricaJusante);
+							}//if (jusante != 0) {
+
+							if (desvio != 0) {
+								const IdHidreletrica idHidreletricaDesvio = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, desvio);
+								lista_jusante_desvio_hidreletrica.setElemento(idHidreletrica, idHidreletricaDesvio);
+							}//if (desvio != 0) {
+
+						}//else if ((deck_str == "DC") && a_hidreletricasPreConfig_instanciadas) {
+
+						if ((deck_str == "DS") && (jusante != 0) && (a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_jusante, IdHidreletrica()) == IdHidreletrica_Nenhum) && a_realiza_conexao_hidraulica) {
+							const IdHidreletrica idHidreletricaJusante = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, jusante);
+							if (idHidreletricaJusante != IdHidreletrica_Nenhum) { a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_jusante, idHidreletricaJusante); }
+						}
+
+						///////////////////////////
+						//jusante_JUSENA
+						if (a_is_set_jusena) {
+							const IdHidreletrica idHidreletricaJusante_JUSENA = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, jusante);
+							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_jusante_JUSENA, idHidreletricaJusante_JUSENA); //Para fazer cálculo da produtibilidade_EAR
+
+						}
+						///////////////////////////
+						// 
+						//CÓDIGO POSTO
+						if ((deck_str == "DC") && (!a_hidreletricasPreConfig_instanciadas)) {//Somente o CP usa os postos lidos no HIDR.DAT, o MP usa o CONFHD.DAT ou a Preconfig e a PD usa o arquivo de tempo de viagem da água
+							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_posto, posto);
+						}
+
+						// USINA DE DESVIO
+						if (desvio != 0 && a_realiza_conexao_hidraulica) {
+							const IdHidreletrica idHidreletricaDesvio = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, desvio);
+							if (idHidreletricaDesvio != IdHidreletrica_Nenhum) { a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_jusante_desvio, idHidreletricaDesvio); }
+						}// if (desvio != 0) {
+
+						// DADOS DAS USINA
+						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_numero_maquinas_base, numero_maquinas_base);
+						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_nome, nome);
+						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_submercado, idSubmercado);
+						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_indisponibilidade_forcada, indisponibilidade_forcada);
+						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_indisponibilidade_programada, indisponibilidade_programada);
+						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_canal_fuga_medio, canal_fuga_medio);
+						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_vertimento_influencia_fcj, vertimento_influencia_fcj);
+						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_vazao_defluente_minima_historica, vazao_defluente_minima_historica);
+						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_fator_de_producao, fator_de_producao);
+						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_volume_referencia, volume_referencia);
+
+
+						switch (tipo_turbina) {
+						case 0: a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_turbina, TipoTurbina_sem_turbina);;  break;
+						case 1: a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_turbina, TipoTurbina_francis);;  break;
+						case 2: a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_turbina, TipoTurbina_kaplan);;  break;
+						case 3: a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_turbina, TipoTurbina_pelton);;  break;
+						}
+
+						//INSTANCIA O RESERVATÓRIO, SE NÃO ESTIVER INSTANCIADO 
+						if (a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.isInstanciado(IdReservatorio_1) == false) {
+							Reservatorio reservatorio;
+							reservatorio.setAtributo(AttComumReservatorio_idReservatorio, IdReservatorio_1);
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.add(reservatorio);
+						}
+
+
+						// CARREGA OS DADOS DOS RESERVATÓRIOS 
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_nome_usina, nome);
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_minimo, volume_minimo);
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_maximo, volume_maximo);
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_minimo_vertimento, volume_minimo_vertimento);
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_minimo_desvio, volume_minimo_desvio);
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_cota_minimo, cota_minima);
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_cota_maximo, cota_maxima);
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_0, poli_cota_volume.at(0));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_1, poli_cota_volume.at(1));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_2, poli_cota_volume.at(2));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_3, poli_cota_volume.at(3));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_volume_4, poli_cota_volume.at(4));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_area_0, poli_cota_area.at(0));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_area_1, poli_cota_area.at(1));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_area_2, poli_cota_area.at(2));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_area_3, poli_cota_area.at(3));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_area_4, poli_cota_area.at(4));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_cota_referencia, a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getCotaMedia(volume_minimo, volume_maximo));
+
+
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//Teste poli_cota_area: testa a cota_minima se der negativo zera o polinômio área
+						// Nota: identificado áreas negativas inclusive com a cota_minima (polinômios mal condicionados)
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						if (true) {
+							const double cota_minima = a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_cota_minimo, double());
+
+							const double A0 = a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_0, double());
+							const double A1 = a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_1, double());
+							const double A2 = a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_2, double());
+							const double A3 = a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_3, double());
+							const double A4 = a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_4, double());
+
+							double area_teste = A0;
+							area_teste += A1 * cota_minima;
+							area_teste += A2 * cota_minima * cota_minima;
+							area_teste += A3 * cota_minima * cota_minima * cota_minima;
+							area_teste += A4 * cota_minima * cota_minima * cota_minima * cota_minima;
+
+							if (area_teste < 0) {
+								std::cout << "Polinomio cota area mal condicionado no HIDR.dat da usina " << a_dados.vetorHidreletrica.at(idHidreletrica).getAtributo(AttComumHidreletrica_nome, std::string()) << " -> coeficientes do polinomio zerados" << std::endl;
+
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_area_0, 0.0);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_area_1, 0.0);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_area_2, 0.0);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_area_3, 0.0);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_poli_cota_area_4, 0.0);
+
+							}//if (area_teste < 0) {
+
+						}//if (true) {
+
+
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_0, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_0, double())));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_1, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_1, double())));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_2, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_2, double())));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_3, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_3, double())));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_volume_4, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_volume_4, double())));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_0, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_0, double())));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_1, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_1, double())));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_2, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_2, double())));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_3, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_3, double())));
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_poli_cota_area_4, SmartEnupla<Periodo, double>(horizonte_estudo, a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getAtributo(AttComumReservatorio_poli_cota_area_4, double())));
+
+
+						//INICIA VETOR ENCHENDO VOLUME MORTO COM false
+						a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_enchendo_volume_morto, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
+
+						// TIPO DE REGULARIZAÇÃO DA USINA
+
+						if (a_dados.vetorHidreletrica.at(idHidreletrica).getSizeVetor(AttVetorHidreletrica_regularizacao) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica).setVetor(AttVetorHidreletrica_regularizacao, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
+
+						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+							if ((tipo_regularizacao == "D") && (periodo.getMinutos() <= Periodo("1d", periodo).getMinutos())) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
+							else if ((tipo_regularizacao == "S") && (periodo.getMinutos() <= Periodo("7d", periodo).getMinutos())) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
+							else if ((tipo_regularizacao == "M") && (periodo.getMinutos() <= Periodo("1M", periodo).getMinutos())) { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 1); }
+							else { a_dados.vetorHidreletrica.at(idHidreletrica).setElemento(AttVetorHidreletrica_regularizacao, periodo, 0); }
+						}
+
+						if (tipo_regularizacao == "M") { a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_mensal); }
+						else if (tipo_regularizacao == "S") { a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_semanal); }
+						else if (tipo_regularizacao == "D") { a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_regularizacao, TipoRegularizacao_diaria); }
+						else { throw std::invalid_argument("Nao identificado tipo_regularizacao: " + tipo_regularizacao); }
+
+
+						// COEFICIENTES DE EVAPORAÇÃO MENSAL
+
+						if (a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).getSizeVetor(AttVetorReservatorio_evaporacao) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_evaporacao, SmartEnupla<IdMes, double>(IdMes_1, std::vector<double>(IdMes_12, 0.0)));
+
+						if (a_codigo_usina_alvo != 176) { // 176 COMP_MOX Somente é utilizada para acoplar com cortes. Não deve possuir evaporação
+							for (IdMes idMes = IdMes_1; idMes <= IdMes_12; idMes++)
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setElemento(AttVetorReservatorio_evaporacao, idMes, evaporacao.at(int(idMes) - 1));
+						}
+
+						if (lista_hidreletrica_sem_capacidade.getElemento(idHidreletrica)) {
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_morto_completo, SmartEnupla<Periodo, int>(horizonte_estudo, 1));
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_enchendo_volume_morto, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
+							lista_hidreletrica_maiorIdConjuntoHidraulico.setElemento(idHidreletrica, IdConjuntoHidraulico_Nenhum);
+						}
+						else {
+							lista_hidreletrica_maiorIdConjuntoHidraulico.setElemento(idHidreletrica, IdConjuntoHidraulico(numConjuntos));
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_volume_morto_completo, SmartEnupla<Periodo, int>(horizonte_estudo, 1));
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setVetor(AttVetorReservatorio_enchendo_volume_morto, SmartEnupla<Periodo, int>(horizonte_estudo, 0));
+						}
+
+
+						if (int(numConjuntos) == 0)
+							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica_sem_producao);
+
+
+						// CONJUNTOS HIDRAULICOS
+						double queda_referencia_usina = 0;
+						int numero_unidades_usina = 0;
+						for (int conjunto = 0; conjunto < numConjuntos; conjunto++) {
+
+							// INSTANCIA CONJUNTO HIDRAULICO
+							const IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico(conjunto + 1);
+
+							if (!a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.isInstanciado(idConjuntoHidraulico)) {
+								ConjuntoHidraulico conjuntohidraulico;
+								conjuntohidraulico.setAtributo(AttComumConjuntoHidraulico_idConjuntoHidraulico, idConjuntoHidraulico);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.add(conjuntohidraulico);
+							}//if (!a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.isInstanciado(idConjuntoHidraulico)) {
+
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).setAtributo(AttComumConjuntoHidraulico_submercado, idSubmercado);
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).setAtributo(AttComumConjuntoHidraulico_queda_referencia, h_nominal.at(conjunto));
+							a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).setAtributo(AttComumConjuntoHidraulico_nome, nome);
+
+
+							// INSTANCIA AS UNIDADES DOS CONJUNTO HIDRAULICOS 
+							for (int unidade = 1; unidade <= numero_maquinas_conjunto.at(conjunto); unidade++) {
+
+								const IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE(unidade);
+
+								if (!a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.isInstanciado(idUnidadeUHE)) {
+									UnidadeUHE unidadeUHE;
+									unidadeUHE.setAtributo(AttComumUnidadeUHE_idUnidadeUHE, idUnidadeUHE);
+									a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.add(unidadeUHE);
+								}//if (!a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.isInstanciado(idUnidadeUHE)) {
+
+
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_submercado, idSubmercado);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_potencia_minima, 0.0);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_potencia_maxima, potencia_unidade_x_conjunto.at(conjunto));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_vazao_turbinada_minima, 0.0);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_vazao_turbinada_maxima, q_nominal.at(conjunto));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_fator_de_producao, fator_de_producao);
+
+								// TIPO DE PERDA HIDRAULICA
+								if (tipo_perda == 1) {
+									a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_de_perda_hidraulica, TipoPerdaHidraulica_percentual);
+									a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_perda_hidraulica, double(perdas / 100));
+									a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_tipo_de_perda_hidraulica, TipoPerdaHidraulica_percentual);
+									a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_perda_hidraulica, double(perdas / 100));
+								}
+								else if (tipo_perda == 2) {
+									a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_de_perda_hidraulica, TipoPerdaHidraulica_metro);
+									a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_perda_hidraulica, perdas);
+									a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_tipo_de_perda_hidraulica, TipoPerdaHidraulica_metro);
+									a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_perda_hidraulica, perdas);
+								}
+								else { throw std::invalid_argument("Nao identificado tipo_perda: " + getString(tipo_perda)); }
+
+							}//for (int unidade = 1; unidade <= uhe.numMaquinas[conjunto]; unidade++) 
+
+							queda_referencia_usina += numero_maquinas_conjunto.at(conjunto) * h_nominal.at(conjunto);
+							numero_unidades_usina += numero_maquinas_conjunto.at(conjunto);
+
+						}//for (int conjunto = 0; conjunto < numConjuntos; conjunto++) {
+
+						//Calcula a queda_referencia_usina como a ponderaçao da queda_referencia por conjunto de acordo ao número de máquinas de cada conjunto dividido pelo numero total de máquinas
+						queda_referencia_usina /= numero_unidades_usina;
+						a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_queda_referencia, queda_referencia_usina);
+
+						// TRATAMENTO CONJUNTO HIDRAULICO 60 HZ ITAIPU QUE ESTÁ CONECTADO NO NÓ IVAIPORÃ 
+						if (codigo_usina == 66) {
+
+							if (itaipu_tipo_detalhamento_producao_por_conjunto) {
+
+								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica_por_conjunto);
+
+								for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= a_dados.getMaiorId(idHidreletrica, IdConjuntoHidraulico()); idConjuntoHidraulico++) {
+
+									if (idConjuntoHidraulico == a_dados.getMaiorId(idHidreletrica, IdConjuntoHidraulico())) {
+										const IdSubmercado idSubmercado_IV = getIdFromCodigoONS(lista_codigo_ONS_submercado, codigo_IV);
+										if (idSubmercado_IV == IdSubmercado_Nenhum)
+											throw std::invalid_argument("Submercado Ivaipora nao encontrado");
+										a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).setAtributo(AttComumConjuntoHidraulico_submercado, idSubmercado_IV);
+									}//if (idConjuntoHidraulico == a_dados.getMaiorId(idHidreletrica, IdConjuntoHidraulico())) {
+
+									else if (idConjuntoHidraulico == IdConjuntoHidraulico_1) {
+										const IdSubmercado idSubmercado_ANDE = getIdFromCodigoONS(lista_codigo_ONS_submercado, codigo_ANDE);
+										if (idSubmercado_ANDE == IdSubmercado_Nenhum)
+											throw std::invalid_argument("Submercado ANDE nao encontrado");
+										a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).setAtributo(AttComumConjuntoHidraulico_submercado, idSubmercado_ANDE);
+									}// else if (idConjuntoHidraulico == IdConjuntoHidraulico_1) {
+
+									for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++) {
+										const IdSubmercado idSubmercado_unidade = a_dados.getAtributo(idHidreletrica, idConjuntoHidraulico, AttComumConjuntoHidraulico_submercado, IdSubmercado());
+										a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_submercado, idSubmercado_unidade);
+									}
+								} // for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= a_dados.getMaiorId(idHidreletrica, IdConjuntoHidraulico()); idConjuntoHidraulico++) {							
+							}//if (itaipu_tipo_detalhamento_producao_por_conjunto) {
+							else {
+
+								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoHidreletrica_por_usina);
+								const IdSubmercado idSubmercado_ITAIPU = getIdFromCodigoONS(lista_codigo_ONS_submercado, codigo_submercado_ITAIPU);
+
+								if (idSubmercado_ITAIPU == IdSubmercado_Nenhum)
+									throw std::invalid_argument("Submercado ITAIPU nao encontrado");
+
+								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_submercado, idSubmercado_ITAIPU);
+
+								for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= a_dados.getMaiorId(idHidreletrica, IdConjuntoHidraulico()); idConjuntoHidraulico++) {
+									a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).setAtributo(AttComumConjuntoHidraulico_submercado, idSubmercado_ITAIPU);
+									for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++) {
+										const IdSubmercado idSubmercado_unidade = a_dados.getAtributo(idHidreletrica, idConjuntoHidraulico, AttComumConjuntoHidraulico_submercado, IdSubmercado());
+										a_dados.vetorHidreletrica.at(idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidadeUHE).setAtributo(AttComumUnidadeUHE_submercado, idSubmercado_unidade);
+									}//for (IdUnidadeUHE idUnidadeUHE = IdUnidadeUHE_1; idUnidadeUHE <= a_dados.getMaiorId(idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE()); idUnidadeUHE++) {
+
+								} // for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico_1; idConjuntoHidraulico <= a_dados.getMaiorId(idHidreletrica, IdConjuntoHidraulico()); idConjuntoHidraulico++) {
+
+							}//else {
+
+						} // if (codigo_usina == 66) {
+
+						//DADOS DOS POLINOMIOS DE JUSANTE
+						if (a_readPoliJusHidr_dat) {
+							for (int polinomio = 0; polinomio < numero_polinomio_jusante; polinomio++) {
+								const IdPolinomioJusante idPolinomioJusante = IdPolinomioJusante(polinomio + 1);
+								PolinomioJusante polinomioJusante;
+								polinomioJusante.setAtributo(AttComumPolinomioJusante_idPolinomioJusante, idPolinomioJusante);
+								polinomioJusante.setAtributo(AttComumPolinomioJusante_nome, nome);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorPolinomioJusante.add(polinomioJusante);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorPolinomioJusante.at(idPolinomioJusante).setVetor(AttVetorPolinomioJusante_altura_ref, SmartEnupla<Periodo, double>(horizonte_estudo, cotaJusanteRef.at(polinomio)));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorPolinomioJusante.at(idPolinomioJusante).setVetor(AttVetorPolinomioJusante_coeficiente_0, SmartEnupla<Periodo, double>(horizonte_estudo, coefJusante.at(polinomio).at(0)));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorPolinomioJusante.at(idPolinomioJusante).setVetor(AttVetorPolinomioJusante_coeficiente_1, SmartEnupla<Periodo, double>(horizonte_estudo, coefJusante.at(polinomio).at(1)));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorPolinomioJusante.at(idPolinomioJusante).setVetor(AttVetorPolinomioJusante_coeficiente_2, SmartEnupla<Periodo, double>(horizonte_estudo, coefJusante.at(polinomio).at(2)));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorPolinomioJusante.at(idPolinomioJusante).setVetor(AttVetorPolinomioJusante_coeficiente_3, SmartEnupla<Periodo, double>(horizonte_estudo, coefJusante.at(polinomio).at(3)));
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorPolinomioJusante.at(idPolinomioJusante).setVetor(AttVetorPolinomioJusante_coeficiente_4, SmartEnupla<Periodo, double>(horizonte_estudo, coefJusante.at(polinomio).at(4)));
+							}//for (int polinomio = 0; polinomio < numero_polinomio_jusante; polinomio++) {
+						}//if (a_readPoliJusHidr_dat) {
+
+					}// if(idHidreletrica.size() > 0){
+				}
+
+			}//if (!nome.empty()) {
+
+			usina++;
+
+		} //while (!(leituraArquivo.eof())) {
+
+		leituraArquivo.clear();
+		leituraArquivo.close();
+
+	}//	try {
+
+	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16: \n" + std::string(erro.what())); }
+
+}
+
 
 void LeituraCEPEL::leitura_CEPEL(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const std::string a_deck, const std::string a_nick) {
 
@@ -153,18 +1319,8 @@ void LeituraCEPEL::leitura_CEPEL(const IdProcesso a_idProcesso, const IdProcesso
 
 		}
 
-		else if (((strCompara(a_deck, "DS")) || (strCompara(a_deck, "DESSEM"))) && (a_idProcesso == IdProcesso_mestre)) {
-			deck_str = "DS";
-			std::string nomePasta;
-			//nomePasta = "DS_CCEE_022020_SEMREDE_RV2D15";
-			//nomePasta = "DS_CCEE_012020_SEMREDE_RV3D23";
-			//nomePasta = "DS_CCEE_052020_SEMREDE_RV0D28";
-			nomePasta = "DadosEntradaDESSEM";
-			leitura_DESSEM(dados, nomePasta + "//dessem.arq", nomePasta);
-		}
-
 		else
-			throw std::invalid_argument("Deck desconhecido " + a_deck + ", valor deve ser NW, DC ou DS.");
+			throw std::invalid_argument("Deck desconhecido " + a_deck + ", valor deve ser NW ou DC.");
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::leitura_CEPEL(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + "," + a_deck + "," + a_nick + "): \n" + std::string(erro.what())); }
@@ -682,7 +1838,6 @@ void LeituraCEPEL::instancia_termeletricas_preConfig(Dados& a_dados, const std::
 		const IdTermeletrica	idTermeletricaIni = a_dados.getMenorId(IdTermeletrica());
 		const IdTermeletrica	idTermeletricaOut = a_dados.getIdOut(IdTermeletrica());
 		for (IdTermeletrica idTermeletrica = idTermeletricaIni; idTermeletrica < idTermeletricaOut; a_dados.vetorTermeletrica.incr(idTermeletrica)) {
-			a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_considerar_usina, false);
 			a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_representacao_discreta_producao, false);
 			a_dados.vetorTermeletrica.at(idTermeletrica).setAtributo(AttComumTermeletrica_tipo_detalhamento_producao, TipoDetalhamentoProducaoTermeletrica_sem_producao);
 
@@ -785,8 +1940,8 @@ void LeituraCEPEL::instancia_hidreletricas_preConfig(Dados& a_dados, const std::
 			if ((a_dados.getAtributo(AttComumDados_tipo_geracao_cenario_hidrologico, TipoGeracaoCenario()) == TipoGeracaoCenario_sintetica_in_sample) ||
 				(a_dados.getAtributo(AttComumDados_tipo_geracao_cenario_hidrologico, TipoGeracaoCenario()) == TipoGeracaoCenario_sintetica_out_of_sample)) {
 
-				entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetor_natural_historico.csv", a_dados, TipoAcessoInstancia_m2);
-				entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_AttVetor_natural_tendencia.csv", a_dados, TipoAcessoInstancia_m2);
+				entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_NATURAL_HISTORICO_AttVetorPremissa_PorPeriodo.csv", a_dados, TipoAcessoInstancia_m2);
+				entradaSaidaDados.carregarArquivoCSV_AttVetor("HIDRELETRICA_AFLUENCIA_NATURAL_TENDENCIA_AttVetorPremissa_PorPeriodo.csv", a_dados, TipoAcessoInstancia_m2);
 
 				a_dados.setAtributo(AttComumDados_tipo_tendencia_hidrologica, TipoTendenciaEstocastica_serie_informada);
 
@@ -937,7 +2092,7 @@ void LeituraCEPEL::instancia_processoEstocasticoHidrologico_preConfig(Dados& a_d
 		a_dados.setAtributo(AttComumDados_numero_cenarios, numero_cenarios);
 
 		entradaSaidaDados.setDiretorioEntrada(diretorio_entrada);
-		entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AFLUENCIA_AttVetorPremissa_PorPeriodo.csv", a_dados, TipoAcessoInstancia_m2);
+		entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_AFLUENCIA_NATURAL_HISTORICO_AttVetorPremissa_PorPeriodo.csv", a_dados, TipoAcessoInstancia_m2);
 
 
 	}// try
