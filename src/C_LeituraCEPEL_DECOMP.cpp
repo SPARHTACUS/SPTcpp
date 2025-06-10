@@ -1729,7 +1729,7 @@ void LeituraCEPEL::instanciar_processo_estocastico_CP(Dados& a_dados) {
 	try {
 
 		a_dados.processoEstocastico_hidrologico = ProcessoEstocastico();
-		a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico_hidrologico_hidreletrica);
+		a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico_1);
 		a_dados.processoEstocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_tipo_correlacao_variaveis_aleatorias, TipoCorrelacaoVariaveisAleatorias_sem_correlacao);
 		
 

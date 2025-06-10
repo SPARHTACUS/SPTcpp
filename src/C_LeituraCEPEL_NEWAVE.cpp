@@ -461,7 +461,7 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 
 				a_dados.setAtributo(AttComumDados_numero_maximo_iteracoes, numero_maximo_iteracoes);
 
-				a_dados.setAtributo(AttComumDados_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico_hidrologico_hidreletrica);
+				a_dados.setAtributo(AttComumDados_tipo_processo_estocastico_geracao_cenario_hidrologico, TipoProcessoEstocasticoHidrologico_por_hidreletrica);
 
 				a_dados.setAtributo(AttComumDados_tipo_modelo_geracao_cenario_hidrologico, TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal);
 

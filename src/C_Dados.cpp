@@ -7363,7 +7363,7 @@ void Dados::validacao_operacional_AgrupamentoIntercambio(EntradaSaidaDados a_ent
 } // void Dados::validacao_operacional_AgrupamentoIntercambio(EntradaSaidaDados a_entradaSaidaDados, const std::string a_diretorio_att_operacional, const std::string a_diretorio_att_premissa, const bool a_imprimir_atributos_sem_recarregar){
 
 
-int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(ProcessoEstocastico& a_processo_estocastico, const IdProcessoEstocastico a_tipo_processo_estocastico) {
+int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(ProcessoEstocastico& a_processo_estocastico) {
 
 	try {
 
@@ -7375,11 +7375,6 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 
 		const Periodo periodo_inicial_otimizacao = horizonte_otimizacao.getElemento(IdEstagio_1);
 		const Periodo periodo_final_otimizacao = horizonte_otimizacao.getElemento(estagio_final);
-
-		const IdHidreletrica maiorIdHidreletrica = getMaiorId(IdHidreletrica());
-
-		if (a_processo_estocastico.getAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico()) != a_tipo_processo_estocastico)
-			return 1;
 
 		const SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> mapeamento_espaco_amostral = a_processo_estocastico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao());
 
@@ -7575,11 +7570,9 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 
 			for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= a_processo_estocastico.getMaiorId(idVariavelAleatoria, IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++) {
 
-				if ((a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_hidreletrica) || (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_bacia)) {
-					if (!vetorHidreletrica.isInstanciado(a_processo_estocastico.getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(idVariavelAleatoria, idVariavelAleatoriaInterna, IdHidreletrica())))
-						return 14;
-				}
-
+				if (!vetorHidreletrica.isInstanciado(a_processo_estocastico.getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(idVariavelAleatoria, idVariavelAleatoriaInterna, IdHidreletrica())))
+					return 14;
+				
 				SmartEnupla<Periodo, double> coeficiente_participacao = a_processo_estocastico.getVetor(idVariavelAleatoria, idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_coeficiente_participacao, Periodo(), double());
 
 				if (coeficiente_participacao.size() == 0)
@@ -7639,7 +7632,7 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 		return 0;
 
 	} // try{
-	catch (const std::exception& erro) { throw std::invalid_argument("Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(a_processo_estocastico," + getFullString(a_tipo_processo_estocastico) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(a_processo_estocastico): \n" + std::string(erro.what())); }
 
 } // bool Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(){
 
@@ -7654,7 +7647,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 		bool calcular_att_operacionais_historico_hidrologico = false;
 		bool calcular_att_operacionais_tendencia_hidrologica = false;
 
-		const IdProcessoEstocastico tipo_processo_estocastico_hidrologico = getAtributo(AttComumDados_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico());
+		const TipoProcessoEstocasticoHidrologico tipo_processo_estocastico_hidrologico = getAtributo(AttComumDados_tipo_processo_estocastico_geracao_cenario_hidrologico, TipoProcessoEstocasticoHidrologico());
 
 		const TipoModeloGeracaoSinteticaCenario tipo_modelo_geracao_sintetica = getAtributo(AttComumDados_tipo_modelo_geracao_cenario_hidrologico, TipoModeloGeracaoSinteticaCenario());
 		const TipoValor     tipo_coeficiente_auto_correlacao = getAtributo(AttComumDados_tipo_coeficiente_auto_correlacao_geracao_cenario_hidrologico, TipoValor());
@@ -7674,7 +7667,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 		const IdCenario cenario_inicial = arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_menor_cenario, IdCenario());
 		const IdCenario cenario_final   = arranjoResolucao.getAtributo(idProcesso, AttComumProcesso_maior_cenario, IdCenario());
 
-		int calcular_att_operacionais_processo_estocastico_hidrologico = isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(processoEstocastico_hidrologico, tipo_processo_estocastico_hidrologico);
+		int calcular_att_operacionais_processo_estocastico_hidrologico = isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(processoEstocastico_hidrologico);
 
 		if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
 			for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++) {
@@ -8207,11 +8200,9 @@ void Dados::imprimir_ProcessoEstocasticoHidrologico_exportacao_pos_estudo(Entrad
 
 
 
-void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncremental(const IdProcessoEstocastico a_tipo_processo_estocastico, ProcessoEstocastico& a_processo_estocastico) {
+void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncremental(const TipoProcessoEstocasticoHidrologico a_tipo_processo_estocastico, ProcessoEstocastico& a_processo_estocastico) {
 	try {
 
-		if ((a_tipo_processo_estocastico != IdProcessoEstocastico_hidrologico_bacia) && (a_tipo_processo_estocastico != IdProcessoEstocastico_hidrologico_hidreletrica))
-			throw std::invalid_argument("O metodo serve apenas para " + getFullString(IdProcessoEstocastico_hidrologico_bacia) + " e " + getFullString(IdProcessoEstocastico_hidrologico_hidreletrica));
 
 		bool isSerieTemporalAdicionadaEmVarExistente = false;
 		bool isTendenciaTemporalAdicionadaEmVarExistente = false;
@@ -8220,9 +8211,9 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 		if (a_processo_estocastico.getMaiorId(IdVariavelAleatoria()) != IdVariavelAleatoria_Nenhum)
 			isProcEstocasticoJaInstanciado = true;
 
-		if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_hidreletrica) {
+		if (a_tipo_processo_estocastico == TipoProcessoEstocasticoHidrologico_por_hidreletrica) {
 
-			a_processo_estocastico.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico_hidrologico_hidreletrica);
+			a_processo_estocastico.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico_1);
 
 			for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 
@@ -8263,11 +8254,11 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 
 			} // for (IdHidreletrica idHidreletrica = getMenorId(IdHidreletrica()); idHidreletrica <= getMaiorId(IdHidreletrica()); vetorHidreletrica.incr(idHidreletrica)) {
 
-		} // if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_hidreletrica) {
+		} // if (a_tipo_processo_estocastico == TipoProcessoEstocasticoHidrologico_por_hidreletrica) {
 
-		else if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_bacia) {
+		else if (a_tipo_processo_estocastico == TipoProcessoEstocasticoHidrologico_por_bacia) {
 
-			a_processo_estocastico.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico_hidrologico_bacia);
+			a_processo_estocastico.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico_1);
 
 			const IdBaciaHidrografica maiorIdBaciaHidrografica = getMaiorId(IdBaciaHidrografica());
 
@@ -8327,7 +8318,7 @@ void Dados::instanciarProcessoEstocasticoHidrologicoComHistoricoAfluenciaIncreme
 
 			} // for (IdBaciaHidrografica idBaciaHidrografica = IdBaciaHidrografica_1; idBaciaHidrografica <= maiorIdBaciaHidrografica; idBaciaHidrografica++) {
 
-		} // else if (a_tipo_processo_estocastico == IdProcessoEstocastico_hidrologico_bacia) {
+		} // else if (a_tipo_processo_estocastico == TipoProcessoEstocasticoHidrologico_por_bacia) {
 
 		if (isSerieTemporalAdicionadaEmVarExistente || isTendenciaTemporalAdicionadaEmVarExistente) {
 

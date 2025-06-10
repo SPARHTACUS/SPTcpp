@@ -987,11 +987,15 @@ DEFINE_SMART_ENUM(IdRestricaoCenario, ID_RESTRICAO_CENARIO)
 DEFINE_SMART_ENUM(IdVariavelRealizacaoInterna, ID_VARIAVEL_REALIZACAO_INTERNA)
 
 #define ID_PROCESSO_ESTOCASTICO(m)\
-	m(IdProcessoEstocastico, hidrologico_hidreletrica)\
-	m(IdProcessoEstocastico, hidrologico_hidreletrica_sintetico)\
-	m(IdProcessoEstocastico, hidrologico_bacia)\
-	m(IdProcessoEstocastico, hidrologico_bacia_sintetico)\
-	m(IdProcessoEstocastico, demanda)
+	m(IdProcessoEstocastico, 1)\
+	m(IdProcessoEstocastico, 2)\
+	m(IdProcessoEstocastico, 3)\
+	m(IdProcessoEstocastico, 4)\
+	m(IdProcessoEstocastico, 5)\
+	m(IdProcessoEstocastico, 6)\
+	m(IdProcessoEstocastico, 7)\
+	m(IdProcessoEstocastico, 8)\
+	m(IdProcessoEstocastico, 9)
 DEFINE_SMART_ENUM(IdProcessoEstocastico, ID_PROCESSO_ESTOCASTICO)
 
 #define ID_MODELO_OTIMIZACAO(m)\
@@ -1336,6 +1340,11 @@ DEFINE_SMART_ENUM(TipoRestricaoHidraulica, TIPO_RESTRICAO_HIDRAULICA)
     m(TipoRegularizacao, diaria)         
 DEFINE_SMART_ENUM(TipoRegularizacao, TIPO_REGULARIZACAO)
 
+#define TIPO_PE_HIDROLOGICO(m)        \
+	m(TipoProcessoEstocasticoHidrologico, por_hidreletrica)  \
+	m(TipoProcessoEstocasticoHidrologico, por_bacia) 
+DEFINE_SMART_ENUM(TipoProcessoEstocasticoHidrologico, TIPO_PE_HIDROLOGICO)
+
 #define TIPO_PROCESSAMENTO_PARALELO(m)        \
 	m(TipoProcessamentoParalelo, por_cenario)  \
 	m(TipoProcessamentoParalelo, por_abertura) 
@@ -1360,6 +1369,7 @@ m(TipoGrandezaModificacao)           \
 m(TipoModeloGeracaoSinteticaCenario) \
 m(TipoPerdaHidraulica)               \
 m(TipoProcessamentoParalelo)         \
+m(TipoProcessoEstocasticoHidrologico)\
 m(TipoRelaxacaoVariavelAleatoria)    \
 m(TipoRestricaoContrato)             \
 m(TipoRestricaoHidraulica)           \

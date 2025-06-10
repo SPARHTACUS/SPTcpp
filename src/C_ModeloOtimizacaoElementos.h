@@ -230,7 +230,7 @@ void armazenarValorPrimal##Elem##_##Nome##_##Nro##_##Seq(const TipoSubproblemaSo
 				if ((isF_##Elem##_##Nome##_##Nro##_##Seq) && (!isPrintFw_##Elem##_##Nome##_##Nro##_##Seq)) { vlrF_##Elem##_##Nome##_##Nro##_##Seq = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>>();}\
 				isPrintFw_##Elem##_##Nome##_##Nro##_##Seq = true;\
 				const Periodo period = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_IdEstagio_1, Periodo());\
-				a_idReal = getElementoMatriz(getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()), AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, period, IdRealizacao());\
+				a_idReal = getElementoMatriz(IdProcessoEstocastico_1, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, period, IdRealizacao());\
 			} \
 			else {\
 				if ((isF_##Elem##_##Nome##_##Nro##_##Seq) && (isPrintFw_##Elem##_##Nome##_##Nro##_##Seq)){vlrF_##Elem##_##Nome##_##Nro##_##Seq = SmartEnupla<TipoSubproblemaSolver, SmartEnupla<IdEstagio, std::vector<std::string>>>();}\
@@ -279,7 +279,7 @@ void armazenarValorDual##Elem##_##Nome##_##Nro##_##Seq(const TipoSubproblemaSolv
 		if (a_idReal == IdRealizacao_Nenhum){\
 			isPrintFw_##Elem##_##Nome##_##Nro##_##Seq = true;\
 			const Periodo period = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_IdEstagio_1, Periodo());\
-			a_idReal = getElementoMatriz(getAtributo(AttComumModeloOtimizacao_tipo_processo_estocastico_hidrologico, IdProcessoEstocastico()), AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, period, IdRealizacao());\
+			a_idReal = getElementoMatriz(IdProcessoEstocastico_1, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, period, IdRealizacao());\
 		} \
 		else { isPrintFw_##Elem##_##Nome##_##Nro##_##Seq = false; }\
 		bool normD = false;\
