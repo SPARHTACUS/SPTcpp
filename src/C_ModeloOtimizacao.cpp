@@ -3983,8 +3983,6 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 
 					if (vetorEstagio_aux.at(idEstagio).vetorCorteBenders.getMaiorId() > IdCorteBenders_Nenhum) {
 
-						SmartEnupla<IdVariavelAleatoria, std::vector<IdHidreletrica>> isIdHidreletricaNosEstadosYP(IdVariavelAleatoria_1, std::vector<std::vector<IdHidreletrica>>(IdVariavelAleatoria(IdVariavelAleatoria_Excedente - 1), std::vector<IdHidreletrica>()));
-
 						if ((estagio_inicial != IdEstagio_1) || (idEstagio > estagio_inicial)) {
 
 							if (getAtributo(idEstagio, AttComumEstagio_periodo_otimizacao, Periodo()).sobreposicao(vetorEstagio_aux.at(idEstagio).getAtributo(AttComumEstagio_periodo_otimizacao, Periodo())) == 0.0)
@@ -4220,13 +4218,12 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 										} // if (nome.at(0) == "VI") {
 
 										else if (nome.at(0) == "YP") {
-											try {
-												
-												IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(3).c_str());
 
-												const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(4).c_str());
+											try {
 
 												Periodo periodo_lag = Periodo(nome.at(2));
+
+												const IdVariavelAleatoria idVarLida = getIdVariavelAleatoriaFromChar(nome.at(4).c_str());
 
 												const double grau_liberdade = getdoubleFromChar(nome.at(5).c_str());
 
@@ -4244,54 +4241,69 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 													listaHidreletrica.push_back(idHidreletrica);
 												}
 
-												if (isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria).size() == 0)
-													isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria) = listaHidreletrica;
-												else {
-													if (!vectorCompara(isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria), listaHidreletrica))
-														throw std::invalid_argument("Variavel aleatoria com lista IdHidreletrica diferente de lista ja instanciada em " + getFullString(idVariavelEstado_corte));
-												}
-
 												if (listaHidreletricaNaoInstanciadaNoModelo.size() > 0)
 													throw std::invalid_argument(getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) + " em " + getFullString(idVariavelEstado_corte) + " nao foi instanciado no modelo.");
 
-												if (listaHidreletrica.size() > 0) {
+												if (listaHidreletrica.size() == 0)
+													throw std::invalid_argument(getFullString(idVariavelEstado_corte) + " nao apresenta hidreletricas.");
 
+												bool match_estado_com_PE_modelo = true;
 
-													bool match_estado_com_PE_modelo = true;
+												IdVariavelAleatoria idVarFound = IdVariavelAleatoria_Nenhum;
+												IdProcessoEstocastico idPEFound = IdProcessoEstocastico_Nenhum;
 
-													IdVariavelAleatoria idVarFound = IdVariavelAleatoria_Nenhum;
+												for (IdProcessoEstocastico idPE = getMenorId(IdProcessoEstocastico()); idPE < getIdOut(IdProcessoEstocastico()); incr(idPE)) {
 
 													for (int i = 0; i < int(listaHidreletrica.size()); i++) {
-														IdVariavelAleatoria idVar; IdVariavelAleatoriaInterna idVarInt;													
-														vetorProcessoEstocastico.at(IdProcessoEstocastico_1).getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico_seExistir(idVar, idVarInt, listaHidreletrica.at(i));
+														IdVariavelAleatoria idVar; IdVariavelAleatoriaInterna idVarInt;
+														vetorProcessoEstocastico.at(idPE).getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico_seExistir(idVar, idVarInt, listaHidreletrica.at(i));
 
-														if (idVar != idVariavelAleatoria){
+														if (idVar != IdVariavelAleatoria_Nenhum) {
+															if (idVarFound == IdVariavelAleatoria_Nenhum) {
+																idVarFound = idVar;
+																idPEFound = idPE;
+															}
+															else if ((idPE != idPEFound) || (idVar != idVarFound)) {
+																match_estado_com_PE_modelo = false;
+																break;
+															}
+															else if (vetorProcessoEstocastico.at(idPE).vetorVariavelAleatoria.at(idVar).vetorVariavelAleatoriaInterna.numObjetos() != listaHidreletrica.size()) {
+																match_estado_com_PE_modelo = false;
+																break;
+															}
+														}
+														else if ((idPE == getMaiorId(IdProcessoEstocastico())) && (i == int(listaHidreletrica.size() - 1))) {
 															match_estado_com_PE_modelo = false;
 															break;
 														}
-														else if (vetorProcessoEstocastico.at(IdProcessoEstocastico_1).vetorVariavelAleatoria.at(idVar).vetorVariavelAleatoriaInterna.numObjetos() != listaHidreletrica.size()) {
-															match_estado_com_PE_modelo = false;
-															break;
-														}
-
 													}//for (int i = 0; i < int(listaHidreletrica.size()); i++) {
+												} // for (IdProcessoEstocastico idPE = getMenorId(IdProcessoEstocastico()); idPE < getIdOut(IdProcessoEstocastico()); incr(idPE)) {
 
-													if (!match_estado_com_PE_modelo) {
-														idProcessoEstocastico = IdProcessoEstocastico_1;
+												if (!match_estado_com_PE_modelo) {
+													idPEFound = IdProcessoEstocastico(getMaiorId(IdProcessoEstocastico()) + 1);
+													ProcessoEstocastico pe;
+													pe.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, idPEFound);
+													idVarFound = idVarLida;
+													vetorProcessoEstocastico.add(pe);
+													VariavelAleatoria var;
+													var.setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria, idVarFound);
+													vetorProcessoEstocastico.at(idPEFound).vetorVariavelAleatoria.add(var);
+												}
 
-														string nome_atualizado = std::string(getNomeSolverVarDecisao_YP(a_TSS, idEstagio, periodo_lag, idProcessoEstocastico, idVariavelAleatoria) + "," + getString(grau_liberdade) + "," + getStringFromLista(listaHidreletrica, ",", false));
-														vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.at(idVariavelEstado_corte).setAtributo(AttComumVariavelEstado_nome, nome_atualizado);
-													}
+												string nome_atualizado = std::string(getNomeSolverVarDecisao_YP(a_TSS, idEstagio, periodo_lag, idPEFound, idVarFound) + "," + getString(grau_liberdade) + "," + getStringFromLista(listaHidreletrica, ",", false));
+												vetorEstagio_aux.at(idEstagio).vetorVariavelEstado.at(idVariavelEstado_corte).setAtributo(AttComumVariavelEstado_nome, nome_atualizado);
 
-												}//if (listaHidreletrica.size() > 0){
+												if (!match_estado_com_PE_modelo)
+													criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idPEFound, idVarFound, periodo_lag, grau_liberdade, listaHidreletrica, true);
+												else
+													criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idPEFound, idVarFound, periodo_lag, grau_liberdade, std::vector<IdHidreletrica>(), true);
 
-												criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica, true);
-												int varYP = getVarDecisao_YP_ADDseExistir(a_TSS, idEstagio, periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
+												int varYP = getVarDecisao_YP_ADDseExistir(a_TSS, idEstagio, periodo_lag, idPEFound, idVarFound);
 
 												if (varYP == -1)
-													varYP = getVarDecisao_YP(a_TSS, idEstagio, periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
+													varYP = getVarDecisao_YP(a_TSS, idEstagio, periodo_lag, idPEFound, idVarFound);
 
-												const int varYP_past = getVarDecisao_YP(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idProcessoEstocastico, idVariavelAleatoria);
+												const int varYP_past = getVarDecisao_YP(a_TSS, IdEstagio(idEstagio - 1), periodo_lag, idPEFound, idVarFound);
 
 												const IdVariavelEstado idVarEstadoNew = vetorEstagio.at(idEstagio).addVariavelEstado(a_TSS, vetorEstagio_aux.at(idEstagio).getAtributo(idVariavelEstado_corte, AttComumVariavelEstado_nome, std::string()), varYP, varYP_past, true);
 
@@ -4855,8 +4867,6 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 			const Periodo periodo_horizonte_estudo_inicial = getElementosMatriz(AttMatrizModeloOtimizacao_horizonte_estudo, getAtributo(AttComumModeloOtimizacao_estagio_inicial, IdEstagio()), Periodo(), double()).getIteradorInicial();
 
-			SmartEnupla<IdVariavelAleatoria, std::vector<IdHidreletrica>> isIdHidreletricaNosEstadosYP(IdVariavelAleatoria_1, std::vector<std::vector<IdHidreletrica>>(IdVariavelAleatoria(IdVariavelAleatoria_Excedente - 1), std::vector<IdHidreletrica>()));
-
 			bool is_conversao_ENA_carregado = false;
 
 			const IdCenario cenarioInicial = IdCenario_1;
@@ -4931,9 +4941,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 
 					Periodo periodo_lag = Periodo(nome.at(2));
 
-					const IdProcessoEstocastico idProcessoEstocastico = getIdProcessoEstocasticoFromChar(nome.at(3).c_str());
-
-					const IdVariavelAleatoria idVariavelAleatoria = getIdVariavelAleatoriaFromChar(nome.at(4).c_str());
+					const IdVariavelAleatoria idVarLida = getIdVariavelAleatoriaFromChar(nome.at(4).c_str());
 
 					const double grau_liberdade = getdoubleFromChar(nome.at(5).c_str());
 
@@ -4951,28 +4959,73 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 						listaHidreletrica.push_back(idHidreletrica);
 					}
 
-					if (isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria).size() == 0)
-						isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria) = listaHidreletrica;
-					else {
-						if (!vectorCompara(isIdHidreletricaNosEstadosYP.at(idVariavelAleatoria), listaHidreletrica))
-							throw std::invalid_argument("Variavel aleatoria com lista IdHidreletrica diferente de lista ja instanciada em " + getFullString(idVariavelEstado));
-					}
-
-					if (listaHidreletricaNaoInstanciadaNoModelo.size() == 1) {
+					if (listaHidreletricaNaoInstanciadaNoModelo.size() == listaHidreletrica.size()) {
 						estagio.anularVariavelEstadoCorteBenders(idVariavelEstado);
 						estagio.vetorVariavelEstado.rem(idVariavelEstado);
 						if (a_idProcesso == IdProcesso_mestre)
 							std::cout << getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) << " nao instanciada. Removendo " << getFullString(idVariavelEstado) << " com abatimento no RHS do corte." << std::endl;
 					}
-					else if (listaHidreletricaNaoInstanciadaNoModelo.size() > 1)
+					else if (listaHidreletricaNaoInstanciadaNoModelo.size() > 0)
 						throw std::invalid_argument(getFullString(listaHidreletricaNaoInstanciadaNoModelo.at(0)) + " em " + getFullString(idVariavelEstado) + " nao foi instanciado no modelo.");
 
-					else if (listaHidreletricaNaoInstanciadaNoModelo.size() == 0) {
-						const int varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idProcessoEstocastico, idVariavelAleatoria, periodo_lag, grau_liberdade, listaHidreletrica);
+					else {
+
+						bool match_estado_com_PE_modelo = true;
+
+						IdVariavelAleatoria idVarFound = IdVariavelAleatoria_Nenhum;
+						IdProcessoEstocastico idPEFound = IdProcessoEstocastico_Nenhum;
+
+						for (IdProcessoEstocastico idPE = getMenorId(IdProcessoEstocastico()); idPE < getIdOut(IdProcessoEstocastico()); incr(idPE)) {
+
+							for (int i = 0; i < int(listaHidreletrica.size()); i++) {
+								IdVariavelAleatoria idVar; IdVariavelAleatoriaInterna idVarInt;
+								vetorProcessoEstocastico.at(idPE).getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico_seExistir(idVar, idVarInt, listaHidreletrica.at(i));
+
+								if (idVar != IdVariavelAleatoria_Nenhum) {
+									if (idVarFound == IdVariavelAleatoria_Nenhum) {
+										idVarFound = idVar;
+										idPEFound = idPE;
+									}
+									else if ((idPE != idPEFound) || (idVar != idVarFound)) {
+										match_estado_com_PE_modelo = false;
+										break;
+									}
+									else if (vetorProcessoEstocastico.at(idPE).vetorVariavelAleatoria.at(idVar).vetorVariavelAleatoriaInterna.numObjetos() != listaHidreletrica.size()) {
+										match_estado_com_PE_modelo = false;
+										break;
+									}
+								}
+								else if ((idPE == getMaiorId(IdProcessoEstocastico())) && (i == int(listaHidreletrica.size() - 1))) {
+									match_estado_com_PE_modelo = false;
+									break;
+								}
+							}//for (int i = 0; i < int(listaHidreletrica.size()); i++) {
+						} // for (IdProcessoEstocastico idPE = getMenorId(IdProcessoEstocastico()); idPE < getIdOut(IdProcessoEstocastico()); incr(idPE)) {
+
+						if (!match_estado_com_PE_modelo) {
+							idPEFound = IdProcessoEstocastico(getMaiorId(IdProcessoEstocastico()) + 1);
+							ProcessoEstocastico pe;
+							pe.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, idPEFound);
+							idVarFound = idVarLida;
+							vetorProcessoEstocastico.add(pe);
+							VariavelAleatoria var;
+							var.setAtributo(AttComumVariavelAleatoria_idVariavelAleatoria, idVarFound);
+							vetorProcessoEstocastico.at(idPEFound).vetorVariavelAleatoria.add(var);
+						}
+
+						int varYP = -1;
+						if (!match_estado_com_PE_modelo)
+							varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idPEFound, idVarFound, periodo_lag, grau_liberdade, listaHidreletrica, true);
+						else
+							varYP = criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(a_TSS, a_dados, idEstagio, idPEFound, idVarFound, periodo_lag, grau_liberdade, std::vector<IdHidreletrica>(), true);
+
 						if (varYP == -1)
 							throw std::invalid_argument("Nao foi possivel criar variaveis e restricoes YP de " + getFullString(idVariavelEstado) + " em " + getFullString(idEstagio));
+
 						estagio.setVariavelDecisaoAnteriorEmVariavelEstado(idVariavelEstado, a_TSS, varYP);
+
 					}
+
 				} // else if (nome.at(0) == "YP") {
 
 				//
@@ -6302,8 +6355,6 @@ void ModeloOtimizacao::instanciarProcessoEstocastico(Dados& a_dados, EntradaSaid
 		processo_estocastico_hidrologico.setAtributo(AttComumProcessoEstocastico_idProcessoEstocastico, IdProcessoEstocastico_1);
 
 		vetorProcessoEstocastico.add(processo_estocastico_hidrologico);
-
-		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("PROCESSO_ESTOCASTICO_AttComumOperacional.csv", vetorProcessoEstocastico.at(IdProcessoEstocastico_1), TipoAcessoInstancia_direto);
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_probabilidade_realizacao) + ".csv", vetorProcessoEstocastico.at(IdProcessoEstocastico_1), TipoAcessoInstancia_direto);
 		
