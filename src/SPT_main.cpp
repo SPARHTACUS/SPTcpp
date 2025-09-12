@@ -13,15 +13,14 @@
 
 void getInfoProduto(const std::string a_arquivoLicenca) {
 	std::cout << "##########################################################" << std::endl << std::endl;
-	std::cout << "                   Norus POWER FUSION " << std::endl;
+	std::cout << "            Modelo SPARHTACUS - sparhtacus.com " << std::endl;
+	std::cout << "            github.com/SPARHTACUS/SPTcpp " << std::endl;
 	std::cout << std::endl;
-	std::cout << "                      Version: 1.0 " << std::endl;
+	std::cout << "                      Versao: 2.5 " << std::endl;
 	std::cout << "            Build: " << __TIMESTAMP__ << std::endl;
-
 	std::cout << std::endl;
-	std::cout << "           Copyright (c) Norus Tecnologia LTDA" << std::endl << std::endl;
-	std::cout << "           2024 - All Rights Reserverd" << std::endl;
-	std::cout << "           More information " << a_arquivoLicenca << " " << std::endl << std::endl;
+	std::cout << "           Programa distribuido sob licenca MIT (x11)" << std::endl;
+	std::cout << "           Mais informacoes em " << a_arquivoLicenca << " " << std::endl << std::endl;
 	std::cout << "##########################################################" << std::endl << std::endl;
 };
 
@@ -57,9 +56,33 @@ void imprimirArquivoLicenca(const std::string a_arquivoLicenca) {
 		if (!escritaStream.is_open())
 			throw std::invalid_argument("Nao foi possivel abrir o arquivo.");
 
-		escritaStream << "Property of Norus Tecnologia LTDA." << std::endl << std::endl;
-		escritaStream << "2024 - All Rights Reserverd" << std::endl;
-		  
+		escritaStream << "SPARHTACUS Model - sparhtacus.com" << std::endl;
+		escritaStream << "R&D ANEEL/BRAZIL: PD-07427-0318/2018 " << std::endl;
+		escritaStream << "Funding:     Norte Energia S.A." << std::endl;
+		escritaStream << "Development: LabPlan UFSC" << std::endl;
+		escritaStream << "             Norus" << std::endl << std::endl;
+
+		escritaStream << "MIT License." << std::endl << std::endl;
+
+		escritaStream << "Copyright (c) 2022 Norte Energia S.A." << std::endl << std::endl;
+
+		escritaStream << "Permission is hereby granted, free of charge, to any person obtaining a copy " << std::endl;
+		escritaStream << "of this software and associated documentation files(the 'Software'), to deal " << std::endl;
+		escritaStream << "in the Software without restriction, including without limitation the rights " << std::endl;
+		escritaStream << "to use, copy, modify, merge, publish, distribute, sublicense, and /or sell " << std::endl;
+		escritaStream << "copies of the Software, and to permit persons to whom the Software is " << std::endl;
+		escritaStream << "furnished to do so, subject to the following conditions :" << std::endl << std::endl;
+
+		escritaStream << "The above copyright notice and this permission notice shall be included in all " << std::endl;
+		escritaStream << "copies or substantial portions of the Software." << std::endl << std::endl;
+
+		escritaStream << "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR " << std::endl;
+		escritaStream << "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, " << std::endl;
+		escritaStream << "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE " << std::endl;
+		escritaStream << "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER " << std::endl;
+		escritaStream << "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, " << std::endl;
+		escritaStream << "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE." << std::endl;
+
 		escritaStream.close();
 		escritaStream.clear();
 	} // try
@@ -127,7 +150,7 @@ int main(int argc, char *argv[]) {
 	const IdProcesso idProcesso = IdProcesso(rank + 1);
 	const IdProcesso maiorIdProcesso = IdProcesso(numProcs);
 
-	const std::string PWF_status = "PWF" + nick_estudo + "_status.txt";
+	const std::string SPT_status = "SPT" + nick_estudo + "_status.txt";
 
 	try {
 
@@ -149,15 +172,15 @@ int main(int argc, char *argv[]) {
 
 			try {
 				std::ofstream escritaStream;
-				escritaStream.open(PWF_status, std::ios_base::out);
+				escritaStream.open(SPT_status, std::ios_base::out);
 				if (!escritaStream.is_open())
 					throw std::invalid_argument("Nao foi possivel abrir o arquivo.");
 				escritaStream << "2;EM_EXECUCAO" << std::endl;
 				escritaStream.close();
 				escritaStream.clear();
 			} // try
-			catch (const std::ofstream::failure& erro) { throw std::invalid_argument("Erro de integridade do arquivo " + PWF_status + ": \n" + std::string(erro.what())); }
-			catch (const std::exception&         erro) { throw std::invalid_argument("Erro ao editar o arquivo " + PWF_status + ": \n" + std::string(erro.what())); }
+			catch (const std::ofstream::failure& erro) { throw std::invalid_argument("Erro de integridade do arquivo " + SPT_status + ": \n" + std::string(erro.what())); }
+			catch (const std::exception&         erro) { throw std::invalid_argument("Erro ao editar o arquivo " + SPT_status + ": \n" + std::string(erro.what())); }
 		} // if (idProcesso == IdProcesso_mestre) {
 
 		if (deck_cepel != "") {
@@ -245,15 +268,15 @@ int main(int argc, char *argv[]) {
 
 			try {
 				std::ofstream escritaStream;
-				escritaStream.open(PWF_status, std::ios_base::out);
+				escritaStream.open(SPT_status, std::ios_base::out);
 				if (!escritaStream.is_open())
 					throw std::invalid_argument("Nao foi possivel abrir o arquivo.");
 				escritaStream << "1;FINALIZADO_COM_SUCESSO";
 				escritaStream.close();
 				escritaStream.clear();
 			} // try
-			catch (const std::ofstream::failure& erro) { throw std::invalid_argument("Erro de integridade do arquivo " + PWF_status + ": \n" + std::string(erro.what())); }
-			catch (const std::exception&         erro) { throw std::invalid_argument("Erro ao editar o arquivo " + PWF_status + ": \n" + std::string(erro.what())); }
+			catch (const std::ofstream::failure& erro) { throw std::invalid_argument("Erro de integridade do arquivo " + SPT_status + ": \n" + std::string(erro.what())); }
+			catch (const std::exception&         erro) { throw std::invalid_argument("Erro ao editar o arquivo " + SPT_status + ": \n" + std::string(erro.what())); }
 
 		} // if (idProcesso == IdProcesso_mestre) {
 		
@@ -269,7 +292,7 @@ int main(int argc, char *argv[]) {
 
 		try {
 			std::ofstream escritaStream;
-			escritaStream.open(PWF_status, std::ios_base::out);
+			escritaStream.open(SPT_status, std::ios_base::out);
 			if (!escritaStream.is_open()) {
 				std::cout << erro.what() << std::endl;
 				throw std::invalid_argument("Nao foi possivel abrir o arquivo.");
@@ -280,8 +303,8 @@ int main(int argc, char *argv[]) {
 			escritaStream.close();
 			escritaStream.clear();
 		} // try
-		catch (const std::ofstream::failure& erro) { std::cout << "Erro de integridade do arquivo " << PWF_status.c_str() << "." << std::endl << erro.what() << std::endl << std::endl; }
-		catch (const std::exception&         erro) { std::cout << "Erro ao editar o arquivo " + PWF_status << "." << std::endl << erro.what() << std::endl << std::endl; }
+		catch (const std::ofstream::failure& erro) { std::cout << "Erro de integridade do arquivo " << SPT_status.c_str() << "." << std::endl << erro.what() << std::endl << std::endl; }
+		catch (const std::exception&         erro) { std::cout << "Erro ao editar o arquivo " + SPT_status << "." << std::endl << erro.what() << std::endl << std::endl; }
 
 		MPI_Barrier(MPI_COMM_WORLD);
 

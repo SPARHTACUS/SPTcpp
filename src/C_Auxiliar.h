@@ -10,7 +10,7 @@
 #include <sstream>
 #include <stdio.h>
 
-#ifndef PWFWIN
+#ifndef SPTWIN
 
 #include <climits>
 #include <limits.h>
@@ -444,7 +444,7 @@ static bool lerRegistro(std::string a_registro, std::string a_registroArquivo, s
 
 } // static bool lerRegistro(std::string a_registro, std::string a_registroArquivo, std::string a_registroLer) {
 
-#ifdef PWFWIN
+#ifdef SPTWIN
 
 #include <windows.h>
 
@@ -489,7 +489,7 @@ static void aguardarTempo(int a_tempo) { Sleep(a_tempo); };
 
 #endif
 
-#ifndef PWFWIN
+#ifndef SPTWIN
 
 #include <sys/types.h>
 #include <sys/stat.h>

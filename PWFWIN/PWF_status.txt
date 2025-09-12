@@ -1,4 +1,0 @@
-0;FINALIZADO_COM_EXCECAO
-Dados::carregarArquivosEntrada(a_entradaSaidaDados): 
-EntradaSaidaDados::carregarArquivoCSV_AttComum(DadosEntrada//DADOS_AttComumOperacional.csv,a_objetoDados,direto): 
-Nao foi possivel abrir o arquivo.

@@ -888,14 +888,14 @@ void LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16(Dados& a_dados, const 
 					leituraArquivo.seekg(724 + info_size * usina, std::ios::beg);
 					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
 
-					const double indisponibilidade_forcada = double(double(f_4) / 100);//Padrão PWF
+					const double indisponibilidade_forcada = double(double(f_4) / 100);//Padrão SPT
 
 					////////////////////////////////////////////////////////////////////////
 					//IP
 					leituraArquivo.seekg(728 + info_size * usina, std::ios::beg);
 					leituraArquivo.read(reinterpret_cast<char*>(&f_4), sizeof(f_4));
 
-					const double indisponibilidade_programada = double(double(f_4) / 100);//Padrão PWF
+					const double indisponibilidade_programada = double(double(f_4) / 100);//Padrão SPT
 
 					////////////////////////////////////////////////////////////////////////
 					//Tipo Perda
