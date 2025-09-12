@@ -1,22 +1,32 @@
-Norus POWER FUSION
+[![Sparhtacus](https://sparhtacus.com/wp-content/uploads/2020/12/spt-hzG.png)](https://sparhtacus.com/sobre/)
 
-PowerFusion is the next generation of stochastic energy allocation programs for computing optimal power decisons with different time resolution and multiple random variables, such as power consumption and hydro, wind & solar generation.
 
-Property of Norus Tecnologia LTDA.
+Modelo computacional open-source para programação hidrotérmica em C++, mais detalhes no [WIKI](https://github.com/SPARHTACUS/SPTcpp/wiki). 
 
-Copyright (c) 2024. All rights reserved.
+[![Versao](https://img.shields.io/github/license/SPARHTACUS/SPTcpp)](https://github.com/SPARHTACUS/SPTcpp/blob/main/LICENSE.md)
+
+
+Versão mais recente:
+
+[![SPTv2.0.](https://img.shields.io/github/v/release/sparhtacus/SPTcpp)](https://github.com/SPARHTACUS/SPTcpp/releases/tag/SPTv2.0)
+
+
+**github@sparhtacus.com** para entrar para a comunidade e colaborar tecnicamente com o projeto! 
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Baixar e executar
 
+Instruções básicas para execução do modelo podem ser encontradas [AQUI](https://github.com/SPARHTACUS/SPTcpp/wiki/Execucao-Basica).
+
+Decks disponibilizados em [sparhtacus.com/decks](https://sparhtacus.com/decks).
 
 ## Windows 10 e 11 (x64):
 
 * Requisitos:
   * [Microsoft Visual C++ Redistributable](https://docs.microsoft.com/en-US/cpp/windows/latest-supported-vc-redist?view=msvc-170) (Caso necessário) 
   * [Microsoft MPI (bin)](https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi)
-  * Executável [PWFWIN]
+  * Executável [SPTWIN](https://github.com/SPARHTACUS/SPTcpp/releases)
 
 ## Ubuntu 20.04 (x64):
 
@@ -25,7 +35,7 @@ Copyright (c) 2024. All rights reserved.
   ```
     $ sudo apt-get install openmpi-bin
   ```  
-  * Executável [PWFLNX]
+  * Executável [SPTLNX](https://github.com/SPARHTACUS/SPTcpp/releases)
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +43,7 @@ Copyright (c) 2024. All rights reserved.
 
 O repositório foi automatizado para utilização do *Microsoft Visual Studio Community 2019 (v16)* em ambiente *Windows* com *Windows Subsistem for Linux (WSL)*.
 
-## PWFWIN (x64)
+## SPTWIN (x64)
 
 * Requisitos:
   * [Microsoft MPI (sdk)](https://docs.microsoft.com/en-us/message-passing-interface/microsoft-mpi).
@@ -54,7 +64,7 @@ O repositório foi automatizado para utilização do *Microsoft Visual Studio Co
     * Criar variável ambiente `GUROBI_INC64` apontando o diretório `/gurobiXXX/win64/include`
     * Criar variável ambiente `GUROBI_LIB64` apontando o diretório `/gurobiXXX/win64/lib`
 
-## PWFLNX (x64)
+## SPTLNX (x64)
 
 * Requisitos:
   * [libseq_beta_04.21.01](http://www.multires.caltech.edu/software/libseq/) (Incluso no diretório */ThirdParty/* com ajustes para compiladores recentes).
