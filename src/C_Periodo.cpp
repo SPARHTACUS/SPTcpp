@@ -575,10 +575,10 @@ unsigned int Periodo::getDias() const {
 			return duration.first;
 
 		if (duration.second == 'h')
-			return unsigned int(duration.first / 24U);
+			return (unsigned int)(duration.first / 24U);
 
 		if (duration.second == 'm')
-			return unsigned int(duration.first / 1440U);
+			return (unsigned int)(duration.first / 1440U);
 
 		if (duration.first == 1U) {
 			if ((dia == IdDia_1) && (hora == IdHor_1) && (minuto == IdMin_1)) {
@@ -633,13 +633,13 @@ unsigned int Periodo::getHoras() const {
 			throw std::invalid_argument("Invalid Period.");
 
 		if (duration.second == 'd')
-			return  unsigned int(duration.first * 24U);
+			return  (unsigned int)(duration.first * 24U);
 
 		if (duration.second == 'h')
 			return duration.first;
 
 		if (duration.second == 'm')
-			return unsigned int(duration.first / 60U);
+			return (unsigned int)(duration.first / 60U);
 
 		return getDias() * 24U;
 
@@ -657,10 +657,10 @@ unsigned int Periodo::getMinutos() const {
 			throw std::invalid_argument("Invalid Period.");
 
 		if (duration.second == 'd')
-			return  unsigned int(duration.first * 1440U);
+			return  (unsigned int)(duration.first * 1440U);
 
 		if (duration.second == 'h')
-			return unsigned int(duration.first * 60U);
+			return (unsigned int)(duration.first * 60U);
 
 		if (duration.second == 'm')
 			return duration.first;

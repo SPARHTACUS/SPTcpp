@@ -10,9 +10,10 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
-# PWF_app Output
-PWFLNX/out/
+# SPT_app Output
+SPTLNX/out/
 ThirdParty/COIN/
+CMakePresets.json
 *.la
 *.so
 *.0

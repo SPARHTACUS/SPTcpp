@@ -255,6 +255,11 @@ template<typename IdM, typename Id##MM, typename IdMMM, typename IdMMMM> \
 IdMMMM getMaiorId(const Id##M a_m, const Id##MM a_mM, const IdMMM a_mMM, const IdMMMM a_mMMM){ return IdMMMM(); };\
 \
 template<typename IdM> \
+IdM getIdOut(const IdM a_m)const{ return IdM(); }; \
+template<typename IdM, typename IdMM> \
+IdMM getIdOut(const Id##M a_m, const IdMM a_mM){ return IdMM(); };\
+\
+template<typename IdM> \
 IdM getMenorId(const IdM a_m)const{ return IdM(); }; \
 template<typename IdM, typename IdMM> \
 IdMM getMenorId(const Id##M a_m, const IdMM a_mM){ return IdMM(); };\
@@ -262,6 +267,11 @@ template<typename IdM, typename IdMM, typename IdMMM> \
 IdMMM getMenorId(const Id##M a_m, const IdMM a_mM, const IdMMM a_mMM){ return IdMMM(); };\
 template<typename IdM, typename Id##MM, typename IdMMM, typename IdMMMM> \
 IdMMMM getMenorId(const Id##M a_m, const Id##MM a_mM, const IdMMM a_mMM, const IdMMMM a_mMMM){ return IdMMMM(); };\
+\
+template<typename IdM> \
+void incr(IdM &a_m)const{ return IdM(); }; \
+template<typename IdM, typename IdMM> \
+void incr(const Id##M a_m, IdMM &a_mM){ return IdMM(); };\
 \
 template<typename IdM> \
 bool isInstanciado(const IdM a_m)const{ return IdM(); }; \
