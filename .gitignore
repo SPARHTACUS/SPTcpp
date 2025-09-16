@@ -13,7 +13,6 @@
 # SPT_app Output
 SPTLNX/out/
 ThirdParty/COIN/
-CMakePresets.json
 *.la
 *.so
 *.0

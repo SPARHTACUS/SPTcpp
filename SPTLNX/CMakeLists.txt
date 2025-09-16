@@ -6,13 +6,13 @@ cmake_minimum_required (VERSION 3.10)
 project ("SPTLNX")
 
 set(CMAKE_CXX_STANDARD 20)
-   
+  
 find_package(MPI REQUIRED)
   
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
 # Diretorio do projeto
-set(SPT_DIR "/mnt/d/repos/PowerFusion")
+set(SPT_DIR "/mnt/d/repos/SPARHTACUS")
 
 #set(CMAKE_CXX_FLAGS "-DGRB -I${SPT_DIR}/ThirdParty/COIN/dist/include/coin-or -I${SPT_DIR}/ThirdParty/lsZollen -I/opt/gurobi912/linux64/include -Ofast")
 
