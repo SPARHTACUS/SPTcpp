@@ -13,17 +13,12 @@
 
 void getInfoProduto(const std::string a_arquivoLicenca) {
 	std::cout << "##########################################################" << std::endl << std::endl;
-	std::cout << "                      Modelo SPARHTACUS - sparhtacus.com " << std::endl;
+	std::cout << "            Modelo SPARHTACUS - sparhtacus.com " << std::endl;
+	std::cout << "            github.com/SPARHTACUS/SPTcpp " << std::endl;
 	std::cout << std::endl;
-	std::cout << "                      Versao: 2.0 " << std::endl;
+	std::cout << "                      Versao: 2.5 " << std::endl;
 	std::cout << "            Build: " << __TIMESTAMP__ << std::endl;
 	std::cout << std::endl;
-	std::cout << "             P&D ANEEL: PD-07427-0318/2018 " << std::endl;
-	std::cout << "           Financiado por: Norte Energia S.A." << std::endl;
-	std::cout << "           Executado  por: LabPlan UFSC" << std::endl;
-	std::cout << "                           Norus " << std::endl;
-	std::cout << std::endl;
-	std::cout << "           Copyright (c) 2022 Norte Energia S.A." << std::endl << std::endl;
 	std::cout << "           Programa distribuido sob licenca MIT (x11)" << std::endl;
 	std::cout << "           Mais informacoes em " << a_arquivoLicenca << " " << std::endl << std::endl;
 	std::cout << "##########################################################" << std::endl << std::endl;
@@ -87,7 +82,7 @@ void imprimirArquivoLicenca(const std::string a_arquivoLicenca) {
 		escritaStream << "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER " << std::endl;
 		escritaStream << "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, " << std::endl;
 		escritaStream << "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE." << std::endl;
-		  
+
 		escritaStream.close();
 		escritaStream.clear();
 	} // try
@@ -108,6 +103,7 @@ int main(int argc, char *argv[]) {
 	std::string nick_estudo = "";
 	std::string deck_cepel  = "";
 
+	bool pause_initiation = false;
 	bool encerrar_apos_deck_cepel = false;
 
 	if (argc > 1) {
@@ -129,6 +125,11 @@ int main(int argc, char *argv[]) {
 		if (indice > 0) {
 			if (std::atoi(argv[indice + 1]) > 0)
 				encerrar_apos_deck_cepel = true;
+		}
+		indice = getIndiceArgumento("-pause", argc, argv);
+		if (indice > 0) {
+			if (std::atoi(argv[indice + 1]) > 0)
+				pause_initiation = true;
 		}
 		else if (indice < 0)
 			encerrar_sessao = true;
@@ -152,6 +153,11 @@ int main(int argc, char *argv[]) {
 	const std::string SPT_status = "SPT" + nick_estudo + "_status.txt";
 
 	try {
+
+		if ((idProcesso == IdProcesso_mestre) && pause_initiation)
+			std::system("pause");
+		MPI_Barrier(MPI_COMM_WORLD);
+
 
 		//
 		// Inicialização de arquivo de Status.
@@ -184,9 +190,6 @@ int main(int argc, char *argv[]) {
 
 		if (!encerrar_apos_deck_cepel) {
 
-			//if (idProcesso == IdProcesso_mestre)
-				//std::system("pause");
-
 			MPI_Barrier(MPI_COMM_WORLD);
 
 			Dados  dados;
@@ -208,7 +211,6 @@ int main(int argc, char *argv[]) {
 			const IdMetodoSolucao idMetodoSolucao = dados.getAtributo(AttComumDados_tipo_metodo_solucao, IdMetodoSolucao());
 
 
-
 			//
 			// OTIMIZACAO
 			//
@@ -223,7 +225,7 @@ int main(int argc, char *argv[]) {
 				if (idProcesso == IdProcesso_mestre)
 					std::cout << std::endl << std::endl << "TEMPO TOTAL PARA CRIAR O MODELO DE OTIMIZACAO                            = " << std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock_modelo).count() / 60 << std::endl;
 
-				MetodoSolucao(entradaSaidaDados, idProcesso, maiorIdProcesso, idMetodoSolucao, modeloOtimizacao);
+				MetodoSolucao(entradaSaidaDados, idProcesso, maiorIdProcesso, idMetodoSolucao, modeloOtimizacao, dados);
 
 				if (idProcesso == IdProcesso_mestre)
 					std::cout << std::endl << std::endl << "TEMPO TOTAL DE OTIMIZACAO = " << std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock_modelo).count() / 60 << std::endl;
@@ -243,7 +245,7 @@ int main(int argc, char *argv[]) {
 				auto start_clock_modelo = std::chrono::high_resolution_clock::now();
 
 				ModeloOtimizacao modeloOtimizacao(IdModeloOtimizacao_multiestagio_estocastico_simulacao, dados, entradaSaidaDados);
-				MetodoSolucao(entradaSaidaDados, idProcesso, maiorIdProcesso, idMetodoSolucao, modeloOtimizacao);
+				MetodoSolucao(entradaSaidaDados, idProcesso, maiorIdProcesso, idMetodoSolucao, modeloOtimizacao, dados);
 
 				if (idProcesso == IdProcesso_mestre)
 					std::cout << std::endl << std::endl << "Tempo Total Simulacao = " << std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - start_clock_modelo).count() / 60 << std::endl;
@@ -262,7 +264,7 @@ int main(int argc, char *argv[]) {
 			std::chrono::duration<double> tempo = std::chrono::high_resolution_clock::now() - start_clock_total;
 			std::cout << std::endl << "Tempo Total de Execucao = " << tempo.count() / 60 << std::endl;
 
-			std::cout << std::endl << "O SPARHTACUS foi finalizado com sucesso." << std::endl;
+			std::cout << std::endl << "O PowerFusion foi finalizado com sucesso." << std::endl;
 
 			try {
 				std::ofstream escritaStream;

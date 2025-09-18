@@ -16,12 +16,12 @@
 #define ATT_VETOR_CONJUNTO_HIDRAULICO(m)  \
 	  m(ConjuntoHidraulico,  AttVetor,             vazao_turbinada_minima,           double,          0,        50000,             0,    Periodo) \
 	  m(ConjuntoHidraulico,  AttVetor,             vazao_turbinada_maxima,           double,          0,        50000,             0,    Periodo) \
+	  m(ConjuntoHidraulico,  AttVetor,                    potencia_minima,           double,          0,        50000,             0,    Periodo) \
+	  m(ConjuntoHidraulico,  AttVetor,                    potencia_maxima,           double,          0,        50000,             0,    Periodo) \
 	  m(ConjuntoHidraulico,  AttVetor,                    disponibilidade,           double,          0,            1,             0,    Periodo) 
 //                c_classe,   smrtAtt,                       nomeAtributo,             Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define ATT_MATRIZ_CONJUNTO_HIDRAULICO(m)  \
-	  m(ConjuntoHidraulico,  AttMatriz,                         potencia_minima,           double,        0,        20000,             0,    Periodo,     IdPatamarCarga) \
-	  m(ConjuntoHidraulico,  AttMatriz,                         potencia_maxima,           double,        0,        20000,             0,    Periodo,     IdPatamarCarga) \
 	  m(ConjuntoHidraulico,  AttMatriz,              potencia_disponivel_minima,           double,        0,        20000,             0,    Periodo,     IdPatamarCarga) \
 	  m(ConjuntoHidraulico,  AttMatriz,              potencia_disponivel_maxima,           double,        0,        20000,             0,    Periodo,     IdPatamarCarga)
 //                c_classe,    smrtAtt,                 nomeAtributo,            Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador

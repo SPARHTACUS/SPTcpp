@@ -43,12 +43,17 @@ public:
 
 	void instanciarProcessos(const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso);
 	bool isIdsCenarioEstadoDiferentesEmAberturasAndCenarios(const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
-	std::vector<IdCenario> getIdsCenarioEstadoFromCenarios(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
-	std::vector<IdCenario> getIdsCenarioEstadoFromAberturas(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
+	bool isAnyCenarioEstado(const IdEstagio a_idEstagio);
+
 	std::vector<IdCenario> getIdsCenarioEstado(const IdProcesso a_idProcessoDE, const IdProcesso a_idProcessoPARA, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
 	std::vector<IdCenario> getIdsCenarioEstado(const IdProcesso a_idProcessoDE, const IdProcesso a_idProcessoPARA, const IdIteracao a_idIteracao);
+	bool isAnyAberturas(const IdEstagio a_idEstagio);
 	int getNumeroAberturas(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
 
+	std::vector<IdCenario> getIdsCenarioEstado(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
+
+	std::vector<IdCenario> getIdsCenarioEstadoFromCenarios_(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
+	std::vector<IdCenario> getIdsCenarioEstadoFromAberturas_(const IdProcesso a_idProcesso, const IdIteracao a_idIteracao, const IdEstagio a_idEstagio);
 };
 
 GET_STRING_FROM_CLASS(ArranjoResolucao)

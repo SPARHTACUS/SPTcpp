@@ -127,6 +127,16 @@ static int findStringNoVetorReturnPos(const std::string a_string, const std::vec
 
 } // static bool findStringNoVetorReturnPos(const std::string a_string, const std::vector<std::string> &a_vetor) {
 
+static int findStringSensNoVetorReturnPos(const std::string a_string, const std::vector<std::string>& a_vetor) {
+
+	for (int i = int(a_vetor.size() - 1); i >= 0; i--) {
+		if (a_string == a_vetor.at(i))
+			return i;
+	} // for (int i = int(a_vetor.size() - 1); i >= 0; i--) {
+
+	return -1;
+
+} // static bool findStringNoVetorReturnPos(const std::string a_string, const std::vector<std::string> &a_vetor) {
 
 static std::vector<bool> findStringsNoVetor(const std::vector<std::string> a_strings, const std::vector<std::string> &a_vetor) {
 
@@ -179,6 +189,22 @@ static std::vector<int> getFromString(const std::vector<int> a_valor, const std:
 };
 
 
+static bool isCharNonZeroNumber(const char a_chr) {
+	if ((a_chr == '1') || (a_chr == '2') || (a_chr == '3') || (a_chr == '4') || (a_chr == '5') || (a_chr == '6') || (a_chr == '7') || (a_chr == '8') || (a_chr == '9'))
+		return true;
+	return false;
+}
+
+static bool isCharNumber(const char a_chr) {
+	if (isCharNonZeroNumber(a_chr))
+		return true;
+	if (a_chr == '0')
+		return true;
+	return false;
+}
+
+
+
 static int getFromChar(const int a_int, const char * a_char) { return getintFromChar(a_char); };
 
 static std::string getString(int a_int) { 
@@ -191,30 +217,66 @@ static std::string getString(int a_int) {
 	return std::to_string(a_int);
 }
 
+static std::string getString(unsigned int a_int) {
+
+	if (a_int == INT_MAX)
+		return "inf";
+
+	return std::to_string(a_int);
+}
+
+static std::string getString(std::pair<unsigned int, char> a_pair) {
+	return getString(a_pair.first) + a_pair.second;
+}
+
+static std::string getFullString(std::pair<unsigned int, char> a_pair) {
+	return "pair_" + getString(a_pair.first) + a_pair.second;
+}
+
 static std::string getStringTipo(int a_int) { return "int"; }
 static std::string getFullString(int a_int) { return getStringTipo(a_int) + "_" + getString(a_int); }
 
 static double getdoubleFromChar(const char * a_char) {
-	if (strCompara(std::string(a_char), std::string("max")))
+	std::string vlr_str = std::string(a_char);
+	if (vlr_str.size() == 0)
+		throw std::invalid_argument("Error getting double from char");
+
+	double vlr = std::atof(vlr_str.c_str());
+	if ((vlr != 0.0) && (vlr > DOUBLE_MIN) && (vlr < DOUBLE_MAX))
+		return vlr;
+
+	bool any_non_zero_char = false;
+	for (int i = 0; i < vlr_str.size(); i++) {
+		char vlr_chr = vlr_str.at(i);
+		if ((vlr_chr != '0') && (vlr_chr != '.') && (vlr_chr != ',') && (vlr_chr != '-') && (vlr_chr != '+')) {
+			any_non_zero_char = true;
+			break;
+		}
+	}
+
+	if (!any_non_zero_char)
+		return vlr;
+
+	if (strCompara(vlr_str, std::string("max")))
 		return DOUBLE_MAX; 
-	else if (strCompara(std::string(a_char), std::string("min")))
+	else if (strCompara(vlr_str, std::string("min")))
 		return DOUBLE_MIN;
-	else if (strCompara(std::string(a_char), std::string("inf")))
+	else if (strCompara(vlr_str, std::string("inf")))
 		return DOUBLE_MAX;
-	else if (strCompara(std::string(a_char), std::string("-inf")))
+	else if (strCompara(vlr_str, std::string("-inf")))
 		return DOUBLE_MIN;
-	else
-		return std::atof(a_char);
+
+	throw std::invalid_argument("Error getting double from char");
+
+	return NAN;
 }; // static double getdoubleFromChar(const char * a_char) {
 
 static double getFromChar(const double a_double, const char * a_char) { return getdoubleFromChar(a_char); };
 
 static std::string getString(const double a_double) {
-	if (isnan(a_double))
-		return "NAN";
-	if (a_double >= DOUBLE_MAX * 0.99)
+	if (a_double >= DOUBLE_MAX)
 		return "inf";
-	else if (a_double <= DOUBLE_MIN * 0.99)
+	else if (a_double <= DOUBLE_MIN)
 		return "-inf";
 	std::ostringstream out;
 	double intpart;
@@ -297,7 +359,10 @@ static std::string getString(const std::string a_string) { return a_string; }
 
 static std::string getString(const double* a_valor) { return std::string("double*"); }
 
+static std::string getString(const std::vector<std::string> a_vetor) { return std::string("vector<string>"); }
 static std::string getString(const std::vector<int> a_vetor) { return std::string("vector<int>"); }
+static std::string getString(const std::vector<std::vector<int>> a_vetor) { return std::string("vector<vector<int>>"); }
+static std::string getString(const std::vector<std::vector<std::vector<int>>> a_vetor) { return std::string("vector<vector<vector<int>>>"); }
 static std::string getString(const std::vector<double> a_vetor) { return std::string("vector<double>"); }
 static std::string getString(const std::vector<std::vector<double>> a_vetor) { return std::string("vector<vector<double>>"); }
 
@@ -335,6 +400,35 @@ static void strNormalizada(std::string &a_string){
 		a_string.erase(a_string.size() - 1);
 } // string EntradaSaidaDados::strNormalizada(){
 
+static std::string remEspacosEntreStr(const std::string& a_string) {
+
+	if (a_string.empty())
+		return a_string;
+
+	if ((a_string.at(0) != ' ') && (a_string.at(a_string.size() - 1) != ' '))
+		return a_string;
+
+	size_t pos_ini = 0;
+	if (a_string.at(pos_ini) == ' ') {
+		for (pos_ini = 0; pos_ini < a_string.size(); pos_ini++) {
+			if (a_string.at(pos_ini) != ' ')
+				break;
+		}
+		if (pos_ini == a_string.size())
+			return std::string();
+
+	}
+	size_t pos_end = a_string.size() - 1;
+	if (a_string.at(pos_end) == ' ') {
+		for (pos_end = a_string.size() - 1; pos_end > 0; pos_end--) {
+			if (a_string.at(pos_end) != ' ')
+				break;
+		}
+	}
+	
+	return a_string.substr(pos_ini, pos_end - pos_ini + 1);
+
+} // string EntradaSaidaDados::strNormalizada(){
 
 static bool lerRegistro(std::string a_registro, std::string a_registroArquivo, std::string a_registroLer) {
 	

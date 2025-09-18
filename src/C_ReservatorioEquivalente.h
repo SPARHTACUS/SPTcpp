@@ -8,6 +8,13 @@
 
 //     c_classe,   smrtAtt,     nomeAtributo,          tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
+#define ATT_VETOR_REE(m)  \
+      m(ReservatorioEquivalente,  AttVetor,               produtibilidade_ENA,          double,         0,       50000,             0,    Periodo) \
+      m(ReservatorioEquivalente,  AttVetor,     produtibilidade_acumulada_EAR,          double,         0,       50000,             0,    Periodo)
+
+
+
+//          c_classe,   smrtAtt,                             nomeAtributo,                                  Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define ATT_MATRIZ_REE(m)  \
       m(ReservatorioEquivalente,  AttMatriz,     conversao_ENA_acoplamento_0,     double,       min,        max,              0,  Periodo, IdCenario) \
@@ -15,6 +22,7 @@
 
 #define SMART_ELEMENTO_REE(m) \
 	  m(ReservatorioEquivalente, AttComum, ATT_COMUM_REE)\
+	  m(ReservatorioEquivalente, AttVetor, ATT_VETOR_REE)\
 	  m(ReservatorioEquivalente, AttMatriz, ATT_MATRIZ_REE) 
 
 DEFINE_SMART_ELEMENTO(ReservatorioEquivalente, SMART_ELEMENTO_REE)

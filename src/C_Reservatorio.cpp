@@ -52,28 +52,49 @@ void Reservatorio::calculaAproximacaoLinearEvaporacao(const double a_volumeUtil,
 	catch (const std::exception & erro) { throw std::invalid_argument("Reservatorio::calculaAproximacaoLinearEvaporacao(): \n" + std::string(erro.what())); }
 }
 
-void Reservatorio::calculaAproximacaoLinearEvaporacao(const double a_volumeMinimo, const double a_volumeMaximo, const Periodo a_periodo) {
+void Reservatorio::calculaAproximacaoLinearEvaporacao(const double a_volumeMinimo, const double a_volumeMaximo, const Periodo a_periodo, bool a_regra_esp) {
 	try {
 
 		const int numeroPontos = 100;
 		std::vector<double> evaporacaoMensal;
 		std::vector<double> gradeVolume;
 		std::vector<double> coef;		
-		const Periodo periodo_final = Periodo(TipoPeriodo_minuto, a_periodo) + a_periodo.getMinutos() - 1;
-		const IdMes idMesFinal = periodo_final.getMes();
-		Periodo periodo_inicial_diario = Periodo(TipoPeriodo_diario, a_periodo);
-		Periodo periodo_final_diario = Periodo(TipoPeriodo_diario, periodo_final);
 
 		double coefEvaporacao = 0.0;
-		double num_dias = 0.0;
-		double numeroDiasMes = 0.0;
-		for (Periodo periodo = periodo_inicial_diario; periodo <= periodo_final_diario; periodo++) {
-			numeroDiasMes += periodo.getMaiorDiaDoMes();
-			coefEvaporacao += getElementoVetor(AttVetorReservatorio_evaporacao, periodo.getMes(), double());
-			num_dias =+ 1.0;
+
+
+		
+		if (a_regra_esp) {
+			if (getSizeVetor(AttVetorReservatorio_poli_cota_area_0) > 0) {			
+				if (a_periodo == getIteradorInicial(AttVetorReservatorio_poli_cota_area_0, Periodo())) {
+					const Periodo period_min_end = Periodo("m", a_periodo + 1) - 1;
+					const Periodo period_month_end = Periodo("M", period_min_end.getMes(), period_min_end.getAno());
+					coefEvaporacao = (getElementoVetor(AttVetorReservatorio_evaporacao, period_month_end.getMes(), double()) / (3.6 * 730));
+				}
+				else {
+					coefEvaporacao = (getElementoVetor(AttVetorReservatorio_evaporacao, a_periodo.getMes(), double()) / (3.6 * 730));
+				}
+			}
+			else
+				a_regra_esp = false;
 		}
-		numeroDiasMes = numeroDiasMes / num_dias;
-		coefEvaporacao = coefEvaporacao / num_dias;		
+		if (!a_regra_esp) {
+			const Periodo period_min_end = Periodo("m", a_periodo + 1) - 1;
+			const Periodo period_month_end = Periodo("M", period_min_end.getMes(), period_min_end.getAno());
+			SmartEnupla<Periodo, double> periods_month;
+
+			Periodo period_month = Periodo("M", a_periodo.getMes(), a_periodo.getAno());
+			periods_month.addElemento(period_month, a_periodo.sobreposicao(period_month));
+
+			if (period_month < period_month_end) {
+				for (Periodo period = period_month + 1; period <= period_month_end; period++)
+					periods_month.addElemento(period, a_periodo.sobreposicao(period));
+			}
+
+			for (Periodo period = periods_month.getIteradorInicial(); period <= periods_month.getIteradorFinal(); periods_month.incrementarIterador(period))
+				coefEvaporacao += (getElementoVetor(AttVetorReservatorio_evaporacao, period.getMes(), double()) / (3.6 * double(period.getHoras()))) * periods_month.at(period);
+		}
+
 
 		// EVAPORAÇÃO = 0 QUANDO O COEFICIENTE DE EVAPORAÇÃO É NULO  
 		if (coefEvaporacao == 0) {
@@ -88,8 +109,13 @@ void Reservatorio::calculaAproximacaoLinearEvaporacao(const double a_volumeMinim
 
 			for (int i = 0; i < numeroPontos; i++) {
 
-				gradeVolume.push_back(  (a_volumeMaximo - a_volumeMinimo) * double(double(i) / double(numeroPontos)));
-				evaporacaoMensal.push_back((getAreaFromVolume(a_periodo, (gradeVolume.at(i))+ a_volumeMinimo) * coefEvaporacao) / double(3.6 * double(numeroDiasMes) * 24.00));
+				gradeVolume.push_back(a_volumeMinimo + (a_volumeMaximo - a_volumeMinimo) * double(double(i) / double(numeroPontos)));
+
+				const double area = getAreaFromVolume(a_periodo, (gradeVolume.at(i)));
+
+				const double evap = area * coefEvaporacao;
+
+				evaporacaoMensal.push_back(evap);
 
 			} // for (int i = 0; i < numeroPontos; i++) {
 
@@ -103,7 +129,7 @@ void Reservatorio::calculaAproximacaoLinearEvaporacao(const double a_volumeMinim
 
 		// EVAPORAÇÃO COSNTANTE PARA VOLUME UTIL = 0  
 		else if (a_volumeMinimo == a_volumeMaximo) {			
-			coef.push_back((getAreaFromVolume(a_periodo, a_volumeMinimo) * coefEvaporacao) / double(3.6 * double(numeroDiasMes) * 24.00));
+			coef.push_back((getAreaFromVolume(a_periodo, a_volumeMinimo) * coefEvaporacao));
 			coef.push_back(0);
 			coef.push_back(0);
 		}//else if (a_volumeMinimo == a_volumeMaximo) {
@@ -126,6 +152,88 @@ void Reservatorio::calculaAproximacaoLinearEvaporacao(const double a_volumeMinim
 	} // try{
 	catch (const std::exception & erro) { throw std::invalid_argument("Reservatorio::calculaAproximacaoLinearEvaporacao(" + getString(a_volumeMinimo) + "," + getString(a_volumeMaximo) + "," + getString(a_periodo) + "): \n" + std::string(erro.what())); }
 }
+
+
+void Reservatorio::calculaAproximacaoLinearCotaMontante(const Periodo a_periodo) {
+	try {
+
+		const double volumeMinimo = getElementoVetor(AttVetorReservatorio_volume_minimo, a_periodo, double());
+		const double volumeMaximo = getElementoVetor(AttVetorReservatorio_volume_maximo, a_periodo, double());
+
+		calculaAproximacaoLinearCotaMontante(volumeMinimo, volumeMaximo, a_periodo);
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("Reservatorio::calculaAproximacaoLinearCotaMontante(): \n" + std::string(erro.what())); }
+}
+
+
+void Reservatorio::calculaAproximacaoLinearCotaMontante(const double a_volumeUtil, const Periodo a_periodo) {
+	try {
+
+		const double volumeMinimo = getElementoVetor(AttVetorReservatorio_volume_minimo, a_periodo, double());
+
+		calculaAproximacaoLinearCotaMontante(volumeMinimo, double(volumeMinimo + a_volumeUtil), a_periodo);
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("Reservatorio::calculaAproximacaoLinearCotaMontante(): \n" + std::string(erro.what())); }
+}
+
+void Reservatorio::calculaAproximacaoLinearCotaMontante(const double a_volumeMinimo, const double a_volumeMaximo, const Periodo a_periodo) {
+	try {
+
+		const int numeroPontos = 100;
+		std::vector<double> gradeCota;
+		std::vector<double> gradeVolume;
+		std::vector<double> coef;
+
+
+		// CALCULA OS COEFICIENTES QUANDO VOLUME UTIL MAIOR QUE 0
+		if (a_volumeMaximo > a_volumeMinimo) {
+
+			for (int i = 0; i < numeroPontos; i++) {
+
+				gradeVolume.push_back(a_volumeMinimo + (a_volumeMaximo - a_volumeMinimo) * double(double(i) / double(numeroPontos)));
+
+				const double cota = getCota(a_periodo, (gradeVolume.at(i)));
+
+				gradeCota.push_back(cota);
+
+			} // for (int i = 0; i < numeroPontos; i++) {
+
+			coef = getMinimosQuadrados(gradeVolume, gradeCota);
+
+			if (coef.at(1) < 1E-7) { coef.at(1) = 0; }
+			if ((coef.at(1) < 0) && (coef.at(0) > 0)) { coef.at(0) = 0; }
+			if ((coef.at(1) > 0) && (coef.at(0) < 0)) { coef.at(0) = 0; }
+
+		}// else if (a_volumeMaximo > a_volumeMinimo) {		
+
+		// EVAPORAÇÃO COSNTANTE PARA VOLUME UTIL = 0  
+		else if (a_volumeMinimo == a_volumeMaximo) {
+			coef.push_back((getCota(a_periodo, a_volumeMinimo)));
+			coef.push_back(0);
+			coef.push_back(0);
+		}//else if (a_volumeMinimo == a_volumeMaximo) {
+
+
+		// EVAPORAÇÃO = 0 PARA VOLUME MAXIMO = 0 
+		else if (a_volumeMaximo == 0) {
+			coef.push_back(0);
+			coef.push_back(0);
+			coef.push_back(0);
+		} // else if (a_volumeMaximo == 0) {
+
+
+		// COEFICIENTE A0      => coef[0]
+		// COEFICIENTE A1      => coef[1]
+		// ERRO DE APROXIMAÇÃO => coef[2]
+		addElemento(AttVetorReservatorio_coef_linear_cota_montante_0, a_periodo, coef.at(0));
+		addElemento(AttVetorReservatorio_coef_linear_cota_montante_1, a_periodo, coef.at(1));
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("Reservatorio::calculaAproximacaoLinearCotaMontante(" + getString(a_volumeMinimo) + "," + getString(a_volumeMaximo) + "," + getString(a_periodo) + "): \n" + std::string(erro.what())); }
+}
+
 
 
 

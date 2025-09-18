@@ -16,22 +16,22 @@
 	  m(VariavelAleatoriaInterna,  AttVetor,                      coeficiente_participacao,   double,        min,          max,             1,  Periodo)   \
 	  m(VariavelAleatoriaInterna,  AttVetor,                            tendencia_temporal,   double,        min,          max,             1,  Periodo)   \
 	  m(VariavelAleatoriaInterna,  AttVetor,               tendencia_temporal_transformada,   double,        min,          max,             1,  Periodo)   \
-	  m(VariavelAleatoriaInterna,  AttVetor,                          media_serie_temporal,   double,        min,          max,             1,  IdEstacao) \
-	  m(VariavelAleatoriaInterna,  AttVetor,                      media_serie_transformada,   double,          1,          max,             1,  IdEstacao) \
-	  m(VariavelAleatoriaInterna,  AttVetor,                         desvio_serie_temporal,   double,          0,          max,             1,  IdEstacao) \
-	  m(VariavelAleatoriaInterna,  AttVetor,                     desvio_serie_transformada,   double,          0,          max,             1,  IdEstacao) \
-	  m(VariavelAleatoriaInterna,  AttVetor,                     assimetria_serie_temporal,   double,          0,          max,             0,  IdEstacao) \
-	  m(VariavelAleatoriaInterna,  AttVetor,                 assimetria_serie_transformada,   double,          0,          max,             0,  IdEstacao) \
-	  m(VariavelAleatoriaInterna,  AttVetor,              coeficiente_participacao_sazonal,   double,          0,            1,             0,  IdEstacao) \
+	  m(VariavelAleatoriaInterna,  AttVetor,                          media_serie_temporal,   double,        min,          max,             1,  IdMes) \
+	  m(VariavelAleatoriaInterna,  AttVetor,                      media_serie_transformada,   double,          1,          max,             1,  IdMes) \
+	  m(VariavelAleatoriaInterna,  AttVetor,                         desvio_serie_temporal,   double,          0,          max,             1,  IdMes) \
+	  m(VariavelAleatoriaInterna,  AttVetor,                     desvio_serie_transformada,   double,          0,          max,             1,  IdMes) \
+	  m(VariavelAleatoriaInterna,  AttVetor,                     assimetria_serie_temporal,   double,          0,          max,             0,  IdMes) \
+	  m(VariavelAleatoriaInterna,  AttVetor,                 assimetria_serie_transformada,   double,          0,          max,             0,  IdMes) \
+	  m(VariavelAleatoriaInterna,  AttVetor,              coeficiente_participacao_sazonal,   double,          0,            1,             0,  IdMes) \
 	  m(VariavelAleatoriaInterna,  AttVetor,                              auto_covariancia,   double,        min,          max,             0,  int) \
 	  m(VariavelAleatoriaInterna,  AttVetor,                               auto_correlacao,   double,        min,          max,             0,  int) 
 //                         c_classe,   smrtAtt,                                  nomeAtributo,     Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define ATT_MATRIZ_VARIAVEL_ALEATORIA_INTERNA(m)  \
 	  m(VariavelAleatoriaInterna,  AttMatriz,              cenarios_realizacao_espaco_amostral,       double,          min,          max,             1,  Periodo, IdCenario)   \
-	  m(VariavelAleatoriaInterna,  AttMatriz,                                 auto_covariancia,       double,          min,          max,             0,  IdEstacao, int)       \
-	  m(VariavelAleatoriaInterna,  AttMatriz,                                  auto_correlacao,       double,          min,          max,             0,  IdEstacao, int)       \
-	  m(VariavelAleatoriaInterna,  AttMatriz,                                       correlacao,       double,          min,          max,             0,  IdVariavelAleatoriaInterna, IdEstacao)
+	  m(VariavelAleatoriaInterna,  AttMatriz,                                 auto_covariancia,       double,          min,          max,             0,  IdMes, int)       \
+	  m(VariavelAleatoriaInterna,  AttMatriz,                                  auto_correlacao,       double,          min,          max,             0,  IdMes, int)       \
+	  m(VariavelAleatoriaInterna,  AttMatriz,                                       correlacao,       double,          min,          max,             0,  IdVariavelAleatoriaInterna, IdMes)
 //                         c_classe,    smrtAtt,                                     nomeAtributo,         Tipo,   lowerBound,   upperBound,  initialValue,  TipoIterador
 
 

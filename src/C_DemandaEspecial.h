@@ -6,6 +6,7 @@
 
 #define ATT_COMUM_DEMANDA_ESPECIAL(m)  \
 	  m(DemandaEspecial,  AttComum,                idDemandaEspecial,             IdDemandaEspecial,      Nenhum,         max,        Nenhum,       sim) \
+	  m(DemandaEspecial,  AttComum,                             nome,                        string,        min,          max,        Nenhum,         sim) \
 	  m(DemandaEspecial,  AttComum,                   numero_demanda,                           int,           0,         max,               0,     nao) 
 //       c_classe,   smrtAtt,                    nomeAtributo,                         tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 

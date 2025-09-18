@@ -89,6 +89,10 @@ public:
 
     virtual bool setTipoVariavelBinaria(const int a_posicao) = 0;
 
+    virtual bool incrAlocVar(const int a_incrAloc) = 0;
+    virtual bool incrAlocEqu(const int a_incrAloc) = 0;
+    virtual bool incrAlocIne(const int a_incrAloc) = 0;
+
     virtual double getCofObjetivo(const int a_posicao) = 0;
 
     virtual double getLimInferior(const int a_posicao) = 0;
@@ -102,6 +106,8 @@ public:
     double getReducedCost(const int a_posicao) {
         return varRC[a_posicao];
     }
+
+    virtual std::vector<std::vector<int>> getCofsRestricao(const int a_posicaoRestricao) = 0;
 
     virtual double getInfinito() = 0;
 
@@ -129,13 +135,14 @@ public:
     virtual int getNumeroVarDinamica() = 0;
 
     virtual bool setNomeRestricao(const int a_posicaoRestricao, const std::string a_nome) = 0;
+    virtual std::string getNomeVariavel(const int a_posicaoVariavel) = 0;
     virtual std::string getNomeRestricao(const int a_posicaoRestricao) = 0;
 
     virtual bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) = 0;
 
     virtual bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) = 0;
 
-    virtual double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao) = 0;
+    virtual double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const int a_pos = -1) = 0;
 
     virtual double getRHSRestricao(const int a_posicaoRestricao) = 0;
 
@@ -392,6 +399,13 @@ public:
 
     bool isNomeSimplificado() { return true; };
 
+
+    bool incrAlocVar(const int a_incrAloc) { return true; }
+
+    bool incrAlocEqu(const int a_incrAloc) { return true; }
+
+    bool incrAlocIne(const int a_incrAloc) { return true; }
+
     int addVar(const double a_lb, const double a_ub, const double a_obj, const std::string a_nome) {
         try {
             if (this == nullptr)
@@ -416,6 +430,7 @@ public:
 
     bool setCofObjetivo(const int a_posicao, const double a_cofObjetivo) {
         try {
+            
             vetorGRBVar.at(a_posicao).set(GRB_DoubleAttr_Obj, a_cofObjetivo);
             return true;
         }
@@ -436,6 +451,7 @@ public:
 
     bool setLimInferior(const int a_posicao, const double a_limInferior) {
         try {
+            
             ptrModelo->update();
             const std::string varName = vetorGRBVar.at(a_posicao).get(GRB_StringAttr_VarName);
             const double prevLB = vetorGRBVar.at(a_posicao).get(GRB_DoubleAttr_LB);
@@ -467,6 +483,7 @@ public:
 
     bool setLimSuperior(const int a_posicao, const double a_limSuperior) {
         try {
+            
             ptrModelo->update();
             const std::string varName = vetorGRBVar.at(a_posicao).get(GRB_StringAttr_VarName);
             const double prevUB = vetorGRBVar.at(a_posicao).get(GRB_DoubleAttr_UB);
@@ -497,6 +514,7 @@ public:
 
     bool setTipoVariavelContinua(const int a_posicao) {
         try {
+            
             vetorGRBVar.at(a_posicao).set(GRB_CharAttr_VType, GRB_CONTINUOUS);
             return true;
         }
@@ -515,6 +533,7 @@ public:
 
     bool setTipoVariavelBinaria(const int a_posicao) {
         try {
+            
             vetorGRBVar.at(a_posicao).set(GRB_CharAttr_VType, GRB_BINARY);
             return true;
         }
@@ -676,8 +695,20 @@ public:
         }
     }
 
+    std::string getNomeVariavel(const int a_posicaoVariavel) {
+        try {
+            return vetorGRBVar.at(a_posicaoVariavel).get(GRB_StringAttr_VarName);
+        }
+        catch (const std::exception& erro) {
+            throw std::invalid_argument(
+                "SolverGRB::getNomeVariavel(" + std::to_string(a_posicaoVariavel) + "): \n" +
+                std::string(erro.what()));
+        }
+    }
+
     bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
         try {
+            
             ptrModelo->chgCoeff(vetorGRBConstr.at(a_posicaoRestricao), vetorGRBVar.at(a_posicaoVariavel),
                                 a_cofRestricao);
             return true;
@@ -698,6 +729,7 @@ public:
 
     bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) {
         try {
+            
             vetorGRBConstr.at(a_posicaoRestricao).set(GRB_DoubleAttr_RHS, a_RHS);
             return true;
         }
@@ -714,7 +746,7 @@ public:
     }; // bool setRHSRestricao(int a_posicaoRestricao, double a_RHS) {
 
 
-    double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao) {
+    double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const int a_pos = -1) {
         try { return ptrModelo->getCoeff(vetorGRBConstr.at(a_posicaoRestricao), vetorGRBVar.at(a_posicaoVariavel)); }
         catch (const GRBException erro) {
             throw std::invalid_argument("SolverGRB::getCofRestricao(" + std::to_string(a_posicaoVariavel) + "," +
@@ -727,6 +759,7 @@ public:
         }
     }; // double getCofRestricao(int a_posicaoVariavel, int a_posicaoRestricao) {
 
+    std::vector<std::vector<int>> getCofsRestricao(const int a_posicaoRestricao) { return  std::vector<std::vector<int>>(); };
 
     double getRHSRestricao(const int a_posicaoRestricao) {
         try { return vetorGRBConstr.at(a_posicaoRestricao).get(GRB_DoubleAttr_RHS); }
@@ -757,6 +790,7 @@ public:
 
     bool addVarDinamica(const int a_posicaoVariavel) {
         try {
+            
             if (vetorGRBVar.size() > a_posicaoVariavel) {
                 for (int i : lista_variavel_dinamica) {
                     if (i == a_posicaoVariavel)
@@ -1500,10 +1534,6 @@ public:
 #include "CbcSolver.hpp"
 #include <algorithm>
 
-#define CAP_INI_VAR 512     //capacidade inicial para inserir variaveis
-#define CAP_INI_CONSTR 512     //capacidade inicial para inserir restricoes
-#define CAP_INI_POR_CONSTR 256 //capacidade inicial para inserir idxs e coefs em cada restricao
-
 static void *xmalloc(const size_t size);
 
 static void *xrealloc(void *ptr, const size_t size);
@@ -1518,6 +1548,14 @@ private:
     int realNumRows;
     std::vector<int> origRowIdx;
     std::vector<char> origRowSense;
+
+    int cap_ini_var_preset = 512;
+    int cap_ini_constr_preset = 512;
+    int cap_ini_por_constr_preset = 4; //capacidade inicial para inserir idxs e coefs em cada restricao
+
+    int cap_ini_var = cap_ini_var_preset;
+    int cap_ini_constr = cap_ini_constr_preset;
+    int cap_ini_por_constr = cap_ini_por_constr_preset;
 
     /* buffer de restricoes */
     int **matrizIdxs = nullptr; //matriz de restricoes, contendo os indices das vars
@@ -1559,7 +1597,8 @@ private:
 
     void inicializaMemRestricoes() {
         sizeBufferRows = 0;
-        capBufferRows = CAP_INI_CONSTR;
+        cap_ini_constr = cap_ini_constr_preset;
+        capBufferRows = cap_ini_constr;
         matrizIdxs = (int **) xmalloc(sizeof(int *) * capBufferRows);
         matrizCoefs = (double **) xmalloc(sizeof(double *) * capBufferRows);
         nomeRow = (char **) xmalloc(sizeof(char *) * capBufferRows);
@@ -1580,7 +1619,8 @@ private:
 
     void inicializaMemVariaveis() {
         sizeBufferCols = 0;
-        capBufferCols = CAP_INI_VAR;
+        cap_ini_var = cap_ini_var_preset;
+        capBufferCols = cap_ini_var;
         nomeCol = (char**)xmalloc(sizeof(char*) * capBufferCols);
         binCol = (int*)xmalloc(sizeof(double) * capBufferCols);
         lbCol = (double*)xmalloc(sizeof(double) * capBufferCols);
@@ -1598,7 +1638,7 @@ private:
     void realocaMemDaRestricao(int pos) {
         assert(pos >= 0 && pos < sizeBufferRows);
         const int capAntiga = capRow[pos];
-        capRow[pos] = (std::max)(CAP_INI_POR_CONSTR, (int) ceil(capAntiga * 1.2));
+        capRow[pos] = (std::max)(cap_ini_por_constr, (int) ceil(capAntiga * 1.2));
         matrizIdxs[pos] = (int *) xrealloc(matrizIdxs[pos], sizeof(int) * capRow[pos]);
         matrizCoefs[pos] = (double *) xrealloc(matrizCoefs[pos], sizeof(double) * capRow[pos]);
     }
@@ -1611,7 +1651,7 @@ private:
         const int capAntiga = capBufferRows;
 
         if (a_numConstrs == 1)
-            capBufferRows = (std::max)(CAP_INI_CONSTR, (int)ceil(capAntiga * 1.2));
+            capBufferRows = (std::max)(cap_ini_constr, (int)ceil(capAntiga * 1.2));
         else
             capBufferRows += a_numConstrs;
 
@@ -1641,7 +1681,7 @@ private:
         const int capAntiga = capBufferCols;
 
         if (a_numVars == 1)
-            capBufferCols = (std::max)(CAP_INI_VAR, (int)ceil(capAntiga * 1.2));
+            capBufferCols = (std::max)(cap_ini_var, (int)ceil(capAntiga * 1.2));
         else
             capBufferCols += a_numVars;
 
@@ -1769,7 +1809,7 @@ private:
 
         sizeBufferRows = 0;
 
-        if (capBufferRows > CAP_INI_CONSTR) {
+        if (capBufferRows > cap_ini_constr) {
             esvaziaMemRestricoes();
             inicializaMemRestricoes();
         }
@@ -1814,7 +1854,7 @@ private:
 
         sizeBufferCols = 0;
 
-        if (capBufferCols > CAP_INI_VAR) {
+        if (capBufferCols > cap_ini_var) {
             esvaziaMemVariaveis();
             inicializaMemVariaveis();
         }
@@ -1824,7 +1864,7 @@ private:
 
     static void remCharsInvalidos(std::string &str) {
         for (char &s : str) {
-            if (s == '/' || s == '-') {
+            if (s == '/' || s == '-' || s == ':') {
                 s = '_';
             }
         }
@@ -2166,6 +2206,9 @@ private:
             
             ultimaVar = ultimaConstr = "";
 
+           // solver->createEmptyMatrix();
+           // solver->matrix()->reverseOrdering();
+
             return true;
         }
 
@@ -2203,6 +2246,35 @@ public:
     std::string str() { return "CLP"; }
 
     bool isNomeSimplificado() { return true; }
+
+
+    bool incrAlocVar(const int a_incrAloc) {
+        try {
+            if (a_incrAloc < 0) { throw std::invalid_argument("Negative Value."); }
+            cap_ini_var += a_incrAloc;
+            return true;
+        }
+        catch (const std::exception& erro) { throw std::invalid_argument("SolverCLP::incrAlocVar(" + std::to_string(a_incrAloc) + "): \n" + std::string(erro.what())); }
+    }
+
+    bool incrAlocEqu(const int a_incrAloc) {
+        try {
+            if (a_incrAloc < 0) { throw std::invalid_argument("Negative Value."); }
+            cap_ini_constr += a_incrAloc;
+            return true;
+        }
+        catch (const std::exception& erro) { throw std::invalid_argument("SolverCLP::incrAlocEqu(" + std::to_string(a_incrAloc) + "): \n" + std::string(erro.what())); }
+    }
+
+    bool incrAlocIne(const int a_incrAloc) {
+        try {
+            if (a_incrAloc < 0) { throw std::invalid_argument("Negative Value."); }
+            cap_ini_constr += a_incrAloc;
+            return true;
+        }
+        catch (const std::exception& erro) { throw std::invalid_argument("SolverCLP::incrAlocIne(" + std::to_string(a_incrAloc) + "): \n" + std::string(erro.what())); }
+    }
+
 
     int addVar_old(const double a_lb, const double a_ub, const double a_obj, const std::string a_nome) {
         try {
@@ -2290,7 +2362,7 @@ public:
 
     bool setCofObjetivo(const int a_posicao, const double a_cofObjetivo) {
         try {
-
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2345,7 +2417,7 @@ public:
 
     bool setLimInferior(const int a_posicao, const double a_limInferior) {
         try {
-
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2402,7 +2474,7 @@ public:
 
     bool setLimSuperior(const int a_posicao, const double a_limSuperior) {
         try {
-
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2413,13 +2485,13 @@ public:
 
             if (colIdx >= solver->getNumCols()) { //restricao esta no buffer; ainda nao foi inserida no modelo
                 const int idxBuffer = colIdx - solver->getNumCols();
-                colDbg.changeLB(nomeCol[idxBuffer], ubCol[idxBuffer], newUB);
+                colDbg.changeUB(nomeCol[idxBuffer], ubCol[idxBuffer], newUB);
                 ubCol[idxBuffer] = newUB;
             }
             else { //restricao ja foi inserida no solver
 
                 solver->setColUpper(colIdx, newUB);
-                colDbg.changeLB(solver->getColumnName(a_posicao), solver->getColUpper()[a_posicao], newUB);
+                colDbg.changeUB(solver->getColumnName(a_posicao), solver->getColUpper()[a_posicao], newUB);
             }
 
             return true;
@@ -2440,7 +2512,7 @@ public:
 
     bool setTipoVariavelContinua(const int a_posicao) {
         try {
-
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2452,6 +2524,7 @@ public:
                 binCol[idxBuffer] = 0;
             }
             else { //restricao ja foi inserida no solver
+
                 solver->setContinuous(a_posicao);
             }
            
@@ -2471,7 +2544,7 @@ public:
     bool setTipoVariavelBinaria(const int a_posicao) {
         try {
 
-
+            
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2484,6 +2557,7 @@ public:
                 isMILP = true;
             }
             else { //restricao ja foi inserida no solver
+
                 solver->setInteger(a_posicao);
                 solver->setColBounds(a_posicao, 0.0, 1.0);
                 isMILP = true;
@@ -2508,6 +2582,7 @@ public:
 
     double getCofObjetivo(const int a_posicao) {
         try {
+
             return solver->getObjCoefficients()[a_posicao];
         }
 
@@ -2519,6 +2594,35 @@ public:
 
     double getLimInferior(const int a_posicao) {
         try {
+            
+            const int colIdx = origColIdx.at(a_posicao);
+            if (colIdx == -1) {//restricao ja foi removida do modelo
+                throw std::invalid_argument(
+                    "Variavel de indice [" + std::to_string(a_posicao) + "] foi removida do modelo.");
+            }
+
+
+            if (colIdx >= solver->getNumCols()) { //restricao esta no buffer; ainda nao foi inserida no modelo
+                const int idxBuffer = colIdx - solver->getNumCols();
+                return lbCol[idxBuffer];
+            }
+            else { //restricao ja foi inserida no solver
+
+                return solver->getColLower()[a_posicao];
+
+            }
+
+        }
+
+        catch (const std::exception& erro) {
+            throw std::invalid_argument(
+                "SolverCLP::getLimInferior(" + std::to_string(a_posicao) + "): \n" + std::string(erro.what()));
+        }
+    }
+
+    /*
+    double getLimInferior(const int a_posicao) {
+        try {
             return solver->getColLower()[a_posicao];
         }
 
@@ -2527,7 +2631,37 @@ public:
                     "SolverCLP::getLimInferior(" + std::to_string(a_posicao) + "): \n" + std::string(erro.what()));
         }
     }
+    */
 
+    double getLimSuperior(const int a_posicao) {
+        try {
+
+            const int colIdx = origColIdx.at(a_posicao);
+            if (colIdx == -1) {//restricao ja foi removida do modelo
+                throw std::invalid_argument(
+                    "Variavel de indice [" + std::to_string(a_posicao) + "] foi removida do modelo.");
+            }
+
+
+            if (colIdx >= solver->getNumCols()) { //restricao esta no buffer; ainda nao foi inserida no modelo
+                const int idxBuffer = colIdx - solver->getNumCols();
+                return ubCol[idxBuffer];
+            }
+            else { //restricao ja foi inserida no solver
+
+                return solver->getColUpper()[a_posicao];
+
+            }
+
+        }
+
+        catch (const std::exception& erro) {
+            throw std::invalid_argument(
+                "SolverCLP::getLimSuperior(" + std::to_string(a_posicao) + "): \n" + std::string(erro.what()));
+        }
+    }
+
+    /*
     double getLimSuperior(const int a_posicao) {
         try {
             return solver->getColUpper()[a_posicao];
@@ -2538,6 +2672,7 @@ public:
                     "SolverCLP::getLimSuperior(" + std::to_string(a_posicao) + "): \n" + std::string(erro.what()));
         }
     }
+    */
 
     int addConstrIgual(const std::string a_nome) {
         try {
@@ -2551,7 +2686,7 @@ public:
             assert(sizeRow[sizeBufferRows] == 0);
 
             if (capRow[sizeBufferRows] == 0) {
-                capRow[sizeBufferRows] = CAP_INI_POR_CONSTR;
+                capRow[sizeBufferRows] = cap_ini_por_constr;
                 matrizIdxs[sizeBufferRows] = (int *) xmalloc(sizeof(int) * capRow[sizeBufferRows]);
                 matrizCoefs[sizeBufferRows] = (double *) xmalloc(sizeof(double) * capRow[sizeBufferRows]);
             }
@@ -2594,7 +2729,7 @@ public:
             assert(sizeRow[sizeBufferRows] == 0);
 
             if (capRow[sizeBufferRows] == 0) {
-                capRow[sizeBufferRows] = CAP_INI_POR_CONSTR;
+                capRow[sizeBufferRows] = cap_ini_por_constr;
                 matrizIdxs[sizeBufferRows] = (int *) xmalloc(sizeof(int) * capRow[sizeBufferRows]);
                 matrizCoefs[sizeBufferRows] = (double *) xmalloc(sizeof(double) * capRow[sizeBufferRows]);
             }
@@ -2642,7 +2777,7 @@ public:
                 assert(sizeRow[sizeBufferRows] == 0);
 
                 if (capRow[sizeBufferRows] == 0) {
-                    capRow[sizeBufferRows] = CAP_INI_POR_CONSTR;
+                    capRow[sizeBufferRows] = cap_ini_por_constr;
                     matrizIdxs[sizeBufferRows] = (int*)xmalloc(sizeof(int) * capRow[sizeBufferRows]);
                     matrizCoefs[sizeBufferRows] = (double*)xmalloc(sizeof(double) * capRow[sizeBufferRows]);
                 }
@@ -2688,7 +2823,7 @@ public:
             assert(sizeRow[sizeBufferRows] == 0);
 
             if (capRow[sizeBufferRows] == 0) {
-                capRow[sizeBufferRows] = CAP_INI_POR_CONSTR;
+                capRow[sizeBufferRows] = cap_ini_por_constr;
                 matrizIdxs[sizeBufferRows] = (int *) xmalloc(sizeof(int) * capRow[sizeBufferRows]);
                 matrizCoefs[sizeBufferRows] = (double *) xmalloc(sizeof(double) * capRow[sizeBufferRows]);
             }
@@ -2721,6 +2856,10 @@ public:
 
     bool setNomeRestricao(const int a_posicaoRestricao, const std::string a_nome) {
         try {
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) { //restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2740,6 +2879,7 @@ public:
                 strncpy(nomeRow[idxBuffer], nomeRestricao.c_str(), nomeRestricao.size());
                 nomeRow[idxBuffer][nomeRestricao.size()] = '\0';
             } else { //restricao ja foi inserida no solver
+
                 solver->setRowName(rowIdx, nomeRestricao);
             }
 
@@ -2759,6 +2899,10 @@ public:
     }
 
     std::string getNomeRestricao(const int a_posicaoRestricao) {
+
+        if (a_posicaoRestricao == -1)
+            throw std::invalid_argument("Negative index for constraint.");
+
         const int rowIdx = origRowIdx.at(a_posicaoRestricao);
         if (rowIdx == -1) { //restricao ja foi removida do modelo
             throw std::invalid_argument(
@@ -2769,12 +2913,116 @@ public:
             const int idxBuffer = rowIdx - solver->getNumRows();
             return nomeRow[idxBuffer];
         } else { //restricao ja foi inserida no solver
+
             return solver->getRowName(rowIdx);
         }
     }
 
+    std::string getNomeVariavel(const int a_posicaoRestricaoVar) {
+
+        if (a_posicaoRestricaoVar == -1)
+            throw std::invalid_argument("Negative index for variable.");
+
+        const int colIdx = origColIdx.at(a_posicaoRestricaoVar);
+        if (colIdx == -1) { //restricao ja foi removida do modelo
+            throw std::invalid_argument(
+                "Variavel de indice [" + std::to_string(a_posicaoRestricaoVar) + "] foi removida do modelo.");
+        }
+
+        if (colIdx >= solver->getNumCols()) { //restricao esta no buffer; ainda nao foi inserida no modelo
+            const int idxBuffer = colIdx - solver->getNumCols();
+            return nomeCol[idxBuffer];
+        }
+        else { //restricao ja foi inserida no solver
+
+            return solver->getColumnName(colIdx);
+        }
+    }
+
+    std::vector<std::vector<int>> getCofsRestricao(const int a_posicaoRestricao) { 
+    
+        try {
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
+            std::vector<std::vector<int>> lista_coefs_vars;
+
+            const int rowIdx = origRowIdx.at(a_posicaoRestricao);
+            if (rowIdx == -1) {//restricao ja foi removida do modelo
+                throw std::invalid_argument(
+                    "Restricao de indice [" + std::to_string(a_posicaoRestricao) + "] foi removida do modelo.");
+            }
+
+            if (rowIdx >= solver->getNumRows()) { //restricao esta no buffer; ainda nao foi inserida no modelo
+                const int idxBuffer = rowIdx - solver->getNumRows();
+
+                lista_coefs_vars = std::vector<std::vector<int>>(sizeRow[idxBuffer], std::vector<int>{-1, -1});
+
+				for (int i = 0; i < sizeRow[idxBuffer]; i++) {
+					lista_coefs_vars.at(i).at(0) = matrizIdxs[idxBuffer][i];
+				}
+
+			}
+			else { //restricao ja foi inserida no solver
+
+				const CoinPackedMatrix* matrixByRow = solver->matrix();
+
+                const int* idxs = matrixByRow->getIndices();
+                const double* coefs = matrixByRow->getElements();
+                const CoinBigIndex* start = matrixByRow->getVectorStarts();
+                const int* length = matrixByRow->getVectorLengths();
+
+                if (!matrixByRow->isColOrdered()) {                 
+
+                    lista_coefs_vars = std::vector<std::vector<int>>(length[rowIdx], std::vector<int>{-1, -1});
+
+                    for (int j = start[rowIdx]; j < start[rowIdx] + length[rowIdx]; j++) {
+                        lista_coefs_vars.at(j - start[rowIdx]).at(0) = idxs[j];
+                        lista_coefs_vars.at(j - start[rowIdx]).at(1) = j;
+                    }
+                }
+                else {
+
+                    lista_coefs_vars.reserve(200);
+
+                    for (int var_orig = 0; var_orig < int(origColIdx.size()); var_orig++) {
+
+                        const int colIdx = origColIdx.at(var_orig);
+
+                        if (colIdx >= 0) {
+                            for (int j = start[colIdx]; j < start[colIdx] + length[colIdx]; j++) {
+                                if (rowIdx == idxs[j]) {
+                                    lista_coefs_vars.push_back(std::vector<int>{var_orig, j});
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+			}
+
+			return lista_coefs_vars;
+		}
+
+		catch (const std::exception& erro) {
+            throw std::invalid_argument("SolverCLP::getCofsRestricao(" + std::to_string(a_posicaoRestricao) + "): \n" + std::string(erro.what()));
+        }
+ 
+    
+    };
+
     bool setCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const double a_cofRestricao) {
         try {
+            
+            if (a_posicaoVariavel == -1)
+                throw std::invalid_argument("Negative index for variable.");
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2802,6 +3050,7 @@ public:
                 matrizCoefs[idxBuffer][tamAtual] = a_cofRestricao;
                 sizeRow[idxBuffer] = sizeRow[idxBuffer] + 1;
             } else { //restricao ja foi inserida no solver
+
                 solver->modifyCoefficient(rowIdx, a_posicaoVariavel, a_cofRestricao);
             }
 
@@ -2817,6 +3066,10 @@ public:
 
     bool setRHSRestricao(const int a_posicaoRestricao, const double a_RHS) {
         try {
+            
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const double newRHS = (fabs(a_RHS) <= 1e-6) ? 0.0 : a_RHS;
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
@@ -2828,6 +3081,7 @@ public:
                 const int idxBuffer = rowIdx - solver->getNumRows();
                 rhsRow[idxBuffer] = newRHS;
             } else { //restricao ja foi inserida no solver
+
                 const char rowSense = origRowSense.at(a_posicaoRestricao);
 
                 if (rowSense == '<') {
@@ -2858,8 +3112,15 @@ public:
         }
     }
 
-    double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao) {
+    double getCofRestricao(const int a_posicaoVariavel, const int a_posicaoRestricao, const int a_pos = -1) {
         try {
+
+            if (a_posicaoVariavel == -1)
+                throw std::invalid_argument("Negative index for variable.");
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2875,16 +3136,56 @@ public:
                 }
                 return 0.0;
             } else { //restricao ja foi inserida no solver
+
                 const CoinPackedMatrix *matrixByRow = solver->matrix();
                 const int *idxs = matrixByRow->getIndices();
                 const double *coefs = matrixByRow->getElements();
                 const CoinBigIndex *start = matrixByRow->getVectorStarts();
                 const int *length = matrixByRow->getVectorLengths();
 
-                for (int j = start[rowIdx]; j < start[rowIdx] + length[rowIdx]; j++) {
-                    if (idxs[j] == a_posicaoVariavel) {
-                        return coefs[j];
+                const int colIdx = origColIdx.at(a_posicaoVariavel);
+
+                if (!matrixByRow->isColOrdered()) {
+                    
+                    int ini = start[rowIdx];
+                    int end = start[rowIdx] + length[rowIdx];
+
+                    if (a_pos > -1) {
+                        if (a_pos >= end)
+                            throw std::invalid_argument("Invalid a_pos");
+                        ini = a_pos;
+                        end = a_pos + 1;
                     }
+
+                    for (int j = ini; j < end; j++) {
+                        if (idxs[j] == colIdx) {
+                            return coefs[j];
+                        }
+                    }
+
+                    throw std::invalid_argument("No cof found");
+
+                }
+                else {
+
+                    int ini = start[colIdx];
+                    int end = start[colIdx] + length[colIdx];
+
+                    if (a_pos > -1) {
+                        if (a_pos >= end)
+                            throw std::invalid_argument("Invalid a_pos");
+                        ini = a_pos;
+                        end = a_pos + 1;
+                    }
+
+                    for (int j = ini; j < end; j++) {
+                        if (idxs[j] == rowIdx) {
+                            return coefs[j];
+                        }
+                    }
+
+                    throw std::invalid_argument("No cof found");
+
                 }
 
                 return 0.0;
@@ -2899,6 +3200,10 @@ public:
 
     double getRHSRestricao(const int a_posicaoRestricao) {
         try {
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2909,6 +3214,7 @@ public:
                 const int idxBuffer = rowIdx - solver->getNumRows();
                 return rhsRow[idxBuffer];
             } else { //restricao ja foi inserida no solver
+
                 const char rowSense = origRowSense.at(a_posicaoRestricao);
 
                 if (rowSense == '<' || rowSense == '=') {
@@ -2933,6 +3239,10 @@ public:
 
     bool remRestricao(const int a_posicaoRestricao) {
         try {
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
             if (rowIdx == -1) {//restricao ja foi removida do modelo
                 throw std::invalid_argument(
@@ -2999,6 +3309,9 @@ public:
 
     bool addVarDinamica(const int a_posicao) {
         try {
+            
+            if (a_posicao == -1)
+                throw std::invalid_argument("Negative index for variable.");
 
             const int colIdx = origColIdx.at(a_posicao);
             if (colIdx == -1) {//restricao ja foi removida do modelo
@@ -3152,6 +3465,10 @@ public:
 
     virtual void getLimiteInferiorVarDinamica(const int a_idx, double* a_array) {
         try {
+
+            if (a_idx == -1)
+                throw std::invalid_argument("Negative index.");
+
             for (int i = 0; i < lista_variavel_dinamica.size(); i++) {
                 a_array[a_idx + i] = getLimInferior(lista_variavel_dinamica[i]);
             }
@@ -3168,6 +3485,10 @@ public:
 
     virtual void  getLimiteSuperiorVarDinamica(const int a_idx, double* a_array) {
         try {
+
+            if (a_idx == -1)
+                throw std::invalid_argument("Negative index.");
+
             for (int i = 0; i < lista_variavel_dinamica.size(); i++) {
                 a_array[a_idx + i] = getLimSuperior(lista_variavel_dinamica[i]);
             }
@@ -3185,6 +3506,10 @@ public:
 
     virtual void  getReducedCostVarDinamica(const int a_idx, double* a_array) {
         try {
+
+            if (a_idx == -1)
+                throw std::invalid_argument("Negative index.");
+
             for (int i = 0; i < lista_variavel_dinamica.size(); i++) {
                 a_array[a_idx + i] = getReducedCost(lista_variavel_dinamica[i]);
             }
@@ -3204,6 +3529,10 @@ public:
 
     double getMultiplicador(const int a_posicaoRestricao) {
         try {
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
 
             if (rowIdx == -1) {
@@ -3222,6 +3551,10 @@ public:
 
     char getSinalRestricao(const int a_posicaoRestricao) {
         try {
+
+            if (a_posicaoRestricao == -1)
+                throw std::invalid_argument("Negative index for constraint.");
+
             const int rowIdx = origRowIdx.at(a_posicaoRestricao);
 
             if (rowIdx == -1) {
@@ -3256,7 +3589,10 @@ public:
     bool otimizar() {
         insereVariaveis();
         insereRestricoes();
-        return otimizar(solver);
+
+        bool status_solver = otimizar(solver);
+
+        return status_solver;
     }
 
     int otimizarComTratamentoInviabilidade() {
@@ -3265,31 +3601,31 @@ public:
                 throw std::invalid_argument("Solver invalido (NULO).");
             }
 
-            int level = 4;
+            int level = 5;
             while (level > 0) {
-                try {
-                    if (level == 4) {
-                        const double toleranciaAntiga = getToleranciaViabilidade();
-                        double novaTolerancia;
-
-                        if (toleranciaAntiga >= 1e-8 || toleranciaAntiga <= 1e-10) {
-                            novaTolerancia = 1e-9;
-                        }
-                        else {
-                            novaTolerancia = 1e-6;
-                        }
-
+				try {
+                    if (level == 5) {
+                        assert(level == 1);
                         resetar();
-                        setToleranciaOtimalidade(novaTolerancia);
-                        setToleranciaViabilidade(novaTolerancia);
                         otimizar();
-                        setToleranciaOtimalidade(toleranciaAntiga);
-                        setToleranciaViabilidade(toleranciaAntiga);
 
                         if (statusOtimizacao == TipoStatusSolver_otimalidade) {
                             return level;
                         }
                     }
+					else if (level == 4) {
+						const TipoMetodoSolver metodoAntigo = tipoMetodoSolver;
+						TipoMetodoSolver metodoNovo = (metodoAntigo == TipoMetodoSolver_dual_simplex) ? TipoMetodoSolver_primal_simplex : TipoMetodoSolver_dual_simplex;
+
+						resetar();
+						tipoMetodoSolver = metodoNovo;
+						otimizar();
+						tipoMetodoSolver = metodoAntigo;
+
+						if (statusOtimizacao == TipoStatusSolver_otimalidade) {
+							return level;
+						}
+					}
                     else if (level == 3) {
                         const int scalingAntigo = escalonamento;
                         const int novoScaling = (scalingAntigo > 0) ? 0 : 1;
@@ -3303,26 +3639,41 @@ public:
                             return level;
                         }
                     }
-                    else if (level == 2) {
-                        const TipoMetodoSolver metodoAntigo = tipoMetodoSolver;
-                        TipoMetodoSolver metodoNovo = (metodoAntigo == TipoMetodoSolver_dual_simplex) ? TipoMetodoSolver_primal_simplex : TipoMetodoSolver_dual_simplex;
+					else if (level == 2) {
+						const double toleranciaAntiga = getToleranciaViabilidade();
+						double novaTolerancia;
 
-                        resetar();
-                        tipoMetodoSolver = metodoNovo;
-                        otimizar();
-                        tipoMetodoSolver = metodoAntigo;
+						if (toleranciaAntiga >= 1e-8 || toleranciaAntiga <= 1e-10) {
+							novaTolerancia = 1e-9;
+						}
+						else {
+							novaTolerancia = 1e-6;
+						}
 
-                        if (statusOtimizacao == TipoStatusSolver_otimalidade) {
-                            return level;
-                        }
-                    }
+						resetar();
+						setToleranciaOtimalidade(novaTolerancia);
+						setToleranciaViabilidade(novaTolerancia);
+						otimizar();
+						setToleranciaOtimalidade(toleranciaAntiga);
+						setToleranciaViabilidade(toleranciaAntiga);
+
+						if (statusOtimizacao == TipoStatusSolver_otimalidade) {
+							return level;
+						}
+					}
                     else {
-                        assert(level == 1);
-                        resetar();
-                        otimizar();
+                        const TipoMetodoSolver metodoAntigo = tipoMetodoSolver;
+                        if (metodoAntigo != TipoMetodoSolver_barrier) {
+                            TipoMetodoSolver metodoNovo = TipoMetodoSolver_barrier;
 
-                        if (statusOtimizacao == TipoStatusSolver_otimalidade) {
-                            return level;
+                            resetar();
+                            tipoMetodoSolver = metodoNovo;
+                            otimizar();
+                            tipoMetodoSolver = metodoAntigo;
+
+                            if (statusOtimizacao == TipoStatusSolver_otimalidade) {
+                                return level;
+                            }
                         }
                     }
                 }

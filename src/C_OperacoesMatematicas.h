@@ -802,74 +802,74 @@ template<typename Valor>
 SmartEnupla<int, Valor> getAutoCovarianciaNaoSazonal(const SmartEnupla<Periodo, Valor> &a_serie_temporal) { return SmartEnupla<int, Valor>(0, getAutoCovarianciaNaoSazonal(a_serie_temporal.getElementos())); }
 
 template<typename Valor>
-SmartEnupla<IdEstacao, SmartEnupla<int, double>> getAutoCovarianciaSazonal(const SmartEnupla<Periodo, Valor> &a_serie_temporal) {
+SmartEnupla<IdMes, SmartEnupla<int, double>> getAutoCovarianciaSazonal(const SmartEnupla<Periodo, Valor> &a_serie_temporal) {
 
 	try {
 
 		if (a_serie_temporal.size() == 0)
-			return SmartEnupla<IdEstacao, SmartEnupla<int, Valor>>();
+			return SmartEnupla<IdMes, SmartEnupla<int, Valor>>();
 
 		const Periodo periodo_inicial_serie_temporal = a_serie_temporal.getIteradorInicial();
 		const Periodo periodo_final_serie_temporal   = a_serie_temporal.getIteradorFinal();
 
-		const TipoPeriodo tipoPeriodo = a_serie_temporal.getIteradorInicial().getTipoPeriodo();
-
-		const IdEstacao maiorEstacao = Periodo::getMaiorEstacao(tipoPeriodo);
+		const IdMes maiorEstacao = IdMes_12;
 
 		const int ordem_maxima = int(maiorEstacao) - 1;
 
-		SmartEnupla<IdEstacao, SmartEnupla<int, Valor>> auto_covariancia;
+		SmartEnupla<IdMes, SmartEnupla<int, Valor>> auto_covariancia(IdMes_1, std::vector<SmartEnupla<int, Valor>>(int(maiorEstacao - IdMes_1) + 1, SmartEnupla<int, Valor>(0, std::vector<Valor>(ordem_maxima + 1, Valor(0)))));
 
-		SmartEnupla <IdEstacao, Valor> medias(IdEstacao_1, std::vector<Valor>(int(maiorEstacao), Valor(0)));
-		for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
-			const std::vector<Valor> elementos = a_serie_temporal.getElementos(idEstacao).at(tipoPeriodo);
-			medias.setElemento(idEstacao, getMedia(elementos));
-		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+		SmartEnupla <IdMes, Valor> medias(IdMes_1, std::vector<Valor>(int(maiorEstacao), Valor(0)));
+		SmartEnupla <IdMes, std::vector<Valor>> elementos(IdMes_1, std::vector<std::vector<Valor>>(int(maiorEstacao), std::vector<Valor>()));
+		for (Periodo periodo = periodo_inicial_serie_temporal; periodo <= periodo_final_serie_temporal; a_serie_temporal.incrementarIterador(periodo)) {
+			const IdMes idEstacao = periodo.getMes();
+			elementos.at(idEstacao).push_back(a_serie_temporal.at_rIt(periodo));
+		} // for (Periodo periodo = periodo_ini; periodo <= periodo_final_serie_temporal; a_serie_temporal.incrementarIterador(periodo)) {
 
-		for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+		for (IdMes idEstacao = IdMes_1; idEstacao <= maiorEstacao; idEstacao++)
+			medias.at(idEstacao) = getMedia(elementos.at(idEstacao));
 
-			SmartEnupla<int, Valor> auto_covariancia_estacao(0, std::vector<Valor>(ordem_maxima + 1, Valor(0)));
+		// A auto_covariancia no lag 0 é i própria variancia na estação
 
-			// A auto_covariancia no lag 0 é i própria variancia na estação
+		SmartEnupla <int, Periodo> periodo_lag(0, std::vector<Periodo>(ordem_maxima + 1, Periodo()));
+
+		SmartEnupla<IdMes, SmartEnupla<int, int>> numero_elementos(IdMes_1, std::vector<SmartEnupla<int, int>>(int(maiorEstacao - IdMes_1) + 1, SmartEnupla<int, int>(0, std::vector<int>(ordem_maxima + 1, 0))));
+		for (Periodo periodo = periodo_inicial_serie_temporal; periodo <= periodo_final_serie_temporal; a_serie_temporal.incrementarIterador(periodo)) {
+
+			const IdMes idEstacao = periodo.getMes();
+
+			const double parcela1 = (a_serie_temporal.at_rIt(periodo) - medias.at(idEstacao));
+
 			for (int lag = 0; lag <= ordem_maxima; lag++) {
 
-				Valor covariancia = Valor(0);
+				if (!periodo_lag.at(lag).isValido()) {
+					if (periodo == periodo_inicial_serie_temporal + lag) {
+						periodo_lag.at(lag) = periodo_inicial_serie_temporal;
+					}
+				}
 
-				int numero_elementos = 0;
-				for (Periodo periodo = periodo_inicial_serie_temporal; periodo <= periodo_final_serie_temporal; periodo++) {
+				if (periodo_lag.at(lag).isValido()) {
 
-					if (periodo.getEstacao() == idEstacao) {
+					auto_covariancia.at(idEstacao).at(lag) += parcela1 * (a_serie_temporal.at_rIt(periodo_lag.at(lag)) - medias.at(periodo_lag.at(lag).getMes()));
 
-						const Periodo periodo_lag = periodo - lag;
+					numero_elementos.at(idEstacao).at(lag)++;
 
-						if (periodo_lag >= periodo_inicial_serie_temporal) {
+					a_serie_temporal.incrementarIterador(periodo_lag.at(lag));
+				}
+			}
+		} // for (Periodo periodo = periodo_inicial_serie_temporal; periodo <= periodo_final_serie_temporal; periodo++) {
 
-							covariancia += (a_serie_temporal.getElemento(periodo) - medias.getElemento(idEstacao)) * (a_serie_temporal.getElemento(periodo_lag) - medias.getElemento(periodo_lag.getEstacao()));
+		for (IdMes idEstacao = IdMes_1; idEstacao <= maiorEstacao; idEstacao++) {
+			for (int lag = 0; lag <= ordem_maxima; lag++)
+				auto_covariancia.at(idEstacao).at(lag) /= numero_elementos.at(idEstacao).at(lag);
+		}
 
-							numero_elementos++;
-
-						} // if (periodo_lag >= periodo_inicial_serie_temporal) {
-
-					} // if (periodo.getEstacao() == idEstacao) {
-
-				} // for (Periodo periodo = periodo_inicial_serie_temporal; periodo <= periodo_final_serie_temporal; periodo++) {
-
-				covariancia /= numero_elementos;
-
-				auto_covariancia_estacao.at(lag) = covariancia;
-
-			} // for (int lag = 0; lag <= ordem_maxima; lag++) {
-
-			auto_covariancia.addElemento(idEstacao, auto_covariancia_estacao);
-
-		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
 
 		return auto_covariancia;
 
 	} // try{
-	catch (const std::exception&erro) { throw std::invalid_argument("getAutoCovarianciaSazonal(a_serie_temporal): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("getAutoCovarianciaSazonal(a_serie_temporal): \n" + std::string(erro.what())); }
 
-} // SmartEnupla<IdEstacao, SmartEnupla<int, double>> getAutoCovarianciaSazonal(const SmartEnupla<Periodo, Valor> &a_enupla) {
+} // SmartEnupla<IdMes, SmartEnupla<int, double>> getAutoCovarianciaSazonal(const SmartEnupla<Periodo, Valor> &a_enupla) {
 
 
 template<typename Valor>
@@ -904,20 +904,20 @@ SmartEnupla<int, Valor> getAutoCorrelacaoNaoSazonal(const SmartEnupla<int, Valor
 
 
 template<typename Valor>
-SmartEnupla<IdEstacao, SmartEnupla<int, Valor>> getAutoCorrelacaoSazonal(const SmartEnupla<IdEstacao, SmartEnupla<int, Valor>> &a_auto_covariancia_sazonal) {
+SmartEnupla<IdMes, SmartEnupla<int, Valor>> getAutoCorrelacaoSazonal(const SmartEnupla<IdMes, SmartEnupla<int, Valor>> &a_auto_covariancia_sazonal) {
 
 	try {
 
 		if (a_auto_covariancia_sazonal.size() == 0)
-			return SmartEnupla<IdEstacao, SmartEnupla<int, Valor>>();
+			return SmartEnupla<IdMes, SmartEnupla<int, Valor>>();
 
-		const IdEstacao maiorEstacao = a_auto_covariancia_sazonal.getIteradorFinal();
+		const IdMes maiorEstacao = a_auto_covariancia_sazonal.getIteradorFinal();
 
 		const int ordem_maxima = int(maiorEstacao) - 1;
 
-		SmartEnupla<IdEstacao, SmartEnupla<int, Valor>> auto_correlacao;
+		SmartEnupla<IdMes, SmartEnupla<int, Valor>> auto_correlacao(IdMes_1, std::vector<SmartEnupla<int, Valor>>(int(maiorEstacao - IdMes_1) + 1, SmartEnupla<int, Valor>()));
 
-		for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+		for (IdMes idEstacao = IdMes_1; idEstacao <= maiorEstacao; idEstacao++) {
 
 			const Valor auto_covariancia_lag0_idEstacao = a_auto_covariancia_sazonal.at(idEstacao).getElemento(0);
 
@@ -928,12 +928,12 @@ SmartEnupla<IdEstacao, SmartEnupla<int, Valor>> getAutoCorrelacaoSazonal(const S
 
 				const Valor auto_covariancia_lag_idEstacao = a_auto_covariancia_sazonal.at(idEstacao).getElemento(lag);
 
-				IdEstacao idEstacaoLag = IdEstacao_Nenhum;
+				IdMes idEstacaoLag = IdMes_Nenhum;
 
-				if (IdEstacao(idEstacao - lag) < IdEstacao_1)
-					idEstacaoLag = IdEstacao(idEstacao - lag + maiorEstacao);
+				if (IdMes(idEstacao - lag) < IdMes_1)
+					idEstacaoLag = IdMes(idEstacao - lag + maiorEstacao);
 				else
-					idEstacaoLag = IdEstacao(idEstacao - lag);
+					idEstacaoLag = IdMes(idEstacao - lag);
 
 				const Valor auto_covariancia_lag0_idEstacaoLag = a_auto_covariancia_sazonal.at(idEstacaoLag).getElemento(0);
 
@@ -944,25 +944,25 @@ SmartEnupla<IdEstacao, SmartEnupla<int, Valor>> getAutoCorrelacaoSazonal(const S
 
 			} // for (int lag = 0; lag <= ordem_maxima; lag++) {
 
-			auto_correlacao.addElemento(idEstacao, auto_correlacao_estacao);
+			auto_correlacao.at(idEstacao) = auto_correlacao_estacao;
 
-		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+		} // for (IdMes idEstacao = IdMes_1; idEstacao <= maiorEstacao; idEstacao++) {
 
 		return auto_correlacao;
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("getAutoCorrelacaoSazonal(a_auto_covariancia_sazonal): \n" + std::string(erro.what())); }
 
-} // SmartEnupla<IdEstacao, SmartEnupla<int, Valor>> getAutoCorrelacaoSazonal(const SmartEnupla<IdEstacao, SmartEnupla<int, Valor>> &a_auto_covariancia_sazonal) {
+} // SmartEnupla<IdMes, SmartEnupla<int, Valor>> getAutoCorrelacaoSazonal(const SmartEnupla<IdMes, SmartEnupla<int, Valor>> &a_auto_covariancia_sazonal) {
 
 
 template<typename Valor>
-SmartEnupla<IdEstacao, Valor> getCorrelacaoSazonal(const SmartEnupla<Periodo, Valor> &a_serie_temporal1, const SmartEnupla<Periodo, Valor> &a_serie_temporal2) {
+SmartEnupla<IdMes, Valor> getCorrelacaoSazonal(const SmartEnupla<Periodo, Valor> &a_serie_temporal1, const SmartEnupla<Periodo, Valor> &a_serie_temporal2) {
 
 	try {
 
 		if ((a_serie_temporal1.size() == 0) || (a_serie_temporal2.size() == 0))
-			return SmartEnupla<IdEstacao, Valor>();
+			return SmartEnupla<IdMes, Valor>();
 
 		const Periodo periodo_inicial_serie1 = a_serie_temporal1.getIteradorInicial();
 		const Periodo periodo_inicial_serie2 = a_serie_temporal2.getIteradorInicial();
@@ -971,12 +971,12 @@ SmartEnupla<IdEstacao, Valor> getCorrelacaoSazonal(const SmartEnupla<Periodo, Va
 		const Periodo periodo_final_serie2 = a_serie_temporal2.getIteradorFinal();
 
 		if (periodo_final_serie1 < periodo_inicial_serie2)
-			return SmartEnupla<IdEstacao, Valor>();
+			return SmartEnupla<IdMes, Valor>();
 		else if (periodo_final_serie2 < periodo_inicial_serie1)
-			return SmartEnupla<IdEstacao, Valor>();
+			return SmartEnupla<IdMes, Valor>();
 
 		Periodo periodo_inicial = periodo_inicial_serie1;
-		Periodo periodo_final   = periodo_final_serie1;
+		Periodo periodo_final = periodo_final_serie1;
 
 		if (periodo_inicial_serie1 > periodo_inicial_serie2)
 			periodo_inicial = periodo_inicial_serie1;
@@ -988,61 +988,58 @@ SmartEnupla<IdEstacao, Valor> getCorrelacaoSazonal(const SmartEnupla<Periodo, Va
 		else if (periodo_final_serie2 < periodo_final_serie1)
 			periodo_final = periodo_final_serie2;
 
-		const TipoPeriodo tipoPeriodo = periodo_inicial.getTipoPeriodo();
+		const IdMes maiorEstacao = IdMes_12;
 
-		const IdEstacao maiorEstacao = Periodo::getMaiorEstacao(tipoPeriodo);
+		SmartEnupla<IdMes, Valor> media_serie1(IdMes_1, std::vector<Valor>(int(maiorEstacao), Valor(0)));
+		SmartEnupla<IdMes, Valor> media_serie2(IdMes_1, std::vector<Valor>(int(maiorEstacao), Valor(0)));
 
-		SmartEnupla<IdEstacao, Valor> media_serie1(IdEstacao_1, std::vector<Valor>(int(maiorEstacao), Valor(0)));
-		SmartEnupla<IdEstacao, Valor> media_serie2(IdEstacao_1, std::vector<Valor>(int(maiorEstacao), Valor(0)));
+		SmartEnupla<IdMes, Valor> desvio_serie1(IdMes_1, std::vector<Valor>(int(maiorEstacao), Valor(0)));
+		SmartEnupla<IdMes, Valor> desvio_serie2(IdMes_1, std::vector<Valor>(int(maiorEstacao), Valor(0)));
 
-		SmartEnupla<IdEstacao, Valor> desvio_serie1(IdEstacao_1, std::vector<Valor>(int(maiorEstacao), Valor(0)));
-		SmartEnupla<IdEstacao, Valor> desvio_serie2(IdEstacao_1, std::vector<Valor>(int(maiorEstacao), Valor(0)));
+		SmartEnupla<IdMes, std::vector<Valor>> elementos_serie1(IdMes_1, std::vector<std::vector<Valor>>(int(maiorEstacao), std::vector<Valor>()));
+		SmartEnupla<IdMes, std::vector<Valor>> elementos_serie2(IdMes_1, std::vector<std::vector<Valor>>(int(maiorEstacao), std::vector<Valor>()));
 
-		for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
-			const std::vector<Valor> elementos_serie1 = a_serie_temporal1.getElementos(idEstacao).at(tipoPeriodo);
-			const std::vector<Valor> elementos_serie2 = a_serie_temporal2.getElementos(idEstacao).at(tipoPeriodo);
+		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_serie_temporal1.incrementarIterador(periodo)){
+			const IdMes idEstacao = periodo.getMes();
+			elementos_serie1.at(idEstacao).push_back(a_serie_temporal1.at_rIt(periodo));
+			elementos_serie2.at(idEstacao).push_back(a_serie_temporal2.at_rIt(periodo));
+		}
 
-			media_serie1.setElemento(idEstacao, getMedia(elementos_serie1));
-			media_serie2.setElemento(idEstacao, getMedia(elementos_serie2));
+		for (IdMes idEstacao = IdMes_1; idEstacao <= maiorEstacao; idEstacao++) {
+			media_serie1.at(idEstacao) = getMedia(elementos_serie1.at(idEstacao));
+			media_serie2.at(idEstacao) = getMedia(elementos_serie2.at(idEstacao));
 
-			desvio_serie1.setElemento(idEstacao, getDesvio(media_serie1.getElemento(idEstacao), elementos_serie1));
-			desvio_serie2.setElemento(idEstacao, getDesvio(media_serie2.getElemento(idEstacao), elementos_serie2));
-		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+			desvio_serie1.at(idEstacao) = getDesvio(media_serie1.at(idEstacao), elementos_serie1.at(idEstacao));
+			desvio_serie2.at(idEstacao) = getDesvio(media_serie2.at(idEstacao), elementos_serie2.at(idEstacao));
+		} // for (IdMes idEstacao = IdMes_1; idEstacao <= maiorEstacao; idEstacao++) {
 
-		SmartEnupla<IdEstacao, Valor> correlacao(IdEstacao_1, std::vector<Valor>(maiorEstacao, Valor(0)));
+		SmartEnupla<IdMes, Valor> correlacao(IdMes_1, std::vector<Valor>(maiorEstacao, Valor(0)));
+		SmartEnupla<IdMes, int> numero_elementos(IdMes_1, std::vector<int>(maiorEstacao, 0));
 
-		for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_serie_temporal1.incrementarIterador(periodo)) {
 
-			Valor valor_correlacao = Valor(0);
+			const IdMes idEstacao = periodo.getMes();
 
-			int numero_elementos = 0;
-			for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
+			correlacao.at(idEstacao) += (a_serie_temporal1.at_rIt(periodo) - media_serie1.at(idEstacao)) * (a_serie_temporal2.at_rIt(periodo) - media_serie2.at(idEstacao));
 
-				if (periodo.getEstacao() == idEstacao) {
+			numero_elementos.at(idEstacao)++;
 
-					valor_correlacao += (a_serie_temporal1.getElemento(periodo) - media_serie1.getElemento(idEstacao)) * (a_serie_temporal2.getElemento(periodo) - media_serie2.getElemento(idEstacao));
+		} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++){
 
-					numero_elementos++;
+		for (IdMes idEstacao = IdMes_1; idEstacao <= maiorEstacao; idEstacao++) {
 
-				} // if (periodo.getEstacao() == idEstacao) {
-
-			} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++){
-
-			if ((desvio_serie1.getElemento(idEstacao) > 0.0) && (desvio_serie2.getElemento(idEstacao) > 0.0))
-				valor_correlacao /= (Valor(numero_elementos) * desvio_serie1.getElemento(idEstacao) * desvio_serie2.getElemento(idEstacao));
+			if ((desvio_serie1.at(idEstacao) > 0.0) && (desvio_serie2.at(idEstacao) > 0.0))
+				correlacao.at(idEstacao) /= (Valor(numero_elementos.at(idEstacao)) * desvio_serie1.at(idEstacao) * desvio_serie2.at(idEstacao));
 			else
-				valor_correlacao = 0.0;
-
-			correlacao.setElemento(idEstacao, valor_correlacao);
-
-		} // for (IdEstacao idEstacao = IdEstacao_1; idEstacao <= maiorEstacao; idEstacao++) {
+				correlacao.at(idEstacao) = 0.0;
+		}
 
 		return correlacao;
 
 	} // try{
 	catch (const std::exception&erro) { throw std::invalid_argument("getCorrelacaoSazonal(a_serie_temporal1, a_serie_temporal2): \n" + std::string(erro.what())); }
 
-} // SmartEnupla<IdEstacao, Valor> getCorrelacaoSazonal(const SmartEnupla<Periodo, Valor> &a_serie_temporal1, const SmartEnupla<Periodo, Valor> &a_serie_temporal2) {
+} // SmartEnupla<IdMes, Valor> getCorrelacaoSazonal(const SmartEnupla<Periodo, Valor> &a_serie_temporal1, const SmartEnupla<Periodo, Valor> &a_serie_temporal2) {
 
 
 template<typename Valor>
@@ -1082,8 +1079,8 @@ Valor getRQuadrado(const SmartEnupla<Periodo, Valor>& a_serie_temporal1, const S
 		Valor sq_res = 0.0;
 		Valor sq_tot = 0.0;
 		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_serie_temporal1.incrementarIterador(periodo)) {
-			sq_res += sqrt((a_serie_temporal1.at(periodo) - a_serie_temporal2.at(periodo)) * (a_serie_temporal1.at(periodo) - a_serie_temporal2.at(periodo)));
-			sq_tot += sqrt((a_serie_temporal1.at(periodo) - media_1) * (a_serie_temporal1.at(periodo) - media_1));
+			sq_res += sqrt((a_serie_temporal1.at_rIt(periodo) - a_serie_temporal2.at_rIt(periodo)) * (a_serie_temporal1.at_rIt(periodo) - a_serie_temporal2.at_rIt(periodo)));
+			sq_tot += sqrt((a_serie_temporal1.at_rIt(periodo) - media_1) * (a_serie_temporal1.at_rIt(periodo) - media_1));
 		}
 
 		return 1 - (sq_res / sq_tot);
@@ -1150,8 +1147,8 @@ Valor getRQuadradoNormalizadoMaior(const SmartEnupla<Periodo, Valor>& a_serie_te
 		SmartEnupla<Periodo, Valor> serie_temporal2_norm = a_serie_temporal2;
 
 		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_serie_temporal1.incrementarIterador(periodo)) {
-			serie_temporal1_norm.at(periodo) /= maior_1;
-			serie_temporal2_norm.at(periodo) /= maior_2;
+			serie_temporal1_norm.at_rIt(periodo) /= maior_1;
+			serie_temporal2_norm.at_rIt(periodo) /= maior_2;
 		}
 
 		return getRQuadrado(serie_temporal1_norm, serie_temporal2_norm);

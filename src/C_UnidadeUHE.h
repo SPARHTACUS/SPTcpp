@@ -20,15 +20,15 @@
 
 
 #define ATT_VETOR_UNIDADE_UHE(m)  \
-	  m(UnidadeUHE,  AttVetor,            disponibilidade,  double,          0,            1,             1,      Periodo)\
-	  m(UnidadeUHE,  AttVetor,     vazao_turbinada_maxima,  double,          0,          max,             0,      Periodo)\
-	  m(UnidadeUHE,  AttVetor,     vazao_turbinada_minima,  double,          0,          max,             0,      Periodo)
-//     c_classe,      smrtAtt,               nomeAtributo,    Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
+	  m(UnidadeUHE,  AttVetor,                disponibilidade,  double,          0,            1,             1,      Periodo)\
+	  m(UnidadeUHE,  AttVetor,                potencia_minima,  double,          0,          max,             0,      Periodo)\
+	  m(UnidadeUHE,  AttVetor,                potencia_maxima,  double,          0,          max,             0,      Periodo)\
+	  m(UnidadeUHE,  AttVetor,         vazao_turbinada_maxima,  double,          0,          max,             0,      Periodo)\
+	  m(UnidadeUHE,  AttVetor,         vazao_turbinada_minima,  double,          0,          max,             0,      Periodo)
+//     c_classe,      smrtAtt,                   nomeAtributo,    Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 
 #define ATT_MATRIZ_UNIDADE_UHE(m)  \
-      m(UnidadeUHE,  AttMatriz,                      potencia_minima,     double,          0,        50000,             0,  Periodo, IdPatamarCarga) \
-      m(UnidadeUHE,  AttMatriz,                      potencia_maxima,     double,          0,        50000,             0,  Periodo, IdPatamarCarga) \
       m(UnidadeUHE,  AttMatriz,           potencia_disponivel_minima,     double,          0,        50000,             0,  Periodo, IdPatamarCarga) \
       m(UnidadeUHE,  AttMatriz,           potencia_disponivel_maxima,     double,          0,        50000,             0,  Periodo, IdPatamarCarga) 
 //        c_classe,    smrtAtt,                         nomeAtributo,       Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador

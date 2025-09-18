@@ -60,41 +60,12 @@ DEFINE_OPERADOR_SMART_ENUM_MAIS_MAIS(SmartAtributo##Classe) \
 
 
 #define DEFINE_METODOS_AttVetor(Classe, Atributo) \
-virtual void addDadoAttVetor(const std::string a_idMembro, const std::string a_iterador, const std::string a_atributo, const std::string a_vlrDado){  \
-	try { addDadoAttVetor(a_idMembro, a_iterador, a_atributo, a_vlrDado, 1); } \
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttVetor(" + a_idMembro + "," + a_iterador + "," + a_atributo + ","  + a_vlrDado + "): \n" + std::string(erro.what())); }\
-}; \
-virtual void addDadoAttVetor(const std::string a_idMembro, const std::string a_iterador, const std::string a_atributo, const std::string a_vlrDado, const int a_alocacao){  \
-	try { \
-		if ((a_iterador == "") && (a_vlrDado == "")) { \
-			validacaoDadosAttVetor(std::vector<std::string>{a_atributo}); \
-			return;  \
-		} \
-		else if (getIdObjeto() != getId##Classe##FromChar(a_idMembro.c_str())) \
-			throw std::invalid_argument("Inconsistencia na alocacao de dados. Membro Argumento - " + a_idMembro + " - Membro Destino - " + getString(getIdObjeto())); \
-		else { \
-			const Atributo##Classe atributo = get##Atributo##Classe##FromChar(a_atributo.c_str()); \
-			addElementoFromString(atributo, a_iterador, a_vlrDado, a_alocacao); \
-		} \
+virtual void addDadoAttVetor(const std::vector<std::string> &a_iter, const std::string &a_att, const std::vector<std::string> & a_vlr){  \
+	try {\
+		const Atributo##Classe att = get##Atributo##Classe##FromChar(a_att.c_str()); \
+		lista##Atributo##Classe.at(att)->addVetorFromString(a_iter, a_vlr);\
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttVetor(" + a_idMembro + "," + a_iterador + "," + a_atributo + ","  + a_vlrDado + "," + getFullString(a_alocacao) + "): \n" + std::string(erro.what())); }\
-}; \
-virtual void addDadoAttVetor(const std::string a_iterador, const std::string a_atributo, const std::string a_vlrDado){  \
-	try { addDadoAttVetor(a_iterador, a_atributo, a_vlrDado, 1); } \
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttVetor(" + a_iterador + "," + a_atributo + ","  + a_vlrDado + "): \n" + std::string(erro.what())); }\
-}; \
-virtual void addDadoAttVetor(const std::string a_iterador, const std::string a_atributo, const std::string a_vlrDado, const int a_alocacao){  \
-	try { \
-		if ((a_iterador == "") && (a_vlrDado == "")) { \
-			validacaoDadosAttVetor(std::vector<std::string>{a_atributo}); \
-			return;  \
-		} \
-		else { \
-			const Atributo##Classe atributo = get##Atributo##Classe##FromChar(a_atributo.c_str()); \
-			addElementoFromString(atributo, a_iterador, a_vlrDado, a_alocacao); \
-		} \
-	} \
-	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttVetor(" + a_iterador + "," + a_atributo + ","  + a_vlrDado + "," + getFullString(a_alocacao) + "): \n" + std::string(erro.what())); }\
+	catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Classe) + "::addDadoAttVetor(): \n" + std::string(erro.what())); }\
 }; \
 virtual std::vector<std::vector<std::string>> getDadosAttVetor(const bool a_incluirIteradores, const std::string a_iteradorInicial, const std::string a_iteradorFinal, const bool a_incluirAtributo, const std::vector<std::string> a_atributo){  \
 	try { \
@@ -219,21 +190,21 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 		}\
 		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + "_Struct::addElemento(" + getString(a_iterador) + "," + getString(a_valor) + "): \n" + std::string(erro.what())); }\
 	};\
-	virtual bool addElementoFromString(const std::string a_iterador, const std::string a_valor) { \
-		try{ return addElementoFromString(a_iterador, a_valor, 1); }\
-		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + "_Struct::addElementoFromString(" + a_iterador + "," + a_valor + "): \n" + std::string(erro.what())); }\
-	};\
-	virtual bool addElementoFromString(const std::string a_iterador, const std::string a_valor, const int a_alocacao) { \
+	virtual bool addVetorFromString(const std::vector<std::string> &a_iter, const std::vector<std::string> &a_vlr) { \
 		try{ \
-			if (getSizeVetor() == 0) { dados = SmartEnupla<TipoIterador,TipoValor>(a_alocacao); }; \
-			if (strCompara(a_valor.c_str(), "NaN") || strCompara(a_valor.c_str(), "-nan(ind)")) { throw std::invalid_argument("Valor NaN."); }\
-			const TipoValor valor = get##TipoValor##FromChar(a_valor.c_str());\
-			if (valor < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
-			else if (valor > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
-			else { dados.addElemento(get##TipoIterador##FromChar(a_iterador.c_str()), valor); } \
-			return true;\
+			SmartEnupla<TipoIterador, TipoValor> enupla(int(a_vlr.size()));\
+			for (int it = 0; it < int(a_vlr.size()); it++) \
+				enupla.addElemento(get##TipoIterador##FromChar(a_iter.at(it).c_str()), get##TipoValor##FromChar(a_vlr.at(it).c_str()));\
+			if (getSizeVetor() == 0) \
+				setVetor(enupla);\
+			else{\
+				SmartEnupla<TipoIterador, TipoValor> enupla_prev = dados;\
+				enupla_prev.addElemento(enupla);\
+				setVetor(enupla_prev);\
+			}\
+			return true; \
 		}\
-		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + "_Struct::addElementoFromString(" + a_iterador + "," + a_valor + "," + getFullString(a_alocacao) + "): \n" + std::string(erro.what())); }\
+		catch (const std::exception& erro) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) + "_Struct::addVetorFromString(): \n" + std::string(erro.what())); }\
 	};\
 	virtual std::vector<std::vector<std::string>> getStringsFromElementos(const bool a_incluirAtributo, const bool a_incluirIteradores, const std::string a_iteradorInicial, const std::string a_iteradorFinal) const { \
 		try{ \
@@ -249,7 +220,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 				if (getString(TipoIterador()) == getString(Periodo())){ \
 					if (getSizeVetor() > 0){ \
 						for (TipoIterador iter = iteradorInicial; iter <= iteradorFinal; vetor.incrementarIterador(iter)) \
-							vetor_auxiliar_iterador.addElemento(iter, true); \
+							vetor_auxiliar_iterador.addElemento_rIt(iter, true); \
 					} \
 					else {\
 						std::vector<std::vector<std::string>> vetorRetorno; \
@@ -268,7 +239,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 				iteradorFinal   = getIteradorFinal(TipoIterador()); \
 				if (getString(TipoIterador()) == getString(Periodo())){ \
 					for (TipoIterador iter = iteradorInicial; iter <= iteradorFinal; vetor.incrementarIterador(iter)) \
-						vetor_auxiliar_iterador.addElemento(iter, true); \
+						vetor_auxiliar_iterador.addElemento_rIt(iter, true); \
 				} \
 				else \
 					vetor_auxiliar_iterador = SmartEnupla<TipoIterador, bool>(iteradorInicial, std::vector<bool>(int(iteradorFinal - iteradorInicial) + 1, true)); \
@@ -296,7 +267,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 					if ((iter < iteradorInicial_local) || (iter > iteradorFinal_local))\
 						vetorRetorno.at(numLinhas-1).at(espacoAtributo + i) = ""; \
 					else \
-						vetorRetorno.at(numLinhas-1).at(espacoAtributo + i) = getString(dados.getElemento(iter)); \
+						vetorRetorno.at(numLinhas-1).at(espacoAtributo + i) = getString(dados.getElemento_rIt(iter)); \
 					if (a_incluirIteradores) \
 						vetorRetorno.at(0).at(espacoAtributo + i) = getString(iter); \
 					i++; \
@@ -357,7 +328,7 @@ struct Atributo##Classe##_##nomeAtributo##_Struct: Atributo##Classe##_Struct{ \
 			const TipoIterador iteradorInicial = a_vetor.getIteradorInicial(); \
 			const TipoIterador iteradorFinal   = a_vetor.getIteradorFinal(); \
 			for (TipoIterador iter = iteradorInicial; iter <= iteradorFinal; a_vetor.incrementarIterador(iter)){ \
-				TipoValor valor = a_vetor.at(iter); \
+				TipoValor valor = a_vetor.at_rIt(iter); \
 				if (valor < Atributo##Classe##PreData.nomeAtributo##_LB) { throw std::invalid_argument("Valor inferior ao valor minimo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
 				else if (valor > Atributo##Classe##PreData.nomeAtributo##_UB) { throw std::invalid_argument("Valor superior ao valor maximo do atributo " + std::string(#Atributo) + std::string(#Classe) + "_" + std::string(#nomeAtributo) ); }\
 			} \
@@ -433,6 +404,7 @@ struct Atributo##Classe##_Struct{\
 \
 	virtual ~Atributo##Classe##_Struct(){}; \
 \
+	virtual bool addVetorFromString(const std::vector<std::string> &a_iter, const std::vector<std::string> &a_vlr) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addVetorFromString(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool addElementoFromString(const std::string a_iterador, const std::string a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElementoFromString(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool addElementoFromString(const std::string a_iterador, const std::string a_valor, const int a_alocacao) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElementoFromString(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool clear()                                                                        { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::clear(): \nEstrutura de dados nao definida."); return false; }; \
@@ -446,12 +418,10 @@ struct Atributo##Classe##_Struct{\
 	virtual bool addElemento(const Periodo     a_iterador,             const          TipoDetalhamentoProducaoTermeletrica a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool addElemento(const Periodo     a_iterador,             const             IdEstagio a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool addElemento(const IdCenario   a_iterador,             const             IdCenario a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElemento(): \nEstrutura de dados nao definida."); return false; }; \
-	virtual bool addElemento(const int         a_iterador,             const      IdUnidadeRealUTE a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool addElemento(const int         a_iterador,             const        IdHidreletrica a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool addElemento(const int         a_iterador,             const        IdTermeletrica a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElemento(): \nEstrutura de dados nao definida."); return false; }; \
     virtual bool addElemento(const int         a_iterador,             const         IdIntercambio a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool addElemento(const int         a_iterador,             const          IdSubmercado a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElemento(): \nEstrutura de dados nao definida."); return false; }; \
-	virtual bool addElemento(const IdNo        a_iterador,             const		  IdRealizacao a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool addElemento(const int         a_iterador,             const		IdCorteBenders a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool addElemento(const int         a_iterador,             const	  IdVariavelEstado a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool addElemento(const int         a_iterador,             const	  IdRealizacao     a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::addElemento(): \nEstrutura de dados nao definida."); return false; }; \
@@ -465,12 +435,10 @@ struct Atributo##Classe##_Struct{\
 	virtual bool setElemento(const Periodo   a_iterador,             const             IdEstagio a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setElemento(const IdCenario a_iterador,             const             IdCenario a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setElemento(const IdProcesso a_iterador,             const             IdCenario a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setElemento(): \nEstrutura de dados nao definida."); return false; }; \
-	virtual bool setElemento(const int       a_iterador,             const       IdUnidadeRealUTE a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setElemento(const int       a_iterador,             const        IdHidreletrica a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setElemento(const int       a_iterador,             const        IdTermeletrica a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setElemento(const int       a_iterador,             const         IdIntercambio a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setElemento(const int       a_iterador,             const          IdSubmercado a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setElemento(): \nEstrutura de dados nao definida."); return false; }; \
-	virtual bool setElemento(const IdNo      a_iterador,             const          IdRealizacao a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setElemento(const int       a_iterador,             const        IdCorteBenders a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setElemento(const int       a_iterador,             const      IdVariavelEstado a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setElemento(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setElemento(const int       a_iterador,             const      IdRealizacao     a_valor) { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setElemento(): \nEstrutura de dados nao definida."); return false; }; \
@@ -483,12 +451,10 @@ struct Atributo##Classe##_Struct{\
 	virtual IdCenario             getElementoVetor(const IdProcesso a_iterador, const             IdCenario a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getElementoVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual TipoDetalhamentoProducaoHidreletrica  getElementoVetor(const Periodo   a_iterador, const        TipoDetalhamentoProducaoHidreletrica a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getElementoVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual IdHidreletrica        getElementoVetor(const int       a_iterador, const        IdHidreletrica a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getElementoVetor(): \nEstrutura de dados nao definida.");}; \
-	virtual IdUnidadeRealUTE      getElementoVetor(const int       a_iterador, const      IdUnidadeRealUTE a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getElementoVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual IdTermeletrica        getElementoVetor(const int       a_iterador, const        IdTermeletrica a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getElementoVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual TipoDetalhamentoProducaoTermeletrica getElementoVetor(const Periodo   a_iterador, const     TipoDetalhamentoProducaoTermeletrica a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getElementoVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual IdIntercambio         getElementoVetor(const int       a_iterador, const         IdIntercambio a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getElementoVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual IdSubmercado          getElementoVetor(const int       a_iterador, const          IdSubmercado a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getElementoVetor(): \nEstrutura de dados nao definida.");}; \
-	virtual IdRealizacao		  getElementoVetor(const IdNo      a_iterador, const		  IdRealizacao a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getElementoVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual IdCorteBenders		  getElementoVetor(const int       a_iterador, const		IdCorteBenders a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getElementoVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual IdVariavelEstado	  getElementoVetor(const int       a_iterador, const	  IdVariavelEstado a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getElementoVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual IdRealizacao     	  getElementoVetor(const int       a_iterador, const	  IdRealizacao     a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getElementoVetor(): \nEstrutura de dados nao definida.");}; \
@@ -502,11 +468,9 @@ struct Atributo##Classe##_Struct{\
 	virtual bool setVetor(const SmartEnupla<IdCenario,        IdCenario> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor(const SmartEnupla<IdProcesso,        IdCenario> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor(const SmartEnupla<int,         IdHidreletrica> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor(): \nEstrutura de dados nao definida."); return false; }; \
-	virtual bool setVetor(const SmartEnupla<int,       IdUnidadeRealUTE> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor(const SmartEnupla<int,         IdTermeletrica> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor(const SmartEnupla<int,           IdSubmercado> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor(const SmartEnupla<int,          IdIntercambio> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor(): \nEstrutura de dados nao definida."); return false; }; \
-	virtual bool setVetor(const SmartEnupla<IdNo,          IdRealizacao> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor(const SmartEnupla<int,         IdCorteBenders> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor(const SmartEnupla<int,       IdVariavelEstado> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor(const SmartEnupla<int,           IdRealizacao> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor(): \nEstrutura de dados nao definida."); return false; }; \
@@ -520,11 +484,9 @@ struct Atributo##Classe##_Struct{\
 	virtual bool setVetor_forced(const SmartEnupla<IdCenario,        IdCenario> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor_forced(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor_forced(const SmartEnupla<IdProcesso,        IdCenario> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor_forced(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor_forced(const SmartEnupla<int,         IdHidreletrica> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor_forced(): \nEstrutura de dados nao definida."); return false; }; \
-	virtual bool setVetor_forced(const SmartEnupla<int,       IdUnidadeRealUTE> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor_forced(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor_forced(const SmartEnupla<int,         IdTermeletrica> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor_forced(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor_forced(const SmartEnupla<int,           IdSubmercado> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor_forced(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor_forced(const SmartEnupla<int,          IdIntercambio> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor_forced(): \nEstrutura de dados nao definida."); return false; }; \
-	virtual bool setVetor_forced(const SmartEnupla<IdNo,          IdRealizacao> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor_forced(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor_forced(const SmartEnupla<int,         IdCorteBenders> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor_forced(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor_forced(const SmartEnupla<int,       IdVariavelEstado> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor_forced(): \nEstrutura de dados nao definida."); return false; }; \
 	virtual bool setVetor_forced(const SmartEnupla<int,           IdRealizacao> &a_vetor){ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::setVetor_forced(): \nEstrutura de dados nao definida."); return false; }; \
@@ -537,12 +499,10 @@ struct Atributo##Classe##_Struct{\
 	virtual SmartEnupla<Periodo,          IdEstagio> getVetor(Periodo   a_iterador,             IdEstagio a_valor)const { throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getVetor(): \nEstrutura de dados nao definida."); }; \
 	virtual SmartEnupla<IdCenario,        IdCenario> getVetor(IdCenario a_iterador,             IdCenario a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual SmartEnupla<IdProcesso,        IdCenario> getVetor(IdProcesso a_iterador,             IdCenario a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getVetor(): \nEstrutura de dados nao definida.");}; \
-	virtual SmartEnupla<int,       IdUnidadeRealUTE> getVetor(int       a_iterador,      IdUnidadeRealUTE a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual SmartEnupla<int,         IdHidreletrica> getVetor(int       a_iterador,        IdHidreletrica a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual SmartEnupla<int,         IdTermeletrica> getVetor(int       a_iterador,        IdTermeletrica a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual SmartEnupla<int,          IdIntercambio> getVetor(int       a_iterador,         IdIntercambio a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual SmartEnupla<int,           IdSubmercado> getVetor(int       a_iterador,          IdSubmercado a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getVetor(): \nEstrutura de dados nao definida.");}; \
-	virtual SmartEnupla<IdNo,          IdRealizacao> getVetor(IdNo      a_iterador,          IdRealizacao a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual SmartEnupla<int,         IdCorteBenders> getVetor(int       a_iterador,        IdCorteBenders a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual SmartEnupla<int,       IdVariavelEstado> getVetor(int       a_iterador,      IdVariavelEstado a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getVetor(): \nEstrutura de dados nao definida.");}; \
 	virtual SmartEnupla<int,           IdRealizacao> getVetor(int       a_iterador,          IdRealizacao a_valor)const{ throw std::invalid_argument(std::string(#Atributo) + std::string(#Classe) + "_Nenhum_Struct::getVetor(): \nEstrutura de dados nao definida.");}; \

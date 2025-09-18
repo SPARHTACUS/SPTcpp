@@ -6,7 +6,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-MetodoSolucao::MetodoSolucao(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdMetodoSolucao a_idMetodoSolucao, ModeloOtimizacao &a_modeloOtimizacao){
+MetodoSolucao::MetodoSolucao(EntradaSaidaDados a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_maiorIdProcesso, const IdMetodoSolucao a_idMetodoSolucao, ModeloOtimizacao &a_modeloOtimizacao, Dados& a_dados){
 	try {
 
 		INICIALIZA_SMART_ELEMENTO(MetodoSolucao, SMART_ELEMENTO_METODO_SOLUCAO)
@@ -25,7 +25,7 @@ MetodoSolucao::MetodoSolucao(EntradaSaidaDados a_entradaSaidaDados, const IdProc
 			if ((idModeloOtimizacao != IdModeloOtimizacao_multiestagio_estocastico_otimizacao) && (idModeloOtimizacao != IdModeloOtimizacao_multiestagio_estocastico_simulacao))
 				throw std::invalid_argument("Modelo de otimizacao " + getFullString(idModeloOtimizacao) + " nao compativel com metodo de solucao.");
 
-			executarPDDE(a_entradaSaidaDados, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao);
+			executarPDDE(a_entradaSaidaDados, a_idProcesso, a_maiorIdProcesso, a_modeloOtimizacao, a_dados);
 
 		} // if (a_idMetodoSolucao == IdMetodoSolucao_PDDE) {
 
@@ -73,13 +73,19 @@ MetodoSolucao::~MetodoSolucao(){
 
 void MetodoSolucao::incrementarTempoExecucao(const IdIteracao a_idIteracao, const double a_tempo_adicional) {
 
-	try{
+	try {
 
 		if (getSizeVetor(AttVetorMetodoSolucao_tempo_execucao) == 0)
 			addElemento(AttVetorMetodoSolucao_tempo_execucao, a_idIteracao, a_tempo_adicional);
 		else {
-			if (getIteradorFinal(AttVetorMetodoSolucao_tempo_execucao, IdIteracao()) < a_idIteracao)
+			if (getIteradorFinal(AttVetorMetodoSolucao_tempo_execucao, IdIteracao()) < a_idIteracao) {
+				const IdIteracao idIter_eval = IdIteracao(getIteradorFinal(AttVetorMetodoSolucao_tempo_execucao, IdIteracao()) + 1);
+				if (a_idIteracao > idIter_eval) {
+					for (IdIteracao idIter = idIter_eval; idIter < a_idIteracao; idIter++)
+						addElemento(AttVetorMetodoSolucao_tempo_execucao, idIter, 0.0);
+				}
 				addElemento(AttVetorMetodoSolucao_tempo_execucao, a_idIteracao, a_tempo_adicional);
+			}
 			else {
 				const double tempo_anterior = getElementoVetor(AttVetorMetodoSolucao_tempo_execucao, a_idIteracao, double());
 				setElemento(AttVetorMetodoSolucao_tempo_execucao, a_idIteracao, a_tempo_adicional + tempo_anterior);

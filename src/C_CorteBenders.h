@@ -4,7 +4,8 @@
 #include "C_SmartElemento.h"
 
 #define ATT_COMUM_CORTE_BENDERS(m)  \
-	  m(CorteBenders,  AttComum,     idCorteBenders,   IdCorteBenders,         min,         max,           min,      sim) \
+	  m(CorteBenders,  AttComum,        idCorteBenders,   IdCorteBenders,         min,         max,           min,      sim) \
+	  m(CorteBenders,  AttComum,            is_externo,           bool,           min,         max,           nao,      nao) \
 	  m(CorteBenders,  AttComum,     is_corte_dominado,           int,           0,           1,             0,      nao) 
 //          c_classe,   smrtAtt,       nomeAtributo,             tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -17,26 +17,22 @@
     <ClCompile Include="..\src\C_BaciaHidrografica.cpp" />
     <ClCompile Include="..\src\C_ConjuntoHidraulico.cpp" />
     <ClCompile Include="..\src\C_Contrato.cpp" />
+    <ClCompile Include="..\src\C_ControleCotaVazao.cpp" />
     <ClCompile Include="..\src\C_CorteBenders.cpp" />
     <ClCompile Include="..\src\C_Dados.cpp" />
-    <ClCompile Include="..\src\C_Dados_CP.cpp" />
-    <ClCompile Include="..\src\C_Dados_MP.cpp" />
     <ClCompile Include="..\src\C_Defluencia.cpp" />
     <ClCompile Include="..\src\C_DemandaEspecial.cpp" />
-    <ClCompile Include="..\src\C_DiscretizacaoTemporal.cpp" />
     <ClCompile Include="..\src\C_ElementoSistema.cpp" />
     <ClCompile Include="..\src\C_EntradaSaidaDados.cpp" />
-    <ClCompile Include="..\src\C_Eolica.cpp" />
+    <ClCompile Include="..\src\C_Renovavel.cpp" />
     <ClCompile Include="..\src\C_RestricaoCenario.cpp" />
     <ClCompile Include="..\src\C_EstagioOtimizacao.cpp" />
     <ClCompile Include="..\src\C_FuncaoProducaoHidreletrica.cpp" />
     <ClCompile Include="..\src\C_Hidreletrica.cpp" />
     <ClCompile Include="..\src\C_Intercambio.cpp" />
-    <ClCompile Include="..\src\C_IntercambioHidraulico.cpp" />
     <ClCompile Include="..\src\C_Iteracao.cpp" />
     <ClCompile Include="..\src\C_LeituraCEPEL.cpp" />
     <ClCompile Include="..\src\C_LeituraCEPEL_DECOMP.cpp" />
-    <ClCompile Include="..\src\C_LeituraCEPEL_DESSEM.cpp" />
     <ClCompile Include="..\src\C_LeituraCEPEL_NEWAVE.cpp" />
     <ClCompile Include="..\src\C_MetodoSolucao.cpp" />
     <ClCompile Include="..\src\C_MetodoSolucao_PDDE.cpp" />
@@ -49,7 +45,6 @@
     <ClCompile Include="..\src\C_Processo.cpp" />
     <ClCompile Include="..\src\C_ProcessoEstocastico.cpp" />
     <ClCompile Include="..\src\C_ReservatorioEquivalente.cpp" />
-    <ClCompile Include="..\src\C_Regua11.cpp" />
     <ClCompile Include="..\src\C_ReservaPotencia.cpp" />
     <ClCompile Include="..\src\C_Reservatorio.cpp" />
     <ClCompile Include="..\src\C_RestricaoEletrica.cpp" />
@@ -75,20 +70,19 @@
     <ClInclude Include="..\src\C_BaciaHidrografica.h" />
     <ClInclude Include="..\src\C_ConjuntoHidraulico.h" />
     <ClInclude Include="..\src\C_Contrato.h" />
+    <ClInclude Include="..\src\C_ControleCotaVazao.h" />
     <ClInclude Include="..\src\C_CorteBenders.h" />
     <ClInclude Include="..\src\C_Dados.h" />
     <ClInclude Include="..\src\C_Defluencia.h" />
     <ClInclude Include="..\src\C_DemandaEspecial.h" />
-    <ClInclude Include="..\src\C_DiscretizacaoTemporal.h" />
     <ClInclude Include="..\src\C_ElementoSistema.h" />
     <ClInclude Include="..\src\C_EntradaSaidaDados.h" />
-    <ClInclude Include="..\src\C_Eolica.h" />
+    <ClInclude Include="..\src\C_Renovavel.h" />
     <ClInclude Include="..\src\C_RestricaoCenario.h" />
     <ClInclude Include="..\src\C_EstagioOtimizacao.h" />
     <ClInclude Include="..\src\C_FuncaoProducaoHidreletrica.h" />
     <ClInclude Include="..\src\C_Hidreletrica.h" />
     <ClInclude Include="..\src\C_Intercambio.h" />
-    <ClInclude Include="..\src\C_IntercambioHidraulico.h" />
     <ClInclude Include="..\src\C_Iteracao.h" />
     <ClInclude Include="..\src\C_LeituraCEPEL.h" />
     <ClInclude Include="..\src\C_MetodoSolucao.h" />
@@ -101,7 +95,6 @@
     <ClInclude Include="..\src\C_Processo.h" />
     <ClInclude Include="..\src\C_ProcessoEstocastico.h" />
     <ClInclude Include="..\src\C_ReservatorioEquivalente.h" />
-    <ClInclude Include="..\src\C_Regua11.h" />
     <ClInclude Include="..\src\C_ReservaPotencia.h" />
     <ClInclude Include="..\src\C_Reservatorio.h" />
     <ClInclude Include="..\src\C_RestricaoEletrica.h" />
@@ -134,6 +127,7 @@
     <ProjectGuid>{5c3c71d3-e400-42b7-8c4f-3ffcacefde79}</ProjectGuid>
     <RootNamespace>SPTWINapp</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>SPTWIN</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -186,7 +180,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(MSMPI_LIB64);$(GUROBI_LIB64);$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>msmpi.lib;gurobi91.lib;gurobi_c++mdd2019.lib;libSeq.lib;libCoinUtils.lib;libClp.lib;libCbc.lib;libCbcSolver.lib;libOsi.lib;libOsiCbc.lib;libOsiClp.lib;libCgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>msmpi.lib;gurobi100.lib;gurobi_c++mdd2017.lib;libSeq.lib;libCoinUtils.lib;libClp.lib;libCbc.lib;libCbcSolver.lib;libOsi.lib;libOsiCbc.lib;libOsiClp.lib;libCgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -203,7 +197,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/Bv /bigobj %(AdditionalOptions)</AdditionalOptions>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <PreprocessToFile>false</PreprocessToFile>
       <LanguageStandard_C>Default</LanguageStandard_C>

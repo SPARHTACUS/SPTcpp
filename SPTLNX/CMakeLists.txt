@@ -1,77 +1,82 @@
-cmake_minimum_required(VERSION 3.10)
+﻿# CMakeList.txt : CMake project for SPTLNX, include source and define
+# project specific logic here.
+#
+cmake_minimum_required (VERSION 3.10)
 
-project(SPTLNX)
+project ("SPTLNX")
 
 set(CMAKE_CXX_STANDARD 20)
-   
+  
 find_package(MPI REQUIRED)
   
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 
-#set(CMAKE_CXX_FLAGS "-DGRB -I${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/COIN/dist/include/coin-or -I${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/lsZollen -I/opt/gurobi912/linux64/include -Ofast")
+# Diretorio do projeto
+set(SPT_DIR "/mnt/d/repos/SPARHTACUS")
 
-set(CMAKE_CXX_FLAGS "-I${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/COIN/dist/include/coin-or -I${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/lsZollen -Ofast")
+#set(CMAKE_CXX_FLAGS "-DGRB -I${SPT_DIR}/ThirdParty/COIN/dist/include/coin-or -I${SPT_DIR}/ThirdParty/lsZollen -I/opt/gurobi912/linux64/include -Ofast")
 
-#set(LINK_FLAGS "-L/opt/gurobi912/linux64/lib -lgurobi_c++ -lgurobi91 -L${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/COIN/dist/lib -lCbcSolver -lCbc -lCgl -lOsiClp -lClpSolver -lClp -lOsi -lCoinUtils -lcoinlapack -lcoinblas -lbz2 -lz -lgfortran -lgomp -lquadmath -ldl -lpthread")
+set(CMAKE_CXX_FLAGS "-I${SPT_DIR}/ThirdParty/COIN/dist/include/coin-or -I${SPT_DIR}/ThirdParty/lsZollen -Ofast")
 
-set(LINK_FLAGS "-L${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/COIN/dist/lib -lCbc -lCgl -lOsiClp -lClp -lOsi -lCoinUtils -lcoinlapack -lcoinblas -lbz2 -lz -lgfortran -lgomp -lquadmath -ldl -lpthread -lreadline")
+#set(LINK_FLAGS "-L/opt/gurobi912/linux64/lib -lgurobi_c++ -lgurobi91 -L${SPT_DIR}/ThirdParty/COIN/dist/lib -lCbcSolver -lCbc -lCgl -lOsiClp -lClpSolver -lClp -lOsi -lCoinUtils -lcoinlapack -lcoinblas -lbz2 -lz -lgfortran -lgomp -lquadmath -ldl -lpthread")
 
-set(SPT_SOURCES ../src/SPT_main.cpp
-                ../src/C_Afluencia.cpp
-                ../src/C_AgrupamentoIntercambio.cpp
-                ../src/C_BaciaHidrografica.cpp
-                ../src/C_ConjuntoHidraulico.cpp 
-                ../src/C_Contrato.cpp 
-                ../src/C_CorteBenders.cpp 
-                ../src/C_Dados_CP.cpp 
-                ../src/C_Dados.cpp
-                ../src/C_Dados_MP.cpp 
-                ../src/C_Defluencia.cpp 
-                ../src/C_DemandaEspecial.cpp 
-                ../src/C_DiscretizacaoTemporal.cpp 
-                ../src/C_ElementoSistema.cpp 
-                ../src/C_EntradaSaidaDados.cpp 
-                ../src/C_Eolica.cpp 
-                ../src/C_EstagioOtimizacao.cpp 
-                ../src/C_FuncaoProducaoHidreletrica.cpp 
-                ../src/C_Hidreletrica.cpp 
-                ../src/C_Intercambio.cpp 
-                ../src/C_IntercambioHidraulico.cpp
-                ../src/C_Iteracao.cpp 
-                ../src/C_LeituraCEPEL.cpp 
-                ../src/C_LeituraCEPEL_DECOMP.cpp 
-                ../src/C_LeituraCEPEL_DESSEM.cpp 
-                ../src/C_LeituraCEPEL_NEWAVE.cpp 
-                ../src/C_MetodoSolucao.cpp 
-                ../src/C_MetodoSolucao_PDDE.cpp 
-                ../src/C_MetodoSolucao_PSD.cpp 
-                ../src/C_ModeloOtimizacao.cpp 
-                ../src/C_ModeloOtimizacao_multiestagio_estocastico.cpp 
-                ../src/C_PatamarDeficit.cpp 
-                ../src/C_Periodo.cpp 
-                ../src/C_PolinomioJusante.cpp 
-                ../src/C_ProcessoEstocastico.cpp
-                ../src/C_Processo.cpp 
-                ../src/C_Regua11.cpp 
-                ../src/C_ReservaPotencia.cpp 
-                ../src/C_Reservatorio.cpp
-                ../src/C_ReservatorioEquivalente.cpp
-                ../src/C_RestricaoEletrica.cpp 
-                ../src/C_RestricaoOperativaUHE.cpp 
-                ../src/C_RestricaoRealizacao.cpp
-                ../src/C_Submercado.cpp 
-                ../src/C_Termeletrica.cpp 
-                ../src/C_UnidadeUHE.cpp 
-                ../src/C_UnidadeUTE.cpp 
-                ../src/C_UsinaElevatoria.cpp 
-                ../src/C_UsinaNaoSimulada.cpp 
-                ../src/C_VariavelAleatoria.cpp 
-                ../src/C_VariavelAleatoriaInterna.cpp 
-                ../src/C_VariavelEstado.cpp 
-                ../src/C_VariavelRealizacao.cpp 
-                ../src/C_VariavelRealizacaoInterna.cpp)
+set(LINK_FLAGS "-L${SPT_DIR}/ThirdParty/COIN/dist/lib -lCbc -lCgl -lOsiClp -lClp -lOsi -lCoinUtils -lcoinlapack -lcoinblas -lbz2 -lz -lgfortran -lgomp -lquadmath -ldl -lpthread -lreadline")
+
+set(SPT_SOURCES ${SPT_DIR}/src/SPT_main.cpp
+                ${SPT_DIR}/src/C_Afluencia.cpp
+                ${SPT_DIR}/src/C_AgrupamentoIntercambio.cpp
+                ${SPT_DIR}/src/C_ArranjoResolucao.cpp
+                ${SPT_DIR}/src/C_BaciaHidrografica.cpp
+                ${SPT_DIR}/src/C_ConjuntoHidraulico.cpp 
+                ${SPT_DIR}/src/C_Contrato.cpp
+                ${SPT_DIR}/src/C_ControleCotaVazao.cpp
+                ${SPT_DIR}/src/C_CorteBenders.cpp
+                ${SPT_DIR}/src/C_Dados.cpp
+                ${SPT_DIR}/src/C_Defluencia.cpp 
+                ${SPT_DIR}/src/C_DemandaEspecial.cpp 
+                ${SPT_DIR}/src/C_ElementoSistema.cpp 
+                ${SPT_DIR}/src/C_EntradaSaidaDados.cpp 
+                ${SPT_DIR}/src/C_EstagioOtimizacao.cpp 
+                ${SPT_DIR}/src/C_FuncaoProducaoHidreletrica.cpp 
+                ${SPT_DIR}/src/C_Hidreletrica.cpp 
+                ${SPT_DIR}/src/C_Intercambio.cpp 
+                ${SPT_DIR}/src/C_Iteracao.cpp 
+                ${SPT_DIR}/src/C_LeituraCEPEL.cpp 
+                ${SPT_DIR}/src/C_LeituraCEPEL_DECOMP.cpp 
+                ${SPT_DIR}/src/C_LeituraCEPEL_NEWAVE.cpp 
+                ${SPT_DIR}/src/C_MetodoSolucao.cpp 
+                ${SPT_DIR}/src/C_MetodoSolucao_PDDE.cpp 
+                ${SPT_DIR}/src/C_MetodoSolucao_PSD.cpp 
+                ${SPT_DIR}/src/C_ModeloOtimizacao.cpp 
+                ${SPT_DIR}/src/C_ModeloOtimizacao_multiestagio_estocastico.cpp 
+                ${SPT_DIR}/src/C_PatamarDeficit.cpp 
+                ${SPT_DIR}/src/C_Periodo.cpp 
+                ${SPT_DIR}/src/C_PolinomioJusante.cpp 
+                ${SPT_DIR}/src/C_Processo.cpp 
+                ${SPT_DIR}/src/C_ProcessoEstocastico.cpp
+                ${SPT_DIR}/src/C_Renovavel.cpp 
+                ${SPT_DIR}/src/C_ReservaPotencia.cpp 
+                ${SPT_DIR}/src/C_Reservatorio.cpp
+                ${SPT_DIR}/src/C_ReservatorioEquivalente.cpp
+                ${SPT_DIR}/src/C_RestricaoCenario.cpp
+                ${SPT_DIR}/src/C_RestricaoEletrica.cpp 
+                ${SPT_DIR}/src/C_RestricaoOperativaUHE.cpp 
+                ${SPT_DIR}/src/C_Submercado.cpp 
+                ${SPT_DIR}/src/C_Termeletrica.cpp 
+                ${SPT_DIR}/src/C_UnidadeUHE.cpp 
+                ${SPT_DIR}/src/C_UnidadeUTE.cpp 
+                ${SPT_DIR}/src/C_UsinaElevatoria.cpp 
+                ${SPT_DIR}/src/C_UsinaNaoSimulada.cpp 
+                ${SPT_DIR}/src/C_VariavelAleatoria.cpp 
+                ${SPT_DIR}/src/C_VariavelAleatoriaInterna.cpp 
+                ${SPT_DIR}/src/C_VariavelEstado.cpp 
+                ${SPT_DIR}/src/C_VariavelRealizacao.cpp 
+                ${SPT_DIR}/src/C_VariavelRealizacaoInterna.cpp)
 
 add_executable(SPTLNX ${SPT_SOURCES})
   
 target_link_libraries(SPTLNX ${MPI_CXX_LIBRARIES} ${MPI_CXX_LINK_FLAGS} ${LINK_FLAGS})
- 
+
+
+
+

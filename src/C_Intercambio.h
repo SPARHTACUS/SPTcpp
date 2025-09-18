@@ -11,7 +11,7 @@
       m(Intercambio,  AttComum,        potencia_minima,         double,           0,          max,             0,      nao) \
       m(Intercambio,  AttComum,        potencia_maxima,         double,           0,          max,             0,      nao) \
       m(Intercambio,  AttComum, penalidade_intercambio,         double,           0,          max,         0.001,      sim) \
-      m(Intercambio,  AttComum, penalidade_intercambio_minimo,  double,           0,          max,          5000,      sim)
+      m(Intercambio,  AttComum, penalidade_intercambio_minimo,  double,           0,          max,         10000,      nao)
 //         c_classe,   smrtAtt,           nomeAtributo,           tipo,  lowerBound,   upperBound,  initialValue, mustRead?
 
 

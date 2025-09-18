@@ -6,19 +6,21 @@
 
 #define ATT_COMUM_ELEMENTO_SISTEMA(m)  \
 	  m(ElementoSistema,  AttComum,                 idElementoSistema,                IdElementoSistema,         min,         max,           min,      sim) \
-	  m(ElementoSistema,  AttComum,                     tipo_elemento,              TipoElementoSistema,         min,         max,           min,      sim) \
-	  m(ElementoSistema,  AttComum,                 unidadehidraulica,                     IdUnidadeUHE,      Nenhum,         max,        Nenhum,      sim) \
-	  m(ElementoSistema,  AttComum,                conjuntohidraulico,             IdConjuntoHidraulico,      Nenhum,         max,        Nenhum,      sim) \
-	  m(ElementoSistema,  AttComum,                      hidreletrica,                   IdHidreletrica,      Nenhum,         max,        Nenhum,      sim) \
-	  m(ElementoSistema,  AttComum,                      termeletrica,                   IdTermeletrica,      Nenhum,         max,        Nenhum,      sim) \
+	  m(ElementoSistema,  AttComum,                     tipo_elemento,              TipoElementoSistema,         min,         max,           min,      nao) \
+	  m(ElementoSistema,  AttComum,                 unidadehidraulica,                     IdUnidadeUHE,      Nenhum,         max,        Nenhum,      nao) \
+	  m(ElementoSistema,  AttComum,                conjuntohidraulico,             IdConjuntoHidraulico,      Nenhum,         max,        Nenhum,      nao) \
+	  m(ElementoSistema,  AttComum,                      hidreletrica,                   IdHidreletrica,      Nenhum,         max,        Nenhum,      nao) \
+	  m(ElementoSistema,  AttComum,                      termeletrica,                   IdTermeletrica,      Nenhum,         max,        Nenhum,      nao) \
 	  m(ElementoSistema,  AttComum,                   demandaEspecial,                IdDemandaEspecial,      Nenhum,         max,        Nenhum,      nao) \
-	  m(ElementoSistema,  AttComum,               unidadeTermeletrica,                     IdUnidadeUTE,      Nenhum,         max,        Nenhum,      sim) \
-	  m(ElementoSistema,  AttComum,                          contrato,                       IdContrato,      Nenhum,         max,        Nenhum,      sim) \
-	  m(ElementoSistema,  AttComum,                       intercambio,                    IdIntercambio,      Nenhum,         max,        Nenhum,      sim) \
-	  m(ElementoSistema,  AttComum,                            eolica,                    IdUsinaEolica,      Nenhum,         max,        Nenhum,      sim) \
-      m(ElementoSistema,  AttComum,                  usina_elevatoria,                IdUsinaElevatoria,      Nenhum,         max,        Nenhum,      sim) \
-      m(ElementoSistema,  AttComum,   tipoVariavelRestricaoOperativa,    TipoVariavelRestricaoOperativa,      Nenhum,         max,        Nenhum,      sim) \
-	  m(ElementoSistema,  AttComum,                fator_participacao,                           double,         -10,          10,             0,      nao)
+	  m(ElementoSistema,  AttComum,               unidadeTermeletrica,                     IdUnidadeUTE,      Nenhum,         max,        Nenhum,      nao) \
+	  m(ElementoSistema,  AttComum,                          contrato,                       IdContrato,      Nenhum,         max,        Nenhum,      nao) \
+	  m(ElementoSistema,  AttComum,                       intercambio,                    IdIntercambio,      Nenhum,         max,        Nenhum,      nao) \
+	  m(ElementoSistema,  AttComum,                         renovavel,                    IdRenovavel,      Nenhum,         max,        Nenhum,      nao) \
+      m(ElementoSistema,  AttComum,                  usina_elevatoria,                IdUsinaElevatoria,      Nenhum,         max,        Nenhum,      nao) \
+      m(ElementoSistema,  AttComum,                          demanda,                      IdSubmercado,      Nenhum,         max,        Nenhum,      nao) \
+      m(ElementoSistema,  AttComum,                   demandaliquida,                      IdSubmercado,      Nenhum,         max,        Nenhum,      nao) \
+      m(ElementoSistema,  AttComum,   tipoVariavelRestricaoOperativa,    TipoVariavelRestricaoOperativa,         min,         max,           min,      sim) \
+	  m(ElementoSistema,  AttComum,                fator_participacao,                           double,         min,         max,             0,      nao)
 //              c_classe,   smrtAtt,          nomeAtributo,          tipo,  lowerBound,  upperBound,  initialValue, mustRead?
 
 
@@ -28,7 +30,7 @@
 
 
 #define ATT_MATRIZ_ELEMENTO_SISTEMA(m)  \
-	  m(ElementoSistema,  AttMatriz, fator_participacao,          double,         min,          max,             0,  Periodo, IdPatamarCarga) 
+	  m(ElementoSistema,  AttMatriz, fator_participacao,          double,         min,          max,             0,  Periodo, IdPatamarCarga)  
 //               c_classe,    smrtAtt,                      nomeAtributo,       Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 
@@ -50,6 +52,8 @@ public:
 	ElementoSistema(const ElementoSistema &instanciaCopiar);
 	void esvaziar();
 	virtual ~ElementoSistema();
+
+	void validar();
 
 	DECLARA_SMART_ELEMENTO(ElementoSistema, SMART_ELEMENTO_ELEMENTO_SISTEMA)
 
