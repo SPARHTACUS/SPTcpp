@@ -1809,10 +1809,8 @@ private:
 
         sizeBufferRows = 0;
 
-        if (capBufferRows > cap_ini_constr) {
-            esvaziaMemRestricoes();
-            inicializaMemRestricoes();
-        }
+        esvaziaMemRestricoes();
+        inicializaMemRestricoes();
 
         free(rowStarts);
         free(rowIdxs);
@@ -1854,10 +1852,8 @@ private:
 
         sizeBufferCols = 0;
 
-        if (capBufferCols > cap_ini_var) {
-            esvaziaMemVariaveis();
-            inicializaMemVariaveis();
-        }
+        esvaziaMemVariaveis();
+        inicializaMemVariaveis();
 
         free(colStarts);
     }
@@ -2276,29 +2272,6 @@ public:
     }
 
 
-    int addVar_old(const double a_lb, const double a_ub, const double a_obj, const std::string a_nome) {
-        try {
-            std::string nomeVar = a_nome;
-            remCharsInvalidos(nomeVar);
-            const int varIdx = solver->getNumCols();
-            solver->addColumn(0, nullptr, nullptr, a_lb, a_ub, a_obj);
-            solver->setColumnName(varIdx, nomeVar);
-            solver->setContinuous(varIdx); /* variavel inicialmente setada como continua */
-
-            return varIdx;
-        }
-
-        catch (const CoinError &erro) {
-            throw std::invalid_argument("SolverCLP::addVar(" + std::to_string(a_lb) + "," + std::to_string(a_ub) + "," +
-                                        std::to_string(a_obj) + "," + a_nome + "): \n" + erro.message());
-        }
-        catch (const std::exception &erro) {
-            throw std::invalid_argument("SolverCLP::addVar(" + std::to_string(a_lb) + "," + std::to_string(a_ub) + "," +
-                                        std::to_string(a_obj) + "," + a_nome + "): \n" + std::string(erro.what()));
-        }
-    }
-
-
     int addVar(const double a_lb, const double a_ub, const double a_obj, const std::string a_nome) {
         try {
             std::string nomeVariavel = a_nome;
@@ -2620,18 +2593,6 @@ public:
         }
     }
 
-    /*
-    double getLimInferior(const int a_posicao) {
-        try {
-            return solver->getColLower()[a_posicao];
-        }
-
-        catch (const std::exception &erro) {
-            throw std::invalid_argument(
-                    "SolverCLP::getLimInferior(" + std::to_string(a_posicao) + "): \n" + std::string(erro.what()));
-        }
-    }
-    */
 
     double getLimSuperior(const int a_posicao) {
         try {
@@ -2661,18 +2622,6 @@ public:
         }
     }
 
-    /*
-    double getLimSuperior(const int a_posicao) {
-        try {
-            return solver->getColUpper()[a_posicao];
-        }
-
-        catch (const std::exception &erro) {
-            throw std::invalid_argument(
-                    "SolverCLP::getLimSuperior(" + std::to_string(a_posicao) + "): \n" + std::string(erro.what()));
-        }
-    }
-    */
 
     int addConstrIgual(const std::string a_nome) {
         try {
@@ -2683,7 +2632,8 @@ public:
                 realocaMemRestricoes();
             }
 
-            assert(sizeRow[sizeBufferRows] == 0);
+            if (sizeRow[sizeBufferRows] != 0)
+                throw std::invalid_argument("Not zero (" + std::to_string(sizeRow[sizeBufferRows]) + ") sizeRow at " + std::to_string(sizeBufferRows) + " for " + a_nome);
 
             if (capRow[sizeBufferRows] == 0) {
                 capRow[sizeBufferRows] = cap_ini_por_constr;
@@ -2726,7 +2676,8 @@ public:
                 realocaMemRestricoes();
             }
 
-            assert(sizeRow[sizeBufferRows] == 0);
+            if (sizeRow[sizeBufferRows] != 0)
+                throw std::invalid_argument("Not zero (" + std::to_string(sizeRow[sizeBufferRows]) + ") sizeRow at " + std::to_string(sizeBufferRows) + " for " + a_nome);
 
             if (capRow[sizeBufferRows] == 0) {
                 capRow[sizeBufferRows] = cap_ini_por_constr;
@@ -2774,7 +2725,8 @@ public:
                 std::string nomeRestricao = a_nomes.at(i);
                 remCharsInvalidos(nomeRestricao);
 
-                assert(sizeRow[sizeBufferRows] == 0);
+                if (sizeRow[sizeBufferRows] != 0)
+				    throw std::invalid_argument("Not zero (" + std::to_string(sizeRow[sizeBufferRows]) + ") sizeRow at " + std::to_string(sizeBufferRows) + " for " + nomeRestricao);
 
                 if (capRow[sizeBufferRows] == 0) {
                     capRow[sizeBufferRows] = cap_ini_por_constr;
@@ -2820,7 +2772,8 @@ public:
                 realocaMemRestricoes();
             }
 
-            assert(sizeRow[sizeBufferRows] == 0);
+            if (sizeRow[sizeBufferRows] != 0)
+                throw std::invalid_argument("Not zero (" + std::to_string(sizeRow[sizeBufferRows]) + ") sizeRow at " + std::to_string(sizeBufferRows) + " for " + a_nome);
 
             if (capRow[sizeBufferRows] == 0) {
                 capRow[sizeBufferRows] = cap_ini_por_constr;

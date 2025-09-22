@@ -189,12 +189,12 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;GRB;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;SPTWIN</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;SPTWIN</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(MSMPI_INC);$(GUROBI_INC64);..\ThirdParty\lsZollen;..\ThirdParty\libseq_beta_04.21.01\src;..\ThirdParty\COIN\Clp\src;..\ThirdParty\COIN\CoinUtils\src;..\ThirdParty\COIN\Cbc\src;..\ThirdParty\COIN\Osi\src\Osi;..\ThirdParty\COIN\Clp\src\OsiClp;..\ThirdParty\COIN\Cgl\src\CglAllDifferent;..\ThirdParty\COIN\Cgl\src\CglBKClique;..\ThirdParty\COIN\Cgl\src\CglClique;..\ThirdParty\COIN\Cgl\src\CglCliqueStrengthening;..\ThirdParty\COIN\Cgl\src\CglCommon;..\ThirdParty\COIN\Cgl\src\CglDuplicateRow;..\ThirdParty\COIN\Cgl\src\CglFlowCover;..\ThirdParty\COIN\Cgl\src\CglGMI;..\ThirdParty\COIN\Cgl\src\CglGomory;..\ThirdParty\COIN\Cgl\src\CglKnapsackCover;..\ThirdParty\COIN\Cgl\src\CglLandP;..\ThirdParty\COIN\Cgl\src\CglLiftAndProject;..\ThirdParty\COIN\Cgl\src\CglMixedIntegerRounding;..\ThirdParty\COIN\Cgl\src\CglMixedIntegerRounding2;..\ThirdParty\COIN\Cgl\src\CglOddHole;..\ThirdParty\COIN\Cgl\src\CglOddWheel;..\ThirdParty\COIN\Cgl\src\CglPreProcess;..\ThirdParty\COIN\Cgl\src\CglProbing;..\ThirdParty\COIN\Cgl\src\CglRedSplit;..\ThirdParty\COIN\Cgl\src\CglRedSplit2;..\ThirdParty\COIN\Cgl\src\CglResidualCapacity;..\ThirdParty\COIN\Cgl\src\CglSimpleRounding;..\ThirdParty\COIN\Cgl\src\CglTwomir;..\ThirdParty\COIN\Cgl\src\CglZeroHalf</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSMPI_INC);..\ThirdParty\lsZollen;..\ThirdParty\libseq_beta_04.21.01\src;..\ThirdParty\COIN\Clp\src;..\ThirdParty\COIN\CoinUtils\src;..\ThirdParty\COIN\Cbc\src;..\ThirdParty\COIN\Osi\src\Osi;..\ThirdParty\COIN\Clp\src\OsiClp;..\ThirdParty\COIN\Cgl\src\CglAllDifferent;..\ThirdParty\COIN\Cgl\src\CglBKClique;..\ThirdParty\COIN\Cgl\src\CglClique;..\ThirdParty\COIN\Cgl\src\CglCliqueStrengthening;..\ThirdParty\COIN\Cgl\src\CglCommon;..\ThirdParty\COIN\Cgl\src\CglDuplicateRow;..\ThirdParty\COIN\Cgl\src\CglFlowCover;..\ThirdParty\COIN\Cgl\src\CglGMI;..\ThirdParty\COIN\Cgl\src\CglGomory;..\ThirdParty\COIN\Cgl\src\CglKnapsackCover;..\ThirdParty\COIN\Cgl\src\CglLandP;..\ThirdParty\COIN\Cgl\src\CglLiftAndProject;..\ThirdParty\COIN\Cgl\src\CglMixedIntegerRounding;..\ThirdParty\COIN\Cgl\src\CglMixedIntegerRounding2;..\ThirdParty\COIN\Cgl\src\CglOddHole;..\ThirdParty\COIN\Cgl\src\CglOddWheel;..\ThirdParty\COIN\Cgl\src\CglPreProcess;..\ThirdParty\COIN\Cgl\src\CglProbing;..\ThirdParty\COIN\Cgl\src\CglRedSplit;..\ThirdParty\COIN\Cgl\src\CglRedSplit2;..\ThirdParty\COIN\Cgl\src\CglResidualCapacity;..\ThirdParty\COIN\Cgl\src\CglSimpleRounding;..\ThirdParty\COIN\Cgl\src\CglTwomir;..\ThirdParty\COIN\Cgl\src\CglZeroHalf</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/Bv /bigobj %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
@@ -208,8 +208,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(MSMPI_LIB64);$(GUROBI_LIB64);$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>msmpi.lib;gurobi100.lib;gurobi_c++mt2017.lib;libSeq.lib;libCoinUtils.lib;libClp.lib;libCbc.lib;libCbcSolver.lib;libOsi.lib;libOsiCbc.lib;libOsiClp.lib;libCgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MSMPI_LIB64);$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>msmpi.lib;libSeq.lib;libCoinUtils.lib;libClp.lib;libCbc.lib;libCbcSolver.lib;libOsi.lib;libOsiCbc.lib;libOsiClp.lib;libCgl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
