@@ -14,9 +14,9 @@ include_directories(SYSTEM ${MPI_INCLUDE_PATH})
 # Diretorio do projeto
 set(SPT_DIR "/mnt/d/repos/SPARHTACUS")
 
-#set(CMAKE_CXX_FLAGS "-DGRB -I${SPT_DIR}/ThirdParty/COIN/dist/include/coin-or -I${SPT_DIR}/ThirdParty/lsZollen -I/opt/gurobi912/linux64/include -Ofast")
+#set(CMAKE_CXX_FLAGS "-DGRB -I${SPT_DIR}/ThirdParty/COIN/dist/include/coin-or -I${SPT_DIR}/ThirdParty/lsZollen -I/opt/gurobi912/linux64/include -O3")
 
-set(CMAKE_CXX_FLAGS "-I${SPT_DIR}/ThirdParty/COIN/dist/include/coin-or -I${SPT_DIR}/ThirdParty/lsZollen -Ofast")
+set(CMAKE_CXX_FLAGS "-I${SPT_DIR}/ThirdParty/COIN/dist/include/coin-or -I${SPT_DIR}/ThirdParty/lsZollen -O3")
 
 #set(LINK_FLAGS "-L/opt/gurobi912/linux64/lib -lgurobi_c++ -lgurobi91 -L${SPT_DIR}/ThirdParty/COIN/dist/lib -lCbcSolver -lCbc -lCgl -lOsiClp -lClpSolver -lClp -lOsi -lCoinUtils -lcoinlapack -lcoinblas -lbz2 -lz -lgfortran -lgomp -lquadmath -ldl -lpthread")
 
