@@ -34,31 +34,31 @@
 	  m(Dados,  AttComum,                 diretorio_importacao_pos_estudo,                            string,         min,         max,        Nenhum,      sim) \
 	  m(Dados,  AttComum,                                iteracao_inicial,                        IdIteracao,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                         numero_maximo_iteracoes,                               int,           0,         max,             0,      sim) \
-	  m(Dados,  AttComum,                                numero_aberturas,                               int,           1,         max,             1,      nao) \
+	  m(Dados,  AttComum,                                numero_aberturas,                               int,           0,         max,             0,      nao) \
 	  m(Dados,  AttComum,             visitar_todos_cenarios_por_iteracao,                              bool,         min,         max,             0,      sim) \
 	  m(Dados,  AttComum,                                 numero_cenarios,                               int,           1,         max,             1,      sim) \
 	  m(Dados,  AttComum,                                    tipo_semente,                       TipoSemente,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                            tipo_aversao_a_risco,                  TipoAversaoRisco,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                                      alpha_CVAR,                            double,           0,           1,             0,      nao) \
 	  m(Dados,  AttComum,                                     lambda_CVAR,                            double,           0,           1,             0,      nao) \
-	  m(Dados,  AttComum,                      tipo_tendencia_hidrologica,          TipoTendenciaEstocastica,         min,         max,           min,      nao) \
+	  m(Dados,  AttComum,                      tipo_tendencia_hidrologica,          TipoTendenciaEstocastica,         min,         max, serie_informada,      nao) \
 	  m(Dados,  AttComum,         periodo_tendencia_hidrologica_historica,                           Periodo,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum, relaxar_afluencia_incremental_com_viabilidade_hidraulica,                     bool,         min,         max,           nao,      nao) \
 	  m(Dados,  AttComum,    calcular_custo_primal_via_subproblema_mestre,                              bool,          min,         max,           min,     nao) \
 	  m(Dados,  AttComum,       tipo_processo_estocastico_geracao_cenario_hidrologico, TipoProcessoEstocasticoHidrologico,         min,         max,           min,      sim) \
-	  m(Dados,  AttComum,                 tipo_correlacao_geracao_cenario_hidrologico, TipoCorrelacaoVariaveisAleatorias,         min,         max,                 min,      nao) \
+	  m(Dados,  AttComum,                 tipo_correlacao_geracao_cenario_hidrologico, TipoCorrelacaoVariaveisAleatorias,         min,         max,                 matriz_carga,      nao) \
 	  m(Dados,  AttComum,            correlacao_dominante_geracao_cenario_hidrologico,                double,        0.1,         1.0,         0.95,      nao) \
-	  m(Dados,  AttComum,                     tipo_modelo_geracao_cenario_hidrologico, TipoModeloGeracaoSinteticaCenario,      nenhum,         max,                 min,      nao) \
+	  m(Dados,  AttComum,                     tipo_modelo_geracao_cenario_hidrologico, TipoModeloGeracaoSinteticaCenario,      min,         max,                 lognormal_3p_sazonal,      nao) \
 	  m(Dados,  AttComum,tipo_coeficiente_auto_correlacao_geracao_cenario_hidrologico,                         TipoValor,         min,         max, positivo_e_negativo,      nao) \
 	  m(Dados,  AttComum,       numero_periodos_avaliacao_geracao_cenario_hidrologico,                               int,           0,         max,                   0,      nao) \
 	  m(Dados,  AttComum,         semente_espaco_amostral_geracao_cenario_hidrologico,                               int,           1,         max,                   1,      nao) \
 	  m(Dados,  AttComum,                         semente_geracao_cenario_hidrologico,                               int,           1,         max,                   1,      nao) \
 	  m(Dados,  AttComum,    tipo_sorteio_espaco_amostral_geracao_cenario_hidrologico,                       TipoSorteio,          min,         max,                  MC,      nao) \
-	  m(Dados,  AttComum,                            tipo_geracao_cenario_hidrologico,                TipoGeracaoCenario,         min,         max,                 min,      nao) \
+	  m(Dados,  AttComum,                            tipo_geracao_cenario_hidrologico,                TipoGeracaoCenario,         min,         max,                 sintetica_in_sample,      nao) \
 	  m(Dados,  AttComum,               periodo_historico_geracao_cenario_hidrologico,                           Periodo,         min,         max,                 min,      nao) \
 	  m(Dados,  AttComum,          imprimir_espaco_amostral_geracao_cenario_hidrologico,                              bool,         min,         max,                 sim,      nao) \
 	  m(Dados,  AttComum,                        imprimir_geracao_cenario_hidrologico,                              bool,         min,         max,                 nao,      nao) \
-	  m(Dados,  AttComum,    ordem_maxima_auto_correlacao_geracao_cenario_hidrologico,                            int,           0,         365,             0,      nao) \
+	  m(Dados,  AttComum,    ordem_maxima_auto_correlacao_geracao_cenario_hidrologico,                            int,           0,         365,             6,      nao) \
 	  m(Dados,  AttComum,                 calcular_cenario_hidrologico_pre_otimizacao,                  bool,         min,         max,             1,      nao) \
 	  m(Dados,  AttComum,                 imprimir_cenario_hidrologico_pre_otimizacao,                  bool,         min,         max,             0,      nao) \
 	  m(Dados,  AttComum,                   imprimir_exportacao_pos_estudo,                  bool,         min,         max,             0,      nao) \
@@ -132,7 +132,7 @@
 
 
 #define ATT_MATRIZ_DADOS(m)  \
-	  m(Dados,  AttMatriz,     percentual_duracao_patamar_carga,                                       double,          0,            1,             0,    Periodo,   IdPatamarCarga) \
+	  m(Dados,  AttMatriz,                     horizonte_estudo,                                       double,          0,            1,             0,    Periodo,   IdPatamarCarga) \
 	  m(Dados,  AttMatriz,               conversor_vazao_volume,                                       double,          0,          100,             0,    Periodo,   IdPatamarCarga) \
 	  m(Dados,  AttMatriz,  percentual_duracao_horizonte_estudo,                                       double,          0,            1,             0,  IdEstagio,   Periodo)        \
 	  m(Dados,  AttMatriz,   desagio_acumulado_horizonte_estudo,                                       double,          0,            1,             0,  IdEstagio,   Periodo)                   
@@ -309,7 +309,7 @@ public:
 
 	void adicionaHidreletricasMontanteDesvio();
 
-	void instanciaCotaJusanteUsinaJusante();
+	void instanciaCotaMontanteUsinaJusante();
 
 	void carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados);
 
