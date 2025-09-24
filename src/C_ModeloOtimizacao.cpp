@@ -3968,7 +3968,7 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 		} // for (IdEstagio idStage_glob = IdEstagio(1); idStage_glob < IdEstagio_Excedente; idStage_glob++) {
 
 
-		const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> horizon = a_dados.getMatriz(AttMatrizDados_percentual_duracao_patamar_carga, Periodo(), IdPatamarCarga(), double());
+		const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> horizon = a_dados.getMatriz(AttMatrizDados_horizonte_estudo, Periodo(), IdPatamarCarga(), double());
 
 		for (IdEstagio idEstagio = estagio_inicial; idEstagio <= estagio_final; idEstagio++) {
 
@@ -4873,7 +4873,7 @@ void ModeloOtimizacao::importarVariaveisEstado_AcoplamentoPosEstudo(const TipoSu
 			const IdCenario cenarioFinal = arranjoResolucao.getAtributo(AttComumArranjoResolucao_maior_cenario, IdCenario());
 			const SmartEnupla<IdCenario, double>enupla_inicializacao(cenarioInicial, std::vector<double>(int(cenarioFinal - cenarioInicial) + 1, 0.0));
 
-			const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> horizon = a_dados.getMatriz(AttMatrizDados_percentual_duracao_patamar_carga, Periodo(), IdPatamarCarga(), double());
+			const SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> horizon = a_dados.getMatriz(AttMatrizDados_horizonte_estudo, Periodo(), IdPatamarCarga(), double());
 
 			// Validar se estados possuem variáveis de decisão no modelo e ajustar cortes se necessário.
 			for (IdVariavelEstado idVariavelEstado = IdVariavelEstado_1; idVariavelEstado <= estagio.getMaiorId(IdVariavelEstado()); idVariavelEstado++) {

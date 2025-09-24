@@ -498,7 +498,7 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 
 			strNormalizada(line);
 
-			if (!dadosPreConfig_instanciados)
+			if ((!dadosPreConfig_instanciados) || (a_dados.getAtributo(AttComumDados_numero_aberturas, int()) == 0))
 				a_dados.setAtributo(AttComumDados_numero_aberturas, std::stoi(line.substr(21, 4)));
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1136,21 +1136,18 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 			leituraArquivo.close();
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//Determina o vetor horizonte_otimização e horizonte_estudo
+			//Determina o vetor horizonte_otimização 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			if (a_dados.getSizeVetor(AttVetorDados_horizonte_otimizacao) == 0) {
 
 				SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao;
-				SmartEnupla<Periodo, IdEstagio> horizonte_estudo;
 
 				Periodo periodo = periodo_estudo_inicial;
 
 				for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= idEstagio_final_otimizacao; idEstagio++) {
 
 					horizonte_otimizacao.addElemento(periodo);
-
-					horizonte_estudo.addElemento(periodo, idEstagio);
 
 					if (periodo.getDuration().second != 'M') {
 
@@ -1166,9 +1163,70 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 				}//for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= idEstagio_final_otimizacao; idEstagio++) {
 
 				a_dados.setVetor(AttVetorDados_horizonte_otimizacao, horizonte_otimizacao);
-				a_dados.setVetor(AttVetorDados_horizonte_estudo, horizonte_estudo);
 
 			} // if (a_dados.getSizeVetor(AttVetorDados_horizonte_otimizacao) == 0) {
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			//Determina o vetor horizonte_estudo
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+			if (a_dados.getSizeVetor(AttVetorDados_horizonte_estudo) == 0) {
+
+				if (a_dados.getSizeMatriz(AttMatrizDados_horizonte_estudo) == 0) {
+
+					SmartEnupla<Periodo, IdEstagio> horizonte_estudo;
+
+					Periodo periodo = periodo_estudo_inicial;
+
+					for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= idEstagio_final_otimizacao; idEstagio++) {
+
+						horizonte_estudo.addElemento(periodo, idEstagio);
+
+						if (periodo.getDuration().second != 'M') {
+
+							periodo = Periodo("M", periodo + 1);
+
+							if ((periodo.getDia() != IdDia_1) || (periodo.getHora() != IdHor_0) || (periodo.getMinuto() != IdMin_0))
+								throw std::invalid_argument("A data inicial do segundo periodo de estudo deve corresponder ao inicio de um mes.");
+
+						}
+						else
+							periodo++;
+
+					}//for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= idEstagio_final_otimizacao; idEstagio++) {
+
+					a_dados.setVetor(AttVetorDados_horizonte_estudo, horizonte_estudo);
+				}
+
+				else {
+
+					SmartEnupla<Periodo, IdEstagio> horizonte_estudo(a_dados.getMatriz(AttMatrizDados_horizonte_estudo, Periodo(), IdPatamarCarga(), double()), IdEstagio_Nenhum);
+
+					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+
+						for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= idEstagio_final_otimizacao; idEstagio++) {
+
+							const Periodo periodo_otimizacao = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
+
+							const double sobreposicao = periodo.sobreposicao(periodo_otimizacao);
+
+							if (sobreposicao == 1.0) {
+								horizonte_estudo.at(periodo) = idEstagio;
+								break;
+							}
+							else if (sobreposicao > 0.0)
+								throw std::invalid_argument("O periodo de estudo " + getString(periodo) + " nao deve incidir parcialmente sobre o periodo de otimizacao " + getString(periodo_otimizacao) + ".");
+
+						}
+
+					}
+
+					a_dados.setVetor(AttVetorDados_horizonte_estudo, horizonte_estudo);
+
+				}
+
+			} // if (a_dados.getSizeVetor(AttVetorDados_horizonte_otimizacao) == 0) {
+
 
 			const Periodo periodo_pos_manutencao_programada = Periodo(IdMes_1, IdAno(horizonte_estudo_DECK.getIteradorInicial().getAno() + numero_anos_manutencao_termica_programada));
 
@@ -1457,21 +1515,22 @@ void LeituraCEPEL::leitura_SISTEMA_201908_NW25(Dados &a_dados, std::string nomeA
 
 				}//if (is_carregado_intercambio_percentual_variacao_patamar_carga) {
 
-
-				std::vector<IdIntercambio> idIntercambio_inicializado = a_dados.vetorIntercambio.getIdObjetos(AttComumIntercambio_submercado_origem, idSubmercado_origem);
-
-				int idIntercambio_inicializado_size = int(idIntercambio_inicializado.size());
-
 				IdIntercambio idIntercambio = IdIntercambio_Nenhum;
 
-				for (int intercambio_inicializado = 0; intercambio_inicializado < idIntercambio_inicializado_size; intercambio_inicializado++) {
+				if (intercambio_A_para_B == true) {
+					std::vector<IdIntercambio> idIntercambio_inicializado = a_dados.vetorIntercambio.getIdObjetos(AttComumIntercambio_submercado_origem, idSubmercado_origem);
 
-					if (a_dados.getAtributo(idIntercambio_inicializado.at(intercambio_inicializado), AttComumIntercambio_submercado_destino, IdSubmercado()) == idSubmercado_destino) {
-						idIntercambio = idIntercambio_inicializado.at(intercambio_inicializado);
-						break;
-					}//if (a_dados.getAtributo(idIntercambio_inicializado.at(intercambio_inicializado), AttComumIntercambio_submercado_destino, IdSubmercado()) == idSubmercado_destino) {
+					int idIntercambio_inicializado_size = int(idIntercambio_inicializado.size());
 
-				}//for (int intercambio_inicializado = 0; intercambio_inicializado < idIntercambio_inicializado_size; intercambio_inicializado++) {
+					for (int intercambio_inicializado = 0; intercambio_inicializado < idIntercambio_inicializado_size; intercambio_inicializado++) {
+
+						if (a_dados.getAtributo(idIntercambio_inicializado.at(intercambio_inicializado), AttComumIntercambio_submercado_destino, IdSubmercado()) == idSubmercado_destino) {
+							idIntercambio = idIntercambio_inicializado.at(intercambio_inicializado);
+							break;
+						}//if (a_dados.getAtributo(idIntercambio_inicializado.at(intercambio_inicializado), AttComumIntercambio_submercado_destino, IdSubmercado()) == idSubmercado_destino) {
+
+					}//for (int intercambio_inicializado = 0; intercambio_inicializado < idIntercambio_inicializado_size; intercambio_inicializado++) {
+				}
 
 				if (idIntercambio == IdIntercambio_Nenhum && (idSubmercado_origem != IdSubmercado_IVAIPORA && idSubmercado_destino != IdSubmercado_IVAIPORA)) {
 
@@ -3743,7 +3802,7 @@ void LeituraCEPEL::leitura_TERM_201908_NW25(Dados& a_dados, std::string nomeArqu
 
 								const double potencia_minima = atof(atributo.c_str());
 
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, periodo, IdPatamarCarga()); idPatamarCarga++) {
 									a_dados.vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.at(IdUnidadeUTE_1).addElemento(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, sobreposicao * potencia_minima);
 									a_dados.vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.at(IdUnidadeUTE_1).addElemento(AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, sobreposicao * potencia_maxima);
 								} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
@@ -3777,7 +3836,7 @@ void LeituraCEPEL::leitura_TERM_201908_NW25(Dados& a_dados, std::string nomeArqu
 
 							if (a_dados.getIterador1Final(idTermeletrica, IdUnidadeUTE_1, AttMatrizUnidadeUTE_potencia_minima, Periodo()) >= periodo) {
 
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, periodo, IdPatamarCarga()); idPatamarCarga++) {
 									const double potencia_minima_old = a_dados.getElementoMatriz(idTermeletrica, IdUnidadeUTE_1, AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, double());
 									a_dados.vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.at(IdUnidadeUTE_1).setElemento(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, potencia_minima_old + sobreposicao * potencia_minima);
 									const double potencia_maxima_old = a_dados.getElementoMatriz(idTermeletrica, IdUnidadeUTE_1, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double());
@@ -3787,7 +3846,7 @@ void LeituraCEPEL::leitura_TERM_201908_NW25(Dados& a_dados, std::string nomeArqu
 							} // if (a_dados.getIterador1Final(idTermeletrica, IdUnidadeUTE_1, AttMatrizUnidadeUTE_potencia_minima) >= periodo) {
 
 							else {
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, periodo, IdPatamarCarga()); idPatamarCarga++) {
 									a_dados.vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.at(IdUnidadeUTE_1).addElemento(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, sobreposicao * potencia_minima);
 									a_dados.vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.at(IdUnidadeUTE_1).addElemento(AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, sobreposicao * potencia_maxima);
 								} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
@@ -3919,7 +3978,7 @@ void LeituraCEPEL::leitura_CLAST_201908_NW25(Dados& a_dados, std::string nomeArq
 					} // for (Periodo periodo = horizonte_estudo_DECK.getIteradorInicial(); periodo <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo)) {
 
 					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
-						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, periodo, IdPatamarCarga()); idPatamarCarga++)
 							a_dados.vetorTermeletrica.at(idTermeletrica).addElemento(AttMatrizTermeletrica_custo_de_operacao, periodo, idPatamarCarga, 0.0);
 					} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -4061,7 +4120,7 @@ void LeituraCEPEL::leitura_CLAST_201908_NW25(Dados& a_dados, std::string nomeArq
 
 							if (sobreposicao > 0.0) {
 
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++){
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, periodo, IdPatamarCarga()); idPatamarCarga++){
 									if (a_dados.getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_custo_de_operacao) > 0) {
 										const double valor_antigo = a_dados.getElementoMatriz(idTermeletrica, AttMatrizTermeletrica_custo_de_operacao, periodo, idPatamarCarga, double());
 
@@ -4602,7 +4661,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 				const IdSubmercado idSubmercado_Maior = a_dados.vetorSubmercado.getMaiorId();
 
 				if(!is_carregado_percentual_duracao_patamar_carga)
-					a_dados.setMatriz(AttMatrizDados_percentual_duracao_patamar_carga, matriz_periodo_patamar_zero);
+					a_dados.setMatriz(AttMatrizDados_horizonte_estudo, matriz_periodo_patamar_zero);
 
 				const Periodo periodo_estudo_inicial = horizonte_estudo.getIteradorInicial();
 
@@ -4666,9 +4725,9 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 								if (sobreposicao > 0.0) {
 
-									const double valor_antigo = a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, double());
+									const double valor_antigo = a_dados.getElementoMatriz(AttMatrizDados_horizonte_estudo, periodo, idPatamarCarga, double());
 
-									a_dados.setElemento(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, valor_antigo + sobreposicao * percentual_duracao_patamar_carga);
+									a_dados.setElemento(AttMatrizDados_horizonte_estudo, periodo, idPatamarCarga, valor_antigo + sobreposicao * percentual_duracao_patamar_carga);
 
 								} // if (sobreposicao > 0.0) {
 
@@ -5391,7 +5450,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 				const IdSubmercado idSubmercado_Maior = a_dados.vetorSubmercado.getMaiorId();
 
 				if(!is_carregado_percentual_duracao_patamar_carga)
-					a_dados.setMatriz(AttMatrizDados_percentual_duracao_patamar_carga, matriz_periodo_patamar_zero);
+					a_dados.setMatriz(AttMatrizDados_horizonte_estudo, matriz_periodo_patamar_zero);
 
 				////////////////
 
@@ -5445,7 +5504,7 @@ void LeituraCEPEL::leitura_PATAMAR_201908_NW25(Dados &a_dados, std::string nomeA
 
 							double percentual_duracao_patamar_carga = valor_mes_patamar.at(mes - 1).at(patamar);
 
-							a_dados.setElemento(AttMatrizDados_percentual_duracao_patamar_carga, periodo, getIdPatamarCargaFromChar(std::to_string(patamar + 1).c_str()), percentual_duracao_patamar_carga);
+							a_dados.setElemento(AttMatrizDados_horizonte_estudo, periodo, getIdPatamarCargaFromChar(std::to_string(patamar + 1).c_str()), percentual_duracao_patamar_carga);
 
 						}//for (int patamar = 0; patamar < numero_patamares; patamar++) {
 
@@ -6101,8 +6160,8 @@ void LeituraCEPEL::leitura_MANUTT_201908_NW25(Dados& a_dados, std::string nomeAr
 								sobreposicao = 1.0;
 
 							double potencia_maxima = 0.0;
-							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++)
-								potencia_maxima += a_dados.getElementoMatriz(idTermeletrica, IdUnidadeUTE_1, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double()) * a_dados.getElementoMatriz(AttMatrizDados_percentual_duracao_patamar_carga, periodo, idPatamarCarga, double());
+							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, periodo, IdPatamarCarga()); idPatamarCarga++)
+								potencia_maxima += a_dados.getElementoMatriz(idTermeletrica, IdUnidadeUTE_1, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double()) * a_dados.getElementoMatriz(AttMatrizDados_horizonte_estudo, periodo, idPatamarCarga, double());
 
 							if ((potencia_maxima == 0.0) && (potencia_unidade_em_manutencao > 0.0))
 								throw std::invalid_argument("Erro no calculo de indisponibilidade programada de " + getFullString(idTermeletrica) + ".");
@@ -7175,7 +7234,7 @@ void LeituraCEPEL::leitura_AGRINT_201908_NW25(Dados& a_dados, std::string nomeAr
 						a_dados.vetorAgrupamentoIntercambio.add(agrupamentoIntercambio);
 
 						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
-							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()); idPatamarCarga++)
+							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()); idPatamarCarga++)
 								a_dados.vetorAgrupamentoIntercambio.at(idAgrupamentoIntercambio).addElemento(AttMatrizAgrupamentoIntercambio_potencia_maxima, periodo, idPatamarCarga, 0.0);
 						} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); periodo++) {
 
@@ -7322,13 +7381,13 @@ void LeituraCEPEL::leitura_AGRINT_201908_NW25(Dados& a_dados, std::string nomeAr
 						//Campo 6-10 -  Limite do agrupamento (MWmédio) para o patamar de carga X
 						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-						SmartEnupla<IdPatamarCarga, double> potencia_maxima_patamar(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0));
+						SmartEnupla<IdPatamarCarga, double> potencia_maxima_patamar(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0));
 
 						if (lista_AGRINT_PMAX.at(idAgrupamentoIntercambio).size() == 0)
-							lista_AGRINT_PMAX.at(idAgrupamentoIntercambio) = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorInicial(), std::vector<SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorFinal() - horizonte_estudo_DECK.getIteradorInicial() + 1, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0))));
+							lista_AGRINT_PMAX.at(idAgrupamentoIntercambio) = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorInicial(), std::vector<SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorFinal() - horizonte_estudo_DECK.getIteradorInicial() + 1, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0))));
 
 
-						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()); idPatamarCarga++) {
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()); idPatamarCarga++) {
 
 							IdPatamarCarga idPatamarCarga_info = idPatamarCarga;
 
@@ -7361,7 +7420,7 @@ void LeituraCEPEL::leitura_AGRINT_201908_NW25(Dados& a_dados, std::string nomeAr
 
 						if (line_size > 29 + 8 * int(maiorIdPatamarCarga_deck - 1)) {//29 + 8 * int(maiorIdPatamarCarga_global - 1) refere-se ao tamanho da linha até o último campo obrigatório
 
-							atributo = line.substr(29 + 8 * int(maiorIdPatamarCarga_deck - 1), line_size - (29 + 8 * int(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()) - 1)) + 1);
+							atributo = line.substr(29 + 8 * int(maiorIdPatamarCarga_deck - 1), line_size - (29 + 8 * int(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()) - 1)) + 1);
 							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
 							if (atributo != "") {
@@ -7401,7 +7460,7 @@ void LeituraCEPEL::leitura_AGRINT_201908_NW25(Dados& a_dados, std::string nomeAr
 
 					if (lista_AGRINT_PMAX.at(idAgrupamentoIntercambio).size() > 0) {
 
-						a_dados.vetorAgrupamentoIntercambio.at(idAgrupamentoIntercambio).setMatriz_forced(AttMatrizAgrupamentoIntercambio_potencia_maxima, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0))));
+						a_dados.vetorAgrupamentoIntercambio.at(idAgrupamentoIntercambio).setMatriz_forced(AttMatrizAgrupamentoIntercambio_potencia_maxima, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0))));
 
 						for (Periodo periodo_DECK = lista_AGRINT_PMAX.at(idAgrupamentoIntercambio).getIteradorInicial(); periodo_DECK <= lista_AGRINT_PMAX.at(idAgrupamentoIntercambio).getIteradorFinal(); periodo_DECK++) {
 
@@ -7528,7 +7587,7 @@ void LeituraCEPEL::leitura_ADTERM_201908_NW25(Dados& a_dados, std::string nomeAr
 						if (a_dados.getSize1Matriz(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada) > 0)
 							periodo = a_dados.getIterador1Final(idTermeletrica, AttMatrizTermeletrica_potencia_disponivel_comandada, Periodo()) + 1;
 
-						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()); idPatamarCarga++) {
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()); idPatamarCarga++) {
 
 							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Campo 1-5 -  Geração térmica antecipada lag i para X patamar de carga (MW) 
@@ -7546,7 +7605,7 @@ void LeituraCEPEL::leitura_ADTERM_201908_NW25(Dados& a_dados, std::string nomeAr
 
 							a_dados.vetorTermeletrica.at(idTermeletrica).addElemento(AttMatrizTermeletrica_potencia_disponivel_comandada, periodo, idPatamarCarga, potencia);
 
-						} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()); idPatamarCarga++) {
+						} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()); idPatamarCarga++) {
 
 					} // else {
 
@@ -7673,15 +7732,15 @@ void LeituraCEPEL::leitura_GHMIN_201908_NW25(Dados& a_dados, std::string nomeArq
 					SmartEnupla<IdPatamarCarga, double> potencia_minima_patamar;
 
 					if (idPatamarCarga_lido == IdPatamarCarga_Nenhum)
-						potencia_minima_patamar = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), potencia_minima));
+						potencia_minima_patamar = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), potencia_minima));
 
 					else {
-						potencia_minima_patamar = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0));
+						potencia_minima_patamar = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0));
 						potencia_minima_patamar.at(idPatamarCarga_lido) = potencia_minima;
 					}
 
 					if (lista_GHMIN.at(idHidreletrica).size() == 0)
-						lista_GHMIN.at(idHidreletrica) = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorInicial(), std::vector<SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorFinal() - horizonte_estudo_DECK.getIteradorInicial() + 1, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0))));
+						lista_GHMIN.at(idHidreletrica) = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorInicial(), std::vector<SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorFinal() - horizonte_estudo_DECK.getIteradorInicial() + 1, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0))));
 
 					for (Periodo periodo = periodo_restricao; periodo <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo)) {
 
@@ -7710,7 +7769,7 @@ void LeituraCEPEL::leitura_GHMIN_201908_NW25(Dados& a_dados, std::string nomeArq
 
 				if (lista_GHMIN.at(idHidreletrica).size() > 0) {
 
-					a_dados.vetorHidreletrica.at(idHidreletrica).setMatriz_forced(AttMatrizHidreletrica_potencia_disponivel_minima, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0))));
+					a_dados.vetorHidreletrica.at(idHidreletrica).setMatriz_forced(AttMatrizHidreletrica_potencia_disponivel_minima, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0))));
 
 					for (Periodo periodo_DECK = lista_GHMIN.at(idHidreletrica).getIteradorInicial(); periodo_DECK <= lista_GHMIN.at(idHidreletrica).getIteradorFinal(); periodo_DECK++) {
 
@@ -8072,7 +8131,7 @@ void LeituraCEPEL::leitura_RE_201908_NW25(Dados& a_dados, std::string nomeArquiv
 
 							//Cria MatrizElementoSistema_fator_participacao
 							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
+								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, periodo, IdPatamarCarga()); idPatamarCarga++) {
 									a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).vetorElementoSistema.at(idElementoSistema).addElemento(AttMatrizElementoSistema_fator_participacao, periodo, idPatamarCarga, 1.0);
 								} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 							} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); periodo++) {
@@ -8088,7 +8147,7 @@ void LeituraCEPEL::leitura_RE_201908_NW25(Dados& a_dados, std::string nomeArquiv
 
 					for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, periodo, IdPatamarCarga()); idPatamarCarga++) {
+						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, periodo, IdPatamarCarga()); idPatamarCarga++) {
 
 							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).addElemento(AttMatrizRestricaoEletrica_lim_inf, periodo, idPatamarCarga, 0.0);
 							//a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).addElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, getdoubleFromChar("max"));
@@ -8263,15 +8322,15 @@ void LeituraCEPEL::leitura_RE_201908_NW25(Dados& a_dados, std::string nomeArquiv
 					SmartEnupla<IdPatamarCarga, double> potencia_maxima_patamar;
 
 					if (idPatamarCarga_lido == IdPatamarCarga_Nenhum)
-						potencia_maxima_patamar = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), potencia_maxima));
+						potencia_maxima_patamar = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), potencia_maxima));
 
 					else {
-						potencia_maxima_patamar = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0));
+						potencia_maxima_patamar = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0));
 						potencia_maxima_patamar.at(idPatamarCarga_lido) = potencia_maxima;
 					}
 
 					if (lista_RE_PMAX.at(idRestricaoEletrica).size() == 0)
-						lista_RE_PMAX.at(idRestricaoEletrica) = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorInicial(), std::vector<SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorFinal() - horizonte_estudo_DECK.getIteradorInicial() + 1, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), getdoubleFromChar("max")))));
+						lista_RE_PMAX.at(idRestricaoEletrica) = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorInicial(), std::vector<SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorFinal() - horizonte_estudo_DECK.getIteradorInicial() + 1, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), getdoubleFromChar("max")))));
 
 					for (Periodo periodo = periodo_re_inicio; periodo <= periodo_re_final; periodo++) {
 
@@ -8300,7 +8359,7 @@ void LeituraCEPEL::leitura_RE_201908_NW25(Dados& a_dados, std::string nomeArquiv
 
 				if (lista_RE_PMAX.at(idRestricaoEletrica).size() > 0) {
 
-					a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz_forced(AttMatrizRestricaoEletrica_lim_sup, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_percentual_duracao_patamar_carga, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), getdoubleFromChar("max")))));
+					a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz_forced(AttMatrizRestricaoEletrica_lim_sup, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), getdoubleFromChar("max")))));
 
 					for (Periodo periodo_DECK = lista_RE_PMAX.at(idRestricaoEletrica).getIteradorInicial(); periodo_DECK <= lista_RE_PMAX.at(idRestricaoEletrica).getIteradorFinal(); periodo_DECK++) {
 
@@ -8416,6 +8475,7 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados, const std::string a_diretorio)
 		if (nomeArquivo_cortes_NW != "nenhum" && hidreletricasPreConfig_instanciadas)
 			a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("DadosSaidaLP//Otimizacao//AcoplamentoPreEstudo"));
 
+		const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
 		a_dados.validacao_operacional_Dados(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -8423,11 +8483,17 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados, const std::string a_diretorio)
 
 		a_dados.validacao_operacional_Intercambio(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
-		a_dados.validacao_operacional_Termeletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+		if (nomeArquivo_cortes_NW != "nenhum" && hidreletricasPreConfig_instanciadas)
+			a_dados.validacao_operacional_Termeletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, false);
+		else
+			a_dados.validacao_operacional_Termeletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		aplicarModificacoesUHE(a_dados);
 
-		a_dados.validacao_operacional_Hidreletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+		if (nomeArquivo_cortes_NW != "nenhum" && hidreletricasPreConfig_instanciadas)
+			a_dados.validacao_operacional_Hidreletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, false);
+		else
+			a_dados.validacao_operacional_Hidreletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		a_dados.validacao_operacional_BaciaHidrografica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -8439,7 +8505,7 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados, const std::string a_diretorio)
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
 
-		const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
+
 
 		if (idProcesso == IdProcesso_mestre && nomeArquivo_cortes_NW != "nenhum" && hidreletricasPreConfig_instanciadas) {
 
@@ -8450,7 +8516,7 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados, const std::string a_diretorio)
 
 			const bool must_read_nwlistcf = true;
 
-			leitura_cortes_NEWAVE(a_dados, horizonte_estudo, nomeArquivo_cortes_NW, must_read_nwlistcf, diretorio_att_premissas, maior_ONS_REE, horizonte_processo_estocastico, a_dados.getMatriz(AttMatrizDados_percentual_duracao_patamar_carga, Periodo(), IdPatamarCarga(), double()));
+			leitura_cortes_NEWAVE(a_dados, horizonte_estudo, nomeArquivo_cortes_NW, must_read_nwlistcf, diretorio_att_premissas, maior_ONS_REE, horizonte_processo_estocastico, a_dados.getMatriz(AttMatrizDados_horizonte_estudo, Periodo(), IdPatamarCarga(), double()));
 
 		}//if (idProcesso == IdProcesso_mestre && nomeArquivo_cortes_NW != "nenhum") {
 
