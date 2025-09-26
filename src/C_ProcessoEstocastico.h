@@ -140,17 +140,16 @@ public:
 		try {
 			for (IdVariavelAleatoria idVar = IdVariavelAleatoria_1; idVar <= getMaiorId(IdVariavelAleatoria()); idVar++) {
 
-				const IdVariavelAleatoriaInterna maiorIdVariavelAleatoriaInterna = getMaiorId(idVar, IdVariavelAleatoriaInterna());
+				std::string idFisico = getAtributo(idVar, AttComumVariavelAleatoria_nome, std::string());
 
-				for (IdVariavelAleatoriaInterna idVarInterna = IdVariavelAleatoriaInterna_1; idVarInterna <= maiorIdVariavelAleatoriaInterna; idVarInterna++) {
-					if (getIdFisicoFromIdVariavelAleatoriaIdVariavelAleatoriaInterna(idVar, idVarInterna, a_idFisico) == a_idFisico)
-						return idVar;
-				}
+				if (idFisico == getFullString(a_idFisico))
+					return idVar;
+
 			}
 			throw std::invalid_argument(getFullString(a_idFisico) + " nao encontrado.");
 
 		}
-		catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(" + "," + getFullString(a_idFisico) + "): \n" + std::string(erro.what())); }
+		catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getIdVariavelAleatoriaFromIdFisico(" + "," + getFullString(a_idFisico) + "): \n" + std::string(erro.what())); }
 	};
 
 	template<typename IdFisico>
@@ -285,7 +284,6 @@ inline void ProcessoEstocastico::addTendenciasTemporais(const TipoVariavelAleato
 
 		if (a_tendencias_temporais.size() == 0)
 			throw std::invalid_argument("Nao ha valores de tendencias temporais a serem adicionadas.");
-
 
 		if (a_lista_tipo_variavel_aleatoria_interna.size() != a_tendencias_temporais.size())
 			throw std::invalid_argument("O tamanho da lista de variaveis aleatorias internas deve ser compativel com o numero de series temporais.");

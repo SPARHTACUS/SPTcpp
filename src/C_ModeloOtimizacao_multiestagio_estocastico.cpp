@@ -856,18 +856,6 @@ void ModeloOtimizacao::criarBalancoHidraulicoPorVazao(const TipoSubproblemaSolve
 
 		vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, 0.0);
 
-		// ENCHENDO VOLUME MORTO 
-		if (a_period > a_periodIni_stage) {
-
-			if (a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_enchendo_volume_morto, a_periodPrev, int()) == 1) {
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, a_periodPrev, double()) / conversor_vazao_volume);
-				const int posIneVM = addIneLinear_VMORTO_ENCH(a_TSS, a_idEstagio, a_periodPrev, a_idPat, a_idHidreletrica);
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneVM, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_meta_enchimento_volume_morto, a_periodPrev, double()));
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_period, a_idHidreletrica), posEquBH, 1.0);
-				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, a_periodPrev, a_idHidreletrica), posEquBH, 1.0);
-			}
-		}//if (a_period > periodIni_stage) {
-
 		// Variável VI
 		if (getVarDecisao_VIseExistir(a_TSS, a_idEstagio, a_period, a_idHidreletrica) > -1)
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_period, a_idHidreletrica), posEquBH, -1.0 / conversor_vazao_volume);
@@ -993,21 +981,6 @@ void ModeloOtimizacao::criarBalancoHidraulicoPorVolume(const TipoSubproblemaSolv
 			//EQUAÇÃO DE BALANÇO HIDRAULICO
 			const int posEquBH = addEquLinear_BH_VOL(a_TSS, a_idEstagio, a_period, a_idHidreletrica);
 			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, 0.0);
-
-			// ENCHENDO VOLUME MORTO 
-			if (a_period > a_periodIni_stage) {
-
-				if (a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_enchendo_volume_morto, a_periodPrev, int()) == 1) {
-
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posEquBH, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_volume_minimo, a_periodPrev, double()));
-
-					const int posIneVM = addIneLinear_VMORTO_ENCH(a_TSS, a_idEstagio, a_periodPrev, a_idPat, a_idHidreletrica);
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(posIneVM, a_dados.getElementoVetor(a_idHidreletrica, IdReservatorio_1, AttVetorReservatorio_meta_enchimento_volume_morto, a_periodPrev, double()));
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VI(a_TSS, a_idEstagio, a_period, a_idHidreletrica), posEquBH, 1.0);
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, a_periodPrev, a_idHidreletrica), posEquBH, 1.0);
-				}
-			}//if (a_period > periodIni_stage) {
-
 
 			//VARIÁVEL EVAPORAÇÃO
 			const int varQEVA = getVarDecisao_QEVAseExistir(a_TSS, a_idEstagio, a_period, a_idHidreletrica);
@@ -2020,15 +1993,6 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 					}
 				}
 
-				//ENCHENDO VOLUME MORTO
-				if (a_dados.getSizeVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_enchendo_volume_morto) > 0) {
-					if (a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_enchendo_volume_morto, a_period, int()) == 1) {
-						throw std::invalid_argument("Error.");
-						const int varVMORTO_FINF = addVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
-						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVMORTO_FINF, getEquLinear_ZP(a_TSS, a_idEstagio, a_period), -a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_volume_minimo, double()));
-					}
-				}
-
 				//
 				// VI: Volume Inicial no periodo
 				// 
@@ -2044,6 +2008,23 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 					varVF = addVarDecisao_VI(a_TSS, a_idEstagio, a_periodNext, idUHE, volume_util_minimo, volume_util_maximo, 0.0);
 				else if (a_period == a_periodEnd_stage)
 					varVF = addVarDecisao_VF(a_TSS, a_idEstagio, a_period, idUHE, volume_util_minimo, volume_util_maximo, 0.0);
+
+
+				//ENCHENDO VOLUME MORTO
+				if (a_dados.getSizeVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_enchendo_volume_morto) > 0) {
+					if (a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_enchendo_volume_morto, a_period, int()) == 1) {
+						const double volume_minimo = a_dados.getElementoVetor(idUHE, IdReservatorio_1, AttVetorReservatorio_volume_minimo, a_period, double());
+						if (volume_minimo > 0.0) {
+							const int varVMORTO_FINF = addVarDecisao_VMORTO_FINF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVMORTO_FINF, getEquLinear_ZP(a_TSS, a_idEstagio, a_period), -a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_volume_minimo, double()));
+							const int ineVMORTO_ENCH = addIneLinear_VMORTO_ENCH(a_TSS, a_idEstagio, a_period, idUHE);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setRHSRestricao(ineVMORTO_ENCH, volume_minimo);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVF, ineVMORTO_ENCH, 1.0);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVMORTO_FINF, ineVMORTO_ENCH, 1.0);
+						}
+					}
+				}
+
 
 				//
 				// VF_prev: VI incorpora Volume Final do periodo anterior via variavel de estado
@@ -2087,12 +2068,16 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 							criarVariaveisDecisao_VariaveisEstado_Restricoes_ZP0_VH_LINF(a_TSS, a_dados, a_idEstagio, periodo_penalizacao);
 						}
 						else {
-							const int equZP0_VH_LINF = addEquLinear_ZP0_VH_LINF(a_TSS, a_idEstagio, a_period);
-							const int varZP0_VH_LINF = addVarDecisao_ZP0_VH_LINF(a_TSS, a_idEstagio, a_period, 0.0, infinito, 0.0);
+							int equZP0_VH_LINF = getEquLinear_ZP0_VH_LINFseExistir(a_TSS, a_idEstagio, a_period);
+							int varZP0_VH_LINF = getVarDecisao_ZP0_VH_LINFseExistir(a_TSS, a_idEstagio, a_period);
+							if (equZP0_VH_LINF == -1) {
+								equZP0_VH_LINF = addEquLinear_ZP0_VH_LINF(a_TSS, a_idEstagio, a_period);
+								varZP0_VH_LINF = addVarDecisao_ZP0_VH_LINF(a_TSS, a_idEstagio, a_period, 0.0, infinito, 0.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VH_LINF, equZP0_VH_LINF, 1.0);
+								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VH_LINF, getEquLinear_ZP0(a_TSS, a_idEstagio), -1.0);
+							}
 							const double valor_penalidade = a_dados.getAtributo(idUHE, AttComumHidreletrica_penalidade_volume_util_minimo, double()) * a_dados.getElementoMatriz(AttMatrizDados_desagio_acumulado_horizonte_estudo, a_idEstagio, a_period, double());
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VH_LINF, equZP0_VH_LINF, 1.0);
 							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varVH_FINF, equZP0_VH_LINF, -valor_penalidade);
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP0_VH_LINF, getEquLinear_ZP0(a_TSS, a_idEstagio), -1.0);
 						} // else {
 
 					}//if (ineVH_FINF == -1) {

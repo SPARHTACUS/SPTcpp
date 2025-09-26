@@ -232,11 +232,11 @@ void VariavelAleatoria::calcularTendenciaTemporal(){
 			SmartEnupla<Periodo, double> horizonte_serie = getVetor(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, Periodo(), double());
 			SmartEnupla<Periodo, double> serie_temporal_transformada(horizonte_serie, 0.0);
 			for (Periodo periodo = horizonte_serie.getIteradorInicial(); periodo <= horizonte_serie.getIteradorFinal(); horizonte_serie.incrementarIterador(periodo)) {
-				for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++) {
+				for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++)
 					serie_temporal_transformada.at(periodo) += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_serie_temporal_transformada, periodo, double());
-					vetorVariavelAleatoriaInterna.at(idVariavelAleatoriaInterna).calcularEstatisticaSerieTransformada();
-				}
 			} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
+			for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= maiorIdVariavelAleatoriaInterna; idVariavelAleatoriaInterna++)
+				vetorVariavelAleatoriaInterna.at(idVariavelAleatoriaInterna).calcularEstatisticaSerieTransformada();
 			setVetor_forced(AttVetorVariavelAleatoria_serie_temporal_transformada, serie_temporal_transformada);
 		}
 
@@ -1160,12 +1160,7 @@ void VariavelAleatoria::gerarRuidoBrancoEspacoAmostral(const SmartEnupla<Periodo
 		const Periodo periodo_inicial = a_horizonte_espaco_amostral.getIteradorInicial();
 		const Periodo periodo_final = a_horizonte_espaco_amostral.getIteradorFinal();
 
-		if (!Periodo::isSameDuration(periodo_inicial, periodo_final) || !Periodo::isSameDuration(periodo_inicial, getIteradorInicial(AttVetorVariavelAleatoria_serie_temporal_transformada, Periodo())))
-			throw std::invalid_argument("O mesmo tipo de periodo deve constar no argumento a_horizonte_amostra e na serie temporal da variavel aleatoria.");
-
-		//setMatriz_forced(AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, a_horizonte_espaco_amostral);
-
-		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
+		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_espaco_amostral.incrementarIterador(periodo)) {
 			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= a_horizonte_espaco_amostral.at(periodo).getIteradorFinal(); idRealizacao++)
 				addElemento(AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, periodo, idRealizacao, getRuidoBranco(a_tipo_sorteio, 1, a_semente).at(0));
 		} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
@@ -1186,11 +1181,6 @@ void VariavelAleatoria::gerarRuidoBrancoEspacoAmostral(const SmartEnupla<Periodo
 
 		const Periodo periodo_inicial = a_horizonte_espaco_amostral.getIteradorInicial();
 		const Periodo periodo_final   = a_horizonte_espaco_amostral.getIteradorFinal();
-
-		if (!Periodo::isSameDuration(periodo_inicial, periodo_final) || !Periodo::isSameDuration(periodo_inicial, getIteradorInicial(AttVetorVariavelAleatoria_serie_temporal_transformada, Periodo())))
-			throw std::invalid_argument("O mesmo tipo de periodo deve constar no argumento a_horizonte_amostra e na serie temporal da variavel aleatoria.");
-
-		//setMatriz_forced(AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, a_horizonte_espaco_amostral);
 
 		Periodo periodo = periodo_inicial;
 		for (int p = 1; p <= a_numero_maximo_periodos; p++){
@@ -1229,9 +1219,6 @@ void VariavelAleatoria::gerarEspacoAmostralFromRuido(const SmartEnupla<Periodo, 
 
 		const Periodo periodo_inicial = getIterador1Inicial(AttMatrizVariavelAleatoria_ruido_correlacionado_espaco_amostral, Periodo());
 		const Periodo periodo_final   = getIterador1Final  (AttMatrizVariavelAleatoria_ruido_correlacionado_espaco_amostral, Periodo());
-
-		if (!Periodo::isSameDuration(getIteradorInicial(AttVetorVariavelAleatoria_serie_temporal_transformada, Periodo()), periodo_inicial))
-			throw std::invalid_argument("Tipo de periodo no horizonte nao compativel com tipo de periodo da serie temporal.");
 
 		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_espaco_amostral.incrementarIterador(periodo)) {
 

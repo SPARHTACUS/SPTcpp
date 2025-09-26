@@ -239,9 +239,6 @@ void Dados::carregarArquivosEntrada(EntradaSaidaDados& a_entradaSaidaDados) {
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttVetor_seExistir("HIDRELETRICA_RESERVATORIO_AttVetorOperacional_PorPeriodo.csv", *this, TipoAcessoInstancia_m2);
 
-		if (tipo_estudo == TipoEstudo_simulacao)
-			a_entradaSaidaDados.carregarArquivoCSV_AttMatriz_seExistir("HIDRELETRICA_RESERVATORIO_AttMatrizOperacional_PorCenarioPorPeriodo.csv", *this, TipoAcessoInstancia_m2);
-
 		// Conjunto Hidraulico
 
 		a_entradaSaidaDados.carregarArquivoCSV_AttComum_seExistir("HIDRELETRICA_CONJUNTO_AttComumOperacional.csv", *this, TipoAcessoInstancia_m2);
@@ -6030,6 +6027,8 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 		validaHidreletrica(menorIdHidreletrica, maiorIdHidreletrica);
 
+		instanciaCotaMontanteUsinaJusante();
+
 		if (!a_imprimir_atributos_sem_recarregar) {
 
 
@@ -6071,9 +6070,6 @@ void Dados::validacao_operacional_Hidreletrica(EntradaSaidaDados a_entradaSaidaD
 
 			if (recarregar_AttMatrizFuncaoProducaoHidreletrica_por_unidade)
 				a_entradaSaidaDados.carregarArquivoCSV_AttMatriz("HIDRELETRICA_CONJUNTO_UNIDADE_FPH_AttMatrizOperacional_PorPeriodoPorInteiro.csv", *this, TipoAcessoInstancia_m4);
-
-
-			instanciaCotaMontanteUsinaJusante();
 
 		} // (!a_imprimir_atributos_sem_recarregar) {
 
@@ -7385,10 +7381,10 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 
 		const SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> mapeamento_espaco_amostral = a_processo_estocastico.getMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario(), Periodo(), IdRealizacao());
 
-		const IdCenario menor_cenario = mapeamento_espaco_amostral.getIteradorInicial();
-
 		if (mapeamento_espaco_amostral.size() == 0)
-			return 2;
+			return 1;
+
+		const IdCenario menor_cenario = mapeamento_espaco_amostral.getIteradorInicial();
 
 		if (mapeamento_espaco_amostral.at(menor_cenario).size() == 0)
 			return 4;
@@ -7615,7 +7611,7 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 				for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= a_processo_estocastico.getMaiorId(idVariavelAleatoria, IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++) {
 					coef_part_acumulado += a_processo_estocastico.getElementoVetor(idVariavelAleatoria, idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_coeficiente_participacao, periodo_espaco_amostral, double());
 				}
-				if (coef_part_acumulado > 1.0)
+				if (!doubleCompara(1e-6, coef_part_acumulado, 1.0))
 					return 19;
 			}
 
