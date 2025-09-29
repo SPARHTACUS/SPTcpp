@@ -19822,6 +19822,9 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 			a_dados.setAtributo(AttComumDados_diretorio_saida_dados, entradaSaidaDados.getDiretorioSaida());
 		}
 
+		a_dados.setAtributo(AttComumDados_imprimir_corte_por_iteracao, false);
+		
+
 		////////////////////////////////////////
 		// INICIO DEV NOVO PROC ESTOCASTICO
 

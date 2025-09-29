@@ -1041,7 +1041,7 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 		} // if (getSizeVetor(AttVetorDados_multiplicidade_corte) > 0) {
 
 		else {
-			calculo_att_operacionais = true;
+			//calculo_att_operacionais = true;
 			for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= estagio_final; idEstagio++) {
 				if (getAtributo(AttComumDados_calcular_custo_primal_via_subproblema_mestre, bool()))
 					addElemento(AttVetorDados_cortes_multiplos, idEstagio, getElementoVetor(AttVetorDados_numero_aberturas, idEstagio, int()));
@@ -1058,7 +1058,7 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 		//
 
 		if (getSizeVetor(AttVetorDados_numero_aberturas_solucao_proxy) == 0) {
-			calculo_att_operacionais = true;
+			//calculo_att_operacionais = true;
 
 			for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= estagio_final; idEstagio++) {
 
@@ -1195,8 +1195,8 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, IdEstagio_1, estagio_final, AttVetorDados_numero_aberturas);
 
 				a_entradaSaidaDados.setAppendArquivo(true);
-				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, IdEstagio_1, estagio_final, AttVetorDados_numero_aberturas_solucao_proxy);
-				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, IdEstagio_1, estagio_final, AttVetorDados_cortes_multiplos);
+				//a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, IdEstagio_1, estagio_final, AttVetorDados_numero_aberturas_solucao_proxy);
+				//a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, IdEstagio_1, estagio_final, AttVetorDados_cortes_multiplos);
 				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, IdEstagio_1, estagio_final, AttVetorDados_lambda_CVAR);
 				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, IdEstagio_1, estagio_final, AttVetorDados_alpha_CVAR);
 
@@ -1215,6 +1215,19 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 						else if (attComumDados == AttComumDados_numero_aberturas) {}
 						else if (attComumDados == AttComumDados_alpha_CVAR) {}
 						else if (attComumDados == AttComumDados_lambda_CVAR) {}
+						else if (attComumDados == AttComumDados_tipo_semente) {}
+						else if (attComumDados == AttComumDados_tipo_metodo_solucao) {}
+						else if (attComumDados == AttComumDados_solucao_proxy_nula) {}
+						else if (attComumDados == AttComumDados_relaxar_afluencia_incremental_com_viabilidade_hidraulica) {}
+						else if (attComumDados == AttComumDados_imprimir_solver_viabilidade_hidraulica) {}
+						else if (attComumDados == AttComumDados_imprimir_solver_mestre) {}
+						else if (attComumDados == AttComumDados_imprimir_tempos_construcao_modelo) {}
+						else if (attComumDados == AttComumDados_imprimir_tempos_metodo_solucao) {}
+						else if (attComumDados == AttComumDados_imprimir_resultado_viabilidade_hidraulica) {}
+						else if (attComumDados == AttComumDados_imprimir_resultado_mestre) {}
+						else if (attComumDados == AttComumDados_tipo_aversao_a_risco) {}
+						else if (attComumDados == AttComumDados_representar_producao_hidreletrica_com_turbinamento_disponivel) {}
+						else if (attComumDados == AttComumDados_imprimir_cortes_NW_com_reducao_estados) {}
 						else if (attComumDados == AttComumDados_calcular_custo_primal_via_subproblema_mestre) {}
 						else if (attComumDados == AttComumDados_tipo_modelo_geracao_cenario_hidrologico) {}
 						else if (attComumDados == AttComumDados_tipo_geracao_cenario_hidrologico) {}
@@ -1254,20 +1267,11 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 
 			if (!a_imprimir_atributos_sem_recarregar) {
 
-				if (true) {
-					int barreira = 0;
-
-					if (arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso()) == IdProcesso_mestre) {
-						for (IdProcesso idProcesso = IdProcesso_1; idProcesso <= arranjoResolucao.getMaiorId(IdProcesso()); idProcesso++)
-							MPI_Send(&barreira, 1, MPI_INT, getRank(idProcesso), 0, MPI_COMM_WORLD);
-					}
-					else
-						MPI_Recv(&barreira, 1, MPI_INT, getRank(IdProcesso_mestre), 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-				}
+				MPI_Barrier(MPI_COMM_WORLD);
 
 				setVetor_forced(AttVetorDados_numero_aberturas, SmartEnupla<IdEstagio, int>());
-				setVetor_forced(AttVetorDados_numero_aberturas_solucao_proxy, SmartEnupla<IdEstagio, int>());
-				setVetor_forced(AttVetorDados_cortes_multiplos, SmartEnupla<IdEstagio, int>());
+				//setVetor_forced(AttVetorDados_numero_aberturas_solucao_proxy, SmartEnupla<IdEstagio, int>());
+				//setVetor_forced(AttVetorDados_cortes_multiplos, SmartEnupla<IdEstagio, int>());
 				setVetor_forced(AttVetorDados_lambda_CVAR, SmartEnupla<IdEstagio, double>());
 				setVetor_forced(AttVetorDados_alpha_CVAR, SmartEnupla<IdEstagio, double>());
 
@@ -7685,7 +7689,7 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 			MPI_Recv(&calcular_att_operacionais_processo_estocastico_hidrologico, 1, MPI_INT, getRank(IdProcesso_mestre), 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 
-		bool imprimir_parametros_hidrologico = false;
+		bool imprimir_parametros_hidrologico = true;
 		bool imprimir_r2_historico_natural = false;
 		bool imprimir_espaco_amostral_hidrologico = false;
 
