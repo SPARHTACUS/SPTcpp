@@ -8484,8 +8484,10 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados, const std::string a_diretorio)
 		a_dados.setAtributo(AttComumDados_diretorio_entrada_dados, entradaSaidaDados.getDiretorioEntrada());
 		a_dados.setAtributo(AttComumDados_diretorio_saida_dados,   entradaSaidaDados.getDiretorioSaida());
 
-		if (nomeArquivo_cortes_NW != "nenhum" && hidreletricasPreConfig_instanciadas)
+		if (nomeArquivo_cortes_NW != "nenhum" && hidreletricasPreConfig_instanciadas) {
 			a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("DadosSaidaLP//Otimizacao//AcoplamentoPreEstudo"));
+			//a_dados.setAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, true);
+		}
 
 		const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 

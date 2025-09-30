@@ -198,12 +198,12 @@ public:
 	void mapearCenariosEspacoAmostralPorSorteio(const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int& a_semente, const Periodo a_periodo_inicial, const Periodo a_periodo_final);
 
 
-private:
-
 	void mapearCenariosEspacoAmostralPorSorteio(const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int& a_semente);
 
 	bool mapearCenariosEspacoAmostralCompleto    (const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);
-	
+
+	private:
+
 	void calcularCorrelacaoSazonalVariaveisAleatorias(const double a_valor_determinacao_correlacao);
 
 	void calcularCorrelacaoSazonalResiduoVariaveisAleatorias(const double a_valor_determinacao_correlacao);

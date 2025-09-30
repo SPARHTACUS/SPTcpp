@@ -7850,7 +7850,9 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 			//
 
 			int semente_geracao_cenario_hidrologico = getAtributo(AttComumDados_semente_geracao_cenario_hidrologico, int());
-			processoEstocastico_hidrologico.gerarCenariosPorSorteio(a_entradaSaidaDados, imprimir_cenarios_hidrologicos, true, true, getAtributo(AttComumDados_numero_cenarios, int()), cenario_inicial, cenario_final, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
+			processoEstocastico_hidrologico.mapearCenariosEspacoAmostralPorSorteio(TipoSorteio_uniforme, getAtributo(AttComumDados_numero_cenarios, int()), cenario_inicial, cenario_final, semente_geracao_cenario_hidrologico);
+			if (imprimir_cenarios_hidrologicos)
+				processoEstocastico_hidrologico.gerarCenariosPorSorteio(a_entradaSaidaDados, imprimir_cenarios_hidrologicos, true, true, getAtributo(AttComumDados_numero_cenarios, int()), cenario_inicial, cenario_final, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
 
 
 

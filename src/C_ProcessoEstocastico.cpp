@@ -276,7 +276,8 @@ void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_ent
 
 	try {
 
-		mapearCenariosEspacoAmostralPorSorteio(a_tipo_sorteio, a_numero_cenarios_global, a_cenario_inicial, a_cenario_final, a_semente);
+		if (getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) == 0)
+			mapearCenariosEspacoAmostralPorSorteio(a_tipo_sorteio, a_numero_cenarios_global, a_cenario_inicial, a_cenario_final, a_semente);
 
 		SmartEnupla<Periodo, double> horizonte_tendencia;
 		
