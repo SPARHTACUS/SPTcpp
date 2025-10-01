@@ -465,10 +465,10 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 
 				a_dados.setAtributo(AttComumDados_tipo_modelo_geracao_cenario_hidrologico, TipoModeloGeracaoSinteticaCenario_lognormal_3p_sazonal);
 
-				a_dados.setAtributo(AttComumDados_relaxar_afluencia_incremental_com_viabilidade_hidraulica, true);
+				a_dados.setAtributo(AttComumDados_relaxar_afluencia_incremental_com_viabilidade_hidraulica, false);
 
 				a_dados.setAtributo(AttComumDados_imprimir_espaco_amostral_geracao_cenario_hidrologico, true);
-				a_dados.setAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, true);
+				a_dados.setAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, false);
 
 			} // if (!dadosPreConfig_instanciados) {
 
@@ -2436,6 +2436,21 @@ void LeituraCEPEL::leitura_VAZOES_201908_NW25(Dados &a_dados, std::string nomeAr
 		int mes = 1;
 		int ano = 1931; //Primeiro ano do histórico
 
+		Periodo periodo_pos_historico = horizonte_estudo_DECK.getIteradorInicial();
+
+		const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
+		const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
+
+		if (hidreletricasPreConfig_instanciadas) {
+			for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
+
+				if (lista_hidreletrica_pre_configuracao.getElemento(idHidreletrica)) {
+					periodo_pos_historico = a_dados.getIteradorFinal(idHidreletrica, IdAfluencia_vazao_afluente, AttVetorAfluencia_natural_historico, Periodo()) + 1;
+					break;
+				}
+			}
+		}
+
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
 		if (leituraArquivo.is_open()) {
@@ -2444,7 +2459,7 @@ void LeituraCEPEL::leitura_VAZOES_201908_NW25(Dados &a_dados, std::string nomeAr
 
 				Periodo periodo(mes, ano);
 
-				if (periodo >= horizonte_estudo_DECK.getIteradorInicial())
+				if (periodo >= periodo_pos_historico)
 					break;
 
 				mes++;
@@ -2460,9 +2475,6 @@ void LeituraCEPEL::leitura_VAZOES_201908_NW25(Dados &a_dados, std::string nomeAr
 					leituraArquivo.read((char*)intLeitura_600, sizeof(intLeitura_600));
 				else
 					throw std::invalid_argument("tamanho do registro de vazoes ivalido " + getFullString(tamanho_registro_arquivo_vazoes_historicas) + ".");
-
-				const IdHidreletrica idHidreletricaIni = a_dados.getMenorId(IdHidreletrica());
-				const IdHidreletrica idHidreletricaOut = a_dados.getIdOut(IdHidreletrica());
 
 				for (IdHidreletrica idHidreletrica = idHidreletricaIni; idHidreletrica < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idHidreletrica)) {
 
@@ -8472,8 +8484,10 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados, const std::string a_diretorio)
 		a_dados.setAtributo(AttComumDados_diretorio_entrada_dados, entradaSaidaDados.getDiretorioEntrada());
 		a_dados.setAtributo(AttComumDados_diretorio_saida_dados,   entradaSaidaDados.getDiretorioSaida());
 
-		if (nomeArquivo_cortes_NW != "nenhum" && hidreletricasPreConfig_instanciadas)
+		if (nomeArquivo_cortes_NW != "nenhum" && hidreletricasPreConfig_instanciadas) {
 			a_dados.setAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string("DadosSaidaLP//Otimizacao//AcoplamentoPreEstudo"));
+			//a_dados.setAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, true);
+		}
 
 		const IdProcesso idProcesso = a_dados.arranjoResolucao.getAtributo(AttComumArranjoResolucao_idProcesso, IdProcesso());
 
@@ -8483,17 +8497,13 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados, const std::string a_diretorio)
 
 		a_dados.validacao_operacional_Intercambio(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
-		if (nomeArquivo_cortes_NW != "nenhum" && hidreletricasPreConfig_instanciadas)
-			a_dados.validacao_operacional_Termeletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, false);
-		else
-			a_dados.validacao_operacional_Termeletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+		a_dados.validacao_operacional_Termeletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
 		aplicarModificacoesUHE(a_dados);
 
-		if (nomeArquivo_cortes_NW != "nenhum" && hidreletricasPreConfig_instanciadas)
-			a_dados.validacao_operacional_Hidreletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, false);
-		else
-			a_dados.validacao_operacional_Hidreletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+		a_dados.validacao_operacional_Hidreletrica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
+
+		a_dados.instanciaCotaMontanteUsinaJusante();
 
 		a_dados.validacao_operacional_BaciaHidrografica(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, imprimir_att_operacionais_sem_recarregar);
 
@@ -8504,8 +8514,6 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados, const std::string a_diretorio)
 		a_dados.definirCenariosPorProcessosEmArranjoResolucao();
 
 		a_dados.validacao_operacional_ProcessoEstocasticoHidrologico(entradaSaidaDados, diretorio_att_operacionais, diretorio_att_premissas, diretorio_exportacao_pos_estudo, imprimir_att_operacionais_sem_recarregar);
-
-
 
 		if (idProcesso == IdProcesso_mestre && nomeArquivo_cortes_NW != "nenhum" && hidreletricasPreConfig_instanciadas) {
 

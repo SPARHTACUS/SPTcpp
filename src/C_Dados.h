@@ -32,7 +32,7 @@
 	  m(Dados,  AttComum,                                   estagio_final,                         IdEstagio,           1,         max,             1,      sim) \
 	  m(Dados,  AttComum,                     diretorio_importacao_cortes,                            string,         min,         max,        Nenhum,      sim) \
 	  m(Dados,  AttComum,                 diretorio_importacao_pos_estudo,                            string,         min,         max,        Nenhum,      sim) \
-	  m(Dados,  AttComum,                                iteracao_inicial,                        IdIteracao,         min,         max,           min,      nao) \
+	  m(Dados,  AttComum,                                iteracao_inicial,                        IdIteracao,         min,         max,             1,      nao) \
 	  m(Dados,  AttComum,                         numero_maximo_iteracoes,                               int,           0,         max,             0,      sim) \
 	  m(Dados,  AttComum,                                numero_aberturas,                               int,           0,         max,             0,      nao) \
 	  m(Dados,  AttComum,             visitar_todos_cenarios_por_iteracao,                              bool,         min,         max,             0,      sim) \
@@ -77,7 +77,7 @@
 	  m(Dados,  AttComum,                         tolerancia_viabilidade,                             double,        1e-14,        1e-2,          1e-13,      nao) \
 	  m(Dados,  AttComum,                        tolerancia_convergencia,                             double,        1e-14,        1e-2,           1e-6,      nao) \
 	  m(Dados,  AttComum,                              tipo_convergencia,                   TipoConvergencia,         min,          max,  sem_criterio,      nao) \
-	  m(Dados,  AttComum,           multiplicador_tempo_limite_resolucao,                             double,         min,         max,            -1,      nao) \
+	  m(Dados,  AttComum,           multiplicador_tempo_limite_resolucao,                             double,           0,         max,             0,      nao) \
 	  m(Dados,  AttComum,            numero_maximo_tentativas_resolucao,                                 int,           1,        1000,           100,      nao) \
 	  m(Dados,  AttComum,                    tipo_selecao_solucao_proxy,             TipoSelecaoSolucaoProxy,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                            solucao_proxy_nula,                                bool,         min,         max,           min,      nao) \
@@ -86,7 +86,7 @@
 	  m(Dados,  AttComum,                        imprimir_solver_mestre,                                bool,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,               exibir_na_tela_resultado_solver,                                bool,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                  imprimir_estado_por_iteracao,                                bool,         min,         max,           min,      nao) \
-	  m(Dados,  AttComum,                   imprimir_corte_por_iteracao,                                bool,         min,         max,           min,      nao) \
+	  m(Dados,  AttComum,                   imprimir_corte_por_iteracao,                                bool,         min,         max,           sim,      nao) \
 	  m(Dados,  AttComum,           imprimir_selecao_corte_por_iteracao,                                bool,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,             imprimir_tempos_construcao_modelo,                                bool,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum,                imprimir_tempos_metodo_solucao,                                bool,         min,         max,           min,      nao) \

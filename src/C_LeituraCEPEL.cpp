@@ -1299,9 +1299,13 @@ void LeituraCEPEL::leitura_CEPEL(const IdProcesso a_idProcesso, const IdProcesso
 
 	try {
 
+
+		if (a_maiorIdProcesso != IdProcesso_mestre)
+			throw std::invalid_argument("LeituraCEPEL::leitura_CEPEL deve ser executada apenas em um processo.");
+
 		Dados dados;
 
-		dados.arranjoResolucao.instanciarProcessos(a_idProcesso, a_maiorIdProcesso);
+		dados.arranjoResolucao.instanciarProcessos(a_idProcesso, a_idProcesso);
 
 		EntradaSaidaDados entradaSaidaDados;
 		entradaSaidaDados.setDiretorioEntrada(entradaSaidaDados.getDiretorioEntrada() + a_nick);
@@ -1325,6 +1329,7 @@ void LeituraCEPEL::leitura_CEPEL(const IdProcesso a_idProcesso, const IdProcesso
 
 		else
 			throw std::invalid_argument("Deck desconhecido " + a_deck + ", valor deve ser NW ou DC.");
+
 
 	} // try
 	catch (const std::exception& erro) { throw std::invalid_argument("LeituraCEPEL::leitura_CEPEL(" + getFullString(a_idProcesso) + "," + getFullString(a_maiorIdProcesso) + "," + a_deck + "," + a_nick + "): \n" + std::string(erro.what())); }
@@ -5593,22 +5598,19 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			} // for (IdTermeletrica idUTE = idTermeletricaIni; idUTE < idTermeletricaOut; a_dados.vetorTermeletrica.incr(idUTE)) {
 
 			// Estados VMINOP
+			/*
 			const IdMes mes_referencia_penalizacao_VMINOP = IdMes_11;
 			Periodo periodo_penalizacao_VMINOP = Periodo("m", Periodo(mes_referencia_penalizacao_VMINOP, periodo_pos_estudo.getAno()) + 1) - 1;
 			if (periodo_pos_estudo.getMes() > mes_referencia_penalizacao_VMINOP)
 				periodo_penalizacao_VMINOP = Periodo("m", Periodo(mes_referencia_penalizacao_VMINOP, IdAno(int(periodo_pos_estudo.getAno()) + 1)) + 1) - 1;
 			const std::string strVarDecisaoZP0_VH_LINFIdEstagio = std::string("ZP0_VH_LINF," + getString(estagio_pos_estudo.getAtributo(AttComumEstagio_idEstagio, IdEstagio())) + "," + getString(periodo_penalizacao_VMINOP));
 			estados.addElemento(estagio_pos_estudo.addVariavelEstado(TipoSubproblemaSolver_geral, strVarDecisaoZP0_VH_LINFIdEstagio, -1, -1), 0.0);
-
+			*/
 
 			const double perc_pat1 = a_percentual_duracao_patamar_carga_original.at(a_horizonte_estudo.getIteradorFinal()).at(IdPatamarCarga_1);
 			const double perc_pat2 = a_percentual_duracao_patamar_carga_original.at(a_horizonte_estudo.getIteradorFinal()).at(IdPatamarCarga_2);
 			const double perc_pat3 = a_percentual_duracao_patamar_carga_original.at(a_horizonte_estudo.getIteradorFinal()).at(IdPatamarCarga_3);
 
-
-			//const double perc_pat1 = a_dados.getElementoMatriz(AttMatrizDados_horizonte_estudo, a_horizonte_estudo.getIteradorFinal(), IdPatamarCarga_1, double());
-			//const double perc_pat2 = a_dados.getElementoMatriz(AttMatrizDados_horizonte_estudo, a_horizonte_estudo.getIteradorFinal(), IdPatamarCarga_2, double());
-			//const double perc_pat3 = a_dados.getElementoMatriz(AttMatrizDados_horizonte_estudo, a_horizonte_estudo.getIteradorFinal(), IdPatamarCarga_3, double());
 
 			SmartEnupla<IdRealizacao, double> rhs_corte(IdRealizacao_1, std::vector<double>(1, 0.0));
 			SmartEnupla<IdRealizacao, SmartEnupla<IdVariavelEstado, double>> coeficientes_corte(IdRealizacao_1, std::vector<SmartEnupla<IdVariavelEstado, double>>(1, SmartEnupla<IdVariavelEstado, double>(IdVariavelEstado_1, std::vector<double>(int(estados.getIteradorFinal()), 0.0))));
@@ -5969,7 +5971,8 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 							} // if (estados_GNL.at(idUTE).size() > 0) {
 						} // for (IdTermeletrica idUTE = idTermeletricaIni; idUTE < idTermeletricaOut; a_dados.vetorTermeletrica.incr(idUTE)) {
 
-						// Variavel ZP0_VH_LINF					
+						// Variavel ZP0_VH_LINF
+						/*
 						if (true) {
 							const IdVariavelEstado idVariavelEstado_VMINOP = estados.getIteradorFinal();
 							coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado_VMINOP) = 0.0;
@@ -5977,7 +5980,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 								coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado_VMINOP) += coeficientes_Vminop.at(idREE);
 							coeficientes_corte.at(IdRealizacao_1).at(idVariavelEstado_VMINOP) *= numero_horas_estagio_NEWAVE;
 
-						}
+						}*/
 
 						// RHS
 						if (true) {
