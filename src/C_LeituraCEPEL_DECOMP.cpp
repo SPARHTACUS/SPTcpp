@@ -23,7 +23,7 @@ Periodo data_execucao; //Periodo no qual o DC é executado (dia anterior ao peri
 //Afluências passadas 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Notas:
-//1. Se uma hidrelétrica tem mudança de posto entre o DECOMP  e NEWAVE -> As afluências observadas vão ser obtidas dos arquivos VAZOES.DAT e prevs.RVX do GEVAZP com os postos do DECOMP
+//1. Se uma hidrelétrica tem mudança de posto entre o DECOMP  e NEWAVE -> As afluências observadas vão ser obtidas dos arquivos VAZOES.DAT e PREVS.RVX do GEVAZP com os postos do DECOMP
 //2. Se uma hidrelétrica NÃO tem mudança de posto entre o DECOMP  e NEWAVE -> As afluências observadas vão ser obtidas do arquivo VAZOES.RVX do DECOMP com os postos do DECOMP
 
 SmartEnupla<int, SmartEnupla <Periodo, double>>  valor_afluencia_passadas_GEVAZP; //Valores de afluência dos meses e semanas passadas
@@ -77,7 +77,7 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 		////////////////////////////////////////////////////////////////////
 
 		instancia_hidreletricas_preConfig(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG");
-		std::ifstream myfile(a_diretorio + "/polinjus.dat");
+		std::ifstream myfile(a_diretorio + "/POLIJUS.DAT");
 		if (myfile.is_open()) { readPoliJusHidr_dat = false; }
 
 		if (a_dados.getMaiorId(IdHidreletrica()) > IdHidreletrica_Nenhum)
@@ -266,7 +266,7 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 
 		leitura_DADGER_201906_DC29(a_dados, a_diretorio + "//DADGER." + revisao);
 
-		leitura_DADGNL_201906_DC29_A(a_dados, a_diretorio + "//DADGNL." + revisao, a_diretorio + "//relgnl." + revisao, a_diretorio + "//DadosAdicionais//relgnl." + revisao);// Ajustar que a geração comandada pode estar fora do horizonte_estudo
+		leitura_DADGNL_201906_DC29_A(a_dados, a_diretorio + "//DADGNL." + revisao, a_diretorio + "//RELGNL." + revisao, a_diretorio + "//DadosAdicionais//RELGNL." + revisao);// Ajustar que a geração comandada pode estar fora do horizonte_estudo
 		leitura_DADGNL_201906_DC29_B(a_dados, a_diretorio, "DADGNL." + revisao);// Ajustar que a geração comandada pode estar fora do horizonte_estudo
 
 		leitura_CADUSIH_201904_NW25_DC29_DES16(a_dados, a_diretorio + "//HIDR.DAT", hidreletricasPreConfig_instanciadas, readPoliJusHidr_dat, true, false, 0);
@@ -275,7 +275,7 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 
 		leitura_MLT_201906_DC29(a_dados, a_diretorio + "//MLT.DAT");
 
-		leitura_POLIJUS(a_dados, a_diretorio + "//polinjus.dat");
+		leitura_POLIJUS(a_dados, a_diretorio + "//POLIJUS.DAT");
 
 		leitura_setPercentualVolumeCalculoFPH(a_dados);
 
@@ -312,14 +312,14 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 				if (imprimeArquivoVazoesDAT)//Somente para teste
 					imprime_VAZOES_DAT();
 
-				if (revisao != "rv0") {
+				if (revisao != "RV0") {
 
-					std::string arquivo_prevs = a_diretorio + "//prevs";
+					std::string arquivo_prevs = a_diretorio + "//PREVS";
 
 					std::ifstream leituraArquivo_prevs(arquivo_prevs);
 
 					if (!leituraArquivo_prevs.is_open())
-						arquivo_prevs = a_diretorio + "//DadosAdicionais//prevs";
+						arquivo_prevs = a_diretorio + "//DadosAdicionais//PREVS";
 					else {
 						leituraArquivo_prevs.clear();
 						leituraArquivo_prevs.close();
@@ -367,6 +367,9 @@ std::string LeituraCEPEL::leitura_CASO_201906_DC29(std::string nomeArquivo)
 
 		}//if (leituraArquivo.is_open()) {
 		else  throw std::invalid_argument("Nao foi possivel abrir o arquivo " + nomeArquivo + ".");
+
+		for (char& c : revisao)
+			c = std::toupper(c);
 
 		return revisao;
 
@@ -615,13 +618,13 @@ void LeituraCEPEL::instanciar_variavelAleatoria_x_idHidreletrica(Dados& a_dados,
 bool LeituraCEPEL::criar_tendencia_temporal_com_vazoes_observadas_CP(const std::string a_diretorio, const std::string a_revisao)
 {
 	try {
-		//A tendência temporal para acoplar com o MP, os valores mensais/semanais observados são obtidos dos arquivos do GEVAZP: VAZOES.DAT e prevs.RVX
+		//A tendência temporal para acoplar com o MP, os valores mensais/semanais observados são obtidos dos arquivos do GEVAZP: VAZOES.DAT e PREVS.RVX
 
 		const std::string vazoes_dat_raiz = a_diretorio + "//VAZOES.DAT";
-		const std::string prevs_raiz = a_diretorio + "//prevs." + a_revisao;
+		const std::string prevs_raiz = a_diretorio + "//PREVS." + a_revisao;
 
 		const std::string vazoes_dat_adicional = a_diretorio + "//DadosAdicionais//VAZOES.DAT";
-		const std::string prevs_adicional = a_diretorio + "//DadosAdicionais//prevs." + a_revisao;
+		const std::string prevs_adicional = a_diretorio + "//DadosAdicionais//PREVS." + a_revisao;
 
 		std::ifstream leituraArquivo_vazoes_raiz(vazoes_dat_raiz);
 		std::ifstream leituraArquivo_prevs_raiz(prevs_raiz);
@@ -632,7 +635,7 @@ bool LeituraCEPEL::criar_tendencia_temporal_com_vazoes_observadas_CP(const std::
 		if (!leituraArquivo_vazoes_raiz.is_open() && !leituraArquivo_vazoes_adicional.is_open())
 			return false;
 
-		if (a_revisao == "rv0")
+		if (a_revisao == "RV0")
 			return true;
 		else {
 
@@ -10918,7 +10921,7 @@ void LeituraCEPEL::leitura_DADGNL_201906_DC29_A(Dados& a_dados, std::string nome
 void LeituraCEPEL::leitura_DADGNL_201906_DC29_B(Dados& a_dados, const std::string a_diretorio, const std::string nomeArquivo) {
 	try {
 
-		std::ifstream leituraArquivo(a_diretorio + "\\" + nomeArquivo);
+		std::ifstream leituraArquivo(a_diretorio + "//" + nomeArquivo);
 
 		if (leituraArquivo.is_open()) {
 
@@ -11837,15 +11840,15 @@ void LeituraCEPEL::leitura_TENDENCIA_VAZOES_SEMANAIS_GEVAZP(Dados& a_dados, cons
 
 		int numero_semanas_observadas = 0;
 
-		if (a_revisao == "rv1")
+		if (a_revisao == "RV1")
 			numero_semanas_observadas = 1;
-		else if (a_revisao == "rv2")
+		else if (a_revisao == "RV2")
 			numero_semanas_observadas = 2;
-		else if (a_revisao == "rv3")
+		else if (a_revisao == "RV3")
 			numero_semanas_observadas = 3;
-		else if (a_revisao == "rv4")
+		else if (a_revisao == "RV4")
 			numero_semanas_observadas = 4;
-		else if (a_revisao == "rv5")
+		else if (a_revisao == "RV5")
 			numero_semanas_observadas = 5;
 
 		////////////////////////////////////////////////////////////////////////
@@ -12321,7 +12324,7 @@ bool LeituraCEPEL::leitura_turbinamento_maximo_from_avl_turb_max_DC(Dados& a_dad
 
 		std::ifstream leituraArquivo_1(a_nomeArquivo_1);
 
-		//Filosofia: do arquivo avl_turb_max.csv carrega o QTUR_MAX correspondente ao primeiro mês
+		//Filosofia: do arquivo AVL_TURB_MAX.CSV carrega o QTUR_MAX correspondente ao primeiro mês
 		//Os dados do segundo mês sao carregados no cálculo de qMax
 
 		if (leituraArquivo_1.is_open()) {
@@ -12448,7 +12451,7 @@ bool LeituraCEPEL::leitura_turbinamento_maximo_from_relato_e_avl_turb_max_DC(Dad
 		std::ifstream leituraArquivo_1(a_nomeArquivo_1);
 		std::ifstream leituraArquivo_2(a_nomeArquivo_2);
 
-		//Filosofia: do arquivo avl_turb_max.csv carrega o QTUR_MAX correspondente ao primeiro mês
+		//Filosofia: do arquivo AVL_TURB_MAX.CSV carrega o QTUR_MAX correspondente ao primeiro mês
 		//Os dados do segundo mês sao carregados do relatos.rvX (supondo que para o periodo mensal nao é limitado o turbinamento por engolimento)
 
 		if (leituraArquivo_1.is_open() && leituraArquivo_2.is_open()) {
@@ -19617,8 +19620,8 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		////////////////////////////////////////////////////
 		std::string nomeArquivo_cortes_NW = "nenhum";
 
-		const std::string nomeArquivo_fcfnwn = a_diretorio + "//DadosAdicionais//Cortes_NEWAVE//fcfnwn." + a_revisao;
-		const std::string nomeArquivo_nwlistcf = a_diretorio + "//DadosAdicionais//Cortes_NEWAVE//nwlistcf.rel";
+		const std::string nomeArquivo_fcfnwn = a_diretorio + "//DadosAdicionais//Cortes_NEWAVE//FCFNWN." + a_revisao;
+		const std::string nomeArquivo_nwlistcf = a_diretorio + "//DadosAdicionais//Cortes_NEWAVE//NWLISTCF.REL";
 
 		std::ifstream leituraArquivo_fcfnwn(nomeArquivo_fcfnwn);
 		std::ifstream leituraArquivo_nwlistcf(nomeArquivo_nwlistcf);
@@ -19699,9 +19702,9 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Lê volumes metas (se existir relato.rvX e relato2.rvX) e turbinamento_maximo (se existir relato.rvX)
 
-		const bool lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC = leitura_turbinamento_maximo_from_avl_turb_max_DC(a_dados, a_diretorio + "//DadosAdicionais" + "//avl_turb_max.csv");
+		const bool lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC = leitura_turbinamento_maximo_from_avl_turb_max_DC(a_dados, a_diretorio + "//DadosAdicionais" + "//AVL_TURB_MAX.CSV");
 
-		leitura_fph_from_avl_cortesfpha_dec_DC(a_dados, a_diretorio + "//DadosAdicionais" + "//avl_cortesfpha_dec." + a_revisao);//Precisa da extensão do horizonte para ter as cotas modificadas com o último período DC
+		leitura_fph_from_avl_cortesfpha_dec_DC(a_dados, a_diretorio + "//DadosAdicionais" + "//AVL_CORTESFPHA_DEC." + a_revisao);//Precisa da extensão do horizonte para ter as cotas modificadas com o último período DC
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		if (!dadosPreConfig_instanciados) {
@@ -20209,7 +20212,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		if (idProcesso == IdProcesso_mestre && nomeArquivo_cortes_NW != "nenhum") {
 			bool must_read_nwlistcf = false;
 
-			//Se existe expansão do horizonte, tem que colocar o arquivo de cortes nwlistcf.rel. Caso contrário, pode ser nwlistcf.rel ou fcfnwn.rvX
+			//Se existe expansão do horizonte, tem que colocar o arquivo de cortes NWLISTCF.REL. Caso contrário, pode ser NWLISTCF.REL ou FCFNWN.rvX
 			if (get_periodo_ultimo_sobreposicao_com_horizonte_DC(a_dados) < horizonte_estudo.getIteradorFinal())
 				must_read_nwlistcf = true;
 
