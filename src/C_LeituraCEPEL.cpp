@@ -5,12 +5,12 @@ const bool instanciarPreConfig = true;
 
 //////////////////////////////////////////////////////////////////////////////
 // Leitura cortes NEWAVE
-//Nota: A estrutura dos arquivos fcfnwn.rvX e nwlistcf.rel é diferente.
-//      Definem-se como default as posições e tamanho no arquivo fcfnwn.rvX. 
-//      Caso exista o nwlistcf.rel são atualizados estes parâmetros
+//Nota: A estrutura dos arquivos FCFNWN.rvX e NWLISTCF.REL é diferente.
+//      Definem-se como default as posições e tamanho no arquivo FCFNWN.rvX. 
+//      Caso exista o NWLISTCF.REL são atualizados estes parâmetros
 //////////////////////////////////////////////////////////////////////////////
 
-//Estrutura arquivo fcfnwn.rvX:
+//Estrutura arquivo FCFNWN.rvX:
 //Posição do começo dos parâmetros 
 int pos_RHS = 13;
 int pos_idREE = 26;
@@ -135,6 +135,9 @@ void LeituraCEPEL::leitura_CADUSIH_201904_NW25_DC29_DES16(Dados& a_dados, const 
 		int usina = 0;
 		std::ifstream leituraArquivo;
 		leituraArquivo.open(a_nomeArquivo, std::ios_base::in | std::ios::binary);
+
+		if (!leituraArquivo.is_open())
+			throw std::invalid_argument("Nao foi possível abrir o arquivo " + a_nomeArquivo + ".");
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
@@ -1318,7 +1321,7 @@ void LeituraCEPEL::leitura_CEPEL(const IdProcesso a_idProcesso, const IdProcesso
 
 		if ((strCompara(a_deck, "NW")) || (strCompara(a_deck, "NEWAVE"))) {
 			deck_str = "NW";
-			leitura_NEWAVE(dados, "DadosEntradaNEWAVE", "ARQUIVOS.dat");
+			leitura_NEWAVE(dados, "DadosEntradaNEWAVE", "ARQUIVOS.DAT");
 		}
 
 		else if ((strCompara(a_deck, "DC")) || (strCompara(a_deck, "DECOMP"))) {
@@ -1531,7 +1534,7 @@ void LeituraCEPEL::calculaEngolimentoMaximo(Dados& a_dados, const SmartEnupla<Pe
 						Periodo periodo_inicial = a_horizonte_estudo.getIteradorInicial();
 						const Periodo periodo_final = a_horizonte_estudo.getIteradorFinal();
 
-						if (a_lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC)//Se sao carregados os qMax do avl_turb_max.csv somente atualiza o último periodo do DC
+						if (a_lido_turbinamento_maximo_from_relato_e_avl_turb_max_DC)//Se sao carregados os qMax do AVL_TURB_MAX.CSV somente atualiza o último periodo do DC
 							periodo_inicial = a_horizonte_estudo.getIteradorFinal();
 
 						for (Periodo periodo = periodo_inicial; periodo <= periodo_final; a_horizonte_estudo.incrementarIterador(periodo)) {
@@ -5304,9 +5307,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Podem ser informados os cortes do NEWAVE via duas opções: 
-		// (i) fcfnwn.rvX: arquivo impresso pelo modelo DECOMP, com a impressão dos cortes de acoplamento entre o DC/NW 
+		// (i) FCFNWN.rvX: arquivo impresso pelo modelo DECOMP, com a impressão dos cortes de acoplamento entre o DC/NW 
 		//                 (i.e. somente é impresso os cortes do período de acoplamento: terceiro mês do horizonte do NW)
-		// (ii) nwlistcf.rel: impressão dos cortes de TODO o horizonte do NW
+		// (ii) NWLISTCF.REL: impressão dos cortes de TODO o horizonte do NW
 		// Nota: caso o usuário informe (i) e (ii) simultaneamente, (ii) vai ser mandatório
 		//       (ii) serve para também para estudos com expansão do horizonte do CP
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -5314,8 +5317,8 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		const Periodo periodo_inicial = a_horizonte_estudo.getIteradorInicial();
 		const Periodo periodo_final = a_horizonte_estudo.getIteradorFinal();
 
-		if ((a_must_read_nwlistcf) && (!(a_nomeArquivo_cortes.find("nwlistcf") != std::string::npos)))//Se existe expansão do horizonte no CP ou for o MP tem que ser o arquivo nwlistcf.rel
-			throw std::invalid_argument("Leitura Cortes do NEWAVE tem que ser do arquivo nwlistcf.rel");
+		if ((a_must_read_nwlistcf) && (!(a_nomeArquivo_cortes.find("NWLISTCF") != std::string::npos)))//Se existe expansão do horizonte no CP ou for o MP tem que ser o arquivo NWLISTCF.REL
+			throw std::invalid_argument("Leitura Cortes do NEWAVE tem que ser do arquivo NWLISTCF.REL");
 
 		std::cout << "Lendo cortes do modelo NEWAVE do arquivo: " << a_nomeArquivo_cortes << " ..." << std::endl;
 
@@ -5400,18 +5403,18 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 		if (true) {
 
 			///////////////////////////////////////////////////////////////////////////////////////
-			// Atualiza parâmetros de leitura do arquivo de cortes caso seja o arquivo nwlistcf.rel:
+			// Atualiza parâmetros de leitura do arquivo de cortes caso seja o arquivo NWLISTCF.REL:
 			///////////////////////////////////////////////////////////////////////////////////////
 
 			bool is_arquivo_fcfnwn = true;
 
 			int periodo_acoplamento = 0; //Inicializa com este valor por ser parte da lógica
 
-			if (a_nomeArquivo_cortes.find("nwlistcf") != std::string::npos) {
+			if (a_nomeArquivo_cortes.find("NWLISTCF") != std::string::npos) {
 
-				//No nwlistcf.rel o período se refer ao estágio onde os cortes são colocados no modelo de otimização 
+				//No NWLISTCF.REL o período se refer ao estágio onde os cortes são colocados no modelo de otimização 
 				// (p.ex, Periodo: 10, significa a FCF que deve ser acoplada no mês outubro significando o custo de novembro em diante)
-				//Informação validada com o arquivo fcfnwn.rvX (saída do modelo DC)
+				//Informação validada com o arquivo FCFNWN.rvX (saída do modelo DC)
 
 				is_arquivo_fcfnwn = false;
 
@@ -5426,12 +5429,12 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 				Periodo periodo_final_mensal = horizonte_tendencia_mais_processo_estocastico_MENSAL.getIteradorFinal();
 
 				//////////////////////
-				Periodo periodo_inicial_aux = Periodo("M", IdMes_1, periodo_inicial_semanal.getAno()); //A impressão dos cortes no arquivo nwlistcf.rel é desde o mês 1 até o mês 12 (mesmo que o estudo comece p.ex. no mês 6)
+				Periodo periodo_inicial_aux = Periodo("M", IdMes_1, periodo_inicial_semanal.getAno()); //A impressão dos cortes no arquivo NWLISTCF.REL é desde o mês 1 até o mês 12 (mesmo que o estudo comece p.ex. no mês 6)
 
 				for (Periodo periodo = periodo_inicial_aux; periodo <= periodo_final_mensal; periodo++)//Todos os períodos são em base mensal
 					periodo_acoplamento++;
 
-			}//if (a_nomeArquivo_cortes.find("nwlistcf") != std::string::npos) {
+			}//if (a_nomeArquivo_cortes.find("NWLISTCF") != std::string::npos) {
 
 
 			////////////////////////////////////////////////////////////////////////////////////
@@ -5620,12 +5623,12 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			std::ifstream leituraArquivo(a_nomeArquivo_cortes);
 
 			////////////////////////////////////////////////////////////////////////////////////
-			//Parâmetros para identificar o bloco de informação quando for o arquivo fcfnwn.rvX
+			//Parâmetros para identificar o bloco de informação quando for o arquivo FCFNWN.rvX
 			int numero_simbolo_cabecalho = 0;
 			std::string simbolo_cabecalho = "X---------";
 
 			////////////////////////////////////////////////////////////////////////////////////
-			//Parâmetro para identificar o bloco de informação quando for o arquivo nwlistcf.rel
+			//Parâmetro para identificar o bloco de informação quando for o arquivo NWLISTCF.REL
 			std::string str_periodo_acoplamento = "PERIODO:" + getString(periodo_acoplamento);
 
 			////////////////////////////////////////////////////////////////////////////////////
@@ -5649,7 +5652,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 					if (is_bloco_informacao) {
 
 						////////////////////////////////////////////
-						//Critério de parada arquivo nwlistcf.rel
+						//Critério de parada arquivo NWLISTCF.REL
 						////////////////////////////////////////////
 
 						atributo = line.substr(0, 9);
@@ -6000,9 +6003,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 					//////////////////////////////////////////////////////////////////////////////////
 					//Chave para saber que está no bloco de informação
-					// Nota: Lembrar que a estrutura do arquivo fcfnwn.rvX e nwlistcf.rel é diferente
+					// Nota: Lembrar que a estrutura do arquivo FCFNWN.rvX e NWLISTCF.REL é diferente
 					//////////////////////////////////////////////////////////////////////////////////
-					if (is_arquivo_fcfnwn) { //Leitura arquivo fcfnwn.rvX
+					if (is_arquivo_fcfnwn) { //Leitura arquivo FCFNWN.rvX
 						if (line.substr(3, 10) == simbolo_cabecalho) {
 							numero_simbolo_cabecalho += 1;
 
@@ -6012,7 +6015,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 						}//if (line.substr(3, 10) == simbolo_cabecalho) {
 
 					}//if (is_arquivo_fcfnwn) {
-					else if (!is_arquivo_fcfnwn) {//Leitura arquivo nwlistcf.rel
+					else if (!is_arquivo_fcfnwn) {//Leitura arquivo NWLISTCF.REL
 
 						atributo = line.substr(0, 23);
 						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
@@ -6021,7 +6024,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 							std::cout << "Encontrado bloco de cortes de acoplamento do " << str_periodo_acoplamento << std::endl;
 							is_bloco_informacao = true;
 
-							//Passa duas linhas de cabecalho (ver arquivo nwlistcf.rel)
+							//Passa duas linhas de cabecalho (ver arquivo NWLISTCF.REL)
 
 							////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Arquivo sem formatação fixa: 
@@ -6206,9 +6209,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			}//while (std::getline(leituraArquivo, line)) {
 
 			if ((!is_bloco_informacao) && (!is_arquivo_fcfnwn))
-				throw std::invalid_argument("Nao encontrado o bloco de cortes no arquivo nwlistcf.rel para o periodo: " + str_periodo_acoplamento);
+				throw std::invalid_argument("Nao encontrado o bloco de cortes no arquivo NWLISTCF.REL para o periodo: " + str_periodo_acoplamento);
 			else if ((!is_bloco_informacao) && (is_arquivo_fcfnwn))
-				throw std::invalid_argument("Nao encontrado o bloco de cortes no arquivo fcfnwn.rvX");
+				throw std::invalid_argument("Nao encontrado o bloco de cortes no arquivo FCFNWN.RVX");
 
 			////////////////////////////////////////////////////////////////////////
 
@@ -6217,28 +6220,6 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			entradaSaidaDados.setSeparadorCSV(";");
 			entradaSaidaDados.setDiretorioSaida(a_dados.getAtributo(AttComumDados_diretorio_importacao_pos_estudo, std::string()));
 
-			/*
-			for (IdHidreletrica idUHE = idHidreletricaIni; idUHE < idHidreletricaOut; a_dados.vetorHidreletrica.incr(idUHE)) {
-
-				if (a_dados.vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente.numObjetos() > 0) {
-
-					for (IdReservatorioEquivalente idREE = a_dados.getMenorId(idUHE, IdReservatorioEquivalente()); idREE <= a_dados.getMaiorId(idUHE, IdReservatorioEquivalente()); a_dados.vetorHidreletrica.at(idUHE).vetorReservatorioEquivalente.incr(idREE)) {
-
-						if (a_dados.getSize1Matriz(idUHE, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0) > 0) {
-							entradaSaidaDados.imprimirArquivoCSV_AttMatriz("HIDRELETRICA_REE_conversao_ENA_acoplamento.csv", idUHE, idREE, a_dados, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_0);
-							entradaSaidaDados.setAppendArquivo(true);
-						}
-
-						if (a_dados.getSize1Matriz(idUHE, idREE, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1) > 0) {
-							entradaSaidaDados.imprimirArquivoCSV_AttMatriz("HIDRELETRICA_REE_conversao_ENA_acoplamento.csv", idUHE, idREE, a_dados, AttMatrizReservatorioEquivalente_conversao_ENA_acoplamento_1);
-							entradaSaidaDados.setAppendArquivo(true);
-						}
-
-					}
-				}
-
-			}
-			*/
 
 			entradaSaidaDados.setAppendArquivo(false);
 			entradaSaidaDados.imprimirArquivoCSV_AttComum("estagio.csv", estagio_pos_estudo, std::vector<AttComumEstagio>{ AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao, AttComumEstagio_selecao_cortes_nivel_dominancia, AttComumEstagio_cortes_multiplos, AttComumEstagio_alpha_CVAR, AttComumEstagio_lambda_CVAR});
@@ -6333,17 +6314,17 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 
 			/////////////////////////////////////////
 				///////////////////////////////////////////////////////////////////////////////////////
-				// Atualiza estrutura de leitura do arquivo de cortes caso seja o arquivo nwlistcf.rel:
+				// Atualiza estrutura de leitura do arquivo de cortes caso seja o arquivo NWLISTCF.REL:
 
 			std::ifstream leituraArquivo(a_nomeArquivo);
 
 			////////////////////////////////////////////////////////////////////////////////////
-			//Parâmetros para identificar o bloco de informação quando for o arquivo fcfnwn.rvX
+			//Parâmetros para identificar o bloco de informação quando for o arquivo FCFNWN.rvX
 			int numero_simbolo_cabecalho = 0;
 			std::string simbolo_cabecalho = "X---------";
 
 			////////////////////////////////////////////////////////////////////////////////////
-			//Parâmetro para identificar o bloco de informação quando for o arquivo nwlistcf.rel
+			//Parâmetro para identificar o bloco de informação quando for o arquivo NWLISTCF.REL
 			std::string str_periodo_acoplamento = "PERIODO:" + getString(a_periodo_acoplamento);
 
 			////////////////////////////////////////////////////////////////////////////////////
@@ -6360,7 +6341,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 					if (is_bloco_informacao) {
 
 						////////////////////////////////////////////
-						//Critério de parada arquivo nwlistcf.rel
+						//Critério de parada arquivo NWLISTCF.REL
 						////////////////////////////////////////////
 
 						atributo = line.substr(0, 9);
@@ -6575,9 +6556,9 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 
 					//////////////////////////////////////////////////////////////////////////////////
 					//Chave para saber que está no bloco de informação
-					// Nota: Lembrar que a estrutura do arquivo fcfnwn.rvX e nwlistcf.rel é diferente
+					// Nota: Lembrar que a estrutura do arquivo FCFNWN.rvX e NWLISTCF.REL é diferente
 					//////////////////////////////////////////////////////////////////////////////////
-					if (a_is_arquivo_fcfnwn) { //Leitura arquivo fcfnwn.rvX
+					if (a_is_arquivo_fcfnwn) { //Leitura arquivo FCFNWN.rvX
 						if (line.substr(3, 10) == simbolo_cabecalho) {
 							numero_simbolo_cabecalho += 1;
 
@@ -6587,7 +6568,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 						}//if (line.substr(3, 10) == simbolo_cabecalho) {
 
 					}//if (is_arquivo_fcfnwn) {
-					else if (!a_is_arquivo_fcfnwn) {//Leitura arquivo nwlistcf.rel
+					else if (!a_is_arquivo_fcfnwn) {//Leitura arquivo NWLISTCF.REL
 
 						atributo = line.substr(0, 23);
 						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
@@ -6595,7 +6576,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE_para_dimensionamento(Dados& a_dados, co
 						if (atributo == str_periodo_acoplamento) {
 							is_bloco_informacao = true;
 
-							//Passa duas linhas de cabecalho (ver arquivo nwlistcf.rel)
+							//Passa duas linhas de cabecalho (ver arquivo NWLISTCF.REL)
 
 							////////////////////////////////////////////////////////////////////////////////////////////////////////////
 							//Arquivo sem formatação fixa: 

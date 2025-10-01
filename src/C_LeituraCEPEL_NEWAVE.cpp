@@ -30,7 +30,7 @@ void LeituraCEPEL::leitura_NEWAVE(Dados& a_dados, const std::string a_diretorio,
 
 	try {
 		bool readPoliJusHidr_dat = true;
-		std::ifstream poliJus(a_diretorio + "/polinjus.dat");
+		std::ifstream poliJus(a_diretorio + "/POLIJUS.DAT");
 		if (poliJus.is_open()) { readPoliJusHidr_dat = false; }
 
 		std::ifstream leituraArquivo(a_diretorio + "//" + nomeArquivo);
@@ -8425,7 +8425,7 @@ void LeituraCEPEL::validacoes_NW(Dados & a_dados, const std::string a_diretorio)
 		////////////////////////////////////////////////////
 		std::string nomeArquivo_cortes_NW = "nenhum";
 
-		const std::string nomeArquivo_nwlistcf = a_diretorio + "//DadosAdicionais//Cortes_NEWAVE//nwlistcf.rel";
+		const std::string nomeArquivo_nwlistcf = a_diretorio + "//DadosAdicionais//Cortes_NEWAVE//NWLISTCF.REL";
 
 		std::ifstream leituraArquivo_nwlistcf(nomeArquivo_nwlistcf);
 
