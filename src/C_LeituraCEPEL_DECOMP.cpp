@@ -2429,52 +2429,70 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 							//A informação do campo 10 não é relevante já que o SPT tem sua própia lógica para considerar o balanço hídrico para as usinas fio d'água
 
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							//Campo 11 - Usinas fora do horizonte de curto prazo - Identificadas como NW
+							/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+							bool usinaHorizonteCP = true;
+
+							if (line_size >= 73) {
+								atributo = line.substr(71, 2);
+								atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+								if (atributo == "NW")
+									usinaHorizonteCP = false;
+
+							}//if (line_size >= 69) {
 
 							//*******************************************************************************************************************
 							//Set infromação na classe Hidreletrica
 							//*******************************************************************************************************************
-
+							
 							//Neste ponto as hidrelétricas já estão inicializadas pela preconfiguração ou na leitura do VAZOES.DAT
 
-							//Identifica se alguma hidrelétrica tem sido inicializada com codigo_ONS
-							const IdHidreletrica idHidreletrica = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina);
+							if (usinaHorizonteCP) {
 
-							if (idHidreletrica == IdHidreletrica_Nenhum)
-								throw std::invalid_argument("Resgistro UH - hidreletrica nao instanciada com codigo_usina_" + getString(codigo_usina));
+								//Identifica se alguma hidrelétrica tem sido inicializada com codigo_ONS
+								const IdHidreletrica idHidreletrica = getIdFromCodigoONS(lista_codigo_ONS_hidreletrica, codigo_usina);
 
-							//const IdBaciaHidrografica idBaciaHidrografica = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_bacia, IdBaciaHidrografica());
+								if (idHidreletrica == IdHidreletrica_Nenhum)
+									throw std::invalid_argument("Registro UH - hidreletrica nao instanciada com codigo_usina_" + getString(codigo_usina));
 
-							if (maior_ONS_REE < codigo_REE_CEPEL)
-								maior_ONS_REE = codigo_REE_CEPEL;
+								//const IdBaciaHidrografica idBaciaHidrografica = a_dados.getAtributo(idHidreletrica, AttComumHidreletrica_bacia, IdBaciaHidrografica());
 
-							///////////////////////
-							a_dados.volume_inicial_carregado_from_premissa = true;
-							a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_percentual_volume_util_inicial, percentual_volume_inicial);
-							a_dados.vetorHidreletrica.at(idHidreletrica).setVetor(AttVetorHidreletrica_vazao_defluente_minima, SmartEnupla<Periodo, double>(horizonte_estudo, vazao_defluente_minima)); //Tem que inicializar o vetor porque o registro "DF" (registro taxa de defluencia) informa os valores por periodo
-							//a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_considera_evaporacao, considera_evaporacao);
-							a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_morto, volume_morto);
-							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_vertimento_maximo, vertimento_maximo);
+								if (maior_ONS_REE < codigo_REE_CEPEL)
+									maior_ONS_REE = codigo_REE_CEPEL;
 
-							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_bacia, atribui_bacia_hidrografica(a_dados, codigo_usina));
+								///////////////////////
+								a_dados.volume_inicial_carregado_from_premissa = true;
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_percentual_volume_util_inicial, percentual_volume_inicial);
+								a_dados.vetorHidreletrica.at(idHidreletrica).setVetor(AttVetorHidreletrica_vazao_defluente_minima, SmartEnupla<Periodo, double>(horizonte_estudo, vazao_defluente_minima)); //Tem que inicializar o vetor porque o registro "DF" (registro taxa de defluencia) informa os valores por periodo
+								//a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_considera_evaporacao, considera_evaporacao);
+								a_dados.vetorHidreletrica.at(idHidreletrica).vetorReservatorio.at(IdReservatorio_1).setAtributo(AttComumReservatorio_volume_morto, volume_morto);
+								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_vertimento_maximo, vertimento_maximo);
 
-							//lista_codigo_ONS_REE.setElemento(idHidreletrica, codigo_REE_CEPEL); //Precisa para setar a defluencia_disponivel_minima
-							a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_REE, codigo_REE_CEPEL);
+								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_bacia, atribui_bacia_hidrografica(a_dados, codigo_usina));
+
+								//lista_codigo_ONS_REE.setElemento(idHidreletrica, codigo_REE_CEPEL); //Precisa para setar a defluencia_disponivel_minima
+								a_dados.vetorHidreletrica.at(idHidreletrica).setAtributo(AttComumHidreletrica_codigo_REE, codigo_REE_CEPEL);
 
 
-							//Determina se a usina está em operação
+								//Determina se a usina está em operação
 
-							if (idEstagio_entrada_operacao != IdEstagio_1) {
+								if (idEstagio_entrada_operacao != IdEstagio_1) {
 
-								SmartEnupla<IdHidreletrica, Periodo> lista_hidreletrica_periodo(1);
+									SmartEnupla<IdHidreletrica, Periodo> lista_hidreletrica_periodo(1);
 
-								lista_hidreletrica_periodo.addElemento(idHidreletrica, periodo_entrada_operacao);
+									lista_hidreletrica_periodo.addElemento(idHidreletrica, periodo_entrada_operacao);
 
-								int iterador = int(matriz_hidreletrica_periodo_entrada_em_operacao.size());
-								iterador++;
+									int iterador = int(matriz_hidreletrica_periodo_entrada_em_operacao.size());
+									iterador++;
 
-								matriz_hidreletrica_periodo_entrada_em_operacao.addElemento(iterador, lista_hidreletrica_periodo);
+									matriz_hidreletrica_periodo_entrada_em_operacao.addElemento(iterador, lista_hidreletrica_periodo);
 
-							}//if (idEstagio_entrada_operacao != IdEstagio_1) {
+								}//if (idEstagio_entrada_operacao != IdEstagio_1) {
+
+							}//if (usinaHorizonteCP) {
 
 						}//try {
 						catch (const std::exception& erro) { throw std::invalid_argument("Erro Registro UH: \n" + std::string(erro.what())); }
@@ -8206,7 +8224,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								//Inicializa vetores minimo e maximo
 								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-								//São instanciados todos os periodos do horizonte_estudo e logo no resgistro LA são atualizados os limites entre periodo_inicio e periodo_final
+								//São instanciados todos os periodos do horizonte_estudo e logo no registro LA são atualizados os limites entre periodo_inicio e periodo_final
 
 								for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -8599,7 +8617,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 								//Nota: limite_inferior/limite_superior com valor min/max não é considerado dentro do modelo
-								//São instanciados todos os periodos do horizonte_estudo e logo no resgistro LV são atualizados os limites entre periodo_inicio e periodo_final
+								//São instanciados todos os periodos do horizonte_estudo e logo no registro LV são atualizados os limites entre periodo_inicio e periodo_final
 
 								for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
@@ -9232,7 +9250,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 								/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 								//O numero_patamares não é informado no registro especificado, porém, da leitura de outros registros é possível obtê-lo
-								//São instanciados todos os periodos do horizonte_estudo e logo no resgistro LQ são atualizados os limites entre periodo_inicio e periodo_final
+								//São instanciados todos os periodos do horizonte_estudo e logo no registro LQ são atualizados os limites entre periodo_inicio e periodo_final
 
 								for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 

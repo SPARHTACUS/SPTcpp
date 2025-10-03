@@ -2645,14 +2645,11 @@ bool LeituraCEPEL::aplicarModificacaoNUMCNJ(Dados& a_dados, const IdHidreletrica
 		}//if (idConjunto > maiorIdConjuntoHidraulico) {
 
 		if (idConjunto <= maiorIdConjuntoHidraulico) {
-			for (IdConjuntoHidraulico idConjuntoHidraulico = IdConjuntoHidraulico(idConjunto + 1); idConjuntoHidraulico <= maiorIdConjuntoHidraulico; idConjuntoHidraulico++) {
 
-				const IdUnidadeUHE maiorIdUnidadeUHE = a_dados.getMaiorId(a_idHidreletrica, idConjuntoHidraulico, IdUnidadeUHE());
+			for (IdConjuntoHidraulico idConjuntoHidraulico = maiorIdConjuntoHidraulico; idConjuntoHidraulico > idConjunto; idConjuntoHidraulico--) {
+				a_dados.vetorHidreletrica.at(a_idHidreletrica).vetorConjuntoHidraulico.rem(idConjuntoHidraulico);
+			}//for (IdConjuntoHidraulico idConjuntoHidraulico = maiorIdConjuntoHidraulico; idConjuntoHidraulico > idConjunto; idConjuntoHidraulico--) {
 
-				for (IdUnidadeUHE idUnidade = IdUnidadeUHE_1; idUnidade <= maiorIdUnidadeUHE; idUnidade++)
-					a_dados.vetorHidreletrica.at(a_idHidreletrica).vetorConjuntoHidraulico.at(idConjuntoHidraulico).vetorUnidadeUHE.at(idUnidade).setVetor(AttVetorUnidadeUHE_disponibilidade, SmartEnupla<Periodo, double>(horizonte_estudo, 0.0));
-
-			}
 		}// if (idConjunto < int(maiorIdConjuntoHidraulico)) {
 
 		return true;
@@ -4003,13 +4000,18 @@ bool LeituraCEPEL::aplicarModificacaoVAZEFE(Dados& a_dados, const IdHidreletrica
 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 
-		const int numero_conjunto = int(a_modificacaoUHE.valor_1);
-		const double turbinamento_maximo = a_modificacaoUHE.valor_2;
+		const IdConjuntoHidraulico idConjunto = IdConjuntoHidraulico(int(a_modificacaoUHE.valor_1));
+		const double vazao_turbinada_maxima = a_modificacaoUHE.valor_2;
 
 		//if(a_dados.vetorHidreletrica.at(a_idHidreletrica).vetorConjuntoHidraulico.getIdObjetos(IdConjuntoHidraulico(numero_conjunto), IdConjuntoHidraulico()).size() == 0)
 			//throw std::invalid_argument("Modificacao VAZEFE indica Conjunto Hidraulico nao inicializado com IdConjuntoHidraulico" + getString(numero_conjunto));
 
-		a_dados.vetorHidreletrica.at(a_idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico(numero_conjunto)).setVetor(AttVetorConjuntoHidraulico_vazao_turbinada_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, turbinamento_maximo));
+		//a_dados.vetorHidreletrica.at(a_idHidreletrica).vetorConjuntoHidraulico.at(IdConjuntoHidraulico(numero_conjunto)).setVetor(AttVetorConjuntoHidraulico_vazao_turbinada_maxima, SmartEnupla<Periodo, double>(horizonte_estudo, turbinamento_maximo));
+
+		const IdUnidadeUHE maiorIdUnidadeUHE = (a_dados.getMaiorId(a_idHidreletrica, idConjunto, IdUnidadeUHE()));
+
+		for (IdUnidadeUHE idUnidade = IdUnidadeUHE_1; idUnidade <= maiorIdUnidadeUHE; idUnidade++)
+			a_dados.vetorHidreletrica.at(a_idHidreletrica).vetorConjuntoHidraulico.at(idConjunto).vetorUnidadeUHE.at(idUnidade).setAtributo(AttComumUnidadeUHE_vazao_turbinada_maxima, vazao_turbinada_maxima);
 
 		return true;
 	} // try{

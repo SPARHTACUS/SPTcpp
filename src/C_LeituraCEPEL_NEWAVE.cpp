@@ -8169,245 +8169,254 @@ void LeituraCEPEL::leitura_RE_201908_NW25(Dados& a_dados, std::string nomeArquiv
 
 
 				}//while (true) {
+				
+				if (a_dados.getMaiorId(IdRestricaoEletrica()) != IdRestricaoEletrica_Nenhum) {
 
-				lista_RE_PMAX = SmartEnupla<IdRestricaoEletrica, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>(IdRestricaoEletrica_1, std::vector<SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>(a_dados.getMaiorId(IdRestricaoEletrica()), SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>()));
+					lista_RE_PMAX = SmartEnupla<IdRestricaoEletrica, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>(IdRestricaoEletrica_1, std::vector<SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>>(a_dados.getMaiorId(IdRestricaoEletrica()), SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>()));
 
 
-				//******************************
-				//Bloco 2
-				//******************************
+					//******************************
+					//Bloco 2
+					//******************************
 
-				//Pula o cabeçalho
-				std::getline(leituraArquivo, line);
-				std::getline(leituraArquivo, line);
-
-				while (true) {
-
+					//Pula o cabeçalho
+					std::getline(leituraArquivo, line);
 					std::getline(leituraArquivo, line);
 
-					strNormalizada(line);
+					while (true) {
 
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					//Campo 1 -  Número da restrição elétrica
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						std::getline(leituraArquivo, line);
 
-					atributo = line.substr(0, 3);
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+						strNormalizada(line);
 
-					if (atributo == "999")
-						break;
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//Campo 1 -  Número da restrição elétrica
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-					const int codigo_usina_restricao = atoi(atributo.c_str());
-
-					const IdRestricaoEletrica idRestricaoEletrica_inicializado = getIdFromCodigoONS(lista_codigo_ONS_restricao_eletrica, codigo_usina_restricao);
-
-					if (idRestricaoEletrica_inicializado == IdRestricaoEletrica_Nenhum)
-						throw std::invalid_argument("Nao inicializada idRestricaoEletrica  com codigo_usina_" + atributo);
-
-					const IdRestricaoEletrica  idRestricaoEletrica = idRestricaoEletrica_inicializado;
-
-					/////////////////////////////////////////////////
-					//Parâmetros
-					/////////////////////////////////////////////////
-
-					IdMes mes_inicial = IdMes_Nenhum;
-					IdAno ano_inicial = IdAno_Nenhum;
-					IdMes mes_final = IdMes_Nenhum;
-					IdAno ano_final = IdAno_Nenhum;
-
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					//Campo 2 -  Mês de início para restrição elétrica 
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-					atributo = line.substr(4, 2);
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-					if (atributo != "")
-						mes_inicial = getIdMesFromChar(atributo.c_str());
-
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					//Campo 3 -  Ano de início para restrição elétrica
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-					atributo = line.substr(7, 4);
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-					if (atributo != "")
-						ano_inicial = getIdAnoFromChar(atributo.c_str());
-
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					//Campo 4 -  Mês de fim para restrição elétrica  
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-					atributo = line.substr(12, 2);
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-					if (atributo != "")
-						mes_final = getIdMesFromChar(atributo.c_str());
-
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					//Campo 5 -  Ano de fim para restrição elétrica 
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-					atributo = line.substr(15, 4);
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-					if (atributo != "")
-						ano_final = getIdAnoFromChar(atributo.c_str());
-
-					//*************************************************
-					//Determina periodos inicial e final
-					//*************************************************
-
-					//Manual: 
-					//Caso os campos relativos à data inicial estiverem em branco e aqueles relacionados à data final estiverem preenchidos, 
-					//os dados relativos ao limite do agrupamento serão considerados a partir do início do período de planejamento. 
-					//Se a data inicial for anterior ao primeiro período de planejamento, essa será deslocada para o início do período de planejamento. 
-					//Caso os campos relativos à data final estiverem em branco e aqueles relacionados à data inicial estiverem preenchidos, os dados relativos 
-					//ao limite do agrupamento serão considerados até o final do horizonte de planejamento. Se a data final for posterior ao fim do período de planejamento, 
-					//essa será deslocada para o final do horizonte de planejamento
-
-
-					Periodo periodo_re_inicio;
-					Periodo periodo_re_final;
-
-					if (((mes_inicial == IdMes_Nenhum) || (ano_inicial == IdAno_Nenhum)) && ((mes_final == IdMes_Nenhum) || (ano_final == IdAno_Nenhum)))//Manual: Se os campos relacionados à data inicial e à data final estiverem em branco, a execução do programa será interrompida com uma mensagem de erro
-						throw std::invalid_argument("Data inicial e final nao reportada");
-
-
-					if ((mes_inicial == IdMes_Nenhum) || (ano_inicial == IdAno_Nenhum))
-						periodo_re_inicio = horizonte_estudo_DECK.getIteradorInicial();
-
-					else
-						periodo_re_inicio = Periodo(mes_inicial, ano_inicial);
-
-
-					if ((mes_final == IdMes_Nenhum) || (ano_final == IdAno_Nenhum))
-						periodo_re_final = horizonte_estudo_DECK.getIteradorFinal();
-
-					else
-						periodo_re_final = Periodo(mes_final, ano_final);
-
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					//Campo 6 -  Número do patamar de carga.
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-					atributo = line.substr(20, 1);
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-					const IdPatamarCarga idPatamarCarga_lido = getIdPatamarCargaFromChar(atributo.c_str());
-
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					//Campo 7 -  Valor da restrição elétrica (MWmédio). 
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-					atributo = line.substr(22, 15);
-					atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
-
-					const double potencia_maxima = atof(atributo.c_str()); //O valor fornecido no campo7 deve ser sempre maior do que zero, e indica a capacidade máxima de geração permitida para o conjunto
-
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-					//Campo Não obrigatório -  Nome da restrição elétrica
-					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-					const int line_size = int(line.length());
-
-					if (line_size > 37) {//37 refere-se ao tamanho da linha até o último campo obrigatório
-
-						atributo = line.substr(37, line_size - 36);
+						atributo = line.substr(0, 3);
 						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-						if (atributo != "") {
+						if (atributo == "999")
+							break;
 
-							const std::string nome_restricao_eletrica = atributo;
+						const int codigo_usina_restricao = atoi(atributo.c_str());
 
-							a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setAtributo(AttComumRestricaoEletrica_nome, nome_restricao_eletrica);
+						const IdRestricaoEletrica idRestricaoEletrica_inicializado = getIdFromCodigoONS(lista_codigo_ONS_restricao_eletrica, codigo_usina_restricao);
 
-						}//if (atributo != "") {
+						if (idRestricaoEletrica_inicializado == IdRestricaoEletrica_Nenhum)
+							throw std::invalid_argument("Nao inicializada idRestricaoEletrica  com codigo_usina_" + atributo);
 
-					}//if (line_size > 37) {
+						const IdRestricaoEletrica  idRestricaoEletrica = idRestricaoEletrica_inicializado;
 
-					//*********************************************
-					//Atualiza vetores nos SmartElementos
-					//*********************************************
+						/////////////////////////////////////////////////
+						//Parâmetros
+						/////////////////////////////////////////////////
 
-					SmartEnupla<IdPatamarCarga, double> potencia_maxima_patamar;
+						IdMes mes_inicial = IdMes_Nenhum;
+						IdAno ano_inicial = IdAno_Nenhum;
+						IdMes mes_final = IdMes_Nenhum;
+						IdAno ano_final = IdAno_Nenhum;
 
-					if (idPatamarCarga_lido == IdPatamarCarga_Nenhum)
-						potencia_maxima_patamar = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), potencia_maxima));
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//Campo 2 -  Mês de início para restrição elétrica 
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-					else {
-						potencia_maxima_patamar = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0));
-						potencia_maxima_patamar.at(idPatamarCarga_lido) = potencia_maxima;
-					}
+						atributo = line.substr(4, 2);
+						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-					if (lista_RE_PMAX.at(idRestricaoEletrica).size() == 0)
-						lista_RE_PMAX.at(idRestricaoEletrica) = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorInicial(), std::vector<SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorFinal() - horizonte_estudo_DECK.getIteradorInicial() + 1, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), getdoubleFromChar("max")))));
+						if (atributo != "")
+							mes_inicial = getIdMesFromChar(atributo.c_str());
 
-					for (Periodo periodo = periodo_re_inicio; periodo <= periodo_re_final; periodo++) {
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//Campo 3 -  Ano de início para restrição elétrica
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= potencia_maxima_patamar.getIteradorFinal(); idPatamarCarga++) {
+						atributo = line.substr(7, 4);
+						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-							if (potencia_maxima_patamar.at(idPatamarCarga) > 0.0)
-								lista_RE_PMAX.at(idRestricaoEletrica).at(periodo).at(idPatamarCarga) = potencia_maxima_patamar.at(idPatamarCarga);
+						if (atributo != "")
+							ano_inicial = getIdAnoFromChar(atributo.c_str());
 
-						} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= potencia_maxima_patamar.getIteradorFinal(); idPatamarCarga++) {
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//Campo 4 -  Mês de fim para restrição elétrica  
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-					} // for (Periodo periodo = periodo_restricao; periodo <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo)) {
+						atributo = line.substr(12, 2);
+						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
 
-				}//while (true) {
+						if (atributo != "")
+							mes_final = getIdMesFromChar(atributo.c_str());
+
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//Campo 5 -  Ano de fim para restrição elétrica 
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						atributo = line.substr(15, 4);
+						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+						if (atributo != "")
+							ano_final = getIdAnoFromChar(atributo.c_str());
+
+						//*************************************************
+						//Determina periodos inicial e final
+						//*************************************************
+
+						//Manual: 
+						//Caso os campos relativos à data inicial estiverem em branco e aqueles relacionados à data final estiverem preenchidos, 
+						//os dados relativos ao limite do agrupamento serão considerados a partir do início do período de planejamento. 
+						//Se a data inicial for anterior ao primeiro período de planejamento, essa será deslocada para o início do período de planejamento. 
+						//Caso os campos relativos à data final estiverem em branco e aqueles relacionados à data inicial estiverem preenchidos, os dados relativos 
+						//ao limite do agrupamento serão considerados até o final do horizonte de planejamento. Se a data final for posterior ao fim do período de planejamento, 
+						//essa será deslocada para o final do horizonte de planejamento
+
+
+						Periodo periodo_re_inicio;
+						Periodo periodo_re_final;
+
+						if (((mes_inicial == IdMes_Nenhum) || (ano_inicial == IdAno_Nenhum)) && ((mes_final == IdMes_Nenhum) || (ano_final == IdAno_Nenhum)))//Manual: Se os campos relacionados à data inicial e à data final estiverem em branco, a execução do programa será interrompida com uma mensagem de erro
+							throw std::invalid_argument("Data inicial e final nao reportada");
+
+
+						if ((mes_inicial == IdMes_Nenhum) || (ano_inicial == IdAno_Nenhum))
+							periodo_re_inicio = horizonte_estudo_DECK.getIteradorInicial();
+
+						else
+							periodo_re_inicio = Periodo(mes_inicial, ano_inicial);
+
+
+						if ((mes_final == IdMes_Nenhum) || (ano_final == IdAno_Nenhum))
+							periodo_re_final = horizonte_estudo_DECK.getIteradorFinal();
+
+						else
+							periodo_re_final = Periodo(mes_final, ano_final);
+
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//Campo 6 -  Número do patamar de carga.
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						atributo = line.substr(20, 1);
+						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+						const IdPatamarCarga idPatamarCarga_lido = getIdPatamarCargaFromChar(atributo.c_str());
+
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//Campo 7 -  Valor da restrição elétrica (MWmédio). 
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						atributo = line.substr(22, 15);
+						atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+						const double potencia_maxima = atof(atributo.c_str()); //O valor fornecido no campo7 deve ser sempre maior do que zero, e indica a capacidade máxima de geração permitida para o conjunto
+
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						//Campo Não obrigatório -  Nome da restrição elétrica
+						/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						const int line_size = int(line.length());
+
+						if (line_size > 37) {//37 refere-se ao tamanho da linha até o último campo obrigatório
+
+							atributo = line.substr(37, line_size - 36);
+							atributo.erase(std::remove(atributo.begin(), atributo.end(), ' '), atributo.end());
+
+							if (atributo != "") {
+
+								const std::string nome_restricao_eletrica = atributo;
+
+								a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setAtributo(AttComumRestricaoEletrica_nome, nome_restricao_eletrica);
+
+							}//if (atributo != "") {
+
+						}//if (line_size > 37) {
+
+						//*********************************************
+						//Atualiza vetores nos SmartElementos
+						//*********************************************
+
+						SmartEnupla<IdPatamarCarga, double> potencia_maxima_patamar;
+
+						if (idPatamarCarga_lido == IdPatamarCarga_Nenhum)
+							potencia_maxima_patamar = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), potencia_maxima));
+
+						else {
+							potencia_maxima_patamar = SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0));
+							potencia_maxima_patamar.at(idPatamarCarga_lido) = potencia_maxima;
+						}
+
+						if (lista_RE_PMAX.at(idRestricaoEletrica).size() == 0)
+							lista_RE_PMAX.at(idRestricaoEletrica) = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorInicial(), std::vector<SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorFinal() - horizonte_estudo_DECK.getIteradorInicial() + 1, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), getdoubleFromChar("max")))));
+
+						for (Periodo periodo = periodo_re_inicio; periodo <= periodo_re_final; periodo++) {
+
+							for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= potencia_maxima_patamar.getIteradorFinal(); idPatamarCarga++) {
+
+								if (potencia_maxima_patamar.at(idPatamarCarga) > 0.0)
+									lista_RE_PMAX.at(idRestricaoEletrica).at(periodo).at(idPatamarCarga) = potencia_maxima_patamar.at(idPatamarCarga);
+
+							} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= potencia_maxima_patamar.getIteradorFinal(); idPatamarCarga++) {
+
+						} // for (Periodo periodo = periodo_restricao; periodo <= horizonte_estudo_DECK.getIteradorFinal(); horizonte_estudo_DECK.incrementarIterador(periodo)) {
+
+					}//while (true) {
+
+				}////if (a_dados.getMaiorId(IdRestricaoEletrica()) != IdRestricaoEletrica_Nenhum) {
 
 				leituraArquivo.close();
 
 			}//if (leituraArquivo.is_open()) {
 			else  throw std::invalid_argument("Nao foi possivel abrir o arquivo " + nomeArquivo + ".");
 
-			double sobreposicao_atraso_periodo_inicial = 0.0;
+			
+			if (a_dados.getMaiorId(IdRestricaoEletrica()) != IdRestricaoEletrica_Nenhum) {
 
-			if (desconsiderar_atraso_periodo_estudo_inicial)
-				sobreposicao_atraso_periodo_inicial = horizonte_estudo.getIteradorInicial().atraso(horizonte_estudo_DECK.getIteradorInicial());
+				double sobreposicao_atraso_periodo_inicial = 0.0;
 
-			for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= lista_RE_PMAX.getIteradorFinal(); idRestricaoEletrica++) {
+				if (desconsiderar_atraso_periodo_estudo_inicial)
+					sobreposicao_atraso_periodo_inicial = horizonte_estudo.getIteradorInicial().atraso(horizonte_estudo_DECK.getIteradorInicial());
 
-				if (lista_RE_PMAX.at(idRestricaoEletrica).size() > 0) {
+				for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= lista_RE_PMAX.getIteradorFinal(); idRestricaoEletrica++) {
 
-					a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz_forced(AttMatrizRestricaoEletrica_lim_sup, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), getdoubleFromChar("max")))));
+					if (lista_RE_PMAX.at(idRestricaoEletrica).size() > 0) {
 
-					for (Periodo periodo_DECK = lista_RE_PMAX.at(idRestricaoEletrica).getIteradorInicial(); periodo_DECK <= lista_RE_PMAX.at(idRestricaoEletrica).getIteradorFinal(); periodo_DECK++) {
+						a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setMatriz_forced(AttMatrizRestricaoEletrica_lim_sup, SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), getdoubleFromChar("max")))));
 
-						for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+						for (Periodo periodo_DECK = lista_RE_PMAX.at(idRestricaoEletrica).getIteradorInicial(); periodo_DECK <= lista_RE_PMAX.at(idRestricaoEletrica).getIteradorFinal(); periodo_DECK++) {
 
-							double sobreposicao = periodo.sobreposicao(periodo_DECK);
+							for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-							if ((periodo == horizonte_estudo.getIteradorInicial()) && (periodo_DECK == horizonte_estudo_DECK.getIteradorInicial()))
-								sobreposicao += sobreposicao_atraso_periodo_inicial;
+								double sobreposicao = periodo.sobreposicao(periodo_DECK);
 
-							if (sobreposicao > 0.0) {
+								if ((periodo == horizonte_estudo.getIteradorInicial()) && (periodo_DECK == horizonte_estudo_DECK.getIteradorInicial()))
+									sobreposicao += sobreposicao_atraso_periodo_inicial;
 
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).getIteradorFinal(); idPatamarCarga++) {
+								if (sobreposicao > 0.0) {
 
-									if (lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).at(idPatamarCarga) != getdoubleFromChar("max")) {//Somente periodos com valores de registros de potencia_maxima sao atualizados 
+									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).getIteradorFinal(); idPatamarCarga++) {
 
-										double valor_antigo = a_dados.getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, double());
+										if (lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).at(idPatamarCarga) != getdoubleFromChar("max")) {//Somente periodos com valores de registros de potencia_maxima sao atualizados 
 
-										if (valor_antigo == getdoubleFromChar("max"))//O primeiro valor a modificar pela restriçao deve ser zero
-											valor_antigo = 0;
+											double valor_antigo = a_dados.getElementoMatriz(idRestricaoEletrica, AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, double());
 
-										a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, valor_antigo + sobreposicao * lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).at(idPatamarCarga));
+											if (valor_antigo == getdoubleFromChar("max"))//O primeiro valor a modificar pela restriçao deve ser zero
+												valor_antigo = 0;
 
-									}//if (lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).at(idPatamarCarga) != getdoubleFromChar("max")) {
-									
-								} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).getIteradorFinal(); idPatamarCarga++) {
+											a_dados.vetorRestricaoEletrica.at(idRestricaoEletrica).setElemento(AttMatrizRestricaoEletrica_lim_sup, periodo, idPatamarCarga, valor_antigo + sobreposicao * lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).at(idPatamarCarga));
 
-							} // if (sobreposicao > 0.0) {
+										}//if (lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).at(idPatamarCarga) != getdoubleFromChar("max")) {
 
-						} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
+									} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= lista_RE_PMAX.at(idRestricaoEletrica).at(periodo_DECK).getIteradorFinal(); idPatamarCarga++) {
 
-					} // for (Periodo periodo_DECK = lista_RE_PMAX.at(idRestricaoEletrica).getIteradorInicial(); periodo_DECK <= lista_RE_PMAX.at(idRestricaoEletrica).getIteradorFinal(); periodo_DECK++) {
+								} // if (sobreposicao > 0.0) {
 
-				} // if (lista_RE_PMAX.at(idRestricaoEletrica).size() > 0) {
+							} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
-			} // for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= lista_RE_PMAX.getIteradorFinal(); idRestricaoEletrica++) {
+						} // for (Periodo periodo_DECK = lista_RE_PMAX.at(idRestricaoEletrica).getIteradorInicial(); periodo_DECK <= lista_RE_PMAX.at(idRestricaoEletrica).getIteradorFinal(); periodo_DECK++) {
+
+					} // if (lista_RE_PMAX.at(idRestricaoEletrica).size() > 0) {
+
+				} // for (IdRestricaoEletrica idRestricaoEletrica = IdRestricaoEletrica_1; idRestricaoEletrica <= lista_RE_PMAX.getIteradorFinal(); idRestricaoEletrica++) {
+
+			}//if (a_dados.getMaiorId(IdRestricaoEletrica()) != IdRestricaoEletrica_Nenhum) {
 
 		}//if (considera_restricoes_eletricas == true) {
 
