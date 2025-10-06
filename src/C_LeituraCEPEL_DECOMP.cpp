@@ -13669,6 +13669,11 @@ void LeituraCEPEL::define_variavel_aleatoria_interna_CP(Dados& a_dados){
 
 				}//if (int(valor_afluencia_passadas.size()) > 0) {
 
+				if (tendencia_temporal.size() == 0) {
+					throw std::invalid_argument("Necessaria a leitura de PREVS.RVX e VAZOES.DAT em DadosEntradaDECOMP/DadosAdicionais para leitura de tendencias ja aplicadas as regras de postos.");
+					tendencia_temporal = valor_afluencia_passadas_DECOMP.at(posto - 1);
+				}
+
 				a_dados.processoEstocastico_hidrologico.vetorVariavelAleatoria.at(idVariavelAleatoria).addTendenciaTemporalVariavelAleatoriaInterna(IdVariavelAleatoriaInterna_1, tendencia_temporal);
 				
 
