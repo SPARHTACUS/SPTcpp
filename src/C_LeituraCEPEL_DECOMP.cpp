@@ -62,6 +62,44 @@ void LeituraCEPEL::leitura_DECOMP(Dados& a_dados, const std::string a_diretorio)
 		instancia_dados_preConfig(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG");
 		instancia_dados_matriz_preConfig(a_dados, a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG");
 
+		if (a_dados.getSizeMatriz(AttMatrizDados_horizonte_estudo) > 0) {
+
+			//a_dados.setVetor_forced(AttVetorDados_horizonte_estudo, SmartEnupla<Periodo, IdEstagio>(a_dados.getMatriz(AttMatrizDados_horizonte_estudo, Periodo(), IdPatamarCarga(), double()), IdEstagio_Nenhum));
+
+			const IdEstagio estagio_final = a_dados.getIteradorFinal(AttVetorDados_horizonte_otimizacao, IdEstagio());
+
+			SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>> matriz_horizonte_estudo = a_dados.getMatriz(AttMatrizDados_horizonte_estudo, Periodo(), IdPatamarCarga(), double());
+
+			SmartEnupla<Periodo, IdEstagio> horizonte_estudo;
+
+			Periodo period_study_ini_stage = matriz_horizonte_estudo.getIteradorInicial();
+			for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= estagio_final; idEstagio++) {
+
+				const Periodo period_otmz = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
+				const Periodo periodNext_otmz = Periodo("m", period_otmz + 1);
+
+				const double min_period_otmz = double(period_otmz.getMinutos());
+
+				if (Periodo("m", period_study_ini_stage) != Periodo("m", period_otmz))
+					throw std::invalid_argument("Otimization period " + getFullString(period_otmz) + " and study period " + getFullString(period_study_ini_stage) + " must start in the same instant.");
+
+				for (Periodo period_study = period_study_ini_stage; Periodo("m", period_study + 1) <= periodNext_otmz; matriz_horizonte_estudo.incrementarIterador(period_study)) {
+					horizonte_estudo.addElemento(period_study, idEstagio);
+				}
+
+				if (idEstagio == estagio_final) {
+					if ((Periodo("m", horizonte_estudo.getIteradorFinal() + 1) - 1) != (periodNext_otmz - 1))
+						throw std::invalid_argument("Otimization period " + getFullString(period_otmz) + " and study period " + getFullString(period_study_ini_stage) + " must end in the same instant.");
+					a_dados.setVetor_forced(AttVetorDados_horizonte_estudo, horizonte_estudo);
+				}
+				else {
+					period_study_ini_stage = horizonte_estudo.getIteradorFinal();
+					matriz_horizonte_estudo.incrementarIterador(period_study_ini_stage);
+				}
+			} // for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= estagio_final; idEstagio++) {
+
+		}//if (a_dados.getSizeMatriz(AttMatrizDados_horizonte_estudo) > 0) {
+
 		if (!dadosPreConfig_instanciados) {
 			a_dados.setAtributo(AttComumDados_tipo_geracao_cenario_hidrologico, TipoGeracaoCenario_serie_informada);
 			a_dados.setAtributo(AttComumDados_mes_penalizacao_volume_util_minimo, IdMes_Nenhum);
