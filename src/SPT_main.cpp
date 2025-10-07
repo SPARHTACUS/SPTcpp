@@ -16,7 +16,7 @@ void getInfoProduto(const std::string a_arquivoLicenca) {
 	std::cout << "            Modelo SPARHTACUS - sparhtacus.com " << std::endl;
 	std::cout << "            github.com/SPARHTACUS/SPTcpp " << std::endl;
 	std::cout << std::endl;
-	std::cout << "                      Versao: 2.5.1 " << std::endl;
+	std::cout << "                      Versao: 2.5.2 " << std::endl;
 	std::cout << "            Build: " << __TIMESTAMP__ << std::endl;
 	std::cout << std::endl;
 	std::cout << "           Programa distribuido sob licenca MIT (x11)" << std::endl;
