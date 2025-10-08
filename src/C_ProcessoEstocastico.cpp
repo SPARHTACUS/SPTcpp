@@ -959,21 +959,29 @@ void ProcessoEstocastico::calcularRuidoCorrelacionadoEspacoAmostral(){
 				break;
 		}
 
-		SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> ruido_branco_ref = getMatriz(idVar_ref, AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, Periodo(), IdRealizacao(), double());
+		SmartEnupla<IdVariavelAleatoria, double> ruido_branco(IdVariavelAleatoria_1, std::vector<double>(int(maiorVariavelAleatoria), NAN));
 
-		for (Periodo periodo = ruido_branco_ref.getIteradorInicial(); periodo <= ruido_branco_ref.getIteradorFinal(); ruido_branco_ref.incrementarIterador(periodo)) {
+		SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>> ruido_branco_espaco_amostral(IdVariavelAleatoria_1, std::vector<SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>>(int(maiorVariavelAleatoria),
+			SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>()));
+		SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>> ruido_correlacionado_espaco_amostral(IdVariavelAleatoria_1, std::vector<SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>>(int(maiorVariavelAleatoria),
+			SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>()));
 
-			for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= ruido_branco_ref.at(periodo).getIteradorFinal(); idRealizacao++) {
+		for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++) {
+			ruido_branco_espaco_amostral.at(idVar_A) = vetorVariavelAleatoria.at(idVar_A).getMatriz(AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, Periodo(), IdRealizacao(), double());
+			ruido_correlacionado_espaco_amostral.at(idVar_A) = ruido_branco_espaco_amostral.at(idVar_A);
+		}
 
-				for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++) {
+		for (Periodo periodo = ruido_branco_espaco_amostral.at(idVar_ref).getIteradorInicial(); periodo <= ruido_branco_espaco_amostral.at(idVar_ref).getIteradorFinal(); ruido_branco_espaco_amostral.at(idVar_ref).incrementarIterador(periodo)) {
 
-					SmartEnupla<IdVariavelAleatoria, double> ruido_branco(IdVariavelAleatoria_1, std::vector<double>(int(maiorVariavelAleatoria), NAN));
+			for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++) {
+
+				for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= ruido_branco_espaco_amostral.at(idVar_A).at(periodo).getIteradorFinal(); idRealizacao++) {
 
 					for (IdVariavelAleatoria idVar_B = IdVariavelAleatoria_1; idVar_B <= maiorVariavelAleatoria; idVar_B++) {
 						if (getAtributo(idVar_B, AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria()) == idVar_B)
-							ruido_branco.setElemento(idVar_B, getElementoMatriz(idVar_B, AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, periodo, idRealizacao, double()));
+							ruido_branco.at(idVar_B) = ruido_branco_espaco_amostral.at(idVar_B).at_rIt(periodo).at(idRealizacao);/// getElementoMatriz(idVar_B, AttMatrizVariavelAleatoria_ruido_branco_espaco_amostral, periodo, idRealizacao, double());
 						else
-							ruido_branco.setElemento(idVar_B, 0.0);
+							ruido_branco.at(idVar_B) = 0.0;
 					}
 
 					IdVariavelAleatoria idVar_A_determinacao = vetorVariavelAleatoria.at(idVar_A).getAtributo(AttComumVariavelAleatoria_idVariavelAleatoria_determinacao, IdVariavelAleatoria());
@@ -983,13 +991,16 @@ void ProcessoEstocastico::calcularRuidoCorrelacionadoEspacoAmostral(){
 
 					const double ruido_correlacionado = vetorVariavelAleatoria.at(idVar_A_determinacao).calcularRuidoCorrelacionado(tipo_correlacao_variaveis_aleatorias, periodo.getMes(), ruido_branco);
 
-					vetorVariavelAleatoria.at(idVar_A).addElemento(AttMatrizVariavelAleatoria_ruido_correlacionado_espaco_amostral, periodo, idRealizacao, ruido_correlacionado);
+					ruido_correlacionado_espaco_amostral.at(idVar_A).at_rIt(periodo).at(idRealizacao) = ruido_correlacionado;
 
-				} // for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++) {
+				} // for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= realizacao_final; idRealizacao++) {
 
-			} // for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= realizacao_final; idRealizacao++) {
+			} // for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++) {
 
 		} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
+
+		for (IdVariavelAleatoria idVar_A = IdVariavelAleatoria_1; idVar_A <= maiorVariavelAleatoria; idVar_A++)
+			vetorVariavelAleatoria.at(idVar_A).setMatriz_forced(AttMatrizVariavelAleatoria_ruido_correlacionado_espaco_amostral, ruido_correlacionado_espaco_amostral.at(idVar_A));
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::calcularRuidoCorrelacionadoEspacoAmostral(): \n" + std::string(erro.what())); }
