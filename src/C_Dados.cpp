@@ -7511,11 +7511,6 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 					if (coeficiente_linear_auto_correlacao.at(periodo_coef_linear).size() == 0)
 						return 121;
 
-					if (coeficiente_linear_auto_correlacao.at(periodo_coef_linear).size() > 1) {
-						if (coeficiente_linear_auto_correlacao.at(periodo_coef_linear).at(coeficiente_linear_auto_correlacao.at(periodo_coef_linear).getIteradorFinal()) == 0.0)
-							return 122;
-					}
-
 					if (residuo_espaco_amostral.at(periodo_residuo).size() == 0)
 						return 123;
 
@@ -7546,6 +7541,23 @@ int Dados::isCalculoAttOperacionaisProcessoEstocasticoHidrologicoNecessario(Proc
 						if(periodo_prob_realizacao <= probabilidade_realizacao.getIteradorFinal())
 							probabilidade_realizacao.incrementarIterador(periodo_prob_realizacao); //refazer
 					}
+
+
+					if (a_processo_estocastico.getSizeMatriz(idVariavelAleatoria, AttMatrizVariavelAleatoria_lag_auto_correlacao) > 0) {
+						Periodo periodo_lag;
+						for (int lag = 1; lag <= coeficiente_linear_auto_correlacao.at(periodo_coef_linear).size(); lag++) {
+							Periodo periodo = a_processo_estocastico.getElementoMatriz(idVariavelAleatoria, AttMatrizVariavelAleatoria_lag_auto_correlacao, periodo_coef_linear, lag, Periodo());
+							if (lag > 1) {
+								if (Periodo("m", periodo_lag + 1) != Periodo("m", periodo))
+									throw std::invalid_argument("Lags nao sequenciais em " + getFullString(idVariavelAleatoria) + " " + getFullString(periodo_coef_linear));
+							}
+							
+							periodo_lag = periodo;
+
+						}	
+					}
+
+
 
 					coeficiente_linear_auto_correlacao.incrementarIterador(periodo_coef_linear);
 					tipo_relaxacao.incrementarIterador(periodo_tipo_rel);
@@ -7876,8 +7888,6 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 				if (processoEstocastico_hidrologico.getSizeMatriz(AttMatrizProcessoEstocastico_probabilidade_realizacao) > 0)
 					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("PROCESSO_ESTOCASTICO_" + getString(AttMatrizProcessoEstocastico_probabilidade_realizacao) + ".csv", processoEstocastico_hidrologico, AttMatrizProcessoEstocastico_probabilidade_realizacao);
 
-				//a_entradaSaidaDados.imprimirArquivoCSV_AttComum("VARIAVEL_ALEATORIA_AttComumOperacional.csv", IdVariavelAleatoria_Nenhum, processoEstocastico_hidrologico);
-
 				a_entradaSaidaDados.imprimirArquivoCSV_AttComum("VARIAVEL_ALEATORIA_INTERNA_AttComumOperacional.csv", IdVariavelAleatoria_Nenhum, IdVariavelAleatoriaInterna_Nenhum, processoEstocastico_hidrologico, std::vector<AttComumVariavelAleatoriaInterna>{AttComumVariavelAleatoriaInterna_idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_nome, AttComumVariavelAleatoriaInterna_grau_liberdade});
 
 				if (processoEstocastico_hidrologico.getSize1Matriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral) > 0)
@@ -7892,6 +7902,11 @@ void Dados::validacao_operacional_ProcessoEstocasticoHidrologico(EntradaSaidaDad
 							maior_ordem_horizonte = maior_ordem;
 					}
 					a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) + ".csv", IdVariavelAleatoria_Nenhum, processoEstocastico_hidrologico, horizonte_coeficiente_linear_auto_correlacao.getIteradorInicial(), horizonte_coeficiente_linear_auto_correlacao.getIteradorFinal(), 1, maior_ordem_horizonte, AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao);
+					if (processoEstocastico_hidrologico.getSize1Matriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_lag_auto_correlacao) > 0) {
+						a_entradaSaidaDados.setAppendArquivo(true);
+						a_entradaSaidaDados.imprimirArquivoCSV_AttMatriz("VARIAVEL_ALEATORIA_" + getString(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao) + ".csv", IdVariavelAleatoria_Nenhum, processoEstocastico_hidrologico, horizonte_coeficiente_linear_auto_correlacao.getIteradorInicial(), horizonte_coeficiente_linear_auto_correlacao.getIteradorFinal(), 1, maior_ordem_horizonte, AttMatrizVariavelAleatoria_lag_auto_correlacao);
+						a_entradaSaidaDados.setAppendArquivo(false);
+					}
 				}
 
 				a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("VARIAVEL_ALEATORIA_" + getString(AttVetorVariavelAleatoria_tipo_relaxacao) + ".csv", IdVariavelAleatoria_Nenhum, processoEstocastico_hidrologico, AttVetorVariavelAleatoria_tipo_relaxacao);

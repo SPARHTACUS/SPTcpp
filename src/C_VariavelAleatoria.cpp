@@ -1326,7 +1326,7 @@ void VariavelAleatoria::gerarCenariosEspacoAmostral(const SmartEnupla <IdCenario
 					const double coeficiente_linear = getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo_amostra, lag, double());
 
 					if (coeficiente_linear != 0.0) {
-						const Periodo periodo_lag = periodo - lag;
+						const Periodo periodo_lag = getPeriodoLagAutocorrelacao(periodo, lag);
 
 						periodos_lag.at(lag) = a_horizonte_processo_estocastico.getIteradores(periodo_lag);
 
@@ -1392,9 +1392,10 @@ void VariavelAleatoria::expandirParametrosEspacoAmostral(const SmartEnupla<Perio
 
 				if (idVariavelAleatoriaInterna == IdVariavelAleatoriaInterna_1) {
 
-					for (int lag = 1; lag <= getIterador2Final(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, int()); lag++)
+					for (int lag = 1; lag <= getIterador2Final(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, int()); lag++) {
 						addElemento(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo, lag, getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, lag, double()));
-
+						addElemento(AttMatrizVariavelAleatoria_lag_auto_correlacao, periodo, lag, Periodo(idEstacao, periodo.getAno()));
+					}
 						//coeficiente_linear_auto_correlacao.at(periodo).addElemento(lag, getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, lag, double()));
 				} // if (idVariavelAleatoriaInterna == IdVariavelAleatoriaInterna_1) {
 
@@ -1481,53 +1482,61 @@ double VariavelAleatoria::getRealizacaoTransformadaEspacoAmostral_recursivo(cons
 		
 		IdRealizacao idRealizacao = IdRealizacao_Nenhum;
 
-		if (a_periodo == a_periodo_realizacao)
-			idRealizacao = a_idRealizacao;
-		else
-			idRealizacao = a_idRealizacoes_cenario.getElemento(a_periodo);
+		const std::vector<Periodo> periodos = a_horizonte_completo.getIteradores(a_periodo);
 
-		// Adicionado 1 na ordem_auto_correlacao para que a SmartEnupla tendencia_por_periodo nao fique vazia em caso de AttVetorVariavelAleatoria_ordem_auto_correlacao = 0.
-		const int ordem_auto_correlacao = getSizeMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo);
+		double realizacao = 0.0;
+		for (int p = 0; p < int(periodos.size()); p++) {
 
-		SmartEnupla<Periodo, double> tendencia_por_periodo;
+			const Periodo periodo = periodos.at(p);
 
-		if ((ordem_auto_correlacao > 1) || (getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo, 1, double()) != 0.0)) {
+			const double sobreposicao = a_periodo.sobreposicao(periodo);
+
+			if (periodo == a_periodo_realizacao)
+				idRealizacao = a_idRealizacao;
+			else
+				idRealizacao = a_idRealizacoes_cenario.getElemento(periodo);
+
+			// Adicionado 1 na ordem_auto_correlacao para que a SmartEnupla tendencia_por_periodo nao fique vazia em caso de AttVetorVariavelAleatoria_ordem_auto_correlacao = 0.
+			const int ordem_auto_correlacao = getSize1Matriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo);
+
+			SmartEnupla<Periodo, double> tendencia_por_periodo;
 
 			const Periodo periodo_tendencia_final = getIteradorFinal(IdVariavelAleatoriaInterna_1, AttVetorVariavelAleatoriaInterna_tendencia_temporal, Periodo());
 
 			for (int lag = 1; lag <= ordem_auto_correlacao; lag++) {
 
-				const Periodo periodo_lag = a_periodo - lag;
+				const Periodo periodo_lag = getPeriodoLagAutocorrelacao(periodo, lag);
 
-				const std::vector<Periodo> periodos = a_horizonte_completo.getIteradores(periodo_lag);
+				const std::vector<Periodo> periodos_lag = a_horizonte_completo.getIteradores(periodo_lag);
 
-				for (int p = 0; p < int(periodos.size()); p++) {
+				for (int p_lag = 0; p_lag < int(periodos_lag.size()); p_lag++) {
 
-					const Periodo periodo = periodos.at(p);
+					const Periodo periodo_lag_inner = periodos_lag.at(p_lag);
 
-					const double sobreposicao = periodo_lag.sobreposicao(periodo);
-
-					if (periodo <= periodo_tendencia_final) {
+					if (periodo_lag_inner <= periodo_tendencia_final) {
 
 						//Valor da tendência está em VariavelAleatoriaInterna
 
 						double valor_realizacao = 0;
 
 						for (IdVariavelAleatoriaInterna idVariavelAleatoriaInterna = IdVariavelAleatoriaInterna_1; idVariavelAleatoriaInterna <= getMaiorId(IdVariavelAleatoriaInterna()); idVariavelAleatoriaInterna++)
-							valor_realizacao += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double()) + getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
+							valor_realizacao += getElementoVetor(idVariavelAleatoriaInterna, AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo_lag_inner, double()) + getAtributo(idVariavelAleatoriaInterna, AttComumVariavelAleatoriaInterna_grau_liberdade, double());
 
-						tendencia_por_periodo.addElemento(periodo, valor_realizacao);
+						tendencia_por_periodo.addElemento(periodo_lag_inner, valor_realizacao);
 
-					}//if (a_periodo <= vetorVariavelAleatoriaInterna.at(IdVariavelAleatoriaInterna_1).getIterador2Final(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, Periodo())) {
+					}//if (periodo <= vetorVariavelAleatoriaInterna.at(IdVariavelAleatoriaInterna_1).getIterador2Final(AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral, a_idCenario, Periodo())) {
 					else
-						tendencia_por_periodo.addElemento(periodo, getRealizacaoTransformadaEspacoAmostral_recursivo(a_idCenario, a_idRealizacao, a_idRealizacoes_cenario, periodo_lag, a_periodo_realizacao, a_horizonte_completo));
+						tendencia_por_periodo.addElemento(periodo_lag_inner, getRealizacaoTransformadaEspacoAmostral_recursivo(a_idCenario, a_idRealizacao, a_idRealizacoes_cenario, periodo_lag, a_periodo_realizacao, a_horizonte_completo));
 
 				} // for (int p = 0; p < int(periodos.size()); p++) {
 
 			} // for (int lag = 1; lag <= ordem_auto_correlacao; lag++) {
+
+			realizacao += sobreposicao * calcularRealizacao(periodo, a_idCenario, tendencia_por_periodo, getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, a_idRealizacao, double()));
+
 		}
 
-		return calcularRealizacao(a_periodo, a_idCenario, tendencia_por_periodo, getElementoMatriz(AttMatrizVariavelAleatoria_residuo_espaco_amostral, a_periodo, a_idRealizacao, double()));
+		return realizacao;
 
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::getRealizacaoTransformadaEspacoAmostral_recursivo(" + getString(a_idCenario) + "," + getString(a_periodo) + "): \n" + std::string(erro.what())); }
@@ -1878,14 +1887,18 @@ double VariavelAleatoria::calcularRegressivo_lognormal_3p(const Periodo a_period
 	try {
 
 		double parcela_regressiva_realizacao = 0.0;
-		const int lag_final = getIterador2Final(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo, int());
+
+		const int lag_final = getSizeMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo);
+
+		if (lag_final == 0)
+			return parcela_regressiva_realizacao;
 
 		if (a_tendencia.size() == 0) {
 
 			if (getSizeMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral) == 0)
 				return parcela_regressiva_realizacao;
 
-			SmartEnupla<Periodo, int> horizonte_tendencia; 
+			const SmartEnupla<Periodo, int> horizonte_tendencia = SmartEnupla<Periodo, int>(getMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, Periodo(), IdCenario(), double()), 0);
 
 			Periodo ultimo_periodo = a_periodo;
 			for (int lag = 1; lag <= lag_final; lag++) {
@@ -1894,37 +1907,26 @@ double VariavelAleatoria::calcularRegressivo_lognormal_3p(const Periodo a_period
 
 				if (coeficiente_linear != 0.0) {
 
-					if (horizonte_tendencia.size() == 0) {
-						horizonte_tendencia = SmartEnupla<Periodo, int>(getMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, Periodo(), IdCenario(), double()), 0);
-						horizonte_tendencia.decrementarIterador(ultimo_periodo);
-					}
+					const Periodo periodo_lag = getPeriodoLagAutocorrelacao(a_periodo, lag);
 
-					const Periodo periodo_lag = a_periodo - lag;
+					if (horizonte_tendencia.getIteradorInicial() > periodo_lag)
+						throw std::invalid_argument("Tendencia nao compativel com lag " + getString(lag) + ".");
 
-					const Periodo periodo_lag_extra = periodo_lag - 1;
-
-					Periodo periodo_tendencia = ultimo_periodo;
+					const std::vector<Periodo> periodos = horizonte_tendencia.getIteradores(periodo_lag);
+					if (periodos.size() == 0)
+						throw std::invalid_argument("Nao encontrados periodos com lag " + getString(lag) + ".");
 
 					double sobreposicao_acumulada = 0.0;
-					for (Periodo periodo_varre = periodo_tendencia; periodo_varre >= periodo_lag_extra; horizonte_tendencia.decrementarIterador(periodo_varre)) {
-
-						const double sobreposicao = periodo_lag.sobreposicao(periodo_varre);
-
-						if (sobreposicao > 0.0) {
-							parcela_regressiva_realizacao += sobreposicao * getElementoMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodo_varre, a_idCenario, double()) * coeficiente_linear;						
-							sobreposicao_acumulada += sobreposicao;
-							if ((0.99 < sobreposicao_acumulada) && (sobreposicao_acumulada < 1.01)){
-								ultimo_periodo = periodo_varre;
-								break;
-							}
-						}
-
+					for (int p = 0; p < int(periodos.size()); p++) {
+						const double sobreposicao = periodo_lag.sobreposicao(periodos.at(p));
+						parcela_regressiva_realizacao += sobreposicao * getElementoMatriz(AttMatrizVariavelAleatoria_cenarios_realizacao_transformada_espaco_amostral, periodos.at(p), a_idCenario, double()) * coeficiente_linear;
+						sobreposicao_acumulada += sobreposicao;
 					}
 
 					if ((sobreposicao_acumulada < 0.99) || (1.01 < sobreposicao_acumulada))
 						throw std::invalid_argument("Nao encontrados periodos complementares");
 
-				}
+				} // if (coeficiente_linear != 0.0) {
 
 			}
 		}
@@ -1937,7 +1939,7 @@ double VariavelAleatoria::calcularRegressivo_lognormal_3p(const Periodo a_period
 
 				if (coeficiente_linear != 0.0) {
 
-					const Periodo periodo_lag = a_periodo - lag;
+					const Periodo periodo_lag = getPeriodoLagAutocorrelacao(a_periodo, lag);
 
 					if (a_tendencia.getIteradorInicial() > periodo_lag)
 						throw std::invalid_argument("Tendencia nao compativel com lag " + getString(lag) + ".");
@@ -1946,8 +1948,15 @@ double VariavelAleatoria::calcularRegressivo_lognormal_3p(const Periodo a_period
 					if (periodos.size() == 0)
 						throw std::invalid_argument("Nao encontrados periodos com lag " + getString(lag) + ".");
 
-					for (int p = 0; p < int(periodos.size()); p++)
-						parcela_regressiva_realizacao += periodo_lag.sobreposicao(periodos.at(p)) * a_tendencia.at(periodos.at(p)) * coeficiente_linear;
+					double sobreposicao_acumulada = 0.0;
+					for (int p = 0; p < int(periodos.size()); p++) {
+						const double sobreposicao = periodo_lag.sobreposicao(periodos.at(p));
+						parcela_regressiva_realizacao += sobreposicao * a_tendencia.at(periodos.at(p)) * coeficiente_linear;
+						sobreposicao_acumulada += sobreposicao;
+					}
+
+					if ((sobreposicao_acumulada < 0.99) || (1.01 < sobreposicao_acumulada))
+						throw std::invalid_argument("Nao encontrados periodos complementares");
 
 				} // if (coeficiente_linear != 0.0) {
 			} // for (int lag = 1; lag <= lag_final; lag++)
@@ -1980,18 +1989,19 @@ double VariavelAleatoria::calcularResiduo_lognormal_3p(double a_ruido_correlacio
 
 		const int ordem_maxima = getSizeMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo);
 
-		const Periodo periodo_maior_lag = a_periodo - ordem_maxima;
-
 		double parcela_regressiva_residuo = media;
-		for (Periodo periodo = periodo_maior_lag; periodo < a_periodo; periodo++) {
 
-			const double coeficiente_linear = getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo, a_periodo - periodo, double());
+		for (int lag = 1; lag <= ordem_maxima; lag++) {
 
-			const double media_lag = getElementoVetor(AttVetorVariavelAleatoria_media_serie_transformada, periodo.getMes(), double());
+			const double coeficiente_linear = getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, a_periodo, lag, double());
+
+			const Periodo periodo_lag = getPeriodoLagAutocorrelacao(a_periodo, lag);
+
+			const double media_lag = getElementoVetor(AttVetorVariavelAleatoria_media_serie_transformada, periodo_lag.getMes(), double());
 
 			parcela_regressiva_residuo -= coeficiente_linear * media_lag;
 
-		} // for (Periodo periodo = periodo_maior_lag; periodo < a_periodo; periodo++) {
+		}
 
 		const double sigma_residuo_normal = getElementoVetor(AttVetorVariavelAleatoria_sigma_residuo_normal, idEstacao, double());
 		const double mi_residuo_normal    = getElementoVetor(AttVetorVariavelAleatoria_mi_residuo_normal,    idEstacao, double());
@@ -2036,5 +2046,24 @@ double VariavelAleatoria::getGrauLiberdade() {
 	} // try{
 	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::getGrauLiberdade(): \n" + std::string(erro.what())); }
 
+
+}
+
+Periodo VariavelAleatoria::getPeriodoLagAutocorrelacao(const Periodo a_periodo, const int a_lag)const{
+
+	try{
+
+		if (a_lag < 0)
+			throw std::invalid_argument("Lag negativo.");
+		else if (a_lag == 0)
+			return a_periodo;
+
+		if (getSizeMatriz(AttMatrizVariavelAleatoria_lag_auto_correlacao) > 0)
+			return getElementoMatriz(AttMatrizVariavelAleatoria_lag_auto_correlacao, a_periodo, a_lag, Periodo());
+		else
+			return a_periodo - a_lag;
+
+	} // try{
+	catch (const std::exception& erro) { throw std::invalid_argument("VariavelAleatoria(" + getString(getIdObjeto()) + ")::getPeriodoLagAutocorrelacao(" + getString(a_periodo) + "," + getString(a_lag) + "): \n" + std::string(erro.what())); }
 
 }

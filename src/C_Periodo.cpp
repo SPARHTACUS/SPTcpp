@@ -329,7 +329,8 @@ Periodo::Periodo(const std::string a_duration, const Periodo& a_periodo) {
 
 Periodo::Periodo(const std::string a_periodo) {
 	inicializaAtributos();
-	setPeriodo(getDurationFromStr(""), a_periodo);
+	if (a_periodo.size() != 6 || (!strCompara(a_periodo, "Nenhum")))
+		setPeriodo(getDurationFromStr(""), a_periodo);
 }
 
 Periodo::Periodo(const std::string a_duration, const std::string a_periodo) {

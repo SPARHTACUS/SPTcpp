@@ -56,6 +56,7 @@
 	  m(VariavelAleatoria,  AttMatriz,                     ruido_branco_espaco_amostral,       double,          min,          max,             0,    Periodo, IdRealizacao)   \
 	  m(VariavelAleatoria,  AttMatriz,             ruido_correlacionado_espaco_amostral,       double,          min,          max,             0,    Periodo, IdRealizacao)   \
 	  m(VariavelAleatoria,  AttMatriz,                          residuo_espaco_amostral,       double,          min,          max,             0,    Periodo, IdRealizacao)   \
+	  m(VariavelAleatoria,  AttMatriz,                              lag_auto_correlacao,      Periodo,       Nenhum,       Nenhum,        Nenhum,    Periodo, int)       \
 	  m(VariavelAleatoria,  AttMatriz,               coeficiente_linear_auto_correlacao,       double,          min,          max,             0,    Periodo, int)       \
 	  m(VariavelAleatoria,  AttMatriz,                         auto_covariancia_sazonal,       double,          min,          max,             0,  IdMes, int)       \
 	  m(VariavelAleatoria,  AttMatriz,                                  auto_correlacao,       double,          min,          max,             0,  IdMes, int)       \
@@ -185,6 +186,8 @@ public:
 	double calcularResiduo_lognormal_3p(double a_ruido_correlacionado, const Periodo a_periodo) const;
 
 	double getGrauLiberdade();
+
+	Periodo getPeriodoLagAutocorrelacao(const Periodo a_periodo, const int a_lag)const;
 
 };
 
