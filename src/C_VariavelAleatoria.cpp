@@ -1394,7 +1394,8 @@ void VariavelAleatoria::expandirParametrosEspacoAmostral(const SmartEnupla<Perio
 
 					for (int lag = 1; lag <= getIterador2Final(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, int()); lag++) {
 						addElemento(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao, periodo, lag, getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, lag, double()));
-						addElemento(AttMatrizVariavelAleatoria_lag_auto_correlacao, periodo, lag, Periodo(idEstacao, periodo.getAno()));
+						Periodo periodo_ = Periodo(idEstacao, periodo.getAno()) - lag;
+						addElemento(AttMatrizVariavelAleatoria_lag_auto_correlacao, periodo, lag, periodo_);
 					}
 						//coeficiente_linear_auto_correlacao.at(periodo).addElemento(lag, getElementoMatriz(AttMatrizVariavelAleatoria_coeficiente_linear_auto_correlacao_sazonal, idEstacao, lag, double()));
 				} // if (idVariavelAleatoriaInterna == IdVariavelAleatoriaInterna_1) {

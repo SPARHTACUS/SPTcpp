@@ -563,7 +563,11 @@ void ModeloOtimizacao::gerarRealizacoes(const IdEstagio a_estagioIni, const IdEs
 				a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//ProcessoEstocasticoHidrologico");
 			}
 
-			vetorProcessoEstocastico.at(IdProcessoEstocastico_1).gerarCenariosPorSorteio(a_entradaSaidaDados, imprimir_cenarios, true, gerar_cenarios_internos, getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()), menor_cenario, maior_cenario, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
+			SmartEnupla<Periodo, IdEstagio> horizonte_decomposicao_inv;
+			for (IdEstagio idEstagio = a_estagioIni; idEstagio <= a_estagioEnd; idEstagio++)
+				horizonte_decomposicao_inv.addElemento(getAtributo(idEstagio, AttComumEstagio_periodo_otimizacao, Periodo()), idEstagio);
+
+			vetorProcessoEstocastico.at(IdProcessoEstocastico_1).gerarCenariosPorSorteio(a_entradaSaidaDados, horizonte_decomposicao_inv, imprimir_cenarios, true, gerar_cenarios_internos, getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()), menor_cenario, maior_cenario, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
 
 		}
 

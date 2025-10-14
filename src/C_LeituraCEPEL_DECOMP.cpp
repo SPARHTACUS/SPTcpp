@@ -19674,6 +19674,10 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		const SmartEnupla<Periodo, IdEstagio> horizonte_estudo = a_dados.getVetor(AttVetorDados_horizonte_estudo, Periodo(), IdEstagio());
 		const SmartEnupla<IdEstagio, Periodo> horizonte_otimizacao = a_dados.getVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
 
+		SmartEnupla<Periodo, IdEstagio> horizonte_decomposicao_inv;
+		for (IdEstagio idEstagio = horizonte_otimizacao.getIteradorInicial(); idEstagio <= horizonte_otimizacao.getIteradorFinal(); idEstagio++)
+			horizonte_decomposicao_inv.addElemento(horizonte_otimizacao.at(idEstagio), idEstagio);
+
 		const std::string nomeFile_PD_preConfig = a_dados.getAtributo(AttComumDados_diretorio_entrada_dados, std::string()) + "_PRECONFIG" + "//DadosEntradaPD_PRECONFIG";
 
 		////////////////////////////////////////////////////
@@ -19945,14 +19949,15 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 
 		if (!processoEstocasticoHidrologicoPreConfig_instanciado) {
 						
-			if (!a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_final_PE_DECOMP, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario)) {
+			if (!a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(horizonte_decomposicao_inv, periodo_final_PE_DECOMP, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario)) {
 
 				int semente = a_dados.getAtributo(AttComumDados_semente_geracao_cenario_hidrologico, int());
 
-				const Periodo periodo_inicial_PE = a_dados.processoEstocastico_hidrologico.getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double()).getIteradorInicial();
-				const Periodo periodo_final_PE = a_dados.processoEstocastico_hidrologico.getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double()).getIteradorFinal();
+				const Periodo periodo_inicial_PE = horizonte_decomposicao_inv.getIteradores(a_dados.processoEstocastico_hidrologico.getIterador1Inicial(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo())).at(0);
+				std::vector<Periodo> periodosEnd = horizonte_decomposicao_inv.getIteradores(a_dados.processoEstocastico_hidrologico.getIterador1Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo()));
+				const Periodo periodo_final_PE = periodosEnd.at(periodosEnd.size()-1);
 
-				a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralPorSorteio(TipoSorteio_uniforme, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario, semente, periodo_inicial_PE, periodo_final_PE);
+				a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralPorSorteio(horizonte_decomposicao_inv, TipoSorteio_uniforme, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario, semente, periodo_inicial_PE, periodo_final_PE);
 
 			}//if (!a_dados.processoEstocastico_hidrologico.mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_final_PE_DECOMP, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario)) {
 
@@ -20163,7 +20168,7 @@ void LeituraCEPEL::validacoes_DC(Dados& a_dados, const std::string a_diretorio, 
 		if (a_dados.processoEstocastico_hidrologico.getSize1Matriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) == 0) {
 			entradaSaidaDados.setDiretorioSaida(diretorio_att_premissas + "//ProcessoEstocasticoHidrologico");
 			int semente = 1; //Precisa de qualquer valor (Nao vai realizar sorteio, só alocar valores já sorteados)
-			a_dados.processoEstocastico_hidrologico.gerarCenariosPorSorteio(entradaSaidaDados, a_dados.getAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, bool()), true, true, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario, TipoSorteio_uniforme, semente);
+			a_dados.processoEstocastico_hidrologico.gerarCenariosPorSorteio(entradaSaidaDados, horizonte_decomposicao_inv, a_dados.getAtributo(AttComumDados_imprimir_geracao_cenario_hidrologico, bool()), true, true, a_dados.getAtributo(AttComumDados_numero_cenarios, int()), menor_cenario, maior_cenario, TipoSorteio_uniforme, semente);
 		}// if (a_dados.processoEstocastico_hidrologico.getSize1Matriz(IdVariavelAleatoria_1, IdVariavelAleatoriaInterna_1, AttMatrizVariavelAleatoriaInterna_cenarios_realizacao_espaco_amostral) == 0) {
 		
 		if(imprimir_exportacao_pos_estudo)

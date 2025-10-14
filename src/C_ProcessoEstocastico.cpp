@@ -112,7 +112,7 @@ void ProcessoEstocastico::parametrizarModelo(const EntradaSaidaDados &a_entradaS
 
 
 
-void ProcessoEstocastico::avaliarModeloViaSerieSintetica(const EntradaSaidaDados &a_entradaSaidaDados, const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, const int a_numero_periodos_avaliacao_sintetica){
+void ProcessoEstocastico::avaliarModeloViaSerieSintetica(const EntradaSaidaDados &a_entradaSaidaDados, const SmartEnupla<Periodo, IdEstagio>& a_horizonte_decomposicao, const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, const int a_numero_periodos_avaliacao_sintetica){
 
 	try{
 
@@ -139,7 +139,7 @@ void ProcessoEstocastico::avaliarModeloViaSerieSintetica(const EntradaSaidaDados
 
 		gerarEspacoAmostralPorSorteio(a_entradaSaidaDados, true, TipoRelaxacaoVariavelAleatoria_sem_relaxacao, horizonte_amostra_comum, a_tipo_sorteio, semente);
 
-		gerarCenariosPorSorteio(a_entradaSaidaDados, true, true, true, 1, IdCenario_1, IdCenario_1, TipoSorteio_uniforme, semente);
+		gerarCenariosPorSorteio(a_entradaSaidaDados, a_horizonte_decomposicao, true, true, true, 1, IdCenario_1, IdCenario_1, TipoSorteio_uniforme, semente);
 
 		//SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, double>> serie_sintetica;
 		
@@ -272,12 +272,12 @@ void ProcessoEstocastico::validar_probabilidade_realizacao() const{
 	catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico::validar_probabilidade_realizacao(): \n" + std::string(erro.what())); }
 } // void ProcessoEstocastico::validar_probabilidade_realizacao() {
 
-void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente){
+void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_entradaSaidaDados, const SmartEnupla<Periodo, IdEstagio> &a_horizonte_decomposicao, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente){
 
 	try {
 
 		if (getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) == 0)
-			mapearCenariosEspacoAmostralPorSorteio(a_tipo_sorteio, a_numero_cenarios_global, a_cenario_inicial, a_cenario_final, a_semente);
+			mapearCenariosEspacoAmostralPorSorteio(a_horizonte_decomposicao, a_tipo_sorteio, a_numero_cenarios_global, a_cenario_inicial, a_cenario_final, a_semente);
 
 		SmartEnupla<Periodo, double> horizonte_tendencia;
 		
@@ -318,10 +318,10 @@ void ProcessoEstocastico::gerarCenariosPorSorteio(const EntradaSaidaDados &a_ent
 
 } // void ProcessoEstocastico::gerarCenariosPorSorteio(const SmartEnupla<IdCenario, IdCenario> a_mapeamento_cenarios_tendencia, const int a_semente){
 
-SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> ProcessoEstocastico::gerarCenariosPorSorteioRetorno(const EntradaSaidaDados& a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int& a_semente){
+SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> ProcessoEstocastico::gerarCenariosPorSorteioRetorno(const EntradaSaidaDados& a_entradaSaidaDados, const SmartEnupla<Periodo, IdEstagio>& a_horizonte_decomposicao, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int& a_semente){
 	try {
 
-		gerarCenariosPorSorteio(a_entradaSaidaDados, a_imprimir_cenarios, a_gerar_cenarios_buffer, a_gerar_cenarios_internos, a_numero_cenarios_global, a_cenario_inicial, a_cenario_final, a_tipo_sorteio, a_semente);
+		gerarCenariosPorSorteio(a_entradaSaidaDados, a_horizonte_decomposicao, a_imprimir_cenarios, a_gerar_cenarios_buffer, a_gerar_cenarios_internos, a_numero_cenarios_global, a_cenario_inicial, a_cenario_final, a_tipo_sorteio, a_semente);
 
 		const IdVariavelAleatoria maiorIdVariavelAleatoria = getMaiorIdVariavelAleatoria();
 
@@ -1076,19 +1076,18 @@ void ProcessoEstocastico::setCenariosInternos(const IdVariavelAleatoria a_idVari
 } // void ProcessoEstocastico::setCenariosInternos(const IdVariavelAleatoria a_idVariavelAleatoria, const AttMatrizVariavelAleatoriaInterna a_attMatrizVariavelAleatoriaInterna, const SmartEnupla<IdVariavelAleatoriaInterna, SmartEnupla<IdCenario, SmartEnupla<Periodo, double>>>& a_matriz){
 
 
-void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int &a_semente) {
+void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const SmartEnupla<Periodo, IdEstagio>& a_horizonte_decomposicao, const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int &a_semente) {
 
 	try {
 
 		if (getSize1Matriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral) == 0)
 			return;
 
-		const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> horizonte_espaco_amostral = getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double());
+		const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> residuo_espaco_amostral = getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double());
 
-		const Periodo periodo_final = horizonte_espaco_amostral.getIteradorFinal();
+		const Periodo periodo_final = a_horizonte_decomposicao.getIteradorFinal();
 
-
-		Periodo periodo_seguinte_mapeamento_existente = horizonte_espaco_amostral.getIteradorInicial();
+		Periodo periodo_seguinte_mapeamento_existente = a_horizonte_decomposicao.getIteradorInicial();
 		if (getSizeMatriz(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral) > 0) {
 			if (getIterador1Inicial(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, IdCenario()) > a_menorIdcenario)
 				throw std::invalid_argument("Matriz inicializada com cenario inicial maior que " + getFullString(a_menorIdcenario) + ".");
@@ -1100,16 +1099,18 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 				return;
 
 			periodo_seguinte_mapeamento_existente = getIterador2Final(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_menorIdcenario, Periodo());
-			horizonte_espaco_amostral.incrementarIterador(periodo_seguinte_mapeamento_existente);
+			std::vector<Periodo> periodos = a_horizonte_decomposicao.getIteradores(periodo_seguinte_mapeamento_existente);
+			if (periodos.size() > 0)
+				throw std::invalid_argument("Period mismatch.");
+			a_horizonte_decomposicao.incrementarIterador(periodos.at(0));
 		}
 
-
 		Periodo periodo_inicial = periodo_seguinte_mapeamento_existente;
-		for (Periodo periodo = periodo_seguinte_mapeamento_existente; periodo <= periodo_final; horizonte_espaco_amostral.incrementarIterador(periodo)) {
-			if (!mapearCenariosEspacoAmostralCompletoPorPeriodo(periodo_inicial, a_numero_cenarios_global, a_menorIdcenario, a_maiorIdcenario))
+		for (Periodo periodo = periodo_seguinte_mapeamento_existente; periodo <= periodo_final; a_horizonte_decomposicao.incrementarIterador(periodo)) {
+			if (!mapearCenariosEspacoAmostralCompletoPorPeriodo(a_horizonte_decomposicao, periodo_inicial, a_numero_cenarios_global, a_menorIdcenario, a_maiorIdcenario))
 				break;
 			else
-				horizonte_espaco_amostral.incrementarIterador(periodo_inicial);
+				a_horizonte_decomposicao.incrementarIterador(periodo_inicial);
 		}
 
 		if (periodo_inicial > periodo_final)
@@ -1118,7 +1119,10 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 		periodo_inicial = periodo_seguinte_mapeamento_existente;
 
 		SmartEnupla<Periodo, int> horizonte_mapeamento_cenarios_por_sorteio;
-		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_espaco_amostral.incrementarIterador(periodo))
+		Periodo periodo_espaco_ini = residuo_espaco_amostral.getIteradores(periodo_inicial).at(0);
+		std::vector<Periodo> periodosEnd = residuo_espaco_amostral.getIteradores(periodo_final);
+		Periodo periodo_espaco_end = periodosEnd.at(periodosEnd.size() - 1);
+		for (Periodo periodo = periodo_espaco_ini; periodo <= periodo_espaco_end; residuo_espaco_amostral.incrementarIterador(periodo))
 			horizonte_mapeamento_cenarios_por_sorteio.addElemento(periodo, 0);
 
 		if (a_tipo_sorteio != TipoSorteio_uniforme)
@@ -1132,18 +1136,23 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 
 				SmartEnupla<Periodo, IdRealizacao> realizacoes_por_periodo(horizonte_mapeamento_cenarios_por_sorteio, IdRealizacao_Nenhum);
 
-				Periodo periodo = periodo_inicial;
+				Periodo periodo_dec = periodo_inicial;
 				for (int p = 1; p <= numero_maximo_periodos_espaco_amostral; p++) {
 
-					if (periodo.isValido()) {
-						realizacoes_por_periodo.setElemento(periodo, getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, IdRealizacao())));
-						if (periodo == periodo_final)
-							periodo = Periodo();
-						else if (periodo < periodo_final)
-							horizonte_mapeamento_cenarios_por_sorteio.incrementarIterador(periodo);
+					if (periodo_dec.isValido()) {
+						std::vector<Periodo> periodos = horizonte_mapeamento_cenarios_por_sorteio.getIteradores(periodo_dec);
+
+						for (int i = 0; i < int(periodos.size()); i++) {
+							realizacoes_por_periodo.setElemento(periodos.at(i), getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodos.at(i), IdRealizacao())));
+							if (periodo_dec == periodo_final)
+								periodo_dec = Periodo();
+							else if (periodo_dec < periodo_final)
+								a_horizonte_decomposicao.incrementarIterador(periodo_dec);
+						}
+
 					}
 					else
-						getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_final, IdRealizacao()));
+						getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_espaco_end, IdRealizacao()));
 
 				} // for (int p = 1; p <= numero_maximo_periodos_espaco_amostral; p++){
 
@@ -1153,15 +1162,15 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 
 			else {
 				for (int p = 1; p <= numero_maximo_periodos_espaco_amostral; p++)
-					getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_final, IdRealizacao()));
+					getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_espaco_end, IdRealizacao()));
 			}
 
 		} // for (IdCenario idCenario = IdCenario_1; idCenario < IdCenario_Excedente; idCenario++) {
 
-		if (periodo_seguinte_mapeamento_existente == horizonte_espaco_amostral.getIteradorInicial())
+		if (periodo_seguinte_mapeamento_existente == residuo_espaco_amostral.getIteradorInicial())
 			setMatriz_forced(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, cenarios);
 		else {
-			for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_mapeamento_cenarios_por_sorteio.incrementarIterador(periodo)) {
+			for (Periodo periodo = periodo_espaco_ini; periodo <= periodo_espaco_end; horizonte_mapeamento_cenarios_por_sorteio.incrementarIterador(periodo)) {
 				for (IdCenario idCenario = a_menorIdcenario; idCenario <= a_maiorIdcenario; idCenario++)
 					addElemento(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, periodo, cenarios.at(idCenario).at(periodo));
 			}
@@ -1172,17 +1181,17 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 
 } // void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorteio a_tipo_sorteio, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final){
 
-void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int& a_semente, const Periodo a_periodo_inicial, const Periodo a_periodo_final) {
+void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const SmartEnupla<Periodo, IdEstagio>& a_horizonte_decomposicao, const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int& a_semente, const Periodo a_periodo_inicial, const Periodo a_periodo_final) {
 
 	try {
 
 		if (getSize1Matriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral) == 0)
 			return;
 
-		const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> horizonte_espaco_amostral = getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double());
+		const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> residuo_espaco_amostral = getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double());
 
-		const Periodo periodo_inicial = horizonte_espaco_amostral.getIteradorInicial();
-		const Periodo periodo_final = horizonte_espaco_amostral.getIteradorFinal();
+		const Periodo periodo_inicial = a_horizonte_decomposicao.getIteradorInicial();
+		const Periodo periodo_final = a_horizonte_decomposicao.getIteradorFinal();
 
 		if (periodo_inicial != a_periodo_inicial || periodo_final != a_periodo_final)
 			return;
@@ -1194,7 +1203,10 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 		Periodo periodo_seguinte_mapeamento_existente = periodo_inicial;
 
 		SmartEnupla<Periodo, int> horizonte_mapeamento_cenarios_por_sorteio;
-		for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_espaco_amostral.incrementarIterador(periodo))
+		Periodo periodo_espaco_ini = residuo_espaco_amostral.getIteradores(periodo_inicial).at(0);
+		std::vector<Periodo> periodosEnd = residuo_espaco_amostral.getIteradores(periodo_final);
+		Periodo periodo_espaco_end = periodosEnd.at(periodosEnd.size() - 1);
+		for (Periodo periodo = periodo_espaco_ini; periodo <= periodo_espaco_end; residuo_espaco_amostral.incrementarIterador(periodo))
 			horizonte_mapeamento_cenarios_por_sorteio.addElemento(periodo, 0);
 
 		if (a_tipo_sorteio != TipoSorteio_uniforme)
@@ -1208,18 +1220,24 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 
 				SmartEnupla<Periodo, IdRealizacao> realizacoes_por_periodo(horizonte_mapeamento_cenarios_por_sorteio, IdRealizacao_Nenhum);
 
-				Periodo periodo = periodo_inicial;
+				Periodo periodo_dec = periodo_inicial;
 				for (int p = 1; p <= numero_maximo_periodos_espaco_amostral; p++) {
 
-					if (periodo.isValido()) {
-						realizacoes_por_periodo.setElemento(periodo, getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, IdRealizacao())));
-						if (periodo == periodo_final)
-							periodo = Periodo();
-						else if (periodo < periodo_final)
-							horizonte_mapeamento_cenarios_por_sorteio.incrementarIterador(periodo);
+					if (periodo_dec.isValido()) {
+						std::vector<Periodo> periodos = horizonte_mapeamento_cenarios_por_sorteio.getIteradores(periodo_dec);
+
+						for (int i = 0; i < int(periodos.size()); i++) {
+							realizacoes_por_periodo.setElemento(periodos.at(i), getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodos.at(i), IdRealizacao())));
+							if (periodo_dec == periodo_final)
+								periodo_dec = Periodo();
+							else if (periodo_dec < periodo_final)
+								a_horizonte_decomposicao.incrementarIterador(periodo_dec);
+						}
+
 					}
+
 					else
-						getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_final, IdRealizacao()));
+						getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_espaco_end, IdRealizacao()));
 
 				} // for (int p = 1; p <= numero_maximo_periodos_espaco_amostral; p++){
 
@@ -1229,15 +1247,15 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 
 			else {
 				for (int p = 1; p <= numero_maximo_periodos_espaco_amostral; p++)
-					getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_final, IdRealizacao()));
+					getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_espaco_end, IdRealizacao()));
 			}
 
 		} // for (IdCenario idCenario = IdCenario_1; idCenario < IdCenario_Excedente; idCenario++) {
 
-		if (periodo_seguinte_mapeamento_existente == horizonte_espaco_amostral.getIteradorInicial())
+		if (periodo_seguinte_mapeamento_existente == a_horizonte_decomposicao.getIteradorInicial())
 			setMatriz_forced(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, cenarios);
 		else {
-			for (Periodo periodo = periodo_inicial; periodo <= periodo_final; horizonte_mapeamento_cenarios_por_sorteio.incrementarIterador(periodo)) {
+			for (Periodo periodo = periodo_espaco_ini; periodo <= periodo_espaco_end; horizonte_mapeamento_cenarios_por_sorteio.incrementarIterador(periodo)) {
 				for (IdCenario idCenario = a_menorIdcenario; idCenario <= a_maiorIdcenario; idCenario++)
 					addElemento(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, idCenario, periodo, cenarios.at(idCenario).at(periodo));
 			}
@@ -1248,103 +1266,7 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorte
 
 } // void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const TipoSorteio a_tipo_sorteio, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final){
 
-
-bool ProcessoEstocastico::mapearCenariosEspacoAmostralCompleto(const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario){
-
-	try {
-
-		if (getSize1Matriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral) == 0)
-			return false;
-
-		const int numero_cenarios_local = int(a_maiorIdcenario - a_menorIdcenario) + 1;
-		if (numero_cenarios_local <= 0)
-			throw std::invalid_argument("Cenarios Invalidos.");
-
-		const int numero_cenarios_global = int(a_numero_cenarios_global);
-
-		if (numero_cenarios_global > numero_maximo_cenarios_mapeamento_completo_espaco_amostral)
-			return false;
-
-		const Periodo periodo_inicial = getIterador1Inicial(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo());
-		const Periodo periodo_final = getIterador1Final  (IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo());
-
-		const int numero_periodos = periodo_final - periodo_inicial + 1;
-
-		// Verifica se pode ser realizado o mapeamento completo das amostras
-		if (numero_periodos > numero_maximo_periodos_mapeamento_completo_espaco_amostral)
-			return false;
-
-		int numero_maximo_cenarios_amostra_comum = 1;
-
-		SmartEnupla<Periodo, int> numero_repeticoes_acumulado_bw(periodo_inicial, std::vector<int>(numero_periodos, 1));
-		SmartEnupla<Periodo, int> numero_repeticoes_acumulado_fw(periodo_inicial, std::vector<int>(numero_periodos, 1));
-
-		int p = 0;
-		for (Periodo periodo = periodo_inicial; periodo <= periodo_final ; periodo++) {
-			const int numero_realizacoes = int(getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, IdRealizacao()));
-
-			numero_maximo_cenarios_amostra_comum *= numero_realizacoes;
-			if (numero_maximo_cenarios_amostra_comum > numero_maximo_cenarios_mapeamento_completo_espaco_amostral)
-				return false;
-
-			else if (periodo > periodo_inicial){
-				const int numero_realizacoes_bw = int(getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_final - p + 1, IdRealizacao()));
-				const int numero_realizacoes_fw = int(getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo - 1, IdRealizacao()));
-
-				numero_repeticoes_acumulado_fw.at(periodo)           = numero_repeticoes_acumulado_fw.at(periodo - 1) * numero_realizacoes_fw;
-				numero_repeticoes_acumulado_bw.at(periodo_final - p) = numero_repeticoes_acumulado_bw.at(periodo_final - p + 1) * numero_realizacoes_bw;
-			}
-
-			p++;
-
-		} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final ; periodo++) {
-
-		if (numero_cenarios_global != numero_maximo_cenarios_amostra_comum)
-			return false;
-
-		SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> cenarios(a_menorIdcenario, std::vector<SmartEnupla<Periodo, IdRealizacao>>(numero_cenarios_local, SmartEnupla<Periodo, IdRealizacao>(periodo_inicial, std::vector<IdRealizacao>(numero_periodos, IdRealizacao_Nenhum))));
-
-
-		for (int c = 0; c < 1; c++) {
-
-			for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
-
-				const IdRealizacao maiorIdRealizacao = getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, IdRealizacao());
-
-				IdCenario idCenario = IdCenario((c * numero_cenarios_global) + 1);
-
-				for (int f = 0; f < numero_repeticoes_acumulado_fw.at(periodo); f++) {
-
-					for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao; idRealizacao++) {
-
-						for (int b = 0; b < numero_repeticoes_acumulado_bw.at(periodo); b++) {
-
-							if ((idCenario >= a_menorIdcenario) && (idCenario <= a_maiorIdcenario))
-								cenarios.at(idCenario).at(periodo) = idRealizacao;
-
-							idCenario++;
-
-						} // for (int b = 0; b < numero_repeticoes_acumulado_bw.at(periodo); b++) {
-
-					} // for (IdRealizacao idRealizacao = IdRealizacao_1; idRealizacao <= maiorIdRealizacao; idRealizacao++) {
-
-				} // for (int f = 0; f < numero_repeticoes_acumulado_fw.at(periodo); f++) {
-
-			} // for (Periodo periodo = periodo_inicial; periodo <= periodo_final; periodo++) {
-
-		} // for (int c = 0; c < a_numero_cenarios_tendencia; c++) {
-
-		setMatriz_forced(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, cenarios);
-
-		return true;
-
-	} // try{
-	catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::mapearCenariosEspacoAmostralCompleto(" + "," + getFullString(a_numero_cenarios_global) + "," + getFullString(a_menorIdcenario) + "," + getFullString(a_maiorIdcenario) + "," + "): \n" + std::string(erro.what())); }
-
-
-} // bool ProcessoEstocastico::mapearCenariosEspacoAmostralCompleta(const SmartEnupla<IdCenario, IdCenario>& a_mapeamento_cenarios_tendencia){
-
-bool ProcessoEstocastico::mapearCenariosEspacoAmostralCompletoPorPeriodo(const Periodo a_periodo_final, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario) {
+bool ProcessoEstocastico::mapearCenariosEspacoAmostralCompletoPorPeriodo(const SmartEnupla<Periodo, IdEstagio>& a_horizonte_decomposicao, const Periodo a_periodo_final, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario) {
 
 	try {
 
@@ -1357,18 +1279,21 @@ bool ProcessoEstocastico::mapearCenariosEspacoAmostralCompletoPorPeriodo(const P
 
 		const int numero_cenarios_global = int(a_numero_cenarios_global);
 
-		const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> horizonte_espaco_amostral = getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double());
+		const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> residuo_espaco_amostral = getMatriz(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, Periodo(), IdRealizacao(), double());
 
-		const Periodo periodo_inicial = horizonte_espaco_amostral.getIteradorInicial();
+		const Periodo periodo_inicial = a_horizonte_decomposicao.getIteradorInicial();
 
 		int numero_maximo_cenarios_amostra_comum = 1;
 
-		SmartEnupla<Periodo, int> numero_repeticoes_acumulado_bw(horizonte_espaco_amostral, 1);
+		SmartEnupla<Periodo, int> numero_repeticoes_acumulado_bw(a_horizonte_decomposicao, 1);
 		SmartEnupla<Periodo, int> numero_repeticoes_acumulado_fw = numero_repeticoes_acumulado_bw;
 
 		int p = 0;
-		for (Periodo periodo = periodo_inicial; periodo <= a_periodo_final; horizonte_espaco_amostral.incrementarIterador(periodo)) {
-			const int numero_realizacoes = int(getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, IdRealizacao()));
+		for (Periodo periodo = periodo_inicial; periodo <= a_periodo_final; a_horizonte_decomposicao.incrementarIterador(periodo)) {
+
+			const std::vector<Periodo> periodos = residuo_espaco_amostral.getIteradores(periodo);
+
+			const int numero_realizacoes = int(getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodos.at(0), IdRealizacao()));
 
 			numero_maximo_cenarios_amostra_comum *= numero_realizacoes;
 			if (numero_maximo_cenarios_amostra_comum > numero_cenarios_global)
@@ -1377,16 +1302,16 @@ bool ProcessoEstocastico::mapearCenariosEspacoAmostralCompletoPorPeriodo(const P
 			else if (periodo > periodo_inicial) {
 
 				Periodo periodo_menos_1 = periodo;
-				horizonte_espaco_amostral.decrementarIterador(periodo_menos_1);
+				a_horizonte_decomposicao.decrementarIterador(periodo_menos_1);
 
 				Periodo periodo_final_menos_p_mais_1 = a_periodo_final;
-				horizonte_espaco_amostral.decrementarIterador(periodo_final_menos_p_mais_1, p - 1);
+				a_horizonte_decomposicao.decrementarIterador(periodo_final_menos_p_mais_1, p - 1);
 
 				Periodo periodo_final_menos_p = a_periodo_final;
-				horizonte_espaco_amostral.decrementarIterador(periodo_final_menos_p, p);
+				a_horizonte_decomposicao.decrementarIterador(periodo_final_menos_p, p);
 
-				const int numero_realizacoes_bw = int(getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_final_menos_p_mais_1, IdRealizacao()));
-				const int numero_realizacoes_fw = int(getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo_menos_1, IdRealizacao()));
+				const int numero_realizacoes_bw = int(getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, residuo_espaco_amostral.getIteradores(periodo_final_menos_p_mais_1).at(0), IdRealizacao()));
+				const int numero_realizacoes_fw = int(getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, residuo_espaco_amostral.getIteradores(periodo_menos_1).at(0), IdRealizacao()));
 
 				numero_repeticoes_acumulado_fw.at(periodo) = numero_repeticoes_acumulado_fw.at(periodo_menos_1) * numero_realizacoes_fw;
 				numero_repeticoes_acumulado_bw.at(periodo_final_menos_p) = numero_repeticoes_acumulado_bw.at(periodo_final_menos_p_mais_1) * numero_realizacoes_bw;
@@ -1404,13 +1329,15 @@ bool ProcessoEstocastico::mapearCenariosEspacoAmostralCompletoPorPeriodo(const P
 
 		const int num_rep = (numero_cenarios_global / numero_maximo_cenarios_amostra_comum);
 
-		SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> cenarios(a_menorIdcenario, std::vector<SmartEnupla<Periodo, IdRealizacao>>(numero_cenarios_local, SmartEnupla<Periodo, IdRealizacao>(horizonte_espaco_amostral, IdRealizacao_Nenhum)));
+		SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>> cenarios(a_menorIdcenario, std::vector<SmartEnupla<Periodo, IdRealizacao>>(numero_cenarios_local, SmartEnupla<Periodo, IdRealizacao>(residuo_espaco_amostral, IdRealizacao_Nenhum)));
 
 		for (int c = 0; c < num_rep; c++) {
 
-			for (Periodo periodo = periodo_inicial; periodo <= a_periodo_final; horizonte_espaco_amostral.incrementarIterador(periodo)) {
+			for (Periodo periodo = periodo_inicial; periodo <= a_periodo_final; a_horizonte_decomposicao.incrementarIterador(periodo)) {
 
-				const IdRealizacao maiorIdRealizacao = getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodo, IdRealizacao());
+				const std::vector<Periodo> periodos = residuo_espaco_amostral.getIteradores(periodo);
+
+				const IdRealizacao maiorIdRealizacao = getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodos.at(0), IdRealizacao());
 
 				IdCenario idCenario = IdCenario((c * numero_maximo_cenarios_amostra_comum) + 1);
 
@@ -1420,8 +1347,10 @@ bool ProcessoEstocastico::mapearCenariosEspacoAmostralCompletoPorPeriodo(const P
 
 						for (int b = 0; b < numero_repeticoes_acumulado_bw.at(periodo); b++) {
 
-							if ((idCenario >= a_menorIdcenario) && (idCenario <= a_maiorIdcenario))
-								cenarios.at(idCenario).at(periodo) = idRealizacao;
+							if ((idCenario >= a_menorIdcenario) && (idCenario <= a_maiorIdcenario)) {
+								for (int i = 0; i < int(periodos.size()); i++)
+									cenarios.at(idCenario).at(periodos.at(i)) = idRealizacao;
+							}
 
 							idCenario++;
 

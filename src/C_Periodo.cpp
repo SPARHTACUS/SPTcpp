@@ -1538,6 +1538,47 @@ std::vector<std::string> Periodo::getDurT(){
 	return std::vector<std::string>{"m", "h", "d", "M", "a"};
 }
 
+std::vector<Periodo> Periodo::getPeriodosComQuebraMensal(const Periodo a_period)
+{
+
+	try{
+
+		const Periodo periodNext = a_period + 1;
+		const Periodo periodLast = Periodo("m", periodNext) - 1;
+
+		const Periodo periodIniM = Periodo(a_period.getMes(), a_period.getAno());
+
+		if (periodIniM == Periodo(periodLast.getMes(), periodLast.getAno()))
+			return std::vector<Periodo>{ a_period };
+
+		std::vector<Periodo> periods;
+
+		Periodo periodBuffer = a_period;
+
+		Periodo periodIniMnext = periodIniM + 1;
+
+		int i = 0;
+		const int iMax = 10000;
+		for (i = 0; i < iMax; i++) {
+
+			if (periodBuffer + 1 <= periodIniMnext) {
+				periods.push_back(periodBuffer);
+				return periods;
+			}
+
+			periods.push_back(getPeriodBtwn(periodBuffer - 1, periodIniMnext));
+			periodBuffer = getPeriodBtwn(periods.at(periods.size() - 1), periodNext);
+			periodIniMnext++;
+
+		}
+
+		throw std::invalid_argument("Error");
+
+	} // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getPeriodosComQuebraMensal(" + getFullString(a_period) + "): \n" + std::string(erro.what())); }
+
+}
+
 
 
 Periodo::~Periodo() {}
