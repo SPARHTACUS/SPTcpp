@@ -7396,7 +7396,7 @@ void LeituraCEPEL::leitura_AGRINT_201908_NW25(Dados& a_dados, std::string nomeAr
 						SmartEnupla<IdPatamarCarga, double> potencia_maxima_patamar(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0));
 
 						if (lista_AGRINT_PMAX.at(idAgrupamentoIntercambio).size() == 0)
-							lista_AGRINT_PMAX.at(idAgrupamentoIntercambio) = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorInicial(), std::vector<SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorFinal() - horizonte_estudo_DECK.getIteradorInicial() + 1, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), 0.0))));
+							lista_AGRINT_PMAX.at(idAgrupamentoIntercambio) = SmartEnupla<Periodo, SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorInicial(), std::vector<SmartEnupla<IdPatamarCarga, double>>(horizonte_estudo_DECK.getIteradorFinal() - horizonte_estudo_DECK.getIteradorInicial() + 1, SmartEnupla<IdPatamarCarga, double>(IdPatamarCarga_1, std::vector<double>(a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()), getdoubleFromChar("max")))));
 
 
 						for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, horizonte_estudo.getIteradorInicial(), IdPatamarCarga()); idPatamarCarga++) {
