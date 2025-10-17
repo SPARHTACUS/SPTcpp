@@ -6052,7 +6052,7 @@ double ModeloOtimizacao::getProbabilidadeAbertura(const IdEstagio a_idEstagio, c
 
 		if (maiorIdRealizacao > IdRealizacao_1) {
 
-			const Periodo periodo = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
+			const Periodo periodo = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo());
 
 			const IdRealizacao idRealizacao = getElementoMatriz(IdProcessoEstocastico_1, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, periodo, IdRealizacao());
 
@@ -6077,7 +6077,7 @@ double ModeloOtimizacao::getProbabilidadeAbertura(const IdEstagio a_idEstagio, c
 
 		if (maiorIdRealizacao > IdRealizacao_1) {
 
-			const Periodo periodo = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
+			const Periodo periodo = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo());
 
 			probabilidade_abertura = getElementoMatriz(IdProcessoEstocastico_1, AttMatrizProcessoEstocastico_probabilidade_realizacao, periodo, a_idRealizacao, double());
 

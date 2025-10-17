@@ -1142,13 +1142,14 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const SmartEnup
 					if (periodo_dec.isValido()) {
 						std::vector<Periodo> periodos = horizonte_mapeamento_cenarios_por_sorteio.getIteradores(periodo_dec);
 
-						for (int i = 0; i < int(periodos.size()); i++) {
-							realizacoes_por_periodo.setElemento(periodos.at(i), getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodos.at(i), IdRealizacao())));
-							if (periodo_dec == periodo_final)
-								periodo_dec = Periodo();
-							else if (periodo_dec < periodo_final)
-								a_horizonte_decomposicao.incrementarIterador(periodo_dec);
-						}
+						const IdRealizacao idRealizacao = getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodos.at(0), IdRealizacao()));
+						for (int i = 0; i < int(periodos.size()); i++) 
+							realizacoes_por_periodo.at(periodos.at(i)) = idRealizacao;
+
+						if (periodo_dec == periodo_final)
+							periodo_dec = Periodo();
+						else if (periodo_dec < periodo_final)
+							a_horizonte_decomposicao.incrementarIterador(periodo_dec);
 
 					}
 					else
@@ -1167,7 +1168,7 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const SmartEnup
 
 		} // for (IdCenario idCenario = IdCenario_1; idCenario < IdCenario_Excedente; idCenario++) {
 
-		if (periodo_seguinte_mapeamento_existente == residuo_espaco_amostral.getIteradorInicial())
+		if (Periodo("m", periodo_seguinte_mapeamento_existente) == Periodo("m", residuo_espaco_amostral.getIteradorInicial()))
 			setMatriz_forced(AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, cenarios);
 		else {
 			for (Periodo periodo = periodo_espaco_ini; periodo <= periodo_espaco_end; horizonte_mapeamento_cenarios_por_sorteio.incrementarIterador(periodo)) {
@@ -1226,14 +1227,14 @@ void ProcessoEstocastico::mapearCenariosEspacoAmostralPorSorteio(const SmartEnup
 					if (periodo_dec.isValido()) {
 						std::vector<Periodo> periodos = horizonte_mapeamento_cenarios_por_sorteio.getIteradores(periodo_dec);
 
-						for (int i = 0; i < int(periodos.size()); i++) {
-							realizacoes_por_periodo.setElemento(periodos.at(i), getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodos.at(i), IdRealizacao())));
-							if (periodo_dec == periodo_final)
-								periodo_dec = Periodo();
-							else if (periodo_dec < periodo_final)
-								a_horizonte_decomposicao.incrementarIterador(periodo_dec);
-						}
+						const IdRealizacao idRealizacao = getUniforme_Elemento(a_semente, getIterador2Final(IdVariavelAleatoria_1, AttMatrizVariavelAleatoria_residuo_espaco_amostral, periodos.at(0), IdRealizacao()));
+						for (int i = 0; i < int(periodos.size()); i++)
+							realizacoes_por_periodo.at(periodos.at(i)) = idRealizacao;
 
+						if (periodo_dec == periodo_final)
+							periodo_dec = Periodo();
+						else if (periodo_dec < periodo_final)
+							a_horizonte_decomposicao.incrementarIterador(periodo_dec);
 					}
 
 					else

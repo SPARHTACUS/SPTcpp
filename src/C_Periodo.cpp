@@ -203,7 +203,8 @@ void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const std::
 			}
 			else if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '-')) {
 				if (!isDurValid)
-					duration_ = getDurationFromStr("M");
+					duration_ = getDurationFromStr(a_perStr.substr(posSeparador.at(1) + 1, std::string::npos));
+
 				anoLido = getIdAnoFromChar(std::string(a_perStr.substr(posSeparador.at(0) + 1, posSeparador.at(1) - posSeparador.at(0) - 1)).c_str());
 				mesLido = getIdMesFromChar(a_perStr.substr(0, posSeparador.at(0)).c_str());
 			}

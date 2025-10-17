@@ -1117,16 +1117,21 @@ public:
 						break;
 					}
 				}
-				perIni = list_structPeriod.at(pos).getPeriodIni();
-				if (!perIni.isValido())
-					return std::vector<Periodo>();
-				else if (pos == list_structPeriod.size() - 1) {
-					if (a_period_externo >= list_structPeriod.at(pos).getPeriodEnd() + 1)
-						return std::vector<Periodo>();
+				if (pos == int(list_structPeriod.size())) {
+					perIni = list_structPeriod.at(0).getPeriodIni();
 				}
-				else if (pos == 0) {
-					if (a_period_externo + 1 <= list_structPeriod.at(0).getPeriodIni())
+				else {
+					perIni = list_structPeriod.at(pos).getPeriodIni();
+					if (!perIni.isValido())
 						return std::vector<Periodo>();
+					else if (pos == list_structPeriod.size() - 1) {
+						if (a_period_externo >= list_structPeriod.at(pos).getPeriodEnd() + 1)
+							return std::vector<Periodo>();
+					}
+					else if (pos == 0) {
+						if (a_period_externo + 1 <= list_structPeriod.at(0).getPeriodIni())
+							return std::vector<Periodo>();
+					}
 				}
 			}
 

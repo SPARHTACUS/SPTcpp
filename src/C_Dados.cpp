@@ -9033,8 +9033,8 @@ void Dados::validaUsinaNaoSimuladaEmSubmercado(const IdSubmercado a_idSubmercado
 							percentualVariacaoPonderado += percentual_duracao * percentual_variacao;
 						} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
 
-						if (!doubleCompara(0.02, percentualVariacaoPonderado, 1.0))
-							throw std::invalid_argument("A ponderacao da Duracao pela Variacao do patamar de carga em " + getString(periodo) + " em " + getFullString(idUsinaNaoSimulada) + " em " + getFullString(a_idSubmercado) + " difere de 1.0 dada a precisao de 0.02.");
+						if (!doubleCompara(0.05, percentualVariacaoPonderado, 1.0))
+							throw std::invalid_argument("A ponderacao da Duracao pela Variacao do patamar de carga em " + getString(periodo) + " em " + getFullString(idUsinaNaoSimulada) + " em " + getFullString(a_idSubmercado) + " difere de 1.0 dada a precisao de 0.05.");
 
 					} // for (Periodo periodo = horizonte_estudo.getIteradorInicial(); periodo <= horizonte_estudo.getIteradorFinal(); horizonte_estudo.incrementarIterador(periodo)) {
 
