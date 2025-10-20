@@ -364,13 +364,20 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 
 			const int meses_planejamento = 12 * (anos_planejamento - 1) + (12 - mes_inicial + 1); //O número de estágios é igual ao número de meses do primeiro ano mais o número de meses dos anos restantes
 
-			const IdEstagio idEstagio_final_otimizacao = getIdEstagioFromChar(std::to_string(meses_planejamento).c_str());
+			IdEstagio idEstagio_final_otimizacao = getIdEstagioFromChar(std::to_string(meses_planejamento).c_str());
 
-			if ((!dadosPreConfig_instanciados) || (a_dados.getAtributo(AttComumDados_estagio_final, IdEstagio()) > idEstagio_final_otimizacao)) {
+			if (a_dados.getSizeVetor(AttVetorDados_horizonte_otimizacao) > 0) {
+				idEstagio_final_otimizacao = a_dados.getIteradorFinal(AttVetorDados_horizonte_otimizacao, IdEstagio());
+				a_dados.setAtributo(AttComumDados_estagio_final, idEstagio_final_otimizacao);
+			}
 
+			else if (dadosPreConfig_instanciados) {
+				idEstagio_final_otimizacao = a_dados.getAtributo(AttComumDados_estagio_final, IdEstagio());
+			} // else if (dadosPreConfig_instanciados) {
+
+			else
 				a_dados.setAtributo(AttComumDados_estagio_final, idEstagio_final_otimizacao);
 
-			} // if ((!dadosPreConfig_instanciados) || (a_dados.getAtributo(AttComumDados_estagio_final, IdEstagio()) > idEstagio_final_otimizacao)) {
 
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//Registro 7 -  Ano inicial do período de planejamento. 
@@ -389,7 +396,11 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 			for (Periodo periodo = periodo_estudo_inicial; periodo <= periodo_estudo_inicial + meses_planejamento - 1; periodo++)
 				horizonte_estudo_DECK.addElemento(periodo, true);
 
-			if (!dadosPreConfig_instanciados)
+			if (a_dados.getSizeMatriz(AttMatrizDados_horizonte_estudo) > 0) {
+				periodo_estudo_inicial = a_dados.getIterador1Inicial(AttMatrizDados_horizonte_estudo, Periodo());
+				a_dados.setAtributo(AttComumDados_periodo_referencia, periodo_estudo_inicial);
+			}
+			else if (!dadosPreConfig_instanciados)
 				a_dados.setAtributo(AttComumDados_periodo_referencia, periodo_estudo_inicial);
 			else
 				periodo_estudo_inicial = a_dados.getAtributo(AttComumDados_periodo_referencia, Periodo());
@@ -1206,7 +1217,7 @@ void LeituraCEPEL::leitura_DGER_201908_NW25(Dados &a_dados, std::string nomeArqu
 
 						for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= idEstagio_final_otimizacao; idEstagio++) {
 
-							const Periodo periodo_otimizacao = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, IdEstagio(), Periodo());
+							const Periodo periodo_otimizacao = a_dados.getElementoVetor(AttVetorDados_horizonte_otimizacao, idEstagio, Periodo());
 
 							const double sobreposicao = periodo.sobreposicao(periodo_otimizacao);
 
@@ -3814,10 +3825,23 @@ void LeituraCEPEL::leitura_TERM_201908_NW25(Dados& a_dados, std::string nomeArqu
 
 								const double potencia_minima = atof(atributo.c_str());
 
-								for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, periodo, IdPatamarCarga()); idPatamarCarga++) {
-									a_dados.vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.at(IdUnidadeUTE_1).addElemento(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, sobreposicao * potencia_minima);
-									a_dados.vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.at(IdUnidadeUTE_1).addElemento(AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, sobreposicao * potencia_maxima);
-								} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+								if ((a_dados.getSize1Matriz(idTermeletrica, IdUnidadeUTE_1, AttMatrizUnidadeUTE_potencia_minima) > 0) && (a_dados.getIterador1Final(idTermeletrica, IdUnidadeUTE_1, AttMatrizUnidadeUTE_potencia_minima, Periodo()) >= periodo)) {
+
+									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, periodo, IdPatamarCarga()); idPatamarCarga++) {
+										const double potencia_minima_old = a_dados.getElementoMatriz(idTermeletrica, IdUnidadeUTE_1, AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, double());
+										a_dados.vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.at(IdUnidadeUTE_1).setElemento(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, potencia_minima_old + sobreposicao * potencia_minima);
+										const double potencia_maxima_old = a_dados.getElementoMatriz(idTermeletrica, IdUnidadeUTE_1, AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, double());
+										a_dados.vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.at(IdUnidadeUTE_1).setElemento(AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, potencia_maxima_old + sobreposicao * potencia_maxima);
+									} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+
+								} // if (a_dados.getIterador1Final(idTermeletrica, IdUnidadeUTE_1, AttMatrizUnidadeUTE_potencia_minima) >= periodo) {
+
+								else {
+									for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= a_dados.getIterador2Final(AttMatrizDados_horizonte_estudo, periodo, IdPatamarCarga()); idPatamarCarga++) {
+										a_dados.vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.at(IdUnidadeUTE_1).addElemento(AttMatrizUnidadeUTE_potencia_minima, periodo, idPatamarCarga, sobreposicao * potencia_minima);
+										a_dados.vetorTermeletrica.at(idTermeletrica).vetorUnidadeUTE.at(IdUnidadeUTE_1).addElemento(AttMatrizUnidadeUTE_potencia_maxima, periodo, idPatamarCarga, sobreposicao * potencia_maxima);
+									} // for (IdPatamarCarga idPatamarCarga = IdPatamarCarga_1; idPatamarCarga <= maiorIdPatamarCarga; idPatamarCarga++) {
+								} // else {
 
 							} // if (sobreposicao > 0.0) {
 

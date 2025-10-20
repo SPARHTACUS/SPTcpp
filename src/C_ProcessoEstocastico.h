@@ -54,15 +54,15 @@ public:
 
 	void parametrizarModelo(const EntradaSaidaDados &a_entradaSaidaDados, const IdProcesso a_idProcesso, const IdProcesso a_idProcessoEnd, const bool a_imprimir_parametros, const TipoModeloGeracaoSinteticaCenario a_tipo_modelo_geracao_sintetica, const TipoValor a_tipo_coeficiente_auto_correlacao, const int a_ordem_coeficiente_auto_correlacao, const TipoCorrelacaoVariaveisAleatorias a_tipo_correlacao_variaveis_aleatorias, const double a_valor_determinacao_correlacao);
 
-	void avaliarModeloViaSerieSintetica(const EntradaSaidaDados &a_entradaSaidaDados, const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, const int a_numero_periodos_avaliacao_sintetica);
+	void avaliarModeloViaSerieSintetica(const EntradaSaidaDados &a_entradaSaidaDados, const SmartEnupla<Periodo, IdEstagio>& a_horizonte_decomposicao, const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>>& a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, const int a_numero_periodos_avaliacao_sintetica);
 
 	void gerarEspacoAmostralPorSorteio(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_amostra, const TipoRelaxacaoVariavelAleatoria a_tipo_relaxacao, const SmartEnupla<Periodo, SmartEnupla<IdRealizacao, double>> &a_horizonte_espaco_amostral, const TipoSorteio a_tipo_sorteio, int &a_semente);
 	
 	void validar_probabilidade_realizacao()const;
 	void validar_probabilidade_realizacao(const Periodo a_periodo)const;
 
-	void gerarCenariosPorSorteio(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente);
-	SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> gerarCenariosPorSorteioRetorno(const EntradaSaidaDados &a_entradaSaidaDados, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente);
+	void gerarCenariosPorSorteio(const EntradaSaidaDados &a_entradaSaidaDados, const SmartEnupla<Periodo, IdEstagio>& a_horizonte_decomposicao, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente);
+	SmartEnupla<IdVariavelAleatoria, SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> gerarCenariosPorSorteioRetorno(const EntradaSaidaDados &a_entradaSaidaDados, const SmartEnupla<Periodo, IdEstagio>& a_horizonte_decomposicao, const bool a_imprimir_cenarios, const bool a_gerar_cenarios_buffer, const bool a_gerar_cenarios_internos, const int a_numero_cenarios_global, const IdCenario a_cenario_inicial, const IdCenario a_cenario_final, const TipoSorteio a_tipo_sorteio, int &a_semente);
 
 	void setCenariosMapeamento(                                                 const AttMatrizProcessoEstocastico           a_attMatrizProcessoEstocastico,                                         const SmartEnupla<IdCenario, SmartEnupla<Periodo, IdRealizacao>>  &a_matriz);
 	void setCenarios          (                                                 const AttMatrizVariavelAleatoria               a_attMatrizVariavelAleatoria, const SmartEnupla<IdVariavelAleatoria,        SmartEnupla<Periodo, SmartEnupla<IdCenario, double>>> &a_matriz);
@@ -194,13 +194,11 @@ public:
 		catch (const std::exception& erro) { throw std::invalid_argument("ProcessoEstocastico(" + getString(getIdObjeto()) + ")::getIdVariavelAleatoriaIdVariavelAleatoriaInternaFromIdFisico(" + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idVariavelAleatoriaInterna) + "," + getFullString(a_idFisico) + "): \n" + std::string(erro.what())); }
 	};
 
-	bool mapearCenariosEspacoAmostralCompletoPorPeriodo(const Periodo a_periodo_final, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);
-	void mapearCenariosEspacoAmostralPorSorteio(const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int& a_semente, const Periodo a_periodo_inicial, const Periodo a_periodo_final);
+	bool mapearCenariosEspacoAmostralCompletoPorPeriodo(const SmartEnupla<Periodo, IdEstagio>& a_horizonte_decomposicao, const Periodo a_periodo_final, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);
+	void mapearCenariosEspacoAmostralPorSorteio(const SmartEnupla<Periodo, IdEstagio>& a_horizonte_decomposicao, const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int& a_semente, const Periodo a_periodo_inicial, const Periodo a_periodo_final);
 
 
-	void mapearCenariosEspacoAmostralPorSorteio(const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int& a_semente);
-
-	bool mapearCenariosEspacoAmostralCompleto    (const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario);
+	void mapearCenariosEspacoAmostralPorSorteio(const SmartEnupla<Periodo, IdEstagio>& a_horizonte_decomposicao, const TipoSorteio a_tipo_sorteio, const int a_numero_cenarios_global, const IdCenario a_menorIdcenario, const IdCenario a_maiorIdcenario, int& a_semente);
 
 	private:
 
