@@ -1573,7 +1573,7 @@ std::vector<Periodo> Periodo::getPeriodosComQuebraMensal(const Periodo a_period)
 
 		}
 
-		throw std::invalid_argument("Error");
+		throw std::invalid_argument("Error breaking periods");
 
 	} // try {
 	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getPeriodosComQuebraMensal(" + getFullString(a_period) + "): \n" + std::string(erro.what())); }

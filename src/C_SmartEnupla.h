@@ -963,7 +963,7 @@ private:
 			genNewCode();
 
 			if ((list_structPeriod.at(list_structPeriod.size() - 1).getIdxEnd() + 1 != vlr.size()) || (vlr.size() != num_elem))
-				throw std::invalid_argument("Error");
+				throw std::invalid_argument("Error updating struct idx");
 
 		}
 		catch (const std::exception& erro) { throw std::invalid_argument("SmartEnupla::updateStructIdx(): \n" + std::string(erro.what())); }
@@ -1537,7 +1537,7 @@ public:
 						// -1: end prev struct
 						else if (insert_flag == -1) {
 							if (list_structPeriod.at(pos - 1).addNext(a_itr) < 0)
-								throw std::invalid_argument("Error");
+								throw std::invalid_argument("Error end prev struct");
 							vlr.insert(vlr.begin() + list_structPeriod.at(pos - 1).getIdxEnd(), a_vlr);
 							const int num_per = list_structPeriod.at(pos).getNumPer() - a_itr.getMinutos();
 							if (num_per > 0)
@@ -1551,7 +1551,7 @@ public:
 						// 1: begining next struct
 						else if (insert_flag == 1) {
 							if (list_structPeriod.at(pos + 1).addPrev(a_itr) < 0)
-								throw std::invalid_argument("Error");
+								throw std::invalid_argument("Error begining next struct");
 							vlr.insert(vlr.begin() + list_structPeriod.at(pos + 1).getIdxIni(), a_vlr);
 							const int num_per = list_structPeriod.at(pos).getNumPer() - a_itr.getMinutos();
 							if (num_per > 0)

@@ -6200,7 +6200,7 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 					size_t pos = elem_str.find("IdEstagio");
 
 					if (pos == std::string::npos)
-						throw std::invalid_argument("Error.");
+						throw std::invalid_argument("Error compiling results.");
 
 					a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS) + "//" + elem_str.substr(0, pos - 1));
 					std::string nome_arquivo = elem_str;
