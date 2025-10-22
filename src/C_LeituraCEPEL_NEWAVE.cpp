@@ -7859,6 +7859,9 @@ void LeituraCEPEL::leitura_CVAR_201908_NW25(Dados& a_dados, std::string nomeArqu
 
 		////////////////////////////////////////////////////////
 
+		if ((a_dados.getAtributo(AttComumDados_alpha_CVAR, double()) >= 0) && (a_dados.getAtributo(AttComumDados_lambda_CVAR, double()) >= 0))
+			return;
+
 		if (a_dados.getAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco()) == TipoAversaoRisco_CVAR) {
 
 			if (leituraArquivo.is_open()) {
