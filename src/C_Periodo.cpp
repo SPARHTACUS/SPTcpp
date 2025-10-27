@@ -203,7 +203,8 @@ void Periodo::setPeriodo(const std::pair<unsigned int, char>& a_dur, const std::
 			}
 			else if ((queSeparador.at(0) == '/') && (queSeparador.at(1) == '-')) {
 				if (!isDurValid)
-					duration_ = getDurationFromStr("M");
+					duration_ = getDurationFromStr(a_perStr.substr(posSeparador.at(1) + 1, std::string::npos));
+
 				anoLido = getIdAnoFromChar(std::string(a_perStr.substr(posSeparador.at(0) + 1, posSeparador.at(1) - posSeparador.at(0) - 1)).c_str());
 				mesLido = getIdMesFromChar(a_perStr.substr(0, posSeparador.at(0)).c_str());
 			}
@@ -329,7 +330,8 @@ Periodo::Periodo(const std::string a_duration, const Periodo& a_periodo) {
 
 Periodo::Periodo(const std::string a_periodo) {
 	inicializaAtributos();
-	setPeriodo(getDurationFromStr(""), a_periodo);
+	if (a_periodo.size() != 6 || (!strCompara(a_periodo, "Nenhum")))
+		setPeriodo(getDurationFromStr(""), a_periodo);
 }
 
 Periodo::Periodo(const std::string a_duration, const std::string a_periodo) {
@@ -1535,6 +1537,47 @@ Periodo Periodo::getPeriodBtwn(const Periodo& a_per1, const Periodo& a_per2){
 std::vector<std::string> Periodo::getDurT(){
 
 	return std::vector<std::string>{"m", "h", "d", "M", "a"};
+}
+
+std::vector<Periodo> Periodo::getPeriodosComQuebraMensal(const Periodo a_period)
+{
+
+	try{
+
+		const Periodo periodNext = a_period + 1;
+		const Periodo periodLast = Periodo("m", periodNext) - 1;
+
+		const Periodo periodIniM = Periodo(a_period.getMes(), a_period.getAno());
+
+		if (periodIniM == Periodo(periodLast.getMes(), periodLast.getAno()))
+			return std::vector<Periodo>{ a_period };
+
+		std::vector<Periodo> periods;
+
+		Periodo periodBuffer = a_period;
+
+		Periodo periodIniMnext = periodIniM + 1;
+
+		int i = 0;
+		const int iMax = 10000;
+		for (i = 0; i < iMax; i++) {
+
+			if (periodBuffer + 1 <= periodIniMnext) {
+				periods.push_back(periodBuffer);
+				return periods;
+			}
+
+			periods.push_back(getPeriodBtwn(periodBuffer - 1, periodIniMnext));
+			periodBuffer = getPeriodBtwn(periods.at(periods.size() - 1), periodNext);
+			periodIniMnext++;
+
+		}
+
+		throw std::invalid_argument("Error breaking periods");
+
+	} // try {
+	catch (const std::exception& erro) { throw std::invalid_argument("Periodo::getPeriodosComQuebraMensal(" + getFullString(a_period) + "): \n" + std::string(erro.what())); }
+
 }
 
 

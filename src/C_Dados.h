@@ -38,9 +38,9 @@
 	  m(Dados,  AttComum,             visitar_todos_cenarios_por_iteracao,                              bool,         min,         max,             0,      sim) \
 	  m(Dados,  AttComum,                                 numero_cenarios,                               int,           1,         max,             1,      sim) \
 	  m(Dados,  AttComum,                                    tipo_semente,                       TipoSemente,         min,         max,           min,      nao) \
-	  m(Dados,  AttComum,                            tipo_aversao_a_risco,                  TipoAversaoRisco,         min,         max,           min,      nao) \
-	  m(Dados,  AttComum,                                      alpha_CVAR,                            double,           0,           1,             0,      nao) \
-	  m(Dados,  AttComum,                                     lambda_CVAR,                            double,           0,           1,             0,      nao) \
+	  m(Dados,  AttComum,                            tipo_aversao_a_risco,                  TipoAversaoRisco,         min,         max,           CVAR,      nao) \
+	  m(Dados,  AttComum,                                      alpha_CVAR,                            double,           -1,           1,             -1,      nao) \
+	  m(Dados,  AttComum,                                     lambda_CVAR,                            double,           -1,           1,             -1,      nao) \
 	  m(Dados,  AttComum,                      tipo_tendencia_hidrologica,          TipoTendenciaEstocastica,         min,         max, serie_informada,      nao) \
 	  m(Dados,  AttComum,         periodo_tendencia_hidrologica_historica,                           Periodo,         min,         max,           min,      nao) \
 	  m(Dados,  AttComum, relaxar_afluencia_incremental_com_viabilidade_hidraulica,                     bool,         min,         max,           nao,      nao) \

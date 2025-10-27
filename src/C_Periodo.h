@@ -153,6 +153,8 @@ public:
 
 	static std::vector<std::string> getDurT();
 
+	static std::vector<Periodo> getPeriodosComQuebraMensal(const Periodo a_period);
+
 	~Periodo();
 
 };

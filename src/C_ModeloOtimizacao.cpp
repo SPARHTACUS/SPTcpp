@@ -563,7 +563,11 @@ void ModeloOtimizacao::gerarRealizacoes(const IdEstagio a_estagioIni, const IdEs
 				a_entradaSaidaDados.setDiretorioSaida(a_entradaSaidaDados.getDiretorioSaida() + "//ProcessoEstocasticoHidrologico");
 			}
 
-			vetorProcessoEstocastico.at(IdProcessoEstocastico_1).gerarCenariosPorSorteio(a_entradaSaidaDados, imprimir_cenarios, true, gerar_cenarios_internos, getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()), menor_cenario, maior_cenario, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
+			SmartEnupla<Periodo, IdEstagio> horizonte_decomposicao_inv;
+			for (IdEstagio idEstagio = a_estagioIni; idEstagio <= a_estagioEnd; idEstagio++)
+				horizonte_decomposicao_inv.addElemento(getAtributo(idEstagio, AttComumEstagio_periodo_otimizacao, Periodo()), idEstagio);
+
+			vetorProcessoEstocastico.at(IdProcessoEstocastico_1).gerarCenariosPorSorteio(a_entradaSaidaDados, horizonte_decomposicao_inv, imprimir_cenarios, true, gerar_cenarios_internos, getAtributo(AttComumModeloOtimizacao_numero_cenarios, int()), menor_cenario, maior_cenario, TipoSorteio_uniforme, semente_geracao_cenario_hidrologico);
 
 		}
 
@@ -6048,7 +6052,7 @@ double ModeloOtimizacao::getProbabilidadeAbertura(const IdEstagio a_idEstagio, c
 
 		if (maiorIdRealizacao > IdRealizacao_1) {
 
-			const Periodo periodo = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
+			const Periodo periodo = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo());
 
 			const IdRealizacao idRealizacao = getElementoMatriz(IdProcessoEstocastico_1, AttMatrizProcessoEstocastico_mapeamento_espaco_amostral, a_idCenario, periodo, IdRealizacao());
 
@@ -6073,7 +6077,7 @@ double ModeloOtimizacao::getProbabilidadeAbertura(const IdEstagio a_idEstagio, c
 
 		if (maiorIdRealizacao > IdRealizacao_1) {
 
-			const Periodo periodo = getAtributo(a_idEstagio, AttComumEstagio_periodo_otimizacao, Periodo());
+			const Periodo periodo = getIterador2Inicial(AttMatrizModeloOtimizacao_horizonte_espaco_amostral_hidrologico, a_idEstagio, Periodo());
 
 			probabilidade_abertura = getElementoMatriz(IdProcessoEstocastico_1, AttMatrizProcessoEstocastico_probabilidade_realizacao, periodo, a_idRealizacao, double());
 
@@ -6196,7 +6200,7 @@ void ModeloOtimizacao::consolidarResultados(const IdProcesso a_idProcesso, const
 					size_t pos = elem_str.find("IdEstagio");
 
 					if (pos == std::string::npos)
-						throw std::invalid_argument("Error.");
+						throw std::invalid_argument("Error compiling results.");
 
 					a_entradaSaidaDados.setDiretorioSaida(diretorio + "//" + getString(a_TSS) + "//" + elem_str.substr(0, pos - 1));
 					std::string nome_arquivo = elem_str;
