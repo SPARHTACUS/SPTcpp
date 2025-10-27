@@ -1090,62 +1090,14 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 		//
 		//
 
-		bool alpha_cvar_redefinido = false;
-		bool lambda_cvar_redefinido = false;
+		if (getSizeVetor(AttVetorDados_alpha_CVAR) == 0) {
+			setVetor_forced(AttVetorDados_alpha_CVAR, SmartEnupla<IdEstagio, double>(IdEstagio_1, std::vector<double>(estagio_final, getAtributo(AttComumDados_alpha_CVAR, double()))));
+			calculo_att_operacionais = true;
+		}
 
-		if (getAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco()) == TipoAversaoRisco_CVAR) {
-
-			if (getSizeVetor(AttVetorDados_alpha_CVAR) == 0) {
-				setVetor_forced(AttVetorDados_alpha_CVAR, SmartEnupla<IdEstagio, double>(IdEstagio_1, std::vector<double>(estagio_final, getAtributo(AttComumDados_alpha_CVAR, double()))));
-				calculo_att_operacionais = true;
-			}
-
-			if (getSizeVetor(AttVetorDados_lambda_CVAR) == 0) {
-				setVetor_forced(AttVetorDados_lambda_CVAR, SmartEnupla<IdEstagio, double>(IdEstagio_1, std::vector<double>(estagio_final, getAtributo(AttComumDados_lambda_CVAR, double()))));
-				calculo_att_operacionais = true;
-			}
-
-		} // if (getAtributo(AttComumDados_tipo_aversao_a_risco, TipoAversaoRisco()) == TipoAversaoRisco_CVAR){
-
-		else {
-
-			if (getSizeVetor(AttVetorDados_lambda_CVAR) > 0) {
-
-				for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= estagio_final; idEstagio++) {
-
-					const double lambda = getElementoVetor(AttVetorDados_lambda_CVAR, idEstagio, double());
-
-					if (lambda > 0.0) {
-						lambda_cvar_redefinido = true;
-						break;
-					}
-
-				} // for (IdEstagio idEstagio = IdEstagio_1; idEstagio < estagio_final; idEstagio++) {
-			}
-
-			if ((getSizeVetor(AttVetorDados_lambda_CVAR) == 0) || (lambda_cvar_redefinido)) {
-				setVetor_forced(AttVetorDados_lambda_CVAR, SmartEnupla<IdEstagio, double>(IdEstagio_1, std::vector<double>(estagio_final, 0.0)));
-				lambda_cvar_redefinido = true;
-			}
-
-			if (getSizeVetor(AttVetorDados_alpha_CVAR) > 0) {
-
-				for (IdEstagio idEstagio = IdEstagio_1; idEstagio <= estagio_final; idEstagio++) {
-
-					const double alpha = getElementoVetor(AttVetorDados_alpha_CVAR, idEstagio, double());
-
-					if (alpha > 0.0) {
-						alpha_cvar_redefinido = true;
-						break;
-					}
-
-				} // for (IdEstagio idEstagio = IdEstagio_1; idEstagio < estagio_final; idEstagio++) {
-			}
-
-			if ((getSizeVetor(AttVetorDados_alpha_CVAR) == 0) || (alpha_cvar_redefinido)) {
-				setVetor_forced(AttVetorDados_alpha_CVAR, SmartEnupla<IdEstagio, double>(IdEstagio_1, std::vector<double>(estagio_final, 0.0)));
-				alpha_cvar_redefinido = true;
-			}
+		if (getSizeVetor(AttVetorDados_lambda_CVAR) == 0) {
+			setVetor_forced(AttVetorDados_lambda_CVAR, SmartEnupla<IdEstagio, double>(IdEstagio_1, std::vector<double>(estagio_final, getAtributo(AttComumDados_lambda_CVAR, double()))));
+			calculo_att_operacionais = true;
 		}
 
 
@@ -1169,21 +1121,6 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 
 		a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
 
-		if ((!calculo_att_operacionais) && (!a_imprimir_atributos_sem_recarregar)) {
-			if (idProcesso == IdProcesso_mestre) {
-
-				a_entradaSaidaDados.setDiretorioSaida(a_diretorio_att_operacional);
-
-				a_entradaSaidaDados.setAppendArquivo(false);
-
-				if (lambda_cvar_redefinido) {
-					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, IdEstagio_1, estagio_final, AttVetorDados_lambda_CVAR);
-					a_entradaSaidaDados.setAppendArquivo(true);
-				}
-				if (alpha_cvar_redefinido)
-					a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("DADOS_AttVetorOperacional_PorIdEstagio.csv", *this, IdEstagio_1, estagio_final, AttVetorDados_alpha_CVAR);
-			}
-		}
 
 		if ((calculo_att_operacionais) || (a_imprimir_atributos_sem_recarregar)) {
 
