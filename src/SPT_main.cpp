@@ -306,9 +306,9 @@ int main(int argc, char *argv[]) {
 		catch (const std::ofstream::failure& erro) { std::cout << "Erro de integridade do arquivo " << SPT_status.c_str() << "." << std::endl << erro.what() << std::endl << std::endl; }
 		catch (const std::exception&         erro) { std::cout << "Erro ao editar o arquivo " + SPT_status << "." << std::endl << erro.what() << std::endl << std::endl; }
 
-		MPI_Barrier(MPI_COMM_WORLD);
-
 		MPI_Abort(MPI_COMM_WORLD, MPI_SUCCESS);
+
+		MPI_Barrier(MPI_COMM_WORLD);
 
 		return EXIT_FAILURE;
 

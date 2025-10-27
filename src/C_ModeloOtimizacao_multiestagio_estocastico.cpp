@@ -723,7 +723,7 @@ void ModeloOtimizacao::criarProcessoEstocasticoHidrologico(const TipoSubproblema
 										varQINC_FINF = addVarDecisao_QINC_FINF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, 0.0, 0.0);
 
 									else if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
-										varQINC_FINF = addVarDecisao_QINC_FINF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 100.0);
+										varQINC_FINF = addVarDecisao_QINC_FINF(a_TSS, a_idEstagio, a_period, idUHE, 0.0, infinito, 0.0);
 
 									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varQINC_FINF);
 
@@ -1518,12 +1518,39 @@ void ModeloOtimizacao::criarRestricoesCusto(const TipoSubproblemaSolver a_TSS, D
 
 	try {
 
-		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica)
-			return;
-
-
 		const double infinito = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getInfinito();
 
+		if (a_TSS == TipoSubproblemaSolver_viabilidade_hidraulica) {
+
+			if (a_idPat == IdPatamarCarga_1) {
+
+				int equZT = getEquLinear_ZTseExistir(a_TSS, a_idEstagio);
+
+				if (equZT < 0) {
+					equZT = addEquLinear_ZT(a_TSS, a_idEstagio);
+					const int varZT = addVarDecisao_ZT(a_TSS, a_idEstagio, 0.0, infinito, 1.0);
+					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZT, equZT, 1.0);
+				}
+
+				const int equZP = addEquLinear_ZP(a_TSS, a_idEstagio, a_period);
+				const int varZP = addVarDecisao_ZP(a_TSS, a_idEstagio, a_period, 0.0, infinito, 0.0);
+
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP, equZP, 1.0);
+
+				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP, equZT, -double(double(a_period.getSegundos()) / 3600.0));
+
+			}
+
+			const int varZP_pat = addVarDecisao_ZP(a_TSS, a_idEstagio, a_period, a_idPat, 0.0, infinito, 0.0);
+
+			const int equZP_pat = addEquLinear_ZP(a_TSS, a_idEstagio, a_period, a_idPat);
+
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP_pat, equZP_pat, 1.0);
+
+			vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varZP_pat, getEquLinear_ZP(a_TSS, a_idEstagio, a_period), -a_dados.getElementoMatriz(AttMatrizDados_horizonte_estudo, a_period, a_idPat, double()));
+
+			return;
+		}
 
 		if ((a_period == a_periodIni_stage) && (a_idPat == IdPatamarCarga_1)){
 
