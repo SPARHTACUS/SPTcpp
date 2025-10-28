@@ -1227,6 +1227,15 @@ bool MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaida
 				if (brecha_num < a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tolerancia_convergencia, double()))
 					encerrar_iteracao = 1;
 
+				const IdIteracao iteracao_final = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_final, IdIteracao());
+				const IdIteracao iteracao_numero_maximo = a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_numero_maximo, IdIteracao());
+
+				if (iteracao_final == iteracao_numero_maximo) {
+					const IdEstagio estagio_final = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_estagio_final, IdEstagio());
+					for (IdEstagio idEstagio = estagio_final; idEstagio >= IdEstagio_1; idEstagio--)
+						a_modeloOtimizacao.exportarCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
+				}
+
 			} // if (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_convergencia, TipoConvergencia()) == TipoConvergencia_gap) {
 
 		} // if (a_idProcesso == IdProcesso_mestre) {
