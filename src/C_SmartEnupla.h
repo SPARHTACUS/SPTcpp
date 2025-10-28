@@ -1437,6 +1437,7 @@ public:
 					// period added in the pos structure
 					if (idx > 0) {
 						vlr.push_back(a_vlr);
+						genNewCode();
 						return;
 					}
 
@@ -1451,6 +1452,7 @@ public:
 						// period must be added in new structure after the end
 						list_structPeriod.push_back(StructPeriod(a_itr, 1, list_structPeriod.at(pos).getIdxEnd()));
 						vlr.push_back(a_vlr);
+						genNewCode();
 						return;
 					} // else if ((idx == -1) || (idx == -2)) {
 					else
