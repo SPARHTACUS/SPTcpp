@@ -16,7 +16,7 @@ void getInfoProduto(const std::string a_arquivoLicenca) {
 	std::cout << "            Modelo SPARHTACUS - sparhtacus.com " << std::endl;
 	std::cout << "            github.com/SPARHTACUS/SPTcpp " << std::endl;
 	std::cout << std::endl;
-	std::cout << "                      Versao: 2.5.6 " << std::endl;
+	std::cout << "                      Versao: 2.5.7 " << std::endl;
 	std::cout << "            Build: " << __TIMESTAMP__ << std::endl;
 	std::cout << std::endl;
 	std::cout << "           Programa distribuido sob licenca MIT (x11)" << std::endl;
@@ -306,9 +306,9 @@ int main(int argc, char *argv[]) {
 		catch (const std::ofstream::failure& erro) { std::cout << "Erro de integridade do arquivo " << SPT_status.c_str() << "." << std::endl << erro.what() << std::endl << std::endl; }
 		catch (const std::exception&         erro) { std::cout << "Erro ao editar o arquivo " + SPT_status << "." << std::endl << erro.what() << std::endl << std::endl; }
 
-		MPI_Barrier(MPI_COMM_WORLD);
-
 		MPI_Abort(MPI_COMM_WORLD, MPI_SUCCESS);
+
+		MPI_Barrier(MPI_COMM_WORLD);
 
 		return EXIT_FAILURE;
 

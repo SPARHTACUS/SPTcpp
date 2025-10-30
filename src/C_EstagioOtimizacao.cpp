@@ -175,7 +175,7 @@ IdRestricaoCenario Estagio::addRestricaoCenario(const TipoSubproblemaSolver a_TS
 }
 
 
-IdVariavelRealizacaoInterna Estagio::addVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const Periodo a_periodo, const double a_fator, const TipoValor a_tipo_valor, const double a_percentual_inicial, const double a_percentual_passo){
+IdVariavelRealizacaoInterna Estagio::addVariavelRealizacaoInterna(const TipoSubproblemaSolver a_TSS, const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const SmartEnupla<Periodo, double>& a_periodos, const TipoValor a_tipo_valor, const double a_percentual_inicial, const double a_percentual_passo){
 
 	try {
 
@@ -210,7 +210,6 @@ IdVariavelRealizacaoInterna Estagio::addVariavelRealizacaoInterna(const TipoSubp
 		vetorVariavelRealizacaoInterna.at(idVariavelRealizacaoInterna).setAtributo(AttComumVariavelRealizacaoInterna_idVariavelAleatoriaInterna,   a_idVariavelAleatoriaInterna);
 		vetorVariavelRealizacaoInterna.at(idVariavelRealizacaoInterna).setAtributo(AttComumVariavelRealizacaoInterna_idVariavelAleatoria,          a_idVariavelAleatoria);
 		vetorVariavelRealizacaoInterna.at(idVariavelRealizacaoInterna).setAtributo(AttComumVariavelRealizacaoInterna_idProcessoEstocastico,        a_idProcessoEstocastico);
-		vetorVariavelRealizacaoInterna.at(idVariavelRealizacaoInterna).setAtributo(AttComumVariavelRealizacaoInterna_periodo,                      a_periodo);
 		vetorVariavelRealizacaoInterna.at(idVariavelRealizacaoInterna).setAtributo(AttComumVariavelRealizacaoInterna_tipo_valor,                   a_tipo_valor);
 		vetorVariavelRealizacaoInterna.at(idVariavelRealizacaoInterna).setAtributo(AttComumVariavelRealizacaoInterna_percentual_inicial,           a_percentual_inicial);
 		vetorVariavelRealizacaoInterna.at(idVariavelRealizacaoInterna).setAtributo(AttComumVariavelRealizacaoInterna_percentual_passo,             a_percentual_passo);
@@ -218,12 +217,17 @@ IdVariavelRealizacaoInterna Estagio::addVariavelRealizacaoInterna(const TipoSubp
 
 		vetorVariavelRealizacaoInterna.at(idVariavelRealizacaoInterna).setVetor_forced(AttVetorVariavelRealizacaoInterna_idVariavelDecisao, SmartEnupla<TipoSubproblemaSolver, int>(TipoSubproblemaSolver(TipoSubproblemaSolver_Nenhum + 1), std::vector<int>(TipoSubproblemaSolver(TipoSubproblemaSolver_Excedente - 1), -1)));
 
+		if (a_periodos.size() == 0)
+			throw std::invalid_argument("O atributo periodos deve ser instanciado com ao menos um periodo.");
+
+		vetorVariavelRealizacaoInterna.at(idVariavelRealizacaoInterna).setVetor(AttVetorVariavelRealizacaoInterna_periodos, a_periodos);
+
 		vetorVariavelRealizacaoInterna.at(idVariavelRealizacaoInterna).setElemento(AttVetorVariavelRealizacaoInterna_idVariavelDecisao, a_TSS, a_idVariavelDecisao);
 
 		return idVariavelRealizacaoInterna;
 
 	} // try
-	catch (const std::exception& erro) { throw std::invalid_argument("Estagio(" + getString(getIdObjeto()) + ")::addVariavelRealizacaoInterna(" + getString(a_TSS) + "," + a_nome + "," + getString(a_idVariavelDecisao) + "," + getFullString(a_idProcessoEstocastico) + "," + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idVariavelAleatoriaInterna) + "," + getFullString(a_periodo) + "," + getFullString(a_tipo_valor) + "," + getFullString(a_percentual_inicial) + "," + getFullString(a_percentual_passo) + "): \n" + std::string(erro.what())); }
+	catch (const std::exception& erro) { throw std::invalid_argument("Estagio(" + getString(getIdObjeto()) + ")::addVariavelRealizacaoInterna(" + getString(a_TSS) + "," + a_nome + "," + getString(a_idVariavelDecisao) + "," + getFullString(a_idProcessoEstocastico) + "," + getFullString(a_idVariavelAleatoria) + "," + getFullString(a_idVariavelAleatoriaInterna) + "," + getFullString(a_tipo_valor) + "," + getFullString(a_percentual_inicial) + "," + getFullString(a_percentual_passo) + "): \n" + std::string(erro.what())); }
 
 
 } // IdVariavelRealizacaoInterna Estagio::addVariavelRealizacaoInterna(const string a_nome, const int a_idVariavelDecisao, const IdProcessoEstocastico a_idProcessoEstocastico, const IdVariavelAleatoria a_idVariavelAleatoria, const IdVariavelAleatoriaInterna a_idVariavelAleatoriaInterna, const TipoValor a_tipo_valor, const double percentual_inicial, const double percentual_incremento){

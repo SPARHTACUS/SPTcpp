@@ -3558,7 +3558,6 @@ public:
             while (level > 0) {
 				try {
                     if (level == 5) {
-                        assert(level == 1);
                         resetar();
                         otimizar();
 

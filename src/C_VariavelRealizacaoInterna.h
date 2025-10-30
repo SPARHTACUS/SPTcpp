@@ -10,8 +10,6 @@
 	  m(VariavelRealizacaoInterna,  AttComum,       percentual_a_utilizar,                           double,           0,            3,             0,      sim) \
 	  m(VariavelRealizacaoInterna,  AttComum,          percentual_inicial,                           double,           0,            1,             0,      sim) \
 	  m(VariavelRealizacaoInterna,  AttComum,            percentual_passo,                           double,        0.01,            1,           0.1,      sim) \
-	  m(VariavelRealizacaoInterna,  AttComum,                       fator,                           double,        0.00,            1,             1,      sim) \
-	  m(VariavelRealizacaoInterna,  AttComum,                     periodo,                          Periodo,         min,          max,           min,      sim) \
 	  m(VariavelRealizacaoInterna,  AttComum,       idProcessoEstocastico,            IdProcessoEstocastico,         min,          max,           min,      sim) \
 	  m(VariavelRealizacaoInterna,  AttComum,         idVariavelAleatoria,              IdVariavelAleatoria,         min,          max,           min,      sim) \
 	  m(VariavelRealizacaoInterna,  AttComum,  idVariavelAleatoriaInterna,       IdVariavelAleatoriaInterna,      Nenhum,          max,           min,      sim) 
@@ -19,7 +17,8 @@
 
 
 #define ATT_VETOR_VARIAVEL_REALIZACAO_INTERNA(m)  \
-	  m(VariavelRealizacaoInterna,   AttVetor,  idVariavelDecisao,     int,        -1,          max,             -1,  TipoSubproblemaSolver)
+	  m(VariavelRealizacaoInterna,   AttVetor,  idVariavelDecisao,     int,        -1,          max,             -1,  TipoSubproblemaSolver)\
+	  m(VariavelRealizacaoInterna,   AttVetor,  periodos,  double,       0.000001,          1,             1,  Periodo)
 //            c_classe,    smrtAtt,       nomeAtributo,    Tipo, lowerBound,   upperBound,  initialValue,  TipoIterador
 
 #define SMART_ELEMENTO_VARIAVEL_REALIZACAO_INTERNA(m) \

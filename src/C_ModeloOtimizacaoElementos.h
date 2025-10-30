@@ -224,6 +224,7 @@ void armazenarValorPrimal##Elem##_##Nome##_##Nro##_##Seq(const TipoSubproblemaSo
 	try{ \
 		if (DECLARAR_ISVAR_##Elem){\
 			if (indx_##Elem##_##Nome##_##Nro##_##Seq.size() == 0) { return; }\
+			if (indx_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).size() == 0) { return; }\
 			if (indx_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).at(a_IdEstagio_1).size() == 0) { return; }\
 			alocVlrVar##Elem##_##Nome##_##Nro##_##Seq(a_TSS, a_IdEstagio_1); \
 			if (a_idReal == IdRealizacao_Nenhum){\
@@ -269,12 +270,13 @@ void armazenarValorPrimal##Elem##_##Nome##_##Nro##_##Seq(const TipoSubproblemaSo
 			}\
 		}\
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorPrimal" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_idIteracao) + "," + getFullString(a_IdEstagio_1) + "," + getString(a_idCenario) + "): \n" + std::string(erro.what())); } \
+	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorPrimal" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "_" + std::string(#Seq) + "(" + getFullString(a_TSS) + "," + getFullString(a_idIteracao) + "," + getFullString(a_IdEstagio_1) + "," + getString(a_idCenario) + "): \n" + std::string(erro.what())); } \
 }; \
 void armazenarValorDual##Elem##_##Nome##_##Nro##_##Seq(const TipoSubproblemaSolver a_TSS, const IdIteracao a_idIteracao, const IdEstagio a_IdEstagio_1, const IdCenario a_idCenario, IdRealizacao a_idReal) { \
 	try{ \
 		if (DECLARAR_ISVAR_##Elem){return;}\
 		if (indx_##Elem##_##Nome##_##Nro##_##Seq.size() == 0) { return; }\
+		if (indx_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).size() == 0) { return; }\
 		if (indx_##Elem##_##Nome##_##Nro##_##Seq.at(a_TSS).at(a_IdEstagio_1).size() == 0) { return; }\
 		if (a_idReal == IdRealizacao_Nenhum){\
 			isPrintFw_##Elem##_##Nome##_##Nro##_##Seq = true;\
@@ -338,7 +340,7 @@ void armazenarValorDual##Elem##_##Nome##_##Nro##_##Seq(const TipoSubproblemaSolv
 			}\
 		}\
 	} \
-	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorDual" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "(" + getFullString(a_IdEstagio_1) + "," + getString(a_idCenario) + "): \n" + std::string(erro.what())); } \
+	catch (const std::exception& erro) { throw std::invalid_argument("armazenarValorDual" + std::string(#Elem) + "_" + std::string(#Nome) + "_" + std::string(#Nro) + "_" + std::string(#Seq) + "(" + getFullString(a_TSS) + "," + getFullString(a_idIteracao) + "," + getFullString(a_IdEstagio_1) + "," + getString(a_idCenario) + "): \n" + std::string(erro.what())); } \
 }; \
 void imprimirVariaveis##Elem##_##Nome##_##Nro##_##Seq(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados); \
 void imprimirRestricoes##Elem##_##Nome##_##Nro##_##Seq(const TipoSubproblemaSolver a_TSS, const IdEstagio a_idEstagio, const std::string a_nome_arquivo, EntradaSaidaDados a_entradaSaidaDados);
