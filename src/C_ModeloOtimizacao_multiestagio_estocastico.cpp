@@ -727,7 +727,11 @@ void ModeloOtimizacao::criarProcessoEstocasticoHidrologico(const TipoSubproblema
 
 									vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varQINC_FINF);
 
-									vetorEstagio.at(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeSolverVarDecisao_QINC_FINF(a_TSS, a_idEstagio, a_period, idUHE), varQINC_FINF, idProcEstocastico, idVariavelAleatoria, idVarInt, periodSP, sobreposicao, TipoValor_positivo, 1.0, 1.0);
+									SmartEnupla<Periodo, double> periodos;
+									for (int p = 0; p < int(periodosSP.size()); p++)
+										periodos.addElemento(periodosSP.at(p), a_period.sobreposicao(periodosSP.at(p)));
+
+									vetorEstagio.at(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeSolverVarDecisao_QINC_FINF(a_TSS, a_idEstagio, a_period, idUHE), varQINC_FINF, idProcEstocastico, idVariavelAleatoria, idVarInt, periodos, TipoValor_positivo, 1.0, 1.0);
 
 								} // if (viabilidade_hidraulica) {
 
@@ -752,7 +756,9 @@ void ModeloOtimizacao::criarProcessoEstocasticoHidrologico(const TipoSubproblema
 							if ((tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento) || (tipo_relaxacao == TipoRelaxacaoVariavelAleatoria_truncamento_penalizacao)) {
 								varYP_FINF = addVarDecisao_YP_FINF(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria, 0.0, 0.0, 0.0);
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->addVarDinamica(varYP_FINF);
-								vetorEstagio.at(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeSolverVarDecisao_YP_FINF(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria), varYP_FINF, idProcEstocastico, idVariavelAleatoria, IdVariavelAleatoriaInterna_Nenhum, periodSP, sobreposicao, TipoValor_positivo, 1.0, 1.0);
+								SmartEnupla<Periodo, double> periodos;
+								periodos.addElemento(periodSP, sobreposicao);
+								vetorEstagio.at(a_idEstagio).addVariavelRealizacaoInterna(a_TSS, getNomeSolverVarDecisao_YP_FINF(a_TSS, a_idEstagio, periodSP, idProcEstocastico, idVariavelAleatoria), varYP_FINF, idProcEstocastico, idVariavelAleatoria, IdVariavelAleatoriaInterna_Nenhum, periodos, TipoValor_positivo, 1.0, 1.0);
 								vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(varYP_FINF, equYP, -1.0);
 							}
 
@@ -2072,7 +2078,7 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 					// VH_FINF: Folga para volume minimo
 					//
 
-					if (volume_util_minimo > 0.0) {
+					if ((volume_util_minimo > 0.0) && (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica)) {
 
 						int ineVH_FINF = getIneLinear_VH_LINFseExistir(a_TSS, a_idEstagio, a_period, idUHE);
 
@@ -2104,7 +2110,7 @@ void ModeloOtimizacao::criarHidreletricas(const TipoSubproblemaSolver a_TSS, Dad
 							} // else {
 
 						}//if (ineVH_FINF == -1) {
-					} // if (idStage_VH != IdEstagio_Nenhum) {
+					} // if ((volume_util_minimo > 0.0) && (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica)) {
 
 
 					//
@@ -4465,12 +4471,8 @@ int ModeloOtimizacao::criarVariaveisDecisao_VariaveisEstado_Restricoes_YP(const 
 						int varQINC = getVarDecisao_QINCseExistir(a_TSS, a_idEstagio, periodo, idUHE);
 
 						if (varQINC == -1) {
-							if (a_TSS != TipoSubproblemaSolver_viabilidade_hidraulica) {
-								const double tendencia = getElementoVetor(idProcessoEstocastico_modelo, idVar, idVarInt, AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double());
-								varQINC = addVarDecisao_QINC(a_TSS, a_idEstagio, periodo, idUHE, tendencia, tendencia, 0.0);
-							}
-							else
-								varQINC = addVarDecisao_QINC(a_TSS, a_idEstagio, periodo, idUHE, -infinito, infinito, 0.0);
+							const double tendencia = getElementoVetor(idProcessoEstocastico_modelo, idVar, idVarInt, AttVetorVariavelAleatoriaInterna_tendencia_temporal, periodo, double());
+							varQINC = addVarDecisao_QINC(a_TSS, a_idEstagio, periodo, idUHE, tendencia, tendencia, 0.0);
 						}
 
 						equYP = getEquLinear_YPseExistir(a_TSS, a_idEstagio, a_periodo_lag, a_idProcessoEstocastico, a_idVariavelAleatoria);
