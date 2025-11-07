@@ -53,7 +53,7 @@ class EntradaSaidaDados;
 	  m(ModeloOtimizacao,  AttComum,                      imprimir_cenario_hidrologico_pre_otimizacao,                               bool,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                     calcular_custo_primal_via_subproblema_mestre,                               bool,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                      calcular_cenario_hidrologico_pre_otimizacao,                               bool,        min,          max,        min,      sim) \
-	  m(ModeloOtimizacao,  AttComum,                                  iteracao_maxima_cortes_externos,                          IdIteracao,       min,          max,          1,      sim) \
+	  m(ModeloOtimizacao,  AttComum,                                  iteracao_maxima_cortes_externos,                          IdIteracao,    Nenhum,          max,     Nenhum,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                maior_estagio_impressao_versao_alternativa_cortes,                          IdEstagio,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                                  estagio_inicial,                          IdEstagio,        min,          max,        min,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                                    estagio_final,                          IdEstagio,        min,          max,        min,      sim) \
