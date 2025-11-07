@@ -124,6 +124,8 @@
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <SYCLOptimization>MaxSpeedHighLevel</SYCLOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
