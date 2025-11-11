@@ -19,6 +19,7 @@ class EntradaSaidaDados;
 #define ATT_VETOR_METODO_SOLUCAO(m)  \
 	  m(MetodoSolucao,  AttVetor,              custo_inferior,    double,     0,      max,      0,  IdIteracao) \
 	  m(MetodoSolucao,  AttVetor,              custo_superior,    double,     0,      max,      0,  IdIteracao) \
+	  m(MetodoSolucao,  AttVetor,              custo_superior_global,    double,     0,      max,      0,  IdIteracao) \
 	  m(MetodoSolucao,  AttVetor,       tempo_medio_solver_fw,    double,     0,      max,      0,  IdIteracao) \
 	  m(MetodoSolucao,  AttVetor,       tempo_medio_solver_bw,    double,     0,      max,      0,  IdIteracao) \
 	  m(MetodoSolucao,  AttVetor,              tempo_execucao,    double,     0,      max,      0,  IdIteracao) \

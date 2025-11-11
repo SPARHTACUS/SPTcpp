@@ -8,37 +8,6 @@
 #include <cassert>
 #include "C_SmartEnum.h"
 
-class ColDebug {
-private:
-    std::vector<std::string> changes; //format: "name;bound type('lb' or 'ub');value
-public:
-    ColDebug() {
-    }
-
-    ~ColDebug() {
-    }
-
-    void changeLB(const std::string &varName, double prevLB, double newLB) {
-        changes.emplace_back(varName + ";lb;" + std::to_string(prevLB) + ";" + std::to_string(newLB));
-    }
-
-    void changeUB(const std::string &varName, double prevUB, double newUB) {
-        changes.emplace_back(varName + ";ub;" + std::to_string(prevUB) + ";" + std::to_string(newUB));
-    }
-
-    void writeLog(std::ofstream &output) {
-        output << "varName;boundType;previousValue;newValue" << std::endl;
-
-        for (const std::string &chg : changes) {
-            output << chg << std::endl;
-        }
-    }
-
-    void clear() {
-        changes.clear();
-    }
-};
-
 class Solver {
 protected:
     /* dados solucao */
@@ -50,10 +19,6 @@ protected:
     double *varX = nullptr; //solucao
     double *varRC = nullptr; //custo reduzido
     double dualObjValue;
-
-    /* debug */
-    std::string ultimaVar, ultimaConstr;
-    ColDebug colDbg;
 
 public:
     Solver() {
@@ -217,10 +182,6 @@ public:
 
     virtual std::string str() = 0;
 
-    std::string getEstadoUltimaViabilidade() const {
-        return "ultima variavel adicionada: " + ultimaVar + "\tultima restricao adicionada: " + ultimaConstr;
-    }
-
     double getDualObjValue() const {
         testeObjPrimalDual(getToleranciaOtimalidade());
         return dualObjValue;
@@ -299,8 +260,6 @@ private:
             setMetodoPadrao();
 
             exibirNaTela(false);
-
-            ultimaVar = ultimaConstr = "";
 
             return true;
         }
@@ -452,15 +411,9 @@ public:
     bool setLimInferior(const int a_posicao, const double a_limInferior) {
         try {
             
-            ptrModelo->update();
-            const std::string varName = vetorGRBVar.at(a_posicao).get(GRB_StringAttr_VarName);
-            const double prevLB = vetorGRBVar.at(a_posicao).get(GRB_DoubleAttr_LB);
-
             if (a_limInferior <= -infinitoSolver) {
-                colDbg.changeLB(varName, prevLB, -GRB_INFINITY);
                 vetorGRBVar.at(a_posicao).set(GRB_DoubleAttr_LB, -GRB_INFINITY);
             } else {
-                colDbg.changeLB(varName, prevLB, a_limInferior);
                 vetorGRBVar.at(a_posicao).set(GRB_DoubleAttr_LB, a_limInferior);
             }
 
@@ -484,15 +437,9 @@ public:
     bool setLimSuperior(const int a_posicao, const double a_limSuperior) {
         try {
             
-            ptrModelo->update();
-            const std::string varName = vetorGRBVar.at(a_posicao).get(GRB_StringAttr_VarName);
-            const double prevUB = vetorGRBVar.at(a_posicao).get(GRB_DoubleAttr_UB);
-
             if (a_limSuperior >= infinitoSolver) {
-                colDbg.changeUB(varName, prevUB, GRB_INFINITY);
                 vetorGRBVar.at(a_posicao).set(GRB_DoubleAttr_UB, GRB_INFINITY);
             } else {
-                colDbg.changeUB(varName, prevUB, a_limSuperior);
                 vetorGRBVar.at(a_posicao).set(GRB_DoubleAttr_UB, a_limSuperior);
             }
             return true;
@@ -1030,14 +977,6 @@ public:
             std::fill(varRC, varRC + model->get(GRB_IntAttr_NumVars), NAN);
             std::fill(dualPrice, dualPrice + model->get(GRB_IntAttr_NumConstrs), NAN);
 
-            //DEBUG
-            std::ofstream output("debug-status-invalido.txt", std::ios_base::out);
-            if (!output.is_open()) {
-                throw std::invalid_argument("Nao foi possivel abrir o arquivo debug-status-invalido.txt");
-            }
-            output << getEstadoUltimaViabilidade() << std::endl;
-            colDbg.writeLog(output);
-            output.close();
         }
     }
 
@@ -1045,10 +984,6 @@ public:
         try {
             auto start_clock = std::chrono::high_resolution_clock::now();
             model->update();
-
-            //DEBUG
-            ultimaVar = ptrModelo->getVar(model->get(GRB_IntAttr_NumVars) - 1).get(GRB_StringAttr_VarName);
-            ultimaConstr = ptrModelo->getConstr(model->get(GRB_IntAttr_NumConstrs) - 1).get(GRB_StringAttr_ConstrName);
 
             if (varX) {
                 delete[] varX;
@@ -1067,8 +1002,6 @@ public:
             fillSolution(model);
             std::chrono::duration<double> tempo = std::chrono::high_resolution_clock::now() - start_clock;
             tempo_otimizacao = tempo.count();
-
-            colDbg.clear();
 
             return true;
         }
@@ -1897,15 +1830,6 @@ private:
                 return 2;
             }
 
-            //DEBUG
-            std::ofstream output("debug-status-invalido.txt", std::ios_base::out);
-            if (!output.is_open()) {
-                throw std::invalid_argument("Nao foi possivel abrir o arquivo debug-status-invalido.txt");
-            }
-            output << getEstadoUltimaViabilidade() << std::endl;
-            colDbg.writeLog(output);
-            output.close();
-
             statusOtimizacao = TipoStatusSolver_nao_otimalidade;
             throw std::invalid_argument(
                     "10005 CLP retornou um status invalido: primary = " + std::to_string(status) + " secondary = " +
@@ -1945,15 +1869,6 @@ private:
                 std::fill(dualPrice, dualPrice + clp->getNumRows(), NAN);
                 statusOtimizacao = TipoStatusSolver_nao_otimalidade;
 
-                //DEBUG
-                std::ofstream output("debug-status-infactivel.txt", std::ios_base::out);
-                if (!output.is_open()) {
-                    throw std::invalid_argument("Nao foi possivel abrir o arquivo debug-status-infactivel.txt");
-                }
-                output << getEstadoUltimaViabilidade() << std::endl;
-                colDbg.writeLog(output);
-                output.close();
-                //throw std::invalid_argument("CLP status: modelo infactivel!");
                 return;
             } else if (res == 1) { // tempo limite excedido
                 objValue = bestPossibleObjValue = clp->getObjValue();
@@ -2010,14 +1925,6 @@ private:
                 std::fill(dualPrice, dualPrice + clp->getNumRows(), NAN);
                 statusOtimizacao = TipoStatusSolver_nao_otimalidade;
 
-                //DEBUG
-                std::ofstream output("debug-status-abandoned.txt", std::ios_base::out);
-                if (!output.is_open()) {
-                    throw std::invalid_argument("Nao foi possivel abrir o arquivo debug-status-abandoned.txt");
-                }
-                output << getEstadoUltimaViabilidade() << std::endl;
-                colDbg.writeLog(output);
-                output.close();
                 throw std::invalid_argument("10005 CBC status: abandoned - Instabilidade numerica!");
             } else if (cbcModel.isProvenInfeasible()) {
                 objValue = bestPossibleObjValue = dualObjValue = COIN_DBL_MAX;
@@ -2026,15 +1933,6 @@ private:
                 std::fill(dualPrice, dualPrice + clp->getNumRows(), NAN);
                 statusOtimizacao = TipoStatusSolver_nao_otimalidade;
 
-                //DEBUG
-                std::ofstream output("debug-status-infactivel.txt", std::ios_base::out);
-                if (!output.is_open()) {
-                    throw std::invalid_argument("Nao foi possivel abrir o arquivo debug-status-infactivel.txt");
-                }
-                output << getEstadoUltimaViabilidade() << std::endl;
-                colDbg.writeLog(output);
-                output.close();
-//                throw std::invalid_argument("CBC status: infactivel!");
             } else if (cbcModel.isProvenOptimal() || cbcModel.isSecondsLimitReached()) {
                 if (cbcModel.isProvenOptimal()) {
                     statusOtimizacao = TipoStatusSolver_otimalidade;
@@ -2065,17 +1963,6 @@ private:
                 }
             } else {
                 statusOtimizacao = TipoStatusSolver_nao_otimalidade;
-                //cbcModel.solver()->writeMps("erro_solve-invalido");
-               // cbcModel.solver()->writeLp("erro_solve-invalido");
-
-                //DEBUG
-                std::ofstream output("debug-status-invalido.txt", std::ios_base::out);
-                if (!output.is_open()) {
-                    throw std::invalid_argument("Nao foi possivel abrir o arquivo debug-status-invalido.txt");
-                }
-                output << getEstadoUltimaViabilidade() << std::endl;
-                colDbg.writeLog(output);
-                output.close();
 
                 throw std::invalid_argument(
                     "10005 CBC retornou um status invalido: primary = " + std::to_string(cbcModel.status()) + " secondary = " +
@@ -2200,11 +2087,6 @@ private:
             inicializaMemVariaveis();
             inicializaMemRestricoes();
             
-            ultimaVar = ultimaConstr = "";
-
-           // solver->createEmptyMatrix();
-           // solver->matrix()->reverseOrdering();
-
             return true;
         }
 
@@ -2367,26 +2249,6 @@ public:
     }
 
 
-    bool setLimInferior_old(const int a_posicao, const double a_limInferior) {
-        try {
-            const double newLB = (fabs(a_limInferior) <= 1e-6) ? 0.0 : a_limInferior;
-            colDbg.changeLB(solver->getColumnName(a_posicao), solver->getColLower()[a_posicao], newLB);
-            solver->setColLower(a_posicao, newLB);
-            return true;
-        }
-
-        catch (const CoinError &erro) {
-            throw std::invalid_argument(
-                    "SolverCLP::setLimInferior(" + std::to_string(a_posicao) + "," + std::to_string(a_limInferior) +
-                    "): \n" + erro.message());
-        }
-        catch (const std::exception &erro) {
-            throw std::invalid_argument(
-                    "SolverCLP::setLimInferior(" + std::to_string(a_posicao) + "," + std::to_string(a_limInferior) +
-                    "): \n" + std::string(erro.what()));
-        }
-    }
-
 
     bool setLimInferior(const int a_posicao, const double a_limInferior) {
         try {
@@ -2401,13 +2263,11 @@ public:
 
             if (colIdx >= solver->getNumCols()) { //restricao esta no buffer; ainda nao foi inserida no modelo
                 const int idxBuffer = colIdx - solver->getNumCols();
-                colDbg.changeLB(nomeCol[idxBuffer], lbCol[idxBuffer], newLB);
                 lbCol[idxBuffer] = newLB;
             }
             else { //restricao ja foi inserida no solver
 
                 solver->setColLower(colIdx, newLB);
-                colDbg.changeLB(solver->getColumnName(a_posicao), solver->getColLower()[a_posicao], newLB);
             }
 
             return true;
@@ -2428,7 +2288,6 @@ public:
     bool setLimSuperior_old(const int a_posicao, const double a_limSuperior) {
         try {
             const double newUB = (fabs(a_limSuperior) <= 1e-6) ? 0.0 : a_limSuperior;
-            colDbg.changeUB(solver->getColumnName(a_posicao), solver->getColUpper()[a_posicao], newUB);
             solver->setColUpper(a_posicao, newUB);
             return true;
         }
@@ -2458,13 +2317,11 @@ public:
 
             if (colIdx >= solver->getNumCols()) { //restricao esta no buffer; ainda nao foi inserida no modelo
                 const int idxBuffer = colIdx - solver->getNumCols();
-                colDbg.changeUB(nomeCol[idxBuffer], ubCol[idxBuffer], newUB);
                 ubCol[idxBuffer] = newUB;
             }
             else { //restricao ja foi inserida no solver
 
                 solver->setColUpper(colIdx, newUB);
-                colDbg.changeUB(solver->getColumnName(a_posicao), solver->getColUpper()[a_posicao], newUB);
             }
 
             return true;
@@ -3525,16 +3382,11 @@ public:
     }
 
     bool otimizar(ClpSimplex *clp) {
-        //DEBUG
-        ultimaVar = clp->getColumnName(clp->getNumCols() - 1);
-        ultimaConstr = clp->getRowName(clp->getNumRows() - 1);
 
         auto start_clock = std::chrono::high_resolution_clock::now();
         solve(clp);
         std::chrono::duration<double> tempo = std::chrono::high_resolution_clock::now() - start_clock;
         tempo_otimizacao = tempo.count();
-
-        colDbg.clear();
 
         return true;
     }

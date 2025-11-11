@@ -30,7 +30,7 @@ class EntradaSaidaDados;
 	  m(ModeloOtimizacao,  AttComum,                                                  numero_cenarios,                                int,          1,          max,          1,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                               numero_maximo_tentativas_resolucao,                                int,          1,         1000,        100,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                             multiplicador_tempo_limite_resolucao,                             double,        min,         max,         100,      nao) \
-	  m(ModeloOtimizacao,  AttComum,                                                    foco_numerico,                                int,          1,            4,          2,      sim) \
+	  m(ModeloOtimizacao,  AttComum,                                                    foco_numerico,                                int,          0,            4,          2,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                           tolerancia_otimalidade,                             double,       1e-14,         1e-2,       1e-13,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                           tolerancia_viabilidade,                             double,       1e-14,         1e-2,       1e-13,      sim) \
 	  m(ModeloOtimizacao,  AttComum,                                          tolerancia_convergencia,                             double,        1e-14,        1e-2,           1e-6,      nao) \

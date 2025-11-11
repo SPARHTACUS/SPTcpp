@@ -837,6 +837,10 @@ void Dados::validacao_operacional_Dados(EntradaSaidaDados a_entradaSaidaDados, c
 		if (estagio_final > getIteradorFinal(AttVetorDados_horizonte_otimizacao, IdEstagio()))
 			throw std::invalid_argument("O valor de " + getFullString(AttComumDados_estagio_final) + " nao pode ser MAIOR que o iterador inicial de " + getFullString(AttVetorDados_horizonte_otimizacao) + ".");
 
+
+		if ((estagio_final == IdEstagio_1) && (getAtributo(AttComumDados_tipo_estudo, TipoEstudo()) != TipoEstudo_simulacao))
+			throw std::invalid_argument("Para " + getFullString(AttComumDados_estagio_final) + " igual a " + getString(IdEstagio_1) + ", " + getFullString(AttComumDados_tipo_estudo) + " deve ser " + getFullString(TipoEstudo_simulacao));
+
 		//
 		//
 		// Valida��o Percentual Dura��o Patamar Carga
