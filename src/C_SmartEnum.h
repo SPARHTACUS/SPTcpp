@@ -1098,7 +1098,8 @@ DEFINE_SMART_ENUM(TipoEstudo, TIPO_ESTUDO)
 
 #define TIPO_CONVERGENCIA(m)\
 	m(TipoConvergencia, sem_criterio)  \
-	m(TipoConvergencia, gap) 
+	m(TipoConvergencia, gap) \
+	m(TipoConvergencia, gap_global) 
 DEFINE_SMART_ENUM(TipoConvergencia, TIPO_CONVERGENCIA)
 
 #define TIPO_CONTRATO(m)\

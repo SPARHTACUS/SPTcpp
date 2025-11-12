@@ -3204,8 +3204,8 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacao(const IdEs
 					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimInferior(idVariavelDecisao, valor);
 					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimSuperior(idVariavelDecisao, valor);
 
-					if (idVariavelRealizacao == maiorIdVariavelRealizacao)
-						vetorEstagio.at(a_idEstagio).getSolver(tSS)->atualizar();
+					//if (idVariavelRealizacao == maiorIdVariavelRealizacao)
+						//vetorEstagio.at(a_idEstagio).getSolver(tSS)->atualizar();
 
 				} // if (idVariavelDecisao > -1) {
 
@@ -3243,8 +3243,8 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacao(const IdEs
 					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimInferior(idVariavelDecisao, valor);
 					vetorEstagio.at(a_idEstagio).getSolver(tSS)->setLimSuperior(idVariavelDecisao, valor);
 
-					if (idVariavelRealizacao == maiorIdVariavelRealizacao)
-						vetorEstagio.at(a_idEstagio).getSolver(tSS)->atualizar();
+					//if (idVariavelRealizacao == maiorIdVariavelRealizacao)
+						//vetorEstagio.at(a_idEstagio).getSolver(tSS)->atualizar();
 
 				} // if (idVariavelDecisao > -1) {
 
@@ -3334,8 +3334,8 @@ void ModeloOtimizacao::atualizarModeloOtimizacaoComRestricaoCenario(const IdEsta
 
 					} // if (getSize1Matriz(a_idEstagio, idRestricaoCenario, AttMatrizRestricaoCenario_coeficiente) > 0) {
 
-					if (idRestricaoCenario == maiorIdRestricaoCenario)
-						vetorEstagio.at(a_idEstagio).getSolver(tSS)->atualizar();
+					//if (idRestricaoCenario == maiorIdRestricaoCenario)
+						//vetorEstagio.at(a_idEstagio).getSolver(tSS)->atualizar();
 
 				} // if (idEquacao > -1) {
 
@@ -3390,8 +3390,8 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 				//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimInferior(idVariavelDecisao_origem, 0.0);
 				vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setLimSuperior(idVariavelDecisao_origem, valor_novo);
 
-				if (idVariavelRealizacaoInterna == maiorIdVariavelRealizacaoInterna)
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->atualizar();
+				//if (idVariavelRealizacaoInterna == maiorIdVariavelRealizacaoInterna)
+					//vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->atualizar();
 
 			} // if (idVariavelAleatoriaInterna > IdVariavelAleatoriaInterna_Nenhum) {
 			 
@@ -3491,8 +3491,8 @@ bool ModeloOtimizacao::atualizarModeloOtimizacaoComVariavelRealizacaoInterna(con
 
 				} // if (idVariavelAleatoriaInterna > IdVariavelAleatoriaInterna_Nenhum) {
 
-				if (idVariavelRealizacaoInterna == maiorIdVariavelRealizacaoInterna)
-					vetorEstagio.at(a_idEstagio).getSolver(a_TSS_destino)->atualizar();
+				//if (idVariavelRealizacaoInterna == maiorIdVariavelRealizacaoInterna)
+					//vetorEstagio.at(a_idEstagio).getSolver(a_TSS_destino)->atualizar();
 
 			} // for (IdVariavelRealizacaoInterna idVariavelRealizacaoInterna = IdVariavelRealizacaoInterna_1; idVariavelRealizacaoInterna <= maiorIdVariavelRealizacaoInterna; idVariavelRealizacaoInterna++) {
 

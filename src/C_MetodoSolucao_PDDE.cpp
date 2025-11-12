@@ -1174,6 +1174,22 @@ bool MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaida
 
 			const double brecha = 100.0*(custo_superior - custo_inferior) / custo_superior;
 
+			double custo_superior_global = custo_superior;
+
+			if (getSizeVetor(AttVetorMetodoSolucao_custo_superior_global) > 0){
+				const double custo_superior_global_prev = getElementoVetor(AttVetorMetodoSolucao_custo_superior_global, getIteradorFinal(AttVetorMetodoSolucao_custo_superior_global, IdIteracao()), double());
+				if (custo_superior_global_prev < custo_superior_global)
+					custo_superior_global = custo_superior_global_prev;
+
+				const IdIteracao idIter_eval = IdIteracao(getIteradorFinal(AttVetorMetodoSolucao_custo_superior_global, IdIteracao()) + 1);
+				for (IdIteracao idIter = idIter_eval; idIter < a_idIteracao; idIter++)
+					addElemento(AttVetorMetodoSolucao_custo_superior_global, idIter, 0.0);
+				
+			}
+
+			addElemento(AttVetorMetodoSolucao_custo_superior_global, a_idIteracao, custo_superior_global);
+
+			const double brecha_global = 100.0 * (custo_superior_global - custo_inferior) / custo_superior;
 
 			//
 			// Impressão na Tela
@@ -1213,7 +1229,8 @@ bool MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaida
 			std::cout << "Custo Superior (milhoes): " + getString(custo_superior / 1000000) << std::endl;
 			std::cout << "Custo Inferior (milhoes): " + getString(custo_inferior / 1000000) << std::endl;
 			std::cout << std::endl;
-			std::cout << "Brecha (%): " + getString(brecha) << std::endl;
+			std::cout << "Brecha Iteracao (%): " + getString(brecha) << std::endl;
+			std::cout << "Brecha Global   (%): " + getString(brecha_global) << std::endl;
 			std::cout << std::endl;
 			std::cout << std::endl;
 			std::cout << "Tempo Execucao Iteracao  (minutos): " + getString(tempo_execucao) << std::endl;
@@ -1224,7 +1241,7 @@ bool MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaida
 			// Impressão em Arquivo
 			//
 			a_entradaSaidaDados.setAppendArquivo(false);
-			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("resultado_por_iteracao.csv", *this, std::vector<AttVetorMetodoSolucao>{AttVetorMetodoSolucao_tempo_execucao, AttVetorMetodoSolucao_custo_inferior, AttVetorMetodoSolucao_custo_superior});
+			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor("resultado_por_iteracao.csv", *this, std::vector<AttVetorMetodoSolucao>{AttVetorMetodoSolucao_tempo_execucao, AttVetorMetodoSolucao_custo_inferior, AttVetorMetodoSolucao_custo_superior, AttVetorMetodoSolucao_custo_superior_global});
 
 			if (a_idIteracao > a_modeloOtimizacao.arranjoResolucao.getAtributo(AttComumArranjoResolucao_iteracao_inicial, IdIteracao()))
 				a_entradaSaidaDados.setAppendArquivo(true);
@@ -1240,9 +1257,14 @@ bool MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaida
 			setMatriz(AttMatrizMetodoSolucao_custo_inferior, SmartEnupla<IdIteracao, SmartEnupla<IdCenario, double>>());
 			setMatriz(AttMatrizMetodoSolucao_custo_superior, SmartEnupla<IdIteracao, SmartEnupla<IdCenario, double>>());
 
-			if (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_convergencia, TipoConvergencia()) == TipoConvergencia_gap) {
 
-				const double brecha_num = (custo_superior - custo_inferior) / custo_superior;
+			const TipoConvergencia tipo_convergencia = a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_convergencia, TipoConvergencia());
+			if ((tipo_convergencia == TipoConvergencia_gap) || (tipo_convergencia == TipoConvergencia_gap_global)) {
+
+				double brecha_num = (custo_superior - custo_inferior) / custo_superior;
+
+				if (tipo_convergencia == TipoConvergencia_gap_global)
+					brecha_num = (custo_superior_global - custo_inferior) / custo_superior;
 
 				if (brecha_num < a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tolerancia_convergencia, double()))
 					encerrar_iteracao = 1;
@@ -1256,7 +1278,7 @@ bool MetodoSolucao::executarPDDE_avaliarSolucao(EntradaSaidaDados a_entradaSaida
 						a_modeloOtimizacao.exportarCorteBenders(a_idProcesso, idEstagio, a_entradaSaidaDados);
 				}
 
-			} // if (a_modeloOtimizacao.getAtributo(AttComumModeloOtimizacao_tipo_convergencia, TipoConvergencia()) == TipoConvergencia_gap) {
+			} // if ((tipo_convergencia == TipoConvergencia_gap) || (TipoConvergencia_gap_global)) {
 
 		} // if (a_idProcesso == IdProcesso_mestre) {
 

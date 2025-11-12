@@ -5414,7 +5414,7 @@ void LeituraCEPEL::leitura_DADGER_201906_DC29(Dados& a_dados, std::string nomeAr
 
 							if (!dadosPreConfig_instanciados) {
 								a_dados.setAtributo(AttComumDados_tolerancia_convergencia, tolerancia_convergencia * 0.01);
-								a_dados.setAtributo(AttComumDados_tipo_convergencia, TipoConvergencia_gap);
+								a_dados.setAtributo(AttComumDados_tipo_convergencia, TipoConvergencia_gap_global);
 							}
 
 						}//try {
