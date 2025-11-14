@@ -77,6 +77,7 @@
 	  m(Dados,  AttComum,                         tolerancia_viabilidade,                             double,        1e-14,        1e-2,          1e-13,      nao) \
 	  m(Dados,  AttComum,                        tolerancia_convergencia,                             double,        1e-14,        1e-2,           1e-6,      nao) \
 	  m(Dados,  AttComum,                              tipo_convergencia,                   TipoConvergencia,         min,          max,  sem_criterio,      nao) \
+	  m(Dados,  AttComum,                           escalonamento_cortes,                             double,           1,         max,             1,      nao) \
 	  m(Dados,  AttComum,           multiplicador_tempo_limite_resolucao,                             double,           0,         max,             0,      nao) \
 	  m(Dados,  AttComum,            numero_maximo_tentativas_resolucao,                                 int,           1,        1000,           100,      nao) \
 	  m(Dados,  AttComum,                    tipo_selecao_solucao_proxy,             TipoSelecaoSolucaoProxy,         min,         max,           min,      nao) \

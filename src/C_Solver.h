@@ -14,11 +14,10 @@ protected:
     TipoStatusSolver statusOtimizacao;
     double tempo_otimizacao;
     double objValue;
-    double bestPossibleObjValue;
+    double objValueBound;
     double *dualPrice = nullptr;
     double *varX = nullptr; //solucao
     double *varRC = nullptr; //custo reduzido
-    double dualObjValue;
 
 public:
     Solver() {
@@ -171,7 +170,7 @@ public:
     }
 
     double getValorObjetivoBound() {
-        return bestPossibleObjValue;
+        return objValueBound;
     }
 
     virtual bool imprimirLP(const std::string a_nomeArquivo) = 0;
@@ -181,21 +180,6 @@ public:
     virtual bool imprimirILP(const std::string a_nomeArquivo) = 0;
 
     virtual std::string str() = 0;
-
-    double getDualObjValue() const {
-        testeObjPrimalDual(getToleranciaOtimalidade());
-        return dualObjValue;
-    }
-
-    void testeObjPrimalDual(double tolerance) const {
-        const double gap = fabs(dualObjValue - objValue) / objValue;
-
-        if (gap > tolerance) {
-            char msg[512];
-            sprintf(msg, "testeObjPrimalDual falhou!\nobj primal: %.12lf obj dual: %.12lf gap: %.12lf\n", objValue, dualObjValue, gap);
-            throw std::invalid_argument(msg);
-        }
-    }
 
 }; // class Solver {
 
@@ -253,7 +237,7 @@ private:
             lista_variavel_dinamica = std::vector<int>();
 
             statusOtimizacao = TipoStatusSolver_Nenhum;
-            objValue = bestPossibleObjValue = dualObjValue = GRB_INFINITY;
+            objValue = objValueBound = GRB_INFINITY;
 
             tempo_otimizacao = 0.0;
 
@@ -275,55 +259,6 @@ private:
 
     }; // bool inicializar() {
 
-    double calculateDualObjValue(const GRBModel *model) {
-        double dualObjPos = 0.0, dualObjNeg = 0.0;
-        const int numVars = model->get(GRB_IntAttr_NumVars);
-        const int numRows = model->get(GRB_IntAttr_NumConstrs);
-
-        for (int j = 0; j < numVars; j++) {
-            const double reducedCost = vetorGRBVar.at(j).get(GRB_DoubleAttr_RC);
-
-            if (reducedCost > 0.0) {
-                const double colLB = vetorGRBVar.at(j).get(GRB_DoubleAttr_LB);
-
-                if (colLB > -infinitoSolver) {
-                    const double result = reducedCost * colLB;
-
-                    if (result < 0.0) {
-                        dualObjNeg += result;
-                    } else {
-                        dualObjPos += result;
-                    }
-                }
-            } else if (reducedCost < 0.0) {
-                const double colUB = vetorGRBVar.at(j).get(GRB_DoubleAttr_UB);
-
-                if (colUB < infinitoSolver) {
-                    const double result = reducedCost * colUB;
-
-                    if (result < 0.0) {
-                        dualObjNeg += result;
-                    } else {
-                        dualObjPos += result;
-                    }
-                }
-            }
-        }
-
-        for (int i = 0; i < numRows; i++) {
-            const double rowPrice = vetorGRBConstr.at(i).get(GRB_DoubleAttr_Pi);
-            const double rowRHS = vetorGRBConstr.at(i).get(GRB_DoubleAttr_RHS);
-            const double result = rowPrice * rowRHS;
-
-            if (result < 0.0) {
-                dualObjNeg += result;
-            } else {
-                dualObjPos += result;
-            }
-        }
-
-        return dualObjNeg + dualObjPos;
-    }
 
 public:
 
@@ -928,17 +863,15 @@ public:
         if (status == GRB_OPTIMAL) {
             statusOtimizacao = TipoStatusSolver_otimalidade;
             objValue = model->get(GRB_DoubleAttr_ObjVal);
-            bestPossibleObjValue = model->get(GRB_DoubleAttr_ObjBound);
+            objValueBound = model->get(GRB_DoubleAttr_ObjBound);
 
             if (model->get(GRB_IntAttr_IsMIP) == 1) {
-                dualObjValue = 0.0;
                 for (int j = 0; j < numVars; j++) {
                     varX[j] = model->getVar(j).get(GRB_DoubleAttr_X);
                     varRC[j] = 0.0;
                 }
                 std::fill(dualPrice, dualPrice + numRows, 0.0);
             } else {
-                dualObjValue = calculateDualObjValue(model);
                 for (int j = 0; j < numVars; j++) {
                     varX[j] = model->getVar(j).get(GRB_DoubleAttr_X);
                     varRC[j] = model->getVar(j).get(GRB_DoubleAttr_RC);
@@ -950,18 +883,15 @@ public:
         } else if (status == GRB_TIME_LIMIT) {
             statusOtimizacao = TipoStatusSolver_tempo_excedido;
             objValue = model->get(GRB_DoubleAttr_ObjVal);
-            bestPossibleObjValue = model->get(GRB_DoubleAttr_ObjBound);
-            dualObjValue = calculateDualObjValue(model);
+            objValueBound = model->get(GRB_DoubleAttr_ObjBound);
 
             if (model->get(GRB_IntAttr_IsMIP) == 1) {
-                dualObjValue = 0.0;
                 for (int j = 0; j < numVars; j++) {
                     varX[j] = model->getVar(j).get(GRB_DoubleAttr_X);
                     varRC[j] = 0.0;
                 }
                 std::fill(dualPrice, dualPrice + numRows, 0.0);
             } else {
-                dualObjValue = calculateDualObjValue(model);
                 for (int j = 0; j < numVars; j++) {
                     varX[j] = model->getVar(j).get(GRB_DoubleAttr_X);
                     varRC[j] = model->getVar(j).get(GRB_DoubleAttr_RC);
@@ -972,7 +902,7 @@ public:
             }
         } else {
             statusOtimizacao = TipoStatusSolver_nao_otimalidade;
-            objValue = bestPossibleObjValue = dualObjValue = GRB_INFINITY;
+            objValue = objValueBound = GRB_INFINITY;
             std::fill(varX, varX + model->get(GRB_IntAttr_NumVars), NAN);
             std::fill(varRC, varRC + model->get(GRB_IntAttr_NumVars), NAN);
             std::fill(dualPrice, dualPrice + model->get(GRB_IntAttr_NumConstrs), NAN);
@@ -1863,7 +1793,7 @@ private:
             dualPrice = new double[clp->getNumRows()];
 
             if (res == 2) { //problema infactivel
-                objValue = bestPossibleObjValue = dualObjValue = COIN_DBL_MAX;
+                objValue = objValueBound = COIN_DBL_MAX;
                 std::fill(varX, varX + clp->getNumCols(), NAN);
                 std::fill(varRC, varRC + clp->getNumCols(), NAN);
                 std::fill(dualPrice, dualPrice + clp->getNumRows(), NAN);
@@ -1871,8 +1801,8 @@ private:
 
                 return;
             } else if (res == 1) { // tempo limite excedido
-                objValue = bestPossibleObjValue = clp->getObjValue();
-                dualObjValue = calculateDualObjValue(clp);
+                objValue = clp->getObjValue();
+                objValueBound = objValue * (1.0 - getToleranciaOtimalidade());
                 const double *x = clp->getColSolution();
                 memcpy(varX, x, sizeof(double) * clp->getNumCols());
                 const double *rc = clp->getReducedCost();
@@ -1885,8 +1815,8 @@ private:
 
             if (!isMILP) { //CLP resolveu na otimalidade e o problema contem somente vars continuas
                 assert(res == 0);
-                objValue = bestPossibleObjValue = clp->getObjValue();
-                dualObjValue = calculateDualObjValue(clp);
+                objValue = clp->getObjValue();
+                objValueBound = objValue * (1.0 - getToleranciaOtimalidade());
                 const double *x = clp->getColSolution();
                 memcpy(varX, x, sizeof(double) * clp->getNumCols());
                 const double *rc = clp->getReducedCost();
@@ -1919,7 +1849,7 @@ private:
             CbcMain1(nargs, args, cbcModel, cbcData);
 
             if (cbcModel.isAbandoned()) {
-                objValue = bestPossibleObjValue = dualObjValue = COIN_DBL_MAX;
+                objValue = objValueBound = COIN_DBL_MAX;
                 std::fill(varX, varX + clp->getNumCols(), NAN);
                 std::fill(varRC, varRC + clp->getNumCols(), NAN);
                 std::fill(dualPrice, dualPrice + clp->getNumRows(), NAN);
@@ -1927,7 +1857,7 @@ private:
 
                 throw std::invalid_argument("10005 CBC status: abandoned - Instabilidade numerica!");
             } else if (cbcModel.isProvenInfeasible()) {
-                objValue = bestPossibleObjValue = dualObjValue = COIN_DBL_MAX;
+                objValue = objValueBound = COIN_DBL_MAX;
                 std::fill(varX, varX + clp->getNumCols(), NAN);
                 std::fill(varRC, varRC + clp->getNumCols(), NAN);
                 std::fill(dualPrice, dualPrice + clp->getNumRows(), NAN);
@@ -1940,7 +1870,7 @@ private:
                     statusOtimizacao = TipoStatusSolver_tempo_excedido;
                 }
 
-                bestPossibleObjValue = cbcModel.getBestPossibleObjValue();
+                objValueBound = cbcModel.getBestPossibleObjValue();
 
                 if (cbcModel.bestSolution()) {
                     if (paramRoundIntVars) {
@@ -1948,7 +1878,7 @@ private:
                     }
 
                     objValue = cbcModel.getObjValue();
-                    dualObjValue = calculateDualObjValue(clp);
+                    objValueBound = objValue * (1.0 - getToleranciaOtimalidade());
                     const double *x = cbcModel.bestSolution();
                     memcpy(varX, x, sizeof(double) * cbcModel.getNumCols());
                     const double *rc = cbcModel.getReducedCost();
@@ -1956,7 +1886,7 @@ private:
                     const double *dp = cbcModel.getRowPrice();
                     memcpy(dualPrice, dp, sizeof(double) * cbcModel.getNumRows());
                 } else {
-                    objValue = dualObjValue = COIN_DBL_MAX;
+                    objValue = objValueBound = COIN_DBL_MAX;
                     std::fill(varX, varX + clp->getNumCols(), NAN);
                     std::fill(varRC, varRC + clp->getNumCols(), NAN);
                     std::fill(dualPrice, dualPrice + clp->getNumRows(), NAN);
@@ -1974,67 +1904,6 @@ private:
         catch (const std::exception &erro) {
             throw std::invalid_argument("SolverCLP::otimiza(): \n" + std::string(erro.what()));
         }
-    }
-
-    double calculateDualObjValue(const ClpSimplex *clp) {
-        double dualObjPos = 0.0, dualObjNeg = 0.0;
-        const double *rowPrice = clp->getRowPrice();
-        const double *rowLB = clp->getRowLower();
-        const double *rowUB = clp->getRowUpper();
-        const double *reducedCost = clp->getReducedCost();
-        const double *colLB = clp->getColLower();
-        const double *colUB = clp->getColUpper();
-
-        for (int j = 0; j < clp->getNumCols(); j++) {
-            if (reducedCost[j] > 0.0) {
-                if (colLB[j] > -infinitoSolver) {
-                    const double result = reducedCost[j] * colLB[j];
-
-                    if (result < 0.0) {
-                        dualObjNeg += result;
-                    } else {
-                        dualObjPos += result;
-                    }
-                }
-            }
-            else if (reducedCost[j] < 0.0) {
-                if (colUB[j] < infinitoSolver) {
-                    const double result = reducedCost[j] * colUB[j];
-
-                    if (result < 0.0) {
-                        dualObjNeg += result;
-                    } else {
-                        dualObjPos += result;
-                    }
-                }
-            }
-        }
-
-        for (int i = 0; i < clp->getNumRows(); i++) {
-            if (rowPrice[i] > 0.0) {
-                if (rowLB[i] > -infinitoSolver) {
-                    const double result = rowPrice[i] * rowLB[i];
-
-                    if (result < 0.0) {
-                        dualObjNeg += result;
-                    } else {
-                        dualObjPos += result;
-                    }
-                }
-            } else if (rowPrice[i] < 0.0) {
-                if (rowUB[i] < infinitoSolver) {
-                    const double result = rowPrice[i] * rowUB[i];
-
-                    if (result < 0.0) {
-                        dualObjNeg += result;
-                    } else {
-                        dualObjPos += result;
-                    }
-                }
-            }
-        }
-
-        return dualObjNeg + dualObjPos;
     }
 
     bool inicializar() {
@@ -2062,7 +1931,6 @@ private:
 
             solver = new ClpSimplex();
             infinitoSolver = COIN_DBL_MAX;
-            dualObjValue = COIN_DBL_MAX;
 
             realNumRows = fakeNumRows = 0;
             realNumCols = fakeNumCols = 0;
@@ -2079,7 +1947,7 @@ private:
             
             tempoLimite = COIN_DBL_MAX;
             objValue = COIN_DBL_MAX;
-            bestPossibleObjValue = COIN_DBL_MAX;
+            objValueBound = COIN_DBL_MAX;
             tipoMetodoSolverPadrao = TipoMetodoSolver_dual_simplex;
             setMetodoPadrao();
             exibirNaTela(false);

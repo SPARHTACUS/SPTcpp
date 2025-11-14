@@ -3846,7 +3846,7 @@ void ModeloOtimizacao::exportarCorteBenders(const IdProcesso a_idProcesso, const
 		a_entradaSaidaDados.setAppendArquivo(false);
 
 		if (vetorEstagio.at(a_estagio).vetorCorteBenders.getMaiorId() != IdCorteBenders_Nenhum) {
-			a_entradaSaidaDados.imprimirArquivoCSV_AttComum(getFullString(a_estagio) + "_estagio.csv", vetorEstagio.at(a_estagio), std::vector<AttComumEstagio>{ AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao, AttComumEstagio_selecao_cortes_nivel_dominancia, AttComumEstagio_cortes_multiplos, AttComumEstagio_alpha_CVAR, AttComumEstagio_lambda_CVAR});
+			a_entradaSaidaDados.imprimirArquivoCSV_AttComum(getFullString(a_estagio) + "_estagio.csv", vetorEstagio.at(a_estagio), std::vector<AttComumEstagio>{ AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao, AttComumEstagio_selecao_cortes_nivel_dominancia, AttComumEstagio_cortes_multiplos, AttComumEstagio_escalonamento_cortes, AttComumEstagio_alpha_CVAR, AttComumEstagio_lambda_CVAR});
 			a_entradaSaidaDados.imprimirArquivoCSV_AttComum(getFullString(a_estagio) + "_estado.csv", IdVariavelEstado_Nenhum, vetorEstagio.at(a_estagio));
 			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(a_estagio) + "_corteBenders_rhs.csv", IdCorteBenders_Nenhum, vetorEstagio.at(a_estagio), AttVetorCorteBenders_rhs);
 			a_entradaSaidaDados.imprimirArquivoCSV_AttVetor(getFullString(a_estagio) + "_corteBenders_estado.csv", IdCorteBenders_Nenhum, vetorEstagio.at(a_estagio), AttVetorCorteBenders_estado);
@@ -4430,6 +4430,11 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 							} // if (numero_variaveis_estado_cortes_encontradas != int(maiorIdVarivelEstado_corte)) {
 
 
+							const double escalonamento_cortes = vetorEstagio_aux.at(idEstagio).getAtributo(AttComumEstagio_escalonamento_cortes, double());
+							const double escalonamento_cortes_modelo = getAtributo(idEstagio, AttComumEstagio_escalonamento_cortes, double());
+
+							const double fator_escalonamento = escalonamento_cortes / escalonamento_cortes_modelo;
+
 							IdCorteBenders idCorteBenders_sequencial = IdCorteBenders_Nenhum;
 							for (IdCorteBenders idCorteBenders = IdCorteBenders_1; idCorteBenders <= maiorIdCorteBenders; idCorteBenders++) {
 								if (vetorEstagio_aux.at(idEstagio).vetorCorteBenders.isInstanciado(idCorteBenders) && (idCorteBenders <= maximoIdCorteBenders)) {
@@ -4483,7 +4488,10 @@ void ModeloOtimizacao::importarCorteBenders(const TipoSubproblemaSolver a_TSS, D
 										vetorEstagio.at(idEstagio).vetorCorteBenders.add(corteBenders);
 
 									} // else if (!modelo_e_cortes_estados_identicos) {
-								}
+
+									vetorEstagio.at(idEstagio).vetorCorteBenders.at(idCorteBenders_sequencial).escalonar(fator_escalonamento);
+
+								} // if (vetorEstagio_aux.at(idEstagio).vetorCorteBenders.isInstanciado(idCorteBenders) && (idCorteBenders <= maximoIdCorteBenders)) {
 							} // for (IdCorteBenders idCorteBenders = IdCorteBenders_1; idCorteBenders <= maiorIdCorteBenders; idCorteBenders++) {
 
 							requestCorteBenders(a_idProcesso, idEstagio, a_diretorio_impressao_selecao_cortes, a_entradaSaidaDados);
@@ -4632,8 +4640,13 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 
 		IdRealizacao maiorIdRealizacao_corte = IdRealizacao_Nenhum;
 
+		const double escalonamento_cortes = getAtributo(estagio_final, AttComumEstagio_escalonamento_cortes, double());
+		const double escalonamento_cortes_futuro = getAtributo(idEstagio_futuro, AttComumEstagio_escalonamento_cortes, double());
+		const double fator_escalonamento = escalonamento_cortes_futuro / escalonamento_cortes;
+
 		for (IdCorteBenders idCorteBenders = IdCorteBenders_1; idCorteBenders <= maximoIdCorteBenders; idCorteBenders++) {
 			if (vetorEstagio.at(idEstagio_futuro).vetorCorteBenders.isInstanciado(idCorteBenders)) {
+				vetorEstagio.at(idEstagio_futuro).vetorCorteBenders.at(idCorteBenders).escalonar(fator_escalonamento);
 				const IdRealizacao idRealizacao = vetorEstagio.at(idEstagio_futuro).getIterador1Final(idCorteBenders, AttMatrizCorteBenders_coeficiente, IdRealizacao());
 				if (idRealizacao > maiorIdRealizacao_corte)
 					maiorIdRealizacao_corte = idRealizacao;
@@ -4663,7 +4676,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 			addVarDecisao_ZF(a_TSS, estagio_final, 0.0, vetorEstagio.at(estagio_final).getSolver(a_TSS)->getInfinito(), 0.0);
 
 			// Variável ZF em EquLinear_ZT
-			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, estagio_final), getEquLinear_ZT(a_TSS, estagio_final), -1.0);
+			vetorEstagio.at(estagio_final).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, estagio_final), getEquLinear_ZT(a_TSS, estagio_final), -escalonamento_cortes);
 
 			//criarRestricoesCorteBendersEmCustoFuturo(a_TSS, estagio_final);
 
@@ -4682,7 +4695,7 @@ void ModeloOtimizacao::importarCorteBenders_AcoplamentoPosEstudo(const TipoSubpr
 			}
 
 		} // if (getVarDecisao_ZFseExistir(estagio_final) == -1) {
-		 
+
 		const int numero_cortes = vetorEstagio.at(idEstagio_futuro).vetorCorteBenders.numObjetos();
 
 		// Todos os cortes são instanciados de maneira estática (maior performance)
@@ -5765,8 +5778,7 @@ bool ModeloOtimizacao::posOtimizacaoProblema(const TipoSubproblemaSolver a_TSS, 
 					vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->imprimirLP(a_diretorio + "//" + getString(a_TSS) + "//PL_" + getString(a_idEstagio) + "_" + getString(a_idCenario) + "_" + getString(a_idRealizacao));
 				}
 
-				const double valorObjetivo = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorObjetivo();
-				//const double valorObjetivo = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getDualObjValue();
+				const double valorObjetivo = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getValorObjetivoBound();
 
 				const double valorSolucaoInferior = vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->getSolucaoInferiorVarDinamica();
 

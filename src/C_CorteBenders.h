@@ -47,6 +47,8 @@ public:
 
 	void sequencializaOrdenacaoCorteDominante(const SmartEnupla<IdCorteBenders, IdCorteBenders> &a_mapeamento_cortes);
 
+	void escalonar(const double a_fator);
+
 };
 
 GET_STRING_FROM_CLASS(CorteBenders)

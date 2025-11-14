@@ -57,6 +57,8 @@ void ModeloOtimizacao::formularModeloOtimizacao(Dados& a_dados, EntradaSaidaDado
 				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_lambda_CVAR, a_dados.getElementoVetor(AttVetorDados_lambda_CVAR, idEstagio, double()));
 				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_alpha_CVAR, a_dados.getElementoVetor(AttVetorDados_alpha_CVAR, idEstagio, double()));
 
+				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_escalonamento_cortes, a_dados.getAtributo(AttComumDados_escalonamento_cortes, double()));
+
 				vetorEstagio.at(idEstagio).selecaoSolucaoProxy(a_dados.getElementoVetor(AttVetorDados_numero_aberturas_solucao_proxy, idEstagio, int()));
 
 				vetorEstagio.at(idEstagio).setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, getAtributo(AttComumModeloOtimizacao_selecao_cortes_nivel_dominancia, int()));
@@ -1709,8 +1711,10 @@ void ModeloOtimizacao::criarRestricoesCusto(const TipoSubproblemaSolver a_TSS, D
 						vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZI(a_TSS, a_idEstagio), posEquZT, -1.0);
 
 						// Variável ZF
-						if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1)
-							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio), posEquZT, -1.0);
+						if (getVarDecisao_ZFseExistir(a_TSS, a_idEstagio) > -1) {
+							const IdEstagio idEstagio_seguinte = IdEstagio(a_idEstagio + 1);
+							vetorEstagio.at(a_idEstagio).getSolver(a_TSS)->setCofRestricao(getVarDecisao_ZF(a_TSS, a_idEstagio), posEquZT, -getAtributo(idEstagio_seguinte, AttComumEstagio_escalonamento_cortes, double()));
+						}
 
 					} // if (posEquZT < 0) {
 
