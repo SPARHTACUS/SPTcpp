@@ -15,6 +15,7 @@
 	  m(Estagio,  AttComum,                       idEstagio,    IdEstagio,         min,          max,           min,      sim) \
 	  m(Estagio,  AttComum,                     tipo_solver,   TipoSolver,         min,          max,           min,      nao) \
 	  m(Estagio,  AttComum,              periodo_otimizacao,      Periodo,         min,          max,           min,      sim) \
+	  m(Estagio,  AttComum,            escalonamento_cortes,       double,           1,          max,             1,      sim) \
 	  m(Estagio,  AttComum,                     lambda_CVAR,       double,           0,            1,             0,      sim) \
 	  m(Estagio,  AttComum,                      alpha_CVAR,       double,           0,            1,             0,      sim) \
 	  m(Estagio,  AttComum,               maiorIdRealizacao, IdRealizacao,         min,          max,           min,      nao) \

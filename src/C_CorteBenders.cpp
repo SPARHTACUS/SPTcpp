@@ -87,3 +87,32 @@ void CorteBenders::sequencializaOrdenacaoCorteDominante(const SmartEnupla<IdCort
 	catch (const std::exception& erro) { throw std::invalid_argument("CorteBenders::sequencializaOrdenacaoCorteDominante(): \n" + std::string(erro.what())); }
 
 } // void CorteBenders::sequencializaOrdenacaoCorteDominante(const SmartEnupla<IdCorteBenders, IdCorteBenders> &a_mapeamento_cortes) {
+
+void CorteBenders::escalonar(const double a_fator){
+
+	try{
+
+		if (a_fator == 1.0)
+			return;
+
+		const IdRealizacao menorIdRealizacao = getIterador1Inicial(AttMatrizCorteBenders_coeficiente, IdRealizacao());
+		const IdRealizacao maiorIdRealizacao = getIterador1Final(AttMatrizCorteBenders_coeficiente, IdRealizacao());
+
+		const IdVariavelEstado maiorIdVariavelEstado = getIterador2Final(AttMatrizCorteBenders_coeficiente, menorIdRealizacao, IdVariavelEstado());
+
+		for (IdRealizacao idRealizacao = menorIdRealizacao; idRealizacao <= maiorIdRealizacao; idRealizacao++) {
+
+			for (IdVariavelEstado idVar = IdVariavelEstado_1; idVar <= maiorIdVariavelEstado; idVar++) {
+				const double coeficiente = getElementoMatriz(AttMatrizCorteBenders_coeficiente, idRealizacao, idVar, double());
+				setElemento(AttMatrizCorteBenders_coeficiente, idRealizacao, idVar, coeficiente * a_fator);
+			}
+
+			const double rhs = getElementoVetor(AttVetorCorteBenders_rhs, idRealizacao, double());
+			setElemento(AttVetorCorteBenders_rhs, idRealizacao, rhs * a_fator);
+
+		}
+
+	} // try
+	catch (const std::exception& erro) { throw std::invalid_argument("CorteBenders::escalonar(" + getString(a_fator) + "): \n" + std::string(erro.what())); }
+
+}

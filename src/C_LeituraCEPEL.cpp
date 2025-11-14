@@ -5469,6 +5469,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 			estagio_pos_estudo.setAtributo(AttComumEstagio_idEstagio, idEstagio_pos_estudo);
 			estagio_pos_estudo.setAtributo(AttComumEstagio_selecao_cortes_nivel_dominancia, 0);
 			estagio_pos_estudo.setAtributo(AttComumEstagio_cortes_multiplos, 0);
+			estagio_pos_estudo.setAtributo(AttComumEstagio_escalonamento_cortes, 1);
 
 			const Periodo periodo_pos_estudo = Periodo("M", horizonte_tendencia_mais_processo_estocastico_MENSAL.getIteradorFinal() + 1);
 			estagio_pos_estudo.setAtributo(AttComumEstagio_periodo_otimizacao, periodo_pos_estudo);
@@ -6224,7 +6225,7 @@ void LeituraCEPEL::leitura_cortes_NEWAVE(Dados& a_dados, const SmartEnupla<Perio
 
 
 			entradaSaidaDados.setAppendArquivo(false);
-			entradaSaidaDados.imprimirArquivoCSV_AttComum("estagio.csv", estagio_pos_estudo, std::vector<AttComumEstagio>{ AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao, AttComumEstagio_selecao_cortes_nivel_dominancia, AttComumEstagio_cortes_multiplos, AttComumEstagio_alpha_CVAR, AttComumEstagio_lambda_CVAR});
+			entradaSaidaDados.imprimirArquivoCSV_AttComum("estagio.csv", estagio_pos_estudo, std::vector<AttComumEstagio>{ AttComumEstagio_idEstagio, AttComumEstagio_periodo_otimizacao, AttComumEstagio_selecao_cortes_nivel_dominancia, AttComumEstagio_cortes_multiplos, AttComumEstagio_escalonamento_cortes, AttComumEstagio_alpha_CVAR, AttComumEstagio_lambda_CVAR});
 			entradaSaidaDados.imprimirArquivoCSV_AttComum("estado.csv", IdVariavelEstado_Nenhum, estagio_pos_estudo);
 			entradaSaidaDados.imprimirArquivoCSV_AttVetor("corteBenders_rhs.csv", IdCorteBenders_Nenhum, estagio_pos_estudo, AttVetorCorteBenders_rhs);
 			entradaSaidaDados.imprimirArquivoCSV_AttMatriz("corteBenders_coeficientes.csv", IdCorteBenders_Nenhum, estagio_pos_estudo, AttMatrizCorteBenders_coeficiente);
